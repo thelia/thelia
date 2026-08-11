@@ -28,6 +28,15 @@
   {loop name="product.seo.meta" type="product" id=$product_id limit="1" with_prev_next_info="1"}
   {include file="includes/meta-seo.html"}
   {/loop}
+
+  {* Share meta *}
+  {loop name="image.product.meta" type="image" limit="1" product=$product_id width="600" height="600" resize_mode="crop"}
+    <meta property="og:image" content="{$IMAGE_URL nofilter}" />
+    <meta property="og:image:secure_url" content="{$IMAGE_URL nofilter}" />
+    <meta property="og:image:width" content="600" />
+    <meta property="og:image:height" content="600" />
+    <meta name="twitter:image" content="{$IMAGE_URL nofilter}" />
+  {/loop}
 {/block}
 
 {* Breadcrumb *}
