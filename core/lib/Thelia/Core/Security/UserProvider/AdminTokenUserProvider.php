@@ -20,7 +20,7 @@ use Thelia\Model\AdminQuery;
 
 class AdminTokenUserProvider extends TokenUserProvider
 {
-    public function getUser(array $key): UserInterface
+    public function getUser(array $key): ?UserInterface
     {
         if (null === $admin = AdminQuery::create()
             ->filterByLogin($key['username'], Criteria::EQUAL)
