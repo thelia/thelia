@@ -226,6 +226,10 @@ class Module extends BaseAction implements EventSubscriberInterface
                             'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
                             ['%name%' => $module->getCode()]
                         )
+                        .' '
+                        .Translator::getInstance()->trans(
+                            'To stop offering it to your customers, deactivate the module instead of deleting it.'
+                        )
                     );
                 }
 

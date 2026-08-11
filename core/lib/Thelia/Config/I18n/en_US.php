@@ -667,6 +667,7 @@ return [
     'Title *' => 'Title *',
     'Title ID not found' => 'Title ID not found',
     'To activate module %name, the following modules should be activated first: %modules' => 'To activate module %name, the following modules should be activated first: %modules',
+    'To stop offering it to your customers, deactivate the module instead of deleting it.' => 'To stop offering it to your customers, deactivate the module instead of deleting it.',
     'Tools' => 'Tools',
     'Translations' => 'Translations',
     'Change short title for' => 'Change short title for',
