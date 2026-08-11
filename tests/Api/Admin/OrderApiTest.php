@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\ApiTestCase;
 
@@ -67,6 +68,35 @@ final class OrderApiTest extends ApiTestCase
         ], $token, 'merge-patch+json');
 
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testGetOrderProductExposesVirtualDocumentFileName(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order();
+
+        $orderProduct = new OrderProduct();
+        $orderProduct
+            ->setOrderId($order->getId())
+            ->setProductRef('REF-VIRTUAL')
+            ->setProductSaleElementsRef('REF-VIRTUAL-PSE')
+            ->setTitle('Virtual product')
+            ->setQuantity(1.0)
+            ->setPrice('10.000000')
+            ->setPromoPrice('0.000000')
+            ->setWasNew(0)
+            ->setWasInPromo(0)
+            ->setVirtual(1)
+            ->setVirtualDocument('user-guide.pdf')
+            ->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest('GET', '/api/admin/order_products/'.$orderProduct->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertSame('user-guide.pdf', $data['virtualDocument']);
     }
 
     public function testGetOrderReturns404ForNonExistent(): void
