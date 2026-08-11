@@ -34,14 +34,14 @@ class TokenProvider
         protected TranslatorInterface $translator,
         string $tokenName = null
     ) {
-        $this->setSessionFromRequest();
         $this->tokenName = $tokenName;
-
-        if (null !== $this->session && null !== $this->tokenName) {
-            $this->token = $this->session->get($this->tokenName);
-        }
+        $this->token = $this->getStoredToken();
     }
 
+    /**
+     * The session is not necessarily available when this service is instantiated, so it has
+     * to be looked up again on each access.
+     */
     private function setSessionFromRequest(): void
     {
         $currentRequest = $this->requestStack?->getCurrentRequest();
@@ -53,19 +53,38 @@ class TokenProvider
         }
     }
 
+    private function getStoredToken(): ?string
+    {
+        $this->setSessionFromRequest();
+
+        if (null === $this->session || null === $this->tokenName) {
+            return null;
+        }
+
+        return $this->session->get($this->tokenName);
+    }
+
+    private function storeToken(string $token): void
+    {
+        $this->setSessionFromRequest();
+
+        $this->token = $token;
+
+        if (null !== $this->tokenName) {
+            $this->session?->set($this->tokenName, $token);
+        }
+    }
+
     /**
      * @throws RandomException
      */
     public function assignToken(): ?string
     {
-        if (null !== $this->token) {
-            return $this->token;
+        if (null !== $storedToken = $this->getStoredToken()) {
+            return $this->token = $storedToken;
         }
 
-        $this->token = $this->getToken();
-        if (null !== $this->tokenName) {
-            $this->session?->set($this->tokenName, $this->token);
-        }
+        $this->storeToken($this->token ?? $this->getToken());
 
         return $this->token;
     }
@@ -75,6 +94,8 @@ class TokenProvider
      */
     public function checkToken(?string $entryValue): bool
     {
+        $this->token = $this->getStoredToken() ?? $this->token;
+
         if (null === $this->token) {
             throw new TokenAuthenticationException(
                 'Tried to check a token without assigning it before'
@@ -89,10 +110,12 @@ class TokenProvider
         return true;
     }
 
+    /**
+     * @throws RandomException
+     */
     protected function refreshToken(): void
     {
-        $this->token = null;
-        $this->assignToken();
+        $this->storeToken($this->getToken());
     }
 
     /**
