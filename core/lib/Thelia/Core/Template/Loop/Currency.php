@@ -163,6 +163,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('LOCALE', $this->locale)
                 ->set('NAME', $currency->getVirtualColumn('i18n_NAME'))
                 ->set('ISOCODE', $currency->getCode())
+                ->set('ISOCODE_NUMERIC', $currency->getIsocodeNumeric())
                 ->set('SYMBOL', $currency->getSymbol())
                 ->set('FORMAT', $currency->getFormat())
                 ->set('RATE', $currency->getRate())

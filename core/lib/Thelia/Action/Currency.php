@@ -55,6 +55,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setFormat($event->getFormat())
             ->setRate($event->getRate())
             ->setCode(strtoupper($event->getCode()))
+            ->setIsocodeNumeric($event->getIsocodeNumeric())
             ->setByDefault($isDefault)
             ->save()
         ;
@@ -76,6 +77,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setFormat($event->getFormat())
                 ->setRate($event->getRate())
                 ->setCode(strtoupper($event->getCode()))
+                ->setIsocodeNumeric($event->getIsocodeNumeric())
 
                 ->save();
 

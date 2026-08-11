@@ -299,6 +299,14 @@
             </div>
         {/form_field}
 
+        {form_field field='isocode_numeric'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control" value="{$value}" title="{intl l='ISO 4217 numeric code'}" placeholder="{intl l='Numeric code'}">
+                <span class="help-block"><a href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">{intl l='More information about ISO 4217'}</a></span>
+            </div>
+        {/form_field}
+
         {form_field field='symbol'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>

@@ -72,6 +72,18 @@
         		                                    </div>
         		                               	{/form_field}
 
+        										{form_field field='isocode_numeric'}
+        		                                    <div class="form-group {if $error}has-error{/if}">
+															<label for="{$label_attr.for|default:null}" class="control-label">
+																{$label}{if $required} *{/if}
+															</label>
+                                                        <input type="text" id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder|default:null}" class="form-control">
+                                                        <span class="help-block">
+                                                            <a title="{$label_attr.help}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">{$label_attr.help}</a>
+                                                        </span>
+        		                                    </div>
+        		                               	{/form_field}
+
         	                                </div>
 
                                             <div class="col-md-6">
