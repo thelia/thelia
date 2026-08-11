@@ -251,6 +251,32 @@ foreach ($themes as $type => $name) {
 
 $commands = [];
 
+// The API login endpoints sign their tokens with the LexikJWTAuthenticationBundle
+// key pair. composer.json only generates it on post-install-cmd, so an install
+// whose composer step ran with --no-scripts, or ended on a "composer update"
+// (post-update-cmd only clears the cache), starts without keys and every call to
+// /api/admin/login answers 500. Generating the pair here makes bin/install
+// self-sufficient, whatever the composer flow was.
+$jwtPrivateKeyPath = resolveJwtKeyPath('JWT_SECRET_KEY', 'private.pem');
+$jwtPublicKeyPath = resolveJwtKeyPath('JWT_PUBLIC_KEY', 'public.pem');
+
+if (!is_file($jwtPrivateKeyPath) || !is_file($jwtPublicKeyPath)) {
+    // lexik:jwt:generate-keypair skips as soon as ONE of the two files exists, so
+    // --skip-if-exists would leave a half pair broken forever: an incomplete pair
+    // is overwritten instead. A lone private key signs tokens nobody can verify,
+    // there is nothing to preserve.
+    $isHalfKeyPair = is_file($jwtPrivateKeyPath) || is_file($jwtPublicKeyPath);
+
+    $commands[] = [
+        'label' => 'Generating JWT key pair',
+        'input' => [
+            'command' => 'lexik:jwt:generate-keypair',
+            ($isHalfKeyPair ? '--overwrite' : '--skip-if-exists') => true,
+            '--no-interaction' => true,
+        ],
+    ];
+}
+
 foreach ($themes as $type => $name) {
     $name = trim($name);
     if ('' !== $name) {
@@ -340,6 +366,11 @@ foreach ($commands as $cmd) {
 
 restore_error_handler();
 
+if (!is_file($jwtPrivateKeyPath) || !is_file($jwtPublicKeyPath)) {
+    fwrite(STDERR, "  ERROR: JWT key pair missing ({$jwtPrivateKeyPath}, {$jwtPublicKeyPath}): the API login endpoints would answer 500. Run \"php bin/console lexik:jwt:generate-keypair --overwrite\".\n");
+    ++$errors;
+}
+
 // ── Result ───────────────────────────────────────────────────────────
 
 if ($errors > 0) {
@@ -350,6 +381,23 @@ if ($errors > 0) {
 echo "\nThelia installed successfully.\n";
 
 // ─── Helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Resolve a JWT key file path from the environment, without booting the kernel.
+ *
+ * The dotenv values hold the %kernel.project_dir% placeholder, which only the
+ * container resolves, hence the manual substitution.
+ */
+function resolveJwtKeyPath(string $envName, string $defaultFileName): string
+{
+    $path = (string) ($_SERVER[$envName] ?? '');
+
+    if ('' === $path) {
+        $path = '%kernel.project_dir%/config/jwt/'.$defaultFileName;
+    }
+
+    return str_replace('%kernel.project_dir%/', THELIA_ROOT, $path);
+}
 
 /**
  * Drop bundles whose template is shipped with another package than the one selected.
