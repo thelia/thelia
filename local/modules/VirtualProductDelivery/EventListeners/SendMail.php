@@ -12,14 +12,12 @@
 
 namespace VirtualProductDelivery\EventListeners;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\OrderProductQuery;
 use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
 
 /**
@@ -45,7 +43,9 @@ class SendMail implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        if ($order->hasVirtualProduct() && $order->isPaid(true)) {
+        // A virtual product without a virtual document has nothing to download, so there is
+        // no download notification to send: do not dispatch the event at all in that case.
+        if ($order->hasVirtualProductWithDocument() && $order->isPaid(true)) {
             $this->eventDispatcher->dispatch(
                 $event,
                 VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE
@@ -62,32 +62,30 @@ class SendMail implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        // Be sure that we have a document to download
-        $virtualProductCount = OrderProductQuery::create()
-            ->filterByOrderId($order->getId())
-            ->filterByVirtual(true)
-            ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
-            ->count();
-
-        if ($virtualProductCount > 0) {
-            $customer = $order->getCustomer();
-
-            $this->mailer->sendEmailToCustomer(
-                'mail_virtualproduct',
-                $customer,
-                [
-                    'customer_id' => $customer->getId(),
-                    'order_id' => $order->getId(),
-                    'order_ref' => $order->getRef(),
-                    'order_date' => $order->getCreatedAt(),
-                    'update_date' => $order->getUpdatedAt(),
-                ]
+        // The event may also be dispatched by a third party: be sure that we have a document
+        // to download. Having none is a legitimate case, not something to warn about.
+        if (!$order->hasVirtualProductWithDocument()) {
+            Tlog::getInstance()->debug(
+                'Virtual product download message not sent to customer: order '
+                .$order->getRef().' has no document to download'
             );
-        } else {
-            Tlog::getInstance()->warning(
-                "Virtual product download message not sent to customer: there's nothing to downnload"
-            );
+
+            return;
         }
+
+        $customer = $order->getCustomer();
+
+        $this->mailer->sendEmailToCustomer(
+            'mail_virtualproduct',
+            $customer,
+            [
+                'customer_id' => $customer->getId(),
+                'order_id' => $order->getId(),
+                'order_ref' => $order->getRef(),
+                'order_date' => $order->getCreatedAt(),
+                'update_date' => $order->getUpdatedAt(),
+            ]
+        );
     }
 
     /**
