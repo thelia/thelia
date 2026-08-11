@@ -399,6 +399,7 @@ return [
     'Phone' => 'Téléphone',
     'Placed order' => 'Commande terminée',
     'Please accept the Terms and conditions in order to register.' => 'Veuillez accepter les termes et conditions pour vous inscrire.',
+    'Please check the parameters of this condition: some of them are missing or invalid.' => 'Merci de vérifier les paramètres de cette condition : certains sont manquants ou invalides.',
     'Please check your input: %error' => 'Merci de vérifier votre saisie: %error',
     'Please enter a valid email address' => 'Veuillez saisir une adresse e-mail valide',
     'Please enter your email address' => 'Renseignez votre adresse e-mail',
