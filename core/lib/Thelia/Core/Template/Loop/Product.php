@@ -25,7 +25,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\FeatureAvI18nTableMap;
@@ -860,10 +859,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
 
             if (null !== $min_price) {
-                if (false === ConfigQuery::useTaxFreeAmounts()) {
-                    // @todo
-                }
-
                 $isPSELeftJoinList[] = 'is_min_price';
                 $isProductPriceFirstLeftJoin = ['is_min_price', 'min_price_data'];
 
@@ -1041,18 +1036,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
 
             if (null !== $min_price) {
-                if (false === ConfigQuery::useTaxFreeAmounts()) {
-                    // @todo
-                }
-
                 $search->where($priceToCompareAsSQL.'>=?', $min_price, \PDO::PARAM_STR);
             }
 
             if (null !== $max_price) {
-                if (false === ConfigQuery::useTaxFreeAmounts()) {
-                    // @todo
-                }
-
                 $search->where($priceToCompareAsSQL.'<=?', $max_price, \PDO::PARAM_STR);
             }
         }
