@@ -23,7 +23,7 @@ CREATE TABLE `carousel`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
 -- carousel_i18n
@@ -45,7 +45,7 @@ CREATE TABLE `carousel_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `carousel` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

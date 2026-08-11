@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="TheliaMain" namespace="Carousel\Model">
+    <vendor type="mysql">
+        <parameter name="Engine" value="InnoDB"/>
+        <parameter name="Charset" value="utf8"/>
+    </vendor>
     <!--
     See propel documentation on http://propelorm.org for all information about schema file
     -->
