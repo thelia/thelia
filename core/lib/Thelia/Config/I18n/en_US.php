@@ -570,6 +570,7 @@ return [
     'The email address "%mail" was not found.' => 'The email address "%mail" was not found.',
     'The extension "%extension" is not allowed' => 'The extension "%extension" is not allowed',
     'The file %path has been successfully downloaded' => 'The file %path has been successfully downloaded',
+    'The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.' => 'The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.',
     'The following columns are missing: %columns' => 'The following columns are missing: %columns',
     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.' => 'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',
     'The language "%id" doesn\'t exist' => 'The language "%id" doesn\'t exist',
