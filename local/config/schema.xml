@@ -618,6 +618,7 @@
     <column description="delivery reference - usually use to identify a delivery progress on a distant delivery tracker website" name="delivery_ref" size="100" type="VARCHAR" />
     <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
     <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" description="the customer discount rate, as a percentage, already included in the order products prices" name="customer_discount_rate" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="postage" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />

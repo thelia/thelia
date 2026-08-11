@@ -366,6 +366,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('DISCOUNT', $order->getDiscount())
                 ->set('DISCOUNT_WITHOUT_TAX', $discountWithoutTax)
                 ->set('DISCOUNT_TAX', $order->getDiscount() - $discountWithoutTax)
+                ->set('CUSTOMER_DISCOUNT_RATE', (float) $order->getCustomerDiscountRate())
                 ->set('TOTAL_ITEMS_TAX', $itemsTax)
                 ->set('TOTAL_ITEMS_AMOUNT', $itemsAmount - $itemsTax)
                 ->set('TOTAL_TAXED_ITEMS_AMOUNT', $itemsAmount)

@@ -17,6 +17,7 @@ namespace Thelia\Domain\Order\Service;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order as ModelOrder;
@@ -48,7 +49,21 @@ readonly class OrderFactory
         $order->setLangId($language->getId());
         $order->setCartId($cart->getId());
         $order->setDiscount($cart->getDiscount());
+        $order->setCustomerDiscountRate($this->resolveCustomerDiscountRate($customer));
 
         return $order;
+    }
+
+    /**
+     * The customer discount is baked into the cart item prices, so the rate itself
+     * has to be copied on the order to stay readable once the customer changes it.
+     */
+    private function resolveCustomerDiscountRate(UserInterface $customer): string
+    {
+        if (!$customer instanceof CustomerModel) {
+            return '0.000000';
+        }
+
+        return $customer->getDiscount() ?? '0.000000';
     }
 }
