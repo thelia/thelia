@@ -328,7 +328,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 Calculator::getUntaxedOrderDiscount($order)
             ;
 
-            $hasVirtualDownload = $order->hasVirtualProduct();
+            $hasVirtualDownload = $order->hasVirtualProductWithDocument();
 
             $loopResultRow = new LoopResultRow($order);
             $loopResultRow

@@ -335,9 +335,11 @@ class Order extends BaseOrder
     }
 
     /**
-     * Check if the current order contains at less 1 virtual product with a file to download.
+     * Check if the current order contains at least 1 virtual product, whether it has a document to
+     * download or not. Virtual delivery modules that do not rely on the core document mechanism use
+     * this method, so its scope is intentionally broad.
      *
-     * @return bool true if this order have at less 1 file to download, false otherwise
+     * @return bool true if this order has at least 1 virtual product, false otherwise
      */
     public function hasVirtualProduct()
     {
@@ -348,6 +350,23 @@ class Order extends BaseOrder
         ;
 
         return $virtualProductCount !== 0;
+    }
+
+    /**
+     * Check if the current order contains at least 1 virtual product having a document to download.
+     *
+     * @return bool true if this order has at least 1 file to download, false otherwise
+     */
+    public function hasVirtualProductWithDocument()
+    {
+        $downloadableProductCount = OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->filterByVirtual(1, Criteria::EQUAL)
+            ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
+            ->count()
+        ;
+
+        return $downloadableProductCount !== 0;
     }
 
     /**
