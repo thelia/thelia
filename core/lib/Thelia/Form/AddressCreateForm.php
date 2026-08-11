@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Form;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
@@ -248,6 +249,7 @@ class AddressCreateForm extends FirewallForm
             ->filterByLocale($this->getLocale())
             ->withColumn(StateI18nTableMap::COL_TITLE, 'title')
             ->endUse()
+            ->orderBy('title', Criteria::ASC)
             ->find();
 
         $statesChoices = [];
