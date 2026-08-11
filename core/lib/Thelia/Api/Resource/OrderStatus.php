@@ -114,6 +114,17 @@ class OrderStatus extends AbstractTranslatableResource
     ])]
     public string $code;
 
+    /**
+     * The canonical code this status stands for, one of \Thelia\Model\OrderStatus::CANONICAL_CODES,
+     * or null when the status stands for itself.
+     */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+    ])]
+    public ?string $equivalentCode = null;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -166,6 +177,18 @@ class OrderStatus extends AbstractTranslatableResource
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getEquivalentCode(): ?string
+    {
+        return $this->equivalentCode;
+    }
+
+    public function setEquivalentCode(?string $equivalentCode): self
+    {
+        $this->equivalentCode = $equivalentCode;
 
         return $this;
     }

@@ -18,6 +18,7 @@ return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => '"%param" parameter cannot be empty in loop type: %type, name: %name',
     '"%param" parameter is missing in loop type: %type, name: %name' => '"%param" parameter is missing in loop type: %type, name: %name',
     '#000000' => '#000000',
+    '%code is not a canonical order status code.' => '%code is not a canonical order status code.',
     '%module (version: %version)' => '%module (version: %version)',
     '%n for number, %c for the currency code, %s for the currency symbol' => '%n for number, %c for the currency code, %s for the currency symbol',
     '%obj SEO modification' => '%obj SEO modification',

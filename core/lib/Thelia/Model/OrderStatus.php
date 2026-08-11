@@ -29,6 +29,18 @@ class OrderStatus extends BaseOrderStatus
     public const CODE_REFUNDED = 'refunded';
 
     /**
+     * The canonical status codes, the only values a custom status may declare as its equivalence.
+     */
+    public const CANONICAL_CODES = [
+        self::CODE_NOT_PAID,
+        self::CODE_PAID,
+        self::CODE_PROCESSING,
+        self::CODE_SENT,
+        self::CODE_CANCELED,
+        self::CODE_REFUNDED,
+    ];
+
+    /**
      * Check if the current status is NOT PAID.
      *
      * @param bool $exact if true, the method will check if the current status is exactly OrderStatus::CODE_NOT_PAID.
@@ -116,8 +128,24 @@ class OrderStatus extends BaseOrderStatus
     }
 
     /**
+     * The canonical code this status stands for.
+     *
+     * A protected (native) status always stands for its own code. A custom status stands for the
+     * canonical code it declares as its equivalence, or for its own code when it declares none.
+     */
+    public function getEffectiveCode(): string
+    {
+        if ($this->getProtectedStatus()) {
+            return $this->getCode();
+        }
+
+        return $this->getEquivalentCode() ?: $this->getCode();
+    }
+
+    /**
      * Check if the current status is $statusCode or, if $statusCode is an array, if the current
-     * status is in the $statusCode array.
+     * status is in the $statusCode array. The comparison is made on the effective code, so a
+     * custom status declaring an equivalence answers for the canonical code it stands for.
      *
      * @param string|array $statusCode the status code, one of OrderStatus::CODE_xxx constants
      *
@@ -125,10 +153,12 @@ class OrderStatus extends BaseOrderStatus
      */
     public function hasStatusHelper(string|array $statusCode): bool
     {
+        $effectiveCode = $this->getEffectiveCode();
+
         if (\is_array($statusCode)) {
-            return \in_array($this->getCode(), $statusCode, true);
+            return \in_array($effectiveCode, $statusCode, true);
         }
 
-        return $this->getCode() === $statusCode;
+        return $effectiveCode === $statusCode;
     }
 }

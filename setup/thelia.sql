@@ -905,6 +905,7 @@ CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `equivalent_code` VARCHAR(45),
     `color` CHAR(7),
     `position` INTEGER,
     `protected_status` TINYINT(1) DEFAULT 0,

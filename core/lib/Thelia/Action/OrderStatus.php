@@ -80,6 +80,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     {
         $orderStatus
             ->setCode($orderStatus->getProtectedStatus() ? $orderStatus->getCode() : $event->getCode())
+            ->setEquivalentCode($this->resolveEquivalentCode($event, $orderStatus))
             ->setColor($event->getColor())
             // i18n
             ->setLocale($event->getLocale())
@@ -98,6 +99,29 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $orderStatus->save();
 
         $event->setOrderStatus($orderStatus);
+    }
+
+    /**
+     * A protected (native) status stands for itself and never carries an equivalence. A custom one
+     * may only stand for a canonical code.
+     */
+    protected function resolveEquivalentCode(OrderStatusEvent $event, OrderStatusModel $orderStatus): ?string
+    {
+        if ($orderStatus->getProtectedStatus()) {
+            return null;
+        }
+
+        $equivalentCode = $event->getEquivalentCode();
+
+        if (null === $equivalentCode || '' === $equivalentCode) {
+            return null;
+        }
+
+        if (!\in_array($equivalentCode, OrderStatusModel::CANONICAL_CODES, true)) {
+            throw new \InvalidArgumentException(Translator::getInstance()->trans('%code is not a canonical order status code.', ['%code' => $equivalentCode]));
+        }
+
+        return $equivalentCode;
     }
 
     /**
