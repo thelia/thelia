@@ -323,6 +323,8 @@ class ModuleController extends AbstractCrudController
 
         if (false !== $message) {
             $response = $this->render('modules', [
+                'module_order' => $this->getCurrentListOrder(),
+                'module_errors' => $this->moduleErrors,
                 'error_message' => $message,
             ]);
         } else {
@@ -387,7 +389,7 @@ class ModuleController extends AbstractCrudController
             ->addForm($moduleInstall)
             ->setGeneralError($message);
 
-        return $this->render('modules');
+        return $this->renderListTemplate($this->getCurrentListOrder());
     }
 
     public function informationAction($module_id)

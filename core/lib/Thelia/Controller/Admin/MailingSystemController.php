@@ -108,7 +108,7 @@ class MailingSystemController extends BaseAdminController
             );
 
             // At this point, the form has errors, and should be redisplayed.
-            $response = $this->render('mailing-system');
+            $response = $this->render('mailing-system', ['editDisabled' => ConfigQuery::isSmtpInEnv()]);
         }
 
         return $response;
