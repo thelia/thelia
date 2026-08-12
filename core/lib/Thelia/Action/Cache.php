@@ -30,6 +30,14 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Removing the cache directory takes the compiled container's lazy service
+     * files with it, so any listener still waiting to be loaded from the
+     * container would fail to load. The deferred clear therefore runs after
+     * every other terminate listener.
+     */
+    private const TERMINATE_PRIORITY = \PHP_INT_MIN;
+
     /** @var CacheEvent[] */
     protected array $onTerminateCacheClearEvents = [];
 
@@ -98,8 +106,8 @@ class Cache extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
-            KernelEvents::TERMINATE => ['onTerminate', 128],
-            ConsoleEvents::TERMINATE => ['onTerminate', 128],
+            KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
         ];
     }
 }

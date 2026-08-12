@@ -16,9 +16,13 @@ namespace Thelia\Tests\Unit\Action;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Cache;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\TheliaEvents;
 
 /**
  * The combined Propel schema depends on the active modules and on their
@@ -87,6 +91,37 @@ final class CacheTest extends TestCase
 
         self::assertDirectoryDoesNotExist($this->clearedDir);
         self::assertDirectoryDoesNotExist($this->propelSchemaDir);
+    }
+
+    /**
+     * Removing the cache directory takes the compiled container's lazy service
+     * files with it. Outside debug mode listeners are loaded from the container
+     * one at a time, as they are called, so a listener that has not run yet
+     * would fail to load.
+     */
+    public function testTheDeferredClearRunsAfterTheOtherTerminateListeners(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+
+        $clearedDirWasStillThere = null;
+        $dispatcher->addListener(
+            ConsoleEvents::TERMINATE,
+            function () use (&$clearedDirWasStillThere): void {
+                $clearedDirWasStillThere = is_dir($this->clearedDir);
+            },
+            // Symfony's own lowest priority on that event (the console profiler).
+            -4096,
+        );
+
+        $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+
+        self::assertDirectoryExists($this->clearedDir);
+
+        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+
+        self::assertTrue($clearedDirWasStillThere, 'The cache directory must outlive every other terminate listener.');
+        self::assertDirectoryDoesNotExist($this->clearedDir);
     }
 
     private function action(): Cache

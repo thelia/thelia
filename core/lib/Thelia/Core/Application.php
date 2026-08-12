@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Command\Install;
 
 /**
@@ -55,6 +56,19 @@ class Application extends BaseApplication
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $this->registerCommands();
+
+        // Without a dispatcher, Symfony's console runs the command and returns
+        // without emitting console.command, console.error or console.terminate.
+        // Whatever the application defers to the end of the process then never
+        // runs: a cache clear queued by a module activation, for one, so the
+        // command reports success while leaving a container that still
+        // describes the previous state.
+        $container = $this->kernel->getContainer();
+        $dispatcher = $container->has('event_dispatcher') ? $container->get('event_dispatcher') : null;
+
+        if ($dispatcher instanceof EventDispatcherInterface) {
+            $this->setDispatcher($dispatcher);
+        }
 
         return parent::doRun($input, $output);
     }
