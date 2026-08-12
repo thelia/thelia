@@ -20,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\Exception\ProcessFileException;
+use Thelia\Core\File\FileConfiguration;
 use Thelia\Core\File\FileManager;
 use Thelia\Model\Lang;
 
@@ -32,6 +33,10 @@ readonly class FileProcessorService
     }
 
     /**
+     * @param array<string, list<string>>|null $validMimeTypes accepted mime types, mapped to the extensions they may carry.
+     *                                                         Null applies the shop policy for $objectType.
+     * @param list<string>|null                $extBlackList   refused extensions. Null applies the shop policy for $objectType.
+     *
      * @throws ProcessFileException If file processing fails
      */
     public function processFile(
@@ -40,79 +45,12 @@ readonly class FileProcessorService
         int $parentId,
         string $parentType,
         string $objectType,
-        array $validMimeTypes = [],
-        array $extBlackList = [],
+        ?array $validMimeTypes = null,
+        ?array $extBlackList = null,
         string $moduleRight = 'thelia',
     ): FileCreateOrUpdateEvent {
-        // Validate if file is too big
-        if (1 === $fileBeingUploaded->getError()) {
-            $message = $this->translator->trans(
-                'File is too large, please retry with a file having a size less than %size%.',
-                ['%size%' => \ini_get('upload_max_filesize')],
-                'core',
-            );
-
-            throw new ProcessFileException($message, 403);
-        }
-
-        $message = null;
-        $realFileName = $fileBeingUploaded->getClientOriginalName();
-
-        if ([] !== $validMimeTypes) {
-            $mimeType = $fileBeingUploaded->getMimeType();
-
-            if (!isset($validMimeTypes[$mimeType])) {
-                $message = $this->translator->trans(
-                    'Only files having the following mime type are allowed: %types%',
-                    ['%types%' => implode(', ', array_keys($validMimeTypes))],
-                );
-            } else {
-                $regex = '#^(.+)\\.('.implode('|', $validMimeTypes[$mimeType]).')$#i';
-
-                if (!preg_match($regex, $realFileName)) {
-                    $message = $this->translator->trans(
-                        "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
-                        [
-                            '%mime' => $mimeType,
-                            '%ext' => $fileBeingUploaded->getClientOriginalExtension(),
-                        ],
-                    );
-                }
-            }
-        }
-
-        if ([] !== $extBlackList) {
-            $regex = '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
-
-            if (preg_match($regex, $realFileName)) {
-                $message = $this->translator->trans(
-                    'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
-                    [
-                        '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
-                    ],
-                );
-            }
-        }
-
-        // Defense in depth against double-extension bypasses (e.g. "shell.php.jpg"):
-        // reject any file whose name contains a server-executable segment, not just the
-        // terminal one. Applies to every upload, regardless of the caller's configuration.
-        if (null === $message && null !== ($dangerousExtension = $this->findExecutableExtension($realFileName))) {
-            $message = $this->translator->trans(
-                'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
-                [
-                    '%extension' => $dangerousExtension,
-                ],
-            );
-        }
-
-        if (null !== $message) {
-            throw new ProcessFileException($message, 415);
-        }
-
-        // Uploaded SVG files are served from the shop origin: strip any active content
-        // so they cannot be used for stored XSS (CWE-79).
-        $this->sanitizeSvgUpload($fileBeingUploaded);
+        $this->validateUpload($fileBeingUploaded, $objectType, $validMimeTypes, $extBlackList);
+        $this->sanitizeUpload($fileBeingUploaded);
 
         $fileModel = $this->fileManager->getModelInstance($objectType, $parentType);
 
@@ -141,6 +79,106 @@ readonly class FileProcessorService
         );
 
         return $fileCreateOrUpdateEvent;
+    }
+
+    /**
+     * Checks an uploaded file against the upload policy before anything is written.
+     *
+     * Callers that have their own policy pass it explicitly; the others get the shop
+     * policy for $objectType (see FileConfiguration). Whatever the policy says, a file
+     * name carrying a server-executable segment is always refused.
+     *
+     * @param array<string, list<string>>|null $validMimeTypes
+     * @param list<string>|null                $extBlackList
+     *
+     * @throws ProcessFileException when the file may not be uploaded
+     */
+    public function validateUpload(
+        UploadedFile $fileBeingUploaded,
+        string $objectType,
+        ?array $validMimeTypes = null,
+        ?array $extBlackList = null,
+    ): void {
+        // Validate if file is too big
+        if (\UPLOAD_ERR_INI_SIZE === $fileBeingUploaded->getError()) {
+            $message = $this->translator->trans(
+                'File is too large, please retry with a file having a size less than %size%.',
+                ['%size%' => \ini_get('upload_max_filesize')],
+                'core',
+            );
+
+            throw new ProcessFileException($message, 403);
+        }
+
+        $policy = FileConfiguration::getConfig($objectType);
+        $validMimeTypes ??= $policy['validMimeTypes'];
+        $extBlackList ??= $policy['extBlackList'];
+
+        $message = null;
+        $realFileName = $fileBeingUploaded->getClientOriginalName();
+
+        if ([] !== $validMimeTypes) {
+            $mimeType = $fileBeingUploaded->getMimeType();
+
+            if (!isset($validMimeTypes[$mimeType])) {
+                $message = $this->translator->trans(
+                    'Only files having the following mime type are allowed: %types%',
+                    ['%types%' => implode(', ', array_keys($validMimeTypes))],
+                );
+            } elseif ([] !== $validMimeTypes[$mimeType]) {
+                $regex = '#^(.+)\\.('.implode('|', $validMimeTypes[$mimeType]).')$#i';
+
+                if (!preg_match($regex, $realFileName)) {
+                    $message = $this->translator->trans(
+                        "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
+                        [
+                            '%mime' => $mimeType,
+                            '%ext' => $fileBeingUploaded->getClientOriginalExtension(),
+                        ],
+                    );
+                }
+            }
+        }
+
+        if (null === $message && [] !== $extBlackList) {
+            $regex = '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
+
+            if (preg_match($regex, $realFileName)) {
+                $message = $this->translator->trans(
+                    'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                    [
+                        '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
+                    ],
+                );
+            }
+        }
+
+        // Defense in depth against double-extension bypasses (e.g. "shell.php.jpg"):
+        // reject any file whose name contains a server-executable segment, not just the
+        // terminal one. Applies to every upload, regardless of the caller's configuration.
+        if (null === $message && null !== ($dangerousExtension = $this->findExecutableExtension($realFileName))) {
+            $message = $this->translator->trans(
+                'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                [
+                    '%extension' => $dangerousExtension,
+                ],
+            );
+        }
+
+        if (null !== $message) {
+            throw new ProcessFileException($message, 415);
+        }
+    }
+
+    /**
+     * Uploaded SVG files are served from the shop origin: strip any active content
+     * so they cannot be used for stored XSS (CWE-79). Other files are left untouched.
+     *
+     * @throws ProcessFileException when the file is declared as SVG but cannot be parsed
+     */
+    public function sanitizeUpload(UploadedFile $fileBeingUploaded): void
+    {
+        $this->sanitizeSvgUpload($fileBeingUploaded);
     }
 
     /**
