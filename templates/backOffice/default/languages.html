@@ -162,6 +162,10 @@
 
                     <div class="title title-without-tabs">{intl l="Using a domain or subdomain for each language"}</div>
 
+                    {flash type="lang-domain-activation"}
+                    <div class="alert alert-danger">{$MESSAGE}</div>
+                    {/flash}
+
                     {if $one_domain_per_lang != 0 && $languages_without_url != ''}
                         <div class="alert alert-warning">
                             {intl l="<strong>Warning</strong>, this setting is active but no domain is defined for: %languages. These languages are served from whichever domain the visitor arrived on." languages=$languages_without_url}
@@ -179,7 +183,7 @@
                                     <th>{$attr_list.url_title}</th>
                                     <td>
                                         <div class="form-group {if $error}has-error{/if}">
-                                        <input type="text" class="form-control" name="{$name}" value="{$value}" placeholder="http://www.domain.com" {if $one_domain_per_lang == 0}readonly{/if}>
+                                        <input type="text" class="form-control" name="{$name}" value="{$value}" placeholder="http://www.domain.com">
                                         </div>
                                     </td>
                                 </tr>
@@ -188,7 +192,11 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td></td>
+                                    <td>
+                                        {if $one_domain_per_lang == 0}
+                                            <span class="help-block">{intl l="Save a domain for every language served in front office, then activate."}</span>
+                                        {/if}
+                                    </td>
                                     <td class="text-right">
                                         {if $one_domain_per_lang == 0}
                                             <a href="{url path="/admin/configuration/languages/domain/activate"}" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="activate"}</a>
@@ -196,7 +204,7 @@
                                             <a href="{url path="/admin/configuration/languages/domain/deactivate"}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="deactivate"}</a>
                                         {/if}
 
-                                        <button type="submit" {if $one_domain_per_lang == 0}disabled{/if} class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
                                     </td>
                                 </tr>
                             </tfoot>

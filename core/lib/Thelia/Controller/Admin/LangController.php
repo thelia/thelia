@@ -419,6 +419,20 @@ class LangController extends BaseAdminController
             return $response;
         }
 
+        $missing = $activate ? $this->getFrontLanguagesWithoutUrl() : [];
+
+        if (!empty($missing)) {
+            $this->getSession()->getFlashBag()->add(
+                'lang-domain-activation',
+                $this->getTranslator()->trans(
+                    'Define a domain for every language served in front office before activating this setting. Missing: %languages.',
+                    ['%languages' => implode(', ', $missing)]
+                )
+            );
+
+            return $this->generateRedirectFromRoute('admin.configuration.languages');
+        }
+
         ConfigQuery::create()
             ->filterByName('one_domain_foreach_lang')
             ->update(['Value' => $activate], null, true);
