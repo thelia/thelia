@@ -70,6 +70,8 @@ class Address extends BaseAction implements EventSubscriberInterface
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
+        $isNewAddress = $addressModel->isNew();
+
         try {
             $addressModel
                 ->setLabel($event->getLabel())
@@ -88,7 +90,13 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setCompany($event->getCompany())
                 ->save();
 
-            if ($event->getIsDefault() && !$addressModel->getIsDefault()) {
+            // A customer whose addresses are all is_default = 0 has no default address at all:
+            // getDefaultAddress() returns null and every caller relying on it breaks. The first
+            // address a customer gets therefore becomes the default one, whatever the form sent.
+            $becomesDefault = $event->getIsDefault()
+                || ($isNewAddress && null === $addressModel->getCustomer()?->getDefaultAddress());
+
+            if ($becomesDefault && !$addressModel->getIsDefault()) {
                 $addressModel->makeItDefault();
             }
 
