@@ -30,5 +30,22 @@ return static function (ContainerConfigurator $container): void {
                 ],
             ],
         ],
+        'rate_limiter' => [
+            // Asking for a new account activation code sends an email to an address
+            // the visitor typed, so an unauthenticated caller can make the shop mail
+            // someone else. Both limits are needed: the per-address one protects the
+            // owner of a single mailbox, the per-client one stops a single caller
+            // from walking a list of addresses.
+            'customer_code_request_per_email' => [
+                'policy' => 'sliding_window',
+                'limit' => 3,
+                'interval' => '1 hour',
+            ],
+            'customer_code_request_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '1 hour',
+            ],
+        ],
     ]);
 };

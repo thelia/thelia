@@ -109,10 +109,14 @@ readonly class CustomerFacade
     }
 
     /**
-     * Resend an account code email to the given address.
+     * Resend an account code email, within the rate limits of the activation flow.
+     *
+     * Returns nothing on purpose: a template must render the same page whether the
+     * mail went out or was held back, so that repeating the request tells a visitor
+     * nothing about the address it names.
      */
     public function sendCode(Customer $customer): void
     {
-        $this->customerCodeManager->createCodeAndSendIt($customer);
+        $this->customerCodeManager->requestCode($customer);
     }
 }
