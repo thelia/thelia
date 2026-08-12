@@ -14,13 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\Brand;
+use Thelia\Model\BrandQuery;
+use Thelia\Model\ProductQuery;
 
-class BrandFilter implements TheliaFilterInterface
+class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
     use LocalizedTitleTrait;
 
@@ -56,5 +60,39 @@ class BrandFilter implements TheliaFilterInterface
                 ->setId($brand->getId())
                 ->setTitle($this->localizedTitle($brand, $locale)),
         ];
+    }
+
+    /**
+     * The brands of a product set are one DISTINCT away; reading them product by
+     * product only to deduplicate them afterwards is what made this expensive.
+     */
+    public function getAggregatedValues(array $resourceIds, string $locale, $valueSearched = null, ?int $depth = 1): array
+    {
+        if ($resourceIds === []) {
+            return [];
+        }
+
+        $brandIds = ProductQuery::create()
+            ->filterById($resourceIds, Criteria::IN)
+            ->filterByBrandId(null, Criteria::ISNOTNULL)
+            ->select('BrandId')
+            ->distinct()
+            ->find()
+            ->getData();
+
+        if ($brandIds === []) {
+            return [];
+        }
+
+        $values = [];
+
+        foreach (BrandQuery::create()->filterById($brandIds, Criteria::IN)->orderByPosition()->find() as $brand) {
+            $values[] =
+                (new FilterValue())
+                    ->setId($brand->getId())
+                    ->setTitle($this->localizedTitle($brand, $locale));
+        }
+
+        return $values;
     }
 }

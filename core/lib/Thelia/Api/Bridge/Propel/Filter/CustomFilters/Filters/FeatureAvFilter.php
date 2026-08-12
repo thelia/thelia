@@ -17,14 +17,17 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\FeatureQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 
-class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface
+class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterface, TheliaAggregatedFilterInterface
 {
     use LocalizedTitleTrait;
 
@@ -99,6 +102,73 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
         }
 
         return $value;
+    }
+
+    /**
+     * One query for the distinct (feature, value) pairs the set holds, then the
+     * features and values themselves — bounded by the shop's taxonomy, not by the
+     * number of products.
+     */
+    public function getAggregatedValues(array $resourceIds, string $locale, $valueSearched = null, ?int $depth = 1): array
+    {
+        if ($resourceIds === []) {
+            return [];
+        }
+
+        $pairs = FeatureProductQuery::create()
+            ->filterByProductId($resourceIds, Criteria::IN)
+            ->filterByFeatureAvId(null, Criteria::ISNOTNULL)
+            ->select(['FeatureId', 'FeatureAvId'])
+            ->distinct()
+            ->find()
+            ->getData();
+
+        if ($pairs === []) {
+            return [];
+        }
+
+        $features = FeatureQuery::create()
+            ->filterById(array_column($pairs, 'FeatureId'), Criteria::IN)
+            ->orderByPosition()
+            ->find()
+            ->toKeyIndex();
+
+        $featureAvs = FeatureAvQuery::create()
+            ->filterById(array_column($pairs, 'FeatureAvId'), Criteria::IN)
+            ->orderByPosition()
+            ->find()
+            ->toKeyIndex();
+
+        // Both collections come back ordered by position: their order is the order
+        // the facets are presented in.
+        $featureRank = array_flip(array_keys($features));
+        $featureAvRank = array_flip(array_keys($featureAvs));
+
+        usort(
+            $pairs,
+            static fn (array $left, array $right): int => [$featureRank[$left['FeatureId']] ?? \PHP_INT_MAX, $featureAvRank[$left['FeatureAvId']] ?? \PHP_INT_MAX]
+                <=> [$featureRank[$right['FeatureId']] ?? \PHP_INT_MAX, $featureAvRank[$right['FeatureAvId']] ?? \PHP_INT_MAX],
+        );
+
+        $values = [];
+
+        foreach ($pairs as $pair) {
+            $feature = $features[$pair['FeatureId']] ?? null;
+            $featureAv = $featureAvs[$pair['FeatureAvId']] ?? null;
+
+            if (null === $feature || null === $featureAv) {
+                continue;
+            }
+
+            $values[] =
+                (new FilterValue())
+                    ->setMainTitle($this->localizedTitle($feature, $locale))
+                    ->setMainId((int) $pair['FeatureId'])
+                    ->setId((int) $pair['FeatureAvId'])
+                    ->setTitle($this->localizedTitle($featureAv, $locale));
+        }
+
+        return $values;
     }
 
     public function getChoiceFilterType(): ActiveRecordInterface

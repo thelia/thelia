@@ -16,12 +16,13 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\CategoryQuery;
 
-class CategoryFilter implements TheliaFilterInterface
+class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
     use LocalizedTitleTrait;
 
@@ -66,6 +67,24 @@ class CategoryFilter implements TheliaFilterInterface
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
+        return $this->browsedCategories($locale, $valueSearched, $depth);
+    }
+
+    /**
+     * The categories offered as facets are those below the browsed one, which the
+     * products of the set do not take part in: the set only has to be non-empty.
+     */
+    public function getAggregatedValues(array $resourceIds, string $locale, $valueSearched = null, ?int $depth = 1): array
+    {
+        if ($resourceIds === []) {
+            return [];
+        }
+
+        return $this->browsedCategories($locale, $valueSearched, $depth);
+    }
+
+    private function browsedCategories(string $locale, $valueSearched, ?int $depth): array
+    {
         if (\is_string($valueSearched) || \is_int($valueSearched)) {
             $valueSearched = explode(',', (string) $valueSearched);
         }
@@ -83,7 +102,7 @@ class CategoryFilter implements TheliaFilterInterface
                 continue;
             }
 
-            $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth);
+            $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth ?? 1);
 
             if ([] === $categoriesWithDepth) {
                 return [];

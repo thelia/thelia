@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\BrandFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
@@ -167,13 +168,32 @@ readonly class FilterService
         $locale ??= $this->langService->getLocale();
         $filters = $this->getAvailableFilters($resource);
 
+        // createFilterDto() drops every filter when no category is being browsed,
+        // so the facet values would be computed only to be thrown away.
+        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
+            return [];
+        }
+
+        $resourceIds = $this->resolveResourceIds($query);
+
+        if ($resourceIds === []) {
+            return [];
+        }
+
         foreach ($filters as $filter) {
-            $values = $this->getValues(
-                query: $query,
-                filter: $filter,
-                tfilters: $tfilters,
-                locale: $locale
-            );
+            $values = $filter instanceof TheliaAggregatedFilterInterface
+                ? $this->getAggregatedValues(
+                    filter: $filter,
+                    resourceIds: $resourceIds,
+                    tfilters: $tfilters,
+                    locale: $locale
+                )
+                : $this->getValues(
+                    query: $query,
+                    filter: $filter,
+                    tfilters: $tfilters,
+                    locale: $locale
+                );
             if ($values === []) {
                 continue;
             }
@@ -251,6 +271,41 @@ readonly class FilterService
         usort($filterObjects, static fn ($a, $b): int => $a->getPosition() <=> $b->getPosition());
 
         return $filterObjects;
+    }
+
+    /**
+     * The identifiers of the filtered set, read once and shared by every filter:
+     * a facet list needs to know which records are in the set, not what they hold.
+     *
+     * @return array<int>
+     */
+    private function resolveResourceIds(ModelCriteria $query): array
+    {
+        $ids = (clone $query)->select('Id')->find()->getData();
+
+        return array_map('intval', $ids);
+    }
+
+    /**
+     * @param array<int> $resourceIds
+     *
+     * @return array<FilterValue>
+     */
+    private function getAggregatedValues(TheliaAggregatedFilterInterface $filter, array $resourceIds, array $tfilters, string $locale): array
+    {
+        if ($filter instanceof CategoryFilter) {
+            return $filter->getAggregatedValues(
+                resourceIds: $resourceIds,
+                locale: $locale,
+                valueSearched: $this->retrieveFilterValue(
+                    theliaFilterNames: CategoryFilter::getFilterName(),
+                    tfilters: $tfilters,
+                ),
+                depth: (int) ($tfilters[CategoryFilter::CATEGORY_DEPTH_NAME] ?? 1),
+            );
+        }
+
+        return $filter->getAggregatedValues(resourceIds: $resourceIds, locale: $locale);
     }
 
     private function getValues($query, $filter, $tfilters, $locale): array
