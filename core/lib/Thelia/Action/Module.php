@@ -31,6 +31,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\File\Exception\FileNotFoundException;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Service\HandlerCleaner;
 use Thelia\Domain\Module\Exception\ModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\OrderQuery;
@@ -47,8 +48,10 @@ use Thelia\Module\Validator\ModuleValidator;
  */
 class Module extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected ContainerInterface $container)
-    {
+    public function __construct(
+        protected ContainerInterface $container,
+        protected HandlerCleaner $handlerCleaner,
+    ) {
     }
 
     public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -308,6 +311,10 @@ class Module extends BaseAction implements EventSubscriberInterface
                     ),
                 );
             }
+
+            // The export and import tables carry no module id, so the entries the module
+            // declared are matched on the namespace of their handler class.
+            $this->handlerCleaner->removeHandlersProvidedBy((string) $module->getFullNamespace(), $con);
 
             $module->delete($con);
 

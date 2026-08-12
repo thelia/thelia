@@ -104,6 +104,10 @@ class ImportHandler
             throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
+        if (!$import->isHandlerAvailable()) {
+            throw new \ErrorException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
+        }
+
         $importHandleClass = $import->getHandleClass();
 
         /** @var AbstractImport $instance */

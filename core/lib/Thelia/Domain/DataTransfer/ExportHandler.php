@@ -84,10 +84,11 @@ class ExportHandler
         bool $includeDocuments = false,
         ?array $rangeDate = null,
     ): ExportEvent {
-        $exportHandleClass = $export->getHandleClass();
+        if (!$export->isHandlerAvailable()) {
+            throw new \ErrorException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
+        }
 
-        /** @var AbstractExport $instance */
-        $instance = new $exportHandleClass();
+        $instance = $export->getHandleClassInstance();
 
         // Configure handle class
         $instance->setLang($language);
