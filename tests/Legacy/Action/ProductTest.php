@@ -861,10 +861,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             // Check each file
             /** @var ProductDocument $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
-                // Thelia\Action\File::cloneImage() walks every active language and
-                // leaves the source model on the last one, where the file name is
-                // usually empty. Read it back in the default language instead.
-                $originalProductFile->setLocale(Lang::getDefaultLanguage()->getLocale());
+                // The source models come back from the Propel instance pool, so cloning
+                // must have left them on the locale they were read with.
+                $this->assertEquals(Lang::getDefaultLanguage()->getLocale(), $originalProductFile->getLocale());
 
                 $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
 
