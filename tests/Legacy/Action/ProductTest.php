@@ -81,6 +81,22 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->delete();
     }
 
+    /**
+     * A DECIMAL column has two representations in one process: the string the
+     * database hands back ('10.000000'), and whatever a setter left in memory
+     * ('10') when Propel's instance pool still holds the object. Prices are
+     * therefore compared as numbers, at the scale the column is declared with,
+     * and never as strings.
+     */
+    private function assertSameDecimal($expected, $actual, string $message): void
+    {
+        $this->assertSame(
+            number_format((float) $expected, 6, '.', ''),
+            number_format((float) $actual, 6, '.', ''),
+            $message
+        );
+    }
+
     public function testCreate()
     {
         $event = new ProductCreateEvent();
@@ -485,8 +501,8 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals($oldProductSaleElements->getWeight(), $newProductSaleElements->getWeight(), sprintf('->testSetProductTemplate new PSE weight must be %s', $oldProductSaleElements->getWeight()));
 
-        $this->assertEquals($oldProductPrice->getPrice(), $productPrice->getPrice(), sprintf('->testSetProductTemplate price must be %s', $oldProductPrice->getPrice()));
-        $this->assertEquals($oldProductPrice->getPromoPrice(), $productPrice->getPromoPrice(), sprintf('->testSetProductTemplate promo price must be %s', $oldProductPrice->getPromoPrice()));
+        $this->assertSameDecimal($oldProductPrice->getPrice(), $productPrice->getPrice(), sprintf('->testSetProductTemplate price must be %s', $oldProductPrice->getPrice()));
+        $this->assertSameDecimal($oldProductPrice->getPromoPrice(), $productPrice->getPromoPrice(), sprintf('->testSetProductTemplate promo price must be %s', $oldProductPrice->getPromoPrice()));
         $this->assertEquals($oldProductPrice->getCurrencyId(), $productPrice->getCurrencyId(), sprintf('->testSetProductTemplate currency_id must be %s', $oldProductPrice->getCurrencyId()));
 
         return $updatedProduct;
@@ -561,7 +577,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $clonedProductPrice = $clonedDefaultPSE->getProductPrices()->getFirst();
 
-        $this->assertEquals($originalProductDefaultPrice->getPrice(), $clonedProductPrice->getPrice(), 'Default price must be equal');
+        $this->assertSameDecimal($originalProductDefaultPrice->getPrice(), $clonedProductPrice->getPrice(), 'Default price must be equal');
         $this->assertEquals($originalProductDefaultPrice->getCurrencyId(), $clonedProductPrice->getCurrencyId(), 'Currency IDs must be equal');
 
         return $event;
@@ -1054,8 +1070,8 @@ class ProductTest extends TestCaseWithURLToolSetup
             'Instance of clone product price must be Thelia\Model\ProductPrice'
         );
         $this->assertEquals($originalProductPrice->getCurrencyId(), $cloneProductPrice->getCurrencyId(), 'CurrencyID must be equal');
-        $this->assertEquals($originalProductPrice->getPrice(), $cloneProductPrice->getPrice(), 'Price must be equal');
-        $this->assertEquals($originalProductPrice->getPromoPrice(), $cloneProductPrice->getPromoPrice(), 'Promo price must be equal');
+        $this->assertSameDecimal($originalProductPrice->getPrice(), $cloneProductPrice->getPrice(), 'Price must be equal');
+        $this->assertSameDecimal($originalProductPrice->getPromoPrice(), $cloneProductPrice->getPromoPrice(), 'Promo price must be equal');
         $this->assertEquals(0, $cloneProductPrice->getFromDefaultCurrency(), 'From default currency must be equal to 0');
 
         return [
