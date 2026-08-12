@@ -72,6 +72,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxTypeInterface;
 use Thelia\Form\FormInterface;
@@ -469,6 +470,7 @@ class TheliaKernel extends Kernel
             ContainerAwareInterface::class => 'thelia.command',
             ControllerInterface::class => 'controller.service_arguments',
             TaxTypeInterface::class => 'thelia.taxType',
+            CustomerPersonalDataProviderInterface::class => 'thelia.customer.personal_data_provider',
 
             QueryCollectionExtensionInterface::class => 'thelia.api.propel.query_extension.collection',
             QueryItemExtensionInterface::class => 'thelia.api.propel.query_extension.item',

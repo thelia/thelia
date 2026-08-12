@@ -131,6 +131,15 @@ final class TheliaEvents
     /** sent on customer removal. */
     public const CUSTOMER_DELETEACCOUNT = 'action.deleteCustomer';
 
+    /**
+     * Sent to erase the identifying data of a customer while keeping the
+     * accounting record of the orders, which cannot be deleted.
+     */
+    public const CUSTOMER_ANONYMIZE = 'action.anonymizeCustomer';
+
+    /** Sent to collect everything the shop knows about one customer. */
+    public const CUSTOMER_PERSONAL_DATA_EXPORT = 'action.exportCustomerPersonalData';
+
     /** sent when a customer need a new password. */
     public const LOST_PASSWORD = 'action.lostPassword';
 
