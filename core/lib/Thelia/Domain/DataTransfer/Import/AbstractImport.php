@@ -29,6 +29,7 @@ abstract class AbstractImport implements \Iterator
     protected File $file;
     protected Lang $language;
     protected array $mandatoryColumns = [];
+    protected array $optionalColumns = [];
     protected int $importedRows = 0;
 
     #[\ReturnTypeWillChange]
@@ -124,6 +125,37 @@ abstract class AbstractImport implements \Iterator
         $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * Get mandatory columns.
+     *
+     * @return array Columns the imported file must provide
+     */
+    public function getMandatoryColumns(): array
+    {
+        return $this->mandatoryColumns;
+    }
+
+    /**
+     * Get optional columns.
+     *
+     * @return array Columns the import handles when they are provided
+     */
+    public function getOptionalColumns(): array
+    {
+        return $this->optionalColumns;
+    }
+
+    /**
+     * Get the columns advertised as the expected file structure, mandatory ones first.
+     * Imports computing their columns at runtime may override this.
+     *
+     * @return array Column names, without duplicates
+     */
+    public function getTemplateColumns(): array
+    {
+        return array_values(array_unique(array_merge($this->getMandatoryColumns(), $this->getOptionalColumns())));
     }
 
     /**

@@ -34,6 +34,12 @@ class ProductPricesImport extends AbstractImport
         'price',
     ];
 
+    protected array $optionalColumns = [
+        'currency',
+        'promo_price',
+        'promo',
+    ];
+
     public function importData(array $data): ?string
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
