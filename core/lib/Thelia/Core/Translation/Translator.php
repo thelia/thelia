@@ -50,14 +50,24 @@ class Translator extends BaseTranslator
         return self::$instance;
     }
 
+    /**
+     * The locale of the shop session, when there is one.
+     *
+     * An API request carries no session, and neither does the console, so the
+     * session is checked before it is read: getSession() throws when it is
+     * absent, which turned any translated message of an API request into a
+     * "Session has not been set." error.
+     */
     public function getLocale(): string
     {
         $currentRequest = $this->requestStack->getMainRequest();
 
-        if ($currentRequest instanceof Request) {
-            $session = $currentRequest->getSession();
+        if ($currentRequest instanceof Request && $currentRequest->hasSession()) {
+            $lang = $currentRequest->getSession()->getLang();
 
-            return $session->getLang()->getLocale();
+            if (null !== $lang) {
+                return $lang->getLocale();
+            }
         }
 
         return parent::getLocale();
