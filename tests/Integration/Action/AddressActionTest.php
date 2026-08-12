@@ -54,6 +54,70 @@ final class AddressActionTest extends ActionIntegrationTestCase
         self::assertSame('75002', $address->getZipcode());
     }
 
+    public function testCreateMakesTheFirstAddressTheDefaultOne(): void
+    {
+        $title = $this->factory->customerTitle();
+        $customer = $this->factory->customer($title);
+        $country = $this->factory->country();
+
+        // The front-office checkout renders the "primary address" checkbox disabled, so the
+        // browser never posts it and the event carries isDefault = 0 for a first address.
+        $event = new AddressCreateOrUpdateEvent(
+            label: 'Home',
+            title: $title->getId(),
+            firstname: 'John',
+            lastname: 'Doe',
+            address1: '10 rue de la Paix',
+            address2: '',
+            address3: '',
+            zipcode: '75002',
+            city: 'Paris',
+            country: $country->getId(),
+            cellphone: '',
+            phone: '',
+            company: null,
+            isDefault: 0,
+        );
+        $event->setCustomer($customer);
+
+        $this->dispatch($event, TheliaEvents::ADDRESS_CREATE);
+
+        self::assertSame(1, (int) AddressQuery::create()->findPk($event->getAddress()->getId())->getIsDefault());
+        self::assertSame($event->getAddress()->getId(), $customer->getDefaultAddress()?->getId());
+    }
+
+    public function testCreateLeavesTheExistingDefaultAddressAloneForTheNextAddresses(): void
+    {
+        $title = $this->factory->customerTitle();
+        $customer = $this->factory->customer($title);
+        $country = $this->factory->country();
+        $existing = $this->factory->address($customer, $country, $title);
+        $existing->makeItDefault();
+
+        $event = new AddressCreateOrUpdateEvent(
+            label: 'Office',
+            title: $title->getId(),
+            firstname: 'John',
+            lastname: 'Doe',
+            address1: '20 rue de la Paix',
+            address2: '',
+            address3: '',
+            zipcode: '75002',
+            city: 'Paris',
+            country: $country->getId(),
+            cellphone: '',
+            phone: '',
+            company: null,
+            isDefault: 0,
+        );
+        $event->setCustomer($customer);
+
+        $this->dispatch($event, TheliaEvents::ADDRESS_CREATE);
+
+        self::assertSame(0, (int) AddressQuery::create()->findPk($event->getAddress()->getId())->getIsDefault());
+        self::assertSame($existing->getId(), $customer->getDefaultAddress()?->getId());
+    }
+
     public function testUpdateChangesAddressFields(): void
     {
         $title = $this->factory->customerTitle();
