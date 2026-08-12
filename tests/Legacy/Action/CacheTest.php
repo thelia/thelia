@@ -44,7 +44,7 @@ class CacheTest extends TestCase
         $event = new CacheEvent($this->dir, false);
 
         $adapter = new ArrayAdapter();
-        $action = new Cache($adapter);
+        $action = new Cache($adapter, __DIR__.'/kernel-cache');
         $action->cacheClear($event);
 
         $fs = new Filesystem();
@@ -56,7 +56,7 @@ class CacheTest extends TestCase
         $event = new CacheEvent($this->dir2);
 
         $adapter = new ArrayAdapter();
-        $action = new Cache($adapter);
+        $action = new Cache($adapter, __DIR__.'/kernel-cache');
         $action->cacheClear($event);
 
         $fs = new Filesystem();
