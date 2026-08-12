@@ -34,6 +34,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterHookListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterTemplateTranslationsPass;
+use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
 
 /**
@@ -72,6 +73,10 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterCommandPass())
             ->addCompilerPass(new RegisterFormPass())
             ->addCompilerPass(new RegisterApiResourceAddonPass());
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new TestPublicServicesPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        }
     }
 
     public function boot(): void
