@@ -464,4 +464,26 @@ WHERE `country_i18n`.`locale` = 'ru_RU' AND `country_i18n`.`title` IS NULL AND `
 UPDATE `country` SET `isoalpha2` = 'BZ' WHERE `isoalpha3` = 'BLZ' AND `isoalpha2` = 'BL';
 UPDATE `country` SET `isocode` = '434' WHERE `isoalpha3` = 'LBY' AND `isocode` = '343';
 
+-- ---------------------------------------------------------------------
+-- Two outdated ISO 3166-2 codes in the Mexican state seed (#3168)
+--
+-- Aguascalientes was seeded as 'AGS' where ISO 3166-2:MX assigns 'AGU', and
+-- the Federal District kept 'DIF' although the entity became Ciudad de Mexico
+-- in 2016 and is coded 'CMX'. State.getIsoCode3166_2() concatenates the
+-- country alpha-2 code with this value, so both rows produced a code that
+-- does not exist in the standard.
+--
+-- Matched on the country alpha-3 code and on the outdated value only, so a
+-- shop that already corrected them by hand is left untouched, and a second
+-- run is a no-op.
+-- ---------------------------------------------------------------------
+
+UPDATE `state` INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state`.`isocode` = 'AGU'
+WHERE `country`.`isoalpha3` = 'MEX' AND `state`.`isocode` = 'AGS';
+
+UPDATE `state` INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state`.`isocode` = 'CMX'
+WHERE `country`.`isoalpha3` = 'MEX' AND `state`.`isocode` = 'DIF';
+
 SET FOREIGN_KEY_CHECKS = 1;
