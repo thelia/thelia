@@ -268,16 +268,49 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
         $langSession = $request->getSession()->getLang();
 
-        if ($lang->getLocale() !== $langSession->getLocale()) {
-            if (ConfigQuery::isMultiDomainActivated()) {
-                $this->redirect(
-                    sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
-                    301
-                );
-            } else {
-                $request->getSession()->setLang($lang);
+        if ($lang->getLocale() === $langSession->getLocale()) {
+            return;
+        }
+
+        if (ConfigQuery::isMultiDomainActivated()) {
+            $domainUrl = rtrim((string) $lang->getUrl(), '/');
+            $targetUrl = $domainUrl.'/'.$rewrittenUrlData->rewrittenUrl;
+
+            // An empty lang.url - the state of a fresh install until the per language domains
+            // are filled in - or a domain equal to the one being browsed makes that redirect
+            // point at the url that was just asked for, and a browser follows it until it gives
+            // up. Switch the session language and serve the page, as in single domain mode.
+            if ('' !== $domainUrl && !$this->isCurrentUrl($request, $targetUrl)) {
+                $this->redirect($targetUrl, 301);
             }
         }
+
+        $request->getSession()->setLang($lang);
+    }
+
+    /**
+     * A redirect to the url being served is never a useful answer: it only tells the browser
+     * to ask the same question again. Queries are ignored on purpose, since dropping them
+     * still lands on the same page, and so still loops.
+     */
+    private function isCurrentUrl(TheliaRequest $request, string $url): bool
+    {
+        $target = parse_url($url);
+
+        if (false === $target) {
+            return false;
+        }
+
+        // A host-less target is relative to the host being browsed.
+        $sameHost = !isset($target['host'])
+            || (
+                $target['host'] === $request->getHost()
+                && ($target['scheme'] ?? $request->getScheme()) === $request->getScheme()
+                && ($target['port'] ?? $request->getPort()) === $request->getPort()
+            );
+
+        return $sameHost
+            && trim($target['path'] ?? '', '/') === trim($request->getRealPathInfo(), '/');
     }
 
     protected function redirect($url, $status = 302): void
