@@ -38,7 +38,7 @@ use Thelia\Tools\I18n;
  * @author Franck Allimant <fallimant@openstudio.fr>
  * @author Vincent Lopes <vlopes@openstudio.fr>
  */
-class Calculator
+class Calculator implements TaxCalculatorInterface
 {
     protected TaxRuleQuery $taxRuleQuery;
     protected ?ObjectCollection $taxRulesCollection = null;

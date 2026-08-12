@@ -387,6 +387,14 @@ final class TheliaEvents
     public const TAX_DELETE = 'action.deleteTax';
     public const TAX_GET_TYPE_SERVICE = 'action.getTaxService';
 
+    /**
+     * Sent by a call site with no container to obtain a tax calculator.
+     * Listen to it to substitute your own implementation.
+     *
+     * @see Tax\TaxCalculatorEvent
+     */
+    public const TAX_GET_CALCULATOR = 'action.getTaxCalculator';
+
     // -- Profile management ---------------------------------------------
 
     public const PROFILE_CREATE = 'action.createProfile';

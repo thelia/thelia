@@ -22,11 +22,13 @@ use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 
 class CartItem extends BaseCartItem
 {
+    use TaxCalculatorResolverTrait;
+
     protected ?EventDispatcherInterface $dispatcher = null;
 
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
@@ -179,9 +181,7 @@ class CartItem extends BaseCartItem
      */
     public function getTaxedPrice(Country $country, ?State $state = null): float
     {
-        $taxCalculator = new Calculator();
-
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
+        return $this->createTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
     }
 
     /**
@@ -189,9 +189,7 @@ class CartItem extends BaseCartItem
      */
     public function getTaxedPromoPrice(Country $country, ?State $state = null): float
     {
-        $taxCalculator = new Calculator();
-
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
+        return $this->createTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
     }
 
     /**

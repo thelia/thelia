@@ -16,7 +16,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\ProductPriceTools;
@@ -24,6 +24,7 @@ use Thelia\Model\Tools\ProductPriceTools;
 class ProductSaleElements extends BaseProductSaleElements
 {
     use PositionManagementTrait;
+    use TaxCalculatorResolverTrait;
 
     /**
      * @throws PropelException
@@ -66,9 +67,7 @@ class ProductSaleElements extends BaseProductSaleElements
      */
     public function getTaxedPrice(Country $country, string $virtualColumnName = 'price_PRICE', float $discount = 0.0): float
     {
-        $taxCalculator = new Calculator();
-
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice($virtualColumnName, $discount));
+        return $this->createTaxCalculator()->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice($virtualColumnName, $discount));
     }
 
     /**
@@ -76,9 +75,7 @@ class ProductSaleElements extends BaseProductSaleElements
      */
     public function getTaxedPromoPrice(Country $country, string $virtualColumnName = 'price_PROMO_PRICE', float $discount = 0.0): float
     {
-        $taxCalculator = new Calculator();
-
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice($virtualColumnName, $discount));
+        return $this->createTaxCalculator()->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice($virtualColumnName, $discount));
     }
 
     /**

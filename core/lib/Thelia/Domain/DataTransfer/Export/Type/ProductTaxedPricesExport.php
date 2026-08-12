@@ -17,7 +17,8 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRuleQuery;
 
@@ -30,11 +31,13 @@ use Thelia\Model\TaxRuleQuery;
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
-    protected Calculator $calculator;
+    use TaxCalculatorResolverTrait;
+
+    protected TaxCalculatorInterface $calculator;
 
     public function __construct()
     {
-        $this->calculator = new Calculator();
+        $this->calculator = $this->createTaxCalculator();
     }
 
     public const FILE_NAME = 'product_taxed_price';
