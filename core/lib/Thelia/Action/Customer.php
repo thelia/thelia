@@ -29,6 +29,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartContext;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Customer\Exception\CustomerException;
+use Thelia\Domain\Customer\Service\CustomerCodeManager;
 use Thelia\Domain\Customer\Service\CustomerEmailRequestLimiter;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Domain\Localization\Service\LangService;
@@ -59,6 +60,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected CartRetriever $cartRetriever,
         protected CartContext $cartContext,
         protected CustomerEmailRequestLimiter $emailRequestLimiter,
+        protected CustomerCodeManager $customerCodeManager,
     ) {
     }
 
@@ -113,22 +115,28 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $event->setCustomer($customer);
     }
 
+    /**
+     * Send the customer what is needed to activate the account.
+     *
+     * This mails the activation code, which is the only mechanism the shipped
+     * front office knows: the `customer_confirmation` mail this used to send
+     * carries the Thelia 2 activation link, whose `/customer/confirm/{token}`
+     * route belongs to the Front module and disappears with it.
+     *
+     * @throws PropelException
+     */
     public function customerConfirmationEmail(CustomerEvent $event): void
     {
         $customer = $event->getModel();
 
-        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
-            $validationCode = $customer->_validationCodeForEmail ?? '------';
-
-            $this->mailer->sendEmailToCustomer(
-                'customer_confirmation',
-                $customer,
-                [
-                    'customer_id' => $customer->getId(),
-                    'validation_code' => $validationCode,
-                ]
-            );
+        if (!ConfigQuery::isCustomerEmailConfirmationEnable() || null === $customer->getConfirmationToken()) {
+            return;
         }
+
+        // A fresh code on every send: the account was just created, or its owner
+        // asked for the code again, and the mail must carry the code the database
+        // will accept, not the one of an earlier attempt.
+        $this->customerCodeManager->createCodeAndSendIt($customer);
     }
 
     /**
