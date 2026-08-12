@@ -104,6 +104,12 @@ trait UrlRewritingTrait
                 ->setViewLocale($locale)
                 ->save()
             ;
+
+            // RewritingUrl::preInsert() sanitizes the url before storing it: accents are
+            // folded, the ".html" extension is dropped, and the object id is prefixed when
+            // the result is already taken. Only the stored url resolves, so that is the one
+            // the caller must get back.
+            return $rewritingUrl->getUrl();
         }
 
         return $urlFilePart;

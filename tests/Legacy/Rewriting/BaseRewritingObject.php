@@ -14,6 +14,7 @@ namespace Thelia\Tests\Rewriting;
 
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Propel;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 /**
@@ -56,10 +57,9 @@ abstract class BaseRewritingObject extends TestCase
         $con = Propel::getConnection();
         $rewrittenUrl = $object->generateRewrittenUrl('fr_FR', $con);
         $this->assertNotNull($rewrittenUrl, 'rewritten url can not be null');
-        // generateRewrittenUrl() returns the url it built from the title, before
-        // RewritingUrl::preInsert() sanitized it. The stored one is what the
-        // front office resolves, so check that one.
-        $this->assertMatchesRegularExpression(self::FRENCH_URL_PATTERN, $object->getRewrittenUrl('fr_FR'));
+        // The returned url is the one that was stored: only that one resolves.
+        $this->assertMatchesRegularExpression(self::FRENCH_URL_PATTERN, $rewrittenUrl);
+        $this->assertNotNull(RewritingUrlQuery::create()->findOneByUrl($rewrittenUrl));
 
         $object->delete();
     }
@@ -82,7 +82,8 @@ abstract class BaseRewritingObject extends TestCase
         $con = Propel::getConnection();
         $rewrittenUrl = $object->generateRewrittenUrl('en_US', $con);
         $this->assertNotNull($rewrittenUrl, 'rewritten url can not be null');
-        $this->assertMatchesRegularExpression(self::ENGLISH_URL_PATTERN, $object->getRewrittenUrl('en_US'));
+        $this->assertMatchesRegularExpression(self::ENGLISH_URL_PATTERN, $rewrittenUrl);
+        $this->assertNotNull(RewritingUrlQuery::create()->findOneByUrl($rewrittenUrl));
 
         $object->delete();
     }
