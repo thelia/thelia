@@ -50,6 +50,9 @@ class TemplateDefinition
     ];
     protected ?array $parentList = null;
 
+    /** @var list<string>|null */
+    protected ?array $internalViews = null;
+
     /**
      * @param string $name the template name (= directory name)
      * @param int    $type the remplate type (see $standardTemplatesSubdirs)
@@ -99,6 +102,36 @@ class TemplateDefinition
         }
 
         return $this->parentList;
+    }
+
+    /**
+     * The views this template declares as internal, i.e. rendered by a controller and not
+     * reachable on a URL made of their own name.
+     *
+     * The declaration is optional (see InternalViewsDeclaration): a template that ships no
+     * declaration keeps exposing all of its root templates. The nearest declaration wins —
+     * an inherited list only applies while the template declares nothing itself.
+     *
+     * @return list<string>
+     */
+    public function getInternalViews(): array
+    {
+        if (null !== $this->internalViews) {
+            return $this->internalViews;
+        }
+
+        $templateList = array_merge([$this], array_values($this->getParentList() ?? []));
+
+        /** @var self $templateDefinition */
+        foreach ($templateList as $templateDefinition) {
+            $declaredViews = InternalViewsDeclaration::readFrom($templateDefinition->getAbsolutePath());
+
+            if (null !== $declaredViews) {
+                return $this->internalViews = $declaredViews;
+            }
+        }
+
+        return $this->internalViews = [];
     }
 
     public function getTemplateFilePath(string $templateName): string

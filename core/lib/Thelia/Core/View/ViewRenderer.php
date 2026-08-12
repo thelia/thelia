@@ -63,6 +63,14 @@ readonly class ViewRenderer
                 throw new NotFoundHttpException();
             }
 
+            // A view reached here was named by the request, either through the catch-all
+            // route of the front-office or through a rewritten URL. A template the active
+            // template declares as internal is not a page: it only renders with the context
+            // its controller prepares, so serving it here can only fail.
+            if (\in_array($view, $parser->getTemplateDefinition()?->getInternalViews() ?? [], true)) {
+                throw new NotFoundHttpException();
+            }
+
             $viewId = $request->attributes->get($view.'_id');
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
 
