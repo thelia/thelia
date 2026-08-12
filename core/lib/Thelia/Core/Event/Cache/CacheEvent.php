@@ -30,6 +30,13 @@ class CacheEvent extends ActionEvent
          */
         protected string $dir,
         protected bool $onKernelTerminate = true,
+        /**
+         * The combined Propel schema depends only on which modules are active and on
+         * the content of their schema.xml. It is dropped by default, because most
+         * clears follow a change that may have touched either; pass false when the
+         * caller knows the database schema cannot have moved.
+         */
+        protected bool $invalidatePropelSchema = true,
     ) {
     }
 
@@ -53,6 +60,18 @@ class CacheEvent extends ActionEvent
     public function setOnKernelTerminate(bool $onKernelTerminate): self
     {
         $this->onKernelTerminate = $onKernelTerminate;
+
+        return $this;
+    }
+
+    public function invalidatesPropelSchema(): bool
+    {
+        return $this->invalidatePropelSchema;
+    }
+
+    public function setInvalidatePropelSchema(bool $invalidatePropelSchema): self
+    {
+        $this->invalidatePropelSchema = $invalidatePropelSchema;
 
         return $this;
     }

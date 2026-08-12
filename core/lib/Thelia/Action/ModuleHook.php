@@ -222,7 +222,10 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     protected function cacheClear(): void
     {
-        $cacheEvent = new CacheEvent($this->cacheDir);
+        // Listener order and activation are frozen into the compiled container, so the
+        // container has to go. Binding a module to a hook, moving it or switching it
+        // off touches no schema.xml, so the Propel schema is left alone.
+        $cacheEvent = new CacheEvent($this->cacheDir, invalidatePropelSchema: false);
 
         $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }

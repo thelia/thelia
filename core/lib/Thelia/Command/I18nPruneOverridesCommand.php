@@ -120,7 +120,11 @@ class I18nPruneOverridesCommand extends ContainerAwareCommand
 
         if ($force) {
             $this->getDispatcher()->dispatch(
-                new CacheEvent($this->getContainer()->getParameter('kernel.cache_dir')),
+                // Translation overrides only: the database schema cannot have moved.
+                new CacheEvent(
+                    $this->getContainer()->getParameter('kernel.cache_dir'),
+                    invalidatePropelSchema: false,
+                ),
                 TheliaEvents::CACHE_CLEAR,
             );
             $io->success(\sprintf('Pruned %d orphaned override(s).', $totalPruned));

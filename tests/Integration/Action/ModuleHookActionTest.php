@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
@@ -253,6 +255,37 @@ final class ModuleHookActionTest extends ActionIntegrationTestCase
         self::assertSame(
             3,
             ModuleHookQuery::create()->findPk($mh1->getId())->getPosition(),
+        );
+    }
+
+    public function testUpdatePositionDoesNotInvalidateThePropelSchema(): void
+    {
+        $hook = $this->createTestHook('test.mh.pos.cache');
+        $moduleId = $this->getActiveModuleId();
+        $moduleHook = $this->createModuleHookBinding($moduleId, $hook->getId(), 'method1');
+
+        $captured = [];
+        $listener = static function (CacheEvent $event) use (&$captured): void {
+            $captured[] = $event;
+        };
+
+        /** @var SymfonyEventDispatcherInterface $dispatcher */
+        $dispatcher = $this->dispatcher;
+        $dispatcher->addListener(TheliaEvents::CACHE_CLEAR, $listener, 255);
+
+        try {
+            $this->dispatch(
+                new UpdatePositionEvent($moduleHook->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1),
+                TheliaEvents::MODULE_HOOK_UPDATE_POSITION,
+            );
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::CACHE_CLEAR, $listener);
+        }
+
+        self::assertCount(1, $captured, 'Reordering a hook still invalidates the container.');
+        self::assertFalse(
+            $captured[0]->invalidatesPropelSchema(),
+            'A display position has no effect on the database schema.',
         );
     }
 
