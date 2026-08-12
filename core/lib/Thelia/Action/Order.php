@@ -157,209 +157,217 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con->beginTransaction();
 
-        $placedOrder = $sessionOrder->copy();
+        try {
+            $placedOrder = $sessionOrder->copy();
 
-        // Be sure to create a brand new order, as copy raises the modified flag for all fields
-        // and will also copy order reference and id.
-        $placedOrder->setId(null)->setRef(null)->setNew(true);
+            // Be sure to create a brand new order, as copy raises the modified flag for all fields
+            // and will also copy order reference and id.
+            $placedOrder->setId(null)->setRef(null)->setNew(true);
 
-        // Dates should be marked as not updated so that Propel will update them.
-        $placedOrder->resetModified(OrderTableMap::COL_CREATED_AT);
-        $placedOrder->resetModified(OrderTableMap::COL_UPDATED_AT);
-        $placedOrder->resetModified(OrderTableMap::COL_VERSION_CREATED_AT);
+            // Dates should be marked as not updated so that Propel will update them.
+            $placedOrder->resetModified(OrderTableMap::COL_CREATED_AT);
+            $placedOrder->resetModified(OrderTableMap::COL_UPDATED_AT);
+            $placedOrder->resetModified(OrderTableMap::COL_VERSION_CREATED_AT);
 
-        $cartItems = $cart->getCartItems();
+            $cartItems = $cart->getCartItems();
 
-        /* fulfill order */
-        $placedOrder->setCustomerId($customer->getId());
-        $placedOrder->setCurrencyId($currency->getId());
-        $placedOrder->setCurrencyRate($currency->getRate());
-        $placedOrder->setLangId($lang->getId());
+            /* fulfill order */
+            $placedOrder->setCustomerId($customer->getId());
+            $placedOrder->setCurrencyId($currency->getId());
+            $placedOrder->setCurrencyRate($currency->getRate());
+            $placedOrder->setLangId($lang->getId());
 
-        if ($useOrderDefinedAddresses) {
-            $taxCountry =
-                OrderAddressQuery::create()
-                    ->findPk($placedOrder->getDeliveryOrderAddressId())
-                    ->getCountry()
-            ;
-        } else {
-            $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
-            $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
+            if ($useOrderDefinedAddresses) {
+                $taxCountry =
+                    OrderAddressQuery::create()
+                        ->findPk($placedOrder->getDeliveryOrderAddressId())
+                        ->getCountry()
+                ;
+            } else {
+                $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
+                $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
 
-            /* hard save the delivery and invoice addresses */
-            $deliveryOrderAddress = new OrderAddress();
-            $deliveryOrderAddress
-                ->setCustomerTitleId($deliveryAddress->getTitleId())
-                ->setCompany($deliveryAddress->getCompany())
-                ->setFirstname($deliveryAddress->getFirstname())
-                ->setLastname($deliveryAddress->getLastname())
-                ->setAddress1($deliveryAddress->getAddress1())
-                ->setAddress2($deliveryAddress->getAddress2())
-                ->setAddress3($deliveryAddress->getAddress3())
-                ->setZipcode($deliveryAddress->getZipcode())
-                ->setCity($deliveryAddress->getCity())
-                ->setPhone($deliveryAddress->getPhone())
-                ->setCellphone($deliveryAddress->getCellphone())
-                ->setCountryId($deliveryAddress->getCountryId())
-                ->setStateId($deliveryAddress->getStateId())
-                ->save($con);
+                /* hard save the delivery and invoice addresses */
+                $deliveryOrderAddress = new OrderAddress();
+                $deliveryOrderAddress
+                    ->setCustomerTitleId($deliveryAddress->getTitleId())
+                    ->setCompany($deliveryAddress->getCompany())
+                    ->setFirstname($deliveryAddress->getFirstname())
+                    ->setLastname($deliveryAddress->getLastname())
+                    ->setAddress1($deliveryAddress->getAddress1())
+                    ->setAddress2($deliveryAddress->getAddress2())
+                    ->setAddress3($deliveryAddress->getAddress3())
+                    ->setZipcode($deliveryAddress->getZipcode())
+                    ->setCity($deliveryAddress->getCity())
+                    ->setPhone($deliveryAddress->getPhone())
+                    ->setCellphone($deliveryAddress->getCellphone())
+                    ->setCountryId($deliveryAddress->getCountryId())
+                    ->setStateId($deliveryAddress->getStateId())
+                    ->save($con);
 
-            $invoiceOrderAddress = new OrderAddress();
-            $invoiceOrderAddress
-                ->setCustomerTitleId($invoiceAddress->getTitleId())
-                ->setCompany($invoiceAddress->getCompany())
-                ->setFirstname($invoiceAddress->getFirstname())
-                ->setLastname($invoiceAddress->getLastname())
-                ->setAddress1($invoiceAddress->getAddress1())
-                ->setAddress2($invoiceAddress->getAddress2())
-                ->setAddress3($invoiceAddress->getAddress3())
-                ->setZipcode($invoiceAddress->getZipcode())
-                ->setCity($invoiceAddress->getCity())
-                ->setPhone($invoiceAddress->getPhone())
-                ->setCellphone($invoiceAddress->getCellphone())
-                ->setCountryId($invoiceAddress->getCountryId())
-                ->setStateId($deliveryAddress->getStateId())
-                ->save($con);
+                $invoiceOrderAddress = new OrderAddress();
+                $invoiceOrderAddress
+                    ->setCustomerTitleId($invoiceAddress->getTitleId())
+                    ->setCompany($invoiceAddress->getCompany())
+                    ->setFirstname($invoiceAddress->getFirstname())
+                    ->setLastname($invoiceAddress->getLastname())
+                    ->setAddress1($invoiceAddress->getAddress1())
+                    ->setAddress2($invoiceAddress->getAddress2())
+                    ->setAddress3($invoiceAddress->getAddress3())
+                    ->setZipcode($invoiceAddress->getZipcode())
+                    ->setCity($invoiceAddress->getCity())
+                    ->setPhone($invoiceAddress->getPhone())
+                    ->setCellphone($invoiceAddress->getCellphone())
+                    ->setCountryId($invoiceAddress->getCountryId())
+                    ->setStateId($deliveryAddress->getStateId())
+                    ->save($con);
 
-            $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
-            $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
+                $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
+                $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
 
-            $taxCountry = $deliveryAddress->getCountry();
-        }
-
-        $placedOrder->setStatusId(
-            OrderStatusQuery::getNotPaidStatus()->getId()
-        );
-
-        $placedOrder->setCartId($cart->getId());
-
-        /* memorize discount */
-        $placedOrder->setDiscount(
-            $cart->getDiscount()
-        );
-
-        $placedOrder->save($con);
-
-        $manageStock = $placedOrder->isStockManagedOnOrderCreation($dispatcher);
-
-        /* fulfill order_products and decrease stock */
-
-        foreach ($cartItems as $cartItem) {
-            $product = $cartItem->getProduct();
-
-            /* get translation */
-            /** @var ProductI18n $productI18n */
-            $productI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'Product', $product->getId());
-
-            $pse = $cartItem->getProductSaleElements();
-
-            // get the virtual document path
-            $virtualDocumentEvent = new VirtualProductOrderHandleEvent($placedOrder, $pse->getId());
-            // essentially used for virtual product. modules that handles virtual product can
-            // allow the use of stock even for virtual products
-            $useStock = true;
-            $virtual = 0;
-
-            // if the product is virtual, dispatch an event to collect information
-            if ($product->getVirtual() === 1) {
-                $dispatcher->dispatch($virtualDocumentEvent, TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE);
-                $useStock = $virtualDocumentEvent->isUseStock();
-                $virtual = $virtualDocumentEvent->isVirtual() ? 1 : 0;
+                $taxCountry = $deliveryAddress->getCountry();
             }
 
-            /* check still in stock */
-            if ($cartItem->getQuantity() > $pse->getQuantity()
-                && true === ConfigQuery::checkAvailableStock()
-                && $useStock) {
-                throw new TheliaProcessException('Not enough stock', TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
-            }
-
-            if ($useStock && $manageStock) {
-                /* decrease stock for non virtual product */
-                $allowNegativeStock = (int) ConfigQuery::read('allow_negative_stock', 0);
-                $newStock = $pse->getQuantity() - $cartItem->getQuantity();
-                // Forbid negative stock
-                if ($newStock < 0 && 0 === $allowNegativeStock) {
-                    $newStock = 0;
-                }
-                $pse->setQuantity(
-                    $newStock
-                );
-
-                $pse->save($con);
-            }
-
-            /* get tax */
-            /** @var TaxRuleI18n $taxRuleI18n */
-            $taxRuleI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'TaxRule', $product->getTaxRuleId());
-
-            $taxDetail = $product->getTaxRule()->getTaxDetail(
-                $product,
-                $taxCountry,
-                $cartItem->getPrice(),
-                $cartItem->getPromoPrice(),
-                $lang->getLocale()
+            $placedOrder->setStatusId(
+                OrderStatusQuery::getNotPaidStatus()->getId()
             );
 
-            $orderProduct = new OrderProduct();
-            $orderProduct
-                ->setOrderId($placedOrder->getId())
-                ->setProductRef($product->getRef())
-                ->setProductSaleElementsRef($pse->getRef())
-                ->setProductSaleElementsId($pse->getId())
-                ->setTitle($productI18n->getTitle())
-                ->setChapo($productI18n->getChapo())
-                ->setDescription($productI18n->getDescription())
-                ->setPostscriptum($productI18n->getPostscriptum())
-                ->setVirtual($virtual)
-                ->setVirtualDocument($virtualDocumentEvent->getPath())
-                ->setQuantity($cartItem->getQuantity())
-                ->setPrice($cartItem->getPrice())
-                ->setPromoPrice($cartItem->getPromoPrice())
-                ->setWasNew($pse->getNewness())
-                ->setWasInPromo($cartItem->getPromo())
-                ->setWeight($pse->getWeight())
-                ->setTaxRuleTitle($taxRuleI18n->getTitle())
-                ->setTaxRuleDescription($taxRuleI18n->getDescription())
-                ->setEanCode($pse->getEanCode())
-                ->setCartItemId($cartItem->getId())
+            $placedOrder->setCartId($cart->getId());
 
-                ->save($con)
-            ;
+            /* memorize discount */
+            $placedOrder->setDiscount(
+                $cart->getDiscount()
+            );
 
-            /* fulfill order_product_tax */
-            /** @var OrderProductTax $tax */
-            foreach ($taxDetail as $tax) {
-                $tax->setOrderProductId($orderProduct->getId());
-                $tax->save($con);
+            $placedOrder->save($con);
+
+            $manageStock = $placedOrder->isStockManagedOnOrderCreation($dispatcher);
+
+            /* fulfill order_products and decrease stock */
+
+            foreach ($cartItems as $cartItem) {
+                $product = $cartItem->getProduct();
+
+                /* get translation */
+                /** @var ProductI18n $productI18n */
+                $productI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'Product', $product->getId());
+
+                $pse = $cartItem->getProductSaleElements();
+
+                // get the virtual document path
+                $virtualDocumentEvent = new VirtualProductOrderHandleEvent($placedOrder, $pse->getId());
+                // essentially used for virtual product. modules that handles virtual product can
+                // allow the use of stock even for virtual products
+                $useStock = true;
+                $virtual = 0;
+
+                // if the product is virtual, dispatch an event to collect information
+                if ($product->getVirtual() === 1) {
+                    $dispatcher->dispatch($virtualDocumentEvent, TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE);
+                    $useStock = $virtualDocumentEvent->isUseStock();
+                    $virtual = $virtualDocumentEvent->isVirtual() ? 1 : 0;
+                }
+
+                /* check still in stock */
+                if ($cartItem->getQuantity() > $pse->getQuantity()
+                    && true === ConfigQuery::checkAvailableStock()
+                    && $useStock) {
+                    throw new TheliaProcessException('Not enough stock', TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+                }
+
+                if ($useStock && $manageStock) {
+                    /* decrease stock for non virtual product */
+                    $allowNegativeStock = (int) ConfigQuery::read('allow_negative_stock', 0);
+                    $newStock = $pse->getQuantity() - $cartItem->getQuantity();
+                    // Forbid negative stock
+                    if ($newStock < 0 && 0 === $allowNegativeStock) {
+                        $newStock = 0;
+                    }
+                    $pse->setQuantity(
+                        $newStock
+                    );
+
+                    $pse->save($con);
+                }
+
+                /* get tax */
+                /** @var TaxRuleI18n $taxRuleI18n */
+                $taxRuleI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'TaxRule', $product->getTaxRuleId());
+
+                $taxDetail = $product->getTaxRule()->getTaxDetail(
+                    $product,
+                    $taxCountry,
+                    $cartItem->getPrice(),
+                    $cartItem->getPromoPrice(),
+                    $lang->getLocale()
+                );
+
+                $orderProduct = new OrderProduct();
+                $orderProduct
+                    ->setOrderId($placedOrder->getId())
+                    ->setProductRef($product->getRef())
+                    ->setProductSaleElementsRef($pse->getRef())
+                    ->setProductSaleElementsId($pse->getId())
+                    ->setTitle($productI18n->getTitle())
+                    ->setChapo($productI18n->getChapo())
+                    ->setDescription($productI18n->getDescription())
+                    ->setPostscriptum($productI18n->getPostscriptum())
+                    ->setVirtual($virtual)
+                    ->setVirtualDocument($virtualDocumentEvent->getPath())
+                    ->setQuantity($cartItem->getQuantity())
+                    ->setPrice($cartItem->getPrice())
+                    ->setPromoPrice($cartItem->getPromoPrice())
+                    ->setWasNew($pse->getNewness())
+                    ->setWasInPromo($cartItem->getPromo())
+                    ->setWeight($pse->getWeight())
+                    ->setTaxRuleTitle($taxRuleI18n->getTitle())
+                    ->setTaxRuleDescription($taxRuleI18n->getDescription())
+                    ->setEanCode($pse->getEanCode())
+                    ->setCartItemId($cartItem->getId())
+
+                    ->save($con)
+                ;
+
+                /* fulfill order_product_tax */
+                /** @var OrderProductTax $tax */
+                foreach ($taxDetail as $tax) {
+                    $tax->setOrderProductId($orderProduct->getId());
+                    $tax->save($con);
+                }
+
+                /* fulfill order_attribute_combination and decrease stock */
+                foreach ($pse->getAttributeCombinations() as $attributeCombination) {
+                    /** @var \Thelia\Model\Attribute $attribute */
+                    $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
+
+                    /** @var \Thelia\Model\AttributeAv $attributeAv */
+                    $attributeAv = I18n::forceI18nRetrieving($lang->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
+
+                    $orderAttributeCombination = new OrderProductAttributeCombination();
+                    $orderAttributeCombination
+                        ->setOrderProductId($orderProduct->getId())
+                        ->setAttributeTitle($attribute->getTitle())
+                        ->setAttributeChapo($attribute->getChapo())
+                        ->setAttributeDescription($attribute->getDescription())
+                        ->setAttributePostscriptum($attribute->getPostscriptum())
+                        ->setAttributeAvTitle($attributeAv->getTitle())
+                        ->setAttributeAvChapo($attributeAv->getChapo())
+                        ->setAttributeAvDescription($attributeAv->getDescription())
+                        ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
+                        ->save($con);
+                }
             }
 
-            /* fulfill order_attribute_combination and decrease stock */
-            foreach ($pse->getAttributeCombinations() as $attributeCombination) {
-                /** @var \Thelia\Model\Attribute $attribute */
-                $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
+            $con->commit();
 
-                /** @var \Thelia\Model\AttributeAv $attributeAv */
-                $attributeAv = I18n::forceI18nRetrieving($lang->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
+            return $placedOrder;
+        } catch (\Throwable $throwable) {
+            // Placing an order writes to a dozen tables; a failure anywhere in
+            // between used to leave the transaction — and its locks — open.
+            $con->rollBack();
 
-                $orderAttributeCombination = new OrderProductAttributeCombination();
-                $orderAttributeCombination
-                    ->setOrderProductId($orderProduct->getId())
-                    ->setAttributeTitle($attribute->getTitle())
-                    ->setAttributeChapo($attribute->getChapo())
-                    ->setAttributeDescription($attribute->getDescription())
-                    ->setAttributePostscriptum($attribute->getPostscriptum())
-                    ->setAttributeAvTitle($attributeAv->getTitle())
-                    ->setAttributeAvChapo($attributeAv->getChapo())
-                    ->setAttributeAvDescription($attributeAv->getDescription())
-                    ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
-                    ->save($con);
-            }
+            throw $throwable;
         }
-
-        $con->commit();
-
-        return $placedOrder;
     }
 
     /**
@@ -499,7 +507,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $event->setOrder($order);
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $con->rollBack();
 
             throw $ex;

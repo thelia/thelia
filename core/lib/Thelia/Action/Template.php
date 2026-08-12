@@ -145,7 +145,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                         ->update(['DefaultTemplateId' => null], $con);
 
                     $con->commit();
-                } catch (\Exception $ex) {
+                } catch (\Throwable $ex) {
                     $con->rollback();
 
                     throw $ex;

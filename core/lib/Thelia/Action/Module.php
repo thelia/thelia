@@ -202,9 +202,10 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function delete(ModuleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-        $con->beginTransaction();
 
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
+            $con->beginTransaction();
+
             try {
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
@@ -279,13 +280,15 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $module->delete($con);
 
                 $con->commit();
-
-                $event->setModule($module);
-                $this->cacheClear($dispatcher);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
                 throw $e;
             }
+
+            // Outside the try: these two run once the deletion is committed, so a
+            // failure there no longer reaches a rollback of a closed transaction.
+            $event->setModule($module);
+            $this->cacheClear($dispatcher);
         }
     }
 
