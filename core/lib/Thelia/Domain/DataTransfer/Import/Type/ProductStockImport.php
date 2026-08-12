@@ -30,6 +30,10 @@ class ProductStockImport extends AbstractImport
         'stock',
     ];
 
+    protected array $optionalColumns = [
+        'ean',
+    ];
+
     public function importData(array $data): ?string
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
