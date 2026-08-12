@@ -65,6 +65,18 @@ class ExportCommand extends ContainerAwareCommand
                 'en_US',
             )
             ->addOption(
+                'start',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Only export records created on or after this date, for the exports that support a date range.',
+            )
+            ->addOption(
+                'end',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Only export records created on or before this date, for the exports that support a date range.',
+            )
+            ->addOption(
                 'list-export',
                 null,
                 InputOption::VALUE_NONE,
@@ -136,6 +148,9 @@ class ExportCommand extends ContainerAwareCommand
             $serializer,
             $archiver,
             (new LangQuery())->findOneByLocale($input->getOption('locale')),
+            false,
+            false,
+            $this->readDateRange($input),
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
@@ -148,6 +163,44 @@ class ExportCommand extends ContainerAwareCommand
         $output->writeln('<comment>'.$exportEvent->getFilePath().'</comment>');
 
         return 0;
+    }
+
+    /**
+     * A date range is optional: without one, an export covers every record.
+     * A single bound is honoured on its own.
+     *
+     * @return array{start: \DateTime|null, end: \DateTime|null}|null
+     */
+    protected function readDateRange(InputInterface $input): ?array
+    {
+        $start = $this->readDate($input, 'start');
+        $end = $this->readDate($input, 'end');
+
+        if (null === $start && null === $end) {
+            return null;
+        }
+
+        return ['start' => $start, 'end' => $end];
+    }
+
+    protected function readDate(InputInterface $input, string $option): ?\DateTime
+    {
+        $value = $input->getOption($option);
+
+        if (!\is_string($value) || '' === $value) {
+            return null;
+        }
+
+        // A day given without a time covers that whole day, as the back-office range does.
+        if ('end' === $option && 1 === preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            $value .= ' 23:59:59';
+        }
+
+        try {
+            return new \DateTime($value);
+        } catch (\Exception $exception) {
+            throw new \InvalidArgumentException(\sprintf('--%s is not a readable date: %s', $option, $value), 0, $exception);
+        }
     }
 
     /**
