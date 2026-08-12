@@ -21,12 +21,15 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
+use Thelia\Domain\Customer\Service\CustomerEmailRequestLimiter;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Customer;
 
 /**
  * "Send me the activation code again" is reachable by anyone who knows an address,
- * so the number of emails it can trigger has to be capped per address and per caller.
+ * so the number of emails it can trigger has to be capped. The windows themselves
+ * are covered by {@see CustomerEmailRequestLimiterTest}; what matters here is that
+ * asking for a code goes through them.
  */
 final class CustomerCodeManagerTest extends TestCase
 {
@@ -35,12 +38,7 @@ final class CustomerCodeManagerTest extends TestCase
         $mailerFactory = $this->createMock(MailerFactory::class);
         $mailerFactory->expects(self::exactly(3))->method('sendEmailToCustomer');
 
-        $manager = new CustomerCodeManager(
-            $mailerFactory,
-            $this->limiter(3),
-            $this->limiter(100),
-            $this->requestStackWithClientIp('203.0.113.7'),
-        );
+        $manager = new CustomerCodeManager($mailerFactory, $this->limiterAllowing(3));
 
         $customer = $this->customer('pending@example.com');
 
@@ -51,63 +49,19 @@ final class CustomerCodeManagerTest extends TestCase
         self::assertFalse($manager->requestCode($customer));
     }
 
-    public function testTheAddressLimitIgnoresCaseSoItCannotBeSidesteppedByRetyping(): void
+    private function limiterAllowing(int $limit): CustomerEmailRequestLimiter
     {
-        $mailerFactory = $this->createMock(MailerFactory::class);
-        $mailerFactory->expects(self::exactly(2))->method('sendEmailToCustomer');
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create('/customer/send-code', server: ['REMOTE_ADDR' => '203.0.113.7']));
 
-        $manager = new CustomerCodeManager(
-            $mailerFactory,
-            $this->limiter(2),
-            $this->limiter(100),
-            $this->requestStackWithClientIp('203.0.113.7'),
+        return new CustomerEmailRequestLimiter(
+            $this->window($limit),
+            $this->window(100),
+            $requestStack,
         );
-
-        self::assertTrue($manager->requestCode($this->customer('pending@example.com')));
-        self::assertTrue($manager->requestCode($this->customer('Pending@Example.COM')));
-        self::assertFalse($manager->requestCode($this->customer('PENDING@EXAMPLE.COM')));
     }
 
-    public function testOneCallerWalkingManyAddressesIsStoppedByTheClientLimit(): void
-    {
-        $mailerFactory = $this->createMock(MailerFactory::class);
-        $mailerFactory->expects(self::exactly(2))->method('sendEmailToCustomer');
-
-        $manager = new CustomerCodeManager(
-            $mailerFactory,
-            $this->limiter(100),
-            $this->limiter(2),
-            $this->requestStackWithClientIp('203.0.113.7'),
-        );
-
-        self::assertTrue($manager->requestCode($this->customer('first@example.com')));
-        self::assertTrue($manager->requestCode($this->customer('second@example.com')));
-        self::assertFalse($manager->requestCode($this->customer('third@example.com')));
-    }
-
-    public function testWithoutARequestOnlyTheAddressLimitApplies(): void
-    {
-        $mailerFactory = $this->createMock(MailerFactory::class);
-        $mailerFactory->expects(self::exactly(2))->method('sendEmailToCustomer');
-
-        // A command line caller (module, cron, install script) has no client IP:
-        // the per-client limit must be skipped instead of blocking the send. Here it
-        // would stop everything after the first mail if it were applied.
-        $manager = new CustomerCodeManager(
-            $mailerFactory,
-            $this->limiter(2),
-            $this->limiter(1),
-            new RequestStack(),
-        );
-
-        $customer = $this->customer('pending@example.com');
-
-        self::assertTrue($manager->requestCode($customer));
-        self::assertTrue($manager->requestCode($customer));
-        self::assertFalse($manager->requestCode($customer));
-    }
-
-    private function limiter(int $limit): RateLimiterFactoryInterface
+    private function window(int $limit): RateLimiterFactoryInterface
     {
         return new RateLimiterFactory(
             [
@@ -118,14 +72,6 @@ final class CustomerCodeManagerTest extends TestCase
             ],
             new InMemoryStorage(),
         );
-    }
-
-    private function requestStackWithClientIp(string $clientIp): RequestStack
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create('/customer/send-code', server: ['REMOTE_ADDR' => $clientIp]));
-
-        return $requestStack;
     }
 
     private function customer(string $email): Customer

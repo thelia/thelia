@@ -15,9 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\Customer\Service;
 
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -26,11 +23,7 @@ readonly class CustomerCodeManager
 {
     public function __construct(
         private MailerFactory $mailerFactory,
-        #[Autowire(service: 'limiter.customer_code_request_per_email')]
-        private RateLimiterFactoryInterface $perEmailCodeRequestLimiter,
-        #[Autowire(service: 'limiter.customer_code_request_per_client')]
-        private RateLimiterFactoryInterface $perClientCodeRequestLimiter,
-        private RequestStack $requestStack,
+        private CustomerEmailRequestLimiter $emailRequestLimiter,
     ) {
     }
 
@@ -48,16 +41,7 @@ readonly class CustomerCodeManager
         Customer $customer,
         int $expiryTimeInHours = 24,
     ): bool {
-        // No request in a CLI context: the per-client limit simply does not apply.
-        // It is consumed first so that a caller who is already over it stops eating
-        // the budget of the mailbox owner, who would then be denied a resend.
-        $clientIp = $this->requestStack->getMainRequest()?->getClientIp();
-
-        if (null !== $clientIp && !$this->perClientCodeRequestLimiter->create($clientIp)->consume()->isAccepted()) {
-            return false;
-        }
-
-        if (!$this->perEmailCodeRequestLimiter->create(hash('sha256', strtolower((string) $customer->getEmail())))->consume()->isAccepted()) {
+        if (!$this->emailRequestLimiter->allows((string) $customer->getEmail())) {
             return false;
         }
 
