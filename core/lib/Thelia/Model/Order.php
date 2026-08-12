@@ -23,7 +23,7 @@ use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
@@ -34,6 +34,8 @@ use Thelia\Module\PaymentModuleInterface;
 
 class Order extends BaseOrder
 {
+    use TaxCalculatorResolverTrait;
+
     protected ?int $choosenDeliveryAddress = null;
 
     protected ?int $choosenInvoiceAddress = null;
@@ -262,7 +264,7 @@ class Order extends BaseOrder
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
-            $tax -= $this->getDiscount() - Calculator::getUntaxedOrderDiscount($this);
+            $tax -= $this->getDiscount() - $this->createTaxCalculator()->computeUntaxedOrderDiscount($this);
 
             if ($total < 0) {
                 $total = 0;
