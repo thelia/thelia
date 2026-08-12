@@ -161,6 +161,13 @@
                 <div class="general-block-decorator clearfix">
 
                     <div class="title title-without-tabs">{intl l="Using a domain or subdomain for each language"}</div>
+
+                    {if $one_domain_per_lang != 0 && $languages_without_url != ''}
+                        <div class="alert alert-warning">
+                            {intl l="<strong>Warning</strong>, this setting is active but no domain is defined for: %languages. These languages are served from whichever domain the visitor arrived on." languages=$languages_without_url}
+                        </div>
+                    {/if}
+
                     {form name="thelia.lang.url"}
                     <form action="{url path="/admin/configuration/languages/updateUrl"}" method="post">
                         {form_hidden_fields}
