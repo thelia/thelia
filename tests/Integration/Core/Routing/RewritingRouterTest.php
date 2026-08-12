@@ -22,6 +22,7 @@ use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Routing\RewritingRouter;
 use Thelia\Model\Category;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class RewritingRouterTest extends IntegrationTestCase
@@ -62,6 +63,31 @@ final class RewritingRouterTest extends IntegrationTestCase
         return $request;
     }
 
+    /**
+     * A request whose session language differs from the language of the url being asked for,
+     * which is what makes the router look at the per language domains.
+     */
+    private function requestInFrench(string $url): Request
+    {
+        $request = $this->request($url);
+        $request->getSession()->setLang(LangQuery::create()->findOneByLocale('fr_FR'));
+
+        return $request;
+    }
+
+    private function langUrl(string $locale, string $url): void
+    {
+        LangQuery::create()->findOneByLocale($locale)->setActive(true)->setUrl($url)->save();
+    }
+
+    /**
+     * The language is switched on the main request, the one LangService works with.
+     */
+    private function mainRequestLocale(): ?string
+    {
+        return $this->getService('request_stack')->getMainRequest()?->getSession()->getLang(false)?->getLocale();
+    }
+
     public function testMatchRequestResolvesALiveUrl(): void
     {
         $category = $this->createCategory('Live category');
@@ -95,6 +121,69 @@ final class RewritingRouterTest extends IntegrationTestCase
         // unrelated object that happened to have the same id.
         $this->expectException(ResourceNotFoundException::class);
         $this->router->matchRequest($this->request($url, ['lang' => 'fr_FR']));
+    }
+
+    public function testMatchRequestDoesNotRedirectToItselfWhenTheLanguageHasNoDomain(): void
+    {
+        ConfigQuery::write('one_domain_foreach_lang', '1');
+        $this->langUrl('en_US', '');
+
+        $category = $this->createCategory('Category of a language without domain');
+        $request = $this->requestInFrench($category->getRewrittenUrl('en_US'));
+
+        // Every lang.url is empty on a fresh install: the redirect target used to be the
+        // very url being asked for, and a browser follows it until it gives up.
+        $parameters = $this->router->matchRequest($request);
+
+        self::assertTrue($parameters['_rewritten']);
+        self::assertSame('en_US', $this->mainRequestLocale());
+    }
+
+    public function testMatchRequestDoesNotRedirectToItselfWhenTheLanguageDomainIsTheCurrentOne(): void
+    {
+        ConfigQuery::write('one_domain_foreach_lang', '1');
+        $this->langUrl('en_US', 'http://localhost');
+
+        $category = $this->createCategory('Category of a language on the current domain');
+        $request = $this->requestInFrench($category->getRewrittenUrl('en_US'));
+
+        $parameters = $this->router->matchRequest($request);
+
+        self::assertTrue($parameters['_rewritten']);
+        self::assertSame('en_US', $this->mainRequestLocale());
+    }
+
+    public function testMatchRequestRedirectsToTheLanguageDomainWhenItDiffers(): void
+    {
+        ConfigQuery::write('one_domain_foreach_lang', '1');
+        $this->langUrl('en_US', 'http://en.example.com');
+
+        $category = $this->createCategory('Category of a language on its own domain');
+        $url = $category->getRewrittenUrl('en_US');
+
+        try {
+            $this->router->matchRequest($this->requestInFrench($url));
+            self::fail('An url of another language domain must redirect to that domain.');
+        } catch (RedirectException $redirectException) {
+            self::assertSame(301, $redirectException->getStatusCode());
+            self::assertSame('http://en.example.com/'.$url, $redirectException->getUrl());
+        }
+    }
+
+    public function testMatchRequestRedirectsToALanguageDomainWrittenWithATrailingSlash(): void
+    {
+        ConfigQuery::write('one_domain_foreach_lang', '1');
+        $this->langUrl('en_US', 'http://en.example.com/');
+
+        $category = $this->createCategory('Category of a language on its own slashed domain');
+        $url = $category->getRewrittenUrl('en_US');
+
+        try {
+            $this->router->matchRequest($this->requestInFrench($url));
+            self::fail('An url of another language domain must redirect to that domain.');
+        } catch (RedirectException $redirectException) {
+            self::assertSame('http://en.example.com/'.$url, $redirectException->getUrl());
+        }
     }
 
     public function testMatchRequestRedirectsAReplacedUrlToTheCurrentOne(): void
