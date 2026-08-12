@@ -19,6 +19,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Routing\RewritingRouter;
+use Thelia\Model\Category;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ProductQuery;
@@ -80,11 +81,53 @@ class RewritingRouterTest extends TestCase
     {
         ConfigQuery::write('rewriting_enable', 1);
         // A random path: any url left in the rewriting_url table by another test
-        // would be matched, obsolete ones included.
+        // would be matched.
         $request = Request::create('http://test.com/'.uniqid('no-such-url-', false));
         // Without a session the router falls back on a native PHP session, and
         // session_start() warns as soon as anything has been written to stdout.
         $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $rewritingRouter = new RewritingRouter();
+
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
+        $rewritingRouter->matchRequest($request);
+    }
+
+    /**
+     * covers RewritingRouter::matchRequest.
+     */
+    public function testMatchRequestWithObsoleteUrl(): void
+    {
+        ConfigQuery::write('rewriting_enable', 1);
+        ConfigQuery::write('one_domain_foreach_lang', 0);
+
+        $defaultLang = LangQuery::create()->findOneByByDefault(1);
+
+        $category = new Category();
+        $category->setVisible(1)
+            ->setPosition(1)
+            ->setLocale($defaultLang->getLocale())
+            ->setTitle('Obsolete rewritten url '.uniqid('', false))
+            ->save();
+
+        $obsoleteUrl = $category->getRewrittenUrl($defaultLang->getLocale());
+
+        // Deleting the object keeps its urls, moved to the obsolete view.
+        $category->delete();
+
+        $this->assertEquals(
+            ConfigQuery::getObsoleteRewrittenUrlView(),
+            RewritingUrlQuery::create()->findOneByUrl($obsoleteUrl)->getView()
+        );
+
+        $request = Request::create('http://test.com/'.$obsoleteUrl);
+        $session = new Session(new MockArraySessionStorage());
+        $session->setLang($defaultLang);
+        $request->setSession($session);
+        $url = new URL();
+        $requestContext = new RequestContext();
+        $requestContext->fromRequest($request);
+        $url->setRequestContext($requestContext);
 
         $rewritingRouter = new RewritingRouter();
 
