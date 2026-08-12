@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
@@ -125,7 +126,17 @@ abstract class IntegrationTestCase extends KernelTestCase
      */
     protected function getService(string $id): object
     {
-        return static::getContainer()->get($id);
+        $container = static::getContainer();
+
+        // Symfony drops a private service nothing else references, and the
+        // message it then answers with ("removed or inlined when the container
+        // was compiled") reads like a broken environment. It is not: the
+        // service simply has no declared way in. Say so, and say what to do.
+        if (!$container->has($id)) {
+            throw new \LogicException(\sprintf('The "%s" service cannot be fetched from the test container: it is private and nothing in the compiled container references it. Make it public for the test environment (see %s) or reach it through a service that is.', $id, TestPublicServicesPass::class));
+        }
+
+        return $container->get($id);
     }
 
     protected function getPropelConnection(): ConnectionInterface
