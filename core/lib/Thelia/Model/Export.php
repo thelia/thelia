@@ -24,30 +24,34 @@ class Export extends BaseExport
 {
     use PositionManagementTrait;
 
-    protected static ?AbstractExport $cache = null;
+    protected ?AbstractExport $cache = null;
 
     /**
-     * @throws \ErrorException
+     * Whether the class named by handle_class can still be loaded. It cannot when the
+     * module that declared the export has been removed, as nothing deletes the export
+     * entries a module leaves behind.
+     */
+    public function isHandlerAvailable(): bool
+    {
+        $class = ltrim((string) $this->getHandleClass(), '\\');
+
+        return '' !== $class && class_exists($class) && is_subclass_of($class, AbstractExport::class);
+    }
+
+    /**
+     * @throws \ErrorException when the handler class is missing or is not an export
      */
     public function getHandleClassInstance(): AbstractExport
     {
-        $class = $this->getHandleClass();
+        $class = '\\'.ltrim((string) $this->getHandleClass(), '\\');
 
-        if ('\\' !== $class[0]) {
-            $class = '\\'.$class;
-        }
-
-        if (!class_exists($class)) {
-            $this->delete();
-
+        if ('\\' === $class || !class_exists($class)) {
             throw new \ErrorException(Translator::getInstance()->trans('The class "%class" doesn\'t exist', ['%class' => $class]));
         }
 
         $instance = new $class();
 
         if (!$instance instanceof AbstractExport) {
-            $this->delete();
-
             throw new \ErrorException(Translator::getInstance()->trans('The class "%class" must extend %baseClass', ['%class' => $class, '%baseClass' => AbstractExport::class]));
         }
 
@@ -56,29 +60,26 @@ class Export extends BaseExport
 
     public function hasImages()
     {
-        if (null === static::$cache) {
-            static::$cache = $this->getHandleClassInstance();
-        }
-
-        return static::$cache->hasImages();
+        return $this->handler()?->hasImages() ?? false;
     }
 
     public function hasDocuments()
     {
-        if (null === static::$cache) {
-            static::$cache = $this->getHandleClassInstance();
-        }
-
-        return static::$cache->hasDocuments();
+        return $this->handler()?->hasDocuments() ?? false;
     }
 
     public function useRangeDate()
     {
-        if (null === static::$cache) {
-            static::$cache = $this->getHandleClassInstance();
+        return $this->handler()?->useRangeDate() ?? false;
+    }
+
+    private function handler(): ?AbstractExport
+    {
+        if (!$this->isHandlerAvailable()) {
+            return null;
         }
 
-        return static::$cache->useRangeDate();
+        return $this->cache ??= $this->getHandleClassInstance();
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool

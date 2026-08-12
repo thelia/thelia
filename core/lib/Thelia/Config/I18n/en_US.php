@@ -555,6 +555,8 @@ return [
     'The brand name or title' => 'The brand name or title',
     'The cart item count should match the condition' => 'The cart item count should match the condition',
     'The category title' => 'The category title',
+    'The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.',
+    'The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.',
     'The class "%class" doesn\'t exist' => 'The class "%class" doesn\'t exist',
     'The class "%class" must extend %baseClass' => 'The class "%class" must extend %baseClass',
     'The container should not be null in this form. Please use the FormFactory to get an instance.' => 'The container should not be null in this form. Please use the FormFactory to get an instance.',

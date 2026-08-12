@@ -554,6 +554,8 @@ return [
     'The brand name or title' => 'Le nom ou le titre de la marque',
     'The cart item count should match the condition' => 'Le nombre d\'articles dans le panier doit vérifier la condition',
     'The category title' => 'Titre de cette catégorie',
+    'The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'L\'export "%ref" ne peut pas être exécuté : sa classe de traitement "%class" n\'est pas disponible. Le module qui la fournissait a probablement été supprimé.',
+    'The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'L\'import "%ref" ne peut pas être exécuté : sa classe de traitement "%class" n\'est pas disponible. Le module qui la fournissait a probablement été supprimé.',
     'The class "%class" doesn\'t exist' => 'La classe "%class" n\'existe pas',
     'The class "%class" must extend %baseClass' => 'La classe "%class" doit hériter de %baseClass',
     'The coupon applies if the cart contains at least one product of the selected categories' => 'Le code promo est valable si le panier contient/ne contient pas des produits appartenant aux catégories sélectionnées',
