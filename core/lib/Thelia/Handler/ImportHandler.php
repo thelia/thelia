@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
+use Thelia\Files\FileConfiguration;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\ImportExport\Import\AbstractImport;
 use Thelia\Model\Import;
@@ -35,6 +36,17 @@ use Thelia\Model\Lang;
  */
 class ImportHandler
 {
+    /**
+     * Compound extensions the archivers read but do not declare. Thelia used to accept
+     * them by accident, through a substring lookup on the file name, and "tar czf"
+     * produces them, so they stay accepted. Each maps to the extension of the archiver
+     * that reads it, so an unavailable archiver does not advertise its compound form.
+     */
+    public const COMPOUND_ARCHIVE_EXTENSIONS = [
+        'tar.gz' => 'tgz',
+        'tar.bz2' => 'bz2',
+    ];
+
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface An event dispatcher interface
      */
@@ -206,6 +218,89 @@ class ImportHandler
     }
 
     /**
+     * Extensions the registered serializers and archivers are able to read. This is
+     * what the back office may accept, and what it advertises to the administrator.
+     *
+     * @return array<int, string>
+     */
+    public function getAcceptedExtensions()
+    {
+        $extensions = [];
+
+        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
+        foreach ($this->serializerManager->getSerializers() as $serializer) {
+            $extensions[] = strtolower($serializer->getExtension());
+        }
+
+        $extensions = array_merge($extensions, $this->getAcceptedArchiveExtensions());
+
+        return array_values(array_unique($extensions));
+    }
+
+    /**
+     * Mime types matching getAcceptedExtensions(), for the file input "accept" hint.
+     *
+     * @return array<int, string>
+     */
+    public function getAcceptedMimeTypes()
+    {
+        $mimeTypes = [];
+
+        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
+        foreach ($this->serializerManager->getSerializers() as $serializer) {
+            $mimeTypes[] = $serializer->getMimeType();
+        }
+
+        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
+        foreach ($this->archiverManager->getArchivers(true) as $archiver) {
+            $mimeTypes[] = $archiver->getMimeType();
+        }
+
+        return array_values(array_unique($mimeTypes));
+    }
+
+    /**
+     * Checks an uploaded file name against the formats the import handlers declare,
+     * before anything is written to disk. Callers get the same policy the back office
+     * displays, so the promise made by the interface is the one that is enforced.
+     *
+     * @param string $fileName File name
+     *
+     * @throws \Thelia\Form\Exception\FormValidationException when the file may not be imported
+     */
+    public function validateUpload($fileName): void
+    {
+        $fileName = (string) $fileName;
+
+        $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
+
+        if ($dangerousExtension !== null) {
+            throw new FormValidationException(
+                Translator::getInstance()->trans(
+                    'The extension "%extension" is not allowed',
+                    [
+                        '%extension' => $dangerousExtension,
+                    ]
+                )
+            );
+        }
+
+        $acceptedExtensions = $this->getAcceptedExtensions();
+
+        if ($this->matchExtension($fileName, $acceptedExtensions) === null) {
+            throw new FormValidationException(
+                Translator::getInstance()->trans(
+                    'The extension "%extension" is not allowed. Accepted formats: %formats',
+                    [
+                        '%extension' => pathinfo($fileName, \PATHINFO_EXTENSION),
+                        '%formats' => implode(', ', $acceptedExtensions),
+                    ]
+                )
+            );
+        }
+    }
+
+    /**
      * Match archiver relative to file name.
      *
      * @param string $fileName File name
@@ -214,9 +309,17 @@ class ImportHandler
      */
     public function matchArchiverByExtension($fileName)
     {
+        $extension = $this->matchExtension((string) $fileName, $this->getAcceptedArchiveExtensions());
+
+        if ($extension === null) {
+            return null;
+        }
+
+        $extension = self::COMPOUND_ARCHIVE_EXTENSIONS[$extension] ?? $extension;
+
         /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
-            if (stripos($fileName, '.'.$archiver->getExtension()) !== false) {
+            if (strcasecmp($extension, $archiver->getExtension()) === 0) {
                 return $archiver;
             }
         }
@@ -233,14 +336,66 @@ class ImportHandler
      */
     public function matchSerializerByExtension($fileName)
     {
+        $extension = pathinfo((string) $fileName, \PATHINFO_EXTENSION);
+
         /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (stripos($fileName, '.'.$serializer->getExtension()) !== false) {
+            if (strcasecmp($extension, $serializer->getExtension()) === 0) {
                 return $serializer;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Extensions of the available archivers, plus the compound forms they can read
+     * without declaring them.
+     *
+     * @return array<int, string>
+     */
+    protected function getAcceptedArchiveExtensions()
+    {
+        $extensions = [];
+
+        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
+        foreach ($this->archiverManager->getArchivers(true) as $archiver) {
+            $extensions[] = strtolower($archiver->getExtension());
+        }
+
+        foreach (self::COMPOUND_ARCHIVE_EXTENSIONS as $compoundExtension => $archiverExtension) {
+            if (\in_array($archiverExtension, $extensions, true)) {
+                $extensions[] = $compoundExtension;
+            }
+        }
+
+        return array_values(array_unique($extensions));
+    }
+
+    /**
+     * Returns the longest of the given extensions the file name ends with, so that
+     * "catalogue.tar.gz" resolves to "tar.gz" and not to "gz".
+     *
+     * @param array<int, string> $extensions
+     */
+    protected function matchExtension(string $fileName, array $extensions): ?string
+    {
+        $fileName = strtolower($fileName);
+        $match = null;
+
+        foreach ($extensions as $extension) {
+            $extension = strtolower($extension);
+
+            if (!str_ends_with($fileName, '.'.$extension)) {
+                continue;
+            }
+
+            if ($match === null || \strlen($extension) > \strlen($match)) {
+                $match = $extension;
+            }
+        }
+
+        return $match;
     }
 
     /**

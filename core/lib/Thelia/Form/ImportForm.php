@@ -14,8 +14,11 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Handler\ImportHandler;
 use Thelia\Model\LangQuery;
 
 /**
@@ -25,6 +28,11 @@ use Thelia\Model\LangQuery;
  */
 class ImportForm extends BaseForm
 {
+    public function __construct(
+        private readonly ImportHandler $importHandler,
+    ) {
+    }
+
     protected function buildForm(): void
     {
         $this->formBuilder
@@ -34,6 +42,9 @@ class ImportForm extends BaseForm
             'required' => true,
                 'constraints' => [
                     new Assert\NotNull(),
+                    new Assert\Callback(
+                        [$this, 'checkFileFormat']
+                    ),
                 ],
             ])
             ->add('language', IntegerType::class, [
@@ -55,6 +66,23 @@ class ImportForm extends BaseForm
     public static function getName()
     {
         return 'thelia_import';
+    }
+
+    /**
+     * The page advertises the formats the import handlers can read; only a NotNull
+     * used to stand between the request and the import cache directory.
+     */
+    public function checkFileFormat($value, ExecutionContextInterface $context): void
+    {
+        if (!$value instanceof UploadedFile) {
+            return;
+        }
+
+        try {
+            $this->importHandler->validateUpload($value->getClientOriginalName());
+        } catch (FormValidationException $exception) {
+            $context->addViolation($exception->getMessage());
+        }
     }
 
     public function checkLanguage($value, ExecutionContextInterface $context): void

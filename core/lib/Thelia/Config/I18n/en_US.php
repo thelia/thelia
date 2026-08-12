@@ -569,6 +569,7 @@ return [
     'The detailed description.' => 'The detailed description.',
     'The email address "%mail" was not found.' => 'The email address "%mail" was not found.',
     'The extension "%extension" is not allowed' => 'The extension "%extension" is not allowed',
+    'The extension "%extension" is not allowed. Accepted formats: %formats' => 'The extension "%extension" is not allowed. Accepted formats: %formats',
     'The file %path has been successfully downloaded' => 'The file %path has been successfully downloaded',
     'The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.' => 'The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.',
     'The following columns are missing: %columns' => 'The following columns are missing: %columns',

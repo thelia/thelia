@@ -13,8 +13,6 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
@@ -141,20 +139,10 @@ class ImportController extends BaseAdminController
             return $this->pageNotFound();
         }
 
-        $extensions = [];
-        $mimeTypes = [];
-
-        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
-        foreach ($this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID)->getSerializers() as $serializer) {
-            $extensions[] = $serializer->getExtension();
-            $mimeTypes[] = $serializer->getMimeType();
-        }
-
-        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
-        foreach ($this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID)->getArchivers(true) as $archiver) {
-            $extensions[] = $archiver->getExtension();
-            $mimeTypes[] = $archiver->getMimeType();
-        }
+        // Advertise exactly what the import handlers accept, so that the page and the
+        // constraint enforced by ImportForm cannot drift apart.
+        $extensions = $importHandler->getAcceptedExtensions();
+        $mimeTypes = $importHandler->getAcceptedMimeTypes();
 
         // Render standard view or ajax one
         $templateName = 'import-page';

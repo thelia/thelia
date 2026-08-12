@@ -567,6 +567,7 @@ return [
     'The detailed description.' => 'La description détaillée.',
     'The email address "%mail" was not found.' => 'L\'adresse e-mail "%mail" n\'as pas été trouvée.',
     'The extension "%extension" is not allowed' => 'L\'extension "%extension" n\'est pas autorisée',
+    'The extension "%extension" is not allowed. Accepted formats: %formats' => 'L\'extension "%extension" n\'est pas autorisée. Formats acceptés : %formats',
     'The file %path has been successfully downloaded' => 'Le fichier %path a été téléchargé',
     'The file your customer will download once the order is paid. Only the documents of this product which are not visible can be selected, so that they cannot be downloaded for free. Leave empty if this virtual product has nothing to download.' => 'Le fichier que votre client téléchargera une fois la commande payée. Seuls les documents non visibles de ce produit peuvent être sélectionnés, afin qu\'ils ne soient pas téléchargeables gratuitement. Laissez vide si ce produit virtuel n\'a rien à télécharger.',
     'The following columns are missing: %columns' => 'Il manque les colonnes suivantes: %columns',
