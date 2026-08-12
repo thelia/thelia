@@ -152,7 +152,7 @@ class OrderExport extends JsonFileAbstractExport
                 LEFT JOIN country_i18n as delivery_country_i18n ON delivery_country_i18n.id = delivery_address.country_id AND delivery_country_i18n.locale = :locale
                 LEFT JOIN country_i18n as invoice_country_i18n ON invoice_country_i18n.id = invoice_address.country_id AND invoice_country_i18n.locale = :locale
                 LEFT JOIN currency ON currency.id = order.currency_id
-                WHERE `order`.created_at >= :start AND `order`.created_at <= :end
+                '.$this->buildDateRangeCondition().'
                 GROUP BY `order`.id
                 ORDER BY `order`.created_at DESC
             ) as tmp
@@ -160,10 +160,52 @@ class OrderExport extends JsonFileAbstractExport
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $stmt->bindValue('start', $this->rangeDate['start']->format('Y-m-d H:i:s'));
-        $stmt->bindValue('end', $this->rangeDate['end']->format('Y-m-d H:i:s'));
+
+        foreach ($this->getDateRangeBounds() as $bound => $date) {
+            $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
+        }
+
         $stmt->execute();
 
         return $this->getDataJsonCache($stmt, 'order');
+    }
+
+    /**
+     * A date range is optional: without one, the export covers every order.
+     * A single bound is honoured on its own, so `--start` alone exports
+     * everything since that date.
+     *
+     * @return array<string, \DateTimeInterface>
+     */
+    private function getDateRangeBounds()
+    {
+        $bounds = [];
+
+        foreach (['start', 'end'] as $bound) {
+            if (($this->rangeDate[$bound] ?? null) instanceof \DateTimeInterface) {
+                $bounds[$bound] = $this->rangeDate[$bound];
+            }
+        }
+
+        return $bounds;
+    }
+
+    /**
+     * @return string
+     */
+    private function buildDateRangeCondition()
+    {
+        $comparisons = ['start' => '>=', 'end' => '<='];
+        $conditions = [];
+
+        foreach ($this->getDateRangeBounds() as $bound => $date) {
+            $conditions[] = '`order`.created_at '.$comparisons[$bound].' :'.$bound;
+        }
+
+        if ($conditions === []) {
+            return '';
+        }
+
+        return 'WHERE '.implode(' AND ', $conditions);
     }
 }
