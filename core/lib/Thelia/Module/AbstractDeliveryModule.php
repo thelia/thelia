@@ -20,6 +20,8 @@ use Thelia\Model\Country;
 
 abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
 {
+    use OrderPostageBuilderTrait;
+
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
 
