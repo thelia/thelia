@@ -787,15 +787,59 @@ class TheliaKernel extends Kernel
 
         $container = $this->container;
 
+        self::configureTrustedRequestSources($container);
+
+        return $container;
+    }
+
+    /**
+     * Applies framework.trusted_hosts and framework.trusted_proxies to the Request class.
+     *
+     * FrameworkExtension stores a single trusted host or proxy as a scalar, and trusted
+     * headers as the list of header names taken from the configuration, while Request
+     * expects an array of host patterns and a bitmask of Request::HEADER_* constants.
+     */
+    protected static function configureTrustedRequestSources(ContainerInterface $container): void
+    {
         if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
+            Request::setTrustedHosts(\is_array($trustedHosts) ? $trustedHosts : preg_split('/\s*+,\s*+(?![^{]*})/', (string) $trustedHosts));
         }
 
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', (string) $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+            Request::setTrustedProxies(
+                \is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', (string) $trustedProxies)),
+                self::trustedHeaderSet($container->getParameter('kernel.trusted_headers')),
+            );
+        }
+    }
+
+    private static function trustedHeaderSet(array|bool|float|int|string|\UnitEnum|null $trustedHeaders): int
+    {
+        if (\is_int($trustedHeaders)) {
+            return $trustedHeaders;
         }
 
-        return $container;
+        if (\is_string($trustedHeaders)) {
+            $trustedHeaders = array_map('trim', explode(',', $trustedHeaders));
+        }
+
+        if (!\is_array($trustedHeaders)) {
+            return Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO;
+        }
+
+        $trustedHeaderSet = 0;
+
+        foreach ($trustedHeaders as $trustedHeader) {
+            $constant = Request::class.'::HEADER_'.strtr(strtoupper((string) $trustedHeader), '-', '_');
+
+            if (!\defined($constant)) {
+                throw new \InvalidArgumentException(\sprintf('The trusted header "%s" is not supported.', $trustedHeader));
+            }
+
+            $trustedHeaderSet |= \constant($constant);
+        }
+
+        return $trustedHeaderSet;
     }
 
     private function loadModuleTranslationDirectories(
