@@ -20,8 +20,10 @@ use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Domain\Taxation\TaxEngine\OrderProductTaxCollection;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
+use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Country;
+use Thelia\Model\Order;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
 use Thelia\Model\State;
@@ -35,6 +37,12 @@ use Thelia\Test\IntegrationTestCase;
 final class TaxCalculatorReplacementTest extends IntegrationTestCase
 {
     public const SUBSTITUTED_TAXED_PRICE = 133.7;
+
+    /**
+     * What the substitute answers when asked to split a discount, whatever the
+     * discount actually is.
+     */
+    public const SUBSTITUTED_UNTAXED_DISCOUNT = 42.42;
 
     private ?\Closure $listener = null;
 
@@ -111,6 +119,61 @@ final class TaxCalculatorReplacementTest extends IntegrationTestCase
         self::assertSame('substituted', $taxDetail->getKey(0)->getTitle());
     }
 
+    /**
+     * The discount split used to be four statics, which no module could replace.
+     */
+    public function testCartDiscountSplitGoesThroughTheReplacedCalculator(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $cart = $factory->cart();
+        $cart->setDiscount('10')->save($this->getPropelConnection());
+        $country = $factory->country();
+
+        self::assertSame(
+            10.0,
+            $cart->getCalculatedDiscount(false, $country),
+            'Nothing taxable in the cart: the shipped calculator leaves the discount alone.',
+        );
+
+        $this->replaceCalculator();
+
+        self::assertSame(
+            self::SUBSTITUTED_UNTAXED_DISCOUNT,
+            $cart->getCalculatedDiscount(false, $country),
+        );
+    }
+
+    public function testOrderDiscountSplitGoesThroughTheReplacedCalculator(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        $order->setDiscount('10')->save($this->getPropelConnection());
+
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+        self::assertSame(0.0, $tax, 'No order product, so no tax to take the discount out of.');
+
+        $this->replaceCalculator();
+
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+
+        // getTotalAmount() subtracts (discount - untaxed discount) from the tax.
+        self::assertSame(self::SUBSTITUTED_UNTAXED_DISCOUNT - 10.0, $tax);
+    }
+
+    public function testTheDeprecatedStaticsStillAnswer(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $cart = $factory->cart();
+        $cart->setDiscount('10')->save($this->getPropelConnection());
+        $order = $factory->order();
+
+        self::assertSame(1.0, Calculator::getCartTaxFactor($cart, $factory->country()));
+        self::assertSame(10.0, (float) Calculator::getUntaxedCartDiscount($cart, $factory->country()));
+        self::assertSame(1.0, Calculator::getOrderTaxFactor($order));
+        self::assertSame(0.0, (float) Calculator::getUntaxedOrderDiscount($order));
+    }
+
     public function testFactoryIsAliasedAndHandsOutAFreshInstanceEveryTime(): void
     {
         $factory = $this->getService(TaxCalculatorFactoryInterface::class);
@@ -178,6 +241,26 @@ final class TaxCalculatorReplacementTest extends IntegrationTestCase
                 public function getUntaxedPrice($taxedPrice): int|float
                 {
                     return $taxedPrice;
+                }
+
+                public function computeUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float
+                {
+                    return TaxCalculatorReplacementTest::SUBSTITUTED_UNTAXED_DISCOUNT;
+                }
+
+                public function computeUntaxedOrderDiscount(Order $order): int|float
+                {
+                    return TaxCalculatorReplacementTest::SUBSTITUTED_UNTAXED_DISCOUNT;
+                }
+
+                public function computeCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float
+                {
+                    return 2.0;
+                }
+
+                public function computeOrderTaxFactor(Order $order): float
+                {
+                    return 2.0;
                 }
             });
         };
