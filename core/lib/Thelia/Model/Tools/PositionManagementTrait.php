@@ -114,6 +114,12 @@ trait PositionManagementTrait
                 $cnx->commit();
             } catch (\Exception) {
                 $cnx->rollback();
+            } catch (\Throwable $throwable) {
+                // A position swap is best-effort, but an Error is not: it keeps
+                // propagating as before, only without leaving the transaction open.
+                $cnx->rollback();
+
+                throw $throwable;
             }
         }
     }
@@ -177,6 +183,12 @@ trait PositionManagementTrait
                 $cnx->commit();
             } catch (\Exception) {
                 $cnx->rollback();
+            } catch (\Throwable $throwable) {
+                // Same as changeRelativePosition(): an Error still propagates,
+                // it just no longer leaves an open transaction behind.
+                $cnx->rollback();
+
+                throw $throwable;
             }
         }
     }

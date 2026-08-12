@@ -329,7 +329,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (\Exception  $ex) {
+        } catch (\Throwable $ex) {
             $con->rollBack();
 
             throw $ex;

@@ -60,7 +60,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
             $event->getCustomerTitle()->delete();
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;
@@ -96,7 +96,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;

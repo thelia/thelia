@@ -196,7 +196,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (\Throwable $e) {
             $con->rollback();
 
             throw $e;
@@ -307,7 +307,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (PropelException $e) {
+            } catch (\Throwable $e) {
                 $con->rollback();
 
                 throw $e;
@@ -342,10 +342,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $event->setSale($sale);
 
             $con->commit();
-        } catch (PropelException $propelException) {
+        } catch (\Throwable $throwable) {
             $con->rollback();
 
-            throw $propelException;
+            throw $throwable;
         }
     }
 
@@ -378,7 +378,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 $event->setSale($sale);
 
                 $con->commit();
-            } catch (PropelException $e) {
+            } catch (\Throwable $e) {
                 $con->rollback();
 
                 throw $e;
@@ -408,10 +408,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ->update(['Promo' => 0], $con);
 
             $con->commit();
-        } catch (PropelException $propelException) {
+        } catch (\Throwable $throwable) {
             $con->rollback();
 
-            throw $propelException;
+            throw $throwable;
         }
     }
 
@@ -465,10 +465,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (PropelException $propelException) {
+        } catch (\Throwable $throwable) {
             $con->rollback();
 
-            throw $propelException;
+            throw $throwable;
         }
     }
 

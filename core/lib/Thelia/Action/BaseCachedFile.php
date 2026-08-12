@@ -223,7 +223,7 @@ abstract class BaseCachedFile extends BaseAction
 
             $event->setUploadedFile($newUploadedFile);
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;

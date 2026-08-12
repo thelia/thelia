@@ -113,7 +113,7 @@ class BaseModule implements BaseModuleInterface
 
                 $this->postActivation($con);
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 if ($con->inTransaction()) {
                     $con->rollBack();
                 }
@@ -144,8 +144,13 @@ class BaseModule implements BaseModuleInterface
                     $this->postDeactivation($con);
 
                     $con->commit();
+                } else {
+                    // A module refusing its own deactivation is a normal outcome:
+                    // discard whatever preDeactivation() wrote instead of leaving
+                    // the transaction — and its locks — open.
+                    $con->rollBack();
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
 
                 throw $e;
@@ -280,46 +285,52 @@ class BaseModule implements BaseModuleInterface
                 if (Image::isImage($filePath)) {
                     $con->beginTransaction();
 
-                    $image = new ModuleImage();
-                    $image->setModuleId($module->getId());
-                    $image->setPosition($imagePosition);
-                    $image->setFile('');
-                    $image->save($con);
+                    try {
+                        $image = new ModuleImage();
+                        $image->setModuleId($module->getId());
+                        $image->setPosition($imagePosition);
+                        $image->setFile('');
+                        $image->save($con);
 
-                    $imageDirectory = \sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
-                    $imageFileName = \sprintf('%s-%d-%s', $module->getCode(), $image->getId(), $fileName);
+                        $imageDirectory = \sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
+                        $imageFileName = \sprintf('%s-%d-%s', $module->getCode(), $image->getId(), $fileName);
 
-                    $increment = 0;
+                        $increment = 0;
 
-                    while (file_exists($imageDirectory.'/'.$imageFileName)) {
-                        $imageFileName = \sprintf(
-                            '%s-%d-%d-%s',
-                            $module->getCode(),
-                            $image->getId(),
-                            $increment,
-                            $fileName,
-                        );
-                        ++$increment;
-                    }
+                        while (file_exists($imageDirectory.'/'.$imageFileName)) {
+                            $imageFileName = \sprintf(
+                                '%s-%d-%d-%s',
+                                $module->getCode(),
+                                $image->getId(),
+                                $increment,
+                                $fileName,
+                            );
+                            ++$increment;
+                        }
 
-                    $imagePath = \sprintf('%s/%s', $imageDirectory, $imageFileName);
+                        $imagePath = \sprintf('%s/%s', $imageDirectory, $imageFileName);
 
-                    if (!is_dir($imageDirectory) && !mkdir($imageDirectory, 0o777, true) && !is_dir($imageDirectory)) {
+                        if (!is_dir($imageDirectory) && !mkdir($imageDirectory, 0o777, true) && !is_dir($imageDirectory)) {
+                            throw new ModuleException(\sprintf('Cannot create directory : %s', $imageDirectory), ModuleException::CODE_NOT_FOUND);
+                        }
+
+                        if (!@copy($filePath, $imagePath)) {
+                            throw new ModuleException(\sprintf('Cannot copy file : %s to : %s', $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
+                        }
+
+                        $image->setFile($imageFileName);
+                        $image->save($con);
+
+                        $con->commit();
+                    } catch (\Throwable $throwable) {
+                        // The two ModuleException paths used to roll back by hand; a
+                        // failing save() did not, and left the transaction open for
+                        // the rest of the install.
                         $con->rollBack();
 
-                        throw new ModuleException(\sprintf('Cannot create directory : %s', $imageDirectory), ModuleException::CODE_NOT_FOUND);
+                        throw $throwable;
                     }
 
-                    if (!@copy($filePath, $imagePath)) {
-                        $con->rollBack();
-
-                        throw new ModuleException(\sprintf('Cannot copy file : %s to : %s', $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
-                    }
-
-                    $image->setFile($imageFileName);
-                    $image->save($con);
-
-                    $con->commit();
                     ++$imagePosition;
                 }
             }

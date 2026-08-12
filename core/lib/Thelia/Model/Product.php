@@ -184,7 +184,7 @@ class Product extends BaseProduct implements FileModelParentInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollback();
 
             throw $exception;

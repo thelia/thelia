@@ -123,10 +123,10 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             $this->save($con);
 
             $con->commit();
-        } catch (PropelException $propelException) {
+        } catch (\Throwable $throwable) {
             $con->rollBack();
 
-            throw $propelException;
+            throw $throwable;
         }
     }
 

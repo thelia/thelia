@@ -103,7 +103,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollback();
 
             throw $exception;
@@ -198,7 +198,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollback();
 
             throw $exception;
@@ -251,7 +251,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 // Store all the stuff !
                 $con->commit();
-            } catch (\Exception $ex) {
+            } catch (\Throwable $ex) {
                 $con->rollback();
 
                 throw $ex;
@@ -304,7 +304,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollback();
 
             throw $exception;

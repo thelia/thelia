@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Lang as BaseLang;
 use Thelia\Model\Map\LangTableMap;
@@ -73,10 +72,10 @@ class Lang extends BaseLang
                 ->save($con);
 
             $con->commit();
-        } catch (PropelException $propelException) {
+        } catch (\Throwable $throwable) {
             $con->rollBack();
 
-            throw $propelException;
+            throw $throwable;
         }
     }
 

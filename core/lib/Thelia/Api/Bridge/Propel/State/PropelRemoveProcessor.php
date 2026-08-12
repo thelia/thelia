@@ -52,7 +52,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
             }
 
             $connection->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $connection->rollBack();
 
             throw $exception;

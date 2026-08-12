@@ -137,7 +137,7 @@ class Content extends BaseContent implements FileModelParentInterface
             $this->setDefaultFolder($defaultFolderId)->save($con);
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollback();
 
             throw $exception;
