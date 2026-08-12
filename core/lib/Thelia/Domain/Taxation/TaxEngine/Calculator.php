@@ -162,6 +162,13 @@ class Calculator implements TaxCalculatorInterface
             }
         }
 
+        // Nothing taxable to spread the discount over: a cart still carrying the
+        // discount of a coupon after its last item was removed, or a destination
+        // no tax rule applies to. Leave the discount as it is, like an order does.
+        if ([] === $cartTaxFactors) {
+            return 1;
+        }
+
         $cartFactor = array_sum($cartTaxFactors) / \count($cartTaxFactors);
 
         $cartFactors[$key] = $cartFactor;
