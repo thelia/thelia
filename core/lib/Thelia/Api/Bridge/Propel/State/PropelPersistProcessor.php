@@ -53,6 +53,8 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $propelModel->setId($uriVariables['id']);
         }
 
+        $resourceAddons = [];
+
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
 
