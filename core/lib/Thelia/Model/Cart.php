@@ -20,11 +20,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\Cart as BaseCart;
 
 class Cart extends BaseCart
 {
+    use TaxCalculatorResolverTrait;
+
     /**
      * Duplicate the current existing cart. Only the token is changed.
      *
@@ -258,7 +260,7 @@ class Cart extends BaseCart
             return (float) $this->getDiscount();
         }
 
-        return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);
+        return round($this->createTaxCalculator()->computeUntaxedCartDiscount($this, $country, $state), 2);
     }
 
     public function getTaxedPostage(): float

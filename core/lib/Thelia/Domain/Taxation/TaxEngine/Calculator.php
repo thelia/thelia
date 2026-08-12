@@ -66,32 +66,78 @@ class Calculator implements TaxCalculatorInterface
     }
 
     /**
-     * @return float
+     * @deprecated since 3.0, use {@see computeUntaxedCartDiscount()} on the calculator
+     *             handed out by TaxCalculatorFactoryInterface. A static cannot be replaced,
+     *             so a custom tax engine never gets a say in this result.
      *
      * @throws PropelException
      */
     public static function getUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float
     {
-        return $cart->getDiscount() / self::getCartTaxFactor($cart, $country, $state);
+        trigger_deprecation('thelia/core', '3.0', 'Calculator::getUntaxedCartDiscount() is deprecated, ask a TaxCalculatorFactoryInterface for a calculator and call computeUntaxedCartDiscount() on it.');
+
+        return (new self())->computeUntaxedCartDiscount($cart, $country, $state);
     }
 
     /**
-     * @throws PropelException
-     */
-    /**
-     * @return float
+     * @deprecated since 3.0, use {@see computeUntaxedOrderDiscount()} on the calculator
+     *             handed out by TaxCalculatorFactoryInterface
      *
      * @throws PropelException
      */
     public static function getUntaxedOrderDiscount(Order $order): int|float
     {
-        return $order->getDiscount() / self::getOrderTaxFactor($order);
+        trigger_deprecation('thelia/core', '3.0', 'Calculator::getUntaxedOrderDiscount() is deprecated, ask a TaxCalculatorFactoryInterface for a calculator and call computeUntaxedOrderDiscount() on it.');
+
+        return (new self())->computeUntaxedOrderDiscount($order);
+    }
+
+    /**
+     * @deprecated since 3.0, use {@see computeOrderTaxFactor()} on the calculator
+     *             handed out by TaxCalculatorFactoryInterface
+     *
+     * @throws PropelException
+     */
+    public static function getOrderTaxFactor(Order $order): float
+    {
+        trigger_deprecation('thelia/core', '3.0', 'Calculator::getOrderTaxFactor() is deprecated, ask a TaxCalculatorFactoryInterface for a calculator and call computeOrderTaxFactor() on it.');
+
+        return (new self())->computeOrderTaxFactor($order);
+    }
+
+    /**
+     * @deprecated since 3.0, use {@see computeCartTaxFactor()} on the calculator
+     *             handed out by TaxCalculatorFactoryInterface
+     *
+     * @throws PropelException
+     */
+    public static function getCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float
+    {
+        trigger_deprecation('thelia/core', '3.0', 'Calculator::getCartTaxFactor() is deprecated, ask a TaxCalculatorFactoryInterface for a calculator and call computeCartTaxFactor() on it.');
+
+        return (new self())->computeCartTaxFactor($cart, $country, $state);
     }
 
     /**
      * @throws PropelException
      */
-    public static function getOrderTaxFactor(Order $order): float
+    public function computeUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float
+    {
+        return $cart->getDiscount() / $this->computeCartTaxFactor($cart, $country, $state);
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function computeUntaxedOrderDiscount(Order $order): int|float
+    {
+        return $order->getDiscount() / $this->computeOrderTaxFactor($order);
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function computeOrderTaxFactor(Order $order): float
     {
         if (0.0 === (float) $order->getDiscount()) {
             return 1;
@@ -103,7 +149,7 @@ class Calculator implements TaxCalculatorInterface
             return self::$orderTaxFactors[$order];
         }
 
-        // Find the average Tax rate (see \Thelia\TaxEngine\Calculator::getCartTaxFactor())
+        // Find the average Tax rate (see computeCartTaxFactor())
         $orderTaxFactors = [];
 
         /** @var OrderProduct $orderProduct */
@@ -124,7 +170,7 @@ class Calculator implements TaxCalculatorInterface
     /**
      * @throws PropelException
      */
-    public static function getCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float
+    public function computeCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float
     {
         if (0.0 === (float) $cart->getDiscount()) {
             return 1;

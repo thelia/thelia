@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Taxation\TaxEngine;
 
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
+use Thelia\Model\Order;
 use Thelia\Model\Product;
 use Thelia\Model\State;
 use Thelia\Model\TaxRule;
@@ -43,4 +45,23 @@ interface TaxCalculatorInterface
     public function getTaxedPrice(float $untaxedPrice, ?OrderProductTaxCollection &$taxCollection = null, ?string $askedLocale = null): int|float;
 
     public function getUntaxedPrice($taxedPrice): int|float;
+
+    /**
+     * The share of a cart discount that is not tax, so that a shop can spread a
+     * coupon over its lines the way its accounting requires.
+     *
+     * These four do not depend on a load*() call: they take the cart or the order
+     * they work on as an argument. They replace the four statics of the same
+     * purpose on Calculator, which are deprecated and cannot be substituted.
+     */
+    public function computeUntaxedCartDiscount(Cart $cart, Country $country, ?State $state = null): int|float;
+
+    public function computeUntaxedOrderDiscount(Order $order): int|float;
+
+    /**
+     * The average tax factor of the cart, the divisor applied to its discount.
+     */
+    public function computeCartTaxFactor(Cart $cart, Country $country, ?State $state = null): float;
+
+    public function computeOrderTaxFactor(Order $order): float;
 }

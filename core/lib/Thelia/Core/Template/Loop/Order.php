@@ -24,7 +24,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -57,6 +57,8 @@ use Thelia\Type\TypeCollection;
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
+    use TaxCalculatorResolverTrait;
+
     protected $countable = true;
     protected $timestampable = true;
     protected $versionable = false;
@@ -335,7 +337,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             if ($order->getId() <= $lastLegacyOrderId) {
                 $discountWithoutTax = $order->getDiscount();
             } else {
-                $discountWithoutTax = Calculator::getUntaxedOrderDiscount($order);
+                $discountWithoutTax = $this->createTaxCalculator()->computeUntaxedOrderDiscount($order);
             }
 
             $hasVirtualDownload = $order->hasVirtualProductWithDocument();
