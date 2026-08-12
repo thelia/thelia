@@ -65,7 +65,34 @@ class LangController extends BaseAdminController
         return $this->render('languages', array_merge($param, [
             'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             'one_domain_per_lang' => ConfigQuery::isMultiDomainActivated(),
+            'languages_without_url' => implode(', ', $this->getFrontLanguagesWithoutUrl()),
         ]), $status);
+    }
+
+    /**
+     * Titles of the languages served in front office (active and visible) that have no domain.
+     * Those are the ones the front office looks up once multi-domain is on, so an empty domain
+     * there means the language keeps being served from whichever domain the visitor arrived on.
+     *
+     * @return array
+     */
+    protected function getFrontLanguagesWithoutUrl()
+    {
+        $titles = [];
+
+        $languages = LangQuery::create()
+            ->filterByActive(1)
+            ->filterByVisible(1)
+            ->orderByPosition()
+            ->find();
+
+        foreach ($languages as $lang) {
+            if ('' === trim((string) $lang->getUrl())) {
+                $titles[] = $lang->getTitle();
+            }
+        }
+
+        return $titles;
     }
 
     public function updateAction($lang_id)
@@ -390,6 +417,20 @@ class LangController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
+        }
+
+        $missing = $activate ? $this->getFrontLanguagesWithoutUrl() : [];
+
+        if (!empty($missing)) {
+            $this->getSession()->getFlashBag()->add(
+                'lang-domain-activation',
+                $this->getTranslator()->trans(
+                    'Define a domain for every language served in front office before activating this setting. Missing: %languages.',
+                    ['%languages' => implode(', ', $missing)]
+                )
+            );
+
+            return $this->generateRedirectFromRoute('admin.configuration.languages');
         }
 
         ConfigQuery::create()

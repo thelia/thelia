@@ -13,7 +13,6 @@
 namespace Thelia\Form\Lang;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
 
@@ -47,14 +46,15 @@ class LangUrlForm extends BaseForm
      */
     protected function buildForm()
     {
+        // No NotBlank here: the domains have to be savable one at a time, and languages that are
+        // not served in front office never need one. Completeness is enforced when the setting is
+        // activated, in LangController::domainActivation().
         foreach (LangQuery::create()->find() as $lang) {
             $this->formBuilder->add(
                 self::LANG_PREFIX.$lang->getId(),
                 TextType::class,
                 [
-                    'constraints' => [
-                        new NotBlank(),
-                    ],
+                    'required' => false,
                     'attr' => [
                         'tag' => 'url',
                         'url_id' => $lang->getId(),
