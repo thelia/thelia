@@ -76,7 +76,7 @@ class Application extends BaseApplication
     protected function registerCommands(): void
     {
         if (!TheliaKernel::isInstalled()) {
-            $this->add(new Install($this->kernel->getEnvironment()));
+            $this->addCommand(new Install($this->kernel->getEnvironment()));
 
             return;
         }
@@ -103,7 +103,7 @@ class Application extends BaseApplication
                 throw new \LogicException(\sprintf('The command "%s" must be an instance of "%s".', $commandId, Command::class));
             }
 
-            $this->add($command);
+            $this->addCommand($command);
         }
     }
 }
