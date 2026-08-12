@@ -210,7 +210,15 @@
         <xsd:attribute name="type" type="hook_type" />
         <xsd:attribute name="active" type="hook_active" />
         <xsd:attribute name="templates" type="xsd:string" />
+        <xsd:attribute name="position" type="hook_position" />
     </xsd:complexType>
+
+    <xsd:simpleType name="hook_position">
+        <xsd:restriction base="xsd:integer">
+            <xsd:minInclusive value="1" />
+            <xsd:maxInclusive value="999" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:simpleType name="hook_type">
         <xsd:restriction base="xsd:string">
