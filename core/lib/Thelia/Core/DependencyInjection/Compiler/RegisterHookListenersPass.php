@@ -153,6 +153,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $attributes['templates'] = isset($attributes['templates']) ? (string) ($attributes['templates']) : '';
         $attributes['type'] = (isset($attributes['type'])) ? $this->getHookType($attributes['type']) : TemplateDefinition::FRONT_OFFICE;
 
+        $declaredPosition = $this->getDeclaredPosition($attributes, $class);
+
         if (null === $hook = $this->getHook($attributes['event'], $attributes['type'])) {
             return;
         }
@@ -210,7 +212,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     ->setActive($savedConfiguration['active'] ?? $active)
                     ->setHookActive(true)
                     ->setModuleActive(true)
-                    ->setPosition($savedConfiguration['position'] ?? ModuleHook::MAX_POSITION);
+                    ->setPosition($savedConfiguration['position'] ?? $declaredPosition ?? ModuleHook::MAX_POSITION);
 
                 if (isset($attributes['templates'])) {
                     $moduleHook->setTemplates($attributes['templates']);
@@ -244,6 +246,39 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 $moduleHook->save();
             }
         }
+    }
+
+    /**
+     * A module may declare the position it wants for one of its hooks. The value is read only when the
+     * module_hook row is created: once the row exists, the position belongs to the back office and the
+     * declaration must not overwrite it.
+     *
+     * @param array  $attributes the hook attributes
+     * @param string $class      the namespace of the class
+     */
+    protected function getDeclaredPosition(array $attributes, string $class): ?int
+    {
+        if (!isset($attributes['position']) || '' === $attributes['position']) {
+            return null;
+        }
+
+        $position = (int) $attributes['position'];
+
+        if ($position < 1 || $position >= ModuleHook::MAX_POSITION) {
+            $this->logAlertMessage(
+                sprintf(
+                    'Hook class [%s] declares position [%s], which is out of the allowed range [1, %d]. The hook is appended at the end of the queue instead.',
+                    $class,
+                    $attributes['position'],
+                    ModuleHook::MAX_POSITION - 1
+                ),
+                true
+            );
+
+            return null;
+        }
+
+        return $position;
     }
 
     /**

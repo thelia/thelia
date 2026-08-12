@@ -474,11 +474,16 @@ abstract class BaseHook implements BaseHookInterface
      *          ],
      *          [
      *              type => "front",
-     *              method => "displaySomething"
+     *              method => "displaySomething",
+     *              position => 10
      *          ],
      *      ],
      *      'another.hook' => [[...]]
      *  ]
+     *
+     *  The optional position, between 1 and 999, states where the module wants to be rendered among the
+     *  listeners of that hook: the lower the position, the earlier the render. It is applied when the hook
+     *  is registered, and never afterwards: an order set in the back office always wins.
      *
      * @return array
      */
