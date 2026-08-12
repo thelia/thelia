@@ -83,6 +83,10 @@ class CategoryQuery extends BaseCategoryQuery
      */
     public static function findAllChildId(int|array $categoryId, int $depth = 0, int $currentPos = 0): array
     {
+        // Cache the tree walk. The cache is static, so it lives for the whole
+        // process and holds the answers of every call made during it: it has to
+        // be indexed on all three arguments, since the same category walked with
+        // another depth has another answer.
         static $cache = [];
 
         $result = [];
@@ -91,30 +95,34 @@ class CategoryQuery extends BaseCategoryQuery
             foreach ($categoryId as $categorySingleId) {
                 $result = array_merge($result, self::findAllChildId($categorySingleId, $depth, $currentPos));
             }
-        } elseif (!isset($cache[$categoryId])) {
-            ++$currentPos;
 
-            if ($depth === $currentPos && 0 !== $depth) {
-                return [];
-            }
-
-            $subCategories = self::create()
-                ->filterByParent($categoryId)
-                ->select(['id'])
-                ->find()
-                ->getData();
-
-            foreach ($subCategories as $subCategoryId) {
-                $result[] = $subCategoryId;
-                $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
-            }
-
-            $cache[$categoryId] = $result;
-        } else {
-            $result = $cache[$categoryId];
+            return $result;
         }
 
-        return $result;
+        $cacheKey = $categoryId.':'.$depth.':'.$currentPos;
+
+        if (isset($cache[$cacheKey])) {
+            return $cache[$cacheKey];
+        }
+
+        ++$currentPos;
+
+        if ($depth === $currentPos && 0 !== $depth) {
+            return [];
+        }
+
+        $subCategories = self::create()
+            ->filterByParent($categoryId)
+            ->select(['id'])
+            ->find()
+            ->getData();
+
+        foreach ($subCategories as $subCategoryId) {
+            $result[] = $subCategoryId;
+            $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
+        }
+
+        return $cache[$cacheKey] = $result;
     }
 
     /**
