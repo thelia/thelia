@@ -7,6 +7,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+# Seeded by the symfony/framework-bundle recipe with a locally generated
+# APP_SECRET, so it belongs to the install, not to the repository.
+/.env.dev
+
 composer.lock
 symfony.lock
 phpunit.xml
@@ -108,7 +112,6 @@ public/.htaccess
 local/modules/
 templates/frontOffice/
 templates/backOffice/*
-!templates/backOffice/default-twig
 templates/email/
 templates/pdf/
 ###> liip/imagine-bundle ###
