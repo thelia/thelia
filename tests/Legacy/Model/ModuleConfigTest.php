@@ -93,7 +93,12 @@ class ModuleConfigTest extends TestCase
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
+        // Deleting a variable that does not exist is a no-op, not an error.
         ModuleConfigQuery::create()->deleteConfigValue($moduleModel->getId(), 'do-not-exists');
+
+        $this->assertNull(
+            ModuleConfigQuery::create()->getConfigValue($moduleModel->getId(), 'do-not-exists')
+        );
     }
 
     public function testDelete(): void

@@ -171,25 +171,25 @@ class CalculatorTest extends TestCase
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 10])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 8])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\FixAmountTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\FixAmountTaxType')
             ->setRequirements(['amount' => 5])
             ->setVirtualColumn('taxRuleCountryPosition', 2);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 1])
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
@@ -217,8 +217,10 @@ class CalculatorTest extends TestCase
          *  tax 3 = 595 * 0.01 = 5.95 // amount with tax 3 : 600.95
          * total tax amount = 100.95
          */
-        $this->assertEquals(100.95, $taxAmount);
-        $this->assertEquals(600.95, $taxedPrice);
+        // Floats: the tax amount is summed step by step, so it lands a few
+        // 1e-14 away from the expected value.
+        $this->assertEqualsWithDelta(100.95, $taxAmount, 0.0001);
+        $this->assertEqualsWithDelta(600.95, $taxedPrice, 0.0001);
     }
 
     public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPrice(): void
@@ -227,25 +229,25 @@ class CalculatorTest extends TestCase
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 10])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 8])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\FixAmountTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\FixAmountTaxType')
             ->setRequirements(['amount' => 5])
             ->setVirtualColumn('taxRuleCountryPosition', 2);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
+        $tax->setType('Thelia\TaxEngine\TaxType\PricePercentTaxType')
             ->setRequirements(['percent' => 1])
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
@@ -273,8 +275,8 @@ class CalculatorTest extends TestCase
          *  tax 1 = 590 - 590 / (1 + 0.08 + 0.10) = 90 // amount without tax 1 : 500
          * total tax amount = 100.95
          */
-        $this->assertEquals(100.95, $taxAmount);
-        $this->assertEquals(500, $untaxedPrice);
+        $this->assertEqualsWithDelta(100.95, $taxAmount, 0.0001);
+        $this->assertEqualsWithDelta(500, $untaxedPrice, 0.0001);
     }
 
     //    public function testGetFeatureFixAmountTaxTypeTaxedPrice(): void
@@ -291,7 +293,7 @@ class CalculatorTest extends TestCase
     //        $taxRulesCollection->setModel('\Thelia\Model\Tax');
     //
     //        $tax = new Tax();
-    //        $tax->setType('\Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType')
+    //        $tax->setType('Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType')
     //            ->setRequirements([
     //                'feature' => $featureProduct->getFeatureId(),
     //                'lang' => $defaultLang->getId(),

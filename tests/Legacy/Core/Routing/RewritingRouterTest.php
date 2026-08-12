@@ -79,7 +79,12 @@ class RewritingRouterTest extends TestCase
     public function testMatchRequestWithNonExistingUrl(): void
     {
         ConfigQuery::write('rewriting_enable', 1);
-        $request = Request::create('http://test.com/foo');
+        // A random path: any url left in the rewriting_url table by another test
+        // would be matched, obsolete ones included.
+        $request = Request::create('http://test.com/'.uniqid('no-such-url-', false));
+        // Without a session the router falls back on a native PHP session, and
+        // session_start() warns as soon as anything has been written to stdout.
+        $request->setSession(new Session(new MockArraySessionStorage()));
 
         $rewritingRouter = new RewritingRouter();
 

@@ -63,5 +63,5 @@ jobs:
         # is test. Without this file Thelia::isInstalled() returns false and every
         # functional test errors with "Thelia is not installed".
         run: grep '^DB_' .env.local > .env.test.local
-      - name: Run CI (coding standard, unit and functional suites)
+      - name: Run CI (coding standard, unit, functional and legacy suites)
         run: composer ci

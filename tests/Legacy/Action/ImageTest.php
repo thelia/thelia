@@ -33,6 +33,14 @@ class ImageTest extends TestCaseWithURLToolSetup
 
     protected $session;
 
+    public function testImageProcessing(): void
+    {
+        $this->markTestSkipped(
+            'Every test of this class is commented out below: they build a FileManager and an image cache by hand, '
+            .'which no longer matches Thelia\Action\Image. They have to be rewritten before they can run again.'
+        );
+    }
+
     //    public function getContainer()
     //    {
     //        $container = new ContainerBuilder();

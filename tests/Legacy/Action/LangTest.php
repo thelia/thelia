@@ -74,7 +74,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimals('2')
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action = new Lang(new TheliaTemplateHelper(THELIA_CACHE_DIR.'test'), $this->requestStack);
         $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdLang = $event->getLang();
@@ -116,7 +116,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimals('1')
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action = new Lang(new TheliaTemplateHelper(THELIA_CACHE_DIR.'test'), $this->requestStack);
 
         $action->update($event, null, $this->getMockEventDispatcher());
 
@@ -156,7 +156,7 @@ class LangTest extends ContainerAwareTestCase
     {
         $event = new LangToggleDefaultEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action = new Lang(new TheliaTemplateHelper(THELIA_CACHE_DIR.'test'), $this->requestStack);
         $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
@@ -182,7 +182,7 @@ class LangTest extends ContainerAwareTestCase
 
         $event = new LangDeleteEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action = new Lang(new TheliaTemplateHelper(THELIA_CACHE_DIR.'test'), $this->requestStack);
         $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedLang = $event->getLang();
@@ -198,7 +198,7 @@ class LangTest extends ContainerAwareTestCase
 
         $event = new LangDeleteEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action = new Lang(new TheliaTemplateHelper(THELIA_CACHE_DIR.'test'), $this->requestStack);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('It is not allowed to delete the default language');

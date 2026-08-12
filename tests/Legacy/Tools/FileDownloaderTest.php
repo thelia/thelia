@@ -64,11 +64,24 @@ class FileDownloaderTest extends TestCase
 
     public function testFileDownloadSuccess(): void
     {
-        $this->downloader->download('https://github.com/', 'php://temp');
+        $target = tempnam(sys_get_temp_dir(), 'thelia-download-');
+
+        $this->downloader->download('https://github.com/', $target);
+
+        $this->assertGreaterThan(0, filesize($target));
+
+        unlink($target);
     }
 
     public function testFileDownloadSuccessWithRedirect(): void
     {
-        $this->downloader->download('https://github.com/', 'php://temp');
+        $target = tempnam(sys_get_temp_dir(), 'thelia-download-');
+
+        // http, not https: the server answers with a redirection.
+        $this->downloader->download('http://github.com/', $target);
+
+        $this->assertGreaterThan(0, filesize($target));
+
+        unlink($target);
     }
 }
