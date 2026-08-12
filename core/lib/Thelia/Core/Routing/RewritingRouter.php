@@ -72,6 +72,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         $pathInfo = $request->getRealPathInfo();
         $resolver = $this->resolveRewritingData($pathInfo);
 
+        $this->rejectObsoleteUrl($resolver);
         $this->maybeRedirectForRequestedLocale($request, $resolver);
         $this->ensureActiveLocaleOrRedirect($resolver);
         $this->maybeRedirectForManualRedirect($resolver);
@@ -101,6 +102,21 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 UrlRewritingException::URL_NOT_FOUND => new ResourceNotFoundException(),
                 default => $e,
             };
+        }
+    }
+
+    /**
+     * Deleting an object does not delete its rewritten urls: Product::postDelete() and its
+     * siblings move them to the obsolete view instead (UrlRewritingTrait::markRewrittenUrlObsolete()).
+     * The object is gone, so there is no page left to serve and no current url to redirect to:
+     * such an url must answer 404, like any unknown one. An url that was merely replaced is a
+     * different case, kept in the rewriting table with its "redirected" target, and still
+     * answered with a 301 further down.
+     */
+    protected function rejectObsoleteUrl(RewritingResolver $resolver): void
+    {
+        if (ConfigQuery::getObsoleteRewrittenUrlView() === $resolver->view) {
+            throw new ResourceNotFoundException();
         }
     }
 
