@@ -380,6 +380,12 @@ class Module extends BaseAction implements EventSubscriberInterface
             } catch (\Exception $ex) {
                 // if module has not been deleted
                 if ($fs->exists($modulePath)) {
+                    // The module was deactivated a few lines above so it could be replaced, and the
+                    // replacement is not going to happen. Put the shop back where it was: a payment
+                    // or delivery module left deactivated by a failed upgrade takes the checkout
+                    // down, silently, while the administrator only reads that the install failed.
+                    $this->restoreActivation((int) $oldModule->getId(), (bool) $activated, $dispatcher);
+
                     throw $ex;
                 }
             }
@@ -412,6 +418,18 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setModule($module);
+    }
+
+    private function restoreActivation(int $moduleId, bool $wasActivated, EventDispatcherInterface $dispatcher): void
+    {
+        if (!$wasActivated) {
+            return;
+        }
+
+        $toggleEvent = new ModuleToggleActivationEvent($moduleId);
+        $toggleEvent->setNoCheck(true);
+
+        $dispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
     }
 
     /**
