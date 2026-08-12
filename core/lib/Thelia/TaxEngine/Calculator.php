@@ -49,6 +49,20 @@ class Calculator
     protected $country;
     protected $state;
 
+    /**
+     * Tax factors already computed in this process, indexed on the order or the
+     * cart they were computed for. A single request handles several of them —
+     * the back-office order list, for one — and each has its own tax rates.
+     *
+     * @var \WeakMap<Order, float>|null
+     */
+    private static $orderTaxFactors;
+
+    /**
+     * @var \WeakMap<Cart, array<string, float>>|null
+     */
+    private static $cartTaxFactors;
+
     public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
@@ -87,33 +101,32 @@ class Calculator
      */
     public static function getOrderTaxFactor(Order $order)
     {
-        // Cache the result in a local variable
-        static $orderTaxFactor;
-
-        if (null === $orderTaxFactor) {
-            if ((float) $order->getDiscount() === 0.0) {
-                return 1;
-            }
-
-            // Find the average Tax rate (see \Thelia\TaxEngine\Calculator::getCartTaxFactor())
-            $orderTaxFactors = [];
-
-            /** @var \Thelia\Model\OrderProduct $orderProduct */
-            foreach ($order->getOrderProducts() as $orderProduct) {
-                /** @var \Thelia\Core\Template\Loop\OrderProductTax $orderProductTax */
-                foreach ($orderProduct->getOrderProductTaxes() as $orderProductTax) {
-                    $orderTaxFactors[] = 1 + $orderProductTax->getAmount() / $orderProduct->getPrice();
-                }
-            }
-
-            if (0 === $orderTaxfactorCount = \count($orderTaxFactors)) {
-                return 1;
-            }
-
-            $orderTaxFactor = array_sum($orderTaxFactors) / \count($orderTaxFactors);
+        if ((float) $order->getDiscount() === 0.0) {
+            return 1;
         }
 
-        return $orderTaxFactor;
+        self::$orderTaxFactors = self::$orderTaxFactors ?? new \WeakMap();
+
+        if (isset(self::$orderTaxFactors[$order])) {
+            return self::$orderTaxFactors[$order];
+        }
+
+        // Find the average Tax rate (see \Thelia\TaxEngine\Calculator::getCartTaxFactor())
+        $orderTaxFactors = [];
+
+        /** @var \Thelia\Model\OrderProduct $orderProduct */
+        foreach ($order->getOrderProducts() as $orderProduct) {
+            /** @var \Thelia\Core\Template\Loop\OrderProductTax $orderProductTax */
+            foreach ($orderProduct->getOrderProductTaxes() as $orderProductTax) {
+                $orderTaxFactors[] = 1 + $orderProductTax->getAmount() / $orderProduct->getPrice();
+            }
+        }
+
+        if ([] === $orderTaxFactors) {
+            return 1;
+        }
+
+        return self::$orderTaxFactors[$order] = array_sum($orderTaxFactors) / \count($orderTaxFactors);
     }
 
     /**
@@ -123,30 +136,45 @@ class Calculator
      */
     public static function getCartTaxFactor(Cart $cart, Country $country, State $state = null)
     {
-        // Cache the result in a local variable
-        static $cartFactor;
-
-        if (null === $cartFactor) {
-            if ((float) $cart->getDiscount() === 0.0) {
-                return 1;
-            }
-
-            $cartItems = $cart->getCartItems();
-
-            // Get the average of tax factor to apply it to the discount
-            $cartTaxFactors = [];
-
-            /** @var CartItem $cartItem */
-            foreach ($cartItems as $cartItem) {
-                $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
-                /** @var TaxRule $taxRule */
-                foreach ($taxRulesCollection as $taxRule) {
-                    $cartTaxFactors[] = 1 + $taxRule->getTypeInstance()->pricePercentRetriever();
-                }
-            }
-
-            $cartFactor = array_sum($cartTaxFactors) / \count($cartTaxFactors);
+        if ((float) $cart->getDiscount() === 0.0) {
+            return 1;
         }
+
+        $cartItems = $cart->getCartItems();
+
+        // The factor depends on the destination and on the products in the cart,
+        // both of which change while a request is being served.
+        $key = implode(':', [$country->getId(), $state !== null ? $state->getId() : null]);
+
+        /** @var CartItem $cartItem */
+        foreach ($cartItems as $cartItem) {
+            $key .= ':'.$cartItem->getProductId();
+        }
+
+        self::$cartTaxFactors = self::$cartTaxFactors ?? new \WeakMap();
+
+        $cartFactors = self::$cartTaxFactors[$cart] ?? [];
+
+        if (isset($cartFactors[$key])) {
+            return $cartFactors[$key];
+        }
+
+        // Get the average of tax factor to apply it to the discount
+        $cartTaxFactors = [];
+
+        /** @var CartItem $cartItem */
+        foreach ($cartItems as $cartItem) {
+            $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
+            /** @var TaxRule $taxRule */
+            foreach ($taxRulesCollection as $taxRule) {
+                $cartTaxFactors[] = 1 + $taxRule->getTypeInstance()->pricePercentRetriever();
+            }
+        }
+
+        $cartFactor = array_sum($cartTaxFactors) / \count($cartTaxFactors);
+
+        $cartFactors[$key] = $cartFactor;
+        self::$cartTaxFactors[$cart] = $cartFactors;
 
         return $cartFactor;
     }
