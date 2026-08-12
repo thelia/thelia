@@ -128,6 +128,12 @@ class File extends BaseAction implements EventSubscriberInterface
                 ->setVisible($originalProductFile->getVisible())
                 ->setPosition($originalProductFile->getPosition());
 
+            // The image file name is translated, so every active language is cloned in turn.
+            // Reading one moves the source model to that locale, and the caller still holds
+            // that model: Propel pools its instances, so even a fresh query hands it back on
+            // the last language walked, where the file name is usually empty.
+            $sourceLocale = $originalProductFile->getLocale();
+
             foreach (LangQuery::create()->findByActive(1) as $lang) {
                 $locale = $lang->getLocale();
                 $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->setLocale($locale)->getFile();
@@ -180,6 +186,8 @@ class File extends BaseAction implements EventSubscriberInterface
                 // Set a temporary source file as the original one
                 rename($srcTmp, $srcPath);
             }
+
+            $originalProductFile->setLocale($sourceLocale);
         }
     }
 
