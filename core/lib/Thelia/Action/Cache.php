@@ -28,8 +28,20 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Entries of the Propel cache a kernel cache clear keeps: the generated
+     * models, the database map they rely on, its loader script, and the schema
+     * hash they were built from. The hash is what makes keeping them safe —
+     * PropelInitService::buildPropelModels() rebuilds everything as soon as the
+     * schema recombined on the next boot no longer matches it.
+     */
+    private const PRESERVED_PROPEL_ENTRIES = ['model', 'database', 'loader', 'hash'];
+
     /** @var AdapterInterface */
     protected $adapter;
+
+    /** @var string */
+    protected $kernelCacheDir;
 
     /**
      * @var CacheEvent[]
@@ -39,9 +51,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /**
      * CacheListener constructor.
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter, string $kernelCacheDir)
     {
         $this->adapter = $adapter;
+        $this->kernelCacheDir = $kernelCacheDir;
     }
 
     public function cacheClear(CacheEvent $event): void
@@ -77,9 +90,49 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $this->adapter->clear();
 
         $dir = $event->getDir();
+        $propelDir = rtrim($dir, DS).DS.'propel';
 
         $fs = new Filesystem();
-        $fs->remove($dir);
+
+        if (!$this->isKernelCacheDir($dir) || !is_dir($propelDir)) {
+            $fs->remove($dir);
+
+            return;
+        }
+
+        // PropelInitService keeps its cache inside the kernel cache, so removing
+        // the whole directory used to take the generated models with it and
+        // rebuild all of them on the next boot. Everything else still goes,
+        // including the combined schema: it is recombined on the next boot, and
+        // the models are rebuilt only if that changes the hash.
+        foreach ($this->childrenOf($dir) as $entry) {
+            if ('propel' !== $entry) {
+                $fs->remove(rtrim($dir, DS).DS.$entry);
+
+                continue;
+            }
+
+            foreach ($this->childrenOf($propelDir) as $propelEntry) {
+                if (\in_array($propelEntry, self::PRESERVED_PROPEL_ENTRIES, true)) {
+                    continue;
+                }
+
+                $fs->remove($propelDir.DS.$propelEntry);
+            }
+        }
+    }
+
+    private function isKernelCacheDir(string $dir): bool
+    {
+        return rtrim($dir, DS) === rtrim($this->kernelCacheDir, DS);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function childrenOf(string $dir): array
+    {
+        return array_diff((array) scandir($dir), ['.', '..']);
     }
 
     public static function getSubscribedEvents(): array
