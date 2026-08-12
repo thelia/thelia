@@ -285,6 +285,27 @@ class ProductDocument extends AbstractTranslatableResource implements ItemFileRe
         return ProductDocumentI18n::class;
     }
 
+    /**
+     * What this shop accepts on an upload, so that a client can build its form
+     * without restating the lists. Read only: the constraints belong to the shop
+     * configuration, not to the file.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'object',
+            'properties' => [
+                'allowedMimeTypes' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'allowedExtensions' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'forbiddenExtensions' => ['type' => 'array', 'items' => ['type' => 'string']],
+            ],
+        ],
+    )]
+    public function getUploadConstraints(): array
+    {
+        return FileUploadConstraints::forFileType(self::getFileType());
+    }
+
     public static function getItemType(): string
     {
         return 'product';
