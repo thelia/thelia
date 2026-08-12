@@ -14,19 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Module;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
-use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
-use Thelia\Model\TaxRuleQuery;
 
 abstract class AbstractDeliveryModuleWithState extends BaseModule implements DeliveryModuleWithStateInterface
 {
-    use TaxCalculatorResolverTrait;
+    use OrderPostageBuilderTrait;
 
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
@@ -57,38 +52,5 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
     public function getDeliveryMode()
     {
         return 'delivery';
-    }
-
-    public function buildOrderPostage(float $untaxedPostage, Country $country, $locale, $taxRuleId = null)
-    {
-        $taxRule = null;
-
-        $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
-
-        if ($taxRuleId) {
-            $taxRule = TaxRuleQuery::create()
-                ->filterById($taxRuleId)
-                ->orderByIsDefault(Criteria::DESC)
-                ->findOne();
-        }
-
-        $orderPostage = new OrderPostage();
-
-        if ($taxRule) {
-            $taxCalculator = $this->createTaxCalculator();
-            $taxCalculator->loadTaxRuleWithoutProduct($taxRule, $country);
-
-            $orderPostage->setAmount($taxCalculator->getTaxedPrice($untaxedPostage));
-            $orderPostage->setAmountTax($taxCalculator->getTaxAmountFromUntaxedPrice($untaxedPostage));
-            $orderPostage->setTaxRuleTitle($taxRule->setLocale($locale)->getTitle());
-
-            return $orderPostage;
-        }
-
-        $orderPostage->setAmount($untaxedPostage);
-        $orderPostage->setAmountTax(0);
-        $orderPostage->setTaxRuleTitle(null);
-
-        return $orderPostage;
     }
 }
