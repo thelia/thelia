@@ -408,6 +408,12 @@ class XmlFileLoader extends FileLoader
             $con->rollBack();
 
             Tlog::getInstance()->error($e->getMessage());
+        } catch (\Throwable $throwable) {
+            // A malformed config entry is logged and skipped, but an Error keeps
+            // propagating as before: only the rollback is new.
+            $con->rollBack();
+
+            throw $throwable;
         }
     }
 
@@ -488,6 +494,12 @@ class XmlFileLoader extends FileLoader
             $con->rollBack();
 
             Tlog::getInstance()->error($e->getMessage());
+        } catch (\Throwable $throwable) {
+            // A malformed config entry is logged and skipped, but an Error keeps
+            // propagating as before: only the rollback is new.
+            $con->rollBack();
+
+            throw $throwable;
         }
     }
 
@@ -532,6 +544,12 @@ class XmlFileLoader extends FileLoader
             $con->rollBack();
 
             Tlog::getInstance()->error($e->getMessage());
+        } catch (\Throwable $throwable) {
+            // A malformed config entry is logged and skipped, but an Error keeps
+            // propagating as before: only the rollback is new.
+            $con->rollBack();
+
+            throw $throwable;
         }
     }
 
@@ -612,6 +630,12 @@ class XmlFileLoader extends FileLoader
             $con->rollBack();
 
             Tlog::getInstance()->error($e->getMessage());
+        } catch (\Throwable $throwable) {
+            // A malformed config entry is logged and skipped, but an Error keeps
+            // propagating as before: only the rollback is new.
+            $con->rollBack();
+
+            throw $throwable;
         }
     }
 

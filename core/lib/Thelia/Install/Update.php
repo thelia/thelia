@@ -257,13 +257,27 @@ class Update
             $this->connection->commit();
             $this->log('debug', 'update successfully');
         } catch (\Exception $e) {
-            $this->connection->rollBack();
+            // The guard matters here: $this->connection is the raw PDO handle
+            // unwrapped in the constructor, and its rollBack() throws when no
+            // transaction is open — which happens when the failure comes from the
+            // logging that follows commit().
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
 
             $this->log('error', sprintf('error during update process with message : %s', $e->getMessage()));
 
             $ex = new UpdateException($e->getMessage(), $e->getCode(), $e->getPrevious());
             $ex->setVersion($version);
             throw $ex;
+        } catch (\Throwable $throwable) {
+            // An Error is not turned into an UpdateException — the installer keeps
+            // seeing it as it is today — but the update transaction is closed.
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
+            throw $throwable;
         }
         $this->log('debug', 'end of update processing');
 

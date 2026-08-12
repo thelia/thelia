@@ -12,7 +12,6 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -86,7 +85,7 @@ class Address extends BaseAction implements EventSubscriberInterface
 
             $event->setAddress($addressModel);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (\Throwable $e) {
             $con->rollback();
             throw $e;
         }

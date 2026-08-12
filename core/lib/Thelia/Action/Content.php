@@ -82,7 +82,7 @@ class Content extends BaseAction implements EventSubscriberInterface
 
                 $event->setContent($content);
                 $con->commit();
-            } catch (PropelException $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
                 throw $e;
             }
@@ -158,7 +158,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollback();
                 throw $e;
             }

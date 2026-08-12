@@ -499,7 +499,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $event->setOrder($order);
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $con->rollBack();
 
             throw $ex;

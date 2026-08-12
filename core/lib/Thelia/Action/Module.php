@@ -282,7 +282,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $event->setModule($module);
                 $this->cacheClear($dispatcher);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
                 throw $e;
             }

@@ -127,7 +127,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollback();
                 throw $e;
             }

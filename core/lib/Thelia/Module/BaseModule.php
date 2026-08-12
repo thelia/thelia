@@ -101,7 +101,7 @@ class BaseModule implements BaseModuleInterface
                 $this->initializeCoreI18n();
                 $this->postActivation($con);
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                 $moduleModel->save();
@@ -128,7 +128,7 @@ class BaseModule implements BaseModuleInterface
 
                     $con->commit();
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
                 throw $e;
             }

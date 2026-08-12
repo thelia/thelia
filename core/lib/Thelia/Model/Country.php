@@ -100,7 +100,7 @@ class Country extends BaseCountry
                 ->save($con);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (\Throwable $e) {
             $con->rollBack();
             throw $e;
         }

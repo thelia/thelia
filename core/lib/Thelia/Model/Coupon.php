@@ -133,7 +133,7 @@ class Coupon extends BaseCoupon
             }
 
             $con->commit();
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $con->rollback();
 
             throw $ex;
