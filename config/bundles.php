@@ -1,4 +1,5 @@
 <?php
+
 return [
     ApiPlatform\Symfony\Bundle\ApiPlatformBundle::class => ['all' => true],
     Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle::class => ['all' => true],
@@ -18,4 +19,7 @@ return [
     Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
+    BackOfficeDefaultBundle\BackOfficeDefaultBundle::class => ['all' => true],
+    BackOfficeDefaultTwigBundle\BackOfficeDefaultTwigBundle::class => ['all' => true],
+    FlexyBundle\FlexyBundle::class => ['all' => true],
 ];

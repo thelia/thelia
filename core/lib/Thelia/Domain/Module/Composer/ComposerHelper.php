@@ -198,7 +198,10 @@ class ComposerHelper
 
     private function dumpBundlesPhp(array $bundles): string
     {
-        $lines = ["<?php\n", "return [\n"];
+        // Same layout as Symfony Flex's BundlesConfigurator, so that enabling a
+        // theme bundle here and a "composer install" afterwards leave the file
+        // byte for byte identical instead of fighting over the blank line.
+        $lines = ["<?php\n", "\n", "return [\n"];
 
         foreach ($bundles as $fqcn => $envs) {
             $envParts = [];
