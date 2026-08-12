@@ -14,54 +14,20 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Core\File\FileManager;
 use Thelia\Core\File\Service\FileDeleteService;
 use Thelia\Core\File\Service\FilePositionService;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Core\File\Service\FileUpdateService;
 use Thelia\Core\File\Service\FileVisibilityService;
 
+/*
+ * The services themselves come from the prototype load in services.php, which is
+ * processed after this file and overwrites whatever is declared here. Only the
+ * aliases survive, so this file must not carry definitions.
+ */
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
-    // Register file services
-    $services->set(FileProcessorService::class)
-        ->args([
-            service('thelia.file_manager'),
-            service('translator'),
-            service('thelia.admin.resources'),
-        ])
-        ->public();
 
-    $services->set(FileUpdateService::class)
-        ->public();
-
-    $services->set(FileDeleteService::class)
-        ->args([
-            service('thelia.file_manager'),
-            service('translator'),
-            service('thelia.admin.resources'),
-        ])
-        ->public();
-
-    $services->set(FilePositionService::class)
-        ->args([
-            service('thelia.file_manager'),
-            service('translator'),
-            service('thelia.admin.resources'),
-        ])
-        ->public();
-
-    $services->set(FileVisibilityService::class)
-        ->args([
-            service('thelia.file_manager'),
-            service('translator'),
-            service('thelia.admin.resources'),
-        ])
-        ->public();
-
-    $services->set(FileManager::class)->public();
-
-    // Create aliases for services
     $services->alias('thelia.file.processor', FileProcessorService::class);
     $services->alias('thelia.file.update', FileUpdateService::class);
     $services->alias('thelia.file.delete', FileDeleteService::class);
