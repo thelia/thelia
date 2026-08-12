@@ -249,7 +249,7 @@ foreach ($finder as $file) {
 
 if (true === $hasDeleteError) {
     cliOutput('The cache has not been cleared properly. Try to run the command manually : '.
-        '(sudo) php Thelia cache:clear (--env=prod).');
+        '(sudo) php Thelia thelia:cache:clear (--env=prod).');
 }
 
 cliOutput('Update process finished.', 'info');

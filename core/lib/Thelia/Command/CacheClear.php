@@ -28,9 +28,13 @@ use Thelia\Model\ConfigQuery;
  *
  * Class CacheClear
  *
+ * The name is namespaced: `cache:clear` belongs to FrameworkBundle, which also
+ * warms the container up, and registering a second command under that name only
+ * makes one of the two reachable.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-#[AsCommand(name: 'cache:clear', description: 'Invalidate all caches')]
+#[AsCommand(name: 'thelia:cache:clear', description: 'Invalidate the application, assets, image and document caches')]
 class CacheClear extends ContainerAwareCommand
 {
     protected function configure(): void
@@ -91,10 +95,14 @@ class CacheClear extends ContainerAwareCommand
 
     protected function clearCache(string $dir, OutputInterface $output): void
     {
-        $output->writeln(\sprintf('Clearing cache in <info>%s</info> directory', $dir));
+        $output->writeln(\sprintf('Invalidating cache in <info>%s</info> directory', $dir));
 
         try {
-            $cacheEvent = new CacheEvent($dir, false);
+            // Deferred: removing the container directory while the command is
+            // still running takes the services it has not loaded yet with it.
+            // The removal happens once the command is over, like every other
+            // caller of CACHE_CLEAR.
+            $cacheEvent = new CacheEvent($dir);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
@@ -108,7 +116,5 @@ class CacheClear extends ContainerAwareCommand
         } catch (IOException $e) {
             $output->writeln(\sprintf('Error during clearing of cache : %s', $e->getMessage()));
         }
-
-        $output->writeln(\sprintf('<info>%s cache directory cleared successfully</info>', $dir));
     }
 }

@@ -61,8 +61,8 @@ Note:
 Once the update is done successfully, you have to clear all caches :  
 
 - clear all caches in all environment :
-    - ```php Thelia cache:clear```
-    - ```php Thelia cache:clear --env=prod```
+    - ```php Thelia thelia:cache:clear```
+    - ```php Thelia thelia:cache:clear --env=prod```
     
 If the command fails, you can do it manually. Just delete the content of 
 the ```cache``` and ```web/cache``` directories. 
