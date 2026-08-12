@@ -77,11 +77,10 @@ final class ImportHandlerTest extends IntegrationTestCase
     {
         $handler = $this->importHandler();
 
+        // Each call throws when the file is refused.
         $handler->validateUpload('products.csv');
         $handler->validateUpload('68ab1c2d.12345678-products.CSV');
         $handler->validateUpload('catalogue.zip');
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testASerializerIsOnlyMatchedOnTheActualExtension(): void
