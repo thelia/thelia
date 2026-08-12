@@ -340,8 +340,10 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
     protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
+        // Only translation files were written; the database schema cannot have moved.
         $cacheEvent = new CacheEvent(
             $this->container->getParameter('kernel.cache_dir'),
+            invalidatePropelSchema: false,
         );
 
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);

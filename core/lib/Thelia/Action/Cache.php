@@ -54,6 +54,12 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
             if ($cacheEvent->getDir() === $event->getDir()) {
+                // Events are deduplicated per directory, so the one that is kept must
+                // carry the schema invalidation as soon as any of them asks for it.
+                if ($event->invalidatesPropelSchema()) {
+                    $cacheEvent->setInvalidatePropelSchema(true);
+                }
+
                 $findDir = true;
                 break;
             }
@@ -75,10 +81,12 @@ class Cache extends BaseAction implements EventSubscriberInterface
     {
         $this->adapter->clear();
 
-        $dir = $event->getDir();
-
         $fs = new Filesystem();
-        $fs->remove($dir);
+        $fs->remove($event->getDir());
+
+        if (!$event->invalidatesPropelSchema()) {
+            return;
+        }
 
         // Invalidate the Propel combined schema so it is recombined on next boot
         // (picks up activated/deactivated modules). Models are only rebuilt if the

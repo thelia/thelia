@@ -149,7 +149,9 @@ class Hook extends BaseAction implements EventSubscriberInterface
 
     protected function cacheClear(): void
     {
-        $cacheEvent = new CacheEvent($this->cacheDir);
+        // Hooks are database rows and container listeners; none of this reaches a
+        // schema.xml, so the Propel schema does not need recombining.
+        $cacheEvent = new CacheEvent($this->cacheDir, invalidatePropelSchema: false);
 
         $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }

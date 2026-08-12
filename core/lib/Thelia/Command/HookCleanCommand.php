@@ -187,7 +187,8 @@ class HookCleanCommand extends ContainerAwareCommand
     {
         try {
             $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-            $cacheEvent = new CacheEvent($cacheDir);
+            // Hook rows only: no schema.xml is involved.
+            $cacheEvent = new CacheEvent($cacheDir, invalidatePropelSchema: false);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $exception) {
             throw new \Exception(\sprintf('Error during clearing of cache : %s', $exception->getMessage()), $exception->getCode(), $exception);
