@@ -21,6 +21,7 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\ImportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\FileConfiguration;
 use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
@@ -128,11 +129,77 @@ class ImportHandler
         return $event;
     }
 
+    /**
+     * Extensions the registered serializers and archivers are able to read. This is
+     * what the back office may accept, and what it advertises to the administrator.
+     *
+     * @return list<string>
+     */
+    public function getAcceptedExtensions(): array
+    {
+        $extensions = [];
+
+        foreach ($this->serializerManager->getSerializers() as $serializer) {
+            $extensions[] = strtolower($serializer->getExtension());
+        }
+
+        foreach ($this->archiverManager->getArchivers(true) as $archiver) {
+            $extensions[] = strtolower($archiver->getExtension());
+        }
+
+        return array_values(array_unique($extensions));
+    }
+
+    /**
+     * Mime types matching getAcceptedExtensions(), for the file input "accept" hint.
+     *
+     * @return list<string>
+     */
+    public function getAcceptedMimeTypes(): array
+    {
+        $mimeTypes = [];
+
+        foreach ($this->serializerManager->getSerializers() as $serializer) {
+            $mimeTypes[] = $serializer->getMimeType();
+        }
+
+        foreach ($this->archiverManager->getArchivers(true) as $archiver) {
+            $mimeTypes[] = $archiver->getMimeType();
+        }
+
+        return array_values(array_unique($mimeTypes));
+    }
+
+    /**
+     * Checks an uploaded file name against the formats the import handlers declare,
+     * before anything is written to disk. Callers get the same policy the back office
+     * displays, so the promise made by the interface is the one that is enforced.
+     *
+     * @throws FormValidationException when the file may not be imported
+     */
+    public function validateUpload(string $fileName): void
+    {
+        $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
+
+        if (null !== $dangerousExtension) {
+            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
+        }
+
+        $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
+        $acceptedExtensions = $this->getAcceptedExtensions();
+
+        if (!\in_array($extension, $acceptedExtensions, true)) {
+            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
+        }
+    }
+
     public function matchArchiverByExtension(string $fileName): ?AbstractArchiver
     {
+        $extension = pathinfo($fileName, \PATHINFO_EXTENSION);
+
         /** @var AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
-            if (false !== stripos($fileName, '.'.$archiver->getExtension())) {
+            if (0 === strcasecmp($extension, $archiver->getExtension())) {
                 return $archiver;
             }
         }
@@ -142,9 +209,11 @@ class ImportHandler
 
     public function matchSerializerByExtension($fileName): ?AbstractSerializer
     {
+        $extension = pathinfo((string) $fileName, \PATHINFO_EXTENSION);
+
         /** @var AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (false !== stripos((string) $fileName, '.'.$serializer->getExtension())) {
+            if (0 === strcasecmp($extension, $serializer->getExtension())) {
                 return $serializer;
             }
         }
