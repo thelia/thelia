@@ -15,16 +15,16 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\BackOffice;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
 
 /**
- * Smoke tests for the Smarty back-office pages.
+ * Smoke tests for the back-office pages.
  *
  * Admin routes are defined in core/lib/Thelia/Config/Resources/routing/admin.xml.
- * Verifies routing existence, firewall behavior, and authenticated access
- * using the {@see AdminSessionInjector} to persist the admin session
- * across browser requests.
+ * Verifies routing, firewall behaviour and authenticated access, using the
+ * {@see AdminSessionInjector} to persist the admin session across requests.
  */
 final class AdminPagesSmokeTest extends WebIntegrationTestCase
 {
@@ -48,7 +48,14 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
 
     private function loginAdmin(): void
     {
-        $admin = $this->createFixtureFactory()->admin();
+        // Built without createFixtureFactory(): that helper pushes a synthetic
+        // request when the stack is empty, and it would then be the "main"
+        // request of the calls below — the one SecurityContext reads the session
+        // from. The admin would be injected into a session nobody looks at, and
+        // every page below would answer a redirect to the login form.
+        $factory = new FixtureFactory($this->getPropelConnection());
+
+        $admin = $factory->admin();
         $admin->eraseCredentials();
         $this->injector->setAdmin($admin);
     }
@@ -57,10 +64,7 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
 
     public function testAdminLoginPageIsPublic(): void
     {
-        $this->client->request('GET', '/admin/login');
-
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/login');
     }
 
     public function testAdminHomeRedirectsToLoginWhenNotLoggedIn(): void
@@ -72,78 +76,63 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
         self::assertStringContainsString('/admin/login', (string) $response->headers->get('Location'));
     }
 
-    public function testAdminCatalogBlockedWhenNotLoggedIn(): void
+    public function testAdminCatalogRedirectsToLoginWhenNotLoggedIn(): void
     {
         $this->client->request('GET', '/admin/categories');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(200, $statusCode, 'Admin catalog must never be served to an anonymous user');
+        $response = $this->client->getResponse();
+        self::assertSame(302, $response->getStatusCode(), 'Admin catalog must never be served to an anonymous user');
+        self::assertStringContainsString('/admin/login', (string) $response->headers->get('Location'));
     }
 
     // -- Authenticated tests (admin session injected on every request) --
 
-    public function testAdminHomeAccessibleWhenLoggedIn(): void
+    public function testAdminHomeRendersWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/home');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        // Firewall passed — page renders (200) or fails on Smarty template (500).
-        // 403 is NOT acceptable here — it means auth failed.
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/home');
     }
 
-    public function testAdminCatalogAccessibleWhenLoggedIn(): void
+    public function testAdminCatalogRendersWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/categories');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/categories');
     }
 
-    public function testAdminCustomersAccessibleWhenLoggedIn(): void
+    public function testAdminCustomersRenderWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/customers');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/customers');
     }
 
-    public function testAdminOrdersAccessibleWhenLoggedIn(): void
+    public function testAdminOrdersRenderWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/orders');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/orders');
     }
 
-    public function testAdminConfigurationAccessibleWhenLoggedIn(): void
+    public function testAdminConfigurationRendersWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/configuration');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/configuration');
     }
 
-    public function testAdminModulesAccessibleWhenLoggedIn(): void
+    public function testAdminModulesRenderWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/modules');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/modules');
     }
 
-    public function testAdminToolsAccessibleWhenLoggedIn(): void
+    public function testAdminToolsRenderWhenLoggedIn(): void
     {
         $this->loginAdmin();
-        $this->client->request('GET', '/admin/tools');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertNotSame(403, $statusCode, 'Admin firewall must not block authenticated request');
+        $this->assertPageRenders('/admin/tools');
     }
 }

@@ -19,22 +19,17 @@ use Thelia\Test\WebIntegrationTestCase;
 /**
  * Smoke tests for the Flexy front-office routing and controller wiring.
  *
- * Note: Twig templates that use `asset()` require a built manifest.json
- * (npm run build in the Flexy theme). In CI without assets, these pages
- * return 500 due to the missing manifest — that's a build dependency,
- * not a core bug. Tests here focus on behavior that works without assets:
- * redirects, auth guards, and controller responses that don't render Twig.
+ * A page that renders a template must answer 200. The only tolerated outcome is
+ * a theme whose assets are not built, which {@see WebIntegrationTestCase::assertPageRenders()}
+ * reports as a skipped test: the core CI installs the theme from Composer and
+ * never runs `npm run build`, while the theme's own CI does and therefore gets
+ * the full assertion.
  */
 final class FrontPagesSmokeTest extends WebIntegrationTestCase
 {
-    public function testHomepageRouteIsReachable(): void
+    public function testHomepageRenders(): void
     {
-        $this->client->request('GET', '/');
-
-        // With built assets: 200. Without: 500 from missing manifest.json.
-        // Either way, the route is wired and the controller was invoked.
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [200, 500]);
+        $this->assertPageRenders('/');
     }
 
     public function testAccountRedirectsWhenNotLoggedIn(): void
@@ -58,28 +53,19 @@ final class FrontPagesSmokeTest extends WebIntegrationTestCase
         self::assertResponseRedirects();
     }
 
-    public function testCustomerLoginRouteExists(): void
+    public function testCustomerLoginRenders(): void
     {
-        $this->client->request('GET', '/customer/login');
-
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [200, 500]);
+        $this->assertPageRenders('/customer/login');
     }
 
-    public function testCustomerRegisterRouteExists(): void
+    public function testCustomerRegisterRenders(): void
     {
-        $this->client->request('GET', '/customer/register');
-
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [200, 500]);
+        $this->assertPageRenders('/customer/register');
     }
 
-    public function testCheckoutCartRouteExists(): void
+    public function testCheckoutCartRenders(): void
     {
-        $this->client->request('GET', '/checkout/cart');
-
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [200, 500]);
+        $this->assertPageRenders('/checkout/cart');
     }
 
     public function testPasswordForgottenRouteRedirects(): void
@@ -90,20 +76,17 @@ final class FrontPagesSmokeTest extends WebIntegrationTestCase
         self::assertResponseRedirects();
     }
 
-    public function testCheckoutDeliveryRouteExists(): void
+    public function testCheckoutDeliveryRedirectsWhenNotLoggedIn(): void
     {
         $this->client->request('GET', '/checkout/delivery');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        // May redirect to cart or render — depends on cart state.
-        self::assertContains($statusCode, [200, 302, 500]);
+        self::assertResponseRedirects();
     }
 
-    public function testCheckoutPaymentRouteExists(): void
+    public function testCheckoutPaymentRedirectsWhenNotLoggedIn(): void
     {
         $this->client->request('GET', '/checkout/payment');
 
-        $statusCode = $this->client->getResponse()->getStatusCode();
-        self::assertContains($statusCode, [200, 302, 500]);
+        self::assertResponseRedirects();
     }
 }
