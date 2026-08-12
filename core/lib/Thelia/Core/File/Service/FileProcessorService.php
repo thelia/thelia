@@ -156,7 +156,7 @@ readonly class FileProcessorService
         // Defense in depth against double-extension bypasses (e.g. "shell.php.jpg"):
         // reject any file whose name contains a server-executable segment, not just the
         // terminal one. Applies to every upload, regardless of the caller's configuration.
-        if (null === $message && null !== ($dangerousExtension = $this->findExecutableExtension($realFileName))) {
+        if (null === $message && null !== ($dangerousExtension = FileConfiguration::findExecutableExtension($realFileName))) {
             $message = $this->translator->trans(
                 'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
                 [
@@ -179,33 +179,6 @@ readonly class FileProcessorService
     public function sanitizeUpload(UploadedFile $fileBeingUploaded): void
     {
         $this->sanitizeSvgUpload($fileBeingUploaded);
-    }
-
-    /**
-     * Returns the first server-executable extension segment found in the file name
-     * (terminal or not), or null when the name is safe. Only extensions that never
-     * collide with legitimate locale/type suffixes are listed, to avoid false positives.
-     */
-    private function findExecutableExtension(string $fileName): ?string
-    {
-        static $dangerous = [
-            'php', 'php3', 'php4', 'php5', 'php6', 'php7', 'php8',
-            'phtml', 'phtm', 'pht', 'phps', 'phpt', 'phar',
-            'shtml', 'shtm', 'stm',
-            'htaccess', 'htpasswd',
-        ];
-
-        $segments = explode('.', strtolower($fileName));
-        // Drop the base name; only extension segments are relevant.
-        array_shift($segments);
-
-        foreach ($segments as $segment) {
-            if (\in_array($segment, $dangerous, true)) {
-                return $segment;
-            }
-        }
-
-        return null;
     }
 
     /**

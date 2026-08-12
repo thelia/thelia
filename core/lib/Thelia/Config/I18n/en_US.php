@@ -571,6 +571,7 @@ return [
     'The detailed description.' => 'The detailed description.',
     'The email address "%mail" was not found.' => 'The email address "%mail" was not found.',
     'The extension "%extension" is not allowed' => 'The extension "%extension" is not allowed',
+    'The extension "%extension" is not allowed. Accepted formats: %formats' => 'The extension "%extension" is not allowed. Accepted formats: %formats',
     'The file %path has been successfully downloaded' => 'The file %path has been successfully downloaded',
     'The following columns are missing: %columns' => 'The following columns are missing: %columns',
     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.' => 'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',

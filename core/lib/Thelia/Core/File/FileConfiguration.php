@@ -64,6 +64,20 @@ class FileConfiguration
     ];
 
     /**
+     * Extensions a web server may be configured to execute. They are refused on
+     * every upload path, whatever the configuration above says, and whether they
+     * end the file name or sit in the middle of it ("shell.php.jpg"). Only
+     * extensions that never collide with a legitimate locale or type suffix are
+     * listed, to avoid false positives.
+     */
+    public const SERVER_EXECUTABLE_EXTENSIONS = [
+        'php', 'php3', 'php4', 'php5', 'php6', 'php7', 'php8',
+        'phtml', 'phtm', 'pht', 'phps', 'phpt', 'phar',
+        'shtml', 'shtm', 'stm',
+        'htaccess', 'htpasswd',
+    ];
+
+    /**
      * Extensions a mime type is allowed to carry, so that a PNG named ".jpg"
      * is rejected. A mime type absent from this table is matched on the mime
      * type alone, which lets a shop add a new one without a core change.
@@ -124,6 +138,25 @@ class FileConfiguration
             'document' => self::getDocumentConfig(),
             default => ['objectType' => $objectType, 'validMimeTypes' => [], 'extBlackList' => []],
         };
+    }
+
+    /**
+     * Returns the first server-executable extension segment found in the file name
+     * (terminal or not), or null when the name is safe.
+     */
+    public static function findExecutableExtension(string $fileName): ?string
+    {
+        $segments = explode('.', strtolower($fileName));
+        // Drop the base name; only extension segments are relevant.
+        array_shift($segments);
+
+        foreach ($segments as $segment) {
+            if (\in_array($segment, self::SERVER_EXECUTABLE_EXTENSIONS, true)) {
+                return $segment;
+            }
+        }
+
+        return null;
     }
 
     /**
