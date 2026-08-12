@@ -479,4 +479,36 @@ UPDATE `state` INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
 SET `state`.`isocode` = 'CMX'
 WHERE `country`.`isoalpha3` = 'MEX' AND `state`.`isocode` = 'DIF';
 
+-- ---------------------------------------------------------------------
+-- Translations of the account activation code message (#3659)
+--
+-- The `customer_send_code` message was added by 3.0.0-alpha1.sql, and by
+-- setup/insert.sql, without a single `message_i18n` row: the subject of a
+-- mail comes from that table, so every activation code left the shop with
+-- an empty subject line.
+--
+-- One row per language installed in the shop, then the English and French
+-- wordings. Existing rows are left as they are, so a shop that already
+-- typed its own subject in the back office keeps it.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`)
+SELECT `message`.`id`, `lang`.`locale`, NULL, NULL, NULL, NULL
+FROM `message`, `lang`
+WHERE `message`.`name` = 'customer_send_code';
+
+UPDATE `message_i18n` INNER JOIN `message` ON `message`.`id` = `message_i18n`.`id`
+SET `message_i18n`.`title` = 'Mail sent to the customer with the code that activates the account',
+    `message_i18n`.`subject` = 'Your {{ config(\"store_name\") }} activation code'
+WHERE `message`.`name` = 'customer_send_code'
+  AND `message_i18n`.`locale` = 'en_US'
+  AND (`message_i18n`.`subject` IS NULL OR `message_i18n`.`subject` = '');
+
+UPDATE `message_i18n` INNER JOIN `message` ON `message`.`id` = `message_i18n`.`id`
+SET `message_i18n`.`title` = 'E-mail envoyé au client avec le code d\'activation de son compte',
+    `message_i18n`.`subject` = 'Votre code d\'activation {{ config(\"store_name\") }}'
+WHERE `message`.`name` = 'customer_send_code'
+  AND `message_i18n`.`locale` = 'fr_FR'
+  AND (`message_i18n`.`subject` IS NULL OR `message_i18n`.`subject` = '');
+
 SET FOREIGN_KEY_CHECKS = 1;
