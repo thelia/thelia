@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Routing\RequestContext;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -85,19 +86,15 @@ abstract class BaseLoopTestor extends TestCase
             ->setMethods(['getContext'])
             ->getMock();
 
-        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
-            ->disableOriginalConstructor()
-            ->setMethods(['getHost'])
-            ->getMock();
-
-        $stubRequestContext->expects($this->any())
-            ->method('getHost')
-            ->willReturn('localhost');
+        // A real request context: its properties are typed, so a mock built with
+        // disableOriginalConstructor() leaves them uninitialized and any getter
+        // Thelia\Tools\URL calls (getBaseUrl(), getScheme(), ...) throws.
+        $requestContext = new RequestContext('/index.php', 'GET', 'localhost');
 
         $stubRouterAdmin->expects($this->any())
             ->method('getContext')
             ->willReturn(
-                $stubRequestContext
+                $requestContext
             );
 
         $requestStack->push($request);
@@ -126,8 +123,8 @@ abstract class BaseLoopTestor extends TestCase
     public function testExec(): void
     {
         $method = $this->getMethod('exec');
-        $page = 0;
-        $methodReturn = $method->invokeArgs($this->instance, [&$page]);
+        $pagination = null;
+        $methodReturn = $method->invokeArgs($this->instance, [&$pagination]);
 
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
@@ -175,14 +172,21 @@ abstract class BaseLoopTestor extends TestCase
     {
         $className = $this->getTestedClassName();
 
-        return new $className(
+        /** @var \Thelia\Core\Template\Element\BaseLoop $instance */
+        $instance = new $className();
+
+        // Loops take no constructor argument: their dependencies are injected
+        // by init(), the way TheliaSmarty\Template\Plugins\TheliaLoop does it.
+        $instance->init(
             $this->container,
             $this->container->get('request_stack'),
             $this->container->get('event_dispatcher'),
             $this->container->get('thelia.securityContext'),
             $this->container->get('thelia.translator'),
-            [],
+            $this->container->getParameter('Thelia.parser.loops'),
             'dev'
         );
+
+        return $instance;
     }
 }

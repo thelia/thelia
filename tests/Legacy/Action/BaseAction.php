@@ -15,7 +15,9 @@ namespace Thelia\Tests\Action;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Mailer\MailerFactory;
 
 /**
  * Class BaseAction.
@@ -41,6 +43,14 @@ class BaseAction extends TestCase
         $parserInterface = $this->createMock('Thelia\\Core\\Template\\ParserInterface');
 
         return $parserInterface;
+    }
+
+    protected function getMockMailerFactory(): MailerFactory
+    {
+        return new MailerFactory(
+            $this->getMockParserInterface(),
+            $this->createMock(MailerInterface::class)
+        );
     }
 
     public function getContainer()

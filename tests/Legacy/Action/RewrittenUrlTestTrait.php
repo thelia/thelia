@@ -67,10 +67,11 @@ trait RewrittenUrlTestTrait
 
         $currentUrl = $object->getRewrittenUrl($object->getLocale());
 
-        /* get a brand new URL */
+        /* get a brand new URL, with no extension: RewritingUrl::sanitizeUrl()
+           strips ".html" unless admin.url.sanitizer.remove.html says otherwise */
         $exist = true;
         while (true === $exist) {
-            $newUrl = md5(random_int(1, 999999)).'.html';
+            $newUrl = md5(random_int(1, 999999));
             try {
                 new RewritingResolver($newUrl);
             } catch (UrlRewritingException $e) {

@@ -128,7 +128,7 @@ class ConditionFactoryTest extends TestCase
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->willReturnMap(['unset.service', false]);
+            ->willReturnMap([['unset.service', false]]);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [

@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use App\Kernel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Action\Feature;
@@ -31,7 +32,6 @@ use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Core\Thelia;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeCombinationQuery;
@@ -43,6 +43,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
@@ -819,7 +820,7 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCloneFile(ProductCloneEvent $event)
     {
-        $kernel = new Thelia('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $action = new File();
@@ -860,6 +861,11 @@ class ProductTest extends TestCaseWithURLToolSetup
             // Check each file
             /** @var ProductDocument $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
+                // Thelia\Action\File::cloneImage() walks every active language and
+                // leaves the source model on the last one, where the file name is
+                // usually empty. Read it back in the default language instead.
+                $originalProductFile->setLocale(Lang::getDefaultLanguage()->getLocale());
+
                 $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
 
                 // Check if original file exists

@@ -56,9 +56,11 @@ class URLTest extends TestCase
         $url = URL::getInstance()->getIndexPage();
         $this->assertEquals('http://localhost/thelia/index.php', $url);
 
+        // Symfony\Component\Routing\RequestContext::setBaseUrl() rtrims the
+        // trailing slash, so '/thelia/' and '/thelia' are the same base url.
         $this->context->setBaseUrl('/thelia/');
         $url = URL::getInstance()->getIndexPage();
-        $this->assertEquals('http://localhost/thelia/', $url);
+        $this->assertEquals('http://localhost/thelia', $url);
 
         $this->context->setBaseUrl('/thelia');
         $url = URL::getInstance()->getIndexPage();
@@ -66,7 +68,7 @@ class URLTest extends TestCase
 
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->getIndexPage();
-        $this->assertEquals('http://localhost/', $url);
+        $this->assertEquals('http://localhost', $url);
     }
 
     public function testGetBaseUrl(): void
@@ -77,11 +79,11 @@ class URLTest extends TestCase
 
         $this->context->setBaseUrl('/thelia/');
         $url = URL::getInstance()->getBaseUrl();
-        $this->assertEquals('http://localhost/thelia/', $url);
+        $this->assertEquals('http://localhost/thelia', $url);
 
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->getBaseUrl();
-        $this->assertEquals('http://localhost/', $url);
+        $this->assertEquals('http://localhost', $url);
     }
 
     public function testAbsoluteUrl(): void
@@ -288,5 +290,6 @@ class URLTest extends TestCase
 
     public function testRetrieve(): void
     {
+        $this->markTestSkipped('Empty since it was added: URL::retrieve() needs a database and a rewriting fixture.');
     }
 }

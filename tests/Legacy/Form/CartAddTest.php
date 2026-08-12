@@ -18,5 +18,6 @@ class CartAddTest extends TestCase
 {
     public function testSimpleAddingToCart(): void
     {
+        $this->markTestSkipped('Empty since it was added: the cart form has never been covered here.');
     }
 }

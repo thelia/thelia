@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\HttpFoundation\Request;
@@ -75,11 +76,13 @@ class TheliaFormFactoryTest extends TestCase
         $container->set('event_dispatcher', $dispatcher);
 
         $this->factory = new TheliaFormFactory(
+            $container,
             $requestStack,
             $dispatcher,
             $translator,
             $formFactoryBuilder,
             $validatorBuilder,
+            $this->createMock(TokenStorageInterface::class),
             $formDefinitions
         );
     }

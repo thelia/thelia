@@ -18,5 +18,6 @@ class OrderDeliveryTest extends TestCase
 {
     public function testOrderDelivery(): void
     {
+        $this->markTestSkipped('Empty since it was added: the delivery form has never been covered here.');
     }
 }

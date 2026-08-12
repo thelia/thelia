@@ -14,6 +14,7 @@ namespace Thelia\Tests\Rewriting;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\RequestContext;
 use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingRetriever;
 use Thelia\Tools\URL;
@@ -34,19 +35,15 @@ class RewritingRetrieverTest extends TestCase
             ->setMethods(['getContext'])
             ->getMock();
 
-        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
-            ->disableOriginalConstructor()
-            ->setMethods(['getHost'])
-            ->getMock();
-
-        $stubRequestContext->expects($this->any())
-            ->method('getHost')
-            ->willReturn('localhost');
+        // A real request context: its properties are typed, so a mock built with
+        // disableOriginalConstructor() leaves them uninitialized and any getter
+        // Thelia\Tools\URL calls (getBaseUrl(), getScheme(), ...) throws.
+        $requestContext = new RequestContext('/index.php', 'GET', 'localhost');
 
         $stubRouterAdmin->expects($this->any())
             ->method('getContext')
             ->willReturn(
-                $stubRequestContext
+                $requestContext
             );
 
         $this->container->set('router.admin', $stubRouterAdmin);

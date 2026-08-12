@@ -25,7 +25,6 @@ use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -114,10 +113,7 @@ class OrderTest extends BaseAction
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
-        $mailerFactory = new MailerFactory(
-            $this->getMockEventDispatcher(),
-            $this->getMockParserInterface()
-        );
+        $mailerFactory = $this->getMockMailerFactory();
 
         $this->orderAction = new Order(
             $this->requestStack,
