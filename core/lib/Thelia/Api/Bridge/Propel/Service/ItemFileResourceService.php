@@ -24,12 +24,14 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelInterface;
+use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Model\ConfigQuery;
 
 readonly class ItemFileResourceService
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
+        private FileProcessorService $fileProcessorService,
     ) {
     }
 
@@ -46,6 +48,12 @@ readonly class ItemFileResourceService
         if (!$file->isValid()) {
             throw new FileException($file->getErrorMessage());
         }
+
+        // The shop upload policy, the one the back office applies (FileConfiguration).
+        // The API used to carry its own copy as per-resource constraints, which said
+        // something else and covered images only.
+        $this->fileProcessorService->validateUpload($file, $fileType);
+        $this->fileProcessorService->sanitizeUpload($file);
 
         // The Propel setters are natively typed, so the raw strings of a multipart
         // body have to be converted before they reach the model.
