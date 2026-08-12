@@ -209,6 +209,7 @@ class CurrencyController extends AbstractCrudController
 
             if ($event->hasUndefinedRates()) {
                 return $this->render('currencies', [
+                    'order' => $this->getCurrentListOrder(),
                     'undefined_rates' => $event->getUndefinedRates(),
                 ]);
             }

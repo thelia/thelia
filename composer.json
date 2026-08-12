@@ -118,15 +118,16 @@
             "php ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1"
         ],
         "test-unit": [
-            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
+            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuite unit"
         ],
         "demo-database": [
             "php Thelia thelia:dev:reloadDB -f",
             "php setup/import.php",
-            "php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com"
+            "php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com",
+            "@cache-clear"
         ],
         "test-functional": [
-            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit functional"
+            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuite functional"
         ],
         "test-legacy": [
             "php Thelia module:activate CustomDelivery -s",
@@ -141,7 +142,8 @@
             "@test-functional"
         ],
         "ci": [
-            "@cs-diff"
+            "@cs-diff",
+            "@test"
         ],
         "cache-clear": [
             "rm -Rf var/cache/*"
