@@ -164,7 +164,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->eventDispatcher->dispatch($event, TheliaEvents::PSE_CLONE);
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;
@@ -370,7 +370,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $event->setProduct($product);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (\Throwable $e) {
             $con->rollBack();
 
             throw $e;
@@ -463,7 +463,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             }
 
             $con->commit();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $con->rollBack();
 
             throw $e;
@@ -671,7 +671,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;

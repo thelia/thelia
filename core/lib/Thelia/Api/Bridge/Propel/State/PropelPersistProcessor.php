@@ -77,7 +77,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $propelModel->reload();
 
             $data->setId($propelModel->getId());
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $connection->rollBack();
 
             throw $exception;

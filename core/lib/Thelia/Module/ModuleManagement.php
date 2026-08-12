@@ -168,7 +168,7 @@ class ModuleManagement
             }
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $exception);
 
             $con->rollBack();

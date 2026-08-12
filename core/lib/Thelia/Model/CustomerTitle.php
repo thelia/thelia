@@ -36,7 +36,7 @@ class CustomerTitle extends BaseCustomerTitle
             $this->setByDefault(1)->save();
 
             $con->commit();
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;

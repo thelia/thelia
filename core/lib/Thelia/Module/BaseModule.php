@@ -113,7 +113,7 @@ class BaseModule implements BaseModuleInterface
 
                 $this->postActivation($con);
                 $con->commit();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 if ($con->inTransaction()) {
                     $con->rollBack();
                 }
@@ -145,7 +145,7 @@ class BaseModule implements BaseModuleInterface
 
                     $con->commit();
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $con->rollBack();
 
                 throw $e;
