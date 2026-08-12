@@ -13,7 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Country as BaseCountry;
