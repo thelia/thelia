@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
@@ -26,6 +26,8 @@ use Thelia\Model\TaxRuleQuery;
 
 abstract class AbstractDeliveryModuleWithState extends BaseModule implements DeliveryModuleWithStateInterface
 {
+    use TaxCalculatorResolverTrait;
+
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
 
@@ -73,7 +75,7 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
         $orderPostage = new OrderPostage();
 
         if ($taxRule) {
-            $taxCalculator = new Calculator();
+            $taxCalculator = $this->createTaxCalculator();
             $taxCalculator->loadTaxRuleWithoutProduct($taxRule, $country);
 
             $orderPostage->setAmount($taxCalculator->getTaxedPrice($untaxedPostage));

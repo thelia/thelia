@@ -18,8 +18,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Tax\TaxCalculatorEvent;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Model\Tax as TaxModel;
 use Thelia\Model\TaxQuery;
 
@@ -30,6 +32,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     public function __construct(
         #[AutowireLocator('thelia.taxType')]
         ServiceLocator $taxTypeLocator,
+        private readonly TaxCalculatorFactoryInterface $taxCalculatorFactory,
     ) {
         $this->taxTypeLocator = $taxTypeLocator;
     }
@@ -87,6 +90,18 @@ class Tax extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Supplies the calculator built by the configured factory, unless another
+     * listener already provided one. Runs last on purpose, so a module only has
+     * to register a listener at any regular priority to take over.
+     */
+    public function getTaxCalculator(TaxCalculatorEvent $event): void
+    {
+        if (!$event->hasTaxCalculator()) {
+            $event->setTaxCalculator($this->taxCalculatorFactory->createTaxCalculator());
+        }
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -94,6 +109,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TAX_UPDATE => ['update', 128],
             TheliaEvents::TAX_DELETE => ['delete', 128],
             TheliaEvents::TAX_GET_TYPE_SERVICE => ['getTaxTypeService', 128],
+            TheliaEvents::TAX_GET_CALCULATOR => ['getTaxCalculator', -128],
         ];
     }
 }

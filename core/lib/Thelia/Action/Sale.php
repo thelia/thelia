@@ -28,7 +28,8 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductPriceQuery;
@@ -48,14 +49,19 @@ use Thelia\Model\SaleQuery;
  */
 class Sale extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly TaxCalculatorFactoryInterface $taxCalculatorFactory,
+    ) {
+    }
+
     /**
      * Update PSE for a given product.
      *
-     * @param array      $pseList              an array of priduct sale elements
-     * @param bool       $promoStatus          true if the PSEs are on sale, false otherwise
-     * @param int        $offsetType           the offset type, see SaleModel::OFFSET_* constants
-     * @param Calculator $taxCalculator        the tax calculator
-     * @param array      $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
+     * @param array                  $pseList              an array of priduct sale elements
+     * @param bool                   $promoStatus          true if the PSEs are on sale, false otherwise
+     * @param int                    $offsetType           the offset type, see SaleModel::OFFSET_* constants
+     * @param TaxCalculatorInterface $taxCalculator        the tax calculator
+     * @param array                  $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
      *
      * @throws PropelException
      */
@@ -63,7 +69,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
         array $pseList,
         bool $promoStatus,
         int $offsetType,
-        Calculator $taxCalculator,
+        TaxCalculatorInterface $taxCalculator,
         array $saleOffsetByCurrency,
         ConnectionInterface $con,
     ): void {
@@ -114,7 +120,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->taxCalculatorFactory->createTaxCalculator();
 
         $sale = $event->getSale();
 

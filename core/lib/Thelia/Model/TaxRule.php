@@ -14,15 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Domain\Taxation\TaxEngine\OrderProductTaxCollection;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\TaxRule as BaseTaxRule;
 
 class TaxRule extends BaseTaxRule
 {
+    use TaxCalculatorResolverTrait;
+
     public function getTaxDetail(Product $product, Country $country, $untaxedAmount, $untaxedPromoAmount, $askedLocale = null): OrderProductTaxCollection
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->createTaxCalculator();
 
         $taxCollection = new OrderProductTaxCollection();
         $taxCalculator->loadTaxRule($this, $country, $product)->getTaxedPrice((float) $untaxedAmount, $taxCollection, $askedLocale);
