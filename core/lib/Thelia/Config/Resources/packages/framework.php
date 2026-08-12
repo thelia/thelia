@@ -31,17 +31,19 @@ return static function (ContainerConfigurator $container): void {
             ],
         ],
         'rate_limiter' => [
-            // Asking for a new account activation code sends an email to an address
-            // the visitor typed, so an unauthenticated caller can make the shop mail
-            // someone else. Both limits are needed: the per-address one protects the
-            // owner of a single mailbox, the per-client one stops a single caller
-            // from walking a list of addresses.
-            'customer_code_request_per_email' => [
+            // Asking for a new account activation code, or for a new password, sends an
+            // email to an address the visitor typed, so an unauthenticated caller can
+            // make the shop mail someone else. Both limits are needed: the per-address
+            // one protects the owner of a single mailbox, the per-client one stops a
+            // single caller from walking a list of addresses. Three an hour leaves room
+            // for the usual "it did not arrive, send it again" without a real customer
+            // ever noticing the cap.
+            'customer_email_request_per_address' => [
                 'policy' => 'sliding_window',
                 'limit' => 3,
                 'interval' => '1 hour',
             ],
-            'customer_code_request_per_client' => [
+            'customer_email_request_per_client' => [
                 'policy' => 'sliding_window',
                 'limit' => 10,
                 'interval' => '1 hour',

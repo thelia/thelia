@@ -29,6 +29,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartContext;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Customer\Exception\CustomerException;
+use Thelia\Domain\Customer\Service\CustomerEmailRequestLimiter;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Mailer\MailerFactory;
@@ -57,6 +58,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected LangService $langService,
         protected CartRetriever $cartRetriever,
         protected CartContext $cartContext,
+        protected CustomerEmailRequestLimiter $emailRequestLimiter,
     ) {
     }
 
@@ -280,10 +282,22 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Reset the password of the given address and mail the new one to it.
+     *
+     * The address comes from whoever asked, so this mails a third party on demand,
+     * and the mail carries a fresh password, which locks the owner out of the account
+     * every time. The cap is taken before the address is looked up, so a caller spends
+     * the same budget whether or not the address has an account, and a front office
+     * offering a "send it again" link cannot be turned into a mail cannon.
+     *
      * @throws PropelException
      */
     public function lostPassword(LostPasswordEvent $event): void
     {
+        if (!$this->emailRequestLimiter->allows((string) $event->getEmail())) {
+            return;
+        }
+
         if (null === $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
             return;
         }
