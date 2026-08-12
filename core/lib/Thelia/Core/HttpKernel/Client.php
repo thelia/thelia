@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\HttpKernel;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Request as DomRequest;
-use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Thelia\Core\HttpFoundation\Request;
 
 /**
@@ -21,7 +21,7 @@ use Thelia\Core\HttpFoundation\Request;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class Client extends HttpKernelBrowser
+class Client extends KernelBrowser
 {
     /**
      * Converts the BrowserKit request to a HttpKernel request.
