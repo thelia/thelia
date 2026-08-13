@@ -71,12 +71,12 @@ final readonly class ShippingFacade
 
         $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state);
 
-        $amountHt = $estimate->getBestPostageAmount();
+        $totalTtc = $estimate->getBestPostageAmount();
         $tax = $estimate->getBestPostageTax();
-        $totalTtc = null;
+        $amountHt = null;
 
-        if (null !== $amountHt && null !== $tax) {
-            $totalTtc = $amountHt + $tax;
+        if (null !== $totalTtc && null !== $tax) {
+            $amountHt = $totalTtc - $tax;
         }
 
         return new PostageEstimateView($amountHt, $tax, $totalTtc);

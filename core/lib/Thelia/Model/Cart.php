@@ -180,7 +180,7 @@ class Cart extends BaseCart
         }
 
         if ($withPostage) {
-            $total += (float) $this->getPostage();
+            $total += $this->getUntaxedPostage();
         }
 
         return round($total, 2);
@@ -263,8 +263,24 @@ class Cart extends BaseCart
         return round($this->createTaxCalculator()->computeUntaxedCartDiscount($this, $country, $state), 2);
     }
 
+    /**
+     * Return the postage, tax included.
+     *
+     * The postage column is stored tax included, exactly like Order::getPostage(),
+     * so this method only spells the convention out for the caller.
+     */
     public function getTaxedPostage(): float
     {
-        return (float) $this->getPostage() + (float) $this->getPostageTax();
+        return (float) $this->getPostage();
+    }
+
+    /**
+     * Return the postage without tax.
+     */
+    public function getUntaxedPostage(): float
+    {
+        return 0 < (float) $this->getPostageTax()
+            ? (float) $this->getPostage() - (float) $this->getPostageTax()
+            : (float) $this->getPostage();
     }
 }

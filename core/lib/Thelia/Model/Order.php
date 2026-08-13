@@ -358,6 +358,8 @@ class Order extends BaseOrder
 
     /**
      * Return the postage without tax.
+     *
+     * The postage column is stored tax included, like Cart::getPostage().
      */
     public function getUntaxedPostage(): float|int
     {
