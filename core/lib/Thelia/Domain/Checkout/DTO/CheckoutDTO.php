@@ -30,14 +30,17 @@ class CheckoutDTO implements DTOEventActionInterface, CartDTOInterface
         protected ?OrderPostage $postage = null,
         protected array $extendedData = [],
     ) {
+        // deliveryAddressId and invoiceAddressId are customer `address` ids.
+        // The cart stores `cart_address` ids — its own copies — so they are read
+        // through the copy.
         if (null === $this->deliveryAddressId) {
-            $this->deliveryAddressId = $cart->getAddressDeliveryId();
+            $this->deliveryAddressId = $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId();
         }
         if (null === $this->deliveryModuleId) {
             $this->deliveryModuleId = $cart->getDeliveryModuleId();
         }
         if (null === $this->invoiceAddressId) {
-            $this->invoiceAddressId = $cart->getAddressInvoiceId();
+            $this->invoiceAddressId = $cart->getCartAddressRelatedByAddressInvoiceId()?->getAddressId();
         }
         if (null === $this->paymentModuleId) {
             $this->paymentModuleId = $cart->getPaymentModuleId();

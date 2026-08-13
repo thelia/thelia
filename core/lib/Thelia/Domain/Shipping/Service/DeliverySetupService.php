@@ -75,25 +75,27 @@ final readonly class DeliverySetupService
             }
 
             if (null !== $defaultAddress) {
-                $cart->setAddressDeliveryId($defaultAddress->getId())->save();
+                $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+                    $defaultAddress,
+                    $cart->getCartAddressRelatedByAddressDeliveryId(),
+                );
+
+                $cart->setAddressDeliveryId($cartAddress->getId())->save();
             }
         }
 
         $cart->setDeliveryModuleId($virtualDeliveryModule->getId())->save();
 
-        $addressId = $cart->getAddressDeliveryId();
-        if (null !== $addressId) {
-            $address = AddressQuery::create()->findPk($addressId);
-            $country = $address?->getCountry();
-            if (null !== $country) {
-                $state = $address->getState();
-                $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state);
+        $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $country = $deliveryAddress?->getCountry();
 
-                $cart
-                    ->setPostage((string) ($estimate->getBestPostageAmount() ?? 0))
-                    ->setPostageTax((string) ($estimate->getBestPostageTax() ?? 0))
-                    ->save();
-            }
+        if (null !== $country) {
+            $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $deliveryAddress->getState());
+
+            $cart
+                ->setPostage((string) ($estimate->getBestPostageAmount() ?? 0))
+                ->setPostageTax((string) ($estimate->getBestPostageTax() ?? 0))
+                ->save();
         }
     }
 }

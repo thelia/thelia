@@ -38,9 +38,12 @@ class CartCheckoutEvent extends ActionEvent
     {
         $this->cart = $cart;
 
-        $this->deliveryAddressId = $cart->getAddressDeliveryId();
+        // The cart columns hold `cart_address` ids — its own frozen copies of
+        // the addresses. The listeners of this event look these ids up in
+        // `address`, so the event carries the customer addresses instead.
+        $this->deliveryAddressId = $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId();
         $this->deliveryModuleId = $cart->getDeliveryModuleId();
-        $this->invoiceAddressId = $cart->getAddressInvoiceId();
+        $this->invoiceAddressId = $cart->getCartAddressRelatedByAddressInvoiceId()?->getAddressId();
         $this->paymentModuleId = $cart->getPaymentModuleId();
     }
 

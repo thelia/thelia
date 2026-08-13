@@ -100,8 +100,8 @@ final readonly class CheckoutFacade
 
         return $this->paymentService->pay(
             $dto->getCart(),
-            $dto->getDeliveryAddressId() ?? $dto->getCart()->getAddressDeliveryId(),
-            $dto->getInvoiceAddressId() ?? $dto->getCart()->getAddressInvoiceId(),
+            $dto->getDeliveryAddressId(),
+            $dto->getInvoiceAddressId(),
             $dto->getDeliveryModuleId() ?? $dto->getCart()->getDeliveryModuleId(),
             $dto->getPaymentModuleId() ?? $dto->getCart()->getPaymentModuleId(),
         );

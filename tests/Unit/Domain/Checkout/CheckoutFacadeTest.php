@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\OrderPostage;
 
 class CheckoutFacadeTest extends TestCase
@@ -76,8 +77,10 @@ class CheckoutFacadeTest extends TestCase
     {
         $cart = $this->createMock(Cart::class);
         $cart->method('getId')->willReturn(1);
-        $cart->method('getAddressDeliveryId')->willReturn(100);
-        $cart->method('getAddressInvoiceId')->willReturn(200);
+        // The cart points at its own copies of the addresses, which in turn
+        // carry the id of the customer address each was copied from.
+        $cart->method('getCartAddressRelatedByAddressDeliveryId')->willReturn($this->cartAddressMock(100));
+        $cart->method('getCartAddressRelatedByAddressInvoiceId')->willReturn($this->cartAddressMock(200));
         $cart->method('getDeliveryModuleId')->willReturn(300);
         $cart->method('getPaymentModuleId')->willReturn(400);
 
@@ -93,8 +96,8 @@ class CheckoutFacadeTest extends TestCase
     {
         $cart = $this->createMock(Cart::class);
         $cart->method('getId')->willReturn(1);
-        $cart->method('getAddressDeliveryId')->willReturn(100);
-        $cart->method('getAddressInvoiceId')->willReturn(200);
+        $cart->method('getCartAddressRelatedByAddressDeliveryId')->willReturn($this->cartAddressMock(100));
+        $cart->method('getCartAddressRelatedByAddressInvoiceId')->willReturn($this->cartAddressMock(200));
         $cart->method('getDeliveryModuleId')->willReturn(300);
         $cart->method('getPaymentModuleId')->willReturn(400);
 
@@ -126,11 +129,19 @@ class CheckoutFacadeTest extends TestCase
     {
         $cart = $this->createMock(Cart::class);
         $cart->method('getId')->willReturn($id);
-        $cart->method('getAddressDeliveryId')->willReturn(null);
-        $cart->method('getAddressInvoiceId')->willReturn(null);
+        $cart->method('getCartAddressRelatedByAddressDeliveryId')->willReturn(null);
+        $cart->method('getCartAddressRelatedByAddressInvoiceId')->willReturn(null);
         $cart->method('getDeliveryModuleId')->willReturn(null);
         $cart->method('getPaymentModuleId')->willReturn(null);
 
         return $cart;
+    }
+
+    private function cartAddressMock(int $addressId): MockObject&CartAddress
+    {
+        $cartAddress = $this->createMock(CartAddress::class);
+        $cartAddress->method('getAddressId')->willReturn($addressId);
+
+        return $cartAddress;
     }
 }

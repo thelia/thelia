@@ -165,8 +165,13 @@ readonly class AddressService
             ?? $request->query->get('addressId');
 
         if (null === $addressId) {
-            $session = $request->getSession();
-            $addressId = $session->getSessionCart($this->dispatcher)?->getAddressDeliveryId();
+            // The cart holds a `cart_address` id, which is its own frozen copy
+            // of the address, so the customer address it was copied from has to
+            // be read through it.
+            $addressId = $request->getSession()
+                ->getSessionCart($this->dispatcher)
+                ?->getCartAddressRelatedByAddressDeliveryId()
+                ?->getAddressId();
         }
 
         if (null !== $addressId) {

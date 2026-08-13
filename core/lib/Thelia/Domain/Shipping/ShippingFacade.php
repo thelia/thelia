@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
+use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
@@ -47,6 +48,7 @@ final readonly class ShippingFacade
         private DeliveryModuleEligibilityChecker $eligibilityChecker,
         private DeliveryOptionsProvider $deliveryOptionsProvider,
         private DeliveryModuleResourceBuilder $deliveryModuleResourceBuilder,
+        private CartAddressService $cartAddressService,
     ) {
     }
 
@@ -91,11 +93,25 @@ final readonly class ShippingFacade
     }
 
     /**
-     * Set the delivery address on the cart (setter + save).
+     * Set the delivery address on the cart, from the id of a customer `address`.
+     *
+     * The cart does not point at `address` but at its own copy of it, in
+     * `cart_address`, so the copy is made (or refreshed) on the way.
      */
     public function chooseDeliveryAddress(Cart $cart, int $addressId): void
     {
-        $cart->setAddressDeliveryId($addressId)->save();
+        $address = AddressQuery::create()->findPk($addressId);
+
+        if (null === $address) {
+            throw new \InvalidArgumentException(\sprintf('Address #%d not found', $addressId));
+        }
+
+        $cartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $address,
+            $cart->getCartAddressRelatedByAddressDeliveryId(),
+        );
+
+        $cart->setAddressDeliveryId($cartAddress->getId())->save();
     }
 
     /**
@@ -232,8 +248,11 @@ final readonly class ShippingFacade
      *
      * Rules:
      * - If country is provided, use the provided (country, state) over address.
-     * - Else, if addressId is provided (or present on the cart), resolve through the address.
+     * - Else, if addressId is provided, resolve through that customer address.
+     * - Else, resolve through the cart's own copy of its delivery address.
      * - Else, return (null, null, null).
+     *
+     * @param int|null $addressId id of a customer `address`
      *
      * @return array{0: ?\Thelia\Model\Address, 1: ?Country, 2: ?State}
      */
@@ -250,16 +269,10 @@ final readonly class ShippingFacade
             return [$address, $country, $state];
         }
 
-        $resolvedAddressId = $addressId ?? $cart->getAddressDeliveryId();
-        if (null === $resolvedAddressId) {
-            return [null, null, null];
-        }
+        $address = null === $addressId
+            ? $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress()
+            : AddressQuery::create()->findPk($addressId);
 
-        $address = AddressQuery::create()
-            ->useCartAddressQuery()
-            ->filterById($resolvedAddressId)
-            ->endUse()
-            ->findOne();
         if (null === $address) {
             return [null, null, null];
         }
@@ -285,15 +298,10 @@ final readonly class ShippingFacade
     private function handleCountry(Cart $cart, ?Country $country): Country
     {
         if ($country === null) {
-            $addressDeliveryId = $cart->getAddressDeliveryId();
-            if ($addressDeliveryId !== null) {
-                $addressDelivery = AddressQuery::create()
-                    ->useCartAddressQuery()
-                    ->filterById($addressDeliveryId)
-                    ->endUse()
-                    ->findOne();
-                $country = $addressDelivery?->getCountry();
-            }
+            // Read from the cart's own copy of the address: it carries a country
+            // of its own, so an address typed in at checkout and never saved to
+            // the customer account still ships to the right place.
+            $country = $cart->getCartAddressRelatedByAddressDeliveryId()?->getCountry();
         }
 
         if ($country === null) {
