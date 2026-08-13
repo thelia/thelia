@@ -59,6 +59,12 @@ use Thelia\Model\Map\CustomerTitleTableMap;
         new GetCollection(
             uriTemplate: '/front/customer_titles',
         ),
+        // Without a front item operation, the collection hands out admin IRIs
+        // and a front client has no title to name on an address or a
+        // registration.
+        new Get(
+            uriTemplate: '/front/customer_titles/{id}',
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
