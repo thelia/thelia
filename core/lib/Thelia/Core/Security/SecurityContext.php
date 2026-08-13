@@ -85,7 +85,7 @@ class SecurityContext
     /**
      * Check if an admin user is logged in.
      *
-     * @return true if an admin user is logged in, false otherwise
+     * @return bool true if an admin user is logged in, false otherwise
      */
     public function hasAdminUser(): bool
     {
@@ -105,7 +105,7 @@ class SecurityContext
     /**
      * Check if a customer user is logged in.
      *
-     * @return true if a customer is logged in, false otherwise
+     * @return bool true if a customer is logged in, false otherwise
      */
     public function hasCustomerUser(): bool
     {

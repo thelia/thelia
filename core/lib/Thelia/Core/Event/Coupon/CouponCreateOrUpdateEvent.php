@@ -66,9 +66,6 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     * @return true
-     */
     public function getPerCustomerUsageCount(): bool
     {
         return $this->perCustomerUsageCount;

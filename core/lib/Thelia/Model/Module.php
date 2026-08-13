@@ -235,7 +235,7 @@ class Module extends BaseModule implements FileModelParentInterface
     }
 
     /**
-     * @return true if this module is a delivery module
+     * @return bool true if this module is a delivery module
      */
     public function isDeliveryModule(): bool
     {
