@@ -154,6 +154,41 @@ class ConfigQuery extends BaseConfigQuery
         return null === $value ? null : (int) $value;
     }
 
+    public static function getStoreSiret(): string
+    {
+        return (string) self::read('store_siret', '');
+    }
+
+    public static function getStoreVatIntracom(): string
+    {
+        return (string) self::read('store_vat_intracom', '');
+    }
+
+    public static function getStoreApeCode(): string
+    {
+        return (string) self::read('store_ape_code', '');
+    }
+
+    public static function getStoreEori(): string
+    {
+        return (string) self::read('store_eori', '');
+    }
+
+    public static function isStoreVatExempt(): bool
+    {
+        return '1' === self::read('store_vat_exempt', '0');
+    }
+
+    public static function isStoreRegistrationExempt(): bool
+    {
+        return '1' === self::read('store_registration_exempt', '0');
+    }
+
+    public static function getStoreLegalMentions(): string
+    {
+        return (string) self::read('store_legal_mentions', '');
+    }
+
     public static function getNotifyNewsletterSubscription(): bool
     {
         return '0' !== self::read('notify_newsletter_subscription', false);

@@ -332,6 +332,25 @@ WHERE `meta_data`.`meta_key` = 'virtual'
 
 DELETE FROM `meta_data` WHERE `meta_key` = 'virtual' AND `element_key` = 'pse';
 
+-- ---------------------------------------------------------------------
+-- Company identifiers of the store
+--
+-- The legal identifiers of a shop used to be typed in a single free-text
+-- key, `store_business_id`. Electronic invoicing needs each of them on its
+-- own, so one key per identifier is created here. Existing rows are left
+-- alone, and `store_business_id` is kept: the PHP script of this version
+-- reads it, and the PDF templates still fall back to it.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('store_siret', '', 0, 1, NOW(), NOW()),
+('store_vat_intracom', '', 0, 1, NOW(), NOW()),
+('store_ape_code', '', 0, 1, NOW(), NOW()),
+('store_eori', '', 0, 1, NOW(), NOW()),
+('store_vat_exempt', '0', 0, 1, NOW(), NOW()),
+('store_registration_exempt', '0', 0, 1, NOW(), NOW()),
+('store_legal_mentions', '', 0, 1, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Some mail subjects were seeded with a `%store` placeholder nothing ever

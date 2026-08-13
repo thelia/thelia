@@ -37,4 +37,32 @@ export class ConfigStorePage extends BaseAdminPage {
   storeCountrySelect(): Locator {
     return this.page.locator('#thelia_configuration_store_store_country');
   }
+
+  siretInput(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_siret');
+  }
+
+  vatIntracomInput(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_vat_intracom');
+  }
+
+  apeCodeInput(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_ape_code');
+  }
+
+  eoriInput(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_eori');
+  }
+
+  vatExemptCheckbox(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_vat_exempt');
+  }
+
+  registrationExemptCheckbox(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_registration_exempt');
+  }
+
+  legalMentionsTextarea(): Locator {
+    return this.page.locator('#thelia_configuration_store_store_legal_mentions');
+  }
 }
