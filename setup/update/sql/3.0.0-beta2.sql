@@ -511,4 +511,74 @@ WHERE `message`.`name` = 'customer_send_code'
   AND `message_i18n`.`locale` = 'fr_FR'
   AND (`message_i18n`.`subject` IS NULL OR `message_i18n`.`subject` = '');
 
+-- ---------------------------------------------------------------------
+-- The Mexican federal district kept its pre-2016 name (#3168)
+--
+-- The entity was renamed Ciudad de Mexico in 2016, when it was also recoded
+-- 'CMX'. The Spanish title already said so, the English, French and Russian
+-- ones still read Distrito Federal, so the same state answered to two names
+-- depending on the language of the shop.
+--
+-- Matched on the outdated title, so a shop that renamed it by hand is left
+-- untouched and a second run is a no-op.
+-- ---------------------------------------------------------------------
+
+UPDATE `state_i18n`
+INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state_i18n`.`title` = 'Ciudad de México'
+WHERE `country`.`isoalpha3` = 'MEX'
+  AND `state`.`isocode` = 'CMX'
+  AND `state_i18n`.`locale` IN ('en_US', 'fr_FR')
+  AND `state_i18n`.`title` = 'Distrito Federal';
+
+UPDATE `state_i18n`
+INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state_i18n`.`title` = 'Мехико'
+WHERE `country`.`isoalpha3` = 'MEX'
+  AND `state`.`isocode` = 'CMX'
+  AND `state_i18n`.`locale` = 'ru_RU'
+  AND `state_i18n`.`title` = 'Федеральный округ';
+
+-- ---------------------------------------------------------------------
+-- Four Italian provinces dissolved in 2016 (#3168)
+--
+-- Carbonia-Iglesias, Medio Campidano, Ogliastra and Olbia-Tempio were merged
+-- into Sud Sardegna and Sassari. ISO 3166-2:IT withdrew IT-CI, IT-VS, IT-OG
+-- and IT-OT and assigns IT-SU to the new province, so the four rows produced
+-- a code the standard no longer defines.
+--
+-- They are hidden rather than deleted: an address already pointing at one of
+-- them keeps its state, it simply cannot be picked again. Sud Sardegna is
+-- added if the shop does not have it yet, so Sardinia stays selectable.
+-- ---------------------------------------------------------------------
+
+SET @italy_id := (SELECT `id` FROM `country` WHERE `isoalpha3` = 'ITA' LIMIT 1);
+
+UPDATE `state` SET `visible` = 0
+WHERE `country_id` = @italy_id AND `isocode` IN ('CI', 'OG', 'OT', 'VS');
+
+INSERT INTO `state` (`visible`, `isocode`, `country_id`, `created_at`, `updated_at`)
+SELECT 1, 'SU', @italy_id, NOW(), NOW() FROM DUAL
+WHERE @italy_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM `state` s WHERE s.`country_id` = @italy_id AND s.`isocode` = 'SU');
+
+INSERT INTO `state_i18n` (`id`, `locale`, `title`)
+SELECT s.`id`, l.`locale`, NULL FROM `state` s, `lang` l
+WHERE s.`country_id` = @italy_id AND s.`isocode` = 'SU'
+  AND NOT EXISTS (SELECT 1 FROM `state_i18n` i WHERE i.`id` = s.`id` AND i.`locale` = l.`locale`);
+
+UPDATE `state_i18n` INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+SET `state_i18n`.`title` = 'Sud Sardegna'
+WHERE `state`.`country_id` = @italy_id AND `state`.`isocode` = 'SU'
+  AND `state_i18n`.`locale` IN ('en_US', 'fr_FR', 'it_IT')
+  AND `state_i18n`.`title` IS NULL;
+
+UPDATE `state_i18n` INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+SET `state_i18n`.`title` = 'Южная Сардиния'
+WHERE `state`.`country_id` = @italy_id AND `state`.`isocode` = 'SU'
+  AND `state_i18n`.`locale` = 'ru_RU'
+  AND `state_i18n`.`title` IS NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;

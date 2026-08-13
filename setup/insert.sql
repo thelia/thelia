@@ -1300,7 +1300,7 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (141, 1, 'CA', '86', NOW(), NOW()),
 (142, 1, 'CL', '86', NOW(), NOW()),
 (143, 1, 'CB', '86', NOW(), NOW()),
-(144, 1, 'CI', '86', NOW(), NOW()),
+(144, 0, 'CI', '86', NOW(), NOW()),
 (145, 1, 'CE', '86', NOW(), NOW()),
 (146, 1, 'CT', '86', NOW(), NOW()),
 (147, 1, 'CZ', '86', NOW(), NOW()),
@@ -1334,7 +1334,7 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (175, 1, 'MN', '86', NOW(), NOW()),
 (176, 1, 'MS', '86', NOW(), NOW()),
 (177, 1, 'MT', '86', NOW(), NOW()),
-(178, 1, 'VS', '86', NOW(), NOW()),
+(178, 0, 'VS', '86', NOW(), NOW()),
 (179, 1, 'ME', '86', NOW(), NOW()),
 (180, 1, 'MI', '86', NOW(), NOW()),
 (181, 1, 'MO', '86', NOW(), NOW()),
@@ -1342,8 +1342,8 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (183, 1, 'NA', '86', NOW(), NOW()),
 (184, 1, 'NO', '86', NOW(), NOW()),
 (185, 1, 'NU', '86', NOW(), NOW()),
-(186, 1, 'OG', '86', NOW(), NOW()),
-(187, 1, 'OT', '86', NOW(), NOW()),
+(186, 0, 'OG', '86', NOW(), NOW()),
+(187, 0, 'OT', '86', NOW(), NOW()),
 (188, 1, 'OR', '86', NOW(), NOW()),
 (189, 1, 'PD', '86', NOW(), NOW()),
 (190, 1, 'PA', '86', NOW(), NOW()),
@@ -1574,7 +1574,8 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (410, 1, '972', '64', NOW(), NOW()),
 (411, 1, '973', '64', NOW(), NOW()),
 (412, 1, '974', '64', NOW(), NOW()),
-(413, 1, '976', '64', NOW(), NOW());
+(413, 1, '976', '64', NOW(), NOW()),
+(414, 1, 'SU', '86', NOW(), NOW());
 
 INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) VALUES
 (1, 4, NOW(), NOW()),
@@ -10142,6 +10143,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'cs_CZ', 'Guyane'),
     (412, 'cs_CZ', 'La Réunion'),
     (413, 'cs_CZ', 'Mayotte'),
+    (414, 'cs_CZ', NULL),
 
     (1, 'de_DE', NULL),
     (2, 'de_DE', NULL),
@@ -10556,6 +10558,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'de_DE', 'Guyane'),
     (412, 'de_DE', 'La Réunion'),
     (413, 'de_DE', 'Mayotte'),
+    (414, 'de_DE', NULL),
 
     (1, 'en_US', 'Alabama'),
     (2, 'en_US', 'Alaska'),
@@ -10618,7 +10621,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (59, 'en_US', 'Chihuahua'),
     (60, 'en_US', 'Coahuila'),
     (61, 'en_US', 'Colima'),
-    (62, 'en_US', 'Distrito Federal'),
+    (62, 'en_US', 'Ciudad de México'),
     (63, 'en_US', 'Durango'),
     (64, 'en_US', 'Guanajuato'),
     (65, 'en_US', 'Guerrero'),
@@ -10970,6 +10973,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'en_US', 'Guyane'),
     (412, 'en_US', 'La Réunion'),
     (413, 'en_US', 'Mayotte'),
+    (414, 'en_US', 'Sud Sardegna'),
 
     (1, 'es_ES', NULL),
     (2, 'es_ES', NULL),
@@ -11384,6 +11388,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'es_ES', 'Guyane'),
     (412, 'es_ES', 'La Réunion'),
     (413, 'es_ES', 'Mayotte'),
+    (414, 'es_ES', NULL),
 
     (1, 'fr_FR', 'Alabama'),
     (2, 'fr_FR', 'Alaska'),
@@ -11446,7 +11451,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (59, 'fr_FR', 'Chihuahua'),
     (60, 'fr_FR', 'Coahuila'),
     (61, 'fr_FR', 'Colima'),
-    (62, 'fr_FR', 'Distrito Federal'),
+    (62, 'fr_FR', 'Ciudad de México'),
     (63, 'fr_FR', 'Durango'),
     (64, 'fr_FR', 'Guanajuato'),
     (65, 'fr_FR', 'Guerrero'),
@@ -11798,6 +11803,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'fr_FR', 'Guyane'),
     (412, 'fr_FR', 'La Réunion'),
     (413, 'fr_FR', 'Mayotte'),
+    (414, 'fr_FR', 'Sud Sardegna'),
 
     (1, 'it_IT', 'Alabama'),
     (2, 'it_IT', 'Alaska'),
@@ -12212,6 +12218,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (411, 'it_IT', 'Guyane'),
     (412, 'it_IT', 'La Réunion'),
     (413, 'it_IT', 'Mayotte'),
+    (414, 'it_IT', 'Sud Sardegna'),
 
     (1, 'ru_RU', 'Алабама'),
     (2, 'ru_RU', 'Аляска'),
@@ -12274,7 +12281,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (59, 'ru_RU', 'Чихуахуа'),
     (60, 'ru_RU', 'Коауила'),
     (61, 'ru_RU', 'Колима'),
-    (62, 'ru_RU', 'Федеральный округ'),
+    (62, 'ru_RU', 'Мехико'),
     (63, 'ru_RU', 'Дюранго'),
     (64, 'ru_RU', 'Гуанахуато'),
     (65, 'ru_RU', 'Герреро'),
@@ -12625,7 +12632,8 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (410, 'ru_RU', 'Martinique'),
     (411, 'ru_RU', 'Guyane'),
     (412, 'ru_RU', 'La Réunion'),
-    (413, 'ru_RU', 'Mayotte')
+    (413, 'ru_RU', 'Mayotte'),
+    (414, 'ru_RU', 'Южная Сардиния')
 ;
 
 

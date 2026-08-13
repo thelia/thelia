@@ -34,6 +34,14 @@ final class StateSeedTest extends IntegrationTestCase
         'ROO', 'SIN', 'SLP', 'SON', 'TAB', 'TAM', 'TLA', 'VER', 'YUC', 'ZAC',
     ];
 
+    /**
+     * The four Sardinian provinces merged into Sud Sardegna and Sassari in 2016.
+     *
+     * ISO 3166-2:IT withdrew their codes, so they are seeded hidden instead of
+     * deleted: an address already pointing at one of them stays readable.
+     */
+    private const WITHDRAWN_ITALIAN_CODES = ['CI', 'OG', 'OT', 'VS'];
+
     public function testTheMexicanStatesUseTheirIso31662Code(): void
     {
         $seeded = [];
@@ -46,6 +54,24 @@ final class StateSeedTest extends IntegrationTestCase
         self::assertSame(self::MEXICO_ISO_3166_2_CODES, $seeded);
     }
 
+    public function testTheDissolvedSardinianProvincesAreHiddenAndReplaced(): void
+    {
+        $visible = [];
+        $hidden = [];
+        foreach (self::statesOf('ITA') as $state) {
+            if (1 === $state->getVisible()) {
+                $visible[] = $state->getIsocode();
+            } else {
+                $hidden[] = $state->getIsocode();
+            }
+        }
+
+        sort($hidden);
+
+        self::assertSame(self::WITHDRAWN_ITALIAN_CODES, $hidden);
+        self::assertContains('SU', $visible);
+    }
+
     /**
      * @return iterable<string, array{string, string, string}>
      */
@@ -53,7 +79,7 @@ final class StateSeedTest extends IntegrationTestCase
     {
         // country alpha-3 code, English title, expected ISO 3166-2 code
         yield 'Aguascalientes' => ['MEX', 'Aguascalientes', 'MX-AGU'];
-        yield 'Ciudad de Mexico' => ['MEX', 'Distrito Federal', 'MX-CMX'];
+        yield 'Ciudad de Mexico' => ['MEX', 'Ciudad de México', 'MX-CMX'];
     }
 
     #[DataProvider('renamedStateProvider')]
