@@ -1,4 +1,6 @@
 # 2.6.2
+- #3743 fix: seed a fresh install with the 2.6.2 version markers
+- #3742 fix: commit the update transaction only when one is still open
 - #3717 fix: drop the bundled ResponsiveFilemanager from the Tinymce module
 - #3709 fix: upgrade a module in place instead of deleting and reinstalling it
 - #3703 fix: return the default locale for a customer that carries no language
