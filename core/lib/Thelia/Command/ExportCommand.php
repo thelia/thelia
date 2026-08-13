@@ -22,8 +22,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
-use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\ExportHandler;
@@ -38,6 +36,14 @@ use Thelia\Model\LangQuery;
 #[AsCommand(name: 'export', description: 'Export data')]
 class ExportCommand extends ContainerAwareCommand
 {
+    public function __construct(
+        private readonly ExportHandler $exportHandler,
+        private readonly SerializerManager $serializerManager,
+        private readonly ArchiverManager $archiverManager,
+    ) {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -123,27 +129,21 @@ class ExportCommand extends ContainerAwareCommand
             throw new \RuntimeException('Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.');
         }
 
-        /** @var ExportHandler $exportHandler */
-        $exportHandler = $this->getContainer()->get('thelia.export.handler');
-
-        $export = $exportHandler->getExportByRef($exportRef);
+        $export = $this->exportHandler->getExportByRef($exportRef);
 
         if (null === $export) {
             throw new \RuntimeException($exportRef." export doesn't exist.");
         }
 
-        $serializerManager = $this->getContainer()->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
-        $serializer = $serializerManager->get($serializer);
+        $serializer = $this->serializerManager->get($serializer);
 
         $archiver = null;
 
         if ($input->getArgument('archiver')) {
-            /** @var ArchiverManager $archiverManager */
-            $archiverManager = $this->getContainer()->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
-            $archiver = $archiverManager->get($input->getArgument('archiver'));
+            $archiver = $this->archiverManager->get($input->getArgument('archiver'));
         }
 
-        $exportEvent = $exportHandler->export(
+        $exportEvent = $this->exportHandler->export(
             $export,
             $serializer,
             $archiver,
@@ -238,11 +238,8 @@ class ExportCommand extends ContainerAwareCommand
     {
         $table = new Table($output);
 
-        /** @var SerializerManager $serializerManager */
-        $serializerManager = $this->getContainer()->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
-
         /** @var SerializerInterface $serializer */
-        foreach ($serializerManager->getSerializers() as $serializer) {
+        foreach ($this->serializerManager->getSerializers() as $serializer) {
             $table->addRow([
                 $serializer->getId(),
                 $serializer->getName(),
@@ -270,11 +267,8 @@ class ExportCommand extends ContainerAwareCommand
     {
         $table = new Table($output);
 
-        /** @var ArchiverManager $archiverManager */
-        $archiverManager = $this->getContainer()->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
-
         /** @var ArchiverInterface $archiver */
-        foreach ($archiverManager->getArchivers(true) as $archiver) {
+        foreach ($this->archiverManager->getArchivers(true) as $archiver) {
             $table->addRow([
                 $archiver->getId(),
                 $archiver->getName(),
