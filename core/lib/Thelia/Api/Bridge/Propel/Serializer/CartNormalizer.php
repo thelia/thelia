@@ -73,8 +73,8 @@ class CartNormalizer extends AbstractItemNormalizer
             country: $country,
             state: $state,
         );
-        $estimatedPostage = $postageInfo['postage'];
-        $postageTax = $postageInfo['tax'];
+        $estimatedPostage = $postageInfo->getBestPostageAmount();
+        $postageTax = $postageInfo->getBestPostageTax();
         /* @var Cart $object */
         $object
             ->setTotalWithoutTax($propelCart->getTotalAmount())
