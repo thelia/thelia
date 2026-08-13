@@ -1332,7 +1332,7 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (141, 1, 'CA', '86', NOW(), NOW()),
 (142, 1, 'CL', '86', NOW(), NOW()),
 (143, 1, 'CB', '86', NOW(), NOW()),
-(144, 1, 'CI', '86', NOW(), NOW()),
+(144, 0, 'CI', '86', NOW(), NOW()),
 (145, 1, 'CE', '86', NOW(), NOW()),
 (146, 1, 'CT', '86', NOW(), NOW()),
 (147, 1, 'CZ', '86', NOW(), NOW()),
@@ -1366,7 +1366,7 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (175, 1, 'MN', '86', NOW(), NOW()),
 (176, 1, 'MS', '86', NOW(), NOW()),
 (177, 1, 'MT', '86', NOW(), NOW()),
-(178, 1, 'VS', '86', NOW(), NOW()),
+(178, 0, 'VS', '86', NOW(), NOW()),
 (179, 1, 'ME', '86', NOW(), NOW()),
 (180, 1, 'MI', '86', NOW(), NOW()),
 (181, 1, 'MO', '86', NOW(), NOW()),
@@ -1374,8 +1374,8 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (183, 1, 'NA', '86', NOW(), NOW()),
 (184, 1, 'NO', '86', NOW(), NOW()),
 (185, 1, 'NU', '86', NOW(), NOW()),
-(186, 1, 'OG', '86', NOW(), NOW()),
-(187, 1, 'OT', '86', NOW(), NOW()),
+(186, 0, 'OG', '86', NOW(), NOW()),
+(187, 0, 'OT', '86', NOW(), NOW()),
 (188, 1, 'OR', '86', NOW(), NOW()),
 (189, 1, 'PD', '86', NOW(), NOW()),
 (190, 1, 'PA', '86', NOW(), NOW()),
@@ -1500,7 +1500,8 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (309, 1, '30', '88', NOW(), NOW()),
 (310, 1, '06', '88', NOW(), NOW()),
 (311, 1, '35', '88', NOW(), NOW()),
-(312, 1, '19', '88', NOW(), NOW());
+(312, 1, '19', '88', NOW(), NOW()),
+(313, 1, 'SU', '86', NOW(), NOW());
 
 INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) VALUES
 (1, 4, NOW(), NOW()),
@@ -3235,7 +3236,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (59, '{$locale}', {intl l='Chihuahua' locale=$locale}),
     (60, '{$locale}', {intl l='Coahuila' locale=$locale}),
     (61, '{$locale}', {intl l='Colima' locale=$locale}),
-    (62, '{$locale}', {intl l='Distrito Federal' locale=$locale}),
+    (62, '{$locale}', {intl l='Ciudad de México' locale=$locale}),
     (63, '{$locale}', {intl l='Durango' locale=$locale}),
     (64, '{$locale}', {intl l='Guanajuato' locale=$locale}),
     (65, '{$locale}', {intl l='Guerrero' locale=$locale}),
@@ -3485,7 +3486,8 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (309, '{$locale}', {intl l='Wakayama' locale=$locale}),
     (310, '{$locale}', {intl l='Yamagata' locale=$locale}),
     (311, '{$locale}', {intl l='Yamaguchi' locale=$locale}),
-    (312, '{$locale}', {intl l='Yamanashi' locale=$locale}){if ! $locale@last},{/if}
+    (312, '{$locale}', {intl l='Yamanashi' locale=$locale}),
+    (313, '{$locale}', {intl l='Sud Sardegna' locale=$locale}){if ! $locale@last},{/if}
 
 {/foreach}
 ;
