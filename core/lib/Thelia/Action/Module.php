@@ -320,13 +320,32 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $oldModule = ModuleQuery::create()->findOneByFullNamespace($moduleDefinition->getNamespace());
 
-        $fs = new Filesystem();
-
         $activated = false;
+
+        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, $moduleDefinition->getCode());
 
         // check existing module
         if (null !== $oldModule) {
-            $activated = $oldModule->getActivate();
+            // The namespace is already installed: this is an upgrade, and the row is kept.
+            // Deleting it would cascade to the hooks and their positions, the configuration,
+            // the hooks the administrator switched off, the module images, the access
+            // profiles, the delivery areas and the coupon conditions carrying its id.
+            if ($oldModule->getCode() !== $moduleDefinition->getCode()) {
+                throw new ModuleException(
+                    Translator::getInstance()->trans(
+                        'The module in the archive is named "%new%" but the namespace "%namespace%" is already installed as "%old%". Uninstall "%old%" before installing "%new%".',
+                        [
+                            '%new%' => $moduleDefinition->getCode(),
+                            '%old%' => $oldModule->getCode(),
+                            '%namespace%' => $moduleDefinition->getNamespace(),
+                        ]
+                    )
+                );
+            }
+
+            $activated = $oldModule->getActivate() == BaseModule::IS_ACTIVATED;
+
+            $modulePath = $oldModule->getAbsoluteBaseDir();
 
             if ($activated) {
                 // deactivate
@@ -336,44 +355,27 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $dispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             }
-
-            // delete
-            $modulePath = $oldModule->getAbsoluteBaseDir();
-
-            $deleteEvent = new ModuleDeleteEvent($oldModule->getId());
-
-            try {
-                $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
-            } catch (\Exception $ex) {
-                // if module has not been deleted
-                if ($fs->exists($modulePath)) {
-                    // The module was deactivated a few lines above so it could be replaced, and the
-                    // replacement is not going to happen. Put the shop back where it was: a payment
-                    // or delivery module left deactivated by a failed upgrade takes the checkout
-                    // down, silently, while the administrator only reads that the install failed.
-                    $this->restoreActivation((int) $oldModule->getId(), (bool) $activated, $dispatcher);
-
-                    throw $ex;
-                }
-            }
         }
-
-        // move new module
-        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
 
         try {
-            $fs->mirror($event->getModulePath(), $modulePath);
-        } catch (IOException $ex) {
-            if (!$fs->exists($modulePath)) {
-                throw $ex;
-            }
-        }
+            $this->replaceModuleFiles($event->getModulePath(), $modulePath);
 
-        // Update the module
-        $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
-        $moduleManagement = new ModuleManagement($this->container);
-        $file = new \SplFileInfo($moduleDescriptorFile);
-        $module = $moduleManagement->updateModule($file, $this->container);
+            // Update the module
+            $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
+            $moduleManagement = new ModuleManagement($this->container);
+            $file = new \SplFileInfo($moduleDescriptorFile);
+            $module = $moduleManagement->updateModule($file, $this->container, true);
+        } catch (\Throwable $ex) {
+            // The module was deactivated a few lines above so it could be replaced, and the
+            // replacement is not going to happen. Put the shop back where it was: a payment
+            // or delivery module left deactivated by a failed upgrade takes the checkout
+            // down, silently, while the administrator only reads that the install failed.
+            if (null !== $oldModule) {
+                $this->restoreActivation((int) $oldModule->getId(), $activated, $dispatcher);
+            }
+
+            throw $ex;
+        }
 
         // activate if old was activated
         if ($activated) {
@@ -384,6 +386,33 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setModule($module);
+    }
+
+    /**
+     * Copies the files of the module being installed over the target directory.
+     */
+    private function replaceModuleFiles(string $sourcePath, string $targetPath): void
+    {
+        $fs = new Filesystem();
+
+        if (realpath($sourcePath) === realpath($targetPath)) {
+            // The module is installed from the directory it already lives in, which is what
+            // activating a dependency does. There is nothing to copy, and mirroring a
+            // directory onto itself would truncate every one of its files.
+            return;
+        }
+
+        try {
+            // 'delete' removes what the new version no longer ships and 'override' replaces
+            // files the archive dates earlier than the installed ones. The target directory
+            // is no longer wiped by the deletion of the module, so without these two the
+            // classes of the previous version would stay on disk, to be autoloaded and hooked.
+            $fs->mirror($sourcePath, $targetPath, null, ['override' => true, 'delete' => true]);
+        } catch (IOException $ex) {
+            if (!$fs->exists($targetPath)) {
+                throw $ex;
+            }
+        }
     }
 
     private function restoreActivation(int $moduleId, bool $wasActivated, EventDispatcherInterface $dispatcher): void
