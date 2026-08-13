@@ -353,6 +353,7 @@ return [
     'Sri Lanka' => 'Sri Lanka',
     'St Pierre et Miquelon' => 'Saint-Pierre e Miquelon',
     'State of Palestine' => 'Stato di Palestina',
+    'Sud Sardegna' => 'Sud Sardegna',
     'Sudan' => 'Sudan',
     'Suriname' => 'Suriname',
     'Svalbard and Jan Mayen' => 'Svalbard e Jan Mayen',
