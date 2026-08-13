@@ -65,4 +65,20 @@ export class TaxesRulesPage extends BaseAdminPage {
   postageTaxRuleRow(moduleCode: string): Locator {
     return this.page.getByTestId(`postage-tax-rule-row-${moduleCode}`);
   }
+
+  get postageTaxStrategySection(): Locator {
+    return this.page.getByTestId('postage-tax-strategy-section');
+  }
+
+  get postageTaxStrategyForm(): Locator {
+    return this.page.getByTestId('postage-tax-strategy-form');
+  }
+
+  get postageTaxStrategySave(): Locator {
+    return this.page.getByTestId('postage-tax-strategy-save');
+  }
+
+  postageTaxStrategyOption(strategy: string): Locator {
+    return this.page.locator(`#postage-tax-strategy-${strategy}`);
+  }
 }
