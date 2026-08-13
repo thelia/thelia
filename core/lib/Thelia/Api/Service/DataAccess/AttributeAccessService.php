@@ -238,8 +238,14 @@ class AttributeAccessService
             case 'taxed_postage':
                 $result = $cart->getTaxedPostage();
                 break;
+            case 'untaxed_postage':
+                $result = $cart->getUntaxedPostage();
+                break;
             case 'postage':
                 $result = $cart->getPostage();
+                break;
+            case 'postage_tax':
+                $result = $cart->getPostageTax();
                 break;
             case 'total_price':
             case 'total_price_with_discount':
