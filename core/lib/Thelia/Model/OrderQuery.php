@@ -135,9 +135,15 @@ class OrderQuery extends BaseOrderQuery
                 ->findOne();
 
         if ($includeShipping) {
+            // The postage column is stored tax included, so a tax-excluded
+            // turnover has to drop the postage tax as well.
+            $postage = $withTaxes
+                ? 'SUM(`order`.postage)'
+                : 'SUM(`order`.postage) - SUM(`order`.postage_tax)';
+
             $amount += (float)
                 self::baseSaleStats($startDate, $endDate)
-                    ->withColumn('SUM(`order`.postage)', 'POSTAGE')
+                    ->withColumn($postage, 'POSTAGE')
                     ->select('POSTAGE')
                     ->findOne();
         }
