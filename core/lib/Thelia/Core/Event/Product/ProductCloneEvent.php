@@ -23,6 +23,15 @@ class ProductCloneEvent extends ActionEvent
     protected array $types = ['images', 'documents'];
 
     /**
+     * Documents copied for the clone, keyed by the id of the source document.
+     * Filled while the files are cloned, so later steps of the cloning process
+     * can point the clone at its own copy of a document instead of the source one.
+     *
+     * @var array<int, int>
+     */
+    protected array $clonedDocumentIds = [];
+
+    /**
      * ProductCloneEvent constructor.
      *
      * @param string $lang the locale (such as fr_FR)
@@ -80,5 +89,15 @@ class ProductCloneEvent extends ActionEvent
     public function getTypes(): array
     {
         return $this->types;
+    }
+
+    public function addClonedDocumentId(int $originalDocumentId, int $clonedDocumentId): void
+    {
+        $this->clonedDocumentIds[$originalDocumentId] = $clonedDocumentId;
+    }
+
+    public function getClonedDocumentId(int $originalDocumentId): ?int
+    {
+        return $this->clonedDocumentIds[$originalDocumentId] ?? null;
     }
 }
