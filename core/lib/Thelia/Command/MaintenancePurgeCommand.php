@@ -20,6 +20,7 @@ use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Admin\Service\AdminLogPurger;
 use Thelia\Domain\Cart\Service\CartPurger;
+use Thelia\Domain\Form\Service\FormFirewallPurger;
 use Thelia\Model\ConfigQuery;
 
 class MaintenancePurgeCommand extends ContainerAwareCommand
@@ -27,18 +28,22 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
     private const DEFAULT_CART_NO_ORDER_DAYS_KEY = 'purification_cart_no_order_days';
     private const DEFAULT_CART_ANONYMOUS_DAYS_KEY = 'purification_cart_anonymous_days';
     private const DEFAULT_ADMIN_LOGS_DAYS_KEY = 'purification_admin_logs_days';
+    private const DEFAULT_FORM_FIREWALL_DAYS_KEY = 'purification_form_firewall_days';
 
     public function configure(): void
     {
         $this
             ->setName('maintenance:purge')
             ->setDescription(
-                'Purge old data from the database: carts without orders, anonymous carts, and admin logs.'
+                'Purge old data from the database: carts without orders, anonymous carts, admin logs, and form firewall records.'
             );
     }
 
-    public function __construct(protected AdminLogPurger $adminLogPurger, protected CartPurger $cartPurger)
-    {
+    public function __construct(
+        protected AdminLogPurger $adminLogPurger,
+        protected CartPurger $cartPurger,
+        protected FormFirewallPurger $formFirewallPurger,
+    ) {
         parent::__construct();
     }
 
@@ -84,6 +89,19 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 '<comment>Admin logs (>%d days):</comment> <info>%d deleted</info>',
                 $adminLogsDays,
                 $deletedAdminLogs
+            ));
+
+            $formFirewallDays = (int) ConfigQuery::read(
+                self::DEFAULT_FORM_FIREWALL_DAYS_KEY,
+                1
+            );
+
+            $deletedFormFirewall = $this->formFirewallPurger->purgeExpiredEntries($formFirewallDays);
+
+            $output->writeln(\sprintf(
+                '<comment>Form firewall records (>%d days):</comment> <info>%d deleted</info>',
+                $formFirewallDays,
+                $deletedFormFirewall
             ));
 
             $event = new MaintenancePurgeEvent();
