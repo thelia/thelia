@@ -34,6 +34,26 @@ final class CartApiTest extends ApiTestCase
         self::assertSame(404, $response->getStatusCode());
     }
 
+    /**
+     * Reading a cart estimates its postage, and the estimate used to be read
+     * as an array although the estimator answers with an object, which made
+     * every single cart read a 500.
+     */
+    public function testCustomerCanReadOwnCart(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $cart = $factory->cart($customer);
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $response = $this->jsonRequest('GET', '/api/front/carts/'.$cart->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertSame($cart->getId(), $data['id']);
+    }
+
     public function testCreateCartViaPost(): void
     {
         $response = $this->jsonRequest('POST', '/api/front/carts', []);
