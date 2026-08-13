@@ -32,6 +32,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\State\Processor\CustomerAddressProcessor;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\AddressTableMap;
 
@@ -66,6 +67,7 @@ use Thelia\Model\Map\AddressTableMap;
         new Post(
             uriTemplate: '/front/account/addresses',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            processor: CustomerAddressProcessor::class,
         ),
         new GetCollection(
             uriTemplate: '/front/account/addresses',
@@ -78,6 +80,7 @@ use Thelia\Model\Map\AddressTableMap;
         new Put(
             uriTemplate: '/front/account/addresses/{id}',
             security: 'object.customer.getId() == user.getId()',
+            processor: CustomerAddressProcessor::class,
         ),
         new Delete(
             uriTemplate: '/front/account/addresses/{id}',
@@ -139,29 +142,31 @@ class Address implements PropelResourceInterface
     public ?int $id = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $label;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED, Cart::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_FRONT_READ_SINGLE])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $firstname;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED, Cart::GROUP_ADMIN_READ_SINGLE, Cart::GROUP_FRONT_READ_SINGLE])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $lastname;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $address1;
 
+    // The column is not nullable and has no default: left uninitialized, it is
+    // skipped by the transformer and the insert fails on the database side.
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public string $address2;
+    public string $address2 = '';
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    public string $address3;
+    public string $address3 = '';
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public string $zipcode;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
@@ -174,7 +179,7 @@ class Address implements PropelResourceInterface
     public ?string $phone = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public ?string $city = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
@@ -188,19 +193,22 @@ class Address implements PropelResourceInterface
 
     #[Relation(targetResource: Country::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public Country $country;
 
     #[Relation(targetResource: State::class)]
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?State $state = null;
 
+    // The front never sets the owner: CustomerAddressProcessor takes it from
+    // the token, so an account endpoint cannot write into another address book.
     #[Relation(targetResource: Customer::class)]
-    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
+    #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
@@ -437,7 +445,7 @@ class Address implements PropelResourceInterface
         return new AddressTableMap();
     }
 
-    #[Callback(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public function verifyZipcode(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();

@@ -58,6 +58,19 @@ final class AddressApiTest extends ApiTestCase
         self::assertStringContainsString('belong to this country', (string) $response->getContent());
     }
 
+    public function testTheOptionalAddressLinesMayBeOmitted(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $payload = $this->payload($country->getId());
+        unset($payload['address2'], $payload['address3']);
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+    }
+
     /**
      * @return array<string, mixed>
      */
