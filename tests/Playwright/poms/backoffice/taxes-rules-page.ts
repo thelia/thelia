@@ -49,4 +49,20 @@ export class TaxesRulesPage extends BaseAdminPage {
   get deleteTaxRuleForm(): Locator {
     return this.page.getByTestId('tax-rule-delete-form');
   }
+
+  get postageTaxRuleCard(): Locator {
+    return this.page.getByTestId('postage-tax-rule-card');
+  }
+
+  get postageTaxRuleForm(): Locator {
+    return this.page.getByTestId('postage-tax-rule-form');
+  }
+
+  get postageTaxRuleSave(): Locator {
+    return this.page.getByTestId('postage-tax-rule-save');
+  }
+
+  postageTaxRuleRow(moduleCode: string): Locator {
+    return this.page.getByTestId(`postage-tax-rule-row-${moduleCode}`);
+  }
 }
