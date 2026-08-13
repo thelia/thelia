@@ -19,8 +19,6 @@ use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\MetaData;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductPriceQuery;
@@ -179,7 +177,7 @@ final class ProductActionTest extends IntegrationTestCase
 
         self::assertSame(
             $document->getId(),
-            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $this->defaultSaleElement($product)->getId()),
+            $this->defaultSaleElement($product)->getVirtualDocument()?->getId(),
         );
     }
 
@@ -189,14 +187,14 @@ final class ProductActionTest extends IntegrationTestCase
         $document = $this->createDocument($product);
         $defaultPse = $this->defaultSaleElement($product);
 
-        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultPse->getId(), $document->getId());
+        $defaultPse->setVirtualDocument($document->getId());
 
         $this->dispatcher->dispatch(
             $this->virtualDocumentUpdateEvent($product, 0),
             TheliaEvents::PRODUCT_UPDATE,
         );
 
-        self::assertNull(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPse->getId()));
+        self::assertNull($defaultPse->getVirtualDocument());
     }
 
     public function testUpdateKeepsTheAssociationsOfAProductWithSeveralCombinations(): void
@@ -206,8 +204,8 @@ final class ProductActionTest extends IntegrationTestCase
         $defaultPse = $this->defaultSaleElement($product);
         $secondPse = $this->factory->productSaleElement($product);
 
-        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultPse->getId(), $document->getId());
-        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $secondPse->getId(), $document->getId());
+        $defaultPse->setVirtualDocument($document->getId());
+        $secondPse->setVirtualDocument($document->getId());
 
         // -1 is what the back office sends when the association is managed per combination.
         $this->dispatcher->dispatch(
@@ -215,14 +213,8 @@ final class ProductActionTest extends IntegrationTestCase
             TheliaEvents::PRODUCT_UPDATE,
         );
 
-        self::assertSame(
-            $document->getId(),
-            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPse->getId()),
-        );
-        self::assertSame(
-            $document->getId(),
-            (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $secondPse->getId()),
-        );
+        self::assertSame($document->getId(), $defaultPse->getVirtualDocument()?->getId());
+        self::assertSame($document->getId(), $secondPse->getVirtualDocument()?->getId());
     }
 
     private function createVirtualProduct(): Product

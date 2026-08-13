@@ -14,18 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
-use Thelia\Model\MetaData;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElementsVirtualDocumentQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * ProductSaleElements::getVirtualDocuments() is the supported way to reach the
- * documents attached to a sale element. It hides the meta data the association
- * currently lives in, so that a module reading it keeps working when the storage
- * moves to its own table.
+ * The documents a sale element is downloaded from live in their own table, reached
+ * through getVirtualDocuments() and written through setVirtualDocument().
  */
 final class ProductSaleElementsVirtualDocumentTest extends IntegrationTestCase
 {
@@ -42,7 +39,7 @@ final class ProductSaleElementsVirtualDocumentTest extends IntegrationTestCase
         $saleElement = $this->createSaleElement();
         $document = $this->createDocument($saleElement);
 
-        $this->associate($saleElement, $document->getId());
+        $saleElement->setVirtualDocument($document->getId());
 
         $documents = $saleElement->getVirtualDocuments();
 
@@ -51,27 +48,67 @@ final class ProductSaleElementsVirtualDocumentTest extends IntegrationTestCase
         self::assertSame($document->getId(), $saleElement->getVirtualDocument()?->getId());
     }
 
-    public function testAnAssociationLeftBehindByADeletedDocumentIsIgnored(): void
+    public function testTheAssociationIsRemovedWithNull(): void
     {
         $saleElement = $this->createSaleElement();
         $document = $this->createDocument($saleElement);
-        $documentId = $document->getId();
 
-        $this->associate($saleElement, $documentId);
+        $saleElement->setVirtualDocument($document->getId());
+        $saleElement->setVirtualDocument(null);
+
+        self::assertNull($saleElement->getVirtualDocument());
+        self::assertSame(0, $this->countAssociations($saleElement));
+    }
+
+    public function testASaleElementKeepsASingleDocument(): void
+    {
+        $saleElement = $this->createSaleElement();
+        $first = $this->createDocument($saleElement);
+        $second = $this->createDocument($saleElement);
+
+        $saleElement->setVirtualDocument($first->getId());
+        $saleElement->setVirtualDocument($second->getId());
+
+        self::assertSame(1, $this->countAssociations($saleElement));
+        self::assertSame($second->getId(), $saleElement->getVirtualDocument()?->getId());
+    }
+
+    public function testDeletingTheDocumentDropsTheAssociation(): void
+    {
+        $saleElement = $this->createSaleElement();
+        $document = $this->createDocument($saleElement);
+
+        $saleElement->setVirtualDocument($document->getId());
         $document->delete();
 
-        // Deleting a document leaves its meta data behind: the accessor is the place
-        // that keeps a dangling id from being mistaken for a downloadable file.
-        self::assertSame(
-            (string) $documentId,
-            (string) MetaDataQuery::getVal(
-                ProductSaleElements::VIRTUAL_DOCUMENT_META_KEY,
-                MetaData::PSE_KEY,
-                $saleElement->getId()
-            )
-        );
-        self::assertTrue($saleElement->getVirtualDocuments()->isEmpty());
+        // The foreign key is what keeps a deleted document from leaving behind an
+        // association that a sale element created later could inherit.
+        self::assertSame(0, $this->countAssociations($saleElement));
         self::assertNull($saleElement->getVirtualDocument());
+    }
+
+    public function testDeletingTheSaleElementDropsTheAssociation(): void
+    {
+        $saleElement = $this->createSaleElement();
+        $document = $this->createDocument($saleElement);
+        $saleElementId = $saleElement->getId();
+
+        $saleElement->setVirtualDocument($document->getId());
+        $saleElement->delete();
+
+        self::assertSame(
+            0,
+            ProductSaleElementsVirtualDocumentQuery::create()
+                ->filterByProductSaleElementsId($saleElementId)
+                ->count()
+        );
+    }
+
+    private function countAssociations(ProductSaleElements $saleElement): int
+    {
+        return ProductSaleElementsVirtualDocumentQuery::create()
+            ->filterByProductSaleElementsId($saleElement->getId())
+            ->count();
     }
 
     private function createSaleElement(): ProductSaleElements
@@ -96,19 +133,8 @@ final class ProductSaleElementsVirtualDocumentTest extends IntegrationTestCase
             ->setProductId($saleElement->getProductId())
             ->setFile('handbook.pdf')
             ->setVisible(0)
-            ->setPosition(1)
             ->save();
 
         return $document;
-    }
-
-    private function associate(ProductSaleElements $saleElement, int $documentId): void
-    {
-        MetaDataQuery::setVal(
-            ProductSaleElements::VIRTUAL_DOCUMENT_META_KEY,
-            MetaData::PSE_KEY,
-            $saleElement->getId(),
-            $documentId
-        );
     }
 }

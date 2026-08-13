@@ -28,14 +28,6 @@ class ProductSaleElements extends BaseProductSaleElements
     use TaxCalculatorResolverTrait;
 
     /**
-     * The meta data key holding the virtual document association.
-     *
-     * Read it through getVirtualDocuments() rather than directly: the storage is
-     * meant to move to a dedicated table, the accessor is not.
-     */
-    public const VIRTUAL_DOCUMENT_META_KEY = 'virtual';
-
-    /**
      * @throws PropelException
      */
     public function getPrice(string $virtualColumnName = 'price_PRICE', float $discount = 0.0): float
@@ -136,24 +128,16 @@ class ProductSaleElements extends BaseProductSaleElements
     /**
      * The documents a customer buying this sale element is entitled to download.
      *
-     * An association pointing at a document that has since been deleted is dropped:
-     * nothing cleans the meta data when a ProductDocument goes away, so a stale id
-     * would otherwise surface as a virtual product with no file behind it.
-     *
      * @return ObjectCollection<ProductDocument>
      */
     public function getVirtualDocuments(): ObjectCollection
     {
-        $documents = new ObjectCollection();
-        $documents->setModel(ProductDocument::class);
-
-        $document = $this->getVirtualDocument();
-
-        if (null !== $document) {
-            $documents->append($document);
-        }
-
-        return $documents;
+        return ProductDocumentQuery::create()
+            ->useProductSaleElementsVirtualDocumentQuery()
+                ->filterByProductSaleElementsId($this->getId())
+                ->orderByPosition()
+            ->endUse()
+            ->find();
     }
 
     /**
@@ -161,17 +145,38 @@ class ProductSaleElements extends BaseProductSaleElements
      */
     public function getVirtualDocument(): ?ProductDocument
     {
-        $documentId = MetaDataQuery::getVal(
-            self::VIRTUAL_DOCUMENT_META_KEY,
-            MetaData::PSE_KEY,
-            $this->getId()
-        );
+        return ProductDocumentQuery::create()
+            ->useProductSaleElementsVirtualDocumentQuery()
+                ->filterByProductSaleElementsId($this->getId())
+                ->orderByPosition()
+            ->endUse()
+            ->findOne();
+    }
 
-        if (!is_numeric($documentId)) {
-            return null;
+    /**
+     * Set the document this sale element is downloaded from, or remove the association
+     * when given null.
+     *
+     * The table holds several rows per sale element so that offering more than one file
+     * stays a matter of allowing a second row. Until that product decision is taken, a
+     * sale element is downloaded from a single document, and this is where the rule is
+     * enforced.
+     */
+    public function setVirtualDocument(?int $documentId): void
+    {
+        ProductSaleElementsVirtualDocumentQuery::create()
+            ->filterByProductSaleElementsId($this->getId())
+            ->delete();
+
+        if (null === $documentId) {
+            return;
         }
 
-        return ProductDocumentQuery::create()->findPk((int) $documentId);
+        (new ProductSaleElementsVirtualDocument())
+            ->setProductSaleElementsId($this->getId())
+            ->setProductDocumentId($documentId)
+            ->setPosition(1)
+            ->save();
     }
 
     protected function addCriteriaToPositionQuery($query): void

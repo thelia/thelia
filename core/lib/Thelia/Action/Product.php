@@ -25,8 +25,6 @@ use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
-use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
-use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
@@ -60,7 +58,6 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
 use Thelia\Model\Map\FeatureTemplateTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
@@ -381,7 +378,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /**
      * Store the document a virtual product is downloaded from, for the default sale element.
-     * The association lives in a meta_data row (virtual key, pse element).
      *
      * A null or negative value means the caller does not handle the association (a product with
      * several combinations sets it per combination), 0 removes it, and a document id sets it.
@@ -403,19 +399,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             return;
         }
 
-        if (0 === (int) $virtualDocumentId) {
-            $this->eventDispatcher->dispatch(
-                new MetaDataDeleteEvent('virtual', MetaDataModel::PSE_KEY, $defaultPse->getId()),
-                TheliaEvents::META_DATA_DELETE
-            );
-
-            return;
-        }
-
-        $this->eventDispatcher->dispatch(
-            new MetaDataCreateOrUpdateEvent('virtual', MetaDataModel::PSE_KEY, $defaultPse->getId(), (int) $virtualDocumentId),
-            TheliaEvents::META_DATA_UPDATE
-        );
+        $defaultPse->setVirtualDocument(0 === (int) $virtualDocumentId ? null : (int) $virtualDocumentId);
     }
 
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher): mixed

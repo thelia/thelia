@@ -2297,6 +2297,35 @@ CREATE TABLE `product_sale_elements_product_document`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- product_sale_elements_virtual_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_virtual_document`;
+
+CREATE TABLE `product_sale_elements_virtual_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_document_id` INTEGER NOT NULL,
+    `position` INTEGER DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `pse_virtual_document_unique_idx` (`product_sale_elements_id`, `product_document_id`),
+    INDEX `fk_pse_virtual_document_product_document_idx` (`product_document_id`),
+    CONSTRAINT `fk_pse_virtual_document_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_pse_virtual_document_product_document_id`
+        FOREIGN KEY (`product_document_id`)
+        REFERENCES `product_document` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- hook
 -- ---------------------------------------------------------------------
 

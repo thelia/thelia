@@ -20,7 +20,6 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
@@ -38,8 +37,6 @@ use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Model\MetaData;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
@@ -391,47 +388,45 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $this->clonePSEAssociatedFiles($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments, $type = 'document');
             }
 
-            $this->cloneVirtualDocumentAssociation($event, $originalProductPSE->getId(), $clonedProductPSEId);
+            $this->cloneVirtualDocumentAssociation($event, $originalProductPSE, $clonedProductPSEId);
         }
     }
 
     /**
      * Point the cloned sale element at the clone's own copy of the document a virtual
-     * product is downloaded from. The association lives in a meta_data row (virtual key,
-     * pse element), and is copied whenever the source has one, whether or not the product
-     * is currently flagged as virtual.
+     * product is downloaded from. The association is copied whenever the source has one,
+     * whether or not the product is currently flagged as virtual.
      */
-    private function cloneVirtualDocumentAssociation(ProductCloneEvent $event, int $originalPseId, int $clonedPseId): void
+    private function cloneVirtualDocumentAssociation(ProductCloneEvent $event, ProductSaleElements $originalPse, int $clonedPseId): void
     {
-        $originalDocumentId = (int) MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $originalPseId);
+        $originalDocument = $originalPse->getVirtualDocument();
 
-        if ($originalDocumentId <= 0) {
+        if (null === $originalDocument) {
             return;
         }
 
-        $clonedDocumentId = $event->getClonedDocumentId($originalDocumentId);
+        $clonedDocumentId = $event->getClonedDocumentId($originalDocument->getId());
 
         if (null === $clonedDocumentId) {
-            // The source document was not copied — its file is missing from the disk, or the
-            // meta_data row points outside of the product. Reusing the source id would make the
-            // clone depend on a file deleted along with the original product, so the clone is
-            // left without a virtual document and the merchant has to pick one.
+            // The source document was not copied — its file is missing from the disk, or it
+            // belongs to another product. Reusing the source id would make the clone depend
+            // on a file deleted along with the original product, so the clone is left without
+            // a virtual document and the merchant has to pick one.
             Tlog::getInstance()->addWarning(
                 \sprintf(
                     'Product clone %s: sale element %d has no virtual document, the document %d of the source product was not copied.',
                     $event->getClonedProduct()->getRef(),
                     $clonedPseId,
-                    $originalDocumentId
+                    $originalDocument->getId()
                 )
             );
 
             return;
         }
 
-        $this->eventDispatcher->dispatch(
-            new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $clonedPseId, $clonedDocumentId),
-            TheliaEvents::META_DATA_UPDATE
-        );
+        $clonedPse = ProductSaleElementsQuery::create()->findPk($clonedPseId);
+
+        $clonedPse?->setVirtualDocument($clonedDocumentId);
     }
 
     /**
