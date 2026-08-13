@@ -17,7 +17,9 @@ namespace Thelia\Domain\Customer\Service;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
@@ -35,7 +37,8 @@ use Thelia\Model\OrderQuery;
  * reference, their invoice number and date, their amounts, their taxes, their
  * coupons and their status history. What disappears is who placed them: the
  * account identity, the address book, the identity frozen on the invoice and
- * delivery order addresses, the carts and the newsletter subscription.
+ * delivery order addresses, the carts, the newsletter subscription and the
+ * identity the administrator audit trail recorded about that customer.
  *
  * The country and state of an order address are kept, because they justify
  * the tax rate applied on the order.
@@ -47,6 +50,7 @@ final readonly class CustomerAnonymizer
 {
     public const ANONYMIZED_VALUE = 'anonymous';
     public const ANONYMIZED_EMAIL_DOMAIN = 'anonymous.invalid';
+    public const ANONYMIZED_ADMIN_LOG_MESSAGE = 'Personal data erased from this entry';
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
@@ -71,6 +75,7 @@ final readonly class CustomerAnonymizer
             $this->deleteAddresses($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
             $this->anonymizeAccount($customer, $connection);
+            $this->anonymizeAdminLogs($customer, $connection);
 
             foreach ($this->personalDataProviders as $provider) {
                 $provider->anonymizePersonalData($customer);
@@ -215,5 +220,33 @@ final readonly class CustomerAnonymizer
         // the account, identity included. Anonymizing the row is pointless
         // while that history is still readable.
         CustomerVersionQuery::create()->filterById($customer->getId())->delete($connection);
+    }
+
+    /**
+     * An ordinary back-office edit of a customer writes their identity twice
+     * in the audit trail: in the message, which is composed from the name, and
+     * in the serialized request, which holds the whole posted form
+     * (AdminLog::append() with $withRequestContent). Neither survives an
+     * erasure.
+     *
+     * What the trail is for does survive: admin_login, action and created_at
+     * are kept, so it still says who did what, to which customer, and when.
+     * Only the rows carrying this customer as their resource are rewritten,
+     * so the trail of every other resource is left untouched. updated_at
+     * records the rewrite itself, rather than letting the row change silently.
+     */
+    private function anonymizeAdminLogs(Customer $customer, ConnectionInterface $connection): void
+    {
+        AdminLogQuery::create()
+            ->filterByResource(AdminResources::CUSTOMER)
+            ->filterByResourceId($customer->getId())
+            ->update(
+                [
+                    'Message' => self::ANONYMIZED_ADMIN_LOG_MESSAGE,
+                    'Request' => null,
+                    'UpdatedAt' => new \DateTime(),
+                ],
+                $connection,
+            );
     }
 }
