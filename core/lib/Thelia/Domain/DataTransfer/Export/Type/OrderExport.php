@@ -54,7 +54,7 @@ class OrderExport extends JsonFileAbstractExport
         'delivery_address_address3' => 'delivery_address_3',
         'delivery_address_zipcode' => 'delivery_zip_code',
         'delivery_address_city' => 'delivery_city',
-        'delivery_country_i18n_title' => 'invoice_country',
+        'delivery_country_i18n_title' => 'delivery_country',
         'delivery_address_phone' => 'delivery_phone',
         'invoice_address_customer_title_long' => 'invoice_title',
         'invoice_address_company' => 'invoice_company',
@@ -93,7 +93,7 @@ class OrderExport extends JsonFileAbstractExport
                     order_coupon.code as order_coupon_code,
                     ROUND(`order`.postage, 2) as order_postage,
                     `order`.postage_tax as "order_postage_tax",
-                    ROUND(`order`.postage_tax_rule_title,2) as "order_postage_tax_rule_title",
+                    `order`.postage_tax_rule_title as "order_postage_tax_rule_title",
                     SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price,
                     SUM(
                         ROUND(
