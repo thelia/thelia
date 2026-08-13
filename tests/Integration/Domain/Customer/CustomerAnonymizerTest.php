@@ -17,9 +17,12 @@ namespace Thelia\Tests\Integration\Domain\Customer;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerAnonymizeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Customer\Service\CustomerAnonymizer;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\AdminLog;
+use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -162,6 +165,68 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         }
     }
 
+    /**
+     * A back-office edit of a customer writes their identity twice in the
+     * audit trail: in the message, composed from the name, and in the
+     * serialized request, which holds the whole posted form.
+     */
+    public function testAnonymizeErasesTheIdentityLeftInTheAdminLog(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+
+        $editLog = $this->adminLog(
+            AdminResources::CUSTOMER,
+            $customer->getId(),
+            'UPDATE',
+            'Customer Anonymizer Subject (ID '.$customer->getId().') modified',
+            'POST /admin/customer/save lastname=Subject&email=anonymizer-subject@test.com',
+        );
+
+        $this->anonymize($customer);
+
+        $rewritten = AdminLogQuery::create()->findPk($editLog->getId());
+        self::assertNotNull($rewritten);
+        self::assertSame(CustomerAnonymizer::ANONYMIZED_ADMIN_LOG_MESSAGE, $rewritten->getMessage());
+        self::assertNull($rewritten->getRequest());
+
+        self::assertSame('admin-login', $rewritten->getAdminLogin(), 'An erasure must not erase who performed the logged action.');
+        self::assertSame('UPDATE', $rewritten->getAction());
+        self::assertSame($customer->getId(), $rewritten->getResourceId());
+        self::assertSame('2020-01-02 03:04:05', $rewritten->getCreatedAt('Y-m-d H:i:s'), 'The trail must still say when the action happened.');
+        self::assertNotSame(
+            '2020-01-02 03:04:05',
+            $rewritten->getUpdatedAt('Y-m-d H:i:s'),
+            'The rewrite is itself recorded, rather than letting an audited row change silently.',
+        );
+    }
+
+    /**
+     * The rewrite is bounded to the rows about that customer: an audit trail
+     * that erased entries about other resources, or about other customers,
+     * would destroy evidence unrelated to the erasure.
+     */
+    public function testAnonymizeLeavesTheAdminLogOfOtherResourcesUntouched(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $otherCustomer = $this->factory->customer($this->factory->customerTitle());
+
+        $orderLog = $this->adminLog(AdminResources::ORDER, $customer->getId(), 'UPDATE', 'Order 12 modified', 'order payload');
+        $otherCustomerLog = $this->adminLog(AdminResources::CUSTOMER, $otherCustomer->getId(), 'UPDATE', 'Customer Other Person modified', 'other payload');
+
+        $this->anonymize($customer);
+
+        $reloadedOrderLog = AdminLogQuery::create()->findPk($orderLog->getId());
+        self::assertNotNull($reloadedOrderLog);
+        self::assertSame('Order 12 modified', $reloadedOrderLog->getMessage());
+        self::assertSame('order payload', $reloadedOrderLog->getRequest());
+        self::assertSame('2020-01-02 03:04:05', $reloadedOrderLog->getUpdatedAt('Y-m-d H:i:s'), 'The row must not be written at all.');
+
+        $reloadedOtherCustomerLog = AdminLogQuery::create()->findPk($otherCustomerLog->getId());
+        self::assertNotNull($reloadedOtherCustomerLog);
+        self::assertSame('Customer Other Person modified', $reloadedOtherCustomerLog->getMessage());
+        self::assertSame('other payload', $reloadedOtherCustomerLog->getRequest());
+    }
+
     public function testAnonymizeCallsThePersonalDataProviders(): void
     {
         $customer = $this->createCustomerWithHistory();
@@ -223,6 +288,23 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         $this->expectExceptionMessage('module failure');
 
         (new CustomerAnonymizer([$failingProvider]))->anonymize($customer);
+    }
+
+    private function adminLog(string $resource, int $resourceId, string $action, string $message, string $request): AdminLog
+    {
+        $adminLog = new AdminLog();
+        $adminLog
+            ->setAdminLogin('admin-login')
+            ->setResource($resource)
+            ->setResourceId($resourceId)
+            ->setAction($action)
+            ->setMessage($message)
+            ->setRequest($request)
+            ->setCreatedAt(new \DateTime('2020-01-02 03:04:05'))
+            ->setUpdatedAt(new \DateTime('2020-01-02 03:04:05'))
+            ->save($this->getPropelConnection());
+
+        return $adminLog;
     }
 
     private function anonymize(Customer $customer): void
