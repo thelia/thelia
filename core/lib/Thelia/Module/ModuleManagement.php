@@ -82,15 +82,16 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param \SplFileInfo       $file      the module.xml file descriptor
-     * @param ContainerInterface $container the container
+     * @param \SplFileInfo       $file                  the module.xml file descriptor
+     * @param ContainerInterface $container             the container
+     * @param bool               $forceHookRegistration register the hooks even when the version did not change
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return Module
      */
-    public function updateModule($file, ContainerInterface $container)
+    public function updateModule($file, ContainerInterface $container, $forceHookRegistration = false)
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
@@ -155,7 +156,11 @@ class ModuleManagement
                 $instance->update($currentVersion, $version, $con);
             }
 
-            if ($action !== 'none') {
+            // $forceHookRegistration covers the module whose files were just replaced without a
+            // version bump: the hooks it now declares still have to be registered.
+            // createOrUpdateHook() is idempotent, and the positions the administrator set
+            // live in module_hook, which this does not touch.
+            if ($action !== 'none' || $forceHookRegistration) {
                 $instance->registerHooks();
             }
 
