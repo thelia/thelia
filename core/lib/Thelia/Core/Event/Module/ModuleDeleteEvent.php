@@ -20,7 +20,9 @@ namespace Thelia\Core\Event\Module;
 class ModuleDeleteEvent extends ModuleEvent
 {
     protected $module_id;
-    protected $delete_data;
+    // getDeleteData() is typed bool: without a default, an event whose delete data was never set
+    // makes the delete listener fail on a TypeError instead of just keeping the module data.
+    protected $delete_data = false;
     protected $assume_delete;
 
     public function __construct(int $module_id, bool $assume_delete = false)
