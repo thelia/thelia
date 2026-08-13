@@ -263,4 +263,73 @@ CREATE TABLE IF NOT EXISTS `order_postage_tax`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- product_sale_elements_virtual_document (#3520)
+--
+-- The file a virtual product is downloaded from was a meta_data row keyed
+-- ('virtual', 'pse', sale element id), holding the document id as text. Nothing
+-- tied it to the two tables it points at: deleting the document or the
+-- combination left the row behind, and since InnoDB does not persist
+-- AUTO_INCREMENT across a restart, a sale element created later could be given
+-- a freed id and inherit an association nobody set. The pair was not unique
+-- either, so two writes could leave two rows and the reader picked one.
+--
+-- The association now has its own table, with a foreign key on each side and a
+-- unique pair. `position` is there so that offering several files per
+-- combination becomes a second row rather than a second migration; the service
+-- layer keeps writing a single row until that product decision is taken.
+--
+-- Existing rows are moved over, then dropped: nothing reads the key any more.
+-- `value` is a CLOB any module can write through MetaDataQuery::setVal(), so a
+-- serialized payload would be cast to 0 - hence the two guards. Rows pointing
+-- at a document or a combination that no longer exists cannot be carried over
+-- and are reported by the SELECT below before they go.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `product_sale_elements_virtual_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_document_id` INTEGER NOT NULL,
+    `position` INTEGER DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `pse_virtual_document_unique_idx` (`product_sale_elements_id`, `product_document_id`),
+    INDEX `fk_pse_virtual_document_product_document_idx` (`product_document_id`),
+    CONSTRAINT `fk_pse_virtual_document_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_pse_virtual_document_product_document_id`
+        FOREIGN KEY (`product_document_id`)
+        REFERENCES `product_document` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The associations that will not be carried over, listed rather than discarded
+-- in silence. An empty result means everything moved.
+SELECT `meta_data`.`element_id` AS `product_sale_elements_id`, `meta_data`.`value` AS `product_document_id`
+FROM `meta_data`
+LEFT JOIN `product_sale_elements` ON `product_sale_elements`.`id` = `meta_data`.`element_id`
+LEFT JOIN `product_document` ON `product_document`.`id` = CAST(`meta_data`.`value` AS UNSIGNED)
+WHERE `meta_data`.`meta_key` = 'virtual' AND `meta_data`.`element_key` = 'pse'
+  AND (`product_sale_elements`.`id` IS NULL OR `product_document`.`id` IS NULL
+       OR `meta_data`.`is_serialized` <> 0 OR `meta_data`.`value` NOT REGEXP '^[0-9]+$');
+
+INSERT IGNORE INTO `product_sale_elements_virtual_document`
+    (`product_sale_elements_id`, `product_document_id`, `position`, `created_at`, `updated_at`)
+SELECT `meta_data`.`element_id`, `product_document`.`id`, 1, NOW(), NOW()
+FROM `meta_data`
+INNER JOIN `product_sale_elements` ON `product_sale_elements`.`id` = `meta_data`.`element_id`
+INNER JOIN `product_document` ON `product_document`.`id` = CAST(`meta_data`.`value` AS UNSIGNED)
+WHERE `meta_data`.`meta_key` = 'virtual'
+  AND `meta_data`.`element_key` = 'pse'
+  AND `meta_data`.`is_serialized` = 0
+  AND `meta_data`.`value` REGEXP '^[0-9]+$';
+
+DELETE FROM `meta_data` WHERE `meta_key` = 'virtual' AND `element_key` = 'pse';
+
 SET FOREIGN_KEY_CHECKS = 1;

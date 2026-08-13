@@ -26,11 +26,8 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Model\MetaData;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -484,7 +481,7 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
         $document = $this->createDocument($product, 'handbook-'.$product->getRef().'.pdf', withFile: true);
 
         foreach ($this->generateTwoSaleElements($product, $currency) as $salesElement) {
-            MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $salesElement->getId(), $document->getId());
+            $salesElement->setVirtualDocument($document->getId());
         }
 
         $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
@@ -497,19 +494,16 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
         self::assertCount(2, $clonedSaleElements);
 
         foreach ($clonedSaleElements as $clonedSaleElement) {
-            $clonedDocumentId = MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $clonedSaleElement->getId());
+            $clonedDocument = $clonedSaleElement->getVirtualDocument();
             self::assertNotNull(
-                $clonedDocumentId,
+                $clonedDocument,
                 'Every cloned sale element must keep the document its virtual product is downloaded from',
             );
             self::assertNotSame(
                 $document->getId(),
-                (int) $clonedDocumentId,
+                $clonedDocument->getId(),
                 'The clone must point at its own copy, not at the document of the source product',
             );
-
-            $clonedDocument = ProductDocumentQuery::create()->findPk((int) $clonedDocumentId);
-            self::assertNotNull($clonedDocument);
             self::assertSame($clonedProduct->getId(), $clonedDocument->getProductId());
         }
     }
@@ -527,7 +521,7 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
             ->filterByProductId($product->getId())
             ->findOne();
         self::assertNotNull($defaultSaleElement);
-        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultSaleElement->getId(), $document->getId());
+        $defaultSaleElement->setVirtualDocument($document->getId());
 
         $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
         $this->dispatch($event, TheliaEvents::PRODUCT_CLONE);
@@ -542,7 +536,7 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
 
         foreach ($clonedSaleElements as $clonedSaleElement) {
             self::assertNull(
-                MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $clonedSaleElement->getId()),
+                $clonedSaleElement->getVirtualDocument(),
                 'A document deleted with the source product must not be handed over to the clone',
             );
         }
