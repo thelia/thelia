@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Install\I18n;
 
 use PHPUnit\Framework\TestCase;
-use Thelia\Install\I18n\SeedTranslationCatalog;
 
 /**
  * The mail templates are Twig, so the mailer renders a subject read from
@@ -24,9 +23,9 @@ use Thelia\Install\I18n\SeedTranslationCatalog;
  * which left a language added after the install with a subject the mailer
  * prints verbatim.
  *
- * `generate:sql` cannot run on Thelia 3 — it renders a Smarty template through
- * a `thelia.parser` service core no longer provides — so these tests stand in
- * for regenerating `insert.sql` and comparing.
+ * Whether the seed on disk is what those sources produce is proved by
+ * SeedSqlGeneratorTest, which regenerates the whole file; these tests guard the
+ * syntax itself, without needing a database.
  */
 final class SeedPlaceholderSyntaxTest extends TestCase
 {
@@ -78,34 +77,10 @@ final class SeedPlaceholderSyntaxTest extends TestCase
         $template = file_get_contents(self::setupDirectory().'/insert.sql.tpl');
 
         self::assertIsString($template);
-        self::assertNotSame(0, preg_match_all("/\{intl l='(.*?)' /", $template, $matches));
+        self::assertNotSame(0, preg_match_all("/\{\{ intl\('(.*?)', locale/", $template, $matches));
 
         foreach ($matches[1] as $key) {
             self::assertDoesNotMatchRegularExpression(self::SMARTY_PLACEHOLDER, $key);
-        }
-    }
-
-    public function testTheSeededMailSubjectsAreWhatTheTemplateAndTheCatalogsProduce(): void
-    {
-        $catalog = new SeedTranslationCatalog(self::setupDirectory().'/I18n');
-        $templateRows = $this->getTemplateMessageRows();
-        $seededRows = $this->getSeededMessageRows();
-
-        self::assertNotEmpty($templateRows);
-        self::assertNotEmpty($seededRows);
-
-        foreach ($seededRows as $locale => $rows) {
-            foreach ($templateRows as $id => $keys) {
-                self::assertArrayHasKey($id, $rows, \sprintf('insert.sql has no message %d in %s.', $id, $locale));
-
-                foreach (['title', 'subject'] as $position => $column) {
-                    self::assertSame(
-                        $catalog->translate($keys[$position], $locale),
-                        $rows[$id][$position],
-                        \sprintf('insert.sql message %d in %s has a %s the seed sources do not produce.', $id, $locale, $column),
-                    );
-                }
-            }
         }
     }
 
@@ -123,97 +98,5 @@ final class SeedPlaceholderSyntaxTest extends TestCase
         self::assertNotEmpty($files);
 
         return $files;
-    }
-
-    /**
-     * The keys `insert.sql.tpl` translates for every locale, per message id.
-     *
-     * @return array<int, array{0: string, 1: string}>
-     */
-    private function getTemplateMessageRows(): array
-    {
-        $block = $this->getMessageBlock(file_get_contents(self::setupDirectory().'/insert.sql.tpl') ?: '');
-
-        preg_match_all(
-            "/\((\d+), '\{\\\$locale\}', \{intl l='(.*?)' locale=\\\$locale\}, \{intl l='(.*?)' locale=\\\$locale\}/",
-            $block,
-            $matches,
-            \PREG_SET_ORDER,
-        );
-
-        $rows = [];
-
-        foreach ($matches as $match) {
-            $rows[(int) $match[1]] = [$match[2], $match[3]];
-        }
-
-        return $rows;
-    }
-
-    /**
-     * The titles and subjects `insert.sql` ships, per locale and message id.
-     *
-     * @return array<string, array<int, array{0: ?string, 1: ?string}>>
-     */
-    private function getSeededMessageRows(): array
-    {
-        $block = $this->getMessageBlock(file_get_contents(self::setupDirectory().'/insert.sql') ?: '');
-        $rows = [];
-
-        foreach (explode("\n", $block) as $line) {
-            if (1 !== preg_match('/^\s*\((\d+),(.*)$/', $line, $matches)) {
-                continue;
-            }
-
-            $values = $this->readRowValues($matches[2]);
-
-            if (\count($values) < 3) {
-                continue;
-            }
-
-            $rows[(string) $values[0]][(int) $matches[1]] = [$values[1], $values[2]];
-        }
-
-        return $rows;
-    }
-
-    private function getMessageBlock(string $content): string
-    {
-        self::assertSame(1, preg_match('/INSERT INTO `message_i18n`.*?\n;/s', $content, $matches));
-
-        return $matches[0];
-    }
-
-    /**
-     * Reads the `NULL` and single quoted values of one seeded row.
-     *
-     * @return list<string|null>
-     */
-    private function readRowValues(string $line): array
-    {
-        $values = [];
-        $length = \strlen($line);
-
-        for ($position = 0; $position < $length; ++$position) {
-            if ("'" === $line[$position]) {
-                $value = '';
-
-                while (++$position < $length && "'" !== $line[$position]) {
-                    // PDO::quote() escapes the quotes of the wording itself.
-                    $value .= '\\' === $line[$position] ? $line[++$position] : $line[$position];
-                }
-
-                $values[] = $value;
-
-                continue;
-            }
-
-            if (0 === substr_compare($line, 'NULL', $position, 4)) {
-                $values[] = null;
-                $position += 3;
-            }
-        }
-
-        return $values;
     }
 }
