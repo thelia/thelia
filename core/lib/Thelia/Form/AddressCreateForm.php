@@ -245,6 +245,7 @@ class AddressCreateForm extends FirewallForm
     {
         $states = StateQuery::create()
             ->filterByCountryId($countryId)
+            ->filterByVisible(1)
             ->useStateI18nQuery()
             ->filterByLocale($this->getLocale())
             ->withColumn(StateI18nTableMap::COL_TITLE, 'title')
