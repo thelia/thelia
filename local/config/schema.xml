@@ -418,6 +418,7 @@
     <column defaultValue="0" name="enable" type="TINYINT" />
     <column name="confirmation_token" size="255" type="VARCHAR" />
     <column name="confirmation_token_expires_at" type="DATE" />
+    <column description="when the identifying data of the account was erased, NULL as long as the account carries an identity" name="anonymized_at" type="TIMESTAMP" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
@@ -435,6 +436,9 @@
     </index>
     <index name="idx_email">
       <index-column name="email" />
+    </index>
+    <index name="idx_customer_anonymized_at">
+      <index-column name="anonymized_at" />
     </index>
     <behavior name="timestampable" />
     <behavior name="versionable">
@@ -622,8 +626,8 @@
     <column defaultValue="0.000000" name="postage" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
-    <column name="payment_module_id" required="true" type="INTEGER" />
-    <column name="delivery_module_id" required="true" type="INTEGER" />
+    <column description="the module that took the payment, NULL once that module is gone" name="payment_module_id" type="INTEGER" />
+    <column description="the module that shipped the order, NULL once that module is gone" name="delivery_module_id" type="INTEGER" />
     <column name="status_id" required="true" type="INTEGER" />
     <column name="lang_id" required="true" type="INTEGER" />
     <column name="cart_id" required="true" type="INTEGER" />

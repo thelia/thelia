@@ -26,6 +26,35 @@ class CartPurger
      */
     public function purgeCartsWithoutOrder(int $days): int
     {
+        return $this->cartsWithoutOrder($days)->delete();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function countCartsWithoutOrder(int $days): int
+    {
+        return $this->cartsWithoutOrder($days)->count();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function purgeAnonymousCarts(int $days): int
+    {
+        return $this->anonymousCarts($days)->delete();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function countAnonymousCarts(int $days): int
+    {
+        return $this->anonymousCarts($days)->count();
+    }
+
+    private function cartsWithoutOrder(int $days): CartQuery
+    {
         $threshold = $this->getThresholdDate($days);
 
         $cartIdsWithOrder = OrderQuery::create()
@@ -41,20 +70,14 @@ class CartPurger
 
         $query->filterByCustomerId(null, Criteria::ISNOTNULL);
 
-        return $query->delete();
+        return $query;
     }
 
-    /**
-     * @throws PropelException
-     */
-    public function purgeAnonymousCarts(int $days): int
+    private function anonymousCarts(int $days): CartQuery
     {
-        $threshold = $this->getThresholdDate($days);
-
         return CartQuery::create()
             ->filterByCustomerId(null, Criteria::ISNULL)
-            ->filterByCreatedAt($threshold, Criteria::LESS_THAN)
-            ->delete();
+            ->filterByCreatedAt($this->getThresholdDate($days), Criteria::LESS_THAN);
     }
 
     private function getThresholdDate(int $days): \DateTime

@@ -25,11 +25,21 @@ class AdminLogPurger
      */
     public function purgeAdminLogs(int $days): int
     {
-        $threshold = $this->getThresholdDate($days);
+        return $this->expiredAdminLogs($days)->delete();
+    }
 
+    /**
+     * @throws PropelException
+     */
+    public function countAdminLogs(int $days): int
+    {
+        return $this->expiredAdminLogs($days)->count();
+    }
+
+    private function expiredAdminLogs(int $days): AdminLogQuery
+    {
         return AdminLogQuery::create()
-            ->filterByCreatedAt($threshold, Criteria::LESS_THAN)
-            ->delete();
+            ->filterByCreatedAt($this->getThresholdDate($days), Criteria::LESS_THAN);
     }
 
     private function getThresholdDate(int $days): \DateTime
