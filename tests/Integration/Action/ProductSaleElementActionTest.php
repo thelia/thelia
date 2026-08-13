@@ -24,13 +24,39 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\MetaData;
+use Thelia\Model\MetaDataQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class ProductSaleElementActionTest extends ActionIntegrationTestCase
 {
+    private ?string $documentUploadDir = null;
+
+    /** @var list<string> */
+    private array $preexistingDocumentFiles = [];
+
+    protected function tearDown(): void
+    {
+        // Cloning documents writes to the media directory, which the database rollback
+        // does not undo: both the source file and the copy made for the clone must go.
+        if (null !== $this->documentUploadDir && is_dir($this->documentUploadDir)) {
+            foreach ($this->documentFiles() as $file) {
+                if (is_file($file) && !\in_array($file, $this->preexistingDocumentFiles, true)) {
+                    unlink($file);
+                }
+            }
+        }
+
+        parent::tearDown();
+    }
+
     public function testCreateWithoutCombinationReusesOrphanPse(): void
     {
         $currency = $this->factory->currency();
@@ -449,5 +475,168 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
         self::assertNotNull($clonedPse);
         self::assertSame(0, $clonedPse->getPromo());
         self::assertSame(0, $clonedPse->getNewness());
+    }
+
+    public function testCloneCarriesTheVirtualDocumentOfEachSaleElement(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->createVirtualProduct($currency);
+        $document = $this->createDocument($product, 'handbook-'.$product->getRef().'.pdf', withFile: true);
+
+        foreach ($this->generateTwoSaleElements($product, $currency) as $salesElement) {
+            MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $salesElement->getId(), $document->getId());
+        }
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $clonedProduct = $event->getClonedProduct();
+        $clonedSaleElements = ProductSaleElementsQuery::create()
+            ->filterByProductId($clonedProduct->getId())
+            ->find();
+        self::assertCount(2, $clonedSaleElements);
+
+        foreach ($clonedSaleElements as $clonedSaleElement) {
+            $clonedDocumentId = MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $clonedSaleElement->getId());
+            self::assertNotNull(
+                $clonedDocumentId,
+                'Every cloned sale element must keep the document its virtual product is downloaded from',
+            );
+            self::assertNotSame(
+                $document->getId(),
+                (int) $clonedDocumentId,
+                'The clone must point at its own copy, not at the document of the source product',
+            );
+
+            $clonedDocument = ProductDocumentQuery::create()->findPk((int) $clonedDocumentId);
+            self::assertNotNull($clonedDocument);
+            self::assertSame($clonedProduct->getId(), $clonedDocument->getProductId());
+        }
+    }
+
+    public function testCloneLeavesNoVirtualAssociationWhenTheSourceFileIsMissing(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->createVirtualProduct($currency);
+
+        // The association points at a document whose file is absent from the disk, so the
+        // cloning process has nothing to copy.
+        $document = $this->createDocument($product, 'never-uploaded-'.$product->getRef().'.pdf', withFile: false);
+
+        $defaultSaleElement = ProductSaleElementsQuery::create()
+            ->filterByProductId($product->getId())
+            ->findOne();
+        self::assertNotNull($defaultSaleElement);
+        MetaDataQuery::setVal('virtual', MetaData::PSE_KEY, $defaultSaleElement->getId(), $document->getId());
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $clonedProduct = $event->getClonedProduct();
+        self::assertSame(1, $clonedProduct->getVirtual(), 'The clone keeps the intent of the source product');
+
+        $clonedSaleElements = ProductSaleElementsQuery::create()
+            ->filterByProductId($clonedProduct->getId())
+            ->find();
+        self::assertCount(1, $clonedSaleElements);
+
+        foreach ($clonedSaleElements as $clonedSaleElement) {
+            self::assertNull(
+                MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $clonedSaleElement->getId()),
+                'A document deleted with the source product must not be handed over to the clone',
+            );
+        }
+    }
+
+    private function createVirtualProduct(Currency $currency): Product
+    {
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $currency,
+        );
+
+        // cloneProduct() reads the source i18n row, which the fixture does not create.
+        $product
+            ->setLocale('en_US')
+            ->setTitle('Digital handbook')
+            ->setVirtual(1)
+            ->save();
+
+        return $product;
+    }
+
+    private function createDocument(Product $product, string $fileName, bool $withFile): ProductDocument
+    {
+        $document = new ProductDocument();
+        $document
+            ->setProductId($product->getId())
+            ->setFile($fileName)
+            // Virtual documents are the hidden ones.
+            ->setVisible(0)
+            ->setPosition(1)
+            ->save();
+
+        $this->rememberDocumentUploadDir($document);
+
+        if ($withFile) {
+            if (!is_dir($this->documentUploadDir)) {
+                mkdir($this->documentUploadDir, 0o775, true);
+            }
+            file_put_contents($this->documentUploadDir.\DIRECTORY_SEPARATOR.$fileName, '%PDF-1.4 test document');
+        }
+
+        return $document;
+    }
+
+    /**
+     * Replaces the default sale element with two combinations, the way a merchant
+     * declining a virtual product would.
+     *
+     * @return list<\Thelia\Model\ProductSaleElements>
+     */
+    private function generateTwoSaleElements(Product $product, Currency $currency): array
+    {
+        $attribute = $this->factory->attribute();
+        $firstValue = $this->factory->attributeAv($attribute);
+        $secondValue = $this->factory->attributeAv($attribute);
+
+        $event = new ProductCombinationGenerationEvent(
+            $product,
+            $currency->getId(),
+            [[$firstValue->getId()], [$secondValue->getId()]],
+        );
+        $event
+            ->setPrice(10.0)
+            ->setSalePrice(8.0)
+            ->setWeight(0.0)
+            ->setQuantity(5)
+            ->setOnsale(false)
+            ->setIsnew(false)
+            ->setEanCode('');
+
+        $this->dispatch($event, TheliaEvents::PRODUCT_COMBINATION_GENERATION);
+
+        return iterator_to_array(
+            ProductSaleElementsQuery::create()->filterByProductId($product->getId())->find(),
+        );
+    }
+
+    private function rememberDocumentUploadDir(ProductDocument $document): void
+    {
+        if (null !== $this->documentUploadDir) {
+            return;
+        }
+
+        $this->documentUploadDir = $document->getUploadDir();
+        $this->preexistingDocumentFiles = $this->documentFiles();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function documentFiles(): array
+    {
+        return array_values(glob($this->documentUploadDir.\DIRECTORY_SEPARATOR.'*') ?: []);
     }
 }

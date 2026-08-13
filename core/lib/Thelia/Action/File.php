@@ -121,6 +121,10 @@ class File extends BaseAction implements EventSubscriberInterface
                         case 'documents':
                             $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::DOCUMENT_SAVE);
 
+                            // Keep track of which copy replaces which source document, so the
+                            // virtual document of each sale element can be remapped later on.
+                            $event->addClonedDocumentId((int) $originalProductFile->getId(), (int) $clonedProductFile->getId());
+
                             // Get original product document I18n
                             $originalProductFileI18ns = ProductDocumentI18nQuery::create()
                                 ->findById($originalProductFile->getId());
