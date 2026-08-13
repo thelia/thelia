@@ -97,8 +97,6 @@ class Delivery extends BaseSpecificModule
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
-                /* @var CartModel $cart */
-                $cart->getAddressDeliveryId();
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
                 $this->dispatcher->dispatch(
                     $deliveryPostageEvent,

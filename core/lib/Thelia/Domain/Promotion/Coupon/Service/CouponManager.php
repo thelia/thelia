@@ -23,7 +23,6 @@ use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
@@ -149,7 +148,7 @@ class CouponManager
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
                 if (!$couponCountries->isEmpty()) {
-                    if (null === $deliveryAddress = AddressQuery::create()->findPk($cart->getAddressDeliveryId())) {
+                    if (null === $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId()) {
                         continue;
                     }
 

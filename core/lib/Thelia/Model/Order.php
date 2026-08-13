@@ -89,7 +89,11 @@ class Order extends BaseOrder
      */
     public function getChoosenDeliveryAddress(): ?int
     {
-        $this->choosenDeliveryAddress = $this->getCart()?->getAddressDeliveryId();
+        // The cart points at its own copy of the address, in `cart_address`.
+        // Every caller looks the answer up in `address`.
+        $this->choosenDeliveryAddress = $this->getCart()
+            ?->getCartAddressRelatedByAddressDeliveryId()
+            ?->getAddressId();
 
         return $this->choosenDeliveryAddress;
     }
@@ -115,7 +119,9 @@ class Order extends BaseOrder
      */
     public function getChoosenInvoiceAddress(): ?int
     {
-        $this->choosenDeliveryAddress = $this->getCart()?->getAddressInvoiceId();
+        $this->choosenInvoiceAddress = $this->getCart()
+            ?->getCartAddressRelatedByAddressInvoiceId()
+            ?->getAddressId();
 
         return $this->choosenInvoiceAddress;
     }

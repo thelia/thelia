@@ -36,6 +36,7 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
@@ -134,7 +135,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $moduleId = $event->getDeliveryModuleId();
-        $deliveryAddressId = $event->getDeliveryAddressId();
+        // Postage is quoted on the address the cart ships to, which is the cart's
+        // own copy in `cart_address`. Reading it off the cart also covers an
+        // address typed in at checkout and never saved to the customer account.
+        $deliveryAddressId = $cart->getAddressDeliveryId();
 
         if (null === $moduleId || null === $deliveryAddressId) {
             return;
@@ -588,6 +592,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param int $deliveryAddressId id of the cart's delivery address, in `cart_address`
+     *
      * @throws PropelException
      */
     protected function getPostageByDeliveryModuleId(
@@ -596,7 +602,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         int $moduleId,
         int $deliveryAddressId,
     ): OrderPostage {
-        if (!$customer = $this->securityContext->getCustomerUser()) {
+        if (!$this->securityContext->getCustomerUser()) {
             throw new \Exception('Customer not found !');
         }
 
@@ -608,16 +614,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-        $deliveryAddress = AddressQuery::create()
-            ->useCustomerQuery()
-            ->filterById($customer->getId())
-            ->endUse()
-            ->useCartAddressQuery()
-                ->filterById($deliveryAddressId)
-            ->endUse()
-            ->findOne();
+        $cartAddress = CartAddressQuery::create()->findPk($deliveryAddressId);
 
-        if (!$deliveryAddress) {
+        if (!$cartAddress) {
             throw new \Exception('Delivery address not found !');
         }
 
@@ -625,8 +624,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
             throw new \Exception('Virtual product delivery failed ! ');
         }
 
-        $country = $deliveryAddress->getCountry();
-        $state = $deliveryAddress->getState();
+        $country = $cartAddress->getCountry();
+        $state = $cartAddress->getState();
+
+        // Delivery modules receive the customer address when the cart address was
+        // copied from one; country and state come from the cart address either way.
+        $deliveryAddress = $cartAddress->getAddress();
 
         $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress, $country, $state);
 
