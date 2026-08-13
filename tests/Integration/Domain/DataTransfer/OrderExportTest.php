@@ -76,6 +76,42 @@ final class OrderExportTest extends IntegrationTestCase
         self::assertNotContains($old->getRef(), $refs);
     }
 
+    /**
+     * `postage_tax_rule_title` is a VARCHAR. Wrapping it in ROUND() made
+     * MySQL coerce the label to a number, so every exported order carried
+     * 0.00 instead of the tax rule name.
+     */
+    public function testItExportsTheShippingTaxRuleTitleAsText(): void
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->setPostageTaxRuleTitle('TVA 20%');
+        $order->save($this->getPropelConnection());
+
+        $row = $this->exportedRow($order->getRef());
+
+        self::assertSame('TVA 20%', $row['order_postage_tax_rule_title']);
+    }
+
+    /**
+     * Both country columns used to be aliased to `invoice_country`, and the
+     * second one silently overwrote the first: the delivery country never
+     * reached the file.
+     */
+    public function testTheDeliveryAndInvoiceCountriesGetTheirOwnColumn(): void
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        $row = $this->exportedRow($order->getRef());
+        $aliased = (new OrderExport())->applyOrderAndAliases($row);
+
+        self::assertArrayHasKey('delivery_country', $aliased);
+        self::assertSame($row['delivery_country_i18n_title'], $aliased['delivery_country']);
+        self::assertSame($row['invoice_country_i18n_title'], $aliased['invoice_country']);
+    }
+
     private function orderCreatedAt(string $modifier): Order
     {
         $order = $this->factory->order();
@@ -106,5 +142,25 @@ final class OrderExportTest extends IntegrationTestCase
         }
 
         return $refs;
+    }
+
+    /**
+     * The export yields the raw column names, not the output aliases.
+     *
+     * @return array<string, mixed>
+     */
+    private function exportedRow(string $ref): array
+    {
+        $export = new OrderExport();
+        $export->setLang(Lang::getDefaultLanguage());
+        $export->setRangeDate(null);
+
+        foreach ($export as $row) {
+            if (($row['order_ref'] ?? null) === $ref) {
+                return $row;
+            }
+        }
+
+        self::fail("Order $ref is missing from the export.");
     }
 }
