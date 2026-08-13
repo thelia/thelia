@@ -15,7 +15,6 @@ return [
     'Category' => 'Catégorie',
     'Conclusion' => 'Conclusion',
     'Content' => 'Contenu',
-    'File manager' => 'Explorateur de fichiers',
     'Folder' => 'Dossier',
     'List of the text area where the wysiwyg editor will be used' => 'Liste des zones de texte dans lesquelles l\'éditeur wysiwyg sera utilisé',
     'None' => 'Aucun',
