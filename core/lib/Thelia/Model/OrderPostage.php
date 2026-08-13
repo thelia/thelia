@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Shipping\DTO\PostageTaxLine;
+
 /**
  * Class OrderPostage.
  *
@@ -25,6 +27,15 @@ class OrderPostage
     protected ?float $amountTax = null;
     protected ?float $untaxedAmount = null;
     protected ?string $taxRuleTitle = null;
+
+    /**
+     * How the tax splits between the rules the goods follow, empty when a
+     * single rule covers the whole postage - which is what a delivery module
+     * produces and what a shop on the default strategy keeps.
+     *
+     * @var list<PostageTaxLine>
+     */
+    protected array $taxBreakdown = [];
 
     public function __construct(?float $amount = null, ?float $amountTax = null, ?string $taxRuleTitle = null)
     {
@@ -80,5 +91,21 @@ class OrderPostage
     public function setUntaxedAmount(float $untaxedAmount): void
     {
         $this->untaxedAmount = $untaxedAmount;
+    }
+
+    /**
+     * @return list<PostageTaxLine>
+     */
+    public function getTaxBreakdown(): array
+    {
+        return $this->taxBreakdown;
+    }
+
+    /**
+     * @param list<PostageTaxLine> $taxBreakdown
+     */
+    public function setTaxBreakdown(array $taxBreakdown): void
+    {
+        $this->taxBreakdown = $taxBreakdown;
     }
 }
