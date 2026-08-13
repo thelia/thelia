@@ -254,7 +254,11 @@ class Update
                 }
             }
 
-            $this->connection->commit();
+            // A DDL statement in an update script (ALTER, CREATE, DROP) implicitly
+            // commits the transaction on MySQL/MariaDB, leaving nothing to commit here.
+            if ($this->connection->inTransaction()) {
+                $this->connection->commit();
+            }
             $this->log('debug', 'update successfully');
         } catch (\Exception $e) {
             // The guard matters here: $this->connection is the raw PDO handle
