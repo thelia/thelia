@@ -60,6 +60,11 @@ use Thelia\Model\Map\LangTableMap;
         new GetCollection(
             uriTemplate: '/front/languages',
         ),
+        // The collection is the only front side this resource had, so its
+        // members were named by their admin IRI.
+        new Get(
+            uriTemplate: '/front/languages/{id}',
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
