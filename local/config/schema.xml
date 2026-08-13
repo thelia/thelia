@@ -627,7 +627,9 @@
     <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
     <column description="the module that took the payment, NULL once that module is gone" name="payment_module_id" type="INTEGER" />
+    <column description="the name the payment module had when it was deleted, NULL while the module is still installed" name="payment_module_title" size="255" type="VARCHAR" />
     <column description="the module that shipped the order, NULL once that module is gone" name="delivery_module_id" type="INTEGER" />
+    <column description="the name the delivery module had when it was deleted, NULL while the module is still installed" name="delivery_module_title" size="255" type="VARCHAR" />
     <column name="status_id" required="true" type="INTEGER" />
     <column name="lang_id" required="true" type="INTEGER" />
     <column name="cart_id" required="true" type="INTEGER" />
