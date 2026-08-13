@@ -220,17 +220,25 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public OrderAddress $deliveryOrderAddress;
 
+    // Null once the module has been deleted: the order keeps the name the module
+    // carried, in paymentModuleTitle, and stops pointing at a row that is gone.
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]
     #[Column(propelSetter: 'setPaymentModuleId')]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public Module $paymentModule;
+    public ?Module $paymentModule = null;
 
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $paymentModuleTitle = null;
+
+    // Null once the module has been deleted: the order keeps the name the module
+    // carried, in deliveryModuleTitle, and stops pointing at a row that is gone.
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByDeliveryModuleId')]
     #[Column(propelSetter: 'setDeliveryModuleId')]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
-    public Module $deliveryModule;
+    public ?Module $deliveryModule = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $deliveryModuleTitle = null;
 
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
@@ -550,26 +558,50 @@ class Order implements PropelResourceInterface
         return $this;
     }
 
-    public function getPaymentModule(): Module
+    public function getPaymentModule(): ?Module
     {
         return $this->paymentModule;
     }
 
-    public function setPaymentModule(Module $paymentModule): self
+    public function setPaymentModule(?Module $paymentModule): self
     {
         $this->paymentModule = $paymentModule;
 
         return $this;
     }
 
-    public function getDeliveryModule(): Module
+    public function getPaymentModuleTitle(): ?string
+    {
+        return $this->paymentModuleTitle;
+    }
+
+    public function setPaymentModuleTitle(?string $paymentModuleTitle): self
+    {
+        $this->paymentModuleTitle = $paymentModuleTitle;
+
+        return $this;
+    }
+
+    public function getDeliveryModule(): ?Module
     {
         return $this->deliveryModule;
     }
 
-    public function setDeliveryModule(Module $deliveryModule): self
+    public function setDeliveryModule(?Module $deliveryModule): self
     {
         $this->deliveryModule = $deliveryModule;
+
+        return $this;
+    }
+
+    public function getDeliveryModuleTitle(): ?string
+    {
+        return $this->deliveryModuleTitle;
+    }
+
+    public function setDeliveryModuleTitle(?string $deliveryModuleTitle): self
+    {
+        $this->deliveryModuleTitle = $deliveryModuleTitle;
 
         return $this;
     }
