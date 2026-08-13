@@ -53,7 +53,7 @@ final class StateSeedTest extends IntegrationTestCase
     {
         // country alpha-3 code, English title, expected ISO 3166-2 code
         yield 'Aguascalientes' => ['MEX', 'Aguascalientes', 'MX-AGU'];
-        yield 'Ciudad de Mexico' => ['MEX', 'Distrito Federal', 'MX-CMX'];
+        yield 'Ciudad de Mexico' => ['MEX', 'Ciudad de México', 'MX-CMX'];
     }
 
     #[DataProvider('renamedStateProvider')]

@@ -3322,7 +3322,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (59, '{$locale}', {intl l='Chihuahua' locale=$locale}),
     (60, '{$locale}', {intl l='Coahuila' locale=$locale}),
     (61, '{$locale}', {intl l='Colima' locale=$locale}),
-    (62, '{$locale}', {intl l='Distrito Federal' locale=$locale}),
+    (62, '{$locale}', {intl l='Ciudad de México' locale=$locale}),
     (63, '{$locale}', {intl l='Durango' locale=$locale}),
     (64, '{$locale}', {intl l='Guanajuato' locale=$locale}),
     (65, '{$locale}', {intl l='Guerrero' locale=$locale}),

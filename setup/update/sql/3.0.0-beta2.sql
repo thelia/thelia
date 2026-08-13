@@ -511,4 +511,34 @@ WHERE `message`.`name` = 'customer_send_code'
   AND `message_i18n`.`locale` = 'fr_FR'
   AND (`message_i18n`.`subject` IS NULL OR `message_i18n`.`subject` = '');
 
+-- ---------------------------------------------------------------------
+-- The Mexican federal district kept its pre-2016 name (#3168)
+--
+-- The entity was renamed Ciudad de Mexico in 2016, when it was also recoded
+-- 'CMX'. The Spanish title already said so, the English, French and Russian
+-- ones still read Distrito Federal, so the same state answered to two names
+-- depending on the language of the shop.
+--
+-- Matched on the outdated title, so a shop that renamed it by hand is left
+-- untouched and a second run is a no-op.
+-- ---------------------------------------------------------------------
+
+UPDATE `state_i18n`
+INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state_i18n`.`title` = 'Ciudad de México'
+WHERE `country`.`isoalpha3` = 'MEX'
+  AND `state`.`isocode` = 'CMX'
+  AND `state_i18n`.`locale` IN ('en_US', 'fr_FR')
+  AND `state_i18n`.`title` = 'Distrito Federal';
+
+UPDATE `state_i18n`
+INNER JOIN `state` ON `state`.`id` = `state_i18n`.`id`
+INNER JOIN `country` ON `country`.`id` = `state`.`country_id`
+SET `state_i18n`.`title` = 'Мехико'
+WHERE `country`.`isoalpha3` = 'MEX'
+  AND `state`.`isocode` = 'CMX'
+  AND `state_i18n`.`locale` = 'ru_RU'
+  AND `state_i18n`.`title` = 'Федеральный округ';
+
 SET FOREIGN_KEY_CHECKS = 1;
