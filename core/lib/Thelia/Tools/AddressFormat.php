@@ -149,7 +149,9 @@ class AddressFormat
             ->withGivenName($address->getFirstname())
             ->withFamilyName($address->getLastname());
 
-        if ($country->getHasStates() && 0 !== (int) $address->getStateId()) {
+        // The state comes from the address, not from a country setting: a shop that
+        // makes the state optional still has to see the one the customer picked.
+        if (0 !== (int) $address->getStateId()) {
             $addressModel = $addressModel->withAdministrativeArea(
                 \sprintf(
                     '%s-%s',

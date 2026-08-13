@@ -24,6 +24,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\StateQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
@@ -175,6 +176,18 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
+        // HAS_STATES tells whether a state is mandatory, HAS_SELECTABLE_STATES whether
+        // the country carries any: a template asks the second one to decide if it shows
+        // the state field at all. Resolved in one query, the loop lists every country.
+        $countryIdsWithStates = array_flip(
+            StateQuery::create()
+                ->filterByVisible(1)
+                ->distinct()
+                ->select('CountryId')
+                ->find()
+                ->toArray(),
+        );
+
         /** @var \Thelia\Model\Country $country */
         foreach ($loopResult->getResultDataCollection() as $country) {
             $loopResultRow = new LoopResultRow($country);
@@ -193,6 +206,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('IS_DEFAULT', $country->getByDefault() ? '1' : '0')
                 ->set('IS_SHOP_COUNTRY', $country->getShopCountry() ? '1' : '0')
                 ->set('HAS_STATES', $country->getHasStates() ? '1' : '0')
+                ->set('HAS_SELECTABLE_STATES', isset($countryIdsWithStates[$country->getId()]) ? '1' : '0')
                 ->set('NEED_ZIP_CODE', $country->getNeedZipCode() ? '1' : '0')
                 ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat());
 
