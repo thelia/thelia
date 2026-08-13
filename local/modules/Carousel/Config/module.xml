@@ -19,6 +19,6 @@
         <email>manu@raynaud.io, franck@cqfdev.fr</email>
     </author>
     <type>classic</type>
-    <thelia>2.6.1</thelia>
+    <thelia>2.6.2</thelia>
     <stability>alpha</stability>
 </module>

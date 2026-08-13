@@ -13,6 +13,6 @@
         <email>manu@raynaud.io</email>
     </author>
     <type>classic</type>
-    <thelia>2.6.1</thelia>
+    <thelia>2.6.2</thelia>
     <stability>prod</stability>
 </module>
