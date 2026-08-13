@@ -71,8 +71,8 @@ final readonly class ShippingFacade
 
         $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state);
 
-        $amountHt = isset($estimate['postage']) ? (float) $estimate['postage'] : null;
-        $tax = isset($estimate['tax']) ? (float) $estimate['tax'] : null;
+        $amountHt = $estimate->getBestPostageAmount();
+        $tax = $estimate->getBestPostageTax();
         $totalTtc = null;
 
         if (null !== $amountHt && null !== $tax) {

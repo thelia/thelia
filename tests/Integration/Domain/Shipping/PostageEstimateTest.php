@@ -20,8 +20,7 @@ use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\Service\DeliverySetupService;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
 use Thelia\Domain\Shipping\ShippingFacade;
-use Thelia\Model\Module;
-use Thelia\Module\BaseModule;
+use Thelia\Model\ModuleQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -53,7 +52,7 @@ final class PostageEstimateTest extends IntegrationTestCase
         $factory->address($customer);
         $cart = $factory->cart($customer);
 
-        $this->installVirtualDeliveryModule();
+        $this->activateVirtualDeliveryModule();
 
         $estimator = $this->createMock(PostageEstimator::class);
         $estimator->method('estimatePostageForCountry')
@@ -66,14 +65,11 @@ final class PostageEstimateTest extends IntegrationTestCase
         self::assertSame(1.5, (float) $cart->getPostageTax());
     }
 
-    private function installVirtualDeliveryModule(): void
+    private function activateVirtualDeliveryModule(): void
     {
-        (new Module())
-            ->setCode('VirtualProductDelivery')
-            ->setType(BaseModule::DELIVERY_MODULE_TYPE)
-            ->setActivate(1)
-            ->setVersion('1.0.0')
-            ->setFullNamespace('VirtualProductDelivery\VirtualProductDelivery')
-            ->save($this->getPropelConnection());
+        $module = ModuleQuery::create()->findOneByCode('VirtualProductDelivery')
+            ?? throw new \RuntimeException('The VirtualProductDelivery module is not installed — run bin/test-prepare.');
+
+        $module->setActivate(1)->save($this->getPropelConnection());
     }
 }
