@@ -45,7 +45,7 @@ class PostageEstimator
     }
 
     /**
-     * Return the minimum expected postage for a cart in a given country.
+     * Return the minimum expected postage, tax included, for a cart in a given country.
      *
      * @throws PropelException
      */
@@ -75,11 +75,11 @@ class PostageEstimator
             $modulePostage = $this->computePostageForModule($deliveryModule, $cart, $country, $state);
 
             if ($modulePostage instanceof OrderPostage) {
-                $amountHt = $modulePostage->getAmount() - $modulePostage->getAmountTax();
+                $amountTtc = $modulePostage->getAmount();
                 $tax = $modulePostage->getAmountTax();
 
-                if (null === $bestPostageAmount || $bestPostageAmount > $amountHt) {
-                    $bestPostageAmount = $amountHt;
+                if (null === $bestPostageAmount || $bestPostageAmount > $amountTtc) {
+                    $bestPostageAmount = $amountTtc;
                     $bestPostageTax = $tax;
                     $bestModuleId = $deliveryModule->getId();
                 }
