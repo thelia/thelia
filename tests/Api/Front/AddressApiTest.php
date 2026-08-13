@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Thelia\Model\CountryQuery;
+use Thelia\Model\StateQuery;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -68,6 +70,38 @@ final class AddressApiTest extends ApiTestCase
 
         self::assertJsonResponseSuccessful($response);
         self::assertHydraTotalItems(1, $response);
+    }
+
+    public function testAStateFromAnotherCountryIsRejected(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $customer = $factory->customer($title, ['password' => 'password']);
+
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        $elsewhere = CountryQuery::create()->findOneByIsoalpha3('USA');
+        self::assertNotNull($country);
+        self::assertNotNull($elsewhere);
+
+        $state = StateQuery::create()->filterByCountryId($elsewhere->getId())->findOne();
+        self::assertNotNull($state);
+
+        $response = $this->jsonRequest('POST', '/api/front/account/addresses', [
+            'label' => 'Home',
+            'firstname' => 'John',
+            'lastname' => 'Doe',
+            'address1' => '1 Main Street',
+            'address2' => '',
+            'address3' => '',
+            'city' => 'Paris',
+            'zipcode' => '75001',
+            'country' => '/api/front/countries/'.$country->getId(),
+            'state' => '/api/admin/states/'.$state->getId(),
+            'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
+        ], $this->authenticateAsCustomer($customer));
+
+        self::assertSame(422, $response->getStatusCode(), substr((string) $response->getContent(), 0, 500));
+        self::assertStringContainsString('belong to this country', (string) $response->getContent());
     }
 
     public function testUnauthenticatedReadIsRejected(): void

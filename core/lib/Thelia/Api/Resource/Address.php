@@ -458,33 +458,45 @@ class Address implements PropelResourceInterface
         }
     }
 
-    #[Callback(groups: [self::GROUP_ADMIN_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
     public function verifyState(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
 
-        if (isset($resource->country) && null !== ($country = $resource->getCountry()->getPropelModel()) && $country->getHasStates()) {
-            if (null !== $state = $resource->getState()->getPropelModel()) {
-                if ($state->getCountryId() !== $country->getId()) {
-                    $context->addViolation(
-                        Translator::getInstance()->trans(
-                            "This state doesn't belong to this country.",
-                            [],
-                            null,
-                            'en_US',
-                        ),
-                    );
-                }
-            } else {
+        if (!isset($resource->country) || null === $country = $resource->getCountry()?->getPropelModel()) {
+            return;
+        }
+
+        $state = $resource->getState()?->getPropelModel();
+
+        // A state stays tied to its country whether or not the country requires one:
+        // an optional department must not be kept when the address moves elsewhere.
+        if (null !== $state) {
+            if ($state->getCountryId() !== $country->getId()) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
-                        'You should select a state for this country.',
+                        "This state doesn't belong to this country.",
                         [],
                         null,
                         'en_US',
                     ),
                 );
             }
+
+            return;
+        }
+
+        // Requiring a state from a country that carries none would reject every address
+        // with an error the caller cannot act on.
+        if ($country->getHasStates() && $country->hasSelectableStates()) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'You should select a state for this country.',
+                    [],
+                    null,
+                    'en_US',
+                ),
+            );
         }
     }
 }

@@ -48,22 +48,35 @@ trait AddressCountryValidationTrait
     {
         $data = $context->getRoot()->getData();
 
-        if (null !== ($country = CountryQuery::create()->findPk($data['country'])) && $country->getHasStates()) {
-            if (null !== $state = StateQuery::create()->findPk($data['state'])) {
-                if ($state->getCountryId() !== $country->getId()) {
-                    $context->addViolation(
-                        Translator::getInstance()->trans(
-                            "This state doesn't belong to this country.",
-                        ),
-                    );
-                }
-            } else {
+        if (null === $country = CountryQuery::create()->findPk($data['country'])) {
+            return;
+        }
+
+        $stateId = $data['state'] ?? null;
+        $state = empty($stateId) ? null : StateQuery::create()->findPk($stateId);
+
+        // A state stays tied to its country whether or not the country requires one:
+        // an optional department must not survive a change of country in the same submit.
+        if (null !== $state) {
+            if ($state->getCountryId() !== $country->getId()) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
-                        'You should select a state for this country.',
+                        "This state doesn't belong to this country.",
                     ),
                 );
             }
+
+            return;
+        }
+
+        // Requiring a state from a country that carries none would leave the customer
+        // with an empty list and no way to submit the form.
+        if ($country->getHasStates() && $country->hasSelectableStates()) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'You should select a state for this country.',
+                ),
+            );
         }
     }
 
