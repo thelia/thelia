@@ -50,6 +50,7 @@ final class AdminCollectionContractTest extends ApiTestCase
         // value or configuration" (StateProvider config issue, not test-related)
         yield 'customer_titles' => ['/api/admin/customer_titles'];
         yield 'addresses' => ['/api/admin/addresses'];
+        yield 'cart_addresses' => ['/api/admin/cart_addresses'];
         yield 'product_sale_elements' => ['/api/admin/product_sale_elements'];
     }
 

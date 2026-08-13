@@ -106,6 +106,8 @@ class Country extends AbstractTranslatableResource
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
         Order::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_ADMIN_READ_SINGLE,
+        Cart::GROUP_FRONT_READ_SINGLE,
         Customer::GROUP_ADMIN_READ_SINGLE,
         Address::GROUP_ADMIN_READ,
         Address::GROUP_FRONT_READ,
