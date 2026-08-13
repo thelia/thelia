@@ -47,7 +47,7 @@ final readonly class DeliveryPostageQuerier
         try {
             $this->dispatcher->dispatch($deliveryPostageEvent, TheliaEvents::MODULE_DELIVERY_GET_POSTAGE);
         } catch (DeliveryException $e) {
-            Tlog::getInstance()->error(\sprintf('Delivery module %s is not available: %s', $module->getName(), $e->getMessage()));
+            Tlog::getInstance()->error(\sprintf('Delivery module %s is not available: %s', $module->getCode(), $e->getMessage()));
 
             return [
                 'postage' => null,

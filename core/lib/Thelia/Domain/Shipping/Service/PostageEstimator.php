@@ -170,7 +170,7 @@ class PostageEstimator
             }
         } catch (DeliveryException) {
             Tlog::getInstance()->error(
-                \sprintf('Delivery module %s is not available', $deliveryModule->getName()),
+                \sprintf('Delivery module %s is not available', $deliveryModule->getCode()),
             );
         }
 
