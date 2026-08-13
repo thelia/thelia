@@ -447,6 +447,7 @@ return [
     'South Sulawesi' => 'Južná Sulawesi',
     'South Sumatra' => 'Južná Sumatra',
     'Southeast Sulawesi' => 'Juhovýchodný Sulawesi',
+    'Sud Sardegna' => 'Sud Sardegna',
     'Tabasco' => 'Tabasco',
     'Tamaulipas' => 'Tamaulipas',
     'Taranto' => 'Taranto',

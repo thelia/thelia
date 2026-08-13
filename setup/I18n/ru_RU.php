@@ -1287,6 +1287,7 @@ return [
     'State of Palestine' => 'Государство Палестина',
     'Store Information - JavaScript' => 'Информация о магазине - JavaScript',
     'Store information configuration' => 'Конфигурация информации магазина',
+    'Sud Sardegna' => 'Южная Сардиния',
     'Sudan' => 'Судан',
     'Suriname' => 'Суринам',
     'Svalbard and Jan Mayen' => 'Шпицберген и Ян-Майен',

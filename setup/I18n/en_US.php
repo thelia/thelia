@@ -1310,6 +1310,7 @@ return [
     'State of Palestine' => 'State of Palestine',
     'Store Information - JavaScript' => 'Store Information - JavaScript',
     'Store information configuration' => 'Store information configuration',
+    'Sud Sardegna' => 'Sud Sardegna',
     'Sudan' => 'Sudan',
     'Suriname' => 'Suriname',
     'Svalbard and Jan Mayen' => 'Svalbard and Jan Mayen',
