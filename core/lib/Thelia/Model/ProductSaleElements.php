@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -25,6 +26,14 @@ class ProductSaleElements extends BaseProductSaleElements
 {
     use PositionManagementTrait;
     use TaxCalculatorResolverTrait;
+
+    /**
+     * The meta data key holding the virtual document association.
+     *
+     * Read it through getVirtualDocuments() rather than directly: the storage is
+     * meant to move to a dedicated table, the accessor is not.
+     */
+    public const VIRTUAL_DOCUMENT_META_KEY = 'virtual';
 
     /**
      * @throws PropelException
@@ -122,6 +131,47 @@ class ProductSaleElements extends BaseProductSaleElements
         }
 
         return new ProductPriceTools((float) $price, (float) $promoPrice);
+    }
+
+    /**
+     * The documents a customer buying this sale element is entitled to download.
+     *
+     * An association pointing at a document that has since been deleted is dropped:
+     * nothing cleans the meta data when a ProductDocument goes away, so a stale id
+     * would otherwise surface as a virtual product with no file behind it.
+     *
+     * @return ObjectCollection<ProductDocument>
+     */
+    public function getVirtualDocuments(): ObjectCollection
+    {
+        $documents = new ObjectCollection();
+        $documents->setModel(ProductDocument::class);
+
+        $document = $this->getVirtualDocument();
+
+        if (null !== $document) {
+            $documents->append($document);
+        }
+
+        return $documents;
+    }
+
+    /**
+     * The single document a sale element currently holds.
+     */
+    public function getVirtualDocument(): ?ProductDocument
+    {
+        $documentId = MetaDataQuery::getVal(
+            self::VIRTUAL_DOCUMENT_META_KEY,
+            MetaData::PSE_KEY,
+            $this->getId()
+        );
+
+        if (!is_numeric($documentId)) {
+            return null;
+        }
+
+        return ProductDocumentQuery::create()->findPk((int) $documentId);
     }
 
     protected function addCriteriaToPositionQuery($query): void
