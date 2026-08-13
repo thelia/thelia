@@ -1,3 +1,84 @@
+# 2.6.2
+- #3717 fix: drop the bundled ResponsiveFilemanager from the Tinymce module
+- #3709 fix: upgrade a module in place instead of deleting and reinstalling it
+- #3703 fix: return the default locale for a customer that carries no language
+- #3685 fix: keep a module activated when its upgrade is refused
+- #3693 fix: finish the ISO 3166-2 clean-up of the state seed
+- #3680 fix: export the shipping tax rule title as text, and the delivery country in its own column
+- #3661 fix: use the ISO 3166-2 codes for Aguascalientes and Ciudad de Mexico
+- #3655 fix: export every order when no date range is given, and let the command supply one
+- #3654 feat: configure multi-domain languages without going through a broken state
+- #3635 fix: run an export without a date range instead of dying on it
+- #3632 test: compare cloned product prices as numbers, not as DECIMAL strings
+- #3629 fix: index the tax factor cache on the order or cart it was computed for
+- #3631 fix: never redirect a rewritten url to itself when the language domain is missing or is the current one
+- #3624 fix: keep the generated Propel models when the kernel cache is cleared
+- #3623 fix: roll back the transaction when a non-Exception error escapes an action
+- #3621 fix: hand back the stored rewritten url, 404 the url of a deleted object, and keep the source image locale when cloning
+- #3614 fix: enforce the declared import formats on the uploaded file
+- #3606 test: make the legacy test suite run again and gate it in CI
+- #3599 feat: let a module declare the position of its hooks
+- #3583 ci: run the unit and functional test suites on the 2.6 branch
+- #3560 fix: keep the hook positions and the ignored hooks when running hook:clean
+- #3569 fix: default missing request parameters in front and back office templates
+- #3570 fix: return a 404 instead of a 500 for an unknown back-office template
+- #3564 fix: pass the validated form to the customer events instead of calling getForm on it
+- #3568 fix: seed Belize as BZ and Libya as 434 in the country list
+- #3558 feat: add the ISO 3166-1 countries missing from the seed
+- #3554 fix: return null instead of rounding a null price in the OrderProduct resource
+- #3547 fix: report a virtual download only when the order has a virtual document
+- #3546 fix: tell the admin to deactivate a module that an order still references
+- #3544 fix: treat the customer discount as the decimal it is
+- #3540 fix: type OrderProduct API virtualDocument as string
+- #3538 chore: let PHPStan scale its worker count to the machine
+- #3551 style: prefix native constants in BaseController
+- refactor: centralize form-based redirect url resolution
+- chore: normalize hidden field rendering in address templates
+- #3524 feat: add ISO 4217 numeric currency code
+- #3530 feat: expose full ISO 3166-2 code as a computed field on states
+- #3527 fix: look up the session on each token access so cart item updates work
+- #3523 fix: refresh cart item prices and special offer status when a cart is restored
+- #3522 fix: consume coupons when the payment is confirmed, not when the order is created
+- #3521 fix: correct swapped Belarus/Palau names and outdated Zaire name in seed countries
+- #3518 fix: prevent fatal TypeError when a hook is attached with the wrong event kind
+- #3515 fix: bind full form data to customer create/update events
+- #3514 fix: explain the virtual product document rules in the back office
+- #3512 fix: restore template definition even if mail rendering fails
+- #3509 fix: store the applied update script version in the thelia_* config variables
+- #3508 fix: keep the template translation domain when a hook is rendered
+- #3503 fix: fall back to same-host check when multi-domain lang.url has no match
+- #3496 fix: render the delivery step again when its form fails validation
+- #3495 fix: keep the back office breadcrumb usable for untitled categories and folders
+- #3469 fix: stop storing Tinymce custom CSS as a file in the module directory
+- #3483 fix: report invalid coupon condition parameters instead of a 500
+- #3482 fix: keep every selected attribute value on sale when a product has several
+- #3481 fix: remove the use_tax_free_amounts variable, which had no effect
+- #3480 fix: remove invalid coupon codes from cart session
+- #3479 feat: add base64 conversion option to local_media smarty block
+- #3478 fix: align module schema charset with core utf8 default
+- #3477 fix: keep current page when redirecting to another language domain
+- #3476 fix: respect edition locale in mail message preview
+- #3475 fix: purge old export cache files on each export
+- #3474 feat: expose more Html2Pdf options through PdfEvent
+- #3472 fix: support multi-word search_mode=any_word in loop search_in
+- #3471 fix: make the update process resume correctly and create the missing CDN variables
+- #3468 fix: use consistent Title wording for the config variable field
+- #3467 refactor: move setupFormErrorContext() to BaseController
+- #3465 fix: correct inverted add/remove event string values for attribute and feature templates
+- #3463 fix: allow null user from remember-me token providers
+- #3462 fix: sync visibility switch state to form before product save
+- #3461 fix: PAYMENT_MODULE empty in order-payment-gateway javascript hook
+- #3460 docs: clarify Node.js/Yarn PATH errors in modern-init.sh
+- #3459 fix: count direct children of the category, not the site total
+- #3458 fix: set og:image to main product image on product page
+- #3464 fix: drop leading backslash on non-native calls in SsrfGuardTest
+- #3455 fix: deny admin session when the admin account was deleted
+- #3453 fix: restore Taiwan country_i18n titles and area link in setup data
+- #3452 fix: validate remote URL in Tinymce filemanager upload to prevent SSRF
+- #3451 fix: cast visible to int in Category/Folder/Content/Brand/Country/State actions
+- #3450 fix: use InputBag::all() for array request params in AdminLogsController
+- #3449 docs: replace outdated docker section with ddev pointer in Readme
+
 # 2.6.1
 - #3446 fix: require lexik/jwt-authentication-bundle ^2.20 in thelia/core
 - fix: allow composer/composer ~2.10.0, all 2.9.x affected by security advisories
