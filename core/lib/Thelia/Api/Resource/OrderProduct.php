@@ -266,7 +266,13 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?int $parent = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_WRITE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE,
+    ])]
     #[Type(type: 'bool', groups: [Order::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
     public bool $virtual;
@@ -275,6 +281,7 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_WRITE,
+        Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $virtualDocument = null;
