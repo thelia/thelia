@@ -32,6 +32,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Service\CartAddressService;
+use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -65,6 +66,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected SecurityContext $securityContext,
         protected ContainerInterface $container,
         protected CartAddressService $cartAddressService,
+        protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
     ) {
     }
 
@@ -638,11 +640,19 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
         );
 
-        if ($deliveryPostageEvent->getPostage()) {
-            return $deliveryPostageEvent->getPostage();
+        $postage = $deliveryPostageEvent->getPostage();
+
+        if (!$postage instanceof OrderPostage) {
+            return new OrderPostage();
         }
 
-        return new OrderPostage();
+        // The delivery module quotes a postage under a single tax rule; whether
+        // that tax follows the goods instead is a shop decision, and the cart is
+        // only known here. Doing it on the way out keeps buildOrderPostage()'s
+        // signature intact, so no delivery module has to change.
+        $this->postageTaxBreakdownCalculator->applyToPostage($postage, $cart, $country, $state);
+
+        return $postage;
     }
 
     protected function dispatchNewCart(EventDispatcherInterface $dispatcher): CartModel

@@ -1513,6 +1513,21 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="order_postage_tax" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column description="the tax rule this share of the postage follows, frozen the way postage_tax_rule_title is" name="title" required="true" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column defaultValue="0.000000" description="the share of the untaxed postage this rule applies to" name="untaxed_amount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" description="the tax due on that share" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="order" name="fk_order_postage_tax_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <index name="idx_order_postage_tax_order_id">
+      <index-column name="order_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\User\UserInterface;
@@ -27,12 +28,16 @@ use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
+use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Country;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Order as ModelOrder;
+use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatusQuery;
 
@@ -49,6 +54,7 @@ readonly class OrderFacade
         private OrderProductFactory $orderProductFactory,
         private OrderRefGeneratorInterface $orderRefGenerator,
         private StockDecrementer $stockDecrementer,
+        private PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
     ) {
     }
 
@@ -99,6 +105,8 @@ readonly class OrderFacade
 
             $placedOrder->setStatusId(OrderStatusQuery::getNotPaidStatus()?->getId());
             $placedOrder->save($connection);
+
+            $this->persistPostageTaxBreakdown($placedOrder, $cart, $taxCountry, $lang, $connection);
 
             $manageStockOnCreation = $placedOrder->isStockManagedOnOrderCreation($dispatcher);
 
@@ -191,6 +199,46 @@ readonly class OrderFacade
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
             throw $throwable;
+        }
+    }
+
+    /**
+     * Freezes how the postage tax of the order splits between the tax rules its
+     * goods follow.
+     *
+     * Nothing is written when the shop applies a single rule to the postage,
+     * which is the default: an order with no line reads as the one rate named
+     * in `postage_tax_rule_title`, exactly like every order placed so far.
+     *
+     * @throws PropelException
+     */
+    private function persistPostageTaxBreakdown(
+        ModelOrder $placedOrder,
+        CartModel $cart,
+        Country $taxCountry,
+        LangModel $lang,
+        ConnectionInterface $connection,
+    ): void {
+        $postageTax = (float) $placedOrder->getPostageTax();
+        $untaxedPostage = (float) $placedOrder->getPostage() - $postageTax;
+
+        $lines = $this->postageTaxBreakdownCalculator->splitForOrder(
+            $cart,
+            $taxCountry,
+            OrderAddressQuery::create()->findPk($placedOrder->getDeliveryOrderAddressId())?->getState(),
+            $untaxedPostage,
+            $postageTax,
+            $lang->getLocale(),
+        );
+
+        foreach ($lines as $line) {
+            (new OrderPostageTax())
+                ->setOrderId($placedOrder->getId())
+                ->setTitle($line->title)
+                ->setDescription($line->description)
+                ->setUntaxedAmount((string) $line->untaxedAmount)
+                ->setAmount((string) $line->amount)
+                ->save($connection);
         }
     }
 

@@ -1799,6 +1799,31 @@ CREATE TABLE `order_product_tax`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_postage_tax
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_postage_tax`;
+
+CREATE TABLE `order_postage_tax`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `title` VARCHAR(255) NOT NULL COMMENT 'the tax rule this share of the postage follows, frozen the way postage_tax_rule_title is',
+    `description` LONGTEXT,
+    `untaxed_amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the share of the untaxed postage this rule applies to',
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the tax due on that share',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_postage_tax_order_id` (`order_id`),
+    CONSTRAINT `fk_order_postage_tax_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- newsletter
 -- ---------------------------------------------------------------------
 

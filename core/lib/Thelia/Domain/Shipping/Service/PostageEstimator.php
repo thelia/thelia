@@ -41,6 +41,7 @@ class PostageEstimator
         protected ContainerInterface $container,
         protected Session $session,
         protected CouponFreeShippingEvaluator $couponFreeShippingEvaluator,
+        protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
     ) {
     }
 
@@ -160,6 +161,10 @@ class PostageEstimator
                 $postage = $deliveryPostageEvent->getPostage();
 
                 if ($postage instanceof OrderPostage) {
+                    // Same post-processing as the checkout, so an estimate and
+                    // the cart it turns into never announce two different taxes.
+                    $this->postageTaxBreakdownCalculator->applyToPostage($postage, $cart, $country, $state);
+
                     return $postage;
                 }
             }

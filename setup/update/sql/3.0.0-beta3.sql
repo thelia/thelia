@@ -227,4 +227,40 @@ WHERE `message`.`name` = 'customer_send_code'
   AND `message_i18n`.`locale` = 'fr_FR'
   AND (`message_i18n`.`subject` IS NULL OR `message_i18n`.`subject` = '');
 
+-- ---------------------------------------------------------------------
+-- order_postage_tax (#3701)
+--
+-- `order.postage_tax` is a single blended figure, and `postage_tax_rule_title`
+-- names one rule. A cart holding goods at two rates pays one postage, and
+-- nothing recorded how its tax split. This table holds one row per tax rule
+-- the postage follows, with the share of the untaxed postage it applies to
+-- and the tax due on that share.
+--
+-- No foreign key to `tax_rule`: the title is frozen on the order, the same
+-- snapshot discipline `order_product_tax` and `postage_tax_rule_title` follow.
+--
+-- Existing orders need no backfill. An order with no row reads as what it is,
+-- one rate named in `postage_tax_rule_title`, which is also what every order
+-- placed under the default `single_rule` strategy keeps looking like.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `order_postage_tax`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `title` VARCHAR(255) NOT NULL COMMENT 'the tax rule this share of the postage follows, frozen the way postage_tax_rule_title is',
+    `description` LONGTEXT,
+    `untaxed_amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the share of the untaxed postage this rule applies to',
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the tax due on that share',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_postage_tax_order_id` (`order_id`),
+    CONSTRAINT `fk_order_postage_tax_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;
