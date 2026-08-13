@@ -163,9 +163,11 @@ class ModuleManagement
                 $instance->update($currentVersion, $version, $con);
             }
 
-            if ('none' !== $action) {
-                $instance->registerHooks();
-            }
+            // Also when the version did not change: reinstalling a module whose files were
+            // fixed without a version bump must still register the hooks it now declares.
+            // createOrUpdateHook() is idempotent, and the positions the administrator set
+            // live in module_hook, which this does not touch.
+            $instance->registerHooks();
 
             $con->commit();
         } catch (\Throwable $exception) {
