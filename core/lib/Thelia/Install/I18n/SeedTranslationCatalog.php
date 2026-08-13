@@ -63,7 +63,7 @@ class SeedTranslationCatalog
      * The installer stores translations, not keys, so a row read back from the
      * database only gives the wording of its own locale. `en_US.php` is almost
      * an identity map, but not entirely: `Taïwan` is seeded as `Taiwan`, and
-     * `Confirm your %store account` as `Confirm your {config key="store_name"}
+     * `Confirm your %store account` as `Confirm your {{ config("store_name") }}
      * account`. Going through the reverse index recovers the original key.
      */
     public function getKeyForTranslation(string $translation, string $locale): ?string

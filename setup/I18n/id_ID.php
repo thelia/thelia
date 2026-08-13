@@ -18,7 +18,7 @@ return [
     '"Remember me" cookie name for administration users' => '"Ingatkan saya" nama kuki untuk administrator',
     '"Remember me" cookie name for customer users' => '"Ingatkan saya" nama kuki untuk pelanggan',
     '72h delivery' => 'Pengiriman 72 jam',
-    'A {config key="store_name"} account has been created for you' => 'Sebuah akun {config key="store_name"} telah dibuat',
+    'A {{ config("store_name") }} account has been created for you' => 'Sebuah akun {{ config("store_name") }} telah dibuat',
     'API Configuration' => 'Konfigurasi API',
     'Aceh' => 'Aceh',
     'Address' => 'Alamat',

@@ -3769,12 +3769,12 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
-    (1, '{$locale}', {intl l='Order confirmation sent to the customer' locale=$locale}, {intl l='Your order {$order_ref} at {config key="store_name"}' locale=$locale}, NULL, NULL),
-    (2, '{$locale}', {intl l='Your new password' locale=$locale}, {intl l='Your new password for {config key="store_name"}' locale=$locale}, NULL, NULL),
-    (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {$order_ref} placed on {config key="store_name"}' locale=$locale}, NULL, NULL),
-    (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
-    (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
-    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL),
+    (1, '{$locale}', {intl l='Order confirmation sent to the customer' locale=$locale}, {intl l='Your order {{ order_ref }} at {{ config("store_name") }}' locale=$locale}, NULL, NULL),
+    (2, '{$locale}', {intl l='Your new password' locale=$locale}, {intl l='Your new password for {{ config("store_name") }}' locale=$locale}, NULL, NULL),
+    (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {{ order_ref }} placed on {{ config("store_name") }}' locale=$locale}, NULL, NULL),
+    (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {{ config("store_name") }} has been changed.' locale=$locale}, NULL, NULL),
+    (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {{ config("store_name") }} account has been created for you' locale=$locale}, NULL, NULL),
+    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' locale=$locale}, NULL, NULL),
     (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' locale=$locale}, NULL, NULL),
     (8, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
