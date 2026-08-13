@@ -22,6 +22,7 @@ use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\Brand;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\Category;
 use Thelia\Model\Content;
 use Thelia\Model\Country;
@@ -415,6 +416,35 @@ final class FixtureFactory
         $address->save($this->connection);
 
         return $address;
+    }
+
+    /**
+     * Creates the cart's own copy of an address. Pass the customer address it
+     * was copied from, or nothing for an address typed in at checkout and
+     * never saved to the account — which is a row with no `address_id`.
+     */
+    public function cartAddress(
+        ?Address $address = null,
+        ?Country $country = null,
+        ?CustomerTitle $title = null,
+        array $overrides = [],
+    ): CartAddress {
+        $n = $this->next();
+
+        $cartAddress = new CartAddress();
+        $cartAddress->setAddressId($address?->getId());
+        $cartAddress->setCustomerTitleId(($title ?? $this->customerTitle())->getId());
+        $cartAddress->setFirstname($overrides['firstname'] ?? $address?->getFirstname() ?? 'John');
+        $cartAddress->setLastname($overrides['lastname'] ?? $address?->getLastname() ?? 'Doe');
+        $cartAddress->setAddress1($overrides['address1'] ?? $address?->getAddress1() ?? $n.' Main Street');
+        $cartAddress->setAddress2($overrides['address2'] ?? '');
+        $cartAddress->setAddress3($overrides['address3'] ?? '');
+        $cartAddress->setZipcode($overrides['zipcode'] ?? $address?->getZipcode() ?? '75001');
+        $cartAddress->setCity($overrides['city'] ?? $address?->getCity() ?? 'Paris');
+        $cartAddress->setCountryId(($country ?? $this->country())->getId());
+        $cartAddress->save($this->connection);
+
+        return $cartAddress;
     }
 
     public function coupon(array $overrides = []): Coupon

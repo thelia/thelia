@@ -100,13 +100,13 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?Customer $customer = null;
 
-    #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressDeliveryId')]
+    #[Relation(targetResource: CartAddress::class, relationAlias: 'CartAddressRelatedByAddressDeliveryId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressDelivery = null;
+    public ?CartAddress $addressDelivery = null;
 
-    #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressInvoiceId')]
+    #[Relation(targetResource: CartAddress::class, relationAlias: 'CartAddressRelatedByAddressInvoiceId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
-    public ?Address $addressInvoice = null;
+    public ?CartAddress $addressInvoice = null;
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -179,24 +179,24 @@ class Cart implements PropelResourceInterface
         return $this;
     }
 
-    public function getAddressDelivery(): ?Address
+    public function getAddressDelivery(): ?CartAddress
     {
         return $this->addressDelivery;
     }
 
-    public function setAddressDelivery(?Address $addressDelivery): self
+    public function setAddressDelivery(?CartAddress $addressDelivery): self
     {
         $this->addressDelivery = $addressDelivery;
 
         return $this;
     }
 
-    public function getAddressInvoice(): ?Address
+    public function getAddressInvoice(): ?CartAddress
     {
         return $this->addressInvoice;
     }
 
-    public function setAddressInvoice(?Address $addressInvoice): self
+    public function setAddressInvoice(?CartAddress $addressInvoice): self
     {
         $this->addressInvoice = $addressInvoice;
 
