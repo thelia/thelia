@@ -582,6 +582,7 @@ return [
     'The method %method% doesn\'t exist in classname %classname%' => 'The method %method% doesn\'t exist in classname %classname%',
     'The method name that will handle the hook event.' => 'The method name that will handle the hook event.',
     'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
+    'The module in the archive is named "%new%" but the namespace "%namespace%" is already installed as "%old%". Uninstall "%old%" before installing "%new%".' => 'The module in the archive is named "%new%" but the namespace "%namespace%" is already installed as "%old%". Uninstall "%old%" before installing "%new%".',
     'The module %module has been installed successfully.' => 'The module %module has been installed successfully.',
     'The module %name is already installed in the same or greater version.' => 'The module %name is already installed in the same or greater version.',
     'The module %name requires Thelia %version or newer' => 'The module %name requires Thelia %version or newer',

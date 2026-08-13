@@ -579,6 +579,7 @@ return [
     'The message has been successfully sent to %recipient.' => 'Le message a bien été envoyé à %recipient. ',
     'The method name that will handle the hook event.' => 'Le nom de la méthode qui va traiter l\'évènement du point d\'accroche.',
     'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Le module "%name%" est utilisé par au moins une commande, et ne peut être supprimé.',
+    'The module in the archive is named "%new%" but the namespace "%namespace%" is already installed as "%old%". Uninstall "%old%" before installing "%new%".' => 'Le module de l\'archive s\'appelle "%new%" mais l\'espace de noms "%namespace%" est déjà installé sous le nom "%old%". Désinstallez "%old%" avant d\'installer "%new%".',
     'The module %module has been installed successfully.' => 'Le module %module a été installé avec succès.',
     'The module %name is already installed in the same or greater version.' => 'Le module %name est déja installé dans la même version, ou dans une version plus récente.',
     'The module %name requires Thelia %version or newer' => 'Le module %name nécessite Thelia %version ou plus récent',
