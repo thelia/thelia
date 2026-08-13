@@ -532,7 +532,6 @@ return [
     'The mailing template in text-only format.' => 'Der Mailing Template im Text Format ',
     "The method %method% doesn't exist in classname %classname%" => 'Die Methode %method% existiert in %classname% nicht',
     'The method name that will handle the hook event.' => 'Der Methodenname, die den Hook-Ereignis behandelt.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Das Modul "%name%" ist in mindestens einer Bestellung benutzt und kann nicht gelöscht werden.',
     'The module %module has been installed successfully.' => 'Das Modul wurde erfolgreich installiert.',
     'The module %name is already installed in the same or greater version.' => 'Das Modul %name ist schon in der selbe oder neuere Version installiert',
     'The module %name requires Thelia %version or newer' => 'Das Modul %name benötigt Thelia %version oder neuere',

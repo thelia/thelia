@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -26,6 +27,7 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\HookQuery;
 use Thelia\Model\IgnoredModuleHook;
 use Thelia\Model\IgnoredModuleHookQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleConfig;
 use Thelia\Model\ModuleConfigQuery;
@@ -287,6 +289,55 @@ final class ModuleActionTest extends ActionIntegrationTestCase
             ModuleQuery::create()->findPk($module->getId())->getActivate(),
             'An upgraded payment module must be left activated, not silently switched off.',
         );
+    }
+
+    /**
+     * A module an order references could not be deleted at all: the order table points at it
+     * through two foreign keys, and a guard turned the constraint violation into an error
+     * message. The order now keeps the name the module carried and lets the reference go, so
+     * the shop can clear out a payment or delivery method it stopped using.
+     */
+    public function testDeletingAModuleUsedByAnOrderFreezesItsNameOnTheOrder(): void
+    {
+        $module = $this->installSampleModule('1.0.0');
+        $moduleId = $module->getId();
+
+        $order = $this->factory->order(null, [
+            'paymentModuleCode' => self::SAMPLE_CODE,
+            'deliveryModuleCode' => self::SAMPLE_CODE,
+        ]);
+        $orderId = $order->getId();
+
+        // The name to keep is the one the module carries in the language of the order.
+        $locale = LangQuery::create()->findPk($order->getLangId())->getLocale();
+        $module->setLocale($locale)->setTitle('Sample payment method')->save();
+
+        $this->dispatch(new ModuleDeleteEvent($moduleId), TheliaEvents::MODULE_DELETE);
+
+        self::assertNull(
+            ModuleQuery::create()->findPk($moduleId),
+            'A module referenced by an order must be deletable.',
+        );
+
+        $reloaded = OrderQuery::create()->findPk($orderId);
+        self::assertNotNull($reloaded, 'Deleting a module must not take the orders that used it away.');
+        self::assertNull($reloaded->getPaymentModuleId());
+        self::assertNull($reloaded->getDeliveryModuleId());
+        self::assertSame(
+            'Sample payment method',
+            $reloaded->getPaymentModuleTitle(),
+            'The order must keep the name of the payment module it used.',
+        );
+        self::assertSame(
+            'Sample payment method',
+            $reloaded->getDeliveryModuleTitle(),
+            'The order must keep the name of the delivery module it used.',
+        );
+
+        // Installing a module reinitializes Propel and drops the transaction this test case
+        // rolls back. The order no longer names a module, so the cleanup in tearDown cannot
+        // find it: take it away here.
+        OrderQuery::create()->filterById($orderId)->delete();
     }
 
     public function testUpgradeCallsUpdateAndNotInstall(): void
