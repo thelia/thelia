@@ -97,11 +97,11 @@ final class SeedTranslationCatalogTest extends TestCase
         self::assertSame('Taïwan', $catalog->getKeyForTranslation('Taiwan', 'en_US'));
         self::assertSame('Taïwan', $catalog->translate('Taïwan', 'fr_FR'));
 
-        $seededSubject = 'Confirm your {config key="store_name"} account';
+        $seededSubject = 'Confirm your {{ config("store_name") }} account';
 
         self::assertNull($catalog->translate($seededSubject, 'fr_FR'));
         self::assertSame(
-            'Confirmez la création de votre compte {config key="store_name"}',
+            'Confirmez la création de votre compte {{ config("store_name") }}',
             $catalog->translate(
                 (string) $catalog->getKeyForTranslation($seededSubject, 'en_US'),
                 'fr_FR',

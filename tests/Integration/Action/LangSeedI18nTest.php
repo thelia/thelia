@@ -93,15 +93,18 @@ final class LangSeedI18nTest extends ActionIntegrationTestCase
     {
         $this->createLang();
 
-        // The mail subjects are seeded with placeholders the translation files
-        // do not carry. The row is still written for its translated columns,
-        // and the subject keeps the wording of the source locale rather than
-        // sending a mail with an empty subject.
-        $addedMessage = MessageI18nQuery::create()->findPk([2, self::ADDED_LOCALE]);
-        $seededMessage = MessageI18nQuery::create()->findPk([2, self::SEEDED_LOCALE]);
+        // Only the subject of the order confirmation is translated in Polish.
+        // The row is still written, and the title keeps the wording of the
+        // source locale rather than leaving the mail without one.
+        $addedMessage = MessageI18nQuery::create()->findPk([1, self::ADDED_LOCALE]);
+        $seededMessage = MessageI18nQuery::create()->findPk([1, self::SEEDED_LOCALE]);
 
-        self::assertSame('Twoje nowe hasło', $addedMessage?->getTitle());
-        self::assertSame($seededMessage?->getSubject(), $addedMessage?->getSubject());
+        self::assertSame(
+            'Twoje zamówienie {{ order_ref }} w {{ config("store_name") }}',
+            $addedMessage?->getSubject(),
+            'A seeded mail subject must reach the added locale with the placeholders the mailer renders.',
+        );
+        self::assertSame($seededMessage?->getTitle(), $addedMessage?->getTitle());
     }
 
     public function testSeedingAgainWritesNothingMore(): void

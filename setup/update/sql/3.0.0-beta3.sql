@@ -264,3 +264,10 @@ CREATE TABLE IF NOT EXISTS `order_postage_tax`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Some mail subjects were seeded with a `%store` placeholder nothing ever
+-- replaced, so the shop name never reached the mail. Bring them to the Twig
+-- call the other locales already use. REPLACE leaves the other rows alone.
+UPDATE `message_i18n`
+SET `subject` = REPLACE(`subject`, '%store', '{{ config("store_name") }}')
+WHERE `subject` IS NOT NULL;
