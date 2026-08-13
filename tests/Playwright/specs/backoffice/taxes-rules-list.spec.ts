@@ -87,4 +87,34 @@ test.describe('Back-office — Taxes rules list (BO Twig)', () => {
     await listPage.postageTaxRuleSave.click();
     await listPage.expectLoaded();
   });
+
+  test('the postage tax breakdown offers the three strategies, single rule by default', async ({ page }) => {
+    const listPage = new TaxesRulesPage(page);
+    await listPage.goto();
+
+    await expect(listPage.postageTaxStrategySection).toBeVisible();
+    await expect(listPage.postageTaxStrategyForm).toBeVisible();
+
+    await expect(listPage.postageTaxStrategyOption('single_rule')).toBeChecked();
+    await expect(listPage.postageTaxStrategyOption('pro_rata')).not.toBeChecked();
+    await expect(listPage.postageTaxStrategyOption('highest_rate')).not.toBeChecked();
+  });
+
+  test('a postage tax strategy survives its save', async ({ page }) => {
+    const listPage = new TaxesRulesPage(page);
+    await listPage.goto();
+
+    await listPage.postageTaxStrategyOption('pro_rata').check();
+    await listPage.postageTaxStrategySave.click();
+    await listPage.expectLoaded();
+
+    await expect(listPage.postageTaxStrategyOption('pro_rata')).toBeChecked();
+
+    // Back to the default, so the run leaves the shop on its original VAT behaviour.
+    await listPage.postageTaxStrategyOption('single_rule').check();
+    await listPage.postageTaxStrategySave.click();
+    await listPage.expectLoaded();
+
+    await expect(listPage.postageTaxStrategyOption('single_rule')).toBeChecked();
+  });
 });
