@@ -15,7 +15,6 @@ return [
     'Category' => 'Категория',
     'Conclusion' => 'Заключение',
     'Content' => 'Контент',
-    'File manager' => 'Менеджер файлов',
     'Folder' => 'Папка',
     'List of the text area where the wysiwyg editor will be used' => 'Список областей вводе где будет использоваться WYSIWYG редактор',
     'None' => 'Нет',

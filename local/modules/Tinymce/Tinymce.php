@@ -25,59 +25,40 @@ class Tinymce extends BaseModule
 
     private $jsPath;
     private $webJsPath;
-    private $webMediaPath;
-    private $webMediaEnvPath;
 
     public function __construct()
     {
         $this->jsPath = __DIR__.DS.'Resources'.DS.'js'.DS.'tinymce';
 
         $this->webJsPath = THELIA_WEB_DIR.'tinymce';
-        $this->webMediaPath = THELIA_WEB_DIR.'media';
     }
 
     public function postActivation(ConnectionInterface $con = null): void
     {
         $fileSystem = new Filesystem();
 
-        // Check for environment
-        if ($env = $this->getContainer()->getParameter('kernel.environment')) {
-            // Check for backward compatibility
-            if ($env !== 'prod' && $env !== 'dev') {
-                // Remove separtion between dev and prod in particular environment
-                $env = str_replace('_dev', '', $env);
-                $this->webMediaEnvPath = $this->webMediaPath.DS.$env;
-            }
-        }
-
-        // Create symbolic links or hard copy in the web directory
-        // (according to \Thelia\Action\Document::CONFIG_DELIVERY_MODE),
-        // to make the TinyMCE code available.
         if (false === $fileSystem->exists($this->webJsPath)) {
-            if (ConfigQuery::read(Document::CONFIG_DELIVERY_MODE) === 'symlink') {
-                $fileSystem->symlink($this->jsPath, $this->webJsPath);
-            } else {
-                $fileSystem->mirror($this->jsPath, $this->webJsPath);
-            }
-        }
-
-        // Create the media directory in the web root , if required
-        if (null !== $this->webMediaEnvPath) {
-            if (false === $fileSystem->exists($this->webMediaEnvPath)) {
-                $fileSystem->mkdir($this->webMediaEnvPath.DS.'upload');
-                $fileSystem->mkdir($this->webMediaEnvPath.DS.'thumbs');
-            }
-        } else {
-            if (false === $fileSystem->exists($this->webMediaPath)) {
-                $fileSystem->mkdir($this->webMediaPath.DS.'upload');
-                $fileSystem->mkdir($this->webMediaPath.DS.'thumbs');
-            }
+            $this->publishTinymce($fileSystem);
         }
 
         static::setConfigValue(
             'available_text_areas',
             '#timymce_configuration-id-test_zone, .wysiwyg'
         );
+    }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    {
+        $fileSystem = new Filesystem();
+
+        // The bundled file manager was removed. When the code was published as a hard copy, an
+        // older version left its PHP entry points in web/tinymce/filemanager, so the published
+        // directory has to be rebuilt from the module.
+        if ($fileSystem->exists($this->webJsPath)) {
+            $fileSystem->remove($this->webJsPath);
+
+            $this->publishTinymce($fileSystem);
+        }
     }
 
     public function postDeactivation(ConnectionInterface $con = null): void
@@ -87,13 +68,18 @@ class Tinymce extends BaseModule
         $fileSystem->remove($this->webJsPath);
     }
 
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
+    /**
+     * Make the TinyMCE code available in the web directory, as a symbolic link or a hard copy
+     * according to \Thelia\Action\Document::CONFIG_DELIVERY_MODE.
+     */
+    private function publishTinymce(Filesystem $fileSystem): void
     {
-        // If we have to delete module data, remove the media directory.
-        if ($deleteModuleData) {
-            $fileSystem = new Filesystem();
+        if (ConfigQuery::read(Document::CONFIG_DELIVERY_MODE) === 'symlink') {
+            $fileSystem->symlink($this->jsPath, $this->webJsPath);
 
-            $fileSystem->remove($this->webMediaPath);
+            return;
         }
+
+        $fileSystem->mirror($this->jsPath, $this->webJsPath);
     }
 }
