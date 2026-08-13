@@ -86,6 +86,37 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         self::assertSame(0, $reloaded->getEnable());
     }
 
+    public function testAnonymizeStampsTheAccountWithTheErasureDate(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        self::assertNull($customer->getAnonymizedAt(), 'An account carrying an identity must not be marked.');
+
+        $this->anonymize($customer);
+
+        $reloaded = CustomerQuery::create()->findPk($customer->getId());
+        self::assertNotNull($reloaded);
+        self::assertNotNull(
+            $reloaded->getAnonymizedAt(),
+            'Nothing else tells an anonymous account from an account that simply has no name yet.',
+        );
+    }
+
+    /**
+     * The marker records when the data actually went away, so replaying the
+     * operation must not push the date forward.
+     */
+    public function testAnonymizingTwiceKeepsTheFirstErasureDate(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $customer->setAnonymizedAt(new \DateTime('2020-01-02 03:04:05'))->save($this->getPropelConnection());
+
+        $this->anonymize($customer);
+
+        $reloaded = CustomerQuery::create()->findPk($customer->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('2020-01-02 03:04:05', $reloaded->getAnonymizedAt('Y-m-d H:i:s'));
+    }
+
     public function testAnonymizeLeavesNoIdentifyingDataBehind(): void
     {
         $customer = $this->createCustomerWithHistory();

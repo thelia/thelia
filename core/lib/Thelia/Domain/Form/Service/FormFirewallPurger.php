@@ -33,9 +33,21 @@ class FormFirewallPurger
      */
     public function purgeExpiredEntries(int $days): int
     {
+        return $this->expiredEntries($days)->delete();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function countExpiredEntries(int $days): int
+    {
+        return $this->expiredEntries($days)->count();
+    }
+
+    private function expiredEntries(int $days): FormFirewallQuery
+    {
         return FormFirewallQuery::create()
-            ->filterByUpdatedAt($this->getThresholdDate($days), Criteria::LESS_THAN)
-            ->delete();
+            ->filterByUpdatedAt($this->getThresholdDate($days), Criteria::LESS_THAN);
     }
 
     /**

@@ -200,6 +200,14 @@ final readonly class CustomerAnonymizer
             ->setConfirmationTokenExpiresAt(null)
             ->setEnable(0);
 
+        // The marker is what tells an anonymous account from an account that
+        // simply has no name yet. It records the first erasure: replaying the
+        // operation must not move the date, or the retention job would lose
+        // track of when the data actually went away.
+        if (null === $customer->getAnonymizedAt()) {
+            $customer->setAnonymizedAt(new \DateTime());
+        }
+
         $customer->erasePassword();
         $customer->save($connection);
 
