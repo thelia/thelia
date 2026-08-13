@@ -340,7 +340,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             // delete
             $modulePath = $oldModule->getAbsoluteBaseDir();
 
-            $deleteEvent = new ModuleDeleteEvent($oldModule);
+            $deleteEvent = new ModuleDeleteEvent($oldModule->getId());
 
             try {
                 $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
