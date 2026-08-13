@@ -75,8 +75,8 @@ final readonly class CustomerPersonalDataExporter
      */
     private function exportAccount(Customer $customer): array
     {
-        // Customer::getLocale() fatals when the account carries no language,
-        // which the schema allows.
+        // Deliberately not Customer::getLocale(): the export reports the language the
+        // account actually carries, not the shop default it falls back to.
         $locale = $customer->getLangModel()?->getLocale();
 
         return [

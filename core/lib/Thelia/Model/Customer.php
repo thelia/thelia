@@ -175,15 +175,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     public function getCustomerLang(): Lang
     {
-        $lang = $this->getLangModel();
-
-        if (null === $lang) {
-            $lang = (new LangQuery())
-                ->filterByByDefault(1)
-                ->findOne();
-        }
-
-        return $lang;
+        return $this->getLangModel() ?? Lang::getDefaultLanguage();
     }
 
     /**
@@ -352,7 +344,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     public function getLocale(): string
     {
-        return $this->getLangModel()->getLocale();
+        return $this->getCustomerLang()->getLocale();
     }
 
     public function hasOrder()
