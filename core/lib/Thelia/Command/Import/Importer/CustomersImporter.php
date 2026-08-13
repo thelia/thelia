@@ -18,6 +18,7 @@ use Thelia\Command\Import\AbstractDemoImporter;
 use Thelia\Command\Import\DemoImportContext;
 use Thelia\Model\Address;
 use Thelia\Model\Customer;
+use Thelia\Model\LangQuery;
 
 /**
  * Creates demo customers and their addresses directly through Propel models.
@@ -42,6 +43,11 @@ final class CustomersImporter extends AbstractDemoImporter
 
     public function import(DemoImportContext $context): void
     {
+        $defaultLangId = LangQuery::create()
+            ->filterByByDefault(1)
+            ->findOne($context->connection)
+            ?->getId();
+
         $isFirst = true;
         foreach ($this->readCsv($context->dataDir.'customers.csv') as $data) {
             $titleId = (int) $data[0];
@@ -52,6 +58,7 @@ final class CustomersImporter extends AbstractDemoImporter
             $customer->setLastname($data[2]);
             $customer->setEmail($data[3]);
             $customer->setPassword(self::DEMO_PASSWORD);
+            $customer->setLangId($defaultLangId);
             $customer->save($context->connection);
 
             (new Address())

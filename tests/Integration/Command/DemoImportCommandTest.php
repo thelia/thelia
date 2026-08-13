@@ -43,6 +43,11 @@ final class DemoImportCommandTest extends IntegrationTestCase
         );
 
         self::assertGreaterThan(1, CustomerQuery::create()->count(), 'multiple customers');
+        self::assertSame(
+            0,
+            CustomerQuery::create()->filterByLangId(null, Criteria::ISNULL)->count(),
+            'every demo customer carries a language',
+        );
         self::assertGreaterThan(0, NewsletterQuery::create()->count(), 'newsletter subscribers');
         self::assertGreaterThan(0, CouponQuery::create()->count(), 'coupons');
 
