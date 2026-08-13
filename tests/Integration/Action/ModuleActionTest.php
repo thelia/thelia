@@ -36,6 +36,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ProfileModule;
 use Thelia\Model\ProfileModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\ModuleManagement;
 use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -365,6 +366,28 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         self::assertNotNull(
             HookQuery::create()->findOneByCode(self::DECLARED_HOOK_CODE),
             'Reinstalling an archive of the same version must still register the hooks the module declares.',
+        );
+    }
+
+    /**
+     * The back-office module list refreshes every module on every visit. Registering the hooks
+     * there dispatches a hook create or update event, and those clear the kernel cache: a page
+     * of the back office would wipe the cache each time it is opened.
+     */
+    public function testRefreshingAModuleDoesNotRegisterItsHooksWhenNothingChanged(): void
+    {
+        $this->installSampleModule('1.0.0');
+
+        HookQuery::create()->filterByCode(self::DECLARED_HOOK_CODE)->delete();
+
+        $this->getService(ModuleManagement::class)->updateModule(
+            new \SplFileInfo(THELIA_MODULE_DIR.self::SAMPLE_CODE.DS.'Config'.DS.'module.xml'),
+            static::getContainer(),
+        );
+
+        self::assertNull(
+            HookQuery::create()->findOneByCode(self::DECLARED_HOOK_CODE),
+            'Refreshing an unchanged module must not touch its hooks.',
         );
     }
 
