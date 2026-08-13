@@ -100,7 +100,7 @@ class ModuleManagement
      * @throws \Exception
      * @throws PropelException
      */
-    public function updateModule(\SplFileInfo $file, ContainerInterface $container): Module
+    public function updateModule(\SplFileInfo $file, ContainerInterface $container, bool $forceHookRegistration = false): Module
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
@@ -163,11 +163,13 @@ class ModuleManagement
                 $instance->update($currentVersion, $version, $con);
             }
 
-            // Also when the version did not change: reinstalling a module whose files were
-            // fixed without a version bump must still register the hooks it now declares.
+            // $forceHookRegistration covers the module whose files were just replaced without a
+            // version bump: the hooks it now declares still have to be registered.
             // createOrUpdateHook() is idempotent, and the positions the administrator set
             // live in module_hook, which this does not touch.
-            $instance->registerHooks();
+            if ('none' !== $action || $forceHookRegistration) {
+                $instance->registerHooks();
+            }
 
             $con->commit();
         } catch (\Throwable $exception) {

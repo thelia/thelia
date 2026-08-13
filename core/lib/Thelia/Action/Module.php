@@ -400,7 +400,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $eventDispatcher = $this->container->get('event_dispatcher');
             $moduleManagement = new ModuleManagement($this->container, $eventDispatcher);
             $file = new \SplFileInfo($moduleDescriptorFile);
-            $module = $moduleManagement->updateModule($file, $this->container);
+            $module = $moduleManagement->updateModule($file, $this->container, true);
         } catch (\Throwable $throwable) {
             // The module was deactivated a few lines above so it could be replaced, and the
             // replacement is not going to happen. Put the shop back where it was: a payment
