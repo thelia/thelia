@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -34,9 +35,10 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Service\HandlerCleaner;
 use Thelia\Domain\Module\Exception\ModuleException;
 use Thelia\Log\Tlog;
-use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 use Thelia\Module\Validator\ModuleValidator;
@@ -261,14 +263,9 @@ class Module extends BaseAction implements EventSubscriberInterface
                 throw new \LogicException(Translator::getInstance()->trans('Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?', ['%name%' => $module->getCode()]));
             }
 
-            // If the module is referenced by an order, display a meaningful error
-            // instead of 'delete cannot delete' caused by a constraint violation.
-            // FIXME: we hav to find a way to delete modules used by order.
-            if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
-                || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
-            ) {
-                throw new \LogicException(Translator::getInstance()->trans('The module "%name%" is currently in use by at least one order, and can\'t be deleted.', ['%name%' => $module->getCode()]).' '.Translator::getInstance()->trans('To stop offering it to your customers, deactivate the module instead of deleting it.'));
-            }
+            // Orders reference the module through a foreign key that forbids the
+            // deletion, so the name they display has to be kept before the row goes.
+            $this->freezeModuleOnOrders($module, $con);
 
             try {
                 if (BaseModule::IS_MANDATORY === $module->getMandatory() && false === $event->getAssumeDelete()) {
@@ -329,6 +326,31 @@ class Module extends BaseAction implements EventSubscriberInterface
         // failure there no longer reaches a rollback of a closed transaction.
         $event->setModule($module);
         $this->cacheClear($dispatcher);
+    }
+
+    /**
+     * An order names its payment and delivery methods through module ids, so an
+     * invoice line or an export column is resolved from the module row at render
+     * time. Write the name the module carries on the orders that used it, in the
+     * language of each order, then release the two references so the row can go.
+     */
+    private function freezeModuleOnOrders(\Thelia\Model\Module $module, ConnectionInterface $con): void
+    {
+        $moduleId = $module->getId();
+
+        foreach (LangQuery::create()->find($con) as $lang) {
+            $title = $module->setLocale($lang->getLocale())->getTitle() ?: $module->getCode();
+
+            OrderQuery::create()
+                ->filterByLangId($lang->getId())
+                ->filterByPaymentModuleId($moduleId)
+                ->update(['PaymentModuleTitle' => $title, 'PaymentModuleId' => null], $con);
+
+            OrderQuery::create()
+                ->filterByLangId($lang->getId())
+                ->filterByDeliveryModuleId($moduleId)
+                ->update(['DeliveryModuleTitle' => $title, 'DeliveryModuleId' => null], $con);
+        }
     }
 
     public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

@@ -111,9 +111,9 @@ class OrderExport extends JsonFileAbstractExport
                             ), 2
                         )
                     ) as order_total_taxed_price,
-                    delivery_module.title as "delivery_module_title",
+                    COALESCE(delivery_module.title, `order`.delivery_module_title) as "delivery_module_title",
                     `order`.delivery_ref as "order_delivery_ref",
-                    payment_module.title as "payment_module_title",
+                    COALESCE(payment_module.title, `order`.payment_module_title) as "payment_module_title",
                     `order`.invoice_ref as "order_invoice_ref",
                     order_status_i18n.title as "order_status_i18n_title",
                     delivery_address_customer_title.long as "delivery_address_customer_title_long",

@@ -554,7 +554,6 @@ return [
     'The mailing template in text-only format.' => 'Шаблон рассылки только в текстовом формате.',
     "The method %method% doesn't exist in classname %classname%" => 'Метод %method% не существет в классе %classname%',
     'The method name that will handle the hook event.' => 'Имя метода обрабатывающего событие этого хука.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Модуль "%name%" сейчас используется по крайне мере в одном заказе и не может быть удален.',
     'The module %module has been installed successfully.' => 'Модуль %module был успешно установлен.',
     'The module %name is already installed in the same or greater version.' => 'Модуль %name уже установлен с такой же или более новой версией.',
     'The module %name requires Thelia %version or newer' => 'Модуль %name требует версию Thelia %version или новее',

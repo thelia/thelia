@@ -513,7 +513,6 @@ return [
     'The mailing template in HTML format.' => 'قالب ایمیل در فرمت HTML.',
     'The mailing template in text-only format.' => 'قالب ایمیل در فرمت متن خام.',
     'The method name that will handle the hook event.' => 'نام متدی که رخداد قلاب را مدیریت می‌کند.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'ماژول "%name%" هم اکنون حداقل برای یک سفارش استفاده شده است و نمی‌تواند پاک شود.',
     'The module %module has been installed successfully.' => 'ماژول %module با موفقیت نصب شد.',
     'The module %name is already installed in the same or greater version.' => 'ماژول %name هم اکنون با همین نسخه ویا نسخه بالاتر نصب شده است.',
     'The module %name requires Thelia %version or newer' => 'ماژول %name نیازمند تلیا با نسخه %version و بالاتر است',

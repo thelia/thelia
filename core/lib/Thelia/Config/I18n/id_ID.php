@@ -446,7 +446,6 @@ return [
     'The mailing template in HTML format.' => 'Template mailing dalam HTML format.',
     'The mailing template in text-only format.' => 'Template mailing dalam format hanya-teks.',
     'The method name that will handle the hook event.' => 'Nama metode yang akan menangani acara hook.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Modul "%name%" yang saat ini digunakan oleh setidaknya satu urutan, dan tidak dapat dihapus.',
     'The module %module has been installed successfully.' => 'Modul % modul telah berhasil diinstall.',
     'The module %name is already installed in the same or greater version.' => '%name modul telah terinstal di versi yang sama atau lebih besar.',
     'The module %name requires Thelia %version or newer' => 'Modul %name memerlukan Thelia % versi atau yang lebih baru',

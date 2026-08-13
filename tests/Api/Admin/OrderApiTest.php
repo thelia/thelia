@@ -48,6 +48,37 @@ final class OrderApiTest extends ApiTestCase
         self::assertGreaterThanOrEqual(1, json_decode($response->getContent(), true)['hydra:totalItems']);
     }
 
+    /**
+     * The payment and delivery module relations were declared non-nullable, and the bridge
+     * turns a non-nullable relation into an inner join: an order whose module has been
+     * deleted answered 404 on its own URL, and dropped out of any read that joins the
+     * module rather than reporting anything.
+     */
+    public function testOrderWhosePaymentModuleWasDeletedStaysReadable(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order();
+        $order->setPaymentModuleId(null)->setPaymentModuleTitle('Cheque')->save();
+
+        $response = $this->jsonRequest('GET', '/api/admin/orders?id='.$order->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        self::assertSame(
+            1,
+            json_decode($response->getContent(), true)['hydra:totalItems'],
+            'An order must stay in the collection once the module that took its payment is gone.',
+        );
+
+        $response = $this->jsonRequest('GET', '/api/admin/orders/'.$order->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertNull($data['paymentModule'] ?? null);
+        self::assertSame('Cheque', $data['paymentModuleTitle']);
+    }
+
     public function testPatchOrderWithoutRequiredFieldsReturns422(): void
     {
         $token = $this->authenticateAsAdmin();

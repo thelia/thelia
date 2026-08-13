@@ -67,6 +67,43 @@ EXECUTE drop_not_null_statement;
 DEALLOCATE PREPARE drop_not_null_statement;
 
 -- ---------------------------------------------------------------------
+-- order.payment_module_title and order.delivery_module_title (#1145)
+--
+-- An order names the method it used only through its module id, so the label
+-- printed on an invoice is resolved at render time. Deleting the module - now
+-- that both ids are nullable - would leave the order with nothing to show.
+-- These two columns hold the name the module carried, in the language of the
+-- order, and are written when the module is deleted; they stay NULL for as
+-- long as the module is installed and can be read from the module table.
+--
+-- `order` is versionable, so order_version gets the same two columns.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'payment_module_title');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `payment_module_title` VARCHAR(255) COMMENT \'the name the payment module had when it was deleted, NULL while the module is still installed\' AFTER `payment_module_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'delivery_module_title');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `delivery_module_title` VARCHAR(255) COMMENT \'the name the delivery module had when it was deleted, NULL while the module is still installed\' AFTER `delivery_module_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'payment_module_title');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `payment_module_title` VARCHAR(255) COMMENT \'the name the payment module had when it was deleted, NULL while the module is still installed\' AFTER `payment_module_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'delivery_module_title');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `delivery_module_title` VARCHAR(255) COMMENT \'the name the delivery module had when it was deleted, NULL while the module is still installed\' AFTER `delivery_module_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- ---------------------------------------------------------------------
 -- Two outdated ISO 3166-2 codes in the Mexican state seed (#3168)
 --
 -- Aguascalientes was seeded as 'AGS' where ISO 3166-2:MX assigns 'AGU', and

@@ -513,7 +513,6 @@ return [
     'The mailing template in HTML format.' => 'HTML formatında posta şablonu.',
     'The mailing template in text-only format.' => 'Salt metin formatında posta şablonu.',
     'The method name that will handle the hook event.' => 'Kanca olay işleyecek yöntemi adı.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => '"%name%" modül şu anda en az bir sipariş tarafından kullanılıyor ve silinemez.',
     'The module %module has been installed successfully.' => 'Modül %modul  başarıyla yüklendi.',
     'The module %name is already installed in the same or greater version.' => 'Modül %name aynı veya daha fazla sürümü zaten yüklü.',
     'The module %name requires Thelia %version or newer' => 'Modül %name Thelia %version gerektirir veya daha yeni',

@@ -320,7 +320,6 @@ return [
     'The language "%id" doesn\'t exist' => 'Język "%id" nie istnieje',
     'The mailing template in HTML format.' => 'Szablon wiadomości w formacie HTML.',
     'The mailing template in text-only format.' => 'Szablon wiadomości w formacie tekstowym.',
-    'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Moduł "%name%" jest obecnie używany przez co najmniej jedno zamówienie i nie może zostać usunięty.',
     'The module %module has been installed successfully.' => 'Moduł %module został pomyślnie zainstalowany.',
     'The module %name is already installed in the same or greater version.' => 'Moduł %name jest już zainstalowany w tej samej lub wyższej wersji.',
     'The module %name requires Thelia %version or newer' => 'Moduł %name wymaga wersji %version lub nowszej',

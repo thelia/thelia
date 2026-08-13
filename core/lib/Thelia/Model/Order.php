@@ -573,7 +573,7 @@ class Order extends BaseOrder
     public function getPaymentModuleInstance(): PaymentModuleInterface
     {
         if (null === $paymentModule = ModuleQuery::create()->findPk($this->getPaymentModuleId())) {
-            throw new TheliaProcessException('Payment module ID='.$this->getPaymentModuleId().' was not found.');
+            throw new TheliaProcessException(\sprintf('The payment module of order "%s" is not installed anymore (%s).', (string) $this->getRef(), $this->getPaymentModuleTitle() ?? 'ID='.$this->getPaymentModuleId()));
         }
 
         return $paymentModule->createInstance();
@@ -587,7 +587,7 @@ class Order extends BaseOrder
     public function getDeliveryModuleInstance(): BaseModuleInterface
     {
         if (null === $deliveryModule = ModuleQuery::create()->findPk($this->getDeliveryModuleId())) {
-            throw new TheliaProcessException('Delivery module ID='.$this->getDeliveryModuleId().' was not found.');
+            throw new TheliaProcessException(\sprintf('The delivery module of order "%s" is not installed anymore (%s).', (string) $this->getRef(), $this->getDeliveryModuleTitle() ?? 'ID='.$this->getDeliveryModuleId()));
         }
 
         return $deliveryModule->createInstance();
@@ -595,7 +595,6 @@ class Order extends BaseOrder
 
     /**
      * Check if stock was decreased at stock creation for this order.
-     * TODO : we definitely have to store modules in an order_modules table juste like order_product and other order related information.
      *
      * @return bool true if the stock was decreased at order creation, false otherwise
      */
