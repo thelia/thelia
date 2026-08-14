@@ -77,9 +77,13 @@ class ModuleManagement
                 try {
                     $filePath = $file->getRealPath();
                     $modulesUpdated[] = $this->updateModule($file, $container);
-                } catch (\Exception $ex) {
+                } catch (\Throwable $ex) {
+                    // A module failing on a PHP Error (a stale constant, a missing class) must not
+                    // abort the refresh of the other modules.
                     // Guess module code
                     $moduleCode = basename(\dirname($filePath, 2));
+
+                    Tlog::getInstance()->addError('Failed to refresh module '.$moduleCode, $ex);
 
                     $errors[$moduleCode] = $ex;
                 }

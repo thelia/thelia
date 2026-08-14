@@ -35,9 +35,9 @@ class InvalidModuleException extends \RuntimeException
     {
         $message = '';
 
-        /** @var \Exception $error */
-        foreach ($this->errors as $error) {
-            $message .= $error->getMessage().$separator;
+        /** @var \Throwable $error */
+        foreach ($this->errors as $moduleCode => $error) {
+            $message .= (\is_string($moduleCode) ? $moduleCode.': ' : '').$error->getMessage().$separator;
         }
 
         return rtrim($message, $separator);
