@@ -74,8 +74,9 @@ class ModuleManagement
             $modulesUpdated = [];
 
             foreach ($finder as $file) {
+                $filePath = $file->getRealPath();
+
                 try {
-                    $filePath = $file->getRealPath();
                     $modulesUpdated[] = $this->updateModule($file, $container);
                 } catch (\Throwable $ex) {
                     // A module failing on a PHP Error (a stale constant, a missing class) must not
