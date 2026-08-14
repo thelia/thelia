@@ -82,7 +82,14 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
 (73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW()),
 (74, 'invoice_ref_auto', '1', 0, 0, NOW(), NOW()),
-(75, 'invoice_ref_format', '%year%-%number%', 0, 0, NOW(), NOW())
+(75, 'invoice_ref_format', '%year%-%number%', 0, 0, NOW(), NOW()),
+(76, 'store_siret', '', 0, 1, NOW(), NOW()),
+(77, 'store_vat_intracom', '', 0, 1, NOW(), NOW()),
+(78, 'store_ape_code', '', 0, 1, NOW(), NOW()),
+(79, 'store_eori', '', 0, 1, NOW(), NOW()),
+(80, 'store_vat_exempt', '0', 0, 1, NOW(), NOW()),
+(81, 'store_registration_exempt', '0', 0, 1, NOW(), NOW()),
+(82, 'store_legal_mentions', '', 0, 1, NOW(), NOW())
 
 ;
 
