@@ -317,6 +317,19 @@ if (isset($options['with-admin'])) {
     ];
 }
 
+// The front-office assets a theme needs at runtime. A theme built on AssetMapper reads
+// its JavaScript from `assets/vendor`, and one built on Tailwind reads a stylesheet that
+// only exists once built: without either, the shop answers 500 on its very first page.
+// Both commands come from packages a theme may or may not require, so they are skipped
+// where nothing provides them. They run last: both read the theme that template:set chose.
+foreach (['importmap:install' => 'Installing front-office asset dependencies', 'tailwind:build' => 'Building the front-office stylesheet'] as $command => $label) {
+    $commands[] = [
+        'label' => $label,
+        'input' => ['command' => $command],
+        'optional' => true,
+    ];
+}
+
 echo "Running kernel commands...\n";
 
 $kernelClass = class_exists(App\Kernel::class) ? App\Kernel::class : Thelia\Core\TheliaKernel::class;
@@ -334,13 +347,20 @@ set_error_handler(static function (int $errno, string $errstr) {
 }, \E_WARNING);
 
 foreach ($commands as $cmd) {
-    echo "  {$cmd['label']}\n";
-
     $kernel = new $kernelClass($_SERVER['APP_ENV'] ?? 'dev', false);
     $kernel->boot();
 
     $app = new Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
     $app->setAutoExit(false);
+
+    // An optional command belongs to a package the active theme may not require.
+    if (($cmd['optional'] ?? false) && !$app->has($cmd['input']['command'])) {
+        $kernel->shutdown();
+
+        continue;
+    }
+
+    echo "  {$cmd['label']}\n";
 
     try {
         $exitCode = $app->run(new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output);
