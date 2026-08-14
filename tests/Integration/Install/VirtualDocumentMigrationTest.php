@@ -152,6 +152,7 @@ final class VirtualDocumentMigrationTest extends IntegrationTestCase
 
         $block = strstr((string) $script, self::MARKER);
         self::assertIsString($block, 'The 3.0.0-beta3 script no longer holds the virtual document migration.');
+        $block = self::upToTheNextBlock($block);
 
         $statements = [];
 
@@ -166,6 +167,27 @@ final class VirtualDocumentMigrationTest extends IntegrationTestCase
         self::assertCount(2, $statements, 'Expected the INSERT and the DELETE of the migration block.');
 
         return $statements;
+    }
+
+    /**
+     * Cuts the text at the block that follows, so that a statement appended further
+     * down the script is not read as part of this migration. Each block opens on a
+     * rule of dashes; the first one met here closes the header of the block itself,
+     * the second one opens the next.
+     */
+    private static function upToTheNextBlock(string $block): string
+    {
+        $rule = "\n-- ---------------------------------------------------------------------";
+
+        $header = strpos($block, $rule);
+
+        if (false === $header) {
+            return $block;
+        }
+
+        $next = strpos($block, $rule, $header + 1);
+
+        return false === $next ? $block : substr($block, 0, $next);
     }
 
     private function countAssociations(int $saleElementId): int
