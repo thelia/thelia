@@ -90,10 +90,14 @@ class KernelListener
     }
 
     #[AsEventListener(event: KernelEvents::REQUEST, priority: 128)]
-    public function initializeLanguageAndAdmin(RequestEvent $event): ?Response
+    public function initializeLanguageAndAdmin(RequestEvent $event): void
     {
+        // Everything a language redirect must not answer to is decided here: a sub request,
+        // an api or a stateless route, a preflight OPTIONS, a request whose headers are
+        // already on the wire. There is no console case to guard: this listener is only
+        // ever called on a kernel request.
         if (!$this->sessionManager->sessionIsStartable($event)) {
-            return null;
+            return;
         }
         /** @var Request $request */
         $request = $event->getRequest();
@@ -106,12 +110,17 @@ class KernelListener
 
         $response = $this->langService->handleLang($session, $request);
 
+        // Symfony discards what a listener returns and reads only what setResponse() puts
+        // on the event. This response used to be returned, a habit kept from the stack
+        // middleware this listener was made of, whose handle() did answer with it: the
+        // redirect to the domain of the requested language has been computed and thrown
+        // away on every request ever since.
         if ($response instanceof Response) {
-            return $response;
+            $event->setResponse($response);
+
+            return;
         }
 
         $this->langService->syncMultiDomainLanguage($request);
-
-        return null;
     }
 }

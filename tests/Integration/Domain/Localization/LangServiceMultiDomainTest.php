@@ -111,10 +111,95 @@ final class LangServiceMultiDomainTest extends IntegrationTestCase
         self::assertSame(self::TARGET_DOMAIN, $response->getTargetUrl());
     }
 
-    private function switchToFrench(string $path): Lang|Response
+    public function testRedirectKeepsTheQueryParametersOfThePageBeingRead(): void
     {
+        $this->frenchLangOnTargetDomain();
+
+        $category = $this->createFixtureFactory()->category();
+        $englishUrl = $this->rewrittenUrl($category, 'en_US', 'Paginated category');
+        $frenchUrl = $this->rewrittenUrl($category, 'fr_FR', 'Categorie paginee');
+
+        $response = $this->switchToFrench('/'.$englishUrl, ['page' => '2', 'order' => 'price']);
+
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame(
+            self::TARGET_DOMAIN.'/'.$frenchUrl,
+            strtok($response->getTargetUrl(), '?'),
+        );
+        self::assertSame(
+            ['order' => 'price', 'page' => '2'],
+            self::queryParametersOf($response->getTargetUrl()),
+        );
+    }
+
+    /**
+     * The language parameters have been consumed here, and the url they point to already is
+     * the one of the requested language. Carrying them over would also make a domain the
+     * shop cannot match redirect to itself for as long as the browser follows.
+     */
+    public function testRedirectDropsTheLanguageParameters(): void
+    {
+        $this->frenchLangOnTargetDomain();
+
+        $category = $this->createFixtureFactory()->category();
+        $englishUrl = $this->rewrittenUrl($category, 'en_US', 'Category asked in two ways');
+        $this->rewrittenUrl($category, 'fr_FR', 'Categorie demandee de deux facons');
+
+        $response = $this->switchToFrench('/'.$englishUrl, ['locale' => 'fr_FR', 'utm_source' => 'newsletter']);
+
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame(
+            ['utm_source' => 'newsletter'],
+            self::queryParametersOf($response->getTargetUrl()),
+        );
+    }
+
+    public function testNoRedirectWhenTheTargetIsThePageBeingServed(): void
+    {
+        // The domain of the language is the one being browsed, written in another case: the
+        // string comparison on the host sees two different domains, and the redirect it
+        // builds points at the very url that was asked for.
+        $this->frenchLangOnTargetDomain()->setUrl('http://EN.EXAMPLE.COM')->save();
+
+        $category = $this->createFixtureFactory()->category();
+        $this->rewrittenUrl($category, 'en_US', 'Category on a shouted domain');
+        $frenchUrl = $this->rewrittenUrl($category, 'fr_FR', 'Categorie sur un domaine crie');
+
+        $lang = $this->switchToFrench('/'.$frenchUrl);
+
+        self::assertInstanceOf(Lang::class, $lang);
+        self::assertSame('fr_FR', $lang->getLocale());
+    }
+
+    public function testNoRedirectOnAFormPost(): void
+    {
+        // A browser replays a 301 as a GET without the body: redirecting the post of a
+        // checkout would throw away the order instead of taking it.
+        $this->frenchLangOnTargetDomain();
+
+        $request = Request::create(self::CURRENT_DOMAIN.'/order/delivery?lang=fr', 'POST');
+
+        $lang = $this->langService->resolveFrontLanguageFromRequest($request);
+
+        self::assertInstanceOf(Lang::class, $lang);
+        self::assertSame('fr_FR', $lang->getLocale());
+    }
+
+    private static function queryParametersOf(string $url): array
+    {
+        $parameters = [];
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $parameters);
+        ksort($parameters);
+
+        return $parameters;
+    }
+
+    private function switchToFrench(string $path, array $query = []): Lang|Response
+    {
+        $query['lang'] = 'fr';
+
         return $this->langService->resolveFrontLanguageFromRequest(
-            Request::create(self::CURRENT_DOMAIN.$path.'?lang=fr'),
+            Request::create(self::CURRENT_DOMAIN.$path.'?'.http_build_query($query)),
         );
     }
 

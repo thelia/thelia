@@ -179,6 +179,14 @@ readonly class LangService
             return $lang;
         }
 
+        // A language switch is a navigation, and a redirect is the only way to answer one.
+        // Answering anything else with a redirect is not: a browser replays a 301 as a GET
+        // and drops the body, so a checkout posted with a "lang" parameter in its action
+        // url would be silently thrown away instead of being taken.
+        if (!$request->isMethodSafe()) {
+            return $lang;
+        }
+
         $domainUrl = $lang->getUrl();
 
         if (empty($domainUrl)) {
@@ -190,16 +198,52 @@ readonly class LangService
             return Lang::getDefaultLanguage();
         }
 
-        // If the language domain differs from the current one, redirect to it, keeping the
-        // current page when a translation of it exists for the target language.
-        if (rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
-            return new RedirectResponse(
-                $this->getTranslatedDomainUrl($request, $domainUrl, $lang),
-                Response::HTTP_MOVED_PERMANENTLY,
-            );
+        // Already on the domain of the requested language: nothing to redirect to.
+        if (rtrim($domainUrl, '/') === $request->getSchemeAndHttpHost()) {
+            return $lang;
         }
 
-        return $lang;
+        // The current page is kept when a translation of it exists for the target language.
+        $targetUrl = $this->withRequestedQueryString(
+            $request,
+            $this->translatedDomainUrl($request, $domainUrl, $lang),
+        );
+
+        // The check above compares two strings, and a domain written with a different case
+        // or with its default port spelled out does not match the one being browsed. Such a
+        // shop would be answered with a redirect to the very url it asked for, which tells
+        // the browser nothing but to ask again.
+        if ($this->isCurrentUrl($request, $targetUrl)) {
+            return $lang;
+        }
+
+        return new RedirectResponse($targetUrl, Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    /**
+     * A redirect to the url being served is never a useful answer: it only tells the browser
+     * to ask the same question again. Queries are ignored on purpose, since dropping them
+     * still lands on the same page, and so still loops.
+     */
+    private function isCurrentUrl(Request $request, string $url): bool
+    {
+        $target = parse_url($url);
+
+        if (false === $target) {
+            return false;
+        }
+
+        // A host-less target is relative to the host being browsed. getHost() and getScheme()
+        // both answer in lower case, which is what a host and a scheme are compared in.
+        $sameHost = !isset($target['host'])
+            || (
+                strtolower($target['host']) === $request->getHost()
+                && strtolower($target['scheme'] ?? $request->getScheme()) === $request->getScheme()
+                && ($target['port'] ?? $request->getPort()) === $request->getPort()
+            );
+
+        return $sameHost
+            && trim($target['path'] ?? '', '/') === trim($request->getRealPathInfo(), '/');
     }
 
     /**
@@ -208,7 +252,7 @@ readonly class LangService
      * when rewriting is disabled, when the current page has no rewritten URL, or when it has
      * no translation in the target language.
      */
-    private function getTranslatedDomainUrl(Request $request, string $domainUrl, Lang $lang): string
+    private function translatedDomainUrl(Request $request, string $domainUrl, Lang $lang): string
     {
         if (!ConfigQuery::isRewritingEnable()) {
             return $domainUrl;
@@ -238,6 +282,31 @@ readonly class LangService
         }
 
         return rtrim($domainUrl, '/').'/'.$translatedUrl->getUrl();
+    }
+
+    /**
+     * The page has to survive the language switch, and so does its state: a paginated
+     * listing, a sort order, a campaign tag are all carried by the query string. They are
+     * read from the query string of the request rather than from the query bag, which any
+     * listener running before this one is free to write into.
+     *
+     * "lang" and "locale" are dropped: they have been consumed here, and the url they point
+     * to already is the one of the requested language. Carrying them over would also turn a
+     * domain the shop cannot match - written http:// on a shop served in https, say - into
+     * an endless redirect, each hop asking for the same switch again.
+     */
+    private function withRequestedQueryString(Request $request, string $url): string
+    {
+        $parameters = [];
+        parse_str((string) $request->getQueryString(), $parameters);
+
+        unset($parameters['lang'], $parameters['locale']);
+
+        if ([] === $parameters) {
+            return $url;
+        }
+
+        return $url.(str_contains($url, '?') ? '&' : '?').http_build_query($parameters);
     }
 
     private function getLanguageByDomain(Request $request): ?Lang
