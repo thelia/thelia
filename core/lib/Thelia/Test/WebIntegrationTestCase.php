@@ -135,7 +135,7 @@ abstract class WebIntegrationTestCase extends WebTestCase
             }
 
             self::markTestSkipped(\sprintf(
-                '"%s" cannot be rendered: the theme assets are not built (npm run build, importmap:install).',
+                '"%s" cannot be rendered: the theme assets are not built (importmap:install, tailwind:build, sass:build).',
                 $url,
             ));
         } finally {
@@ -155,12 +155,14 @@ abstract class WebIntegrationTestCase extends WebTestCase
      */
     private static function isMissingAssetBuild(\Throwable $failure): bool
     {
-        // A theme builds its assets with Encore, which reads an entrypoints file, or
-        // with AssetMapper, which reads the vendor assets `importmap:install` writes
-        // into the theme. Both are produced by the theme build, never by the core.
+        // A theme builds its assets with Encore, which reads an entrypoints file; with
+        // AssetMapper, which reads the vendor assets `importmap:install` writes into the
+        // theme; or with sass-bundle, which serves a stylesheet that only exists once
+        // `sass:build` ran. All are produced by the theme build, never by the core.
         $missingBuildMessages = [
             'Could not find the entrypoints file',
             'vendor asset is missing',
+            'run php bin/console sass:build',
         ];
 
         for ($cause = $failure; null !== $cause; $cause = $cause->getPrevious()) {
