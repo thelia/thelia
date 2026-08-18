@@ -778,7 +778,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     ->addJoinObject($minPriceJoin, 'is_min_price_join')
                     ->addJoinCondition('is_min_price_join', '`min_price_data`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-                if ($defaultCurrency?->getId() !== $currency->getId()) {
+                if ($defaultCurrency instanceof CurrencyModel && $defaultCurrency->getId() !== $currency->getId()) {
                     $minPriceJoinDefaultCurrency = new Join();
                     $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data'.$defaultCurrencySuffix);
                     $minPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);

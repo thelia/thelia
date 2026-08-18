@@ -138,7 +138,7 @@ class Update
 
         $lastEntry = end($this->version);
 
-        return version_compare((string) $lastEntry, (string) $version, '<=');
+        return version_compare((string) $lastEntry, (string) $version, '<=') === true;
     }
 
     /**
@@ -371,17 +371,21 @@ class Update
             return;
         }
 
-        // Tlog::log() keys its levels by the numeric constants, not by the PSR-3 names,
-        // so the level has to be dispatched to the matching method.
-        match ($level) {
-            'debug' => $this->logger->debug($message),
-            'info' => $this->logger->info($message),
-            'notice' => $this->logger->notice($message),
-            'warning' => $this->logger->warning($message),
-            'error' => $this->logger->error($message),
-            'critical' => $this->logger->critical($message),
+        // Tlog keys its levels by the numeric constants, not by the PSR-3 names, so passing
+        // 'debug' straight to Tlog::log() would silently log nothing.
+        $tlogLevel = match ($level) {
+            'debug' => Tlog::DEBUG,
+            'info' => Tlog::INFO,
+            'notice' => Tlog::NOTICE,
+            'warning' => Tlog::WARNING,
+            'error' => Tlog::ERROR,
+            'critical' => Tlog::CRITICAL,
             default => null,
         };
+
+        if (null !== $tlogLevel) {
+            $this->logger->log($tlogLevel, $message);
+        }
     }
 
     protected function updateToVersion(string $version, Database $database): void
