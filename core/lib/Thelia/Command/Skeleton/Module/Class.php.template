@@ -22,6 +22,15 @@ class %%CLASSNAME%% extends BaseModule
      * Have fun !
      */
 
+    /*
+     * Declare your routes with PHP attributes on your controllers:
+     *
+     *     #[Route('/my/route/name', name: '%%DOMAINNAME%%.my_route')]
+     *
+     * A controller answering /admin/module/%%DOMAINNAME%% gets a "Configuration" button
+     * next to the module in the back-office module list.
+     */
+
     /**
      * Defines how services are loaded in your modules
      *
