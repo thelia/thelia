@@ -558,17 +558,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         Tlog::getInstance()->debug('-- Starting new product build criteria');
 
-        $currencyId = $this->getCurrency();
-
-        if (null !== $currencyId) {
-            $currency = CurrencyQuery::create()->findOneById($currencyId);
-
-            if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
-            }
-        } else {
-            $currency = $this->getMainRequest()->getSession()->getCurrency();
-        }
+        $currency = $this->resolveCurrency();
 
         $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
@@ -582,45 +572,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $complex = $this->getComplex();
 
         if (!$complex) {
-            $search->innerJoinProductSaleElements('pse');
-            $search->addJoinCondition('pse', '`pse`.IS_DEFAULT=1');
-
-            $search->innerJoinProductSaleElements('pse_count');
-
-            $priceJoin = new Join();
-            $priceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price');
-            $priceJoin->setJoinType(Criteria::LEFT_JOIN);
-
-            $search->addJoinObject($priceJoin, 'price_join')
-                ->addJoinCondition('price_join', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
-
-            if ($defaultCurrency?->getId() !== $currency->getId()) {
-                $priceJoinDefaultCurrency = new Join();
-                $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price'.$defaultCurrencySuffix);
-                $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
-
-                $search->addJoinObject($priceJoinDefaultCurrency, 'price_join'.$defaultCurrencySuffix)
-                    ->addJoinCondition('price_join'.$defaultCurrencySuffix, '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
-
-                /**
-                 * rate value is checked as a float in overloaded getRate method.
-                 */
-                $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
-                ELSE
-                    CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
-                END';
-
-                $search->withColumn($priceToCompareAsSQL, 'real_price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END', 'price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END', 'promo_price');
-            } else {
-                $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
-
-                $search->withColumn($priceToCompareAsSQL, 'real_price');
-                $search->withColumn('`price`.PRICE', 'price');
-                $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
-            }
+            $priceToCompareAsSQL = $this->addPriceJoins($search, $currency, $defaultCurrency, $defaultCurrencySuffix);
         }
 
         /* manage translations */
@@ -650,41 +602,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
 
-        $manualOrderAllowed = false;
-
-        if (null !== $categoryDefault = $this->getCategoryDefault()) {
-            // Select the products which have $categoryDefault as the default category.
-            $search
-                ->useProductCategoryQuery('CategorySelect')
-                ->filterByDefaultCategory(true)
-                ->filterByCategoryId($categoryDefault, Criteria::IN)
-                ->endUse();
-            // We can only sort by position if we have a single category ID
-            $manualOrderAllowed = (1 === \count($categoryDefault));
-        } elseif (null !== $categoryIdList = $this->getCategory()) {
-            // Select all products which have one of the required categories as the default one, or an associated one
-            $depth = $this->getDepth();
-
-            $allCategoryIDs = CategoryQuery::getCategoryTreeIds($categoryIdList, (int) $depth);
-
-            $search
-                ->useProductCategoryQuery('CategorySelect')
-                ->filterByCategoryId($allCategoryIDs, Criteria::IN)
-                ->endUse();
-            // We can only sort by position if we have a single category ID, with a depth of 1
-            $manualOrderAllowed = (1 === (int) $depth && 1 === \count($categoryIdList));
-        } else {
-            $search
-                ->leftJoinProductCategory('CategorySelect')
-                ->addJoinCondition('CategorySelect', '`CategorySelect`.DEFAULT_CATEGORY = 1');
-        }
-
-        $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.\PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
-            'position_delegate',
-        );
-        $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
-        $search->withColumn('`CategorySelect`.DEFAULT_CATEGORY', 'is_default_category');
+        $manualOrderAllowed = $this->applyCategoryFilters($search);
 
         $current = $this->getCurrent();
 
@@ -860,7 +778,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     ->addJoinObject($minPriceJoin, 'is_min_price_join')
                     ->addJoinCondition('is_min_price_join', '`min_price_data`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-                if ($defaultCurrency?->getId() !== $currency->getId()) {
+                if ($defaultCurrency instanceof CurrencyModel && $defaultCurrency->getId() !== $currency->getId()) {
                     $minPriceJoinDefaultCurrency = new Join();
                     $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data'.$defaultCurrencySuffix);
                     $minPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
@@ -1087,6 +1005,120 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('COUNT(distinct(`pse_count`.ID))', 'pse_count');
         }
 
+        $this->applyOrder($search, $complex, $manualOrderAllowed, $id);
+
+        return $search;
+    }
+
+    private function applyCategoryFilters(ProductQuery $search): bool
+    {
+        $manualOrderAllowed = false;
+
+        if (null !== $categoryDefault = $this->getCategoryDefault()) {
+            // Select the products which have $categoryDefault as the default category.
+            $search
+                ->useProductCategoryQuery('CategorySelect')
+                ->filterByDefaultCategory(true)
+                ->filterByCategoryId($categoryDefault, Criteria::IN)
+                ->endUse();
+            // We can only sort by position if we have a single category ID
+            $manualOrderAllowed = (1 === \count($categoryDefault));
+        } elseif (null !== $categoryIdList = $this->getCategory()) {
+            // Select all products which have one of the required categories as the default one, or an associated one
+            $depth = $this->getDepth();
+
+            $allCategoryIDs = CategoryQuery::getCategoryTreeIds($categoryIdList, (int) $depth);
+
+            $search
+                ->useProductCategoryQuery('CategorySelect')
+                ->filterByCategoryId($allCategoryIDs, Criteria::IN)
+                ->endUse();
+            // We can only sort by position if we have a single category ID, with a depth of 1
+            $manualOrderAllowed = (1 === (int) $depth && 1 === \count($categoryIdList));
+        } else {
+            $search
+                ->leftJoinProductCategory('CategorySelect')
+                ->addJoinCondition('CategorySelect', '`CategorySelect`.DEFAULT_CATEGORY = 1');
+        }
+
+        $search->withColumn(
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.\PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
+            'position_delegate',
+        );
+        $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
+        $search->withColumn('`CategorySelect`.DEFAULT_CATEGORY', 'is_default_category');
+
+        return $manualOrderAllowed;
+    }
+
+    private function resolveCurrency(): CurrencyModel
+    {
+        $currencyId = $this->getCurrency();
+
+        if (null === $currencyId) {
+            return $this->getMainRequest()->getSession()->getCurrency();
+        }
+
+        $currency = CurrencyQuery::create()->findOneById($currencyId);
+
+        if (null === $currency) {
+            throw new \InvalidArgumentException(\sprintf('Cannot find currency id `%s` in the product loop', $currencyId));
+        }
+
+        return $currency;
+    }
+
+    private function addPriceJoins(
+        ProductQuery $search,
+        CurrencyModel $currency,
+        ?CurrencyModel $defaultCurrency,
+        string $defaultCurrencySuffix,
+    ): string {
+        $search->innerJoinProductSaleElements('pse');
+        $search->addJoinCondition('pse', '`pse`.IS_DEFAULT=1');
+
+        $search->innerJoinProductSaleElements('pse_count');
+
+        $priceJoin = new Join();
+        $priceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price');
+        $priceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+        $search->addJoinObject($priceJoin, 'price_join')
+            ->addJoinCondition('price_join', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+        if ($defaultCurrency?->getId() !== $currency->getId()) {
+            $priceJoinDefaultCurrency = new Join();
+            $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price'.$defaultCurrencySuffix);
+            $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->addJoinObject($priceJoinDefaultCurrency, 'price_join'.$defaultCurrencySuffix)
+                ->addJoinCondition('price_join'.$defaultCurrencySuffix, '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+
+            /**
+             * rate value is checked as a float in overloaded getRate method.
+             */
+            $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
+                CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
+            ELSE
+                CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
+            END';
+
+            $search->withColumn($priceToCompareAsSQL, 'real_price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END', 'price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END', 'promo_price');
+        } else {
+            $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
+
+            $search->withColumn($priceToCompareAsSQL, 'real_price');
+            $search->withColumn('`price`.PRICE', 'price');
+            $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
+        }
+
+        return $priceToCompareAsSQL;
+    }
+
+    private function applyOrder(ProductQuery $search, bool $complex, bool $manualOrderAllowed, ?array $id): void
+    {
         $orders = $this->getOrder();
 
         foreach ($orders as $order) {
@@ -1197,8 +1229,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break 2;
             }
         }
-
-        return $search;
     }
 
     /**

@@ -20,6 +20,7 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Thelia\Config\DatabaseConfigurationSource;
@@ -137,7 +138,7 @@ class Update
 
         $lastEntry = end($this->version);
 
-        return version_compare($lastEntry, $version, '<=');
+        return version_compare((string) $lastEntry, (string) $version, '<=') === true;
     }
 
     /**
@@ -154,7 +155,7 @@ class Update
         $index = array_search($currentVersion, $this->version, true);
 
         if (false !== $index) {
-            return $index;
+            return (int) $index;
         }
 
         $closestIndex = null;
@@ -185,7 +186,7 @@ class Update
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
-        $index = $this->getStartIndex($currentVersion);
+        $index = $this->getStartIndex((string) $currentVersion);
 
         $this->connection->beginTransaction();
 
@@ -324,6 +325,10 @@ class Update
      */
     public function restoreDb(): bool
     {
+        if (null === $this->backupFile) {
+            return false;
+        }
+
         $database = new Database($this->connection);
 
         try {
@@ -356,29 +361,30 @@ class Update
 
     protected function log($level, $message): void
     {
-        if ($this->usePropel) {
-            switch ($level) {
-                case 'debug':
-                    $this->logger->debug($message);
-                    break;
-                case 'info':
-                    $this->logger->info($message);
-                    break;
-                case 'notice':
-                    $this->logger->notice($message);
-                    break;
-                case 'warning':
-                    $this->logger->warning($message);
-                    break;
-                case 'error':
-                    $this->logger->error($message);
-                    break;
-                case 'critical':
-                    $this->logger->critical($message);
-                    break;
-            }
-        } else {
+        if (!$this->usePropel) {
             $this->logs[] = [$level, $message];
+
+            return;
+        }
+
+        if (!$this->logger instanceof Tlog) {
+            return;
+        }
+
+        // Tlog keys its levels by the numeric constants, not by the PSR-3 names, so passing
+        // 'debug' straight to Tlog::log() would silently log nothing.
+        $tlogLevel = match ($level) {
+            'debug' => Tlog::DEBUG,
+            'info' => Tlog::INFO,
+            'notice' => Tlog::NOTICE,
+            'warning' => Tlog::WARNING,
+            'error' => Tlog::ERROR,
+            'critical' => Tlog::CRITICAL,
+            default => null,
+        };
+
+        if (null !== $tlogLevel) {
+            $this->logger->log($tlogLevel, $message);
         }
     }
 
@@ -455,12 +461,12 @@ class Update
      */
     public function getDataBaseSize(): float
     {
-        $stmt = $this->connection->query(
+        $statement = $this->connection->query(
             "SELECT sum(data_length) / 1024 / 1024 'size' FROM information_schema.TABLES WHERE table_schema = DATABASE() GROUP BY table_schema",
         );
 
-        if ($stmt->rowCount()) {
-            return (float) $stmt->fetch(\PDO::FETCH_OBJ)->size;
+        if ($statement instanceof \PDOStatement && $statement->rowCount() > 0) {
+            return (float) $statement->fetch(\PDO::FETCH_OBJ)->size;
         }
 
         throw new \Exception('Impossible to calculate the database size');
@@ -571,11 +577,11 @@ class Update
         $list = [];
         $finder = new Finder();
         $path = \sprintf('%s%s', THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
-        $sort = static function (\SplFileInfo $a, \SplFileInfo $b): int {
-            $a = strtolower(substr($a->getRelativePathname(), 0, -4));
-            $b = strtolower(substr($b->getRelativePathname(), 0, -4));
+        $sort = static function (SplFileInfo $a, SplFileInfo $b): int {
+            $left = strtolower(substr($a->getRelativePathname(), 0, -4));
+            $right = strtolower(substr($b->getRelativePathname(), 0, -4));
 
-            return version_compare($a, $b);
+            return (int) version_compare($left, $right);
         };
 
         $files = $finder->name('*.sql')->in($path)->sort($sort);
@@ -626,6 +632,10 @@ class Update
         curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, \CURLOPT_TIMEOUT, 5);
         $res = curl_exec($curl);
+
+        if (!\is_string($res)) {
+            return null;
+        }
 
         try {
             if (Version::parse($res)) {
