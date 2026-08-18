@@ -268,13 +268,6 @@ class TheliaKernel extends Kernel
                             $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
                         }
 
-                        // remove STRICT_TRANS_TABLES
-                        if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode, true)) !== false) {
-                            unset($sessionSqlMode[$key]);
-                            $canUpdate = true;
-                            $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
-                        }
-
                         // remove ONLY_FULL_GROUP_BY
                         if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode, true)) !== false) {
                             unset($sessionSqlMode[$key]);
@@ -283,14 +276,7 @@ class TheliaKernel extends Kernel
                         }
                     }
                 } else {
-                    // MariaDB 10.2.4+ compatibility
-                    // remove STRICT_TRANS_TABLES
-                    if (version_compare($data['version'], '10.2.4', '>=') && $key = \in_array('STRICT_TRANS_TABLES', $sessionSqlMode, true)) {
-                        unset($sessionSqlMode[$key]);
-                        $canUpdate = true;
-                        $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
-                    }
-
+                    // MariaDB 10.1.7+ compatibility
                     if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode, true)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
