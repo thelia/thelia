@@ -207,6 +207,17 @@ final class DatabaseBackupTest extends IntegrationTestCase
         self::assertStringContainsString('SET @a = 1; SET @b = 2;', $trigger);
     }
 
+    public function testAPipeIsAcceptableAsADelimiter(): void
+    {
+        // It used to be rejected, because '|' was the placeholder the splitter used.
+        $file = "DELIMITER |\nCREATE TRIGGER t BEGIN SET @a = 1; SET @b = 2; END|\nDELIMITER ;\n";
+
+        $statements = $this->database()->statementsOf($file);
+        $trigger = implode('', array_filter($statements, static fn (string $s) => str_contains($s, 'TRIGGER')));
+
+        self::assertStringContainsString('SET @a = 1; SET @b = 2;', $trigger);
+    }
+
     private function database(): DatabaseExposingItsParser
     {
         return new DatabaseExposingItsParser($this->connection());

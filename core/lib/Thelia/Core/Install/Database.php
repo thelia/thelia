@@ -138,10 +138,8 @@ class Database
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
 
         foreach ($m[0] as $k => $v) {
-            if ('|' === $m[1][$k]) {
-                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
-            }
-
+            // A '|' delimiter used to be rejected here, because '|' was the placeholder
+            // above and the two would have collided. Nothing is reserved any more.
             $stored = str_replace([';', $m[1][$k]], [$blockSemicolon, ";\n"], $m[2][$k]);
             $sql = str_replace($v, $stored, $sql);
         }
