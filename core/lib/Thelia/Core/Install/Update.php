@@ -486,26 +486,43 @@ class Update
 
     /**
      * Checks whether it is possible to make a data base backup.
+     *
+     * The backup accumulates the whole dump in memory, so a finite memory_limit
+     * caps the database size the backup can handle. A negative memory_limit
+     * means unlimited memory: the backup is always possible.
      */
     public function checkBackupIsPossible(): bool
     {
-        $size = 0;
+        $memoryLimit = self::parseMemoryLimit(\ini_get('memory_limit'));
 
-        if (preg_match('/^(\d+)(.)$/', \ini_get('memory_limit'), $matches)) {
-            switch (strtolower($matches[2])) {
-                case 'k':
-                    $size = $matches[1] / 1024;
-                    break;
-                case 'm':
-                    $size = $matches[1];
-                    break;
-                case 'g':
-                    $size = $matches[1] * 1024;
-                    break;
-            }
+        if ($memoryLimit < 0) {
+            return true;
         }
 
-        return !($this->getDataBaseSize() > ($size - 64) / 8);
+        $memoryLimitInMegabytes = $memoryLimit / (1024 ** 2);
+
+        return !($this->getDataBaseSize() > ($memoryLimitInMegabytes - 64) / 8);
+    }
+
+    /**
+     * Converts a php.ini shorthand-byte value to bytes, following the PHP
+     * semantics: the leading integer part is kept (a fractional prefix such as
+     * "0.5G" truncates to 0), the k/m/g suffix is case-insensitive, and a value
+     * without a suffix is already in bytes. A negative result means unlimited.
+     *
+     * @internal exposed for tests
+     */
+    public static function parseMemoryLimit(string $memoryLimit): int
+    {
+        $memoryLimit = trim($memoryLimit);
+        $bytes = (int) $memoryLimit;
+
+        return match (strtolower(substr($memoryLimit, -1))) {
+            'k' => $bytes * 1024,
+            'm' => $bytes * 1024 ** 2,
+            'g' => $bytes * 1024 ** 3,
+            default => $bytes,
+        };
     }
 
     public function getLatestVersion(): mixed
