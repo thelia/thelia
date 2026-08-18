@@ -92,9 +92,11 @@ if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
 
 // ── Phase 1: Check permissions ───────────────────────────────────────
 
-// Ensure required directories exist (may be missing after a fresh clone)
+// Ensure required directories exist (may be missing after a fresh clone).
+// var/translations is registered as an AssetMapper path by symfony/ux-translator,
+// which never creates it at boot: without it, the first page answers 500.
 $fs = new Symfony\Component\Filesystem\Filesystem();
-foreach (['var', 'public', 'local/media', 'local/config'] as $dir) {
+foreach (['var', 'public', 'local/media', 'local/config', 'var/translations'] as $dir) {
     $fs->mkdir(THELIA_ROOT.$dir);
 }
 
