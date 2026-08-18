@@ -51,10 +51,17 @@ if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
     } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
+        // A thelia/thelia checkout: setup/ sits at the root, next to vendor/.
         require $file;
-    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
-        // Here we are on a thelia/thelia-project
+    } elseif (is_file($file = __DIR__.'/../../bootstrap.php') && is_file($autoload = __DIR__.'/../../vendor/autoload.php')) {
+        // A thelia-project install: the script sits in local/setup/, and the project
+        // root holds bootstrap.php next to vendor/. bootstrap.php only defines the
+        // path constants and deliberately leaves the autoloader alone, so both have
+        // to be loaded, and in that order: vendor/autoload.php pulls in the core
+        // bootstrap.php, which would otherwise read THELIA_ROOT off vendor/thelia/core.
+        // public/index.php and bin/install of the project load them the same way.
         require $file;
+        require $autoload;
     } else {
         echo 'No autoload file found. Please use the -b argument to include yours';
         exit(1);
