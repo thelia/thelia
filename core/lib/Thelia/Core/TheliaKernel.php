@@ -244,17 +244,23 @@ class TheliaKernel extends Kernel
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
         if (!file_exists($this->getCacheDir().DS.'check_mysql_configurations.php')) {
-            $sessionSqlMode = [];
+            $serverSqlMode = [];
             $canUpdate = false;
             $logs = [];
+            // The verdict is cached across requests, so it must describe the
+            // server-configured sql_mode (@@GLOBAL, what every fresh connection
+            // inherits), never the current session: bin/install boots several
+            // kernels over one shared connection, and a session corrected by a
+            // previous kernel would cache a "nothing to do" verdict that every
+            // later web request would then run with.
             /** @var PDODataFetcher $result */
-            $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
+            $result = $con->query('SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode');
 
             if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-                $sessionSqlMode = explode(',', (string) $data['session_sql_mode']);
+                $serverSqlMode = explode(',', (string) $data['global_sql_mode']);
 
-                if (empty($sessionSqlMode[0])) {
-                    unset($sessionSqlMode[0]);
+                if (empty($serverSqlMode[0])) {
+                    unset($serverSqlMode[0]);
                 }
 
                 // MariaDB is not impacted by this problem
@@ -262,23 +268,23 @@ class TheliaKernel extends Kernel
                     // MySQL 5.6+ compatibility
                     if (version_compare($data['version'], '5.6.0', '>=')) {
                         // add NO_ENGINE_SUBSTITUTION
-                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode, true)) {
-                            $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
+                            $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                             $canUpdate = true;
                             $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
                         }
 
                         // remove ONLY_FULL_GROUP_BY
-                        if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode, true)) !== false) {
-                            unset($sessionSqlMode[$key]);
+                        if (($key = array_search('ONLY_FULL_GROUP_BY', $serverSqlMode, true)) !== false) {
+                            unset($serverSqlMode[$key]);
                             $canUpdate = true;
                             $logs[] = 'Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.';
                         }
                     }
                 } else {
                     // MariaDB 10.1.7+ compatibility
-                    if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode, true)) {
-                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                    if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
+                        $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
                         $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
                     }
@@ -294,7 +300,7 @@ class TheliaKernel extends Kernel
             (new Filesystem())->dumpFile(
                 $this->getCacheDir().DS.'check_mysql_configurations.php',
                 '<?php return '.VarExporter::export([
-                    'modes' => array_values($sessionSqlMode),
+                    'modes' => array_values($serverSqlMode),
                     'canUpdate' => $canUpdate,
                     'logs' => $logs,
                 ]).';',
