@@ -75,12 +75,14 @@ class Tlog implements LoggerInterface
 
     public static function getInstance(): self
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            self::$instance->init();
+        $instance = self::$instance;
+
+        if (!$instance instanceof self) {
+            $instance = self::getNewInstance();
+            self::$instance = $instance;
         }
 
-        return self::$instance;
+        return $instance;
     }
 
     public static function getNewInstance(): self
@@ -188,9 +190,7 @@ class Tlog implements LoggerInterface
 
     public function addDebug(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::DEBUG, $arg);
-        }
+        $this->logEach(self::DEBUG, $args);
     }
 
     public function info($message, array $context = []): void
@@ -200,9 +200,7 @@ class Tlog implements LoggerInterface
 
     public function addInfo(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::INFO, $arg);
-        }
+        $this->logEach(self::INFO, $args);
     }
 
     public function notice($message, array $context = []): void
@@ -212,9 +210,7 @@ class Tlog implements LoggerInterface
 
     public function addNotice(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::NOTICE, $arg);
-        }
+        $this->logEach(self::NOTICE, $args);
     }
 
     public function warning($message, array $context = []): void
@@ -224,9 +220,7 @@ class Tlog implements LoggerInterface
 
     public function addWarning(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::WARNING, $arg);
-        }
+        $this->logEach(self::WARNING, $args);
     }
 
     public function error($message, array $context = []): void
@@ -236,9 +230,7 @@ class Tlog implements LoggerInterface
 
     public function addError(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::ERROR, $arg);
-        }
+        $this->logEach(self::ERROR, $args);
     }
 
     public function err($message, array $context = []): void
@@ -253,9 +245,7 @@ class Tlog implements LoggerInterface
 
     public function addCritical(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::CRITICAL, $arg);
-        }
+        $this->logEach(self::CRITICAL, $args);
     }
 
     public function crit($message, array $context = []): void
@@ -270,9 +260,7 @@ class Tlog implements LoggerInterface
 
     public function addAlert(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::ALERT, $arg);
-        }
+        $this->logEach(self::ALERT, $args);
     }
 
     public function emergency($message, array $context = []): void
@@ -282,9 +270,7 @@ class Tlog implements LoggerInterface
 
     public function addEmergency(mixed ...$args): void
     {
-        foreach ($args as $arg) {
-            $this->log(self::EMERGENCY, $arg);
-        }
+        $this->logEach(self::EMERGENCY, $args);
     }
 
     public function log(mixed $level, $message, array $context = []): void
@@ -294,6 +280,13 @@ class Tlog implements LoggerInterface
         }
 
         $this->out($this->levels[$level], (string) $message, $context);
+    }
+
+    private function logEach(int $level, array $args): void
+    {
+        foreach ($args as $arg) {
+            $this->log($level, $arg);
+        }
     }
 
     public function write(string &$res): void
@@ -416,7 +409,7 @@ class Tlog implements LoggerInterface
         if ($message instanceof \Exception) {
             $text = $message->getMessage()."\n".$message->getTraceAsString();
         } elseif (!\is_scalar($message)) {
-            $text = print_r($message, true);
+            $text = (string) print_r($message, true);
         } else {
             $text = (string) $message;
         }
