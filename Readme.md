@@ -28,7 +28,6 @@ Thelia is open source software. See the [LICENSE](LICENSE) file for details.
 - PHP 8.3 with these extensions: pdo_mysql, openssl, intl, gd, curl, dom, mbstring, zip
 - MariaDB 10.11 or MySQL 8
 - Composer 2.7+
-- Node.js 20 and npm, to build the back-office assets
 - Nginx or Apache, with the document root set to `public/`
 
 ## Setting up a development environment
@@ -59,17 +58,12 @@ Without DDEV, export the database variables (or put them in `.env.local`) and ru
 
 ### Build the assets
 
-`bin/install` compiles the front-office assets itself: it runs `importmap:install` and `tailwind:build` for the active front-office theme. To rebuild them later, run both commands from the application root:
+`bin/install` compiles all the assets itself: it runs `importmap:install` and `tailwind:build` for the active front-office theme, and `sass:build` for the back-office stylesheet. To rebuild them later, run the same commands from the application root:
 
 ```bash
-ddev exec php bin/console importmap:install
-ddev exec php bin/console tailwind:build
-```
-
-The back-office theme still builds with npm:
-
-```bash
-ddev exec bash -c "cd templates/backOffice/default-twig && npm install && npm run build"
+ddev exec php bin/console importmap:install   # front-office JavaScript dependencies
+ddev exec php bin/console tailwind:build      # front-office stylesheet (Flexy)
+ddev exec php bin/console sass:build          # back-office stylesheet (default-twig)
 ```
 
 The storefront is then at `https://<project>.ddev.site` and the admin at `https://<project>.ddev.site/admin`.
