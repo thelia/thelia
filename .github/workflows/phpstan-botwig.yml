@@ -53,5 +53,5 @@ jobs:
           rm -rf templates/backOffice/default-twig
           git clone --depth 1 --branch main https://github.com/thelia-templates/default-twig.git templates/backOffice/default-twig
 
-      - name: PHPStan (level 5 + dedicated baseline)
-        run: ./vendor/bin/phpstan analyse -c phpstan-botwig.neon --level=5 --no-progress --error-format=github templates/backOffice/default-twig/src
+      - name: PHPStan (level and paths come from phpstan-botwig.neon)
+        run: ./vendor/bin/phpstan analyse -c phpstan-botwig.neon --no-progress --error-format=github
