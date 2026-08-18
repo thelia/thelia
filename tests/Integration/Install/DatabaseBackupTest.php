@@ -35,6 +35,9 @@ final class DatabaseBackupTest extends IntegrationTestCase
 {
     private const TABLE = 'backup_round_trip';
 
+    /** Mirrors the statement backupDb() closes a dump with; the assertion below catches a drift. */
+    private const DUMP_TERMINATOR = 'SET foreign_key_checks=1;';
+
     protected bool $useTransaction = false;
 
     private string $dumpFile;
@@ -146,10 +149,19 @@ final class DatabaseBackupTest extends IntegrationTestCase
         $this->insert(1, 'a row');
         $this->database()->backupDb($this->dumpFile, [self::TABLE]);
 
-        // Narrow the column the dump recreates, so its own INSERT no longer fits it:
-        // the same rejection, mid-restore, that an empty string for an integer produced.
+        // A row carrying the wrong number of values. Every server refuses that, in any
+        // sql_mode and any version. Narrowing a column and feeding it a string instead
+        // only failed where STRICT_TRANS_TABLES is on: Thelia takes that mode off on
+        // MySQL, so the restore went through and the test had nothing to catch.
         $dump = (string) file_get_contents($this->dumpFile);
-        file_put_contents($this->dumpFile, str_replace('`payload` longtext', '`payload` int(11)', $dump));
+        $broken = str_replace(
+            self::DUMP_TERMINATOR,
+            'INSERT INTO `'.self::TABLE."` VALUES('one value for three columns');\n".self::DUMP_TERMINATOR,
+            $dump,
+        );
+
+        self::assertNotSame($dump, $broken, 'A dump no longer ends the way this test breaks it.');
+        file_put_contents($this->dumpFile, $broken);
 
         $message = null;
 
