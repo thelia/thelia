@@ -207,6 +207,7 @@ if (null === $updateError) {
             cliOutput('Database restore started. Wait, it could take a while...');
 
             if (false === $update->restoreDb()) {
+                cliOutput($update->getRestoreFailure() ?? 'The backup could not be restored.', 'error');
                 cliOutput(sprintf(
                     'Sorry, your database can\'t be restore. Try to do it manually : %s',
                     $update->getBackupFile(),

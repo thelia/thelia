@@ -54,6 +54,7 @@ class Update
     protected array $updatedVersions = [];
     protected ConnectionInterface|\PDO $connection;
     protected ?string $backupFile = null;
+    protected ?string $restoreFailure = null;
     protected string $backupDir = 'local/backup/';
     protected array $messages = [];
     protected Translator $translator;
@@ -338,13 +339,25 @@ class Update
 
             $database->restoreDb($this->backupFile);
         } catch (\Exception $exception) {
+            // Kept for the caller to print: it names the table the restore stopped on,
+            // and what the database holds now. Written on the object rather than echoed,
+            // so the caller decides where it goes.
+            $this->restoreFailure = $exception->getMessage();
+
             $this->log('error', \sprintf('error during restore process with message : %s', $exception->getMessage()));
-            echo $exception->getMessage();
 
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Why the last restore failed, or null if none did.
+     */
+    public function getRestoreFailure(): ?string
+    {
+        return $this->restoreFailure;
     }
 
     public function getBackupFile(): ?string
