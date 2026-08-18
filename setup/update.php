@@ -20,6 +20,9 @@ if (\PHP_SAPI !== 'cli') {
     throw new Exception('this script can only be launched with cli sapi');
 }
 
+// How many times an unusable answer is asked again before the script gives up.
+const UPDATE_MAX_INPUT_ATTEMPTS = 3;
+
 $bootstrapToggle = false;
 $bootstraped = false;
 
@@ -95,64 +98,40 @@ $current = $update->getCurrentVersion();
 $files = $update->getLatestVersion();
 $web = $update->getWebVersion();
 
-while (1) {
-    if (null !== $web && $files !== $web) {
-        cliOutput(sprintf(
-            'Thelia server is reporting the current stable release version is %s ',
-            $web,
-        ), 'warning');
-    }
-
+if (null !== $web && $files !== $web) {
     cliOutput(sprintf(
-        'You are going to update Thelia from version %s to version %s.',
-        $current,
+        'Thelia server is reporting the current stable release version is %s ',
+        $web,
+    ), 'warning');
+}
+
+cliOutput(sprintf(
+    'You are going to update Thelia from version %s to version %s.',
+    $current,
+    $files,
+), 'info');
+
+if (null !== $web && $files < $web) {
+    cliOutput(sprintf(
+        'Your files belongs to version %s, which is not the latest stable release.',
         $files,
-    ), 'info');
-
-    if (null !== $web && $files < $web) {
-        cliOutput(sprintf(
-            'Your files belongs to version %s, which is not the latest stable release.',
-            $files,
-        ), 'warning');
-        cliOutput(
-            'It is recommended to upgrade your files first then run this script again.'.\PHP_EOL
-            .'The latest version is available at http://thelia.net/#download .',
-            'warning',
-        );
-        cliOutput('Continue update process anyway ? (Y/n)');
-    } else {
-        cliOutput('Continue update process ? (Y/n)');
-    }
-
-    $rep = readStdin(true);
-
-    if ('y' === $rep) {
-        break;
-    }
-
-    if ('n' === $rep) {
-        cliOutput('Update aborted', 'warning');
-        exit(0);
-    }
+    ), 'warning');
+    cliOutput(
+        'It is recommended to upgrade your files first then run this script again.'.\PHP_EOL
+        .'The latest version is available at http://thelia.net/#download .',
+        'warning',
+    );
+    $question = 'Continue update process anyway ? (Y/n)';
+} else {
+    $question = 'Continue update process ? (Y/n)';
 }
 
-$backup = false;
-
-while (1) {
-    cliOutput('Would you like to backup the current database before proceeding ? (Y/n)');
-
-    $rep = readStdin(true);
-
-    if ('y' === $rep) {
-        $backup = true;
-        break;
-    }
-
-    if ('n' === $rep) {
-        $backup = false;
-        break;
-    }
+if (!askConfirmation($question)) {
+    cliOutput('Update aborted', 'warning');
+    exit(0);
 }
+
+$backup = askConfirmation('Would you like to backup the current database before proceeding ? (Y/n)');
 
 /*
  * Update
@@ -198,30 +177,18 @@ if (null === $updateError) {
         cliOutput(sprintf('[%s] %s'.\PHP_EOL, $log[0], $log[1]), 'error');
     }
 
-    if (true === $backup) {
-        while (1) {
-            cliOutput('Would you like to restore the backup database ? (Y/n)');
+    if (true === $backup && askConfirmation('Would you like to restore the backup database ? (Y/n)')) {
+        cliOutput('Database restore started. Wait, it could take a while...');
 
-            $rep = readStdin(true);
-
-            if ('y' === $rep) {
-                cliOutput('Database restore started. Wait, it could take a while...');
-
-                if (false === $update->restoreDb()) {
-                    cliOutput(sprintf(
-                        'Sorry, your database can\'t be restore. Try to do it manually : %s',
-                        $update->getBackupFile(),
-                    ), 'error');
-                    exit(5);
-                }
-                cliOutput('Database successfully restore.');
-                exit(5);
-            }
-
-            if ('n' === $rep) {
-                exit(0);
-            }
+        if (false === $update->restoreDb()) {
+            cliOutput(sprintf(
+                'Sorry, your database can\'t be restore. Try to do it manually : %s',
+                $update->getBackupFile(),
+            ), 'error');
+            exit(5);
         }
+        cliOutput('Database successfully restore.');
+        exit(5);
     }
 }
 
@@ -253,12 +220,15 @@ if (true === $hasDeleteError) {
 }
 
 cliOutput('Update process finished.', 'info');
-exit(0);
+exit(null === $updateError ? 0 : 7);
 
 /*
  * Utils
  */
 
+/**
+ * @return string|false the answer, or false when standard input is exhausted
+ */
 function readStdin($normalize = false)
 {
     // Kept open across calls: closing php://stdin makes every later read fail,
@@ -269,16 +239,55 @@ function readStdin($normalize = false)
         $stream = fopen('php://stdin', 'r');
     }
 
+    if (false === $stream) {
+        return false;
+    }
+
     $input = fgets($stream, 128);
 
-    // End of input (a pipe that ran out, or no stdin at all): behave like an empty answer.
-    $input = false === $input ? '' : rtrim($input);
+    // End of input: a pipe that ran out, or no stdin at all.
+    if (false === $input) {
+        return false;
+    }
+
+    $input = rtrim($input);
 
     if ($normalize) {
         $input = strtolower(trim($input));
     }
 
     return $input;
+}
+
+function askConfirmation($question): bool
+{
+    for ($attempt = 0; $attempt < UPDATE_MAX_INPUT_ATTEMPTS; ++$attempt) {
+        cliOutput($question);
+
+        $answer = readStdin(true);
+
+        if (false === $answer) {
+            abortUpdate('standard input is exhausted or is not a terminal, no answer can be read.');
+        }
+
+        if ('y' === $answer) {
+            return true;
+        }
+
+        if ('n' === $answer) {
+            return false;
+        }
+
+        cliOutput('Please answer y or n.', 'warning');
+    }
+
+    abortUpdate(sprintf('no valid answer after %d attempts.', UPDATE_MAX_INPUT_ATTEMPTS));
+}
+
+function abortUpdate($reason): never
+{
+    cliOutput('Update aborted : '.$reason, 'error');
+    exit(6);
 }
 
 function joinPaths()
