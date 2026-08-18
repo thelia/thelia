@@ -190,8 +190,13 @@ class Update
 
         $index = $this->getStartIndex((string) $currentVersion);
 
-        $this->connection->beginTransaction();
-
+        // The loop runs outside any transaction. MariaDB commits implicitly on every
+        // CREATE, ALTER and DROP, so a transaction spanning a schema migration ends at
+        // the first one and leaves everything written before it committed: it promises
+        // all-or-nothing and delivers neither. What makes an interrupted run recoverable
+        // is the version marker updateToVersion() writes after each version, so the next
+        // run resumes where this one stopped, and the backup update.php offers
+        // beforehand, the only thing that can undo a schema change.
         $database = new Database($this->connection);
         $version = null;
 
@@ -240,29 +245,20 @@ class Update
                 }
             }
 
-            $this->connection->commit();
             $this->log('debug', 'update successfully');
         } catch (\Exception $exception) {
-            if ($this->connection->inTransaction()) {
-                $this->connection->rollBack();
-            }
-
             $this->log('error', \sprintf('error during update process with message : %s', $exception->getMessage()));
 
-            $ex = new UpdateException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
+            // A failing statement reaches here as a PDOException, whose getCode() is the
+            // SQLSTATE string ('42S02'). Exception only takes an int, so wrapping it
+            // raised a TypeError of its own and no SQL failure ever reached update.php:
+            // the operator got a fatal error instead of the offer to restore the backup.
+            $code = $exception->getCode();
+
+            $ex = new UpdateException($exception->getMessage(), \is_int($code) ? $code : 0, $exception);
             $ex->setVersion($version);
 
             throw $ex;
-        } catch (\Throwable $throwable) {
-            // An Error is not turned into an UpdateException — the installer keeps
-            // seeing it as it is today — but the update transaction is closed.
-            // The guard matters here: $this->connection is the unwrapped handle
-            // (see __construct()), whose rollBack() throws when no transaction is open.
-            if ($this->connection->inTransaction()) {
-                $this->connection->rollBack();
-            }
-
-            throw $throwable;
         }
 
         $this->log('debug', 'end of update processing');

@@ -184,18 +184,39 @@ if (null === $updateError) {
         cliOutput(sprintf('[%s] %s'.\PHP_EOL, $log[0], $log[1]), 'error');
     }
 
-    if (true === $backup && askConfirmation('Would you like to restore the backup database ? (Y/n)')) {
-        cliOutput('Database restore started. Wait, it could take a while...');
+    if (true === $backup) {
+        // Say what the restore does before asking. It rewrites every table from the
+        // backup, so it undoes the versions the run did manage to apply and drops
+        // everything written since the backup was taken.
+        $appliedVersions = $update->getUpdatedVersions();
 
-        if (false === $update->restoreDb()) {
+        if ([] !== $appliedVersions) {
             cliOutput(sprintf(
-                'Sorry, your database can\'t be restore. Try to do it manually : %s',
-                $update->getBackupFile(),
-            ), 'error');
+                'Applied to the database before the failure: %s.',
+                implode(', ', $appliedVersions),
+            ), 'warning');
+        }
+
+        cliOutput(
+            'Restoring rewrites every table from the backup: those versions, and anything '
+            .'written since the backup was taken, are lost.',
+            'warning',
+        );
+
+        if (askConfirmation('Would you like to restore the backup database ? (Y/n)')) {
+            cliOutput('Database restore started. Wait, it could take a while...');
+
+            if (false === $update->restoreDb()) {
+                cliOutput(sprintf(
+                    'Sorry, your database can\'t be restore. Try to do it manually : %s',
+                    $update->getBackupFile(),
+                ), 'error');
+                exit(5);
+            }
+
+            cliOutput('Database successfully restore.');
             exit(5);
         }
-        cliOutput('Database successfully restore.');
-        exit(5);
     }
 }
 
