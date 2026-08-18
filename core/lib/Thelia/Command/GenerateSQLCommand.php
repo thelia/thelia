@@ -46,12 +46,19 @@ class GenerateSQLCommand extends ContainerAwareCommand
     {
         $this
             ->setName('generate:sql')
-            ->setDescription('Generate SQL files (insert.sql, update*.sql)')
+            ->setDescription('Generate setup/insert.sql from setup/insert.sql.tpl')
             ->addOption(
                 'locales',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES'
+                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES. '
+                .'Defaults to the locales of the languages the seed creates.'
+            )
+            ->addOption(
+                'check',
+                null,
+                InputOption::VALUE_NONE,
+                'report whether setup/insert.sql is what the template produces, without writing it'
             );
     }
 
@@ -59,36 +66,31 @@ class GenerateSQLCommand extends ContainerAwareCommand
     {
         $this->init($input);
 
-        // Main insert.sql file
-        $content = file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql.tpl');
+        $seed = THELIA_SETUP_DIRECTORY.'insert.sql';
+
+        $content = file_get_contents($seed.'.tpl');
         $version = Version::parse();
         $content = $this->parser->renderString($content, $version, false);
 
-        if (false === file_put_contents(THELIA_SETUP_DIRECTORY.'insert.sql', $content)) {
-            $output->writeln("Can't write file ".THELIA_SETUP_DIRECTORY.'insert.sql');
-        } else {
-            $output->writeln('File '.THELIA_SETUP_DIRECTORY.'insert.sql generated successfully.');
-        }
+        if ($input->getOption('check')) {
+            if ($content === file_get_contents($seed)) {
+                $output->writeln('File '.$seed.' is up to date.');
 
-        // sql update files
-        $finder = Finder::create()
-            ->name('*.tpl')
-            ->depth(0)
-            ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
-
-        /** @var \SplFileInfo $file */
-        foreach ($finder as $file) {
-            $content = file_get_contents($file->getRealPath());
-            $content = $this->parser->renderString($content, [], false);
-
-            $destination = THELIA_SETUP_DIRECTORY.'update'.DS.'sql'.DS.$file->getBasename('.tpl');
-
-            if (false === file_put_contents($destination, $content)) {
-                $output->writeln("Can't write file ".$destination);
-            } else {
-                $output->writeln('File '.$destination.' generated successfully.');
+                return 0;
             }
+
+            $output->writeln('<error>'.$seed.' is not what insert.sql.tpl and setup/I18n produce. Run: php Thelia generate:sql</error>');
+
+            return 1;
         }
+
+        if (false === file_put_contents($seed, $content)) {
+            $output->writeln("Can't write file ".$seed);
+
+            return 1;
+        }
+
+        $output->writeln('File '.$seed.' generated successfully.');
 
         return 0;
     }
@@ -125,7 +127,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         if (!empty($localesToKeep)) {
             $localesToKeep = explode(',', $localesToKeep);
         } else {
-            $localesToKeep = null;
+            $localesToKeep = $this->getSeededLocales();
         }
 
         /** @var \SplFileInfo $file */
@@ -133,7 +135,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
             $locale = $file->getBasename('.php');
             $availableLocales[] = $locale;
 
-            if (empty($localesToKeep) || \in_array($locale, $localesToKeep)) {
+            if (\in_array($locale, $localesToKeep, true)) {
                 $this->locales[] = $locale;
                 $this->translator->addResource(
                     'php',
@@ -152,6 +154,29 @@ class GenerateSQLCommand extends ContainerAwareCommand
                 )
             );
         }
+    }
+
+    /**
+     * The locales of the languages the seed creates, read from the `lang` block
+     * of the template.
+     *
+     * Seeding the wording of a language the shop does not have would only bloat
+     * the generated file, and it is what the shipped `insert.sql` holds: taking
+     * every file of `setup/I18n` instead makes a plain run rewrite it.
+     *
+     * @return string[]
+     */
+    protected function getSeededLocales()
+    {
+        $template = file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql.tpl');
+
+        if (1 !== preg_match('/INSERT INTO `lang`.*?;/s', $template, $langBlock)) {
+            throw new \RuntimeException('insert.sql.tpl seeds no language.');
+        }
+
+        preg_match_all("/^\(\d+, '[^']*', '[^']*', '([^']*)'/m", $langBlock[0], $matches);
+
+        return $matches[1];
     }
 
     /**

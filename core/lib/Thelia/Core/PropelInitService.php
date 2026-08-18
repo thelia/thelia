@@ -268,19 +268,33 @@ class PropelInitService
     }
 
     /**
+     * @return bool whether the generated global schema(s) hold at least one schema
+     */
+    public function hasPropelGlobalSchema()
+    {
+        $schemas = glob($this->getPropelSchemaDir().'*.schema.xml');
+
+        return \is_array($schemas) && [] !== $schemas;
+    }
+
+    /**
      * Generate the global Propel schema(s).
      */
     public function buildPropelGlobalSchema()
     {
         $fs = new Filesystem();
 
-        // TODO: caching rules ?
-        if ($fs->exists($this->getPropelSchemaDir())) {
+        // The directory alone does not make the cache: a generation interrupted
+        // after its creation leaves it empty, and Propel then refuses to build
+        // the models with "No schema files were found". Only a directory that
+        // holds a schema is a cache to keep.
+        if ($this->hasPropelGlobalSchema()) {
             return false;
         }
 
         $hash = '';
 
+        $fs->remove($this->getPropelSchemaDir());
         $fs->mkdir($this->getPropelSchemaDir());
 
         $schemaCombiner = new SchemaCombiner(
@@ -313,7 +327,8 @@ class PropelInitService
         $fs = new Filesystem();
 
         // cache testing
-        if ($fs->exists($this->getPropelModelDir().'hash')
+        if ($fs->exists($this->getPropelCacheDir().'hash')
+            && $fs->exists($this->getPropelModelDir().'hash')
             && file_get_contents($this->getPropelCacheDir().'hash') === file_get_contents($this->getPropelModelDir().'hash')) {
             return false;
         }
