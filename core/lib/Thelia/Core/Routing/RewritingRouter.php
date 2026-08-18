@@ -137,8 +137,31 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 ->retrieve($resolver->view, $resolver->viewId, $requestedLang->getLocale())
                 ->toString();
 
-            $this->redirect(URL::getInstance()->absoluteUrl($localizedUrl), 301);
+            $this->redirect(
+                URL::getInstance()->absoluteUrl($localizedUrl, $this->requestedQueryParameters($request)),
+                301,
+            );
         }
+    }
+
+    /**
+     * The page has to survive the language switch, and so does its state: a paginated
+     * listing, a sort order, a filter are all carried by the query string.
+     *
+     * They are read from the query string of the request and not from the query bag, which
+     * applyRewritingAttributes() fills with the view id and with the parameters encoded in
+     * the rewritten url. Those are internal to the rewriting and have no business being
+     * written back into a public url. "lang" is dropped as well: it has been consumed here,
+     * and the url it points to already is the one of the requested language.
+     */
+    private function requestedQueryParameters(Request $request): array
+    {
+        $parameters = [];
+        parse_str((string) $request->getQueryString(), $parameters);
+
+        unset($parameters['lang']);
+
+        return $parameters;
     }
 
     protected function ensureActiveLocaleOrRedirect(RewritingResolver $resolver): void

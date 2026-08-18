@@ -213,18 +213,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 file_put_contents($filename, $schemaContent);
             }
 
-            // routing.xml file
-            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.'routing.xml';
-
-            if (!$fs->exists($filename)) {
-                $routingContent = file_get_contents($skeletonDir.'routing.xml');
-
-                $routingContent = str_replace('%%NAMESPACE%%', $this->module, $routingContent);
-                $routingContent = str_replace('%%CLASSNAME_LOWER%%', strtolower((string) $this->module), $routingContent);
-
-                file_put_contents($filename, $routingContent);
-            }
-
             // I18n sample files
             $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'fr_FR.php';
 

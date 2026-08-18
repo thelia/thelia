@@ -75,8 +75,10 @@ class Update
                 ProductTableMap::DATABASE_NAME,
             );
 
-            // Unwrap before assigning: the property is typed \PDO, so the wrapper
-            // cannot transit through it.
+            // Unwrap the wrapper Propel returns, so that the update runs on the one
+            // connection it opened rather than through its transaction bookkeeping.
+            // What comes out is a PdoConnection, not a \PDO: it exposes the same
+            // query(), prepare() and exec(), and keeps its own \PDO private.
             if ($connection instanceof ConnectionWrapper) {
                 $connection = $connection->getWrappedConnection();
             }
@@ -254,7 +256,7 @@ class Update
         } catch (\Throwable $throwable) {
             // An Error is not turned into an UpdateException — the installer keeps
             // seeing it as it is today — but the update transaction is closed.
-            // The guard matters here: $this->connection is the raw PDO handle
+            // The guard matters here: $this->connection is the unwrapped handle
             // (see __construct()), whose rollBack() throws when no transaction is open.
             if ($this->connection->inTransaction()) {
                 $this->connection->rollBack();
@@ -442,15 +444,16 @@ class Update
 
     public function setCurrentVersion($version): void
     {
-        if ($this->connection instanceof \PDO) {
-            try {
-                $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
-                $stmt->execute([$version, 'thelia_version']);
-            } catch (\PDOException $e) {
-                $this->log('error', \sprintf('Error setting current version : %s', $e->getMessage()));
+        // No instanceof \PDO guard here: the connection Propel hands out is a
+        // PdoConnection, so the guard silently skipped the only write that records
+        // how far the update went, and every run started over from the same version.
+        try {
+            $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
+            $stmt->execute([$version, 'thelia_version']);
+        } catch (\PDOException $e) {
+            $this->log('error', \sprintf('Error setting current version : %s', $e->getMessage()));
 
-                throw $e;
-            }
+            throw $e;
         }
     }
 

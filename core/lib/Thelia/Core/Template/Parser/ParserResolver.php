@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -39,7 +40,14 @@ class ParserResolver
     }
 
     /**
-     * @throws \Exception
+     * No parser able to render the named template means the template does not exist in the
+     * active theme: an unknown view, not a broken installation. It is reported as a missing
+     * resource, the same way a parser reports a template file it cannot load, so that callers
+     * decide what it means for them - the front-office view chain answers 404, the back-office
+     * catch-all does the same, and the mail and PDF renderers, which also run from the command
+     * line, are free to treat it as the misconfiguration it is for them.
+     *
+     * @throws ResourceNotFoundException when no registered parser can render the template
      */
     public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
     {
@@ -56,11 +64,11 @@ class ParserResolver
             }
         }
 
-        throw new \Exception(\sprintf('Parser for template %s not found', $templateName));
+        throw new ResourceNotFoundException(\sprintf('Parser for template %s not found', $templateName));
     }
 
     /**
-     * @throws \Exception
+     * @throws ResourceNotFoundException when no registered parser can render the requested view
      */
     public function getParserByCurrentRequest(): ?ParserInterface
     {

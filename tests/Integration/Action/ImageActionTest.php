@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Action;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
@@ -26,6 +27,8 @@ use Thelia\Tests\Support\Trait\CreatesTestFiles;
 final class ImageActionTest extends ActionIntegrationTestCase
 {
     use CreatesTestFiles;
+
+    private const CACHE_SUBDIRECTORY = 'test-image-action';
 
     protected function tearDown(): void
     {
@@ -140,5 +143,64 @@ final class ImageActionTest extends ActionIntegrationTestCase
 
         $reloaded = ProductImageQuery::create()->findPk($savedModel->getId());
         self::assertSame(0, (int) $reloaded->getVisible());
+    }
+
+    public function testProcessImageServesAnSvgWithoutRasterizingIt(): void
+    {
+        $sourceFile = $this->createTestSvg();
+        $this->trackFileForCleanup($sourceFile);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        $cacheFilePath = $event->getCacheFilepath();
+        self::assertNotNull($cacheFilePath);
+        $this->trackFileForCleanup($cacheFilePath);
+        $this->trackFileForCleanup($event->getCacheOriginalFilepath());
+
+        self::assertFileExists($cacheFilePath);
+        self::assertNotEmpty($event->getFileUrl());
+        self::assertNull($event->getImageObject(), 'A vector image must never be handed to the raster pipeline.');
+    }
+
+    public function testProcessImageRescalesAnSvgWithoutRasterizingIt(): void
+    {
+        $sourceFile = $this->createTestSvg();
+        $this->trackFileForCleanup($sourceFile);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY)
+            ->setWidth(64);
+
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        $cacheFilePath = $event->getCacheFilepath();
+        self::assertNotNull($cacheFilePath);
+        $this->trackFileForCleanup($cacheFilePath);
+        $this->trackFileForCleanup($event->getCacheOriginalFilepath());
+
+        self::assertStringContainsString('width="64"', (string) file_get_contents($cacheFilePath));
+        self::assertNull($event->getImageObject(), 'A vector image must never be handed to the raster pipeline.');
+    }
+
+    public function testProcessImageStillAttachesAnImageObjectForRasterImages(): void
+    {
+        $sourceFile = $this->createTestPng();
+        $this->trackFileForCleanup($sourceFile);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        $this->trackFileForCleanup((string) $event->getCacheFilepath());
+        $this->trackFileForCleanup($event->getCacheOriginalFilepath());
+
+        self::assertNotNull($event->getImageObject());
     }
 }

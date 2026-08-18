@@ -186,6 +186,68 @@ final class RewritingRouterTest extends IntegrationTestCase
         }
     }
 
+    /**
+     * @return array{0: string, 1: string} the french then the english url of the same category
+     */
+    private function createTranslatedCategory(string $title): array
+    {
+        $category = $this->createCategory($title);
+        $category->setLocale('fr_FR')->setTitle($title.' en francais')->save();
+
+        return [$category->getRewrittenUrl('fr_FR'), $category->getRewrittenUrl('en_US')];
+    }
+
+    private static function queryParametersOf(string $url): array
+    {
+        $parameters = [];
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $parameters);
+        ksort($parameters);
+
+        return $parameters;
+    }
+
+    public function testMatchRequestKeepsTheQueryParametersWhenSwitchingLanguage(): void
+    {
+        [$frenchUrl, $englishUrl] = $this->createTranslatedCategory('Category read in another language');
+
+        try {
+            $this->router->matchRequest(
+                $this->request($frenchUrl, ['page' => '2', 'order' => 'price', 'lang' => 'en_US']),
+            );
+            self::fail('Asking for another language must redirect to the url of that language.');
+        } catch (RedirectException $redirectException) {
+            $target = $redirectException->getUrl();
+
+            // The state of the page - here the page of a paginated listing and its sort order -
+            // used to be dropped, sending the visitor back to the top of the first page.
+            self::assertStringEndsWith('/'.$englishUrl, (string) parse_url($target, \PHP_URL_PATH));
+            self::assertSame(['order' => 'price', 'page' => '2'], self::queryParametersOf($target));
+        }
+    }
+
+    public function testMatchRequestDoesNotCarryRewritingParametersOverWhenSwitchingLanguage(): void
+    {
+        [$frenchUrl, $englishUrl] = $this->createTranslatedCategory('Category read with rewriting parameters');
+
+        $request = $this->request($frenchUrl, ['page' => '2', 'lang' => 'en_US']);
+
+        // What applyRewritingAttributes() writes into the query bag: the view id, and the
+        // parameters encoded in the rewritten url. They are internal to the rewriting and
+        // must never be handed back to the visitor as part of a public url.
+        $request->query->set('category_id', '4242');
+        $request->query->set('folder_id', '7');
+
+        try {
+            $this->router->matchRequest($request);
+            self::fail('Asking for another language must redirect to the url of that language.');
+        } catch (RedirectException $redirectException) {
+            $target = $redirectException->getUrl();
+
+            self::assertStringEndsWith('/'.$englishUrl, (string) parse_url($target, \PHP_URL_PATH));
+            self::assertSame(['page' => '2'], self::queryParametersOf($target));
+        }
+    }
+
     public function testMatchRequestRedirectsAReplacedUrlToTheCurrentOne(): void
     {
         $category = $this->createCategory('Replaced category');
