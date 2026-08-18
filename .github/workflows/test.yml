@@ -46,5 +46,17 @@ jobs:
         # database, build the Propel models and generate the JWT keys.
         run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
 
+      - name: Install the front theme importmap vendors
+        # The Flexy theme renders its JavaScript through AssetMapper and its Composer
+        # package ships no assets/vendor/: without them the front pages cannot render
+        # and their smoke tests skip instead of asserting a 200. The vendor directory
+        # follows the active front template, which the kernel reads from the database,
+        # so the test database has to exist first — `composer ci` builds it again,
+        # idempotently. A failed download only brings the skips back, never a red job.
+        continue-on-error: true
+        run: |
+          php bin/test-prepare
+          php bin/console importmap:install --env=test
+
       - name: Run CI (cs-diff, phpstan, the five PHPUnit suites)
         run: composer ci
