@@ -45,6 +45,9 @@ use Thelia\Tools\URL;
  * A copy (or symbolic link, by default) of the original image is always created in the cache, so that the full
  * resolution image is always available.
  *
+ * SVG images are never rasterized: only their width and height attributes are rewritten, and no Imagine
+ * image object is attached to the event.
+ *
  * Various image processing options are available :
  *
  * - resizing, with border, crop, or by keeping image aspect ratio
@@ -93,11 +96,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
-        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
 
         if (null === $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
+
+        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
 
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
@@ -137,7 +141,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
-                if ('svg' === $imageExt) {
+                if ($this->isVectorImage($imageExt)) {
                     $dom = new \DOMDocument('1.0', 'utf-8');
                     $dom->load($originalImagePathInCache);
                     $svg = $dom->documentElement;
@@ -182,9 +186,26 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $event->setFileUrl(URL::getInstance()->absoluteUrl($processedImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
         $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($originalImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
 
+        // The raster pipeline cannot open a vector image: attaching an ImageInterface to the event
+        // would fail on every single render, including when the cached file is already up to date.
+        if ($this->isVectorImage($imageExt)) {
+            $event->setImageObject(null);
+
+            return;
+        }
+
         $imagine = $this->createImagineInstance();
         $image = $imagine->open($cacheFilePath);
         $event->setImageObject($image);
+    }
+
+    /**
+     * A vector image is served from the cache as-is: it is never rasterized, and no
+     * ImageInterface is attached to the event.
+     */
+    private function isVectorImage(string $extension): bool
+    {
+        return 'svg' === strtolower($extension);
     }
 
     private function applyTransformation(
