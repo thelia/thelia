@@ -5,6 +5,9 @@
         "thelia/installer": "~1.1"
     },
     "extra": {
-        "installer-name": "setup"
+        "installer-name": "setup",
+        "branch-alias": {
+            "dev-main": "3.0.x-dev"
+        }
     }
 }
