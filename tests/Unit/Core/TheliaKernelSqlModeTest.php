@@ -76,7 +76,7 @@ final class TheliaKernelSqlModeTest extends TestCase
         $fetcher = $this->createMock(PDODataFetcher::class);
         $fetcher->method('fetch')->willReturn([
             'version' => $version,
-            'session_sql_mode' => implode(',', $serverModes),
+            'global_sql_mode' => implode(',', $serverModes),
         ]);
 
         $appliedModes = $serverModes;
