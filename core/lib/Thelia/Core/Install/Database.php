@@ -27,6 +27,9 @@ use Thelia\Log\Tlog;
  */
 class Database
 {
+    /** The statement backupDb() closes a dump with, and restoreDb() looks for to tell a whole file from a truncated one. */
+    private const DUMP_TERMINATOR = 'SET foreign_key_checks=1;';
+
     protected ConnectionInterface|\PDO $connection;
 
     /**
@@ -122,29 +125,45 @@ class Database
      */
     protected function prepareSql($sql): array
     {
-        $sql = str_replace(";',", '-CODE-', $sql);
+        // Both substitutions below hide a semicolon from the splitter and put it back
+        // once the file is cut. The tokens are drawn per call and checked against the
+        // file, so nothing in the data can be mistaken for one on the way back. Fixed
+        // markers could be: the placeholder was '|', so every pipe a shop had written
+        // came out of a dump as a semicolon.
+        $quotedSemicolon = $this->placeholderAbsentFrom($sql);
+        $blockSemicolon = $this->placeholderAbsentFrom($sql);
+
+        $sql = str_replace(";',", $quotedSemicolon, $sql);
         $sql = trim($sql);
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
 
         foreach ($m[0] as $k => $v) {
-            if ('|' === $m[1][$k]) {
-                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
-            }
-
-            $stored = str_replace([';', $m[1][$k]], ['|', ";\n"], $m[2][$k]);
+            // A '|' delimiter used to be rejected here, because '|' was the placeholder
+            // above and the two would have collided. Nothing is reserved any more.
+            $stored = str_replace([';', $m[1][$k]], [$blockSemicolon, ";\n"], $m[2][$k]);
             $sql = str_replace($v, $stored, $sql);
         }
 
         $query = [];
 
-        $tab = explode(";\n", $sql);
-
-        foreach ($tab as $iValue) {
-            $queryTemp = str_replace(['-CODE-', '|'], [";',", ';'], $iValue);
-            $query[] = $queryTemp;
+        foreach (explode(";\n", $sql) as $iValue) {
+            $query[] = str_replace([$quotedSemicolon, $blockSemicolon], [";',", ';'], $iValue);
         }
 
         return $query;
+    }
+
+    /**
+     * A token the file does not already contain, so that putting it back cannot alter
+     * a value that happened to look like it.
+     */
+    private function placeholderAbsentFrom(string $sql): string
+    {
+        do {
+            $placeholder = '{{thelia-sql-'.bin2hex(random_bytes(8)).'}}';
+        } while (str_contains($sql, $placeholder));
+
+        return $placeholder;
     }
 
     /**
@@ -202,9 +221,7 @@ class Database
                     $data[] = 'INSERT INTO `'.$table.'` VALUES(';
 
                     for ($j = 0; $j < $fieldCount; ++$j) {
-                        $row[$j] = addslashes((string) $row[$j]);
-                        $row[$j] = str_replace("\n", '\\n', $row[$j]);
-                        $data[] = '"'.$row[$j].'"';
+                        $data[] = $this->quoteForDump($row[$j]);
 
                         if ($j < ($fieldCount - 1)) {
                             $data[] = ',';
@@ -218,10 +235,37 @@ class Database
             $data[] = "\n\n\n";
         }
 
-        $data[] = 'SET foreign_key_checks=1;';
+        $data[] = self::DUMP_TERMINATOR;
 
         // save filename
         $this->writeFilename($filename, $data);
+    }
+
+    /**
+     * A value as it goes back in through a plain SQL file.
+     *
+     * NULL stays NULL. Writing it as an empty string is what made a restore die on the
+     * first nullable non-string column it met, after having already dropped and rebuilt
+     * every table before that one.
+     *
+     * Everything else is quoted by the connection, which knows the charset it talks in
+     * and the escaping mode of the server; addslashes() knew neither.
+     *
+     * That also settles the newlines, which used to be substituted by hand afterwards:
+     * the connection escapes CR, LF and CTRL-Z itself, so no raw newline can reach the
+     * file and split a statement in two when prepareSql() cuts the dump on ";\n".
+     */
+    private function quoteForDump(int|float|string|bool|null $value): string
+    {
+        if (null === $value) {
+            return 'NULL';
+        }
+
+        if (\is_bool($value)) {
+            $value = $value ? '1' : '0';
+        }
+
+        return $this->connection->quote((string) $value);
     }
 
     /**
@@ -231,7 +275,65 @@ class Database
      */
     public function restoreDb(string $filename): void
     {
-        $this->insertSql(null, [$filename]);
+        $statements = $this->prepareSql($this->readCompleteDump($filename));
+
+        try {
+            $this->replay($statements);
+        } finally {
+            // A dump turns foreign key checks off so it can be replayed in any order,
+            // and turns them back on at its end. A restore that stops before that must
+            // not leave them off on a connection the caller goes on using.
+            $this->connection->exec('SET foreign_key_checks=1');
+        }
+    }
+
+    /**
+     * @param list<string> $statements
+     */
+    private function replay(array $statements): void
+    {
+        $table = null;
+
+        foreach ($statements as $statement) {
+            if ('' === trim($statement)) {
+                continue;
+            }
+
+            if (1 === preg_match('/^\s*DROP TABLE `([^`]+)`/i', $statement, $matches)) {
+                $table = $matches[1];
+            }
+
+            try {
+                $this->execute($statement);
+            } catch (\Throwable $throwable) {
+                // Say where it stopped. A dump is a DROP, a CREATE and the rows of one
+                // table after another, and DDL cannot be rolled back, so what is left
+                // is the backup up to this table and the previous content after it.
+                throw new \RuntimeException(\sprintf('The restore stopped while rebuilding `%s`. The tables restored before it now hold the backup, the ones after it still hold what they held: %s', $table ?? 'the first statement', $throwable->getMessage()), 0, $throwable);
+            }
+        }
+    }
+
+    /**
+     * Reads a dump only if it is whole.
+     *
+     * The check happens before a single table is dropped: a file cut short by a full
+     * disk or a killed process would otherwise be replayed until it runs out, and leave
+     * the database part backup, part what it was, with nothing to say so.
+     */
+    private function readCompleteDump(string $filename): string
+    {
+        $dump = file_get_contents($filename);
+
+        if (false === $dump || '' === trim($dump)) {
+            throw new \RuntimeException(\sprintf('The backup file %s is empty. Nothing was restored.', $filename));
+        }
+
+        if (!str_ends_with(rtrim($dump), self::DUMP_TERMINATOR)) {
+            throw new \RuntimeException(\sprintf('The backup file %s is truncated: it does not end the way a complete dump ends. Nothing was restored.', $filename));
+        }
+
+        return $dump;
     }
 
     /**
