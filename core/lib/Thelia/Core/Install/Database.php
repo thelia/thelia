@@ -258,7 +258,13 @@ class Database
         );
     }
 
-    public function getConnection(): \PDO
+    /**
+     * The handle the update scripts of setup/update/php are given. Propel hands out a
+     * PdoConnection, which speaks the same query(), prepare() and exec() as \PDO but
+     * does not extend it and keeps its own \PDO private, so a \PDO return type turns
+     * every update script into a TypeError.
+     */
+    public function getConnection(): ConnectionInterface|\PDO
     {
         return $this->connection;
     }
