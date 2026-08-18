@@ -8,18 +8,39 @@ build:
 
     nodes:
         analysis:
+            services:
+                # bin/test-prepare needs a database to build the Propel models; the service
+                # answers on 127.0.0.1:3306 as root with an empty password.
+                mariadb: '10.11'
             tests:
                 override:
+                    # Propel generates its model classes into var/propel/<env>/model when the
+                    # kernel boots. Without them every core/lib/Thelia/Model/* stub reports its
+                    # own Base class as an unknown type — 310 phantom "bug" issues out of the
+                    # 1670 reported. This has to run after the Composer install, hence its place
+                    # here rather than in `dependencies`. A failure only brings those issues
+                    # back, so it must not fail the inspection.
+                    - printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=\nDATABASE_NAME=test\n' > .env.test.local
+                    - php bin/test-prepare || true
                     - php-scrutinizer-run
                     - command: composer phpstan
                       use_website_config: false
 
 filter:
+    # The analysed perimeter lives here rather than in the website configuration, so that
+    # it is versioned and reviewed like the rest of the build.
+    paths:
+        - 'core/lib/Thelia/*'
+
+    # Indexed so that types resolve, never rated: generated Propel models and dependencies.
+    dependency_paths:
+        - 'var/propel/*'
+        - 'vendor/*'
+
     excluded_paths:
         - 'core/CHANGELOG.md'
         - 'tests/*'
         - 'templates/*'
-        - 'vendor/*'
         - 'var/*'
         - 'public/*'
         - 'local/*'
