@@ -8,6 +8,15 @@ build:
 
     nodes:
         analysis:
+            dependencies:
+                before:
+                    # Propel generates its model classes into var/propel/<env>/model when the
+                    # kernel boots. Without them every core/lib/Thelia/Model/* stub reports its
+                    # own Base class as an unknown type — 310 phantom "bug" issues out of the
+                    # 1670 reported. A failure here only brings those back, so it must not fail
+                    # the inspection.
+                    - printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=\nDATABASE_NAME=test\n' > .env.test.local
+                    - php bin/test-prepare || true
             tests:
                 override:
                     - php-scrutinizer-run
@@ -15,11 +24,20 @@ build:
                       use_website_config: false
 
 filter:
+    # The analysed perimeter lives here rather than in the website configuration, so that
+    # it is versioned and reviewed like the rest of the build.
+    paths:
+        - 'core/lib/Thelia/*'
+
+    # Indexed so that types resolve, never rated: generated Propel models and dependencies.
+    dependency_paths:
+        - 'var/propel/*'
+        - 'vendor/*'
+
     excluded_paths:
         - 'core/CHANGELOG.md'
         - 'tests/*'
         - 'templates/*'
-        - 'vendor/*'
         - 'var/*'
         - 'public/*'
         - 'local/*'
