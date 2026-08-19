@@ -44,6 +44,8 @@ readonly class AddressService
             'firstname' => $address->getFirstname(),
             'lastname' => $address->getLastname(),
             'company' => $address->getCompany(),
+            'siret' => $address->getSiret(),
+            'vat_number' => $address->getVatNumber(),
             'address1' => $address->getAddress1(),
             'address2' => $address->getAddress2(),
             'address3' => $address->getAddress3(),
@@ -150,6 +152,8 @@ readonly class AddressService
             $data['company'] ?? null,
             $data['is_default'] ?? false,
             isset($data['state']) ? (int) $data['state'] : null,
+            $data['siret'] ?? null,
+            $data['vat_number'] ?? null,
         );
     }
 

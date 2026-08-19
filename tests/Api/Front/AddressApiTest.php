@@ -168,6 +168,30 @@ final class AddressApiTest extends ApiTestCase
         self::assertStringContainsString('zip code', (string) $response->getContent());
     }
 
+    /**
+     * The front API is another door onto the same table as the address form: a customer must
+     * not be able to save a business address without its identifiers by going through it.
+     */
+    public function testACompanyAddressWithoutIdentifiersIsRefusedOnTheFrontApiToo(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $customer = $factory->customer($title, ['password' => 'password']);
+
+        $payload = $this->payload($title);
+        $payload['company'] = 'Acme SAS';
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/addresses',
+            $payload,
+            $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('registration number is required', (string) $response->getContent());
+    }
+
     public function testTheOptionalAddressLinesMayBeOmitted(): void
     {
         $factory = $this->createFixtureFactory();

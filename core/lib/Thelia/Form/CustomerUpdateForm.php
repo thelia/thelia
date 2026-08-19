@@ -33,6 +33,9 @@ use Thelia\Core\Translation\Translator;
 class CustomerUpdateForm extends BaseForm
 {
     use AddressCountryValidationTrait;
+    // This form does not extend AddressCreateForm, so the trait is applied here too
+    // rather than inherited, and the two fields are declared again below.
+    use AddressLegalIdentifiersValidationTrait;
 
     /**
      * @return void|null
@@ -55,6 +58,26 @@ class CustomerUpdateForm extends BaseForm
                 'label' => Translator::getInstance()->trans('Company'),
                 'label_attr' => [
                     'for' => 'company',
+                ],
+                'required' => false,
+            ])
+            ->add('siret', TextType::class, [
+                'constraints' => [
+                    new Callback($this->verifySiret(...)),
+                ],
+                'label' => Translator::getInstance()->trans('Company registration number'),
+                'label_attr' => [
+                    'for' => 'siret',
+                ],
+                'required' => false,
+            ])
+            ->add('vat_number', TextType::class, [
+                'constraints' => [
+                    new Callback($this->verifyVatNumber(...)),
+                ],
+                'label' => Translator::getInstance()->trans('VAT number'),
+                'label_attr' => [
+                    'for' => 'vat_number',
                 ],
                 'required' => false,
             ])

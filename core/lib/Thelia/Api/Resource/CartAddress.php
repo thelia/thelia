@@ -84,6 +84,13 @@ class CartAddress implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
     public ?string $company = null;
 
+    // Copied from the address by CartAddressService, never typed against the cart itself.
+    #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
+    public ?string $siret = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
+    public ?string $vatNumber = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, ...self::GROUP_CART_COMBINED])]
     public string $address1;
 
@@ -179,6 +186,30 @@ class CartAddress implements PropelResourceInterface
     public function setCompany(?string $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getSiret(): ?string
+    {
+        return $this->siret;
+    }
+
+    public function setSiret(?string $siret): self
+    {
+        $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function getVatNumber(): ?string
+    {
+        return $this->vatNumber;
+    }
+
+    public function setVatNumber(?string $vatNumber): self
+    {
+        $this->vatNumber = $vatNumber;
 
         return $this;
     }

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Customer;
 
+use Thelia\Domain\Legal\CompanyIdentifier;
+
 /**
  * Class CustomerCreateOrUpdateEvent.
  *
@@ -46,6 +48,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         protected ?string $company = null,
         protected ?string $ref = null,
         protected ?int $state = null,
+        protected ?string $siret = null,
+        protected ?string $vatNumber = null,
     ) {
         parent::__construct();
     }
@@ -169,6 +173,20 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this;
     }
 
+    public function setSiret(?string $siret): self
+    {
+        $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function setVatNumber(?string $vatNumber): self
+    {
+        $this->vatNumber = $vatNumber;
+
+        return $this;
+    }
+
     public function setRef(?string $ref): self
     {
         $this->ref = $ref;
@@ -186,6 +204,16 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     public function getCompany(): ?string
     {
         return $this->company;
+    }
+
+    public function getSiret(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->company, CompanyIdentifier::normalizeSiret($this->siret));
+    }
+
+    public function getVatNumber(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->company, CompanyIdentifier::normalizeVatNumber($this->vatNumber));
     }
 
     public function getAddress1(): ?string

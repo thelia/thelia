@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 use Thelia\Test\ApiTestCase;
@@ -69,6 +71,104 @@ final class AddressApiTest extends ApiTestCase
         $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
 
         self::assertJsonResponseSuccessful($response);
+    }
+
+    public function testTheLegalIdentifiersAreReadBack(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $payload = $this->payload($country->getId());
+        $payload['company'] = 'Acme SAS';
+        $payload['siret'] = '303 265 045 00003';
+        $payload['vatNumber'] = 'fr 40 303 265 045';
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+
+        $created = json_decode((string) $response->getContent(), true);
+
+        // Stored in the canonical form, not as they were typed.
+        self::assertSame('30326504500003', $created['siret']);
+        self::assertSame('FR40303265045', $created['vatNumber']);
+    }
+
+    public function testACompanyAddressWithoutAVatNumberIsAValidationError(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $payload = $this->payload($country->getId());
+        $payload['company'] = 'Acme SAS';
+        $payload['siret'] = '30326504500003';
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('VAT number is required', (string) $response->getContent());
+    }
+
+    public function testAnAddressWithoutACompanyNameNeedsNoIdentifier(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $this->payload($country->getId()), $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+        $this->assertStoredIdentifiersAreNull($response);
+    }
+
+    /**
+     * A payload that skips the browser cannot smuggle identifiers onto an address that
+     * carries no company name: they are dropped rather than stored.
+     */
+    public function testIdentifiersPostedWithoutACompanyNameAreDropped(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $payload = $this->payload($country->getId());
+        $payload['siret'] = '30326504500003';
+        $payload['vatNumber'] = 'FR40303265045';
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+        $this->assertStoredIdentifiersAreNull($response);
+    }
+
+    /**
+     * Asserted on the stored row rather than on the response body: the serializer leaves a
+     * null property out of the payload, so an absent key would satisfy assertNull by accident.
+     */
+    private function assertStoredIdentifiersAreNull(Response $response): void
+    {
+        $created = json_decode((string) $response->getContent(), true);
+        self::assertIsArray($created);
+        self::assertArrayHasKey('id', $created);
+
+        $address = AddressQuery::create()->findPk($created['id']);
+        self::assertNotNull($address);
+        self::assertNull($address->getSiret());
+        self::assertNull($address->getVatNumber());
+    }
+
+    public function testASiretWithAnInvalidChecksumIsAValidationError(): void
+    {
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $payload = $this->payload($country->getId());
+        $payload['company'] = 'Acme SAS';
+        $payload['siret'] = '12345678900011';
+        $payload['vatNumber'] = 'FR40303265045';
+
+        $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('checksum of this SIRET', (string) $response->getContent());
     }
 
     /**
