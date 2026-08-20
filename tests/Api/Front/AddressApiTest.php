@@ -168,10 +168,6 @@ final class AddressApiTest extends ApiTestCase
         self::assertStringContainsString('zip code', (string) $response->getContent());
     }
 
-    /**
-     * The front API is another door onto the same table as the address form: a customer must
-     * not be able to save a business address without its identifiers by going through it.
-     */
     public function testACompanyAddressWithoutIdentifiersIsAcceptedOnTheFrontApiToo(): void
     {
         // Same contract as the admin API: identifiers are optional even with a company
