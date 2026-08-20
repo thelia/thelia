@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
@@ -25,6 +26,8 @@ use Thelia\Model\CartAddress;
 use Thelia\Model\CartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\Currency;
+use Thelia\Model\Customer;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -42,17 +45,22 @@ use Thelia\Test\ActionIntegrationTestCase;
  * price (ROUNDING_MODE_SUM_OF_ROUNDINGS, the historical behaviour and still the
  * default) or on the line total (ROUNDING_MODE_ROUNDING_OF_SUMS).
  *
- * Whichever mode is picked, the cart and the placed order have to agree: a cart
- * shown at 1.80 € that turns into a 3.00 € order is worse than either figure.
+ * Two properties matter more than either figure. The cart and the placed order
+ * have to agree, whichever mode is on — a cart shown at 1.80 € that turns into
+ * a 3.00 € order is worse than both. And an order already invoiced must keep
+ * its amount when a shop opts in, which is what `last_sum_of_roundings_order_id`
+ * is for.
  */
 final class OrderRoundingModeTest extends ActionIntegrationTestCase
 {
-    /** One gram of a product priced at 5.678 € the kilogram. */
+    /** One gram of a product priced 5.678 € the kilogram, taxed at 5.5 %. */
     private const PRICE_PER_GRAM = '0.005678';
 
     private const GRAMS = 300;
 
-    private const VAT_PERCENT = '5.5';
+    private const REDUCED_VAT = '5.5';
+
+    private const STANDARD_VAT = '20';
 
     /** @var list<array{0: string, 1: callable}> */
     private array $registeredListeners = [];
@@ -81,13 +89,24 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         self::assertFalse(ConfigQuery::isRoundingModeRoundingOfSums());
     }
 
+    public function testAnUnknownModeValueReadsAsTheHistoricalOne(): void
+    {
+        ConfigQuery::write('order_rounding_mode', '3');
+
+        self::assertSame(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, ConfigQuery::getOrderRoundingMode());
+
+        $fixtures = $this->createCart([$this->bulkLine()]);
+
+        self::assertEqualsWithDelta(3.0, $fixtures['cart']->getTaxedAmount($fixtures['country']), 0.0001);
+    }
+
     public function testTheDefaultModeRoundsTheUnitPriceBeforeApplyingTheQuantity(): void
     {
-        $fixtures = $this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS);
+        $fixtures = $this->createCart([$this->bulkLine()]);
         $cartItem = $fixtures['cart']->getCartItems()->getFirst();
 
-        // 0.005678 rounds to 0.01, and 0.01 x 300 is 3.00 both before and
-        // after tax: the tax is lost in the same rounding.
+        // 0.005678 rounds to 0.01, and 0.01 x 300 is 3.00 both before and after
+        // tax: the tax is lost in the same rounding.
         self::assertEqualsWithDelta(3.0, $cartItem->getTotalPrice(), 0.0001);
         self::assertEqualsWithDelta(3.0, $cartItem->getTotalTaxedPrice($fixtures['country']), 0.0001);
         self::assertEqualsWithDelta(3.0, $fixtures['cart']->getTaxedAmount($fixtures['country']), 0.0001);
@@ -95,9 +114,9 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
 
     public function testRoundingOfSumsAppliesTheQuantityBeforeRounding(): void
     {
-        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $this->optIn();
 
-        $fixtures = $this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS);
+        $fixtures = $this->createCart([$this->bulkLine()]);
         $cartItem = $fixtures['cart']->getCartItems()->getFirst();
 
         // 0.005678 x 300 = 1.7034 before tax, and x 1.055 = 1.797087 with it.
@@ -106,32 +125,49 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(1.80, $fixtures['cart']->getTaxedAmount($fixtures['country']), 0.0001);
     }
 
-    public function testAPriceAlreadyExpressedInCentsIsUnaffectedByTheMode(): void
+    public function testAPriceWhoseTaxedAmountIsAWholeNumberOfCentsIsUnaffectedByTheMode(): void
     {
-        $withoutTheMode = $this->cartTotals($this->createCheckoutReadyCart('12.34', 3));
+        $line = ['price' => '10.00', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT];
 
-        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $historical = $this->cartTotals($this->createCart([$line]));
 
-        $withTheMode = $this->cartTotals($this->createCheckoutReadyCart('12.34', 3));
+        $this->optIn();
 
-        self::assertEqualsWithDelta(37.02, $withoutTheMode['untaxed'], 0.0001);
-        self::assertEqualsWithDelta(39.06, $withoutTheMode['taxed'], 0.0001);
+        self::assertSame([30.0, 36.0], $historical);
         self::assertSame(
-            $withoutTheMode,
-            $withTheMode,
-            'A shop whose prices are cents must not see a single amount move when it opts in.',
+            $historical,
+            $this->cartTotals($this->createCart([$line])),
+            'A shop whose taxed prices are whole cents must not see a single amount move.',
         );
+    }
+
+    /**
+     * The other half of the truth: as soon as a unit amount has a third decimal,
+     * the two modes can land one cent apart on a line. Rounding of sums is the
+     * side that charges the price times the quantity.
+     */
+    public function testAPriceWithASubCentTaxShiftsByOneCentPerLine(): void
+    {
+        // 12.34 x 1.20 = 14.808 for one, 44.424 for three.
+        $line = ['price' => '12.34', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT];
+
+        self::assertSame([37.02, 44.43], $this->cartTotals($this->createCart([$line])));
+
+        $this->optIn();
+
+        self::assertSame([37.02, 44.42], $this->cartTotals($this->createCart([$line])));
     }
 
     public function testAPromoPriceFollowsTheMode(): void
     {
-        $fixtures = $this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS, promoPrice: '0.004000');
+        $fixtures = $this->createCart([$this->bulkLine(promoPrice: '0.004000')]);
         $cartItem = $fixtures['cart']->getCartItems()->getFirst();
 
         // Rounded to the cent, 0.004 is nothing at all: the line is free.
         self::assertEqualsWithDelta(0.0, $cartItem->getTotalRealPrice(), 0.0001);
+        self::assertEqualsWithDelta(0.0, $cartItem->getTotalRealTaxedPrice($fixtures['country']), 0.0001);
 
-        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $this->optIn();
 
         self::assertEqualsWithDelta(1.20, $cartItem->getTotalRealPrice(), 0.0001);
         self::assertEqualsWithDelta(1.27, $cartItem->getTotalRealTaxedPrice($fixtures['country']), 0.0001);
@@ -139,7 +175,7 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
 
     public function testTheOrderChargesWhatTheDefaultModeShowedInTheCart(): void
     {
-        $fixtures = $this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS);
+        $fixtures = $this->createCart([$this->bulkLine()]);
         $cartAmount = $fixtures['cart']->getTaxedAmount($fixtures['country']);
 
         $order = $this->placeOrder($fixtures);
@@ -150,9 +186,9 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
 
     public function testTheOrderChargesWhatRoundingOfSumsShowedInTheCart(): void
     {
-        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $this->optIn();
 
-        $fixtures = $this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS);
+        $fixtures = $this->createCart([$this->bulkLine()]);
         $cartAmount = $fixtures['cart']->getTaxedAmount($fixtures['country']);
 
         $order = $this->placeOrder($fixtures);
@@ -168,11 +204,118 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(0.10, $tax, 0.0001, 'The tax is the gap between the taxed and untaxed line totals.');
     }
 
+    /**
+     * @return iterable<string, array{0: int}>
+     */
+    public static function roundingModeProvider(): iterable
+    {
+        yield 'sum of roundings' => [ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS];
+        yield 'rounding of sums' => [ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS];
+    }
+
+    #[DataProvider('roundingModeProvider')]
+    public function testAMixedCartChargesTheSumOfItsLinesWhateverTheMode(int $mode): void
+    {
+        ConfigQuery::write('order_rounding_mode', $mode);
+
+        $fixtures = $this->createCart([
+            $this->bulkLine(),
+            ['price' => '10.00', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT],
+        ]);
+        $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $mode;
+
+        self::assertEqualsWithDelta(
+            $roundingOfSums ? 37.80 : 39.00,
+            $fixtures['cart']->getTaxedAmount($fixtures['country']),
+            0.0001,
+        );
+
+        $order = $this->placeOrder($fixtures);
+
+        self::assertEqualsWithDelta(
+            $fixtures['cart']->getTaxedAmount($fixtures['country']),
+            $order->getTotalAmount(),
+            0.0001,
+            'Each line keeps its own tax rate, and the order totals the same lines as the cart.',
+        );
+    }
+
+    #[DataProvider('roundingModeProvider')]
+    public function testADiscountIsSubtractedFromTheRoundedLinesWhateverTheMode(int $mode): void
+    {
+        ConfigQuery::write('order_rounding_mode', $mode);
+
+        $fixtures = $this->createCart(
+            [
+                $this->bulkLine(),
+                ['price' => '10.00', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT],
+            ],
+            ['discount' => '5.00'],
+        );
+        $goods = $mode === ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS ? 37.80 : 39.00;
+
+        self::assertEqualsWithDelta($goods - 5.00, $fixtures['cart']->getTaxedAmount($fixtures['country']), 0.0001);
+
+        $order = $this->placeOrder($fixtures);
+
+        self::assertEqualsWithDelta($goods - 5.00, $order->getTotalAmount(), 0.0001);
+    }
+
+    #[DataProvider('roundingModeProvider')]
+    public function testPostageIsAddedOnTopOfTheRoundedLinesWhateverTheMode(int $mode): void
+    {
+        ConfigQuery::write('order_rounding_mode', $mode);
+
+        $fixtures = $this->createCart(
+            [$this->bulkLine()],
+            ['postage' => '4.80', 'postageTax' => '0.80'],
+        );
+        $goods = $mode === ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS ? 1.80 : 3.00;
+
+        self::assertEqualsWithDelta(
+            $goods + 4.80,
+            $fixtures['cart']->getTaxedAmount($fixtures['country'], withPostage: true),
+            0.0001,
+        );
+
+        $order = $this->placeOrder($fixtures);
+
+        $tax = 0.0;
+        self::assertEqualsWithDelta($goods + 4.80, $order->getTotalAmount(), 0.0001);
+        self::assertEqualsWithDelta($goods, $order->getTotalAmount($tax, false), 0.0001);
+    }
+
+    /**
+     * The reason the pivot exists: a shop that opts in must not see the total of
+     * an order it has already invoiced move by a single cent.
+     */
+    public function testAnOrderPlacedBeforeTheSwitchKeepsTheAmountItWasInvoicedWith(): void
+    {
+        $order = $this->placeOrder($this->createCart([$this->bulkLine()]));
+        $amountInvoiced = $order->getTotalAmount();
+
+        ConfigQuery::write('last_sum_of_roundings_order_id', $order->getId());
+        $this->optIn();
+
+        self::assertEqualsWithDelta(3.0, $amountInvoiced, 0.0001);
+        self::assertEqualsWithDelta($amountInvoiced, $order->getTotalAmount(), 0.0001);
+        self::assertSame(
+            ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS,
+            ConfigQuery::getOrderRoundingMode((int) $order->getId()),
+        );
+
+        // A cart is priced with the mode the shop runs today, pivot or not, and
+        // the order placed above the pivot charges what the cart showed.
+        $newCart = $this->createCart([$this->bulkLine()]);
+        self::assertEqualsWithDelta(1.80, $newCart['cart']->getTaxedAmount($newCart['country']), 0.0001);
+        self::assertEqualsWithDelta(1.80, $this->placeOrder($newCart)->getTotalAmount(), 0.0001);
+    }
+
     public function testAnOrderFrozenByThe24UpgradeIgnoresTheMode(): void
     {
-        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $this->optIn();
 
-        $order = $this->placeOrder($this->createCheckoutReadyCart(self::PRICE_PER_GRAM, self::GRAMS));
+        $order = $this->placeOrder($this->createCart([$this->bulkLine()]));
 
         ConfigQuery::write('last_legacy_rounding_order_id', $order->getId());
 
@@ -181,21 +324,44 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(1.797087, $order->getTotalAmount(), 0.0001);
     }
 
+    private function optIn(): void
+    {
+        ConfigQuery::write('order_rounding_mode', ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+    }
+
+    /**
+     * @return array{price: string, quantity: float, vatPercent: string, promoPrice?: string}
+     */
+    private function bulkLine(?string $promoPrice = null): array
+    {
+        $line = [
+            'price' => self::PRICE_PER_GRAM,
+            'quantity' => (float) self::GRAMS,
+            'vatPercent' => self::REDUCED_VAT,
+        ];
+
+        if (null !== $promoPrice) {
+            $line['promoPrice'] = $promoPrice;
+        }
+
+        return $line;
+    }
+
     /**
      * @param array{cart: Cart, country: Country} $fixtures
      *
-     * @return array{untaxed: float, taxed: float}
+     * @return array{0: float, 1: float} the untaxed then the taxed cart amount
      */
     private function cartTotals(array $fixtures): array
     {
         return [
-            'untaxed' => $fixtures['cart']->getTotalAmount(country: $fixtures['country']),
-            'taxed' => $fixtures['cart']->getTaxedAmount($fixtures['country']),
+            $fixtures['cart']->getTotalAmount(country: $fixtures['country']),
+            $fixtures['cart']->getTaxedAmount($fixtures['country']),
         ];
     }
 
     /**
-     * @param array{cart: Cart, customer: \Thelia\Model\Customer, currency: \Thelia\Model\Currency, deliveryModule: Module, paymentModule: Module, deliveryAddressId: int, invoiceAddressId: int} $fixtures
+     * @param array{cart: Cart, customer: Customer, currency: Currency, deliveryModule: Module, paymentModule: Module, deliveryAddressId: int, invoiceAddressId: int} $fixtures
      */
     private function placeOrder(array $fixtures): Order
     {
@@ -235,20 +401,17 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
     }
 
     /**
-     * @return array{cart: Cart, country: Country, customer: \Thelia\Model\Customer, currency: \Thelia\Model\Currency, deliveryModule: Module, paymentModule: Module, deliveryAddressId: int, invoiceAddressId: int}
+     * @param list<array{price: string, quantity: float, vatPercent: string, promoPrice?: string}> $lines
+     * @param array{discount?: string, postage?: string, postageTax?: string}                      $cartOverrides
+     *
+     * @return array{cart: Cart, country: Country, customer: Customer, currency: Currency, deliveryModule: Module, paymentModule: Module, deliveryAddressId: int, invoiceAddressId: int}
      */
-    private function createCheckoutReadyCart(string $price, float $quantity, ?string $promoPrice = null): array
+    private function createCart(array $lines, array $cartOverrides = []): array
     {
         $currency = $this->factory->currency();
         $customerTitle = $this->factory->customerTitle();
         $customer = $this->factory->customer($customerTitle);
         $country = $this->factory->country();
-        $product = $this->factory->product(
-            $this->factory->category(),
-            $this->createTaxRule($country),
-            $currency,
-            ['basePrice' => (float) $price, 'baseQuantity' => 100000],
-        );
 
         $deliveryAddress = $this->createCartAddress($customerTitle->getId(), $country->getId());
         $invoiceAddress = $this->createCartAddress($customerTitle->getId(), $country->getId());
@@ -266,20 +429,31 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
             ->setAddressInvoiceId($invoiceAddress->getId())
             ->setDeliveryModuleId($deliveryModule->getId())
             ->setPaymentModuleId($paymentModule->getId())
-            // Free delivery, so that the amounts under test are the goods only.
-            ->setPostage('0')
-            ->setPostageTax('0');
+            // Free delivery unless the test quotes one, so that the amounts
+            // under test are the goods only.
+            ->setPostage($cartOverrides['postage'] ?? '0')
+            ->setPostageTax($cartOverrides['postageTax'] ?? '0')
+            ->setDiscount($cartOverrides['discount'] ?? '0');
         $cart->save($this->getPropelConnection());
 
-        (new CartItem())
-            ->setCartId($cart->getId())
-            ->setProductId($product->getId())
-            ->setProductSaleElementsId($product->getDefaultSaleElements()->getId())
-            ->setQuantity($quantity)
-            ->setPrice($price)
-            ->setPromoPrice($promoPrice ?? $price)
-            ->setPromo(null === $promoPrice ? 0 : 1)
-            ->save($this->getPropelConnection());
+        foreach ($lines as $line) {
+            $product = $this->factory->product(
+                $this->factory->category(),
+                $this->createTaxRule($country, $line['vatPercent']),
+                $currency,
+                ['basePrice' => (float) $line['price'], 'baseQuantity' => 100000],
+            );
+
+            (new CartItem())
+                ->setCartId($cart->getId())
+                ->setProductId($product->getId())
+                ->setProductSaleElementsId($product->getDefaultSaleElements()->getId())
+                ->setQuantity($line['quantity'])
+                ->setPrice($line['price'])
+                ->setPromoPrice($line['promoPrice'] ?? $line['price'])
+                ->setPromo(isset($line['promoPrice']) ? 1 : 0)
+                ->save($this->getPropelConnection());
+        }
 
         $cart->reload(true, $this->getPropelConnection());
 
@@ -295,13 +469,13 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         ];
     }
 
-    private function createTaxRule(Country $country): TaxRule
+    private function createTaxRule(Country $country, string $percent): TaxRule
     {
         // A non-empty override array forces a rule of its own instead of reusing the seeded one.
         $taxRule = $this->factory->taxRule(['isDefault' => false]);
         $tax = $this->factory->tax([
-            'requirements' => ['percent' => self::VAT_PERCENT],
-            'title' => 'VAT '.self::VAT_PERCENT,
+            'requirements' => ['percent' => $percent],
+            'title' => 'VAT '.$percent,
         ]);
 
         (new TaxRuleCountry())
