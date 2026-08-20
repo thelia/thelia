@@ -27,7 +27,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Model\OrderProductTax as OrderProductTaxModel;
 
 #[ApiResource(
     operations: [
@@ -183,7 +185,7 @@ class OrderProductTax implements PropelResourceInterface
 
     public function getAmount(): float
     {
-        return round($this->amount, 2);
+        return $this->unitAmount($this->amount);
     }
 
     public function setAmount(float $amount): self
@@ -195,7 +197,27 @@ class OrderProductTax implements PropelResourceInterface
 
     public function getPromoAmount(): ?float
     {
-        return round($this->promoAmount, 2);
+        return null === $this->promoAmount ? null : $this->unitAmount($this->promoAmount);
+    }
+
+    /**
+     * Exposes a unit tax with the precision the order total was built from, the
+     * way Thelia\Api\Resource\OrderProduct exposes a unit price. Under rounding
+     * of sums the order total adds unit taxes at their stored precision, so
+     * cutting them to the cent here would contradict the amount charged.
+     */
+    private function unitAmount(float $amount): float
+    {
+        $propelModel = $this->getPropelModel();
+        $orderId = $propelModel instanceof OrderProductTaxModel
+            ? $propelModel->getOrderProduct()?->getOrderId()
+            : null;
+
+        if (ConfigQuery::isRoundingModeRoundingOfSums($orderId)) {
+            return $amount;
+        }
+
+        return round($amount, 2);
     }
 
     public function setPromoAmount(?float $promoAmount): self
