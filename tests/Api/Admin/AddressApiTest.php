@@ -94,8 +94,11 @@ final class AddressApiTest extends ApiTestCase
         self::assertSame('FR40303265045', $created['vatNumber']);
     }
 
-    public function testACompanyAddressWithoutAVatNumberIsAValidationError(): void
+    public function testACompanyAddressWithoutAVatNumberIsAccepted(): void
     {
+        // Neither identifier is mandatory: an association or a VAT-exempt business
+        // legitimately has a company name and no VAT number to give. Only a typed-in
+        // value gets its format checked (see CompanyIdentifierRules).
         $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
         self::assertNotNull($country);
 
@@ -105,8 +108,12 @@ final class AddressApiTest extends ApiTestCase
 
         $response = $this->jsonRequest('POST', '/api/admin/addresses', $payload, $this->authenticateAsAdmin());
 
-        self::assertSame(422, $response->getStatusCode());
-        self::assertStringContainsString('VAT number is required', (string) $response->getContent());
+        self::assertJsonResponseSuccessful($response);
+
+        $created = json_decode((string) $response->getContent(), true);
+        self::assertSame('30326504500003', $created['siret']);
+        // Null values are omitted from the response, so the key may simply be absent.
+        self::assertNull($created['vatNumber'] ?? null);
     }
 
     public function testAnAddressWithoutACompanyNameNeedsNoIdentifier(): void
