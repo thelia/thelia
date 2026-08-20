@@ -26,12 +26,16 @@ class BaseFrontController extends BaseController
 {
     public const CONTROLLER_TYPE = 'front';
 
-    protected string $currentRouter = 'router.front';
+    /**
+     * The front-office routes live in the default router: the theme declares them with
+     * #[Route], and so do the modules. Only the back office runs a router of its own.
+     */
+    protected string $currentRouter = 'router';
 
     public function checkAuth(): void
     {
         if (false === $this->getSecurityContext()->hasCustomerUser()) {
-            throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
+            throw new RedirectException($this->retrieveUrlFromRouteId('customer_login'));
         }
     }
 
@@ -45,7 +49,7 @@ class BaseFrontController extends BaseController
         $cart = $this->getSession()->getSessionCart($eventDispatcher);
 
         if (null === $cart || 0 === $cart->countCartItems()) {
-            throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
+            throw new RedirectException($this->retrieveUrlFromRouteId('checkout_cart'));
         }
     }
 
@@ -58,7 +62,7 @@ class BaseFrontController extends BaseController
             || null === $order->getDeliveryModuleId()
             || null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
             || null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
-            throw new RedirectException($this->retrieveUrlFromRouteId('order.delivery'));
+            throw new RedirectException($this->retrieveUrlFromRouteId('checkout_delivery'));
         }
     }
 
@@ -71,7 +75,7 @@ class BaseFrontController extends BaseController
             || null === $order->getPaymentModuleId()
             || null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
             || null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
-            throw new RedirectException($this->retrieveUrlFromRouteId('order.invoice'));
+            throw new RedirectException($this->retrieveUrlFromRouteId('checkout_payment'));
         }
     }
 
