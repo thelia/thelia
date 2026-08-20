@@ -117,6 +117,10 @@ final readonly class CustomerAnonymizer
             $orderAddress
                 ->setCustomerTitleId(null)
                 ->setCompany(null)
+                // A registration number identifies the company as precisely as the name it
+                // belongs to, so it is erased with it rather than left on the kept order.
+                ->setSiret(null)
+                ->setVatNumber(null)
                 ->setFirstname(self::ANONYMIZED_VALUE)
                 ->setLastname(self::ANONYMIZED_VALUE)
                 ->setAddress1(self::ANONYMIZED_VALUE)

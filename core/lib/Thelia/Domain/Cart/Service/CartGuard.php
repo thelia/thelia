@@ -16,9 +16,11 @@ namespace Thelia\Domain\Cart\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
+use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
+use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\ModuleQuery;
@@ -63,6 +65,34 @@ class CartGuard
         $address = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
         if (!$address) {
             throw new MissingAddressException('Invoice address not found');
+        }
+    }
+
+    /**
+     * An invoice for a business buyer has to carry its legal identifiers, so a billing address
+     * that names a company without them cannot be ordered against. Checked on the cart address
+     * rather than on the customer's own: that is what the order will be frozen from.
+     *
+     * The delivery address is deliberately not subject to this - it names a place, not a payer.
+     *
+     * @throws IncompleteInvoiceAddressException
+     * @throws MissingAddressException
+     */
+    public function checkInvoiceAddressLegalIdentifiers(?Cart $cart): void
+    {
+        $this->checkInvoiceAddress($cart);
+
+        $address = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
+
+        $violations = CompanyIdentifierRules::violationsFor(
+            $address->getCompany(),
+            $address->getSiret(),
+            $address->getVatNumber(),
+            $address->getCountry()?->getIsoalpha2(),
+        );
+
+        if ([] !== $violations) {
+            throw new IncompleteInvoiceAddressException($violations[0]->message);
         }
     }
 

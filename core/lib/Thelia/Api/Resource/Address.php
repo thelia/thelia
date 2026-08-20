@@ -34,6 +34,8 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\State\Processor\CustomerAddressProcessor;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Legal\CompanyIdentifier;
+use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Model\Map\AddressTableMap;
 
 #[ApiResource(
@@ -172,6 +174,12 @@ class Address implements PropelResourceInterface
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $company = null;
+
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    public ?string $siret = null;
+
+    #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
+    public ?string $vatNumber = null;
 
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $cellphone = null;
@@ -321,6 +329,33 @@ class Address implements PropelResourceInterface
         return $this;
     }
 
+    // Normalized when read rather than when written: the deserializer sets the properties in
+    // whatever order the payload lists them, so `company` is only reliably known once the
+    // whole resource has been populated.
+    public function getSiret(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->company, CompanyIdentifier::normalizeSiret($this->siret));
+    }
+
+    public function setSiret(?string $siret): self
+    {
+        $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function getVatNumber(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->company, CompanyIdentifier::normalizeVatNumber($this->vatNumber));
+    }
+
+    public function setVatNumber(?string $vatNumber): self
+    {
+        $this->vatNumber = $vatNumber;
+
+        return $this;
+    }
+
     public function getCellphone(): ?string
     {
         return $this->cellphone;
@@ -444,6 +479,33 @@ class Address implements PropelResourceInterface
     public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new AddressTableMap();
+    }
+
+    /**
+     * Same rules as the address forms, from the same place: both identifiers are required as
+     * soon as a company name is given, and the checks narrow with the country of the address.
+     */
+    // GROUP_FRONT_WRITE included on purpose: /api/front/account/addresses writes the same
+    // table as the address form, and would otherwise accept what the form refuses.
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]
+    public function verifyLegalIdentifiers(ExecutionContextInterface $context): void
+    {
+        /** @var self $resource */
+        $resource = $context->getRoot();
+
+        $violations = CompanyIdentifierRules::violationsFor(
+            $resource->company,
+            $resource->siret,
+            $resource->vatNumber,
+            isset($resource->country) ? $resource->getCountry()?->getPropelModel()?->getIsoalpha2() : null,
+        );
+
+        foreach ($violations as $violation) {
+            $context
+                ->buildViolation(Translator::getInstance()->trans($violation->message, $violation->parameters, null, 'en_US'))
+                ->atPath($violation->field)
+                ->addViolation();
+        }
     }
 
     #[Callback(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE, Customer::GROUP_ADMIN_WRITE])]

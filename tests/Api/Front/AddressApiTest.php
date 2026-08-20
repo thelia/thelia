@@ -168,6 +168,33 @@ final class AddressApiTest extends ApiTestCase
         self::assertStringContainsString('zip code', (string) $response->getContent());
     }
 
+    public function testACompanyAddressWithoutIdentifiersIsAcceptedOnTheFrontApiToo(): void
+    {
+        // Same contract as the admin API: identifiers are optional even with a company
+        // name, only a typed-in value gets its format checked (see CompanyIdentifierRules).
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $customer = $factory->customer($title, ['password' => 'password']);
+
+        $payload = $this->payload($title);
+        $payload['company'] = 'Acme SAS';
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/addresses',
+            $payload,
+            $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertJsonResponseSuccessful($response);
+
+        $created = json_decode((string) $response->getContent(), true);
+        self::assertSame('Acme SAS', $created['company']);
+        // Null values are omitted from the response, so the keys may simply be absent.
+        self::assertNull($created['siret'] ?? null);
+        self::assertNull($created['vatNumber'] ?? null);
+    }
+
     public function testTheOptionalAddressLinesMayBeOmitted(): void
     {
         $factory = $this->createFixtureFactory();

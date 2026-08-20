@@ -33,6 +33,8 @@ class CartAddressService
             ->setCustomerTitleId($address->getTitleId())
             ->setAddressId($address->getId())
             ->setCompany($address->getCompany())
+            ->setSiret($address->getSiret())
+            ->setVatNumber($address->getVatNumber())
             ->setFirstname($address->getFirstname())
             ->setLastname($address->getLastname())
             ->setAddress1($address->getAddress1())

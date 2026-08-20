@@ -34,6 +34,8 @@ readonly class AddressDTO implements DTOEventActionInterface
         public ?string $company = null,
         public ?int $stateId = null,
         public bool $isDefault = false,
+        public ?string $siret = null,
+        public ?string $vatNumber = null,
     ) {
     }
 
@@ -54,6 +56,8 @@ readonly class AddressDTO implements DTOEventActionInterface
             'phone' => $this->phone,
             'cellphone' => $this->cellphone,
             'company' => $this->company,
+            'siret' => $this->siret,
+            'vat_number' => $this->vatNumber,
             'is_default' => $this->isDefault,
         ];
     }

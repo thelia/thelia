@@ -252,6 +252,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getRef(),
             $event->getEmailUpdateAllowed(),
             $event->getState(),
+            siret: $event->getSiret(),
+            vatNumber: $event->getVatNumber(),
         );
 
         $event->setCustomer($customer);
