@@ -16,7 +16,6 @@ return [
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Symfony\UX\Translator\UxTranslatorBundle::class => ['all' => true],
     Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
-    Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     BackOfficeDefaultBundle\BackOfficeDefaultBundle::class => ['all' => true],
     BackOfficeDefaultTwigBundle\BackOfficeDefaultTwigBundle::class => ['all' => true],
