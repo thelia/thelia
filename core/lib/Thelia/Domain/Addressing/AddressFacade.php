@@ -144,6 +144,8 @@ final readonly class AddressFacade
             $dto->company,
             $dto->isDefault,
             $dto->stateId,
+            $dto->siret,
+            $dto->vatNumber,
         );
     }
 

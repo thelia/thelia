@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\Address;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Domain\Legal\CompanyIdentifier;
 use Thelia\Model\Address;
 use Thelia\Model\Customer;
 
@@ -86,6 +87,10 @@ class AddressCreateOrUpdateEvent extends ActionEvent
          * @var int state id
          */
         protected $state = null,
+        // Appended rather than placed next to $company: the legacy Smarty back office
+        // still builds this event positionally, and it is a frozen theme.
+        protected ?string $siret = null,
+        protected ?string $vatNumber = null,
     ) {
     }
 
@@ -117,6 +122,16 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     public function getCompany(): ?string
     {
         return $this->company;
+    }
+
+    public function getSiret(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->getCompany(), CompanyIdentifier::normalizeSiret($this->siret));
+    }
+
+    public function getVatNumber(): ?string
+    {
+        return CompanyIdentifier::forCompany($this->getCompany(), CompanyIdentifier::normalizeVatNumber($this->vatNumber));
     }
 
     public function getCountry(): int

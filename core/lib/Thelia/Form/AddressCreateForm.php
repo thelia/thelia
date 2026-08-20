@@ -36,6 +36,7 @@ use Thelia\Model\StateQuery;
 class AddressCreateForm extends FirewallForm
 {
     use AddressCountryValidationTrait;
+    use AddressLegalIdentifiersValidationTrait;
 
     public function __construct(
         protected CountryService $countryService,
@@ -116,6 +117,28 @@ class AddressCreateForm extends FirewallForm
                 'label' => Translator::getInstance()->trans('Company Name'),
                 'label_attr' => [
                     'for' => 'company',
+                ],
+                'required' => false,
+            ])
+            // Required as soon as `company` is filled - the Callback constraints hold that
+            // rule, so `required` stays false and the browser never blocks a private buyer.
+            ->add('siret', TextType::class, [
+                'constraints' => [
+                    new Callback($this->verifySiret(...)),
+                ],
+                'label' => Translator::getInstance()->trans('Company registration number'),
+                'label_attr' => [
+                    'for' => 'siret',
+                ],
+                'required' => false,
+            ])
+            ->add('vat_number', TextType::class, [
+                'constraints' => [
+                    new Callback($this->verifyVatNumber(...)),
+                ],
+                'label' => Translator::getInstance()->trans('VAT number'),
+                'label_attr' => [
+                    'for' => 'vat_number',
                 ],
                 'required' => false,
             ])

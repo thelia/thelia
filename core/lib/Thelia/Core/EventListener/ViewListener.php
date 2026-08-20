@@ -49,6 +49,17 @@ class ViewListener
         if (true === $request->attributes->get(TheliaHttpKernel::IGNORE_THELIA_VIEW, false)) {
             return;
         }
+
+        // A LiveComponent's default render action reaches this listener as a main
+        // request (unlike a named LiveAction, dispatched through a kernel.view
+        // sub-request the check above already skips). Both share this listener's
+        // priority with LiveComponentSubscriber::onKernelView(), and are registered
+        // first, so treating the component's return value as a Thelia view name
+        // throws before LiveComponentSubscriber gets to render it - the same
+        // component every dependent field change or periodic refresh re-renders.
+        if ($request->attributes->has('_live_component')) {
+            return;
+        }
         $response = $this->viewRenderer->render($request);
         $event->setResponse($response);
     }

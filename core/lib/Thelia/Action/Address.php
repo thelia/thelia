@@ -87,6 +87,8 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setCellphone((string) $event->getCellphone())
                 ->setPhone((string) $event->getPhone())
                 ->setCompany($event->getCompany())
+                ->setSiret($event->getSiret())
+                ->setVatNumber($event->getVatNumber())
                 ->save();
 
             // A customer whose addresses are all is_default = 0 has no default address at all:
