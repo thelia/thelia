@@ -185,7 +185,9 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public int $quantity;
+    // order_product.quantity is a FLOAT: a line of goods sold by weight carries
+    // grams, not units. An int here billed 300.5 g as 300 g.
+    public float $quantity;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -444,12 +446,12 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getQuantity(): int
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
