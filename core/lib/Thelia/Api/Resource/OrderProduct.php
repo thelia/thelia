@@ -32,7 +32,9 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\ProductQuery;
 
 #[ApiResource(
@@ -183,7 +185,9 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    public int $quantity;
+    // order_product.quantity is a FLOAT: a line of goods sold by weight carries
+    // grams, not units. An int here billed 300.5 g as 300 g.
+    public float $quantity;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -442,12 +446,12 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getQuantity(): int
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
@@ -456,7 +460,7 @@ class OrderProduct implements PropelResourceInterface
 
     public function getPrice(): float
     {
-        return round($this->price, 2);
+        return $this->unitAmount($this->price);
     }
 
     public function setPrice(float $price): self
@@ -468,7 +472,7 @@ class OrderProduct implements PropelResourceInterface
 
     public function getPromoPrice(): ?float
     {
-        return null === $this->promoPrice ? null : round($this->promoPrice, 2);
+        return null === $this->promoPrice ? null : $this->unitAmount($this->promoPrice);
     }
 
     public function setPromoPrice(?float $promoPrice): self
@@ -480,7 +484,28 @@ class OrderProduct implements PropelResourceInterface
 
     public function getUnitTaxedPrice(): ?float
     {
-        return null === $this->unitTaxedPrice ? null : round($this->unitTaxedPrice, 2);
+        return null === $this->unitTaxedPrice ? null : $this->unitAmount($this->unitTaxedPrice);
+    }
+
+    /**
+     * Exposes a unit amount with the precision the order total was built from.
+     *
+     * Under sum of roundings the total multiplies unit amounts already rounded
+     * to the cent, so the cent is what the line was charged on. Under rounding
+     * of sums the total keeps the stored precision, and a unit price cut to the
+     * cent here would no longer multiply up to the total the customer paid --
+     * which is the whole point of a price per gram or per millilitre.
+     */
+    private function unitAmount(float $amount): float
+    {
+        $propelModel = $this->getPropelModel();
+        $orderId = $propelModel instanceof OrderProductModel ? $propelModel->getOrderId() : null;
+
+        if (ConfigQuery::isRoundingModeRoundingOfSums($orderId)) {
+            return $amount;
+        }
+
+        return round($amount, 2);
     }
 
     public function isWasNew(): bool

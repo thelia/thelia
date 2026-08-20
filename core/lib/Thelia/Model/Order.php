@@ -200,63 +200,21 @@ class Order extends BaseOrder
     public function getTotalAmount(float|int &$tax = 0, bool $includePostage = true, bool $includeDiscount = true): float
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-        if ($this->getId() <= ConfigQuery::read('last_legacy_rounding_order_id', 0)) {
+        if (ConfigQuery::isOrderWithLegacyRounding((int) $this->getId())) {
             return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
         }
 
         // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
         // and may cache results for several orders, for example in the order list in the back-office.
+        // The rounding mode is part of the key: it decides what the query computes.
         static $queryResult = [];
 
-        $id = $this->getId();
+        $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
+        $id = $this->getId().'-'.$roundingMode;
 
         if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
-            // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
-            // For each order line, we round quantity x taxed price.
-            $query = '
-                SELECT
-                    SUM(
-                        '.OrderProductTableMap::COL_QUANTITY.'
-                        *
-                        (
-                            ROUND(
-                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.'),
-                                2
-                            )
-                            +
-                            (
-                                SELECT COALESCE(
-                                    SUM(
-                                        ROUND(
-                                            IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.'),
-                                            2
-                                        )
-                                    ),
-                                0)
-                                FROM '.OrderProductTaxTableMap::TABLE_NAME.'
-                                WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
-                            )
-                        )
-                    ) as total_taxed_price,
-                    SUM(
-                        '.OrderProductTableMap::COL_QUANTITY.'
-                        *
-                        ROUND(
-                            IF(
-                                '.OrderProductTableMap::COL_WAS_IN_PROMO.'=1,
-                                '.OrderProductTableMap::COL_PROMO_PRICE.',
-                                '.OrderProductTableMap::COL_PRICE.'
-                            ), 2
-                        )
-                    ) as total_untaxed_price
-                from
-                    '.OrderProductTableMap::TABLE_NAME.'
-                where
-                    '.OrderProductTableMap::COL_ORDER_ID.'=:order_id
-            ';
-
             $con = Propel::getConnection();
-            $stmt = $con->prepare($query);
+            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode));
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
@@ -287,6 +245,51 @@ class Order extends BaseOrder
         }
 
         return $total;
+    }
+
+    /**
+     * Totals the order lines the way CartItem::getTotalPrice() and
+     * CartItem::getTotalTaxedPrice() total the cart lines, so that the amount
+     * charged matches the amount the customer saw in the cart.
+     *
+     * With ROUNDING_MODE_SUM_OF_ROUNDINGS every unit amount is rounded to the
+     * cent before being multiplied by the quantity. With
+     * ROUNDING_MODE_ROUNDING_OF_SUMS the multiplication happens at the
+     * precision the prices are stored with, and only the line total is rounded.
+     */
+    private function buildTotalAmountQuery(int $roundingMode): string
+    {
+        $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode;
+
+        $unitPrice = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')';
+        $unitTax = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')';
+
+        if (!$roundingOfSums) {
+            $unitPrice = 'ROUND('.$unitPrice.', 2)';
+            $unitTax = 'ROUND('.$unitTax.', 2)';
+        }
+
+        $unitTaxes = '(
+            SELECT COALESCE(SUM('.$unitTax.'), 0)
+            FROM '.OrderProductTaxTableMap::TABLE_NAME.'
+            WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
+        )';
+
+        $taxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * ('.$unitPrice.' + '.$unitTaxes.')';
+        $untaxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * '.$unitPrice;
+
+        if ($roundingOfSums) {
+            $taxedLineTotal = 'ROUND('.$taxedLineTotal.', 2)';
+            $untaxedLineTotal = 'ROUND('.$untaxedLineTotal.', 2)';
+        }
+
+        return '
+            SELECT
+                SUM('.$taxedLineTotal.') as total_taxed_price,
+                SUM('.$untaxedLineTotal.') as total_untaxed_price
+            FROM '.OrderProductTableMap::TABLE_NAME.'
+            WHERE '.OrderProductTableMap::COL_ORDER_ID.' = :order_id
+        ';
     }
 
     /**

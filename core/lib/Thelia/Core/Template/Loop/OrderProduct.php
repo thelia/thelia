@@ -107,17 +107,20 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $lastLegacyRoundingOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
-
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
+
+            // The loop walks orders of several shops' worth of history at once
+            // in the back office, and the rounding an order was invoiced with
+            // depends on when it was placed.
+            $roundingOfSums = ConfigQuery::isRoundingModeRoundingOfSums($orderProduct->getOrderId());
 
             $tax = $orderProduct->getVirtualColumn('TOTAL_TAX'); // 1,39755 => 1.4
             $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-            if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
+            if (ConfigQuery::isOrderWithLegacyRounding($orderProduct->getOrderId())) {
                 $totalTax = round($tax * $orderProduct->getQuantity(), 2);
                 $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
 
@@ -129,6 +132,31 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
                 $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+            } elseif ($roundingOfSums) {
+                // Same rounding as CartItem::getTotalTaxedPrice() under this mode:
+                // the quantity multiplies the unit amount at full precision, and
+                // only the line total is rounded. Unit amounts stay unrounded, as
+                // a price per gram or per millilitre is nothing once cut to the cent.
+                $tax = (float) $tax;
+                $promoTax = (float) $promoTax;
+
+                $taxedPrice = (float) $orderProduct->getPrice() + $tax;
+                $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + $promoTax;
+
+                $totalPrice = round((float) $orderProduct->getPrice() * $orderProduct->getQuantity(), 2);
+                $totalPromoPrice = round((float) $orderProduct->getPromoPrice() * $orderProduct->getQuantity(), 2);
+
+                $totalTaxedPrice = round($taxedPrice * $orderProduct->getQuantity(), 2);
+                $totalTaxedPromoPrice = round($taxedPromoPrice * $orderProduct->getQuantity(), 2);
+
+                // Rounding the tax of the line on its own would leave the three
+                // totals disagreeing by a cent, and an invoice whose lines and
+                // whose footer state different amounts. Order::getTotalAmount()
+                // reads the tax of an order as the gap between its taxed and its
+                // untaxed total; a line reads it the same way, so the identity
+                // holds by construction.
+                $totalTax = round($totalTaxedPrice - $totalPrice, 2);
+                $totalPromoTax = round($totalTaxedPromoPrice - $totalPromoPrice, 2);
             } else {
                 $tax = round((float) $tax, 2);
                 $promoTax = round((float) $promoTax, 2);

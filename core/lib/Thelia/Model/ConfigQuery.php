@@ -25,6 +25,20 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
+    /**
+     * Every unit price is rounded to the cent before being multiplied by the
+     * quantity. This is the historical Thelia behaviour and stays the default.
+     */
+    public const ROUNDING_MODE_SUM_OF_ROUNDINGS = 1;
+
+    /**
+     * The unit price is multiplied by the quantity at full precision, and only
+     * the resulting line total is rounded to the cent. Shops selling by weight
+     * or by volume need this: a price stored per gram or per millilitre is
+     * meaningless once rounded to the cent.
+     */
+    public const ROUNDING_MODE_ROUNDING_OF_SUMS = 2;
+
     protected static $booted = false;
     protected static $cache = [];
 
@@ -366,6 +380,56 @@ class ConfigQuery extends BaseConfigQuery
     public static function getMinimuAdminPasswordLength()
     {
         return self::read('minimum_admin_password_length', 4);
+    }
+
+    /**
+     * Orders placed before Thelia 2.4 were totalled without any rounding at all.
+     * Their amount is frozen: reading them back with a newer rule would restate
+     * an invoice the customer has already paid.
+     */
+    public static function isOrderWithLegacyRounding(int $orderId): bool
+    {
+        return $orderId <= (int) self::read('last_legacy_rounding_order_id', 0);
+    }
+
+    /**
+     * The last order that keeps a sum-of-roundings total whatever
+     * order_rounding_mode says. A shop switching to rounding of sums writes its
+     * current maximum order id here, exactly the way the 2.4 upgrade wrote
+     * last_legacy_rounding_order_id, so that the orders already invoiced are
+     * left alone. Zero, the default, means the shop has nothing to protect.
+     */
+    public static function isOrderWithSumOfRoundings(int $orderId): bool
+    {
+        return $orderId <= (int) self::read('last_sum_of_roundings_order_id', 0);
+    }
+
+    /**
+     * Tells how a line total has to be built from a unit price and a quantity.
+     *
+     * Pass the id of a persisted order to get the mode that order was invoiced
+     * with; pass nothing for a cart, which is always priced with the mode the
+     * shop runs today.
+     *
+     * Any value other than the two known modes reads as the historical one: a
+     * typo in a configuration variable must not restate an invoice.
+     */
+    public static function getOrderRoundingMode(?int $orderId = null): int
+    {
+        if (null !== $orderId && self::isOrderWithSumOfRoundings($orderId)) {
+            return self::ROUNDING_MODE_SUM_OF_ROUNDINGS;
+        }
+
+        $configuredMode = (int) self::read('order_rounding_mode', self::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+
+        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === $configuredMode
+            ? self::ROUNDING_MODE_ROUNDING_OF_SUMS
+            : self::ROUNDING_MODE_SUM_OF_ROUNDINGS;
+    }
+
+    public static function isRoundingModeRoundingOfSums(?int $orderId = null): bool
+    {
+        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === self::getOrderRoundingMode($orderId);
     }
 }
 
