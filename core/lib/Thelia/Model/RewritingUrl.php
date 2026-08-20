@@ -98,12 +98,20 @@ class RewritingUrl extends BaseRewritingUrl
         return preg_replace('/-+/', $replacement, $string) ?? $string;
     }
 
+    /**
+     * A rewritten url is a path, not a single segment: the slash separates the
+     * levels a shop nests its content under, and dropping it silently welds two
+     * segments into one, so the url the visitor and the sitemap were given
+     * answers 404 while an address nobody asked for takes its place. Kept out of
+     * the default character class for that reason; a project that wants flat
+     * urls can still forbid it through the configuration key.
+     */
     protected function replaceSpecialCharacter(string $string, string $replacement = ''): string
     {
         return preg_replace(
             '/'.ConfigQuery::read(
                 self::SPECIAL_CHARS_REGEXP_CONFIG_KEY,
-                '[^a-zA-Z0-9-\.]'
+                '[^a-zA-Z0-9-\.\/]'
             ).'/',
             $replacement,
             $string

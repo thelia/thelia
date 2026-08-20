@@ -235,4 +235,17 @@ final class UrlRewritingTest extends IntegrationTestCase
             ->count();
         self::assertSame(0, $countAfter);
     }
+
+    public function testAHierarchicalUrlKeepsItsSeparators(): void
+    {
+        // A shop nesting its content answers on a path, and the address it was
+        // given has to be the address it is stored under: dropping the slash
+        // welds "guides/summer" into "guidessummer", so the url handed to the
+        // visitor, the sitemap and the search engine answers 404.
+        $category = $this->createCategoryWithTitle('Summer Guide');
+        $category->setRewrittenUrl('en_US', 'guides/summer');
+
+        self::assertSame('guides/summer', $category->getRewrittenUrl('en_US'));
+        self::assertNotNull(RewritingUrlQuery::create()->findOneByUrl('guides/summer'));
+    }
 }
