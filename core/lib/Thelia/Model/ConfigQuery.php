@@ -25,6 +25,20 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
+    /**
+     * Every unit price is rounded to the cent before being multiplied by the
+     * quantity. This is the historical Thelia behaviour and stays the default.
+     */
+    public const ROUNDING_MODE_SUM_OF_ROUNDINGS = 1;
+
+    /**
+     * The unit price is multiplied by the quantity at full precision, and only
+     * the resulting line total is rounded to the cent. Shops selling by weight
+     * or by volume need this: a price stored per gram or per millilitre is
+     * meaningless once rounded to the cent.
+     */
+    public const ROUNDING_MODE_ROUNDING_OF_SUMS = 2;
+
     protected static $booted = false;
     protected static $cache = [];
 
@@ -366,6 +380,34 @@ class ConfigQuery extends BaseConfigQuery
     public static function getMinimuAdminPasswordLength()
     {
         return self::read('minimum_admin_password_length', 4);
+    }
+
+    /**
+     * Orders placed before Thelia 2.4 were totalled without any rounding at all.
+     * Their amount is frozen: reading them back with a newer rule would restate
+     * an invoice the customer has already paid.
+     */
+    public static function isOrderWithLegacyRounding(int $orderId): bool
+    {
+        return $orderId <= (int) self::read('last_legacy_rounding_order_id', 0);
+    }
+
+    /**
+     * Tells how a line total has to be built from a unit price and a quantity.
+     *
+     * The mode is shop-wide, so changing it restates the total of the orders
+     * already placed. Freeze them the way the 2.4 upgrade did, by writing the
+     * current maximum order id into last_legacy_rounding_order_id, before
+     * switching a shop that already has an order history.
+     */
+    public static function getOrderRoundingMode(): int
+    {
+        return (int) self::read('order_rounding_mode', self::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+    }
+
+    public static function isRoundingModeRoundingOfSums(): bool
+    {
+        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === self::getOrderRoundingMode();
     }
 }
 

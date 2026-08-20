@@ -205,7 +205,7 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPrice(Country $country, ?State $state = null): float
     {
-        return round($this->getTaxedPrice($country, $state), 2) * $this->getQuantity();
+        return $this->lineTotal($this->getTaxedPrice($country, $state));
     }
 
     /**
@@ -213,21 +213,37 @@ class CartItem extends BaseCartItem
      */
     public function getTotalTaxedPromoPrice(Country $country, ?State $state = null)
     {
-        return round($this->getTaxedPromoPrice($country, $state), 2) * $this->getQuantity();
+        return $this->lineTotal($this->getTaxedPromoPrice($country, $state));
     }
 
     public function getTotalPrice(): float
     {
-        return round((float) $this->getPrice(), 2) * $this->getQuantity();
+        return $this->lineTotal((float) $this->getPrice());
     }
 
     public function getTotalPromoPrice(): float
     {
-        return round((float) $this->getPromoPrice(), 2) * $this->getQuantity();
+        return $this->lineTotal((float) $this->getPromoPrice());
     }
 
     public function getTotalRealPrice(): float
     {
-        return round($this->getRealPrice(), 2) * $this->getQuantity();
+        return $this->lineTotal($this->getRealPrice());
+    }
+
+    /**
+     * Turns a unit price into a line total, rounding where the shop's
+     * order_rounding_mode says to round.
+     *
+     * Order::getTotalAmount() has to reach the same figure from the persisted
+     * order lines, so any change here belongs there too.
+     */
+    private function lineTotal(float $unitPrice): float
+    {
+        if (ConfigQuery::isRoundingModeRoundingOfSums()) {
+            return round($unitPrice * $this->getQuantity(), 2);
+        }
+
+        return round($unitPrice, 2) * $this->getQuantity();
     }
 }

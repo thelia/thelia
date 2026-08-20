@@ -107,7 +107,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $lastLegacyRoundingOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
+        $roundingOfSums = ConfigQuery::isRoundingModeRoundingOfSums();
 
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
@@ -117,7 +117,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-            if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
+            if (ConfigQuery::isOrderWithLegacyRounding($orderProduct->getOrderId())) {
                 $totalTax = round($tax * $orderProduct->getQuantity(), 2);
                 $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
 
@@ -129,6 +129,25 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
                 $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+            } elseif ($roundingOfSums) {
+                // Same rounding as CartItem::getTotalTaxedPrice() under this mode:
+                // the quantity multiplies the unit amount at full precision, and
+                // only the line total is rounded. Unit amounts stay unrounded, as
+                // a price per gram or per millilitre is nothing once cut to the cent.
+                $tax = (float) $tax;
+                $promoTax = (float) $promoTax;
+
+                $totalTax = round($tax * $orderProduct->getQuantity(), 2);
+                $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
+
+                $taxedPrice = (float) $orderProduct->getPrice() + $tax;
+                $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + $promoTax;
+
+                $totalPrice = round((float) $orderProduct->getPrice() * $orderProduct->getQuantity(), 2);
+                $totalPromoPrice = round((float) $orderProduct->getPromoPrice() * $orderProduct->getQuantity(), 2);
+
+                $totalTaxedPrice = round($taxedPrice * $orderProduct->getQuantity(), 2);
+                $totalTaxedPromoPrice = round($taxedPromoPrice * $orderProduct->getQuantity(), 2);
             } else {
                 $tax = round((float) $tax, 2);
                 $promoTax = round((float) $promoTax, 2);
