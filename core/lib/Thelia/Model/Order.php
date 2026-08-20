@@ -209,7 +209,7 @@ class Order extends BaseOrder
         // The rounding mode is part of the key: it decides what the query computes.
         static $queryResult = [];
 
-        $roundingMode = ConfigQuery::getOrderRoundingMode();
+        $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $id = $this->getId().'-'.$roundingMode;
 
         if (!isset($queryResult[$id]) || null === $queryResult[$id]) {

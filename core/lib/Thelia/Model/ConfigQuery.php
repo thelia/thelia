@@ -393,21 +393,43 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
-     * Tells how a line total has to be built from a unit price and a quantity.
-     *
-     * The mode is shop-wide, so changing it restates the total of the orders
-     * already placed. Freeze them the way the 2.4 upgrade did, by writing the
-     * current maximum order id into last_legacy_rounding_order_id, before
-     * switching a shop that already has an order history.
+     * The last order that keeps a sum-of-roundings total whatever
+     * order_rounding_mode says. A shop switching to rounding of sums writes its
+     * current maximum order id here, exactly the way the 2.4 upgrade wrote
+     * last_legacy_rounding_order_id, so that the orders already invoiced are
+     * left alone. Zero, the default, means the shop has nothing to protect.
      */
-    public static function getOrderRoundingMode(): int
+    public static function isOrderWithSumOfRoundings(int $orderId): bool
     {
-        return (int) self::read('order_rounding_mode', self::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+        return $orderId <= (int) self::read('last_sum_of_roundings_order_id', 0);
     }
 
-    public static function isRoundingModeRoundingOfSums(): bool
+    /**
+     * Tells how a line total has to be built from a unit price and a quantity.
+     *
+     * Pass the id of a persisted order to get the mode that order was invoiced
+     * with; pass nothing for a cart, which is always priced with the mode the
+     * shop runs today.
+     *
+     * Any value other than the two known modes reads as the historical one: a
+     * typo in a configuration variable must not restate an invoice.
+     */
+    public static function getOrderRoundingMode(?int $orderId = null): int
     {
-        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === self::getOrderRoundingMode();
+        if (null !== $orderId && self::isOrderWithSumOfRoundings($orderId)) {
+            return self::ROUNDING_MODE_SUM_OF_ROUNDINGS;
+        }
+
+        $configuredMode = (int) self::read('order_rounding_mode', self::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+
+        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === $configuredMode
+            ? self::ROUNDING_MODE_ROUNDING_OF_SUMS
+            : self::ROUNDING_MODE_SUM_OF_ROUNDINGS;
+    }
+
+    public static function isRoundingModeRoundingOfSums(?int $orderId = null): bool
+    {
+        return self::ROUNDING_MODE_ROUNDING_OF_SUMS === self::getOrderRoundingMode($orderId);
     }
 }
 

@@ -107,11 +107,14 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $roundingOfSums = ConfigQuery::isRoundingModeRoundingOfSums();
-
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
+
+            // The loop walks orders of several shops' worth of history at once
+            // in the back office, and the rounding an order was invoiced with
+            // depends on when it was placed.
+            $roundingOfSums = ConfigQuery::isRoundingModeRoundingOfSums($orderProduct->getOrderId());
 
             $tax = $orderProduct->getVirtualColumn('TOTAL_TAX'); // 1,39755 => 1.4
             $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
