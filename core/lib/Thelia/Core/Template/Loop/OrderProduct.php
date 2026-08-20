@@ -140,9 +140,6 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $tax = (float) $tax;
                 $promoTax = (float) $promoTax;
 
-                $totalTax = round($tax * $orderProduct->getQuantity(), 2);
-                $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
-
                 $taxedPrice = (float) $orderProduct->getPrice() + $tax;
                 $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + $promoTax;
 
@@ -151,6 +148,15 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
                 $totalTaxedPrice = round($taxedPrice * $orderProduct->getQuantity(), 2);
                 $totalTaxedPromoPrice = round($taxedPromoPrice * $orderProduct->getQuantity(), 2);
+
+                // Rounding the tax of the line on its own would leave the three
+                // totals disagreeing by a cent, and an invoice whose lines and
+                // whose footer state different amounts. Order::getTotalAmount()
+                // reads the tax of an order as the gap between its taxed and its
+                // untaxed total; a line reads it the same way, so the identity
+                // holds by construction.
+                $totalTax = round($totalTaxedPrice - $totalPrice, 2);
+                $totalPromoTax = round($totalTaxedPromoPrice - $totalPromoPrice, 2);
             } else {
                 $tax = round((float) $tax, 2);
                 $promoTax = round((float) $promoTax, 2);
