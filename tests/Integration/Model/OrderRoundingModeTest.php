@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Model;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Service\DataAccess\LoopDataAccessService;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -283,6 +284,48 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         $tax = 0.0;
         self::assertEqualsWithDelta($goods + 4.80, $order->getTotalAmount(), 0.0001);
         self::assertEqualsWithDelta($goods, $order->getTotalAmount($tax, false), 0.0001);
+    }
+
+    /**
+     * The invoice, the delivery note and the order emails read the order_product
+     * loop, and they print the three totals of a line side by side. Rounding each
+     * of them on its own leaves them disagreeing by a cent, so the tax of a line
+     * is the gap between its taxed and its untaxed total, the way
+     * Order::getTotalAmount() reads the tax of an order.
+     */
+    #[DataProvider('roundingModeProvider')]
+    public function testALineOfTheOrderProductLoopAddsUpWhateverTheMode(int $mode): void
+    {
+        ConfigQuery::write('order_rounding_mode', $mode);
+
+        $order = $this->placeOrder($this->createCart([
+            $this->bulkLine(),
+            ['price' => '12.34', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT],
+        ]));
+
+        $lines = $this->getService(LoopDataAccessService::class)
+            ->theliaLoop('lines', 'order_product', ['order' => $order->getId()]);
+
+        self::assertCount(2, $lines);
+
+        $taxedTotal = 0.0;
+        foreach ($lines as $line) {
+            self::assertEqualsWithDelta(
+                (float) $line['REAL_TOTAL_TAXED_PRICE'],
+                (float) $line['REAL_TOTAL_PRICE'] + (float) $line['REAL_TOTAL_PRICE_TAX'],
+                0.0001,
+                'A line total, its tax and its taxed total have to be the same figure read twice.',
+            );
+
+            $taxedTotal += (float) $line['REAL_TOTAL_TAXED_PRICE'];
+        }
+
+        self::assertEqualsWithDelta(
+            $order->getTotalAmount(),
+            $taxedTotal,
+            0.0001,
+            'The lines of the invoice have to add up to the amount charged.',
+        );
     }
 
     /**

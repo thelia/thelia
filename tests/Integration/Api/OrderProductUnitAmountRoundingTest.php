@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Api;
 
+use Thelia\Api\Resource\CartItem as CartItemResource;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
 use Thelia\Model\ConfigQuery;
@@ -58,6 +59,23 @@ final class OrderProductUnitAmountRoundingTest extends IntegrationTestCase
         self::assertSame(0.01, $orderProduct->getPromoPrice());
         self::assertSame(0.01, $orderProduct->getUnitTaxedPrice());
         self::assertSame(0.0, $this->orderProductTaxResource()->getAmount());
+    }
+
+    /**
+     * order_product.quantity and cart_item.quantity are both FLOAT columns: a
+     * line of goods sold by weight carries grams, not units. Typed as an int the
+     * resource billed 300.5 g as 300 g, whatever the rounding mode.
+     */
+    public function testAFractionalQuantitySurvivesTheApiResource(): void
+    {
+        $orderProduct = $this->orderProductResource();
+        $orderProduct->setQuantity(300.5);
+
+        self::assertSame(300.5, $orderProduct->getQuantity());
+
+        $cartItem = (new CartItemResource())->setQuantity(300.5);
+
+        self::assertSame(300.5, $cartItem->getQuantity());
     }
 
     public function testRoundingOfSumsExposesUnitAmountsAtTheStoredPrecision(): void
