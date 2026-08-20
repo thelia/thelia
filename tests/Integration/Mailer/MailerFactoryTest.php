@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Mailer;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -231,6 +232,43 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('fr_FR', $session->getLang()->getLocale());
     }
 
+    public function testAMessageWithoutATemplateFileRendersItsStoredBody(): void
+    {
+        // No template file at all: the message renders from its database-stored body, so
+        // there is no file for a parser to claim. Resolving a parser from the message code
+        // reports a missing resource, and sendEmailMessage() would swallow it: the mail is
+        // silently lost. The default parser has to render the stored body instead.
+        $message = new Message();
+        $message->setName('test_body_only_message');
+        $message->setLocale('en_US');
+        $message->setSubject('Subject');
+        $message->setHtmlMessage('<p>Stored body</p>');
+        $message->setTextMessage('Stored body');
+        $message->save();
+
+        $parser = $this->createMock(ParserInterface::class);
+        $parser->method('getRequest')->willReturn($this->getService(RequestStack::class)->getMainRequest());
+        $parser->method('getTemplateHelper')->willReturn($this->getService(TemplateHelperInterface::class));
+        $parser->method('renderString')->willReturnArgument(0);
+
+        $mailerFactory = new MailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->createParserResolverWhereNoParserClaimsAView($parser),
+            $this->getService(MailerInterface::class),
+        );
+
+        $email = $mailerFactory->createEmailMessage(
+            'test_body_only_message',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            [],
+            'en_US',
+        );
+
+        self::assertSame('<p>Stored body</p>', $email->getHtmlBody());
+        self::assertSame('Stored body', $email->getTextBody());
+    }
+
     public function testSendDoesNotThrowWithNullTransport(): void
     {
         $email = $this->mailerFactory->createSimpleEmailMessage(
@@ -247,6 +285,34 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertTrue(true);
     }
 
+    /**
+     * The situation of an install whose parsers all verify that a template file exists
+     * (the Twig parser always did, the Smarty parser does since TheliaSmarty 3.0.1): a
+     * view no theme ships is claimed by nobody, and only getDefaultParser() answers.
+     */
+    private function createParserResolverWhereNoParserClaimsAView(ParserInterface $defaultParser): ParserResolver
+    {
+        return new class($this->getService(RequestStack::class), $this->getService(TemplateHelperInterface::class), $defaultParser) extends ParserResolver {
+            public function __construct(
+                RequestStack $requestStack,
+                TemplateHelperInterface $templateHelper,
+                private readonly ParserInterface $defaultParser,
+            ) {
+                parent::__construct([], [], $requestStack, $templateHelper);
+            }
+
+            public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
+            {
+                throw new ResourceNotFoundException(\sprintf('Parser for template %s not found', $templateName));
+            }
+
+            public function getDefaultParser(): ParserInterface
+            {
+                return $this->defaultParser;
+            }
+        };
+    }
+
     private function createParserResolverReturning(ParserInterface $parser): ParserResolver
     {
         return new class($this->getService(RequestStack::class), $this->getService(TemplateHelperInterface::class), $parser) extends ParserResolver {
@@ -259,6 +325,11 @@ final class MailerFactoryTest extends IntegrationTestCase
             }
 
             public function getParser(string $pathTemplate, ?string $templateName): ParserInterface
+            {
+                return $this->parser;
+            }
+
+            public function getDefaultParser(): ParserInterface
             {
                 return $this->parser;
             }
