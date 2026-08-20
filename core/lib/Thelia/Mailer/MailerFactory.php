@@ -172,7 +172,7 @@ class MailerFactory
         // that existence test miss the real file and fall back to the wrong engine.
         $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
         $parser = $this->getParser(
-            '' !== $templateFileName ? pathinfo($templateFileName, \PATHINFO_FILENAME) : $messageCode
+            '' !== $templateFileName ? pathinfo($templateFileName, \PATHINFO_FILENAME) : null
         );
         // Assign parameters
         foreach ($messageParameters as $name => $value) {
@@ -316,10 +316,16 @@ class MailerFactory
     /**
      * @throws \Exception
      */
-    protected function getParser(string $template): ParserInterface
+    protected function getParser(?string $template): ParserInterface
     {
+        // A message with no template file at all renders from its database-stored body,
+        // so there is no file for a parser to claim: asking the resolver for one would
+        // report a missing resource, and sendEmailMessage() would swallow it — the mail
+        // silently lost. The default parser renders the stored body instead.
         $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
-        $parser = $this->parserResolver->getParser($path, $template);
+        $parser = null === $template
+            ? $this->parserResolver->getDefaultParser()
+            : $this->parserResolver->getParser($path, $template);
 
         $parser->setTemplateDefinition(
             $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
