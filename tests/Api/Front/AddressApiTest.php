@@ -172,8 +172,10 @@ final class AddressApiTest extends ApiTestCase
      * The front API is another door onto the same table as the address form: a customer must
      * not be able to save a business address without its identifiers by going through it.
      */
-    public function testACompanyAddressWithoutIdentifiersIsRefusedOnTheFrontApiToo(): void
+    public function testACompanyAddressWithoutIdentifiersIsAcceptedOnTheFrontApiToo(): void
     {
+        // Same contract as the admin API: identifiers are optional even with a company
+        // name, only a typed-in value gets its format checked (see CompanyIdentifierRules).
         $factory = $this->createFixtureFactory();
         $title = $factory->customerTitle();
         $customer = $factory->customer($title, ['password' => 'password']);
@@ -188,8 +190,13 @@ final class AddressApiTest extends ApiTestCase
             $this->authenticateAsCustomer($customer),
         );
 
-        self::assertSame(422, $response->getStatusCode());
-        self::assertStringContainsString('registration number is required', (string) $response->getContent());
+        self::assertJsonResponseSuccessful($response);
+
+        $created = json_decode((string) $response->getContent(), true);
+        self::assertSame('Acme SAS', $created['company']);
+        // Null values are omitted from the response, so the keys may simply be absent.
+        self::assertNull($created['siret'] ?? null);
+        self::assertNull($created['vatNumber'] ?? null);
     }
 
     public function testTheOptionalAddressLinesMayBeOmitted(): void
