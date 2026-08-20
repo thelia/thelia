@@ -78,6 +78,29 @@ final class OrderRoundingModeCommandTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * Moving the pivot up on a shop that already switched would read the orders
+     * invoiced under the new rule back under the old one — the harm the pivot
+     * exists to prevent. Asking for the mode the shop already runs is a no-op.
+     */
+    public function testAskingForTheModeAlreadyInPlaceLeavesThePivotAlone(): void
+    {
+        $this->runCommand(['mode' => 'rounding-of-sums']);
+        $pivot = (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0);
+
+        $orderPlacedUnderTheNewRule = $this->createFixtureFactory()->order();
+        $tester = $this->runCommand(['mode' => 'rounding-of-sums']);
+
+        self::assertSame(0, $tester->getStatusCode());
+        self::assertStringContainsString('already runs', $tester->getDisplay());
+        self::assertSame($pivot, (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0));
+        self::assertSame(
+            ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS,
+            ConfigQuery::getOrderRoundingMode((int) $orderPlacedUnderTheNewRule->getId()),
+            'An order placed after the switch must keep being read with the new rule.',
+        );
+    }
+
     public function testSwitchingBackLeavesThePivotInPlace(): void
     {
         $this->runCommand(['mode' => 'rounding-of-sums']);

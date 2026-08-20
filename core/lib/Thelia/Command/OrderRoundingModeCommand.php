@@ -103,6 +103,16 @@ class OrderRoundingModeCommand extends ContainerAwareCommand
 
         $this->showState($style);
 
+        // Running this again on a shop that already switched would move the pivot
+        // up to today's last order, and the orders placed since the switch — the
+        // ones invoiced under the new rule — would be read back under the old one.
+        // That is the very harm the pivot exists to prevent.
+        if ($mode === ConfigQuery::getOrderRoundingMode()) {
+            $style->comment(\sprintf('The shop already runs %s. Nothing to do.', $requestedMode));
+
+            return self::SUCCESS;
+        }
+
         if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $mode) {
             $style->text([
                 \sprintf('Switching to <info>rounding of sums</info> and freezing orders up to id <info>%d</info>.', $pivot),
