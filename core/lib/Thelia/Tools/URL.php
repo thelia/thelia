@@ -25,6 +25,7 @@ use Thelia\Core\Routing\Rewriting\RewritingResolver;
 use Thelia\Core\Routing\Rewriting\RewritingRetriever;
 use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\RewritingUrlQuery;
 
 class URL
 {
@@ -272,6 +273,53 @@ class URL
         }
 
         return $this->retriever;
+    }
+
+    /**
+     * Fills the rewritten url cache for a whole batch of ids of the same view
+     * and locale in a single query, instead of paying one query per id the
+     * first time each of them is retrieved.
+     *
+     * @param list<int|string> $viewIds
+     */
+    public function preloadRewrittenUrls(string $view, $viewLocale, array $viewIds): void
+    {
+        if (!ConfigQuery::isRewritingEnable()) {
+            return;
+        }
+
+        $missingIds = array_values(array_filter(
+            array_unique($viewIds),
+            fn ($viewId): bool => !$this->memoizer->has($view, $viewId, $viewLocale),
+        ));
+
+        if ([] === $missingIds) {
+            return;
+        }
+
+        $rewritingUrlsByViewId = (new RewritingUrlQuery())->getViewUrlsQuery($view, $viewLocale, $missingIds);
+
+        foreach ($missingIds as $viewId) {
+            $allParametersWithoutView = [];
+
+            if (null !== $viewLocale) {
+                $allParametersWithoutView['lang'] = $viewLocale;
+            }
+
+            if (null !== $viewId) {
+                $allParametersWithoutView[$view.'_id'] = $viewId;
+            }
+
+            $rewrittenUrlPath = $rewritingUrlsByViewId[(string) $viewId] ?? null;
+
+            $this->memoizer->set(
+                $view,
+                $viewId,
+                $viewLocale,
+                $this->viewUrl($view, $allParametersWithoutView),
+                null !== $rewrittenUrlPath ? $this->absoluteUrl($rewrittenUrlPath) : null,
+            );
+        }
     }
 
     /**

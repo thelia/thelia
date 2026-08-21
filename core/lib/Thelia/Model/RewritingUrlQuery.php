@@ -66,6 +66,45 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->findOne();
     }
 
+    /**
+     * Same match as getViewUrlQuery(), for a whole batch of view ids at once:
+     * one query preloading a collection instead of one query per item.
+     *
+     * @param list<int|string> $viewIds
+     *
+     * @return array<string, string> the rewritten url path, keyed by view id (as a string)
+     */
+    public function getViewUrlsQuery(string $view, $viewLocale, array $viewIds): array
+    {
+        if ([] === $viewIds) {
+            return [];
+        }
+
+        $rows = self::create()
+            ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
+            ->where('ISNULL(`ra`.REWRITING_URL_ID)')
+            ->filterByView($view)
+            ->filterByViewLocale($this->retrieveLocale($viewLocale))
+            ->filterByViewId($viewIds, Criteria::IN)
+            ->filterByRedirected(null)
+            ->orderById(Criteria::DESC)
+            ->find();
+
+        $urlsByViewId = [];
+
+        foreach ($rows as $row) {
+            $viewId = (string) $row->getViewId();
+
+            // Rows come back most-recent-id first (orderById DESC), so the first one
+            // seen for a given view id reproduces what getViewUrlQuery()'s findOne() picks.
+            if (!\array_key_exists($viewId, $urlsByViewId)) {
+                $urlsByViewId[$viewId] = $row->getUrl();
+            }
+        }
+
+        return $urlsByViewId;
+    }
+
     public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters): ?RewritingUrl
     {
         // A rewriting argument value is always scalar, so an array-valued parameter can never match

@@ -253,6 +253,76 @@ final class UrlRewritingTest extends IntegrationTestCase
         self::assertNotNull(RewritingUrlQuery::create()->findOneByUrl('guides/summer'));
     }
 
+    public function testGetViewUrlsQueryBatchesSeveralIdsInOneCallAndSkipsTheOnesWithoutAUrl(): void
+    {
+        $con = Propel::getConnection('TheliaMain');
+
+        $withUrl = $this->createCategoryWithTitle('Batched Category One');
+        $withUrl->generateRewrittenUrl('en_US', $con);
+
+        $otherWithUrl = $this->createCategoryWithTitle('Batched Category Two');
+        $otherWithUrl->generateRewrittenUrl('en_US', $con);
+
+        $withoutUrl = $this->createFixtureFactory()->category();
+
+        $urlsByViewId = RewritingUrlQuery::create()->getViewUrlsQuery(
+            'category',
+            'en_US',
+            [$withUrl->getId(), $otherWithUrl->getId(), $withoutUrl->getId()],
+        );
+
+        self::assertStringContainsString('batched-category-one', $urlsByViewId[(string) $withUrl->getId()]);
+        self::assertStringContainsString('batched-category-two', $urlsByViewId[(string) $otherWithUrl->getId()]);
+        self::assertArrayNotHasKey(
+            (string) $withoutUrl->getId(),
+            $urlsByViewId,
+            'A category without a title never got a rewritten url: it must not appear in the map at all.',
+        );
+    }
+
+    public function testPreloadRewrittenUrlsFillsTheCacheForEveryIdInOneQuery(): void
+    {
+        $con = Propel::getConnection('TheliaMain');
+
+        $categories = [
+            $this->createCategoryWithTitle('Preloaded Category One'),
+            $this->createCategoryWithTitle('Preloaded Category Two'),
+            $this->createCategoryWithTitle('Preloaded Category Three'),
+        ];
+
+        foreach ($categories as $category) {
+            $category->generateRewrittenUrl('en_US', $con);
+        }
+
+        $url = URL::getInstance();
+        $ids = array_map(static fn (Category $category): int => $category->getId(), $categories);
+
+        $statements = $this->recordSqlQueries(static function () use ($url, $ids): void {
+            $url->preloadRewrittenUrls('category', 'en_US', $ids);
+        });
+
+        self::assertSame(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'rewriting_url'),
+            'One query must cover the whole batch, not one per id.',
+        );
+
+        $secondBatch = $this->recordSqlQueries(static function () use ($url, $categories): void {
+            foreach ($categories as $category) {
+                self::assertStringContainsString(
+                    'preloaded-category',
+                    (string) $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl,
+                );
+            }
+        });
+
+        self::assertSame(
+            0,
+            self::countSqlQueriesSelectingFrom($secondBatch, 'rewriting_url'),
+            'Every id was preloaded already: none of the retrieve() calls above may read the table again.',
+        );
+    }
+
     public function testUrlRetrieveMemoizesTheSameKeyWithinARequest(): void
     {
         $category = $this->createCategoryWithTitle('Memoized Category');
