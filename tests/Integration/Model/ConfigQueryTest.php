@@ -16,9 +16,58 @@ namespace Thelia\Tests\Integration\Model;
 
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 final class ConfigQueryTest extends IntegrationTestCase
 {
+    use RecordsSqlQueries;
+
+    /**
+     * Locks the falsy-value pitfall together with the query count: a stored
+     * '0' read twice must still be served from the cache the second time,
+     * not just return the right value at the cost of a query per call.
+     */
+    public function testReadingAStoredZeroTwiceCostsOneQuery(): void
+    {
+        ConfigQuery::write('test_read_falsy_zero_query_count', '0');
+        ConfigQuery::resetCache();
+
+        $statements = $this->recordSqlQueries(static function (): void {
+            self::assertSame('0', ConfigQuery::read('test_read_falsy_zero_query_count', 1));
+            self::assertSame('0', ConfigQuery::read('test_read_falsy_zero_query_count', 1));
+        });
+
+        self::assertSame(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'config'),
+            'Reading the same name twice must load the table once, not query per call.',
+        );
+    }
+
+    /**
+     * The snapshot loaded on the first uncached read is exhaustive: a name
+     * that was never written has no row in the table at all, so every read
+     * of it after the first one must be free, and several distinct never
+     * written names must still share the same single bulk load.
+     */
+    public function testReadingSeveralNeverWrittenNamesCostsAtMostOneQuery(): void
+    {
+        ConfigQuery::resetCache();
+
+        $statements = $this->recordSqlQueries(static function (): void {
+            self::assertSame('a', ConfigQuery::read('test_never_written_one', 'a'));
+            self::assertSame('b', ConfigQuery::read('test_never_written_two', 'b'));
+            self::assertSame('b', ConfigQuery::read('test_never_written_two', 'b'));
+            self::assertSame('c', ConfigQuery::read('test_never_written_three', 'c'));
+        });
+
+        self::assertSame(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'config'),
+            'Four reads across three never-written names must still cost a single bulk load.',
+        );
+    }
+
     public function testReadReturnsAStoredZeroInsteadOfTheDefault(): void
     {
         ConfigQuery::write('test_read_falsy_zero', '0');

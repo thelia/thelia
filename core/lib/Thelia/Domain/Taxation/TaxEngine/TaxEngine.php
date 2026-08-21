@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
-use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\State;
 
@@ -66,7 +65,7 @@ class TaxEngine
         $customer = $this->getSession()?->getCustomerUser();
 
         if (!$customer) {
-            $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+            $this->taxCountry = Country::getDefaultCountry();
             $this->taxState = null;
 
             return $this->taxCountry;
@@ -79,7 +78,7 @@ class TaxEngine
             return $this->taxCountry;
         }
 
-        $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+        $this->taxCountry = Country::getDefaultCountry();
         $this->taxState = null;
 
         return $this->taxCountry;
