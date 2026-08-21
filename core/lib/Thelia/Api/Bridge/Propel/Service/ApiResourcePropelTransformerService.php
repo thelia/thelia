@@ -699,10 +699,12 @@ readonly class ApiResourcePropelTransformerService
                 $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
 
                 if ($baseModel->hasVirtualColumn($virtualColumn)) {
+                    // The query left-joined every active language, so an empty column
+                    // is an answer: that language has no translation. Reading it as
+                    // "not loaded yet" sent one query per row and per language after a
+                    // row that is not there.
                     $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
-                }
-
-                if (null === $fieldValue) {
+                } else {
                     $propelModel->setlocale($lang->getLocale());
                     $getter = 'get'.ucfirst($i18nFieldName);
 
