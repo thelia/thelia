@@ -154,6 +154,14 @@ class Country extends BaseCountry
     }
 
     /**
+     * @internal
+     */
+    public static function resetDefaultCountryCache(): void
+    {
+        self::$defaultCountry = null;
+    }
+
+    /**
      * Return the shop country.
      *
      * @throws \LogicException if no shop country is defined

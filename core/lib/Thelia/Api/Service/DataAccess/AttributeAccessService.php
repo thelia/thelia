@@ -197,7 +197,9 @@ class AttributeAccessService
         return $this->dataAccessWithI18n(
             'defaultCountry',
             $attributeName,
-            CountryQuery::create()->filterByByDefault(1)->limit(1)
+            // Filtering by the already memoized default country's id, rather than
+            // by_default=1 again, skips a redundant lookup of which country that is.
+            CountryQuery::create()->filterById(Country::getDefaultCountry()->getId())->limit(1)
         );
     }
 
