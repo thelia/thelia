@@ -44,22 +44,29 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
     public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
         if (!$isMinOrMaxFilter) {
-            foreach ($value as $featureId => $childValue) {
-                foreach ($childValue as $type => $featureAvId) {
-                    $count = FeatureAvQuery::create()
-                        ->filterById($featureAvId, Criteria::IN)
-                        ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
-                        ->select(['distinct_feature_count'])
-                        ->findOne();
+            $featureAvIds = $this->flattenSelectedValues($value);
 
-                    $query
-                        ->useFeatureProductQuery()
-                        ->filterByFeatureAvId($featureAvId, Criteria::IN)
-                        ->endUse()
-                        ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
-                        ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
-                }
+            if ($featureAvIds === []) {
+                return;
             }
+
+            // Every identifier selected across every feature goes into a single IN, and the
+            // HAVING then asks a product to carry as many distinct features as were selected.
+            // Two values of the same feature widen the match (they count as one feature), values
+            // of two different features narrow it. Applying one IN per value instead would put
+            // two mutually exclusive conditions on the same join and match nothing.
+            $count = FeatureAvQuery::create()
+                ->filterById($featureAvIds, Criteria::IN)
+                ->withColumn('COUNT(DISTINCT feature_id)', 'distinct_feature_count')
+                ->select(['distinct_feature_count'])
+                ->findOne();
+
+            $query
+                ->useFeatureProductQuery()
+                ->filterByFeatureAvId($featureAvIds, Criteria::IN)
+                ->endUse()
+                ->groupBy(FeatureProductTableMap::COL_PRODUCT_ID)
+                ->having('COUNT(DISTINCT '.FeatureProductTableMap::COL_FEATURE_ID.') = ?', $count);
 
             return;
         }
@@ -78,6 +85,29 @@ class FeatureAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInterf
                     ->endUse();
             }
         }
+    }
+
+    /**
+     * The feature availability identifiers held by a [featureId => values] selection, whatever
+     * the depth the query string nested them at.
+     *
+     * @return array<int, int|string>
+     */
+    private function flattenSelectedValues(mixed $value): array
+    {
+        $featureAvIds = [];
+
+        foreach ((array) $value as $childValue) {
+            foreach ((array) $childValue as $featureAvId) {
+                if (\is_array($featureAvId) || $featureAvId === null || $featureAvId === '') {
+                    continue;
+                }
+
+                $featureAvIds[] = $featureAvId;
+            }
+        }
+
+        return array_values(array_unique($featureAvIds));
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
