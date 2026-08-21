@@ -23,13 +23,16 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
 use Thelia\Core\Routing\Rewriting\RewritingResolver;
 use Thelia\Core\Routing\Rewriting\RewritingRetriever;
+use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\RewritingUrlQuery;
 
 class URL
 {
     protected RewritingResolver $resolver;
     protected RewritingRetriever $retriever;
     protected RequestContext $requestContext;
+    private RewritingUrlMemoizer $memoizer;
 
     public const PATH_TO_FILE = true;
     public const WITH_INDEX_PAGE = false;
@@ -39,7 +42,7 @@ class URL
     /** @var string a cache for the base URL scheme */
     private ?string $baseUrlScheme = null;
 
-    public function __construct(?RouterInterface $router = null)
+    public function __construct(?RouterInterface $router = null, ?RewritingUrlMemoizer $memoizer = null)
     {
         // Allow singleton style calls once instantiated.
         // For this to work, the URL service has to be instantiated very early. This is done manually
@@ -52,6 +55,9 @@ class URL
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
+        // Optional so tests and other manual `new URL()` call sites keep working: each
+        // instance then simply gets its own, unshared memoizer.
+        $this->memoizer = $memoizer ?? new RewritingUrlMemoizer();
     }
 
     public function setRequestContext(RequestContext $requestContext): void
@@ -241,7 +247,19 @@ class URL
     public function retrieve(string $view, $viewId, $viewLocale): RewritingRetriever
     {
         if (ConfigQuery::isRewritingEnable()) {
-            $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+            $cached = $this->memoizer->remember(
+                $view,
+                $viewId,
+                $viewLocale,
+                function () use ($view, $viewId, $viewLocale): array {
+                    $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+
+                    return ['url' => $this->retriever->url, 'rewrittenUrl' => $this->retriever->rewrittenUrl];
+                },
+            );
+
+            $this->retriever->url = $cached['url'];
+            $this->retriever->rewrittenUrl = $cached['rewrittenUrl'];
         } else {
             $allParametersWithoutView = [];
             $allParametersWithoutView['lang'] = $viewLocale;
@@ -255,6 +273,64 @@ class URL
         }
 
         return $this->retriever;
+    }
+
+    /**
+     * Fills the rewritten url cache for a whole batch of ids of the same view
+     * and locale in a single query, instead of paying one query per id the
+     * first time each of them is retrieved.
+     *
+     * @param list<int|string> $viewIds
+     */
+    public function preloadRewrittenUrls(string $view, $viewLocale, array $viewIds): void
+    {
+        if (!ConfigQuery::isRewritingEnable()) {
+            return;
+        }
+
+        $missingIds = array_values(array_filter(
+            array_unique($viewIds),
+            fn ($viewId): bool => !$this->memoizer->has($view, $viewId, $viewLocale),
+        ));
+
+        if ([] === $missingIds) {
+            return;
+        }
+
+        $rewritingUrlsByViewId = (new RewritingUrlQuery())->getViewUrlsQuery($view, $viewLocale, $missingIds);
+
+        foreach ($missingIds as $viewId) {
+            $allParametersWithoutView = [];
+
+            if (null !== $viewLocale) {
+                $allParametersWithoutView['lang'] = $viewLocale;
+            }
+
+            if (null !== $viewId) {
+                $allParametersWithoutView[$view.'_id'] = $viewId;
+            }
+
+            $rewrittenUrlPath = $rewritingUrlsByViewId[(string) $viewId] ?? null;
+
+            $this->memoizer->set(
+                $view,
+                $viewId,
+                $viewLocale,
+                $this->viewUrl($view, $allParametersWithoutView),
+                null !== $rewrittenUrlPath ? $this->absoluteUrl($rewrittenUrlPath) : null,
+            );
+        }
+    }
+
+    /**
+     * Drops every cached rewritten url lookup. Writes that go through
+     * {@see \Thelia\Model\Tools\UrlRewritingTrait} clear it themselves; this is
+     * the escape hatch for the ones that write through a bulk
+     * `ModelCriteria::update()` and never instantiate a RewritingUrl object.
+     */
+    public function clearRewritingUrlCache(): void
+    {
+        $this->memoizer->clear();
     }
 
     /**
