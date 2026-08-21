@@ -211,7 +211,9 @@ class Address implements PropelResourceInterface
 
     // The front never sets the owner: CustomerAddressProcessor takes it from
     // the token, so an account endpoint cannot write into another address book.
-    #[Relation(targetResource: Customer::class)]
+    // hydrateOutOfGroups: the account endpoints check `object.customer` before
+    // answering, and no front group returns the owner.
+    #[Relation(targetResource: Customer::class, hydrateOutOfGroups: true)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     public Customer $customer;
 

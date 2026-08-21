@@ -112,7 +112,9 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?int $id = null;
 
-    #[Relation(targetResource: Order::class)]
+    // hydrateOutOfGroups: the account endpoint checks `object.order.customer`
+    // before answering with a line.
+    #[Relation(targetResource: Order::class, hydrateOutOfGroups: true)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public Order $order;
 
@@ -654,35 +656,35 @@ class OrderProduct implements PropelResourceInterface
 
     public function afterModelToResource(array $context): void
     {
-        if (isset($context['operation']) && ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection)) {
-            // unitTaxedPrice
-            $totalTax = 0;
-            $totalPromoTax = 0;
+        $operation = $context['operation'] ?? null;
 
-            if ([] !== $this->orderProductTaxes) {
-                /** @var OrderProductTax $orderProductTax */
-                foreach ($this->orderProductTaxes as $orderProductTax) {
-                    /** @var \Thelia\Model\OrderProductTax $orderProductTax */
-                    $propelOrderProductTax = $orderProductTax->getPropelModel();
-
-                    if (!$this->getPropelModel()->getWasInPromo()) {
-                        $totalTax += (float) $propelOrderProductTax->getAmount();
-                    }
-
-                    if ($this->getPropelModel()->getWasInPromo()) {
-                        $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
-                    }
-                }
-
-                if (!$this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
-                }
-
-                if ($this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
-                }
-            }
+        if (!$operation instanceof Get && !$operation instanceof GetCollection) {
+            return;
         }
+
+        $propelModel = $this->getPropelModel();
+
+        if (!$propelModel instanceof OrderProductModel) {
+            return;
+        }
+
+        // The taxes are read from the model, not from $orderProductTaxes: that
+        // relation belongs to the single read only, while unitTaxedPrice is
+        // returned by the collections too.
+        $taxes = $propelModel->getOrderProductTaxes();
+
+        if (0 === $taxes->count()) {
+            return;
+        }
+
+        $wasInPromo = (bool) $propelModel->getWasInPromo();
+        $totalTax = 0.0;
+
+        foreach ($taxes as $tax) {
+            $totalTax += (float) ($wasInPromo ? $tax->getPromoAmount() : $tax->getAmount());
+        }
+
+        $this->unitTaxedPrice = (float) $propelModel->getPrice() + $totalTax;
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap

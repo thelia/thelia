@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Service;
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
@@ -523,15 +525,7 @@ readonly class ApiResourcePropelTransformerService
         Collection $langs,
     ): void {
         foreach ($reflector->getProperties() as $property) {
-            if (
-                !$this->checkGroupsSerialization(property: $property, context: $context)
-                && $this->isGroupsExcluded(property: $property, context: $context)
-            ) {
-                // This condition prevents circular references during resource serialization,
-                // avoiding infinite recursion. To make this work, you need to use the
-                // `excludedGroups` attribute on the related resource (e.g.:
-                // #[Relation(targetResource: SelectionContainer::class, excludedGroups: [SelectionContainer::GROUP_READ])])
-                // to exclude problematic serialization groups and break the circular dependency.
+            if (!$this->shouldHydrateRelation(property: $property, reflector: $reflector, context: $context)) {
                 continue;
             }
             $defaultGetter = 'get'.ucfirst($property->getName());
@@ -795,6 +789,55 @@ readonly class ApiResourcePropelTransformerService
                 $query->{$filterMethod}($value);
             }
         }
+    }
+
+    /**
+     * Reading a relation costs a query, and the serializer only ever returns the
+     * properties of the current groups: walking the others buys rows nobody
+     * looks at. A front product collection paid one read of attribute_combination
+     * per sale element for a payload that names none.
+     *
+     * `excludedGroups` still cuts a relation the groups do select, which is how a
+     * circular reference between two resources is broken. `hydrateOutOfGroups`
+     * does the opposite for the rare relation a resource computes one of its own
+     * fields from.
+     *
+     * Properties that are not relations are left alone: they cost nothing to read
+     * and some of them are set for reasons the groups do not describe.
+     */
+    private function shouldHydrateRelation(\ReflectionProperty $property, \ReflectionClass $reflector, array $context): bool
+    {
+        $relationAttribute = $property->getAttributes(Relation::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+
+        if (null === $relationAttribute || !isset($context['groups'])) {
+            return true;
+        }
+
+        if (true === ($relationAttribute->getArguments()['hydrateOutOfGroups'] ?? false)) {
+            return true;
+        }
+
+        // A write reads the resource to validate it, and its validation groups are
+        // not the groups of the response it answers with: the state provider has to
+        // hand over the whole resource. Only a read can be trimmed to what it returns.
+        $operation = $context['operation'] ?? null;
+
+        if ($operation instanceof Operation && !$operation instanceof Get && !$operation instanceof GetCollection) {
+            return true;
+        }
+
+        // A resource identified by its relations builds its own IRI out of them,
+        // so they are read whatever the groups return.
+        if (\in_array(
+            $property->getName(),
+            $this->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys'),
+            true,
+        )) {
+            return true;
+        }
+
+        return $this->checkGroupsSerialization(property: $property, context: $context)
+            && !$this->isGroupsExcluded(property: $property, context: $context);
     }
 
     private function checkGroupsSerialization(\ReflectionProperty $property, array $context): bool
