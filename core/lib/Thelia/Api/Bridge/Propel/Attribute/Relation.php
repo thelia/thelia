@@ -17,12 +17,19 @@ namespace Thelia\Api\Bridge\Propel\Attribute;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Relation
 {
+    /**
+     * @param bool $hydrateOutOfGroups reads the relation even when no group of the
+     *                                 current context serializes it. Only a resource
+     *                                 computing another of its fields from that
+     *                                 relation needs it, and it costs a query per row.
+     */
     public function __construct(
         private readonly string $targetResource,
         private readonly ?string $relationAlias = null,
         private readonly ?array $propertyGroups = [],
         private readonly ?bool $forceJoin = null,
         private readonly ?array $excludedGroups = [],
+        private readonly bool $hydrateOutOfGroups = false,
     ) {
     }
 }

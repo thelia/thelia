@@ -246,7 +246,9 @@ class Order implements PropelResourceInterface
     #[Column(propelSetter: 'setStatusId')]
     public OrderStatus $orderStatus;
 
-    #[Relation(targetResource: Customer::class)]
+    // hydrateOutOfGroups: the account endpoints check `object.customer` -- an order
+    // read through one of its lines carries the groups of the line, not its own.
+    #[Relation(targetResource: Customer::class, hydrateOutOfGroups: true)]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public Customer $customer;
