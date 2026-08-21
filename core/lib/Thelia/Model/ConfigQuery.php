@@ -63,21 +63,56 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * @internal
+     *
+     * The whole table, name => value. It is small enough to load in one go
+     * and to hand to {@see initCache()} as an authoritative snapshot: every
+     * name absent from the result has no row in the table at all.
+     *
+     * @return array<string, string>
+     */
+    public static function findAllAsMap(): array
+    {
+        $configs = [];
+
+        foreach (self::create()->find() as $config) {
+            $configs[$config->getName()] = $config->getValue();
+        }
+
+        return $configs;
+    }
+
+    /**
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched
      */
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
-        if ($ignoreCache || !self::$booted || !\array_key_exists($search, self::$cache)) {
+        if ($ignoreCache) {
             $model = self::create()->filterByName($search)->findOneOrCreate();
 
             // The default only applies to a variable that does not exist yet: a stored
             // '0' or '' is a value, and the cached path returns it as such.
-            self::$cache[$search] = $model->getValue() ?? $default;
+            return self::$cache[$search] = $model->getValue() ?? $default;
         }
 
-        return self::$cache[$search];
+        if (!self::$booted) {
+            // Nothing warmed the cache yet (this can run before
+            // ConfigCacheService gets a chance to, e.g. a debug logger reading
+            // its own config while Propel itself is still being wired up).
+            // Load the whole table once instead of paying for every distinct
+            // name read from here on, one row at a time.
+            self::initCache(self::findAllAsMap());
+        }
+
+        if (!\array_key_exists($search, self::$cache)) {
+            // The snapshot above is exhaustive: a name missing from it has no
+            // row in the table, it is not a lookup that has not run yet.
+            return $default;
+        }
+
+        return self::$cache[$search] ?? $default;
     }
 
     public static function write($configName, $value, $secured = null, $hidden = null): void

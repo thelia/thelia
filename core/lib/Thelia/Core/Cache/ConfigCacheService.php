@@ -50,12 +50,6 @@ class ConfigCacheService
      */
     private static function loadConfigs(): array
     {
-        $configs = [];
-
-        foreach (ConfigQuery::create()->find() as $config) {
-            $configs[$config->getName()] = $config->getValue();
-        }
-
-        return $configs;
+        return ConfigQuery::findAllAsMap();
     }
 }
