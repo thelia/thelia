@@ -129,12 +129,23 @@ readonly class ApiResourcePropelTransformerService
 
         if ($withAddon) {
             foreach ($this->getResourceAddonDefinitions($resourceClass) as $addonShortName => $addonClass) {
-                if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
-                    $addon = (new $addonClass())
-                        ->setContext($context)
-                        ->buildFromModel($propelModel, $apiResource);
-                    $apiResource->setResourceAddon($addonShortName, $addon);
+                if (!is_subclass_of($addonClass, ResourceAddonInterface::class)) {
+                    continue;
                 }
+
+                /** @var ResourceAddonInterface $addon */
+                $addon = (new $addonClass())->setContext($context);
+
+                // An addon resolves its own rows, and the serializer returns it only
+                // when one of its properties belongs to the current groups. Building
+                // it out of them bought a query per row for a payload that never
+                // mentions the addon. It is still attached, so nothing reading it
+                // through the resource finds a hole where the addon used to be.
+                if ($this->hasPropertyInGroups($addonClass, $context)) {
+                    $addon = $addon->buildFromModel($propelModel, $apiResource);
+                }
+
+                $apiResource->setResourceAddon($addonShortName, $addon);
             }
         }
 
@@ -838,6 +849,28 @@ readonly class ApiResourcePropelTransformerService
 
         return $this->checkGroupsSerialization(property: $property, context: $context)
             && !$this->isGroupsExcluded(property: $property, context: $context);
+    }
+
+    /**
+     * Mirrors what the serializer keeps of an addon: its attribute carries the
+     * groups of all of its own properties (see ClassMetaDataFactory), so it is
+     * returned as soon as one of them is in the context.
+     *
+     * @param class-string $class
+     */
+    private function hasPropertyInGroups(string $class, array $context): bool
+    {
+        if (!isset($context['groups'])) {
+            return true;
+        }
+
+        foreach ((new \ReflectionClass($class))->getProperties() as $property) {
+            if ($this->checkGroupsSerialization(property: $property, context: $context)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function checkGroupsSerialization(\ReflectionProperty $property, array $context): bool
