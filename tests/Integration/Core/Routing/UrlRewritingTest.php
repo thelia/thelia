@@ -21,9 +21,13 @@ use Thelia\Core\Routing\Rewriting\RewritingRetriever;
 use Thelia\Model\Category;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\RecordsSqlQueries;
+use Thelia\Tools\URL;
 
 final class UrlRewritingTest extends IntegrationTestCase
 {
+    use RecordsSqlQueries;
+
     private function createCategoryWithTitle(string $title): Category
     {
         $factory = $this->createFixtureFactory();
@@ -247,5 +251,91 @@ final class UrlRewritingTest extends IntegrationTestCase
 
         self::assertSame('guides/summer', $category->getRewrittenUrl('en_US'));
         self::assertNotNull(RewritingUrlQuery::create()->findOneByUrl('guides/summer'));
+    }
+
+    public function testUrlRetrieveMemoizesTheSameKeyWithinARequest(): void
+    {
+        $category = $this->createCategoryWithTitle('Memoized Category');
+
+        $con = Propel::getConnection('TheliaMain');
+        $category->generateRewrittenUrl('en_US', $con);
+
+        $url = URL::getInstance();
+
+        $first = $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl;
+
+        $statements = $this->recordSqlQueries(static function () use ($url, $category): void {
+            $url->retrieve('category', $category->getId(), 'en_US');
+        });
+
+        self::assertSame(
+            0,
+            self::countSqlQueriesSelectingFrom($statements, 'rewriting_url'),
+            'The same (view, id, locale) key was already resolved once: a second retrieve() must not read it again.',
+        );
+        self::assertSame($first, $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl);
+    }
+
+    public function testUrlRetrieveMemoizesAMissTooAndCostsNoSecondQuery(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+
+        $url = URL::getInstance();
+
+        $first = $url->retrieve('category', $category->getId(), 'en_US');
+        self::assertNull($first->rewrittenUrl, 'No title was set, so no rewritten url exists yet.');
+
+        $statements = $this->recordSqlQueries(static function () use ($url, $category): void {
+            $url->retrieve('category', $category->getId(), 'en_US');
+        });
+
+        self::assertSame(
+            0,
+            self::countSqlQueriesSelectingFrom($statements, 'rewriting_url'),
+            'A category with no rewritten url is a negative result and must be cached too.',
+        );
+    }
+
+    public function testSetRewrittenUrlInvalidatesTheMemoizedCache(): void
+    {
+        $category = $this->createCategoryWithTitle('Stale Cache Category');
+
+        $con = Propel::getConnection('TheliaMain');
+        $category->generateRewrittenUrl('en_US', $con);
+
+        $url = URL::getInstance();
+
+        // Warm the cache with the url generated from the title.
+        $staleRewrittenUrl = $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl;
+
+        $category->setRewrittenUrl('en_US', 'hand-picked-url.html');
+
+        $refreshed = $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl;
+
+        self::assertNotSame($staleRewrittenUrl, $refreshed);
+        self::assertStringContainsString('hand-picked-url.html', (string) $refreshed);
+    }
+
+    public function testMarkRewrittenUrlObsoleteInvalidatesTheMemoizedCache(): void
+    {
+        // markRewrittenUrlObsolete() writes through ModelCriteria::update(), which never
+        // instantiates a RewritingUrl object and so never runs its postSave() hook: this is
+        // the case that needs an explicit cache clear of its own to not go stale.
+        $category = $this->createCategoryWithTitle('Obsoleted Cache Category');
+
+        $con = Propel::getConnection('TheliaMain');
+        $category->generateRewrittenUrl('en_US', $con);
+
+        $url = URL::getInstance();
+
+        $staleRewrittenUrl = $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl;
+        self::assertNotNull($staleRewrittenUrl);
+
+        $category->markRewrittenUrlObsolete();
+
+        $refreshed = $url->retrieve('category', $category->getId(), 'en_US')->rewrittenUrl;
+
+        self::assertNull($refreshed, 'The url was reassigned to the obsolete view: it must no longer resolve under "category".');
     }
 }

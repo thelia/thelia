@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Tools\URL;
 
 return static function (ContainerConfigurator $configurator): void {
@@ -21,7 +22,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     // URL management
     $services->set(URL::class)
-        ->args([service('router')]);
+        ->args([service('router'), service(RewritingUrlMemoizer::class)]);
 
     $services->alias('thelia.url.manager', URL::class)
         ->public();

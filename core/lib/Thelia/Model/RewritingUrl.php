@@ -17,6 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\RewritingUrl as BaseRewritingUrl;
+use Thelia\Tools\URL;
 
 class RewritingUrl extends BaseRewritingUrl
 {
@@ -38,6 +39,25 @@ class RewritingUrl extends BaseRewritingUrl
                     'Redirected' => $this->getId(),
                 ]);
         }
+    }
+
+    /**
+     * postSave() runs after both postInsert() and postUpdate(): whichever of
+     * the two writes a row, the request-scoped rewritten url cache must not
+     * keep serving what it read before that write.
+     */
+    public function postSave(?ConnectionInterface $con = null): void
+    {
+        parent::postSave($con);
+
+        URL::getInstance()->clearRewritingUrlCache();
+    }
+
+    public function postDelete(?ConnectionInterface $con = null): void
+    {
+        parent::postDelete($con);
+
+        URL::getInstance()->clearRewritingUrlCache();
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool
