@@ -65,6 +65,11 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
     public function testAdminLoginPageIsPublic(): void
     {
         $this->assertPageRenders('/admin/login');
+
+        self::assertTrue(
+            $this->client->getResponse()->headers->hasCacheControlDirective('no-store'),
+            'The login page must not enter the browser back-forward cache',
+        );
     }
 
     public function testAdminHomeRedirectsToLoginWhenNotLoggedIn(): void
@@ -134,5 +139,34 @@ final class AdminPagesSmokeTest extends WebIntegrationTestCase
         $this->loginAdmin();
 
         $this->assertPageRenders('/admin/tools');
+    }
+
+    public function testAdminLoginPageRedirectsToHomeWhenLoggedIn(): void
+    {
+        $this->loginAdmin();
+
+        $this->client->request('GET', '/admin/login');
+
+        $response = $this->client->getResponse();
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringEndsWith('/admin', (string) $response->headers->get('Location'));
+    }
+
+    public function testAdminCheckLoginRedirectsToHomeWhenLoggedIn(): void
+    {
+        $this->loginAdmin();
+
+        // A stale login form submitted from the browser cache must lead to the
+        // home page, whatever credentials it carries.
+        $this->client->request('POST', '/admin/checklogin', [
+            'thelia_admin_login' => [
+                'username' => 'wrong-user',
+                'password' => 'wrong-password',
+            ],
+        ]);
+
+        $response = $this->client->getResponse();
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringEndsWith('/admin', (string) $response->headers->get('Location'));
     }
 }
