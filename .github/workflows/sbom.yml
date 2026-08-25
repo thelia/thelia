@@ -1,0 +1,57 @@
+name: sbom
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sbom:
+    name: CycloneDX SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, gd, zip
+
+      # composer.lock is not committed (library-type repository): resolve the
+      # dependency tree first, without installing or running anything.
+      - name: Resolve the dependency tree
+        run: composer update --no-install --no-scripts --no-plugins --no-progress --prefer-dist
+
+      - name: Install the CycloneDX Composer plugin
+        run: |
+          composer global config --no-plugins allow-plugins.cyclonedx/cyclonedx-php-composer true
+          composer global require --no-progress cyclonedx/cyclonedx-php-composer
+
+      - name: Generate the SBOM from composer.lock
+        run: composer CycloneDX:make-sbom --omit=dev --output-format=JSON --output-file="$PWD/sbom.cdx.json"
+
+      - name: Audit the locked dependencies for known advisories
+        # Findings must be visible in the run but must not block the SBOM publication.
+        continue-on-error: true
+        run: composer audit --locked | tee composer-audit.txt
+
+      - name: Upload the SBOM as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: |
+            sbom.cdx.json
+            composer-audit.txt
+
+      - name: Attach the SBOM to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG_NAME" sbom.cdx.json --clobber
