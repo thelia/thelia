@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,6 +43,7 @@ class TheliaFormFactory
         protected TokenStorageInterface $tokenStorage,
         #[Autowire(param: 'Thelia.parser.forms')]
         protected array $formDefinition,
+        protected ?CsrfTokenManagerInterface $csrfTokenManager = null,
     ) {
     }
 
@@ -74,6 +76,7 @@ class TheliaFormFactory
             $type,
             $data,
             $options,
+            $this->csrfTokenManager,
         );
 
         return $form;
