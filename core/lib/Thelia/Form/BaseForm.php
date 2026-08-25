@@ -27,6 +27,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -69,6 +70,7 @@ abstract class BaseForm implements FormInterface
         string $type = FormType::class,
         array $data = [],
         array $options = [],
+        ?CsrfTokenManagerInterface $csrfTokenManager = null,
     ): void {
         $this->request = $request;
         $this->type = $type;
@@ -81,10 +83,14 @@ abstract class BaseForm implements FormInterface
         $this->initFormWithRequest($type, $data, $options);
 
         if (!isset($options['csrf_protection']) || false !== $options['csrf_protection']) {
+            // The framework manager keeps session-bound tokens for the default token id (the
+            // form name) and switches to stateless, origin-based validation for the ids listed
+            // in framework.csrf_protection.stateless_token_ids, so a form rendered inside a
+            // cache can opt in through the 'csrf_token_id' option or its own name.
             $this->formFactoryBuilder
                 ->addExtension(
                     new CsrfExtension(
-                        new CsrfTokenManager(null, $tokenStorage),
+                        $csrfTokenManager ?? new CsrfTokenManager(null, $tokenStorage),
                     ),
                 );
         }
