@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
-use Thelia\Model\LangQuery;
+use Thelia\Model\Lang;
 
 final readonly class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -243,7 +243,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
             return;
         }
 
-        $langs = LangQuery::create()->filterByActive(1)->find();
+        $langs = Lang::getActiveLangs();
         $i18nResource = new ($resourceClass::getI18nResourceClass());
 
         if (!$i18nResource instanceof I18n) {

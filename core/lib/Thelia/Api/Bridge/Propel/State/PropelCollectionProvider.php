@@ -23,7 +23,7 @@ use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
 use Thelia\Api\Resource\PropelResourceInterface;
-use Thelia\Model\LangQuery;
+use Thelia\Model\Lang;
 
 readonly class PropelCollectionProvider implements ProviderInterface
 {
@@ -69,7 +69,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
             $results = $query->find();
         }
 
-        $langs = LangQuery::create()->filterByActive(1)->find();
+        $langs = Lang::getActiveLangs();
 
         if ($results instanceof PropelModelPager) {
             $resources = array_map(

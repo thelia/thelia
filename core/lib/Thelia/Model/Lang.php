@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Lang as BaseLang;
@@ -26,6 +27,8 @@ class Lang extends BaseLang
     public const REPLACE_BY_DEFAULT_LANGUAGE = 1;
 
     protected static $defaultLanguage;
+
+    protected static ?ObjectCollection $activeLangs = null;
 
     /**
      * Return the default language object, using a local variable to cache it.
@@ -45,6 +48,26 @@ class Lang extends BaseLang
         }
 
         return self::$defaultLanguage;
+    }
+
+    /**
+     * The active languages, read once per request.
+     *
+     * The API bridge asks for them every time it transforms a model or eager-loads a
+     * collection: a page rendering a dozen resources reread the same rows a dozen times.
+     * Reset by {@see \Thelia\Core\EventListener\ActiveLangsCacheListener} at the start of
+     * every request and console command, and whenever a language is saved or deleted.
+     *
+     * @return ObjectCollection<Lang>
+     */
+    public static function getActiveLangs(): ObjectCollection
+    {
+        return self::$activeLangs ??= LangQuery::create()->filterByActive(1)->find();
+    }
+
+    public static function resetActiveLangsCache(): void
+    {
+        self::$activeLangs = null;
     }
 
     public function toggleDefault(): void
