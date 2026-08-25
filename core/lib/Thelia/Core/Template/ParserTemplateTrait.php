@@ -35,9 +35,20 @@ trait ParserTemplateTrait
     #[Required]
     public RequestStack $requestStack;
 
-    public function getRequest(): Request
+    /**
+     * The request the template is rendered for, or null when there is none: a template
+     * rendered from the command line - an email sent by a scheduled task, a PDF built by a
+     * console command - has no request to read from, and the callers already treat the
+     * request as optional.
+     */
+    public function getRequest(): ?Request
     {
         $request = $this->requestStack->getMainRequest();
+
+        if (null === $request) {
+            return null;
+        }
+
         if (!$request instanceof Request) {
             return Request::createFromBase($request);
         }
