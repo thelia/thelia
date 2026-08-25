@@ -35,7 +35,7 @@ use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
-use Thelia\Model\LangQuery;
+use Thelia\Model\Lang;
 
 readonly class ApiResourcePropelTransformerService
 {
@@ -67,7 +67,7 @@ readonly class ApiResourcePropelTransformerService
         bool $withAddon = true,
     ): PropelResourceInterface {
         if (!$langs instanceof Collection) {
-            $langs = LangQuery::create()->filterByActive(1)->find();
+            $langs = Lang::getActiveLangs();
         }
 
         // Init internal recursion-control context
