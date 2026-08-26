@@ -157,11 +157,15 @@ readonly class FilterService
 
         if ($isApiRoute) {
             $tfilters = $request->query->all('tfilters');
+            $visible = $request->query->get('visible');
             $query = $this->filterTFilterWithRequest(request: $request);
         } else {
             $tfilters = $context['filters']['tfilters'] ?? [];
+            $visible = $context['filters']['visible'] ?? null;
             $query = $this->filterTFilterWithContext(context: $context);
         }
+
+        $this->restrictToVisibility($query, $visible);
 
         $filterObjects = [];
         $locale = $context['filters']['locale'] ?? $request->query->get('locale');
@@ -256,6 +260,20 @@ readonly class FilterService
         }
 
         return $this->managePosition($filterObjects);
+    }
+
+    /**
+     * The facets follow the listing: a `visible` parameter narrows the set they are read from
+     * the way the collection's own filter narrows the products, so a value held only by hidden
+     * products is not offered to filter a list that will never show them.
+     */
+    private function restrictToVisibility(ModelCriteria $query, mixed $visible): void
+    {
+        if ($visible === null || $visible === '' || !method_exists($query, 'filterByVisible')) {
+            return;
+        }
+
+        $query->filterByVisible(filter_var($visible, \FILTER_VALIDATE_BOOL) ? 1 : 0);
     }
 
     private function managePosition(array $filterObjects): array
