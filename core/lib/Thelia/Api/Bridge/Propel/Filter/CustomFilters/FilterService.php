@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -145,6 +146,14 @@ readonly class FilterService
         return $query->groupById();
     }
 
+    /**
+     * The facets of the browsed set. A filter that is part of the selection reads its facet
+     * from the set narrowed by every other filter but itself, so a checked value keeps its
+     * siblings on offer (checking one brand must not hide the other brands); a filter that is
+     * not selected reads it from the fully narrowed set. The category filter is the browsing
+     * scope, never relaxed. A collection restricted to a set of ids (`id[]=…`, the products a
+     * search engine ranked) gets its facets from that set, category or not.
+     */
     public function getFilters(array $context, string $resource): array
     {
         $request = $this->requestStack->getMainRequest();
@@ -158,108 +167,251 @@ readonly class FilterService
         if ($isApiRoute) {
             $tfilters = $request->query->all('tfilters');
             $visible = $request->query->get('visible');
-            $query = $this->filterTFilterWithRequest(request: $request);
+            $scopeIds = $request->query->all('id');
+            $categoryDepth = (int) $request->query->get(CategoryFilter::CATEGORY_DEPTH_NAME);
         } else {
             $tfilters = $context['filters']['tfilters'] ?? [];
             $visible = $context['filters']['visible'] ?? null;
-            $query = $this->filterTFilterWithContext(context: $context);
+            $scopeIds = $context['filters']['id'] ?? [];
+            $categoryDepth = (int) ($context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null);
         }
 
-        $this->restrictToVisibility($query, $visible);
+        $scopeIds = $this->scopeIds($scopeIds);
+        $browsesCategory = $this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
 
-        $filterObjects = [];
+        // Without a browsed category nor an explicit set of ids the facets would describe the
+        // whole catalogue, which no listing shows.
+        if (!$browsesCategory && $scopeIds === null) {
+            return [];
+        }
+
         $locale = $context['filters']['locale'] ?? $request->query->get('locale');
         $locale ??= $this->langService->getLocale();
-        $filters = $this->getAvailableFilters($resource);
 
-        // createFilterDto() drops every filter when no category is being browsed,
-        // so the facet values would be computed only to be thrown away.
-        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
-            return [];
-        }
+        $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds): array {
+            $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth);
+            $this->restrictToVisibility($query, $visible);
+            $this->restrictToScope($query, $scopeIds);
 
-        $resourceIds = $this->resolveResourceIds($query);
+            return $this->resolveResourceIds($query);
+        };
 
-        if ($resourceIds === []) {
-            return [];
-        }
+        $narrowedIds = $resolveIds($tfilters);
+        $narrowedQuery = null;
+        $choiceFilters = $this->choiceFiltersOfBrowsedCategory($tfilters);
+        $filterObjects = [];
 
-        foreach ($filters as $filter) {
-            $values = $filter instanceof TheliaAggregatedFilterInterface
-                ? $this->getAggregatedValues(
-                    filter: $filter,
-                    resourceIds: $resourceIds,
-                    tfilters: $tfilters,
-                    locale: $locale
-                )
-                : $this->getValues(
-                    query: $query,
+        foreach ($this->getAvailableFilters($resource) as $filter) {
+            if ($filter instanceof TheliaAggregatedFilterInterface) {
+                $values = $this->aggregatedFacet(
                     filter: $filter,
                     tfilters: $tfilters,
-                    locale: $locale
+                    narrowedIds: $narrowedIds,
+                    resolveIds: $resolveIds,
+                    locale: $locale,
                 );
+            } else {
+                if ($narrowedIds === []) {
+                    continue;
+                }
+                $narrowedQuery ??= $this->restrictedQuery($tfilters, $resource, $visible, $categoryDepth, $scopeIds);
+                $values = $this->getValues(query: $narrowedQuery, filter: $filter, tfilters: $tfilters, locale: $locale);
+            }
+
             if ($values === []) {
                 continue;
             }
-            $hasMainResource = $this->hasMainResource($values);
-            if ($hasMainResource) {
-                $values = array_intersect_key(
-                    $values, array_unique(
-                        array_map(
-                            static fn (FilterValue $filterValue): string => $filterValue->getId().'-'.$filterValue->getMainId(),
-                            $values,
-                        )
-                    )
-                );
 
-                $splitValues = [];
-
-                /** @var FilterValue $value */
-                foreach ($values as $value) {
-                    $splitValues[$value->getMainId()][] = $value;
-                }
-
-                foreach ($splitValues as $value) {
-                    $filterDto = $this->createFilterDto(
-                        tfilters: $tfilters,
-                        filter: $filter,
-                        values: $value,
-                        locale: $locale
-                    );
-                    if (!$filterDto || !$filterDto->isVisible()) {
-                        continue;
-                    }
-                    $filterObjects[] = $filterDto;
-                }
-            }
-            if (!$hasMainResource) {
-                $values = array_values(
-                    array_reduce(
-                        $values,
-                        static function ($carry, $item) {
-                            $carry[$item->getId()] = $item;
-
-                            return $carry;
-                        },
-                        []
-                    )
-                );
-
-                $filterDto = $this->createFilterDto(
-                    tfilters: $tfilters,
-                    filter: $filter,
-                    values: $values,
-                    locale: $locale,
-                );
+            foreach ($this->groupByMainResource($values) as $group) {
+                $filterDto = $this->createFilterDto(filter: $filter, values: $group, locale: $locale, choiceFilters: $choiceFilters);
 
                 if (!$filterDto || !$filterDto->isVisible()) {
                     continue;
                 }
+
                 $filterObjects[] = $filterDto;
             }
         }
 
         return $this->managePosition($filterObjects);
+    }
+
+    /**
+     * @param array<int>|null $scopeIds
+     */
+    private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth, ?array $scopeIds): ModelCriteria
+    {
+        $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth);
+        $this->restrictToVisibility($query, $visible);
+        $this->restrictToScope($query, $scopeIds);
+
+        return $query;
+    }
+
+    /**
+     * The `id` parameter of the collection, as a search page sends it: the facets then describe
+     * the products the search engine ranked, not the catalogue. Null when the request sends none.
+     *
+     * @return array<int>|null
+     */
+    private function scopeIds(mixed $ids): ?array
+    {
+        if ($ids === null || $ids === '' || $ids === []) {
+            return null;
+        }
+
+        if (\is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        $ids = array_values(array_unique(array_map('intval', array_filter((array) $ids, 'is_scalar'))));
+
+        return $ids === [] ? null : $ids;
+    }
+
+    /**
+     * @param array<int>|null $scopeIds
+     */
+    private function restrictToScope(ModelCriteria $query, ?array $scopeIds): void
+    {
+        if ($scopeIds === null) {
+            return;
+        }
+
+        $query->filterById($scopeIds, Criteria::IN);
+    }
+
+    /**
+     * The facet values of one aggregated filter. When the filter is selected, the values of
+     * each selected group (a feature, an attribute, or the filter as a whole for a brand) are
+     * read from the set narrowed by everything but that group; the other groups keep the fully
+     * narrowed set.
+     *
+     * @param array<int>                  $narrowedIds
+     * @param callable(array): array<int> $resolveIds
+     *
+     * @return array<FilterValue>
+     */
+    private function aggregatedFacet(TheliaAggregatedFilterInterface $filter, array $tfilters, array $narrowedIds, callable $resolveIds, string $locale): array
+    {
+        if ($filter instanceof CategoryFilter) {
+            return $narrowedIds === [] ? [] : $this->getAggregatedValues($filter, $narrowedIds, $tfilters, $locale);
+        }
+
+        $selectedKeys = array_values(array_filter(
+            $filter::getFilterName(),
+            static fn (string $name): bool => isset($tfilters[$name]) && $tfilters[$name] !== [] && $tfilters[$name] !== '',
+        ));
+
+        if ($selectedKeys === []) {
+            return $narrowedIds === [] ? [] : $this->getAggregatedValues($filter, $narrowedIds, $tfilters, $locale);
+        }
+
+        if (!$filter instanceof TheliaChoiceFilterInterface) {
+            $relaxed = $tfilters;
+            foreach ($selectedKeys as $key) {
+                unset($relaxed[$key]);
+            }
+
+            $relaxedIds = $resolveIds($relaxed);
+
+            return $relaxedIds === [] ? [] : $this->getAggregatedValues($filter, $relaxedIds, $tfilters, $locale);
+        }
+
+        $values = $narrowedIds === [] ? [] : $this->getAggregatedValues($filter, $narrowedIds, $tfilters, $locale);
+
+        foreach ($selectedKeys as $key) {
+            foreach (array_keys((array) $tfilters[$key]) as $group) {
+                $relaxed = $tfilters;
+                unset($relaxed[$key][$group]);
+
+                if ($relaxed[$key] === []) {
+                    unset($relaxed[$key]);
+                }
+
+                $relaxedIds = $resolveIds($relaxed);
+                $values = array_values(array_filter(
+                    $values,
+                    static fn (FilterValue $value): bool => (string) $value->getMainId() !== (string) $group,
+                ));
+
+                if ($relaxedIds === []) {
+                    continue;
+                }
+
+                foreach ($this->getAggregatedValues($filter, $relaxedIds, $tfilters, $locale) as $value) {
+                    if ((string) $value->getMainId() === (string) $group) {
+                        $values[] = $value;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Splits the values by the entity they hang from (a feature, an attribute), deduplicated;
+     * values without one (a brand, a category) form a single group.
+     *
+     * @param array<FilterValue> $values
+     *
+     * @return array<array<FilterValue>>
+     */
+    private function groupByMainResource(array $values): array
+    {
+        if (!$this->hasMainResource($values)) {
+            $unique = [];
+
+            foreach ($values as $value) {
+                $unique[$value->getId()] ??= $value;
+            }
+
+            return [array_values($unique)];
+        }
+
+        $groups = [];
+
+        foreach ($values as $value) {
+            $groups[$value->getMainId()][$value->getId()] ??= $value;
+        }
+
+        return array_map('array_values', array_values($groups));
+    }
+
+    /**
+     * The choice_filter rows that rule the browsed category, read once for every filter of
+     * the page rather than once per facet.
+     *
+     * @return array{rows: array<ChoiceFilter>, template_id: int|null}|null null when nothing rules them
+     */
+    private function choiceFiltersOfBrowsedCategory(array $tfilters): ?array
+    {
+        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
+            // A listing outside any category (a search) has no choice_filter rows to obey: every
+            // filter is offered, as a checkbox list.
+            return ['rows' => [], 'template_id' => null];
+        }
+
+        $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
+        $category = CategoryQuery::create()->findPk(key: $categoryId);
+
+        if (!$category) {
+            return null;
+        }
+
+        $templateId = null;
+        $rows = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateId)->getData();
+
+        if ($rows === [] && $templateId) {
+            $rows = ChoiceFilterQuery::create()->filterByTemplateId($templateId)->find()->getData();
+        }
+
+        if ($rows === [] && $templateId === null) {
+            return null;
+        }
+
+        return ['rows' => $rows, 'template_id' => $templateId];
     }
 
     /**
@@ -382,77 +534,43 @@ readonly class FilterService
         return $ids;
     }
 
-    private function createFilterDto(array $tfilters, TheliaFilterInterface $filter, array $values, string $locale): ?Filter
+    /**
+     * @param array<FilterValue>                                           $values
+     * @param array{rows: array<ChoiceFilter>, template_id: int|null}|null $choiceFilters
+     */
+    private function createFilterDto(TheliaFilterInterface $filter, array $values, string $locale, ?array $choiceFilters): ?Filter
     {
-        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
-            return null;
-        }
-
-        $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
-        $category = CategoryQuery::create()->findPk(key: $categoryId);
-        $choiceFiltersCategory = ChoiceFilterQuery::findChoiceFilterByCategory(category: $category, templateId: $templateIdFind)->getData();
-        $choiceFiltersTemplate = [];
-
-        if ($templateIdFind) {
-            $choiceFiltersTemplate = ChoiceFilterQuery::create()->filterByTemplateId($templateIdFind)->find()->getData();
-        }
-
-        $choiceFilters = $choiceFiltersCategory;
-
-        if (empty($choiceFilters)) {
-            $choiceFilters = $choiceFiltersTemplate;
-        }
-
-        if (empty($choiceFilters) && $templateIdFind === null) {
+        if ($choiceFilters === null) {
             return null;
         }
 
         /** @var ChoiceFilter $choiceFilter */
-        foreach ($choiceFilters as $choiceFilter) {
+        foreach ($choiceFilters['rows'] as $choiceFilter) {
             $otherType = $choiceFilter->getChoiceFilterOther()?->getType();
 
             if (\in_array($otherType, $filter->getFilterName(), true)) {
-                return $this->hydrateFilterDto(
-                    filter: $filter,
-                    values: $values,
-                    locale: $locale,
-                    choiceFilter: $choiceFilter,
-                );
+                return $this->hydrateFilterDto(filter: $filter, values: $values, locale: $locale, choiceFilter: $choiceFilter);
             }
 
-            /**
-             * @var FilterValue $value
-             */
+            if (!$filter instanceof TheliaChoiceFilterInterface) {
+                continue;
+            }
+
+            $mainType = $filter->getChoiceFilterType();
+
+            /** @var FilterValue $value */
             foreach ($values as $value) {
-                if ($filter instanceof TheliaChoiceFilterInterface) {
-                    $mainType = $filter->getChoiceFilterType();
+                if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value->getMainId()) {
+                    return $this->hydrateFilterDto(filter: $filter, values: $values, locale: $locale, choiceFilter: $choiceFilter);
+                }
 
-                    if ($choiceFilter->getAttribute() instanceof $mainType && $choiceFilter->getAttribute()->getId() === $value->getMainId()) {
-                        return $this->hydrateFilterDto(
-                            filter: $filter,
-                            values: $values,
-                            locale: $locale,
-                            choiceFilter: $choiceFilter,
-                        );
-                    }
-
-                    if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value->getMainId()) {
-                        return $this->hydrateFilterDto(
-                            filter: $filter,
-                            values: $values,
-                            locale: $locale,
-                            choiceFilter: $choiceFilter,
-                        );
-                    }
+                if ($choiceFilter->getFeature() instanceof $mainType && $choiceFilter->getFeature()->getId() === $value->getMainId()) {
+                    return $this->hydrateFilterDto(filter: $filter, values: $values, locale: $locale, choiceFilter: $choiceFilter);
                 }
             }
         }
 
-        return $this->hydrateFilterDto(
-            filter: $filter,
-            values: $values,
-            locale: $locale
-        );
+        return $this->hydrateFilterDto(filter: $filter, values: $values, locale: $locale);
     }
 
     private function hydrateFilterDto(

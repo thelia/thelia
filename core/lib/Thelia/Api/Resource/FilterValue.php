@@ -33,6 +33,25 @@ class FilterValue
     #[Groups([Filter::GROUP_FRONT_READ])]
     private ?int $depth = null;
 
+    /**
+     * How many resources of the browsed set would remain if this value alone were checked
+     * within its filter, null when the filter does not count.
+     */
+    #[Groups([Filter::GROUP_FRONT_READ])]
+    private ?int $count = null;
+
+    public function getCount(): ?int
+    {
+        return $this->count;
+    }
+
+    public function setCount(?int $count): self
+    {
+        $this->count = $count;
+
+        return $this;
+    }
+
     public function getDepth(): ?int
     {
         return $this->depth;
