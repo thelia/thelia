@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -150,7 +151,8 @@ readonly class FilterService
      * from the set narrowed by every other filter but itself, so a checked value keeps its
      * siblings on offer (checking one brand must not hide the other brands); a filter that is
      * not selected reads it from the fully narrowed set. The category filter is the browsing
-     * scope, never relaxed.
+     * scope, never relaxed. A collection restricted to a set of ids (`id[]=…`, the products a
+     * search engine ranked) gets its facets from that set, category or not.
      */
     public function getFilters(array $context, string $resource): array
     {
@@ -165,25 +167,31 @@ readonly class FilterService
         if ($isApiRoute) {
             $tfilters = $request->query->all('tfilters');
             $visible = $request->query->get('visible');
+            $scopeIds = $request->query->all('id');
             $categoryDepth = (int) $request->query->get(CategoryFilter::CATEGORY_DEPTH_NAME);
         } else {
             $tfilters = $context['filters']['tfilters'] ?? [];
             $visible = $context['filters']['visible'] ?? null;
+            $scopeIds = $context['filters']['id'] ?? [];
             $categoryDepth = (int) ($context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null);
         }
 
-        // createFilterDto() drops every filter when no category is being browsed,
-        // so the facet values would be computed only to be thrown away.
-        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
+        $scopeIds = $this->scopeIds($scopeIds);
+        $browsesCategory = $this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
+
+        // Without a browsed category nor an explicit set of ids the facets would describe the
+        // whole catalogue, which no listing shows.
+        if (!$browsesCategory && $scopeIds === null) {
             return [];
         }
 
         $locale = $context['filters']['locale'] ?? $request->query->get('locale');
         $locale ??= $this->langService->getLocale();
 
-        $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth): array {
+        $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds): array {
             $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth);
             $this->restrictToVisibility($query, $visible);
+            $this->restrictToScope($query, $scopeIds);
 
             return $this->resolveResourceIds($query);
         };
@@ -206,7 +214,7 @@ readonly class FilterService
                 if ($narrowedIds === []) {
                     continue;
                 }
-                $narrowedQuery ??= $this->restrictedQuery($tfilters, $resource, $visible, $categoryDepth);
+                $narrowedQuery ??= $this->restrictedQuery($tfilters, $resource, $visible, $categoryDepth, $scopeIds);
                 $values = $this->getValues(query: $narrowedQuery, filter: $filter, tfilters: $tfilters, locale: $locale);
             }
 
@@ -228,12 +236,49 @@ readonly class FilterService
         return $this->managePosition($filterObjects);
     }
 
-    private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth): ModelCriteria
+    /**
+     * @param array<int>|null $scopeIds
+     */
+    private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth, ?array $scopeIds): ModelCriteria
     {
         $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth);
         $this->restrictToVisibility($query, $visible);
+        $this->restrictToScope($query, $scopeIds);
 
         return $query;
+    }
+
+    /**
+     * The `id` parameter of the collection, as a search page sends it: the facets then describe
+     * the products the search engine ranked, not the catalogue. Null when the request sends none.
+     *
+     * @return array<int>|null
+     */
+    private function scopeIds(mixed $ids): ?array
+    {
+        if ($ids === null || $ids === '' || $ids === []) {
+            return null;
+        }
+
+        if (\is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        $ids = array_values(array_unique(array_map('intval', array_filter((array) $ids, 'is_scalar'))));
+
+        return $ids === [] ? null : $ids;
+    }
+
+    /**
+     * @param array<int>|null $scopeIds
+     */
+    private function restrictToScope(ModelCriteria $query, ?array $scopeIds): void
+    {
+        if ($scopeIds === null) {
+            return;
+        }
+
+        $query->filterById($scopeIds, Criteria::IN);
     }
 
     /**
@@ -342,6 +387,12 @@ readonly class FilterService
      */
     private function choiceFiltersOfBrowsedCategory(array $tfilters): ?array
     {
+        if (!$this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters)) {
+            // A listing outside any category (a search) has no choice_filter rows to obey: every
+            // filter is offered, as a checkbox list.
+            return ['rows' => [], 'template_id' => null];
+        }
+
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
         $category = CategoryQuery::create()->findPk(key: $categoryId);
 

@@ -144,6 +144,34 @@ final class FacetSelectionTest extends IntegrationTestCase
         );
     }
 
+    public function testASetOfIdsGetsItsFacetsWithoutAnyCategory(): void
+    {
+        // What a search page does: the engine ranked ACME-BLUE-S and BOLT-RED-S, no category.
+        $facets = $this->filterService->getFilters(
+            [
+                'path_info' => '/api/front/products',
+                'filters' => [
+                    'id' => [$this->productIds['ACME-BLUE-S'], $this->productIds['BOLT-RED-S']],
+                    'tfilters' => ['brand' => ['brand' => [$this->ids['acme']]]],
+                    'locale' => 'en_US',
+                ],
+            ],
+            'products',
+        );
+
+        self::assertSame(['Acme' => 1, 'Bolt' => 1], $this->counts($facets, 'brand'));
+        self::assertSame(['Blue' => 1], $this->counts($facets, 'feature', $this->ids['colour']));
+        self::assertSame([], $this->counts($facets, 'category'));
+    }
+
+    public function testNothingIsOfferedOutsideACategoryWithoutASetOfIds(): void
+    {
+        self::assertSame([], $this->filterService->getFilters(
+            ['path_info' => '/api/front/products', 'filters' => ['tfilters' => [], 'locale' => 'en_US']],
+            'products',
+        ));
+    }
+
     /**
      * @return array<Filter>
      */
