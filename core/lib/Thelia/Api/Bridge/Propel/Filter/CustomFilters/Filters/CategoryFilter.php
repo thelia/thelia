@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
@@ -21,6 +22,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilter
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ProductCategoryQuery;
 
 class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
@@ -80,7 +82,32 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
             return [];
         }
 
-        return $this->browsedCategories($locale, $valueSearched, $depth);
+        $values = $this->browsedCategories($locale, $valueSearched, $depth);
+
+        if ($values === []) {
+            return [];
+        }
+
+        // One GROUP BY gives how many products of the set sit directly in each browsed
+        // sub-category; a sub-category none of them belongs to is still listed, at zero.
+        $counts = array_column(
+            ProductCategoryQuery::create()
+                ->filterByProductId($resourceIds, Criteria::IN)
+                ->filterByCategoryId(array_map(static fn (FilterValue $value): int => $value->getId(), $values), Criteria::IN)
+                ->withColumn('COUNT(DISTINCT product_id)', 'ProductCount')
+                ->select(['CategoryId', 'ProductCount'])
+                ->groupBy('CategoryId')
+                ->find()
+                ->getData(),
+            'ProductCount',
+            'CategoryId',
+        );
+
+        foreach ($values as $value) {
+            $value->setCount((int) ($counts[$value->getId()] ?? 0));
+        }
+
+        return $values;
     }
 
     private function browsedCategories(string $locale, $valueSearched, ?int $depth): array
@@ -96,7 +123,7 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
         $value = [];
 
         foreach ($valueSearched as $categoryId) {
-            $mainCategory = CategoryQuery::create()->findOneById($categoryId);
+            $mainCategory = CategoryQuery::create()->joinWithI18n($locale)->findOneById($categoryId);
 
             if (!$mainCategory) {
                 continue;

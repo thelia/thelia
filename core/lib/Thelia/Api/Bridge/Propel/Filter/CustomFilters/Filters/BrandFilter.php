@@ -27,6 +27,7 @@ use Thelia\Model\ProductQuery;
 class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
     use LocalizedTitleTrait;
+    use SelectedValuesTrait;
 
     public function getResourceType(): array
     {
@@ -51,29 +52,6 @@ class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterf
         $query->filterByBrandId($brandIds, Criteria::IN);
     }
 
-    /**
-     * The selection arrives as `tfilters[brand][brand][] = id`, one or two levels deep
-     * depending on the client. Keeps the identifiers, whatever the nesting, without duplicates.
-     *
-     * @return list<int|string>
-     */
-    private function flattenSelectedValues(mixed $value): array
-    {
-        $brandIds = [];
-
-        foreach ((array) $value as $childValue) {
-            foreach ((array) $childValue as $brandId) {
-                if (\is_array($brandId) || $brandId === null || $brandId === '') {
-                    continue;
-                }
-
-                $brandIds[] = $brandId;
-            }
-        }
-
-        return array_values(array_unique($brandIds));
-    }
-
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
     {
         $brand = $activeRecord->getBrand();
@@ -90,8 +68,8 @@ class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterf
     }
 
     /**
-     * The brands of a product set are one DISTINCT away; reading them product by
-     * product only to deduplicate them afterwards is what made this expensive.
+     * The brands of a product set, each with the number of products carrying it, are one
+     * GROUP BY away; reading them product by product is what made this expensive.
      */
     public function getAggregatedValues(array $resourceIds, string $locale, $valueSearched = null, ?int $depth = 1): array
     {
@@ -99,25 +77,35 @@ class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterf
             return [];
         }
 
-        $brandIds = ProductQuery::create()
+        $rows = ProductQuery::create()
             ->filterById($resourceIds, Criteria::IN)
             ->filterByBrandId(null, Criteria::ISNOTNULL)
-            ->select('BrandId')
-            ->distinct()
+            ->withColumn('COUNT(*)', 'ProductCount')
+            ->select(['BrandId', 'ProductCount'])
+            ->groupBy('BrandId')
             ->find()
             ->getData();
 
-        if ($brandIds === []) {
+        if ($rows === []) {
             return [];
         }
 
+        $counts = array_column($rows, 'ProductCount', 'BrandId');
+
+        $brands = BrandQuery::create()
+            ->filterById(array_keys($counts), Criteria::IN)
+            ->joinWithI18n($locale)
+            ->orderByPosition()
+            ->find();
+
         $values = [];
 
-        foreach (BrandQuery::create()->filterById($brandIds, Criteria::IN)->orderByPosition()->find() as $brand) {
+        foreach ($brands as $brand) {
             $values[] =
                 (new FilterValue())
                     ->setId($brand->getId())
-                    ->setTitle($this->localizedTitle($brand, $locale));
+                    ->setTitle($this->localizedTitle($brand, $locale))
+                    ->setCount((int) $counts[$brand->getId()]);
         }
 
         return $values;
