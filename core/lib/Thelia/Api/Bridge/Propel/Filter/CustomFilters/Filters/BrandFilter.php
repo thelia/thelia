@@ -40,11 +40,38 @@ class BrandFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterf
 
     public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
-        foreach ($value as $id => $childValue) {
-            foreach ($childValue as $type => $brandId) {
-                $query->filterByBrandId($brandId);
+        $brandIds = $this->flattenSelectedValues($value);
+
+        if ($brandIds === []) {
+            return;
+        }
+
+        // A product has one brand, so two checked brands can only be asked for as one IN:
+        // one equality per brand would AND two exclusive conditions and match nothing.
+        $query->filterByBrandId($brandIds, Criteria::IN);
+    }
+
+    /**
+     * The selection arrives as `tfilters[brand][brand][] = id`, one or two levels deep
+     * depending on the client. Keeps the identifiers, whatever the nesting, without duplicates.
+     *
+     * @return list<int|string>
+     */
+    private function flattenSelectedValues(mixed $value): array
+    {
+        $brandIds = [];
+
+        foreach ((array) $value as $childValue) {
+            foreach ((array) $childValue as $brandId) {
+                if (\is_array($brandId) || $brandId === null || $brandId === '') {
+                    continue;
+                }
+
+                $brandIds[] = $brandId;
             }
         }
+
+        return array_values(array_unique($brandIds));
     }
 
     public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
