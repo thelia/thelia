@@ -40,7 +40,18 @@ class ConfigQuery extends BaseConfigQuery
     public const ROUNDING_MODE_ROUNDING_OF_SUMS = 2;
 
     protected static $booted = false;
+
+    /**
+     * Stored values only, never the environment overrides applied on top of them:
+     * this map is handed to a cache shared by every process of the shop, so a
+     * variable set for one process must not end up being read by the next one.
+     *
+     * @var array<string, string|null>
+     */
     protected static $cache = [];
+
+    /** @var array<string, string> */
+    private static array $envNames = [];
 
     /**
      * @internal
@@ -65,18 +76,19 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @internal
      *
-     * The whole table, name => value. It is small enough to load in one go
-     * and to hand to {@see initCache()} as an authoritative snapshot: every
-     * name absent from the result has no row in the table at all.
+     * The whole table, name => stored value. It is small enough to load in one
+     * go and to hand to {@see initCache()} as an authoritative snapshot: every
+     * name absent from the result has no row in the table at all. Environment
+     * overrides are deliberately left out, {@see read()} applies them.
      *
-     * @return array<string, string>
+     * @return array<string, string|null>
      */
     public static function findAllAsMap(): array
     {
         $configs = [];
 
         foreach (self::create()->find() as $config) {
-            $configs[$config->getName()] = $config->getValue();
+            $configs[$config->getName()] = $config->getStoredValue();
         }
 
         return $configs;
@@ -90,14 +102,9 @@ class ConfigQuery extends BaseConfigQuery
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
         if ($ignoreCache) {
-            $model = self::create()->filterByName($search)->findOneOrCreate();
-
-            // The default only applies to a variable that does not exist yet: a stored
-            // '0' or '' is a value, and the cached path returns it as such.
-            return self::$cache[$search] = $model->getValue() ?? $default;
-        }
-
-        if (!self::$booted) {
+            // findOneOrCreate() puts the name in the cache, so the lookup below finds it.
+            self::$cache[$search] = self::create()->filterByName($search)->findOneOrCreate()->getStoredValue();
+        } elseif (!self::$booted) {
             // Nothing warmed the cache yet (this can run before
             // ConfigCacheService gets a chance to, e.g. a debug logger reading
             // its own config while Propel itself is still being wired up).
@@ -112,6 +119,18 @@ class ConfigQuery extends BaseConfigQuery
             return $default;
         }
 
+        // An environment variable wins over the stored value, but only for the process
+        // that has it set. Applying it here rather than caching the result is what
+        // keeps the cached snapshot readable by a process started with another
+        // environment, and this one readable by no one else.
+        $envName = self::$envNames[$search] ??= Config::getEnvNameFor($search);
+
+        if (isset($_ENV[$envName])) {
+            return (string) $_ENV[$envName];
+        }
+
+        // The default only applies to a variable that does not exist yet: a stored
+        // '0' or '' is a value, and it is returned as such.
         return self::$cache[$search] ?? $default;
     }
 
@@ -135,7 +154,7 @@ class ConfigQuery extends BaseConfigQuery
         $config->setValue($value !== null ? (string) $value : '');
         $config->save();
 
-        self::$cache[$configName] = $config->getValue();
+        self::$cache[$configName] = $config->getStoredValue();
     }
 
     public static function getConfiguredShopUrl()
