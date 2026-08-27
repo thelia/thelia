@@ -17,14 +17,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Thelia\Core\EventListener\ControllerListener;
 use Thelia\Core\EventListener\ErrorListener;
 use Thelia\Core\EventListener\ResponseListener;
-use Thelia\Core\EventListener\SessionListener;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
     $services->alias('response.listener', ResponseListener::class);
-
-    $services->alias('session.listener', SessionListener::class);
 
     $services->alias('controller.listener', ControllerListener::class);
 

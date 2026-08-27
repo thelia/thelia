@@ -145,12 +145,6 @@ parameters:
 			path: core/lib/Thelia/Api/Resource/Product.php
 
 		-
-			message: '#^Class Thelia\\Core\\EventListener\\SessionListener not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Config/Resources/services/core/event_listeners.php
-
-		-
 			message: '#^Call to method getPackage\(\) on an unknown class Thelia\\Core\\Propel\\Generator\\Builder\\Om\\Mixin\\AbstractOMBuilder\.$#'
 			identifier: class.notFound
 			count: 1
