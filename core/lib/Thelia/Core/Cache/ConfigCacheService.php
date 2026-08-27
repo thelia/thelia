@@ -18,6 +18,14 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Thelia\Model\ConfigQuery;
 
+/**
+ * Keeps the configuration table in a cache shared by every process of the shop.
+ *
+ * The entry holds stored values only. An environment variable overriding a
+ * configuration name belongs to the process that declares it, and is applied by
+ * {@see ConfigQuery::read()} on each read, so a process started with an override
+ * can neither publish it to the others nor read theirs.
+ */
 class ConfigCacheService
 {
     public const CACHE_KEY = 'thelia_config';
