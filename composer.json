@@ -31,11 +31,11 @@
         "php": ">= 8.3",
         "thelia/core": "^3.0.0-beta1",
         "thelia/backoffice-default-template": "^1.0.0-beta1",
-        "thelia/backoffice-default-twig-template": "^1.0.0-beta1",
+        "thelia/backoffice-default-twig-template": "^1.0",
         "thelia/email-default-template": "^1.0.0-beta1",
         "thelia/pdf-default-template": "^1.0.0-beta1",
         "symfony/flex": "^2.4",
-        "thelia/flexy": "^1.0.0-beta1",
+        "thelia/flexy": "^1.0",
         "ext-simplexml": "*",
         "ext-dom": "*"
     },
