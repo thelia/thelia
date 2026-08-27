@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
+use Thelia\Model\ConfigQuery;
 
 /**
  * Class OrderExport.
@@ -28,6 +29,17 @@ class OrderExport extends JsonFileAbstractExport
 {
     public const FILE_NAME = 'order';
     public const USE_RANGE_DATE = true;
+
+    /**
+     * Orders placed before Thelia 2.4 were totalled without any rounding at all.
+     * ConfigQuery has no constant for it: it is not a mode a shop can be set to,
+     * only a state some rows are frozen in.
+     */
+    private const ROUNDING_MODE_LEGACY = 0;
+
+    private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
+
+    private const UNIT_TAX = 'IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)';
 
     protected array $orderAndAliases = [
         'order_ref' => 'ref',
@@ -94,23 +106,8 @@ class OrderExport extends JsonFileAbstractExport
                     ROUND(`order`.postage, 2) as order_postage,
                     `order`.postage_tax as "order_postage_tax",
                     `order`.postage_tax_rule_title as "order_postage_tax_rule_title",
-                    SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price,
-                    SUM(
-                        ROUND(
-                            order_product.quantity * (
-                                IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)
-                                +
-                                (
-                                    SELECT
-                                        COALESCE(SUM(IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)), 0)
-                                    FROM
-                                        order_product_tax
-                                    WHERE
-                                        order_product_tax.order_product_id = order_product.id
-                                )
-                            ), 2
-                        )
-                    ) as order_total_taxed_price,
+                    '.$this->orderTotal(taxed: false).' as order_total_price,
+                    '.$this->orderTotal(taxed: true).' as order_total_taxed_price,
                     COALESCE(delivery_module.title, `order`.delivery_module_title) as "delivery_module_title",
                     `order`.delivery_ref as "order_delivery_ref",
                     COALESCE(payment_module.title, `order`.payment_module_title) as "payment_module_title",
@@ -163,6 +160,8 @@ class OrderExport extends JsonFileAbstractExport
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
+        $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
+        $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
@@ -171,6 +170,57 @@ class OrderExport extends JsonFileAbstractExport
         $stmt->execute();
 
         return $this->getDataJsonCache($stmt, 'order');
+    }
+
+    /**
+     * Totals the lines of an order the way it was invoiced.
+     *
+     * One query covers the whole order history, and the rule an order was
+     * charged with depends on when it was placed: an order frozen by the 2.4
+     * upgrade was totalled without any rounding, an order placed before a shop
+     * switched to rounding of sums keeps the historical rule, and the rest
+     * follow the shop. Thelia\Model\Order::getTotalAmount() is the reference the
+     * three branches mirror — an export that disagrees with it states an amount
+     * the customer was never charged.
+     */
+    private function orderTotal(bool $taxed): string
+    {
+        return '
+                    SUM(
+                        CASE
+                            WHEN `order`.id <= :legacy_rounding_pivot THEN '.$this->lineTotal(self::ROUNDING_MODE_LEGACY, $taxed).'
+                            WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotal(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
+                            ELSE '.$this->lineTotal(ConfigQuery::getOrderRoundingMode(), $taxed).'
+                        END
+                    )';
+    }
+
+    /**
+     * One line total, rounded where the given mode says to round: on the unit
+     * amounts under sum of roundings, on the line total under rounding of sums,
+     * nowhere at all for an order frozen by the 2.4 upgrade.
+     */
+    private function lineTotal(int $roundingMode, bool $taxed): string
+    {
+        $roundUnitAmounts = ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS === $roundingMode;
+
+        $unitAmount = $roundUnitAmounts ? 'ROUND('.self::UNIT_PRICE.', 2)' : self::UNIT_PRICE;
+
+        if ($taxed) {
+            $unitTax = $roundUnitAmounts ? 'ROUND('.self::UNIT_TAX.', 2)' : self::UNIT_TAX;
+
+            $unitAmount = '('.$unitAmount.' + (
+                                SELECT COALESCE(SUM('.$unitTax.'), 0)
+                                FROM order_product_tax
+                                WHERE order_product_tax.order_product_id = order_product.id
+                            ))';
+        }
+
+        $lineTotal = 'order_product.quantity * '.$unitAmount;
+
+        return ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode
+            ? 'ROUND('.$lineTotal.', 2)'
+            : $lineTotal;
     }
 
     /**
