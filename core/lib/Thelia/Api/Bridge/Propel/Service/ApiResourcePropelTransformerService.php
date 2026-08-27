@@ -39,6 +39,13 @@ use Thelia\Model\Lang;
 
 readonly class ApiResourcePropelTransformerService
 {
+    /**
+     * Context flag telling the transformer that the model instance it reads
+     * carries i18n columns joined before a write, so they hold the values that
+     * write replaced. Set it on a write response, never on a read.
+     */
+    public const STALE_I18N_VIRTUAL_COLUMNS = 'thelia_stale_i18n_virtual_columns';
+
     public function __construct(
         private array $apiResourceAddons,
         private ValidatorInterface $validator,
@@ -676,6 +683,8 @@ readonly class ApiResourcePropelTransformerService
         array $context,
         Collection $langs,
     ): void {
+        $staleVirtualColumns = (bool) ($context[self::STALE_I18N_VIRTUAL_COLUMNS] ?? false);
+
         foreach ($langs as $lang) {
             $i18nResource = new ($resourceClass::getI18nResourceClass());
 
@@ -698,7 +707,7 @@ readonly class ApiResourcePropelTransformerService
 
                 $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
 
-                if ($baseModel->hasVirtualColumn($virtualColumn)) {
+                if (!$staleVirtualColumns && $baseModel->hasVirtualColumn($virtualColumn)) {
                     // The query left-joined every active language, so an empty column
                     // is an answer: that language has no translation. Reading it as
                     // "not loaded yet" sent one query per row and per language after a
