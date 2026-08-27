@@ -30,11 +30,13 @@ class RegisterFormExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('thelia.form_factory_builder')) {
+        // thelia.form_factory_builder is an alias, which hasDefinition() answers no to:
+        // findDefinition() is the one that follows the alias to the real definition.
+        if (!$container->has('thelia.form_factory_builder')) {
             return;
         }
 
-        $formFactoryBuilderDefinition = $container->getDefinition('thelia.form_factory_builder');
+        $formFactoryBuilderDefinition = $container->findDefinition('thelia.form_factory_builder');
 
         /*
          * Add form extensions
