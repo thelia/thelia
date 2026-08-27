@@ -27,6 +27,7 @@ use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerPasswordUpdateForm;
 use Thelia\Form\CustomerProfileUpdateForm;
+use Thelia\Form\CustomerResetPasswordForm;
 use Thelia\Form\EmptyForm;
 use Thelia\Form\NewsletterForm;
 use Thelia\Form\NewsletterUnsubscribeForm;
@@ -55,6 +56,7 @@ return static function (ContainerConfigurator $configurator): void {
         'thelia.front.customer.create' => CustomerCreateForm::class,
         'thelia.front.customer.profile.update' => CustomerProfileUpdateForm::class,
         'thelia.front.customer.password.update' => CustomerPasswordUpdateForm::class,
+        'thelia.front.customer.resetpassword' => CustomerResetPasswordForm::class,
         'thelia.front.address.create' => AddressCreateForm::class,
         'thelia.front.address.update' => AddressUpdateForm::class,
         'thelia.front.contact' => ContactForm::class,

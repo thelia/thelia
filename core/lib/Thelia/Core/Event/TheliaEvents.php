@@ -140,8 +140,11 @@ final class TheliaEvents
     /** Sent to collect everything the shop knows about one customer. */
     public const CUSTOMER_PERSONAL_DATA_EXPORT = 'action.exportCustomerPersonalData';
 
-    /** sent when a customer need a new password. */
+    /** Sent when a customer asks to be mailed a link to choose a new password. */
     public const LOST_PASSWORD = 'action.lostPassword';
+
+    /** Sent when a customer comes back with a password reset link and a new password. */
+    public const CUSTOMER_RESET_PASSWORD = 'action.customer.resetPassword';
 
     /** Send the account ccreation confirmation email. */
     public const SEND_ACCOUNT_CONFIRMATION_EMAIL = 'action.customer.sendAccountConfirmationEmail';
