@@ -31,11 +31,17 @@ return static function (ContainerConfigurator $container): void {
 
     $services->alias('thelia.forms.validator_builder', ValidatorBuilder::class);
 
-    $services->set(FormFactoryBuilderInterface::class, FormFactoryBuilder::class);
+    // RegisterFormExtensionPass feeds this builder with every service tagged
+    // thelia.forms.extension, thelia.form.type or thelia.form.type_extension, and
+    // BaseForm builds each form from a copy of it. The constructor flag forces the
+    // core extension in first, exactly like Forms::createFormFactoryBuilder() does.
+    $services->set(FormFactoryBuilderInterface::class, FormFactoryBuilder::class)
+        ->args([true]);
 
     $services->alias('thelia.form_factory_builder', FormFactoryBuilderInterface::class);
 
-    $services->set(HttpFoundationExtension::class);
+    $services->set(HttpFoundationExtension::class)
+        ->tag('thelia.forms.extension');
 
     $services->alias('thelia.forms.extension.http_foundation_extension', HttpFoundationExtension::class);
 

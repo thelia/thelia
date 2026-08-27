@@ -17,13 +17,11 @@ namespace Thelia\Form;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\Form\FormInterface as SymfonyFormInterface;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
@@ -77,7 +75,11 @@ abstract class BaseForm implements FormInterface
 
         $this->dispatcher = $eventDispatcher;
         $this->translator = $translator;
-        $this->formFactoryBuilder = $formFactoryBuilder;
+        // The injected builder is the shared service carrying the extensions, the types
+        // and the type extensions registered by the modules. Each form works on its own
+        // copy, so the CSRF and validator extensions added below for this form only never
+        // pile up on the instance the next form will be built from.
+        $this->formFactoryBuilder = clone $formFactoryBuilder;
         $this->validatorBuilder = $validationBuilder;
 
         $this->initFormWithRequest($type, $data, $options);
@@ -146,9 +148,6 @@ abstract class BaseForm implements FormInterface
     protected function initFormWithRequest($type, $data, $options): void
     {
         $this->validatorBuilder = Validation::createValidatorBuilder();
-
-        $this->formFactoryBuilder = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension());
 
         $this->translator = Translator::getInstance();
 
