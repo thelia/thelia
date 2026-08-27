@@ -49,5 +49,5 @@ return static function (ContainerConfigurator $container): void {
                 'interval' => '1 hour',
             ],
         ],
-    ]);
+    ], prepend: true);
 };

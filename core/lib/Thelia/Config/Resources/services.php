@@ -27,7 +27,10 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 return static function (ContainerConfigurator $configurator, ContainerBuilder $container): void {
-    // Import service configurations
+    // Import service configurations. Everything the core declares for another
+    // bundle is prepended, here and in packages/*.php: the kernel loads this file
+    // a second time from buildContainer(), after the shop's own config/packages,
+    // and a default must never win over the file the shop wrote.
     $configurator->import('packages/*');
     $configurator->import('parameters/*');
     $configurator->import('services/*');
@@ -123,7 +126,7 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
             'mailer' => [
                 'dsn' => addslashes($dsn),
             ],
-        ]);
+        ], prepend: true);
     }
 
     if ($propelAvailable) {
@@ -158,7 +161,7 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
             }
         }
 
-        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiResourcePaths]]);
+        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiResourcePaths]], prepend: true);
     }
 
     $serviceConfigurator->get(ConfigCacheService::class)
