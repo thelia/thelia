@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Admin;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\CategoryI18nTableMap;
+use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Test\ApiTestCase;
 
 final class CategoryApiTest extends ApiTestCase
@@ -71,6 +73,38 @@ final class CategoryApiTest extends ApiTestCase
 
         self::assertJsonResponseSuccessful($response);
         self::assertSame(0, (int) CategoryQuery::create()->findPk($category->getId())->getVisible());
+    }
+
+    public function testPatchCategoryAnswersWithTheSavedTranslation(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $category->setLocale('en_US')->setTitle('Title before the patch');
+        $category->setLocale('fr_FR')->setTitle('Titre Français');
+        $category->save();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/categories/'.$category->getId(), [
+            'i18ns' => [
+                'en_US' => [
+                    'title' => 'Title after the patch',
+                ],
+            ],
+        ], $token, 'merge-patch+json');
+
+        self::assertJsonResponseSuccessful($response);
+
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('Title after the patch', $data['i18ns']['en_US']['title']);
+        self::assertSame('Titre Français', $data['i18ns']['fr_FR']['title']);
+
+        CategoryTableMap::clearInstancePool();
+        CategoryI18nTableMap::clearInstancePool();
+
+        self::assertSame(
+            'Title after the patch',
+            CategoryQuery::create()->findPk($category->getId())->setLocale('en_US')->getTitle(),
+        );
     }
 
     public function testDeleteCategoryRemovesResource(): void

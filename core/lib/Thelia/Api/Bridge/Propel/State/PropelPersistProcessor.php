@@ -92,7 +92,13 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $data = $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $data::class,
                 propelModel: $propelModel,
-                context: $postOperation->getNormalizationContext(),
+                // The model instance is the one the provider read before the write,
+                // so its joined i18n columns still hold the replaced values. Only
+                // the translation getters know what was just saved.
+                context: [
+                    ...($postOperation->getNormalizationContext() ?? []),
+                    ApiResourcePropelTransformerService::STALE_I18N_VIRTUAL_COLUMNS => true,
+                ],
                 withAddon: false,
             );
 
