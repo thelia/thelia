@@ -31,7 +31,10 @@ class TemplateDefinition
     public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
     public const BACK_OFFICE_CONFIG_NAME = 'active-admin-template';
     public const PDF_CONFIG_NAME = 'active-pdf-template';
-    public const EMAIL_CONFIG_NAME = 'active-email-template';
+    // The email template has been stored under 'active-mail-template' since 2.0.0-beta2,
+    // and that is the name the seed writes and every reader looks up. Anything else here
+    // makes 'template:set email' write a variable no shop ever reads.
+    public const EMAIL_CONFIG_NAME = 'active-mail-template';
     public const CONFIG_NAMES = [
         self::FRONT_OFFICE_SUBDIR => self::FRONT_OFFICE_CONFIG_NAME,
         self::BACK_OFFICE_SUBDIR => self::BACK_OFFICE_CONFIG_NAME,
