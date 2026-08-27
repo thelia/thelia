@@ -3738,7 +3738,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {% for locale in locales %}
     (1, '{{ locale }}', {{ intl('Order confirmation sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} at {{ config("store_name") }}', locale) }}, NULL, NULL),
-    (2, '{{ locale }}', {{ intl('Your new password', locale) }}, {{ intl('Your new password for {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (2, '{{ locale }}', {{ intl('Password reset link sent to the customer', locale) }}, {{ intl('Reset your password on {{ config("store_name") }}', locale) }}, NULL, NULL),
     (3, '{{ locale }}', {{ intl('Message sent to the shop owner when a new order is placed', locale) }}, {{ intl('New order {{ order_ref }} placed on {{ config("store_name") }}', locale) }}, NULL, NULL),
     (4, '{{ locale }}', {{ intl('Mail sent to the customer when its password or email is changed in the back-office', locale) }}, {{ intl('Your account information on {{ config("store_name") }} has been changed.', locale) }}, NULL, NULL),
     (5, '{{ locale }}', {{ intl('Mail sent to the customer when its account is created by an administrator in the back-office', locale) }}, {{ intl('A {{ config("store_name") }} account has been created for you', locale) }}, NULL, NULL),

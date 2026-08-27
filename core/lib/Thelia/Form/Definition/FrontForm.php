@@ -28,6 +28,7 @@ final class FrontForm
     public const COUPON_CONSUME = 'thelia.order.coupon';
     public const CUSTOMER_LOGIN = 'thelia.front.customer.login';
     public const CUSTOMER_LOST_PASSWORD = 'thelia.front.customer.lostpassword';
+    public const CUSTOMER_RESET_PASSWORD = 'thelia.front.customer.resetpassword';
     public const CUSTOMER_CREATE = 'thelia.front.customer.create';
     public const CUSTOMER_PROFILE_UPDATE = 'thelia.front.customer.profile.update';
     public const CUSTOMER_PASSWORD_UPDATE = 'thelia.front.customer.password.update';

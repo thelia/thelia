@@ -56,6 +56,8 @@ return [
     'Aichi' => 'Aichi',
     'Akita' => 'Akita',
     'Alabama' => 'Alabama',
+    'Password reset link sent to the customer' => 'Lien de réinitialisation du mot de passe envoyé au client',
+    'Reset your password on {{ config("store_name") }}' => 'Réinitialisez votre mot de passe sur {{ config("store_name") }}',
     'Åland Islands' => 'Îles Åland',
     'Alaska' => 'Alaska',
     'Albania' => 'Albanie',
