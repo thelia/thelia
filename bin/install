@@ -202,8 +202,11 @@ $configMap = [
 ];
 
 foreach ($themes as $type => $name) {
-    if (isset($configMap[$type]) && '' !== trim($name)) {
-        $setup->setConfig($configMap[$type], trim($name));
+    $name = trim($name);
+
+    if (isset($configMap[$type]) && '' !== $name) {
+        $setup->setConfig($configMap[$type], $name);
+        publishConfigVariableForCurrentProcess($configMap[$type], $name);
     }
 }
 
@@ -433,6 +436,26 @@ function resolveJwtKeyPath(string $envName, string $defaultFileName): string
     }
 
     return str_replace('%kernel.project_dir%/', THELIA_ROOT, $path);
+}
+
+/**
+ * Publish a Thelia configuration variable as an environment variable of the running process.
+ *
+ * Thelia\Model\Config lets an environment variable take precedence over the stored value, and
+ * the template packages declare their own theme that way in .env. The kernel booted below would
+ * otherwise run the rest of the install — module post-activation, demo import — on the theme a
+ * recipe declares rather than the one being installed: template:set writes the choice to
+ * .env.local, a file the dotenv loader has already read by then.
+ *
+ * The variable name is the one Thelia\Model\Config::getEnvName() derives from the config name.
+ */
+function publishConfigVariableForCurrentProcess(string $configName, string $value): void
+{
+    $envName = str_replace(['.', '-'], '_', strtoupper($configName));
+
+    $_SERVER[$envName] = $value;
+    $_ENV[$envName] = $value;
+    putenv($envName.'='.$value);
 }
 
 /**
