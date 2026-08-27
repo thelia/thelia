@@ -40,7 +40,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function getActiveMailTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
-            ConfigQuery::read('active-mail-template', 'default'),
+            ConfigQuery::read(TemplateDefinition::EMAIL_CONFIG_NAME, 'default'),
             TemplateDefinition::EMAIL,
         );
     }
@@ -56,16 +56,16 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
         switch ($templateDefinition->getType()) {
             case TemplateDefinition::FRONT_OFFICE:
-                $configTemplateName = 'active-front-template';
+                $configTemplateName = TemplateDefinition::FRONT_OFFICE_CONFIG_NAME;
                 break;
             case TemplateDefinition::BACK_OFFICE:
-                $configTemplateName = 'active-admin-template';
+                $configTemplateName = TemplateDefinition::BACK_OFFICE_CONFIG_NAME;
                 break;
             case TemplateDefinition::PDF:
-                $configTemplateName = 'active-pdf-template';
+                $configTemplateName = TemplateDefinition::PDF_CONFIG_NAME;
                 break;
             case TemplateDefinition::EMAIL:
-                $configTemplateName = 'active-mail-template';
+                $configTemplateName = TemplateDefinition::EMAIL_CONFIG_NAME;
                 break;
         }
 
@@ -78,7 +78,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function getActivePdfTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
-            ConfigQuery::read('active-pdf-template', 'default'),
+            ConfigQuery::read(TemplateDefinition::PDF_CONFIG_NAME, 'default'),
             TemplateDefinition::PDF,
         );
     }
@@ -89,7 +89,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function getActiveAdminTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
-            ConfigQuery::read('active-admin-template', 'default'),
+            ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'),
             TemplateDefinition::BACK_OFFICE,
         );
     }
@@ -100,7 +100,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     public function getActiveFrontTemplate(): TemplateDefinition
     {
         return new TemplateDefinition(
-            ConfigQuery::read('active-front-template', 'default'),
+            ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default'),
             TemplateDefinition::FRONT_OFFICE,
         );
     }

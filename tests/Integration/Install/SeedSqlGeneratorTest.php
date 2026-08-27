@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Install;
 
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Install\Generator\SeedSqlGenerator;
 use Thelia\Test\IntegrationTestCase;
 
@@ -52,6 +53,34 @@ final class SeedSqlGeneratorTest extends IntegrationTestCase
         // language without wording is the gap #3697 closed.
         self::assertSame($seededLocales, $this->getLocalesOfTheSeededMessages());
         self::assertEmpty(array_diff($seededLocales, $generator->getAvailableLocales()));
+    }
+
+    public function testTheSeedCreatesEveryActiveTemplateConfigTheCodeWrites(): void
+    {
+        $seededConfigNames = $this->getSeededConfigNames();
+
+        foreach (TemplateDefinition::CONFIG_NAMES as $templateType => $configName) {
+            self::assertContains(
+                $configName,
+                $seededConfigNames,
+                \sprintf('The %s template is stored under a config variable the seed never creates.', $templateType),
+            );
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getSeededConfigNames(): array
+    {
+        $seed = file_get_contents($this->getService(SeedSqlGenerator::class)->getOutputPath());
+
+        self::assertIsString($seed);
+        self::assertSame(1, preg_match('/INSERT INTO `config`.*?\n;/s', $seed, $block));
+
+        preg_match_all("/^\s*\(\d+, '([^']+)'/m", $block[0], $matches);
+
+        return $matches[1];
     }
 
     /**

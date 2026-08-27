@@ -41,10 +41,10 @@ class HookHelper
     public function parseActiveTemplate(int $templateType = TemplateDefinition::FRONT_OFFICE): array
     {
         $tplVar = match ($templateType) {
-            TemplateDefinition::FRONT_OFFICE => 'active-front-template',
-            TemplateDefinition::BACK_OFFICE => 'active-admin-template',
-            TemplateDefinition::PDF => 'active-pdf-template',
-            TemplateDefinition::EMAIL => 'active-mail-template',
+            TemplateDefinition::FRONT_OFFICE => TemplateDefinition::FRONT_OFFICE_CONFIG_NAME,
+            TemplateDefinition::BACK_OFFICE => TemplateDefinition::BACK_OFFICE_CONFIG_NAME,
+            TemplateDefinition::PDF => TemplateDefinition::PDF_CONFIG_NAME,
+            TemplateDefinition::EMAIL => TemplateDefinition::EMAIL_CONFIG_NAME,
             default => throw new TheliaProcessException('Unknown template type: '.$templateType),
         };
 
