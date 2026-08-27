@@ -36,5 +36,5 @@ return static function (ContainerConfigurator $container): void {
             \dirname(__DIR__, 3).\DIRECTORY_SEPARATOR.'Resources'
                 .\DIRECTORY_SEPARATOR.'views'.\DIRECTORY_SEPARATOR.'ApiPlatform' => 'ApiPlatform',
         ],
-    ]);
+    ], prepend: true);
 };

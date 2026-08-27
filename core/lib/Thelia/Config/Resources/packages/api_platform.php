@@ -55,5 +55,5 @@ return static function (ContainerConfigurator $container): void {
                 ],
             ],
         ],
-    ]);
+    ], prepend: true);
 };
