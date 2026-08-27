@@ -1,3 +1,62 @@
+# 3.0.0-beta5
+
+8 commits since 3.0.0-beta4. The version number follows the update script this release ships, `setup/update/sql/3.0.0-beta5.sql`, which adds the legal identifier columns to the address, cart address and order address tables.
+
+## Orders and invoicing
+
+- The rounding rule an order is totalled with is configurable. `order_rounding_mode` keeps the historical unit-price rounding as the default, and a shop can opt into rounding the line totals instead. A console command switches the mode, reports how the figures of existing orders would move, and freezes the totals of the orders placed before the switch. The api exposes order unit amounts with the precision the order total uses. #3801
+- A business address carries the legal identifiers electronic invoicing asks for: a company registration number and a VAT number, entered on the address, copied to the cart address and frozen on the order address, next to the company name they identify. The format is checked only on a value that was actually typed, and is country-aware. Neither identifier is ever mandatory and existing rows stay NULL, so nothing is required retroactively. #3798, #3804
+
+## Front office
+
+- Checking several values of the same feature filter widens the product list instead of emptying it: the values of one feature are OR-ed together, distinct features still narrow the list. #3810
+- A rewritten url that spells out a path keeps its separators instead of losing them to the url sanitizer. A shop that wants flat urls can still forbid the slash through the configuration key. #3809
+- The front controllers point at the router service and the routes a Thelia 3 install registers, so their redirects resolve instead of failing when a visitor reaches them. #3802
+- A live component renders again: the Thelia view listener no longer claims the default render action of a component as an unknown view and answers 404 before the component is rendered. #3798
+
+## Emails
+
+- A mail message that has no template file renders the body stored in the database with the default parser, instead of being silently lost. #3803
+
+## Install
+
+- A fresh install of the development repository resolves again: the version of the `core/` path repository follows the release, and the bundle list no longer registers an asset bundle nothing installs. #3799
+
+# 3.0.0-beta4
+
+30 commits since 3.0.0-beta3. The version number follows the update script this release ships, `setup/update/sql/3.0.0-beta4.sql`. That script carries no database change: every fix of this cycle lives in code, and the file exists so that the updater finds a script matching the version marker instead of replaying the whole history.
+
+## Updating a shop
+
+- The update loop runs on the connection Propel hands out, and `setup/update.php` bootstraps on a thelia-project layout: updating an existing shop works again. #3769, #3770
+- The backup taken before an update restores, where NULL values used to be dumped as empty strings, and it is allowed when `memory_limit` is unlimited instead of being refused outright. #3778, #3792
+- An update run is reported for what it did instead of a phantom transaction error, the script aborts cleanly and exits non-zero when stdin gives no answer, and a missing backup file no longer breaks the run. #3776, #3768, #3759
+
+## Installing a shop
+
+- A fresh install serves its first page: `bin/install` creates `var/translations`, an AssetMapper path that `symfony/ux-translator` registers but never creates at boot. #3791
+- The back office stylesheet is built during install, now that the `default-twig` theme ships on AssetMapper with sass-bundle: no npm anywhere any more, Node.js is no longer a prerequisite. #3795
+- The `sql_mode` verdict cached during install is read from the server configuration, not from the session that computed it, so web requests get the session mode they need on MySQL, and `STRICT_TRANS_TABLES` stays in the session mode on both engines. #3793, #3782
+- `composer/installers` 2.x is accepted, and `thelia/setup` and `thelia/config` declare a branch alias so their development line resolves. #3781, #3790
+
+## Front office
+
+- An unknown front office path answers 404 instead of 500. #3762
+- A redirect lands on the domain of the requested language, and a rewritten url keeps its query parameters when it switches language. #3775, #3771
+- SVG images are served as they are instead of being handed to the raster image pipeline. #3761
+
+## Modules
+
+- The module refresh keeps going when one module raises a PHP error, and resolves the descriptor path of a module before the refresh can fail on it.
+- A generated module no longer ships a deprecated `routing.xml`. #3766
+
+## Console and internals
+
+- Deprecation logs stay out of the production error log. #3764
+- The three worst-rated legacy classes were split into smaller units, without a change of behaviour. #3759
+- Tests cover the virtual product download link and route, guard the core against deprecated `Request::get()` call sites, and assert the theme render instead of skipping it once the theme vendors are installed. #3763, #3765, #3756, #3757
+- The Readme documents the AssetMapper asset builds, front and back, and carries the build, release and stack badges. #3789, #3796, #3760
+
 # 3.0.0-beta3
 
 118 commits since 3.0.0-beta1. The version number follows the update script this release ships, `setup/update/sql/3.0.0-beta3.sql`, so that a fresh install does not read itself as out of date.
