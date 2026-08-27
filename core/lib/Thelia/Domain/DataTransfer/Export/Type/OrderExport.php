@@ -102,7 +102,7 @@ class OrderExport extends JsonFileAbstractExport
                     `order`.created_at as "order_created_at",
                     customer.ref as "customer_ref",
                     ROUND(`order`.discount, 2) as order_discount,
-                    order_coupon.code as order_coupon_code,
+                    '.$this->couponCodes().' as order_coupon_code,
                     ROUND(`order`.postage, 2) as order_postage,
                     `order`.postage_tax as "order_postage_tax",
                     `order`.postage_tax_rule_title as "order_postage_tax_rule_title",
@@ -136,12 +136,10 @@ class OrderExport extends JsonFileAbstractExport
                     invoice_country_i18n.title as "invoice_country_i18n_title",
                     invoice_address.phone as "invoice_address_phone",
                     currency.code as "currency_code",
-                    order_product_tax.title as "order_product_tax_title"
+                    '.$this->taxTitles().' as "order_product_tax_title"
                 FROM `order`
                 LEFT JOIN customer ON customer.id = `order`.customer_id
                 LEFT JOIN order_product ON order_product.order_id = `order`.id
-                LEFT JOIN order_product_tax ON order_product_tax.order_product_id = order_product.id
-                LEFT JOIN order_coupon ON order_coupon.order_id = `order`.id
                 LEFT JOIN `module_i18n` as delivery_module ON delivery_module.id = `order`.delivery_module_id AND delivery_module.locale = :locale
                 LEFT JOIN `module_i18n` as payment_module ON payment_module.id = `order`.payment_module_id AND payment_module.locale = :locale
                 LEFT JOIN order_status_i18n ON order_status_i18n.id = `order`.status_id AND order_status_i18n.locale = :locale
@@ -170,6 +168,44 @@ class OrderExport extends JsonFileAbstractExport
         $stmt->execute();
 
         return $this->getDataJsonCache($stmt, 'order');
+    }
+
+    /**
+     * The codes of the coupons the order carries, in the single `coupons`
+     * column the export has always had.
+     *
+     * A top-level join would repeat every line of the order once per coupon,
+     * and the totals are summed over those lines: an order paid with two
+     * coupons exported twice the amount it was invoiced. Reading the codes in
+     * a subquery keeps one row per line, and an order carrying several coupons
+     * now lists them all instead of whichever one the database happened to
+     * hand back.
+     */
+    private function couponCodes(): string
+    {
+        return "
+                    (
+                        SELECT GROUP_CONCAT(order_coupon.code ORDER BY order_coupon.id SEPARATOR ', ')
+                        FROM order_coupon
+                        WHERE order_coupon.order_id = `order`.id
+                    )";
+    }
+
+    /**
+     * The tax labels the order bears, listed the same way and for the same
+     * reason: a line taxed twice reached the totals twice. The column has
+     * carried the label rather than an amount since Thelia 2 — the amount is
+     * what `order_total_tax` states.
+     */
+    private function taxTitles(): string
+    {
+        return "
+                    (
+                        SELECT GROUP_CONCAT(DISTINCT order_product_tax.title ORDER BY order_product_tax.title SEPARATOR ', ')
+                        FROM order_product_tax
+                        INNER JOIN order_product as taxed_product ON taxed_product.id = order_product_tax.order_product_id
+                        WHERE taxed_product.order_id = `order`.id
+                    )";
     }
 
     /**

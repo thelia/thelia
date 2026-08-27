@@ -19,6 +19,7 @@ use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
+use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Test\FixtureFactory;
@@ -191,6 +192,54 @@ final class OrderExportTest extends IntegrationTestCase
         $this->assertExportedTotalsMatchTheInvoice($order);
     }
 
+    /**
+     * A line bearing two taxes is one line on the invoice. The export joined
+     * order_product_tax at the top level, so the line reached the SUM() once
+     * per tax row and the order came out doubled.
+     */
+    public function testALineTaxedTwiceIsTotalledOnce(): void
+    {
+        $order = $this->twiceTaxedOrder();
+
+        self::assertEqualsWithDelta(115.0, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * Same multiplication through the coupons: an order carrying two of them
+     * was totalled twice, and one carrying three of them three times.
+     */
+    public function testAnOrderCarryingSeveralCouponsIsTotalledOnce(): void
+    {
+        $order = $this->twiceTaxedOrder();
+        $this->addCoupon($order, 'SPRING');
+        $this->addCoupon($order, 'SUMMER');
+
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * The column holds the tax label, as it has since Thelia 2. Picking one
+     * row out of a group left the others out of the file, and which one
+     * survived was up to the database.
+     */
+    public function testEveryTaxLabelOfTheOrderReachesTheTaxColumn(): void
+    {
+        $order = $this->twiceTaxedOrder();
+
+        self::assertSame('Eco tax, VAT', $this->exportedRow($order->getRef())['order_product_tax_title']);
+    }
+
+    /** The column is aliased `coupons`, and an order can carry several. */
+    public function testEveryCouponCodeOfTheOrderReachesTheCouponColumn(): void
+    {
+        $order = $this->twiceTaxedOrder();
+        $this->addCoupon($order, 'SPRING');
+        $this->addCoupon($order, 'SUMMER');
+
+        self::assertSame('SPRING, SUMMER', $this->exportedRow($order->getRef())['order_coupon_code']);
+    }
+
     /** The taxed total of the goods, the figure the invoice states for the lines. */
     private function invoicedTotal(Order $order): float
     {
@@ -234,6 +283,56 @@ final class OrderExportTest extends IntegrationTestCase
             ->save($this->getPropelConnection());
 
         return $order;
+    }
+
+    /** One line of 100.00 € bearing a 10.00 € VAT and a 5.00 € eco tax: 115.00 € invoiced. */
+    private function twiceTaxedOrder(): Order
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        $orderProduct = new OrderProduct();
+        $orderProduct
+            ->setOrderId($order->getId())
+            ->setProductRef('taxed-ref')
+            ->setProductSaleElementsRef('taxed-pse-ref')
+            ->setTitle('Twice taxed goods')
+            ->setQuantity(1.0)
+            ->setPrice('100.000000')
+            ->setWasNew(0)
+            ->setWasInPromo(0)
+            ->save($this->getPropelConnection());
+
+        foreach (['VAT' => '10.000000', 'Eco tax' => '5.000000'] as $title => $amount) {
+            (new OrderProductTax())
+                ->setOrderProductId($orderProduct->getId())
+                ->setTitle($title)
+                ->setDescription('')
+                ->setAmount($amount)
+                ->save($this->getPropelConnection());
+        }
+
+        return $order;
+    }
+
+    private function addCoupon(Order $order, string $code): void
+    {
+        (new OrderCoupon())
+            ->setOrderId($order->getId())
+            ->setCode($code)
+            ->setType('thelia.coupon.type.remove_x_amount')
+            ->setAmount('0.000000')
+            ->setTitle($code)
+            ->setShortDescription('')
+            ->setDescription('')
+            ->setExpirationDate(new \DateTime('+1 year'))
+            ->setIsCumulative(true)
+            ->setIsRemovingPostage(false)
+            ->setIsAvailableOnSpecialOffers(false)
+            ->setSerializedConditions('')
+            ->setPerCustomerUsageCount(false)
+            ->save($this->getPropelConnection());
     }
 
     /**
