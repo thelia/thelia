@@ -1,0 +1,94 @@
+{# The API documentation, dressed as Thelia rather than as API Platform.
+
+   `@!ApiPlatform` is the bundle's own template, so everything this file does
+   not touch — Swagger UI, ReDoc, Scalar, the format links — keeps working as
+   the bundle ships it. #}
+{% extends '@!ApiPlatform/SwaggerUi/index.html.twig' %}
+
+{% block title %}
+    <title>{{ title|default('Thelia API') }}</title>
+{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+
+    <style>
+        :root {
+            --thelia-orange: #f26041;
+            --thelia-pink: #c73459;
+            --thelia-green: #99c455;
+            --thelia-ink: #282828;
+            --thelia-ink-soft: #4f4f4f;
+            --thelia-mist: #f4f7fa;
+        }
+
+        header:before {
+            background-color: var(--thelia-ink);
+        }
+
+        header #logo {
+            right: auto;
+            left: 40px;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: .02em;
+            text-decoration: none;
+        }
+
+        header #logo em {
+            color: var(--thelia-orange);
+            font-style: normal;
+        }
+
+        .swagger-ui .info .title,
+        .swagger-ui .info .title small pre {
+            color: var(--thelia-ink);
+        }
+
+        .swagger-ui .info a,
+        .swagger-ui .information-container .info a,
+        #formats .info a {
+            color: var(--thelia-pink);
+        }
+
+        .swagger-ui .btn.execute {
+            background-color: var(--thelia-orange);
+            border-color: var(--thelia-orange);
+            color: #fff;
+        }
+
+        .swagger-ui .btn.authorize {
+            color: var(--thelia-green);
+            border-color: var(--thelia-green);
+        }
+
+        .swagger-ui .btn.authorize svg {
+            fill: var(--thelia-green);
+        }
+
+        .swagger-ui .opblock.opblock-get .opblock-summary-method {
+            background-color: var(--thelia-ink-soft);
+        }
+
+        .swagger-ui .opblock.opblock-post .opblock-summary-method,
+        .swagger-ui .opblock.opblock-patch .opblock-summary-method,
+        .swagger-ui .opblock.opblock-put .opblock-summary-method {
+            background-color: var(--thelia-orange);
+        }
+
+        .swagger-ui .opblock.opblock-delete .opblock-summary-method {
+            background-color: var(--thelia-pink);
+        }
+
+        .swagger-ui .scheme-container {
+            background-color: var(--thelia-mist);
+        }
+    </style>
+{% endblock %}
+
+{% block header %}
+    <header>
+        <a id="logo" href="https://thelia.net" rel="noopener">The<em>lia</em></a>
+    </header>
+{% endblock %}
