@@ -17,7 +17,7 @@ namespace Thelia\Tests\Integration\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Form\CouponCode;
+use Thelia\Form\EmptyForm;
 use Thelia\Test\IntegrationTestCase;
 
 final class BaseFormCsrfTokenTest extends IntegrationTestCase
@@ -93,7 +93,7 @@ final class BaseFormCsrfTokenTest extends IntegrationTestCase
         /** @var TheliaFormFactory $factory */
         $factory = $this->getService(TheliaFormFactory::class);
 
-        return $factory->createForm(CouponCode::getName(), options: $options)->getForm();
+        return $factory->createForm(EmptyForm::getName(), options: $options)->getForm();
     }
 
     private function tokenValueOf(\Symfony\Component\Form\FormInterface $form): string
@@ -114,7 +114,7 @@ final class BaseFormCsrfTokenTest extends IntegrationTestCase
 
     private function submit(\Symfony\Component\Form\FormInterface $form, string $token): \Symfony\Component\Form\FormInterface
     {
-        $form->submit(['coupon-code' => 'ANY', '_token' => $token]);
+        $form->submit(['_token' => $token]);
 
         return $form;
     }
