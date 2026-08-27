@@ -15,12 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerLostPasswordForm.
@@ -30,21 +27,11 @@ use Thelia\Model\CustomerQuery;
 class CustomerLostPasswordForm extends FirewallForm
 {
     /**
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :.
+     * The address is only checked for shape here.
      *
-     * $this->formBuilder->add("name", TextType::class)
-     *   ->add("email", EmailType::class, array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', IntegerType::class);
+     * Telling the visitor that an address has no account would answer, to anyone who
+     * asks, whether a given person is a customer of this shop — so a well-formed
+     * address is always accepted, and the shop replies the same way in both cases.
      */
     protected function buildForm(): void
     {
@@ -53,24 +40,12 @@ class CustomerLostPasswordForm extends FirewallForm
                 'constraints' => [
                     new NotBlank(),
                     new Email(),
-                    new Callback(
-                        $this->verifyExistingEmail(...),
-                    ),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your email address'),
                 'label_attr' => [
                     'for' => 'forgot-email',
                 ],
             ]);
-    }
-
-    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
-    {
-        $customer = CustomerQuery::create()->findOneByEmail($value);
-
-        if (null === $customer) {
-            $context->addViolation(Translator::getInstance()->trans('This email does not exists'));
-        }
     }
 
     /**

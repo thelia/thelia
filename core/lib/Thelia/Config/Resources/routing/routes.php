@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Thelia\Controller\Api\RefreshTokenController;
+use Thelia\Controller\Front\ContactController;
 use Thelia\Controller\Front\DefaultController;
 
 return static function (RoutingConfigurator $routes): void {
@@ -31,6 +32,14 @@ return static function (RoutingConfigurator $routes): void {
 
     $routes->add('index', '/')
         ->controller([DefaultController::class, 'noAction']);
+
+    // Declared before the theme and module routes: a front-office theme serves its pages
+    // through a catch-all that matches any single segment whatever the method, so a route
+    // imported after it would never be reached. The GET of the same path stays with the
+    // theme, which owns the contact page and its markup.
+    $routes->add('contact_submit', '/contact')
+        ->controller([ContactController::class, 'send'])
+        ->methods(['POST']);
 
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');

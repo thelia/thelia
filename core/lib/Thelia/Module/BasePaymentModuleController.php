@@ -233,13 +233,17 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Redirect the customer to the successful payment page.
      *
+     * The order is passed as a routing parameter, so a theme declaring a placeholder for it
+     * gets it in the path, and a theme declaring none — the case of the shipped ones — gets
+     * it in the query string. This is the shape AbstractPaymentModule builds too.
+     *
      * @param int $orderId the order ID
      */
     public function redirectToSuccessPage(int $orderId): void
     {
         $this->getLog()->addInfo('Redirecting customer to payment success page');
 
-        throw new RedirectException($this->retrieveUrlFromRouteId('order.placed', [], ['order_id' => $orderId], Router::ABSOLUTE_PATH));
+        throw new RedirectException($this->retrieveUrlFromRouteId('checkout_confirm', [], ['order_id' => $orderId], Router::ABSOLUTE_PATH));
     }
 
     /**
@@ -252,6 +256,6 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         $this->getLog()->addInfo('Redirecting customer to payment failure page');
 
-        throw new RedirectException($this->retrieveUrlFromRouteId('order.failed', [], ['order_id' => $orderId, 'message' => $message], Router::ABSOLUTE_PATH));
+        throw new RedirectException($this->retrieveUrlFromRouteId('checkout_failed', [], ['order_id' => $orderId, 'message' => $message], Router::ABSOLUTE_PATH));
     }
 }

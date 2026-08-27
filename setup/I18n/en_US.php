@@ -19,6 +19,8 @@ return [
     '"Remember me" cookie name for customer users' => '"Remember me" cookie name for customer users',
     '72h delivery' => '72h delivery',
     'A {{ config("store_name") }} account has been created for you' => 'A {{ config("store_name") }} account has been created for you',
+    'Password reset link sent to the customer' => 'Password reset link sent to the customer',
+    'Reset your password on {{ config("store_name") }}' => 'Reset your password on {{ config("store_name") }}',
     'Åland Islands' => 'Åland Islands',
     'American Samoa' => 'American Samoa',
     'Anguilla' => 'Anguilla',

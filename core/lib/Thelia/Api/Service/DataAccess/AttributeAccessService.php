@@ -188,12 +188,14 @@ class AttributeAccessService
         return '';
     }
 
+    /**
+     * Reads an attribute of the shop's default country: its title, its iso
+     * codes, any of its columns. The argument names that attribute, the way
+     * attributeCurrency() and attributeBrand() take one; it does not name the
+     * country, since the default one is the only country this reads.
+     */
     public function attributeCountry(string $attributeName): mixed
     {
-        if ($attributeName !== 'default') {
-            return '';
-        }
-
         return $this->dataAccessWithI18n(
             'defaultCountry',
             $attributeName,
