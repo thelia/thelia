@@ -560,10 +560,20 @@ readonly class ApiResourcePropelTransformerService
                 continue;
             }
 
+            $relationAttributes = $property->getAttributes(Relation::class);
+
+            // The recursion guard prunes this branch, so nothing reads what the
+            // getter would return. Asking for it first fetched the relation rows
+            // to throw them away, once per back reference of every nested
+            // resource of a collection.
+            if ([] !== $relationAttributes && !$withRelation) {
+                continue;
+            }
+
             $value = $propelModel->{$propelGetter}();
 
-            foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
-                if (!$withRelation || null === $value) {
+            foreach ($relationAttributes as $relationAttribute) {
+                if (null === $value) {
                     continue 2;
                 }
 
