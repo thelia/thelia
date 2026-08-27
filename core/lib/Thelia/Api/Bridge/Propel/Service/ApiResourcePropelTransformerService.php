@@ -86,7 +86,7 @@ readonly class ApiResourcePropelTransformerService
 
         $baseModel ??= $propelModel;
 
-        $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel);
+        $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel, $context);
         $this->eventDispatcher->dispatch($modelToResourceEvent, ModelToResourceEvent::BEFORE_TRANSFORM);
         $baseModel = $modelToResourceEvent->getModel();
 

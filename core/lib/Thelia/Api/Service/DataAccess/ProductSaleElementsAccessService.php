@@ -20,14 +20,15 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Attribute\AttributeAvProductEvent;
 use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Lang;
-use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 class ProductSaleElementsAccessService
@@ -35,7 +36,7 @@ class ProductSaleElementsAccessService
     protected ?Request $request;
 
     public function __construct(
-        RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         private readonly TaxEngine $taxEngine,
         private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -54,6 +55,7 @@ class ProductSaleElementsAccessService
 
         $discount = 0;
         $taxCountry = $this->taxEngine->getDeliveryCountry();
+        $currency = $this->currentCurrency();
 
         if ($this->securityContext->hasCustomerUser()) {
             $discount = $this->securityContext->getCustomerUser()->getDiscount();
@@ -61,12 +63,15 @@ class ProductSaleElementsAccessService
 
         foreach (ProductSaleElementsQuery::create()->filterByVisible(true)->orderByPosition()->findByProductId($productId) as $pse) {
             $attributes = [];
-            $price = ProductPriceQuery::create()->filterByProductSaleElements($pse)->findOne();
 
-            $basePrice = $price->getPrice() * (1 - ($discount / 100));
-            $promoPrice = $price->getPromoPrice() * (1 - ($discount / 100));
-            $pse->setVirtualColumn('price_PRICE', (float) $basePrice);
-            $pse->setVirtualColumn('price_PROMO_PRICE', (float) $promoPrice);
+            // Reading the first price row priced the sale element in whichever
+            // currency the database answered first. The model knows the rule:
+            // the row of the currency being browsed, the default currency one
+            // converted at its rate when there is none.
+            $prices = $pse->getPricesByCurrency($currency, (float) $discount);
+
+            $pse->setVirtualColumn('price_PRICE', $prices->getPrice());
+            $pse->setVirtualColumn('price_PROMO_PRICE', $prices->getPromoPrice());
 
             foreach ($pse->getAttributeCombinations() as $attribute) {
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
@@ -152,6 +157,21 @@ class ProductSaleElementsAccessService
         }
 
         return $title ?? '';
+    }
+
+    /**
+     * The currency being browsed, which a command line has none of.
+     *
+     * The request is read from the stack rather than from the one the
+     * constructor captured: this service is built before the request it is
+     * asked about exists, and holds a null one ever after.
+     */
+    private function currentCurrency(): Currency
+    {
+        $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
+        $session = $request?->hasSession() ? $request->getSession() : null;
+
+        return $session instanceof Session ? $session->getCurrency() : Currency::getDefaultCurrency();
     }
 
     private function fallbackLocale(string $currentLocale): ?string

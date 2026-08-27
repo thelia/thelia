@@ -28,7 +28,17 @@ class ModelToResourceEvent extends Event
     public function __construct(
         private ActiveRecordInterface $model,
         private ?ActiveRecordInterface $parentModel = null,
+        private array $context = [],
     ) {
+    }
+
+    /**
+     * The serialization context the resource is being built for. A listener
+     * reads its groups to tell an admin read from a front one.
+     */
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     public function getResource(): PropelResourceInterface
