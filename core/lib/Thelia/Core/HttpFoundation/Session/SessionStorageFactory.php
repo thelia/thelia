@@ -34,7 +34,7 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
         $env = \is_string($_SERVER['APP_ENV'] ?? null) ? $_SERVER['APP_ENV'] : 'prod';
 
         if ('test' === $env || headers_sent()) {
-            return new MockFileSessionStorage($this->defaultSavePath);
+            return $this->createMockStorage($request);
         }
 
         $lifetime = (int) ConfigQuery::read('session_config.lifetime', 0);
@@ -52,5 +52,26 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
         $handler = new NativeFileSessionHandler($customSavePath ?: $this->defaultSavePath);
 
         return new NativeSessionStorage($options, $handler);
+    }
+
+    /**
+     * The native storage reads the session cookie itself, through php. The mock one never
+     * does, so it has to be handed the id the client sends back: without it every request
+     * of a same client opens a new session, and nothing a page stores for the next request
+     * — a form token, a cart, a flash message — survives the round trip.
+     *
+     * The id names the file the storage reads, so only the character set php gives session
+     * ids is accepted.
+     */
+    private function createMockStorage(?Request $request): MockFileSessionStorage
+    {
+        $storage = new MockFileSessionStorage($this->defaultSavePath);
+        $sessionId = $request?->cookies->get($storage->getName());
+
+        if (\is_string($sessionId) && 1 === preg_match('/^[a-zA-Z0-9,-]{1,128}$/', $sessionId)) {
+            $storage->setId($sessionId);
+        }
+
+        return $storage;
     }
 }
