@@ -16,8 +16,11 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderProductTax;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -27,6 +30,13 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class OrderExportTest extends IntegrationTestCase
 {
+    /** One gram of a product priced 5.678 € the kilogram, taxed 0.312 € the kilogram. */
+    private const PRICE_PER_GRAM = '0.005678';
+
+    private const TAX_PER_GRAM = '0.000312';
+
+    private const GRAMS = 300.0;
+
     private FixtureFactory $factory;
 
     protected function setUp(): void
@@ -38,6 +48,15 @@ final class OrderExportTest extends IntegrationTestCase
         // only ExportHandler::processExport() does, and this test does not go
         // through the handler.
         (new Filesystem())->mkdir(THELIA_CACHE_DIR.'export');
+    }
+
+    protected function tearDown(): void
+    {
+        // ConfigQuery caches in a static array the transaction rollback cannot
+        // reach, so a mode written here would answer the next test.
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
     }
 
     public function testItExportsEveryOrderWhenNoRangeIsGiven(): void
@@ -110,6 +129,132 @@ final class OrderExportTest extends IntegrationTestCase
         self::assertArrayHasKey('delivery_country', $aliased);
         self::assertSame($row['delivery_country_i18n_title'], $aliased['delivery_country']);
         self::assertSame($row['invoice_country_i18n_title'], $aliased['invoice_country']);
+    }
+
+    /**
+     * A shop selling by weight stores a price per gram, and the mode the shop
+     * runs decides where the cent appears. The default rounds the unit price
+     * first: 0.005678 € the gram becomes 0.01 €, and the 300 g line is invoiced
+     * 3.00 €. An export stating 1.70 € for it states an amount nobody charged.
+     */
+    public function testTheDefaultModeExportsTheAmountTheOrderWasInvoicedWith(): void
+    {
+        $order = $this->bulkOrder();
+
+        self::assertEqualsWithDelta(3.0, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * Rounding of sums multiplies at the stored precision and rounds the line
+     * total: 300 x 0.005678 = 1.7034 before tax, 1.797 with it.
+     */
+    public function testRoundingOfSumsExportsTheAmountTheOrderWasInvoicedWith(): void
+    {
+        $this->optIn();
+
+        $order = $this->bulkOrder();
+
+        self::assertEqualsWithDelta(1.80, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * The pivot a shop writes when it opts in: the orders it had already
+     * invoiced keep the rule they were charged with, and so does their line in
+     * the export.
+     */
+    public function testAnOrderFrozenByThePivotIsExportedWithTheHistoricalRule(): void
+    {
+        $order = $this->bulkOrder();
+
+        ConfigQuery::write('last_sum_of_roundings_order_id', (string) $order->getId());
+        $this->optIn();
+
+        self::assertEqualsWithDelta(3.0, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * Orders placed before Thelia 2.4 were totalled without any rounding at all,
+     * and the amount their invoice states cannot be restated afterwards.
+     */
+    public function testAnOrderFrozenByThe24UpgradeIsExportedWithoutRounding(): void
+    {
+        $this->optIn();
+
+        $order = $this->bulkOrder();
+
+        ConfigQuery::write('last_legacy_rounding_order_id', (string) $order->getId());
+
+        self::assertEqualsWithDelta(1.797, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /** The taxed total of the goods, the figure the invoice states for the lines. */
+    private function invoicedTotal(Order $order): float
+    {
+        $tax = 0.0;
+
+        return $order->getTotalAmount($tax, false, false);
+    }
+
+    private function optIn(): void
+    {
+        ConfigQuery::write('order_rounding_mode', (string) ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+    }
+
+    /**
+     * An order of one line of goods sold by weight, the case where the two
+     * rounding modes land more than a cent apart.
+     */
+    private function bulkOrder(): Order
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        $orderProduct = new OrderProduct();
+        $orderProduct
+            ->setOrderId($order->getId())
+            ->setProductRef('bulk-ref')
+            ->setProductSaleElementsRef('bulk-pse-ref')
+            ->setTitle('Bulk rice')
+            ->setQuantity(self::GRAMS)
+            ->setPrice(self::PRICE_PER_GRAM)
+            ->setWasNew(0)
+            ->setWasInPromo(0)
+            ->save($this->getPropelConnection());
+
+        (new OrderProductTax())
+            ->setOrderProductId($orderProduct->getId())
+            ->setTitle('VAT')
+            ->setDescription('')
+            ->setAmount(self::TAX_PER_GRAM)
+            ->save($this->getPropelConnection());
+
+        return $order;
+    }
+
+    /**
+     * The export carries the goods alone: postage and discount get their own
+     * columns, so the order is read the same way.
+     */
+    private function assertExportedTotalsMatchTheInvoice(Order $order): void
+    {
+        $tax = 0.0;
+        $invoicedTaxedTotal = $order->getTotalAmount($tax, false, false);
+
+        $row = $this->exportedRow($order->getRef());
+
+        self::assertEqualsWithDelta(
+            $invoicedTaxedTotal,
+            (float) $row['order_total_taxed_price'],
+            0.0001,
+            'The exported taxed total has to be the amount the order was invoiced.',
+        );
+        self::assertEqualsWithDelta($invoicedTaxedTotal - $tax, (float) $row['order_total_price'], 0.0001);
+        self::assertEqualsWithDelta($tax, (float) $row['order_total_tax'], 0.0001);
     }
 
     private function orderCreatedAt(string $modifier): Order
