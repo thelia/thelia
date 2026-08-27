@@ -331,6 +331,14 @@ foreach ([
     'tailwind:build' => 'Building the front-office stylesheet',
     'sass:build' => 'Building the Sass stylesheets',
 ] as $command => $label) {
+    // sass:build compiles the entry files the active theme declares. When none of
+    // the selected themes ships Sass, symfonycasts/sass-bundle keeps its own
+    // default entry (assets/styles/app.scss), a file Thelia does not ship, and the
+    // build fails on a stylesheet nobody asked for.
+    if ('sass:build' === $command && !hasSassSourcesToBuild($themes)) {
+        continue;
+    }
+
     $commands[] = [
         'label' => $label,
         'input' => ['command' => $command],
@@ -425,6 +433,48 @@ function resolveJwtKeyPath(string $envName, string $defaultFileName): string
     }
 
     return str_replace('%kernel.project_dir%/', THELIA_ROOT, $path);
+}
+
+/**
+ * Whether one of the selected themes, or the project itself, ships a Sass entry file.
+ *
+ * A theme built on Sass registers its own entry file with symfonycasts/sass-bundle,
+ * but only while it is the active one: on any run where another theme is selected,
+ * the bundle falls back to its default entry and the build fails on a file that does
+ * not exist. Partials (a leading underscore) are compile-time inputs, never entries.
+ *
+ * @param array<string, string> $selectedThemes
+ */
+function hasSassSourcesToBuild(array $selectedThemes): bool
+{
+    $searchDirectories = [THELIA_ROOT.'assets'];
+
+    foreach ($selectedThemes as $type => $name) {
+        $name = trim($name);
+
+        if ('' !== $name) {
+            $searchDirectories[] = THELIA_TEMPLATE_DIR.$type.DS.$name.DS.'assets';
+        }
+    }
+
+    foreach ($searchDirectories as $directory) {
+        if (!is_dir($directory)) {
+            continue;
+        }
+
+        $finder = (new Symfony\Component\Finder\Finder())
+            ->files()
+            ->in($directory)
+            ->exclude(['vendor', 'node_modules'])
+            ->name('*.scss')
+            ->notName('_*');
+
+        if ($finder->hasResults()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
