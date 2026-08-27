@@ -224,6 +224,17 @@ readonly class ApiResourcePropelTransformerService
     /**
      * @throws \ReflectionException
      */
+    /**
+     * The Propel getter a resource property reads its value from. A property
+     * may rename it, either as a column or as a relation alias.
+     */
+    public function resolvePropelGetterName(\ReflectionProperty $property): string
+    {
+        $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', 'get'.ucfirst($property->getName()));
+
+        return $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
+    }
+
     public function getColumnValues(\ReflectionClass $reflector, array $columns): array
     {
         $columnValues = [];
@@ -546,9 +557,7 @@ readonly class ApiResourcePropelTransformerService
             if (!$this->shouldHydrateRelation(property: $property, reflector: $reflector, context: $context)) {
                 continue;
             }
-            $defaultGetter = 'get'.ucfirst($property->getName());
-            $propelGetter = $this->determinePropelGetterName($property, Column::class, 'propelFieldName', $defaultGetter);
-            $propelGetter = $this->determinePropelGetterName($property, Relation::class, 'relationAlias', $propelGetter);
+            $propelGetter = $this->resolvePropelGetterName($property);
 
             if (!method_exists($propelModel, $propelGetter)) {
                 continue;
@@ -837,7 +846,12 @@ readonly class ApiResourcePropelTransformerService
      * Properties that are not relations are left alone: they cost nothing to read
      * and some of them are set for reasons the groups do not describe.
      */
-    private function shouldHydrateRelation(\ReflectionProperty $property, \ReflectionClass $reflector, array $context): bool
+    /**
+     * Whether the current context reads a relation at all. Public because the
+     * preloader has to select exactly the relations this transformer will walk:
+     * reading one it then skips would put back the queries #3812 removed.
+     */
+    public function shouldHydrateRelation(\ReflectionProperty $property, \ReflectionClass $reflector, array $context): bool
     {
         $relationAttribute = $property->getAttributes(Relation::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
 
