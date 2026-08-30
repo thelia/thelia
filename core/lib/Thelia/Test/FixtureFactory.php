@@ -24,6 +24,7 @@ use Thelia\Model\AttributeAv;
 use Thelia\Model\Brand;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
+use Thelia\Model\CartItem;
 use Thelia\Model\Category;
 use Thelia\Model\Content;
 use Thelia\Model\Country;
@@ -573,6 +574,32 @@ final class FixtureFactory
         $cart->save($this->connection);
 
         return $cart;
+    }
+
+    /**
+     * Creates a CartItem in the given cart. The product's default
+     * ProductSaleElements is used unless another one is passed.
+     */
+    public function cartItem(
+        Cart $cart,
+        Product $product,
+        ?ProductSaleElements $productSaleElements = null,
+        array $overrides = [],
+    ): CartItem {
+        $productSaleElements ??= $product->getProductSaleElementss()->getFirst()
+            ?? throw new \RuntimeException('The product has no ProductSaleElements to build a CartItem from.');
+
+        $cartItem = new CartItem();
+        $cartItem->setCartId($cart->getId());
+        $cartItem->setProductId($product->getId());
+        $cartItem->setProductSaleElementsId($productSaleElements->getId());
+        $cartItem->setQuantity($overrides['quantity'] ?? 1.0);
+        $cartItem->setPrice($overrides['price'] ?? '10.000000');
+        $cartItem->setPromoPrice($overrides['promoPrice'] ?? '10.000000');
+        $cartItem->setPromo($overrides['promo'] ?? 0);
+        $cartItem->save($this->connection);
+
+        return $cartItem;
     }
 
     /**

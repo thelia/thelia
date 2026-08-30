@@ -25,6 +25,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Security\CartItemVoter;
 use Thelia\Model\Map\CartItemTableMap;
 
 #[ApiResource(
@@ -52,6 +53,10 @@ use Thelia\Model\Map\CartItemTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
+// The front operations are anonymous by design — a visitor builds a cart
+// before signing in — so the caller's own cart is the only boundary there is.
+// CartItemOwnershipExtension keeps foreign rows out of every query, and
+// CartItemVoter answers on the row that did come back.
 #[ApiResource(
     operations: [
         new Post(
@@ -63,12 +68,15 @@ use Thelia\Model\Map\CartItemTableMap;
         new Get(
             uriTemplate: '/front/cart_items/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'is_granted("'.CartItemVoter::OWNER.'", object)',
         ),
         new Put(
             uriTemplate: '/front/cart_items/{id}',
+            security: 'is_granted("'.CartItemVoter::OWNER.'", object)',
         ),
         new Delete(
             uriTemplate: '/front/cart_items/{id}',
+            security: 'is_granted("'.CartItemVoter::OWNER.'", object)',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
