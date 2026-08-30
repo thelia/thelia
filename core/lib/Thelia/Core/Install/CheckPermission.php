@@ -46,9 +46,14 @@ class CheckPermission extends BaseInstall
         'upload_max_filesize' => 2097152,
     ];
 
-    protected $phpExpectedVerions = [
-        'min' => '8.2',
-        'max' => '8.3',
+    /**
+     * Supported PHP range: minimum inclusive, maximum exclusive.
+     * Thelia 3 runs on any PHP 8.3+ up to (but not including) the next major.
+     * The next major (9.0) must be validated by a Thelia release before it is allowed.
+     */
+    protected array $phpExpectedVersions = [
+        'min' => '8.3',
+        'max' => '9.0',
     ];
     protected $extensions = [
         'curl',
@@ -122,9 +127,7 @@ class CheckPermission extends BaseInstall
      */
     public function exec(): bool
     {
-        $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, '.'));
-
-        if (!version_compare($currentVersion, $this->phpExpectedVerions['min'], '>=') && version_compare($currentVersion, $this->phpExpectedVerions['max'], '<=')) {
+        if (!$this->isPhpVersionSupported(\PHP_VERSION)) {
             $this->isValid = false;
             $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(\PHP_VERSION, false);
             $this->validationMessages['php_version']['status'] = false;
@@ -163,6 +166,18 @@ class CheckPermission extends BaseInstall
         }
 
         return $this->isValid;
+    }
+
+    /**
+     * Tell whether the given PHP version falls in the supported range
+     * (minimum inclusive, maximum exclusive). Expects a full "x.y.z" version.
+     */
+    public function isPhpVersionSupported(string $phpVersion): bool
+    {
+        $version = substr($phpVersion, 0, (int) strrpos($phpVersion, '.'));
+
+        return version_compare($version, $this->phpExpectedVersions['min'], '>=')
+            && version_compare($version, $this->phpExpectedVersions['max'], '<');
     }
 
     /**
@@ -215,7 +230,7 @@ class CheckPermission extends BaseInstall
     protected function getI18nConfigText(string $key, string $expectedValue, string $currentValue, bool $isValid): string
     {
         $sentence = $isValid ? 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).'
-            : 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
+            : 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia (%expectedValue% required).';
 
         return $this->formatString(
             $sentence,
@@ -245,14 +260,14 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionText(string $currentValue, bool $isValid): string
     {
-        $sentence = $isValid ? 'PHP version %currentValue% matches the version required (>= %minExpectedValue% <= %maxExpectedValue%).'
-            : 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
+        $sentence = $isValid ? 'PHP version %currentValue% matches the version required (>= %minExpectedValue% and < %maxExpectedValue%).'
+            : 'The installer detected PHP version %currentValue%, but Thelia 3 requires PHP >= %minExpectedValue% and < %maxExpectedValue%.';
 
         return $this->formatString(
             $sentence,
             [
-                '%minExpectedValue%' => $this->phpExpectedVerions['min'],
-                '%maxExpectedValue%' => $this->phpExpectedVerions['max'],
+                '%minExpectedValue%' => $this->phpExpectedVersions['min'],
+                '%maxExpectedValue%' => $this->phpExpectedVersions['max'],
                 '%currentValue%' => $currentValue,
             ],
         );
@@ -263,7 +278,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionHint(): string
     {
-        return $this->formatString('You should change the installed PHP version to continue Thelia 2 installation.', []);
+        return $this->formatString('You should change the installed PHP version to continue Thelia 3 installation.', []);
     }
 
     /**
