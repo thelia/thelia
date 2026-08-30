@@ -1,5 +1,7 @@
 {
     "name": "thelia/config",
+    "description": "Application configuration installed by the Thelia installer.",
+    "license": "GPL-3.0-or-later",
     "type": "thelia-local",
     "require": {
         "thelia/installer": "~1.1"
