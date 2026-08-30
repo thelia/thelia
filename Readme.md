@@ -76,7 +76,7 @@ Thelia 3 installs the Twig back office (`default-twig`) by default. The Smarty b
 ddev exec bin/console template:set backOffice default-twig   # or: default
 ```
 
-If you maintain a module, the migration guide is in `BREAKING_CHANGES.md` inside the default-twig template.
+If you maintain a module, the migration guide is at <https://doc.thelia.net/docs/upgrading/migrate>.
 
 ## Tests and quality
 
