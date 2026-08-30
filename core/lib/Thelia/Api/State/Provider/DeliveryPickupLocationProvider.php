@@ -17,9 +17,9 @@ namespace Thelia\Api\State\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Delivery\PickupLocationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 
@@ -27,7 +27,7 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private Request $request,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -69,6 +69,8 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
 
     private function requestParam(string $key): mixed
     {
-        return $this->request->query->get($key) ?? $this->request->request->get($key);
+        $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
+
+        return $request?->query->get($key) ?? $request?->request->get($key);
     }
 }
