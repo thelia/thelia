@@ -28,7 +28,7 @@
         }
     ],
     "require": {
-        "php": ">= 8.3",
+        "php": ">=8.3 <9.0",
         "thelia/core": "^3.0.0-beta1",
         "thelia/backoffice-default-template": "^1.0.0-beta1",
         "thelia/backoffice-default-twig-template": "^1.0",
