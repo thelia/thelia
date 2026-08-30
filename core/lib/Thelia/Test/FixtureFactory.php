@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
 use Thelia\Model\Address;
 use Thelia\Model\Admin;
@@ -46,6 +47,9 @@ use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Profile;
+use Thelia\Model\ProfileResource;
+use Thelia\Model\Resource;
+use Thelia\Model\ResourceQuery;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
@@ -243,9 +247,58 @@ final class FixtureFactory
         $admin->setPassword($overrides['password'] ?? 'password');
         $admin->setLocale($overrides['locale'] ?? 'en_US');
         $admin->setEmail($overrides['email'] ?? 'admin-'.$n.'@test.com');
+
+        if (isset($overrides['profile'])) {
+            $admin->setProfileId($overrides['profile']->getId());
+        }
+
         $admin->save($this->connection);
 
         return $admin;
+    }
+
+    /**
+     * Creates an administrator whose profile grants exactly the accesses given,
+     * as [AdminResources code => list of AccessManager constants]. Unlike an
+     * admin() with no profile, which is a superadministrator, such an
+     * administrator is subject to the per-resource permission checks.
+     *
+     * @param array<string, list<string>> $grants
+     */
+    public function restrictedAdmin(array $grants, array $overrides = []): Admin
+    {
+        $profile = $this->profile();
+
+        foreach ($grants as $resourceCode => $accesses) {
+            $this->profileResource($profile, $resourceCode, $accesses);
+        }
+
+        return $this->admin($overrides + ['profile' => $profile]);
+    }
+
+    /**
+     * @param list<string> $accesses
+     */
+    public function profileResource(Profile $profile, string $resourceCode, array $accesses = [AccessManager::VIEW]): ProfileResource
+    {
+        $resource = ResourceQuery::create()->findOneByCode($resourceCode, $this->connection);
+
+        if (!$resource instanceof Resource) {
+            $resource = new Resource();
+            $resource->setCode($resourceCode);
+            $resource->save($this->connection);
+        }
+
+        $accessManager = new AccessManager(0);
+        $accessManager->build($accesses);
+
+        $profileResource = new ProfileResource();
+        $profileResource->setProfileId($profile->getId());
+        $profileResource->setResourceId($resource->getId());
+        $profileResource->setAccess($accessManager->getAccessValue());
+        $profileResource->save($this->connection);
+
+        return $profileResource;
     }
 
     public function address(
