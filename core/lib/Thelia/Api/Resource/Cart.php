@@ -96,8 +96,11 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     public ?string $token = null;
 
+    // Not writable from the front: POST /front/carts is anonymous, so a body
+    // that names its owner would let anyone file a cart under any account.
+    // The cart is bound to its customer server-side, at login.
     #[Relation(targetResource: Customer::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?Customer $customer = null;
 
     #[Relation(targetResource: CartAddress::class, relationAlias: 'CartAddressRelatedByAddressDeliveryId')]
@@ -116,7 +119,9 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?array $cartItems = [];
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    // Not writable from the front either: the discount is subtracted from the
+    // cart total, and it is derived from the customer's own rate.
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?float $discount = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
