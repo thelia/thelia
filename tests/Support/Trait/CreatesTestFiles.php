@@ -33,7 +33,6 @@ trait CreatesTestFiles
         $tmpFile = tempnam(sys_get_temp_dir(), $prefix);
         $img = imagecreatetruecolor(1, 1);
         imagepng($img, $tmpFile);
-        imagedestroy($img);
 
         return $tmpFile;
     }

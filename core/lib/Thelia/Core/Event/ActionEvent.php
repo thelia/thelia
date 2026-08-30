@@ -65,7 +65,6 @@ abstract class ActionEvent extends Event
     {
         $reflection = new \ReflectionClass(Event::class);
         $property = $reflection->getProperty('propagationStopped');
-        $property->setAccessible(true);
         $property->setValue($this, false);
     }
 
