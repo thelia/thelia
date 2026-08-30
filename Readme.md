@@ -12,7 +12,7 @@ To create a shop, use the project skeleton instead: [thelia/thelia-project](http
 
 Thelia is an open source framework for building online stores and managing web content. Version 3 runs on:
 
-- PHP 8.3
+- PHP 8.3, 8.4 or 8.5
 - Symfony 7.4 LTS
 - API Platform 4.3 (standalone)
 - Propel ORM
@@ -25,10 +25,15 @@ Thelia is open source software. See the [LICENSE](LICENSE) file for details.
 
 ## Requirements
 
-- PHP 8.3 with these extensions: pdo_mysql, openssl, intl, gd, curl, dom, mbstring, zip
-- MariaDB 10.11 or MySQL 8
-- Composer 2.7+
-- Nginx or Apache, with the document root set to `public/`
+| Requirement | Supported |
+| --- | --- |
+| PHP | 8.3, 8.4 or 8.5 (8.3 recommended) |
+| Database | MariaDB 10.11 or later (recommended), or MySQL 8.x |
+| PHP extensions | pdo_mysql, openssl, intl, gd, curl, dom, mbstring, zip |
+| Composer | 2.7 or later |
+| Web server | Nginx or Apache, document root set to `public/` |
+
+How long each release series receives security fixes is listed in [SECURITY.md](SECURITY.md).
 
 ## Setting up a development environment
 
