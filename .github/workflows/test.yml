@@ -41,16 +41,6 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer update --no-interaction --prefer-dist
 
-      - name: Lint the YAML config and the Twig themes
-        # The kernel boots without a database here (Propel-backed sections degrade
-        # gracefully), so these run before the database is prepared. The back-office
-        # default-twig theme is left out on purpose: its `safe_hook` Twig function is
-        # unknown to the bare console environment, so a plain lint reports false
-        # errors on it; that theme is covered by the phpstan-botwig job instead.
-        run: |
-          php bin/console lint:yaml config/
-          php bin/console lint:twig templates/frontOffice templates/email templates/pdf core/lib/Thelia/Resources/views
-
       - name: Prepare the test database credentials
         # bin/test-prepare (run by `composer test`) reads these to create the test
         # database, build the Propel models and generate the JWT keys.
@@ -67,6 +57,18 @@ jobs:
         run: |
           php bin/test-prepare
           php bin/console importmap:install --env=test
+
+      - name: Lint the YAML config and the Twig themes
+        # Runs in the test environment: booting the kernel needs the generated Propel
+        # model classes, which bin/test-prepare builds (rerun here, it is idempotent,
+        # in case the best-effort step above did not reach it). The back-office
+        # default-twig theme is left out on purpose: its `safe_hook` Twig function is
+        # unknown to the bare console environment, so a plain lint reports false errors
+        # on it; that theme is covered by the phpstan-botwig job instead.
+        run: |
+          php bin/test-prepare
+          php bin/console lint:yaml config/ --env=test
+          php bin/console lint:twig templates/frontOffice templates/email templates/pdf core/lib/Thelia/Resources/views --env=test
 
       - name: Run CI (cs-diff, phpstan, the five PHPUnit suites)
         run: composer ci
