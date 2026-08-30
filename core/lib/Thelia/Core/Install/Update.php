@@ -42,6 +42,13 @@ class Update
     public const PHP_DIR = 'update/php/';
     public const INSTRUCTION_DIR = 'update/instruction/';
 
+    /**
+     * The oldest database version an in-place update can start from. Thelia 3
+     * ships no update script between 2.5.5 and 3.0.0-alpha1, so any database
+     * below this belongs to Thelia 2 and needs the guided migration instead.
+     */
+    public const MIN_UPDATABLE_VERSION = '3.0.0-alpha1';
+
     protected array $version;
     protected ?Tlog $logger;
 
@@ -145,6 +152,16 @@ class Update
     }
 
     /**
+     * Whether an in-place update can start from this database version. Thelia 3
+     * only continues an update already on the 3.x line: any version below
+     * 3.0.0-alpha1 belongs to Thelia 2 and needs the guided migration instead.
+     */
+    public static function isVersionUpdatable(string $currentVersion): bool
+    {
+        return version_compare($currentVersion, self::MIN_UPDATABLE_VERSION, '>=');
+    }
+
+    /**
      * Find the position of the current version in the update script list.
      *
      * Some releases ship without an update script, so the current version is not always part of
@@ -187,6 +204,16 @@ class Update
             $this->log('debug', 'You already have the latest version. No update available');
 
             throw new UpToDateException('You already have the latest version. No update available');
+        }
+
+        // A Thelia 3 codebase only continues an update already on the 3.x line.
+        // Its update scripts jump straight from 2.5.5 to 3.0.0-alpha1, so a Thelia
+        // 2.6 database would be mistaken for 2.5.5 and have the 3.0 migrations
+        // replayed over a schema they were never written for. Refuse before writing
+        // anything: moving from Thelia 2 is a guided migration, not an in-place
+        // update (see UPDATE.md).
+        if (!self::isVersionUpdatable((string) $currentVersion)) {
+            throw new UpdateException(\sprintf('This database is on Thelia %s. Thelia 3 cannot update a Thelia 2 database in place; follow the migration guide at https://doc.thelia.net/docs/upgrading/migrate before updating.', $currentVersion));
         }
 
         $index = $this->getStartIndex((string) $currentVersion);
