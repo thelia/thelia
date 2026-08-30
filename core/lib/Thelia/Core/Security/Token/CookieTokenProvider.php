@@ -27,17 +27,36 @@ class CookieTokenProvider
         }
     }
 
-    public function createCookie(UserInterface $user, $cookieName, $cookieExpires): void
+    public function createCookie(UserInterface $user, $cookieName, $cookieExpires, ?bool $secure = null): void
     {
         $tokenProvider = new TokenProvider();
 
         $key = $tokenProvider->encodeKey($user);
 
-        setcookie($cookieName, $key, ['expires' => time() + $cookieExpires, 'path' => '/']);
+        setcookie($cookieName, $key, $this->buildCookieOptions(time() + $cookieExpires, $secure));
     }
 
-    public function clearCookie($cookieName): void
+    public function clearCookie($cookieName, ?bool $secure = null): void
     {
-        setcookie($cookieName, '', ['expires' => time() - 3600, 'path' => '/']);
+        setcookie($cookieName, '', $this->buildCookieOptions(time() - 3600, $secure));
+    }
+
+    /**
+     * Build the options for the remember-me cookie. It holds a long-lived
+     * authentication token, so it is hardened against theft: httponly keeps it
+     * out of reach of JavaScript (XSS), samesite mitigates CSRF, and secure
+     * keeps it off cleartext HTTP. When the caller does not tell us whether the
+     * connection is secure, it is deduced from the current request so a plain
+     * HTTP local setup does not silently drop the cookie.
+     */
+    protected function buildCookieOptions(int $expires, ?bool $secure): array
+    {
+        return [
+            'expires' => $expires,
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax',
+            'secure' => $secure ?? Request::createFromGlobals()->isSecure(),
+        ];
     }
 }
