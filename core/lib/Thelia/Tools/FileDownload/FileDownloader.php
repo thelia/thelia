@@ -67,8 +67,6 @@ class FileDownloader implements FileDownloaderInterface
 
         $httpCode = curl_getinfo($con, \CURLINFO_HTTP_CODE);
 
-        curl_close($con);
-
         if (false === $response || 0 !== $errno
             || ('200' !== $httpCode && '204' !== $httpCode)
         ) {
