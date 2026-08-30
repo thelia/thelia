@@ -16,13 +16,13 @@ namespace Thelia\Domain\Module\Payment;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\PaymentModuleOptionEvent;
 use Thelia\Api\Resource\ModuleI18n;
 use Thelia\Api\Resource\PaymentModule;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Cart;
 use Thelia\Model\Lang;
 use Thelia\Model\Module;
@@ -32,7 +32,7 @@ use Thelia\Module\BaseModule;
 readonly class PaymentModuleService
 {
     public function __construct(
-        private Request $request,
+        private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
         private ContainerInterface $container,
     ) {
@@ -40,7 +40,10 @@ readonly class PaymentModuleService
 
     public function getPaymentModules($moduleId = null): array
     {
-        $request = $this->request;
+        $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
+        if (null === $request) {
+            return [];
+        }
         $dispatcher = $this->dispatcher;
         $cart = $request->getSession()->getSessionCart($dispatcher);
         $lang = $request->getSession()->getLang();

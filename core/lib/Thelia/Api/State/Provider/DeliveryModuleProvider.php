@@ -17,6 +17,7 @@ namespace Thelia\Api\State\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -31,7 +32,7 @@ use Thelia\Model\StateQuery;
 readonly class DeliveryModuleProvider implements ProviderInterface
 {
     public function __construct(
-        private Request $request,
+        private RequestStack $requestStack,
         private Session $session,
         private SecurityContext $securityContext,
         private AddressService $addressService,
@@ -56,7 +57,10 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             return [];
         }
 
-        $deliveryAddress = $this->addressService->getDeliveryAddress($this->request, $this->securityContext);
+        $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
+        $deliveryAddress = $request instanceof Request
+            ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
+            : null;
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
             : CountryQuery::create()->filterByByDefault(1)->findOne();
