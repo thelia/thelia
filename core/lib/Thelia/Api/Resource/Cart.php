@@ -25,6 +25,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Controller\Front\CartController;
+use Thelia\Api\State\Processor\CartCreationProcessor;
 use Thelia\Model\Map\CartTableMap;
 
 #[ApiResource(
@@ -56,6 +57,7 @@ use Thelia\Model\Map\CartTableMap;
     operations: [
         new Post(
             uriTemplate: '/front/carts',
+            processor: CartCreationProcessor::class,
         ),
         new Get(
             uriTemplate: '/front/carts/{id}',
@@ -93,7 +95,10 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, CartItem::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    // Not writable from the front: the token is a bearer secret used to restore
+    // an anonymous cart from its cookie. Letting the body choose it opens cart
+    // fixation, so it is always generated server-side (Cart::preInsert).
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?string $token = null;
 
     // Not writable from the front: POST /front/carts is anonymous, so a body

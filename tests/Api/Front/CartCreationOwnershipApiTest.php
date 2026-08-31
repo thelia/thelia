@@ -64,4 +64,22 @@ final class CartCreationOwnershipApiTest extends ApiTestCase
             'The body must not be able to set the cart discount.',
         );
     }
+
+    public function testTheCartTokenIsServerGeneratedNotChosenByTheBody(): void
+    {
+        $chosen = 'attacker-chosen-token-value';
+
+        $response = $this->jsonRequest('POST', '/api/front/carts', ['token' => $chosen]);
+        self::assertContains($response->getStatusCode(), [200, 201]);
+
+        $data = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        $token = CartQuery::create()
+            ->findPk((int) $data['id'], $this->getPropelConnection())
+            ?->getToken();
+
+        // The token is a bearer secret restored from a cookie: the body must not
+        // be able to fix it, and the server must always assign an unguessable one.
+        self::assertNotEmpty($token, 'A created cart must carry a server-generated token.');
+        self::assertNotSame($chosen, $token, 'The body must not be able to choose the cart token.');
+    }
 }
