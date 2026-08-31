@@ -43,6 +43,5 @@ return static function (ContainerConfigurator $container): void {
             '/api/front/countries',
             '/api/front/currencies',
             '/api/front/taxes',
-            '/api/front/modules',
         ]);
 };

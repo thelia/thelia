@@ -51,18 +51,6 @@ use Thelia\Model\Map\ModuleTableMap;
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
     denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
 )]
-#[ApiResource(
-    operations: [
-        new GetCollection(
-            uriTemplate: '/front/modules',
-        ),
-        new Get(
-            uriTemplate: '/front/modules/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-        ),
-    ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
-)]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
