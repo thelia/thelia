@@ -1,3 +1,68 @@
+# 3.0.0
+
+First stable release of Thelia 3. 56 commits since 3.0.0-beta5. The version number follows the update script this release ships, `setup/update/sql/3.0.0.sql`, which carries the lost password mail wording, the canonical mail template configuration row, and deactivates the module the default install no longer ships.
+
+## Security
+
+Two coordinated advisories are fixed and published with this release. Shops running a beta should update without waiting.
+
+- GHSA-v6v7-757c-2w5g — the front cart items API answered for any cart item id, whoever asked. Cart items are now scoped to the cart their caller owns, whether the caller is a logged-in customer or an anonymous session, and creating a cart no longer accepts a foreign owner.
+- GHSA-p2h2-2622-q773 — any authenticated back-office account reached every admin API resource. The admin API now enforces the per-resource permissions the back-office profiles define.
+- Coupons are no longer readable anonymously: `/api/front/coupons` requires an authenticated customer, so restricted coupon codes stay restricted.
+- The front API no longer lists the installed modules and their exact versions; `/api/front/modules` is gone, the admin endpoint is unchanged.
+- The cart token is assigned server-side. The body of `POST /api/front/carts` cannot choose it any more, which closes cart fixation; a headless client reads the token in the response instead of picking one.
+- The lost password mail sends a signed, single-use reset link. The shop never generates, stores or mails a new password on someone else's request, and the form no longer discloses whether an address has an account. #3840
+- The remember-me cookie carries `HttpOnly`, `Secure` and `SameSite`.
+
+## Breaking changes
+
+- The write group of the front cart API no longer contains the cart owner, its discount, or its token: those are set by the server. A front-office client that sent them must stop; readers are unaffected.
+- `/api/front/coupons` answers 401 for anonymous callers, and `/api/front/modules` no longer exists.
+- The constructor of `Thelia\Action\Customer` changed with the password reset rework. #3840
+- A shop configuration value has the last word over the core defaults again. A project that overrode `title`, `version` or `stateless` in its own `config/packages/api_platform.yaml` to compensate should remove those keys. #3860
+- Updating a Thelia 2 database in place is refused with an explicit message instead of silently replaying the 2.5 scripts; migrating from Thelia 2 is a separate, documented path. `UPDATE.md` now describes Thelia 3 in-place updates.
+- The `VirtualProductControl` module left the default install: it only ever shipped a Thelia 2 Smarty back-office hook. The update script deactivates it; the module row comes back if it is ever reinstalled on purpose.
+
+## Front office
+
+- The contact form linked in the footer submits: the core handles `POST /contact`, mails the store with the visitor address as reply-to, and answers on the page. #3838
+- A visitor who checks several sub-categories, several brands or several values of one feature widens the list instead of emptying it. #3867, #3829, #3828, #3830
+- The tfilters facets are counted from the products the visible filter keeps, and each feature and attribute facet reads in its own mode. #3830
+- Front sale elements are priced in the currency being browsed, not the shop default. #3835
+- Thelia forms can opt into stateless CSRF tokens, so a cached product page no longer rejects the first add-to-cart of a fresh visitor. Session tokens stay the default. #3825
+- A payment return reaches the checkout routes Thelia 3 declares instead of Thelia 2 route names. #3836
+- A parser rendering outside HTTP (mail from a command, PDF from a cron) reports no request instead of crashing. #3827
+
+## Performance
+
+- The API bridge stops paying for data the serializer discards, memoizes and batches the rewritten url lookups, and reads the config table, the default country and the active languages once per request; to-many relations of a collection load in one query each. The demo home went from about 1400 SQL queries to about 150. #3812, #3813, #3814, #3823, #3839, #3844
+- The resource addons aggregate in front of the serializer metadata cache, so `cache:warmup` no longer strips them from API responses. #3834
+
+## API
+
+- A write answers with the translation it saved, not the one it replaced. #3831
+- Thelia forms build from the injected form factory builder, so form extensions registered through `thelia.forms.extension` apply again. #3832
+- The api documentation page wears the Thelia colours, title and version. #3853
+
+## Back office
+
+- Submitting the admin login while a session is already open redirects to the requested page instead of erroring. #3822
+
+## Install and update
+
+- Environment overrides stay out of the shared config cache, and the first install run wires the themes it was given. #3859, #3852
+- The email template configuration lives under the single name every shop reads; the update script carries a value stored by a beta over. #3858
+- The install skips the Sass build when no active theme ships Sass sources. #3842
+- An order export totals an order once, whatever its number of tax and coupon rows, and totals the exported orders the way they were invoiced. #3848, #3843
+- The `nl_NL` language Thelia 2 shipped is seeded again, eight languages in all. #3851
+- PHP is required as `>= 8.3 < 9.0` everywhere the bound is checked, and the test suite runs on PHP 8.3, 8.4 and 8.5.
+
+## Project
+
+- `SECURITY.md` is a coordinated vulnerability disclosure policy with an incident response process, and every release ships a CycloneDX SBOM.
+- The yaml config and the twig themes are linted on every CI run, after the propel models are built.
+- The `thelia/config` and `thelia/setup` packages declare a description and a license, so `composer validate` passes on both.
+
 # 3.0.0-beta5
 
 8 commits since 3.0.0-beta4. The version number follows the update script this release ships, `setup/update/sql/3.0.0-beta5.sql`, which adds the legal identifier columns to the address, cart address and order address tables.
