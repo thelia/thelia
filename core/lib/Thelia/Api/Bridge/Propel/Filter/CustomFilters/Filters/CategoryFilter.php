@@ -27,6 +27,7 @@ use Thelia\Model\ProductCategoryQuery;
 class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
     use LocalizedTitleTrait;
+    use SelectedValuesTrait;
 
     public const CATEGORY_DEPTH_NAME = 'category_depth';
 
@@ -36,25 +37,24 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
 
     public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
     {
-        foreach ($value as $id => $childValue) {
-            foreach ($childValue as $type => $categoryId) {
-                if (!\is_array($categoryId)) {
-                    $categoryId = [$categoryId];
+        $categoryIds = $this->flattenSelectedValues($value);
+
+        if ($categoryIds === []) {
+            return;
+        }
+
+        if ($categoryDepth) {
+            foreach ($this->filterService->getCategoriesRecursively($categoryIds, $categoryDepth) as $categories) {
+                foreach ($categories as $category) {
+                    $categoryIds[] = $category->getId();
                 }
-
-                if ($categoryDepth) {
-                    $categories = $this->filterService->getCategoriesRecursively($categoryId, $categoryDepth);
-
-                    foreach ($categories as $categoryList) {
-                        foreach ($categoryList as $category) {
-                            $categoryId[] = $category->getId();
-                        }
-                    }
-                }
-
-                $query->useProductCategoryQuery()->filterByCategoryId($categoryId)->endUse();
             }
         }
+
+        // A product is filed in a category, so two checked sub-categories can only be asked for
+        // as one IN: one condition per category would AND them on the same join, and a shopper
+        // checking a second aisle would get an empty list instead of more products.
+        $query->useProductCategoryQuery()->filterByCategoryId(array_unique($categoryIds), Criteria::IN)->endUse();
     }
 
     public function getResourceType(): array
