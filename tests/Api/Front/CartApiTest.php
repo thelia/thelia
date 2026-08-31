@@ -160,9 +160,9 @@ final class CartApiTest extends ApiTestCase
         self::assertArrayHasKey('hydra:member', $data);
     }
 
-    public function testCouponsCollectionReturns200(): void
+    public function testCouponsCollectionReturns200ForAnAuthenticatedCustomer(): void
     {
-        $response = $this->jsonRequest('GET', '/api/front/coupons');
+        $response = $this->jsonRequest('GET', '/api/front/coupons', token: $this->authenticateAsCustomer());
 
         self::assertJsonResponseSuccessful($response);
         $data = json_decode($response->getContent(), true);

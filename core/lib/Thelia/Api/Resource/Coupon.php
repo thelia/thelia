@@ -34,14 +34,17 @@ use Thelia\Model\Map\CouponTableMap;
     operations: [
         new GetCollection(
             uriTemplate: '/front/coupons',
+            security: 'is_granted("ROLE_CUSTOMER")',
         ),
         new Get(
             uriTemplate: '/front/coupons/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'is_granted("ROLE_CUSTOMER")',
         ),
         new Get(
             uriTemplate: '/front/coupons/{code}/by-code',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'is_granted("ROLE_CUSTOMER")',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
