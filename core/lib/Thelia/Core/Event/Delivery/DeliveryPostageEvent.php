@@ -34,8 +34,8 @@ class DeliveryPostageEvent extends ActionEvent
 {
     protected bool $validModule = false;
     protected ?OrderPostage $postage = null;
-    protected ?\DateTime $deliveryDate;
-    protected ?DeliveryMode $deliveryMode;
+    protected ?\DateTime $deliveryDate = null;
+    protected ?DeliveryMode $deliveryMode = null;
     protected array $additionalData = [];
 
     public function __construct(
