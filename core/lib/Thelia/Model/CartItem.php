@@ -124,6 +124,10 @@ class CartItem extends BaseCartItem
      */
     public function addQuantity($value)
     {
+        if ($value <= 0) {
+            return $this;
+        }
+
         $currentQuantity = $this->getQuantity();
         $newQuantity = $currentQuantity + $value;
 

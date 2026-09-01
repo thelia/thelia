@@ -72,6 +72,42 @@ final class CartActionTest extends ActionIntegrationTestCase
         self::assertSame(1, CartItemQuery::create()->filterByCartId($cart->getId())->count());
     }
 
+    public function testAddItemTakesTheProductFromTheSaleElement(): void
+    {
+        $cart = $this->newEmptyCart();
+        $category = $this->factory->category();
+        $taxRule = $this->factory->taxRule();
+        $currency = $this->factory->currency();
+        $product = $this->factory->product($category, $taxRule, $currency, ['baseQuantity' => 100]);
+        $otherProduct = $this->factory->product($category, $taxRule, $currency, ['baseQuantity' => 100]);
+
+        // The request names another product than the one the sale element belongs to.
+        $event = $this->dispatchAddItem($cart, $otherProduct->getId(), $this->defaultPseFor($product->getId())->getId(), 1);
+
+        self::assertSame($product->getId(), $event->getCartItem()->getProductId());
+    }
+
+    public function testAddItemRefusesANonPositiveQuantity(): void
+    {
+        $cart = $this->newEmptyCart();
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['baseQuantity' => 100],
+        );
+        $pse = $this->defaultPseFor($product->getId());
+        $this->dispatchAddItem($cart, $product->getId(), $pse->getId(), 2);
+
+        try {
+            $this->dispatchAddItem($cart, $product->getId(), $pse->getId(), -5);
+            self::fail('A negative quantity must be refused');
+        } catch (\InvalidArgumentException) {
+        }
+
+        self::assertSame(2.0, (float) CartItemQuery::create()->filterByCartId($cart->getId())->findOne()->getQuantity());
+    }
+
     public function testAddItemTwiceIncrementsExistingLine(): void
     {
         $cart = $this->newEmptyCart();

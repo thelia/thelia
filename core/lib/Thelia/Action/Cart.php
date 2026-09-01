@@ -241,8 +241,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $discount = (float) $customer->getDiscount();
         }
 
-        $productSaleElementsId = $event->getProductSaleElementsId();
-        $productId = $event->getProductId();
+        if (null === $quantity || $quantity <= 0) {
+            throw new \InvalidArgumentException('The quantity to add to the cart must be positive');
+        }
+
+        $productSaleElements = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementsId());
+
+        if (null === $productSaleElements) {
+            $event->setCartItem(null);
+
+            return;
+        }
+
+        // The line describes one sale element; the product it belongs to follows from it,
+        // whatever the request said, so the line, its price and its tax rule agree.
+        $productId = $productSaleElements->getProductId();
+        $event->setProductId($productId);
 
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
@@ -253,16 +267,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if ($cartItem instanceof CartItem && $append) {
             $cartItem->addQuantity($quantity)->save();
         } else {
-            $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
+            $productPrices = $productSaleElements->getPricesByCurrency(
+                $currency ?? CurrencyModel::getDefaultCurrency(),
+                $discount,
+            );
 
-            if (null !== $productSaleElements) {
-                $productPrices = $productSaleElements->getPricesByCurrency(
-                    $currency ?? CurrencyModel::getDefaultCurrency(),
-                    $discount,
-                );
-
-                $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
-            }
+            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
         }
 
         $event->setCartItem($cartItem);
