@@ -215,33 +215,34 @@ class Translation extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        if ($fp = @fopen($file, 'w')) {
-            fwrite($fp, '<'."?php\n\n");
-            fwrite($fp, "return array(\n");
+        $texts = $event->getTranslatableStrings();
+        $translations = $event->getTranslatedStrings();
 
-            $texts = $event->getTranslatableStrings();
-            $translations = $event->getTranslatedStrings();
+        // Sort keys alphabetically while keeping index
+        asort($texts);
 
-            // Sort keys alphabetically while keeping index
-            asort($texts);
+        $catalogue = [];
 
-            foreach ($texts as $key => $text) {
-                // Write only defined (not empty) translations
-                if (!empty($translations[$key])) {
-                    $text = str_replace("'", "\\'", $text);
-
-                    $translation = str_replace("'", "\\'", $translations[$key]);
-
-                    fwrite($fp, \sprintf("    '%s' => '%s',\n", $text, $translation));
-                }
+        foreach ($texts as $key => $text) {
+            // Write only defined (not empty) translations
+            if (!empty($translations[$key])) {
+                $catalogue[$text] = $translations[$key];
             }
+        }
 
-            fwrite($fp, ");\n");
-
-            @fclose($fp);
-        } else {
+        if (false === @file_put_contents($file, self::exportCatalogue($catalogue))) {
             throw new \RuntimeException(Translator::getInstance()->trans('Failed to open translation file %file. Please be sure that this file is writable by your Web server', ['%file' => $file]));
         }
+    }
+
+    /**
+     * The catalogue is written as PHP source and read back with require, so every key and
+     * value goes through var_export: it is the only quoting the PHP parser cannot be talked
+     * out of, whatever the text holds.
+     */
+    private static function exportCatalogue(array $catalogue): string
+    {
+        return '<'."?php\n\nreturn ".var_export($catalogue, true).";\n";
     }
 
     public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -272,58 +273,43 @@ class Translation extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        if ($fp = @fopen($file, 'w')) {
-            $texts = $event->getTranslatableStrings();
-            $customs = $event->getCustomFallbackStrings();
-            $globals = $event->getGlobalFallbackStrings();
+        $texts = $event->getTranslatableStrings();
+        $customs = $event->getCustomFallbackStrings();
+        $globals = $event->getGlobalFallbackStrings();
 
-            // just reset current translations for this domain to remove strings that do not exist anymore
-            $translations[$event->getDomain()] = [];
+        // just reset current translations for this domain to remove strings that do not exist anymore
+        $translations[$event->getDomain()] = [];
 
-            foreach ($texts as $key => $text) {
-                if (!empty($customs[$key])) {
-                    $translations[$event->getDomain()][$text] = $customs[$key];
-                }
-
-                if (!empty($globals[$key])) {
-                    $translations[$text] = $globals[$key];
-                } else {
-                    unset($translations[$text]);
-                }
+        foreach ($texts as $key => $text) {
+            if (!empty($customs[$key])) {
+                $translations[$event->getDomain()][$text] = $customs[$key];
             }
 
-            fwrite($fp, '<'."?php\n\n");
-            fwrite($fp, "return [\n");
+            if (!empty($globals[$key])) {
+                $translations[$text] = $globals[$key];
+            } else {
+                unset($translations[$text]);
+            }
+        }
 
-            // Sort keys alphabetically while keeping index
-            ksort($translations);
+        // Write only defined (not empty) translations, keys sorted alphabetically
+        $catalogue = [];
+        ksort($translations);
 
-            foreach ($translations as $key => $text) {
-                // Write only defined (not empty) translations
-                if (!empty($translations[$key])) {
-                    if (\is_array($translations[$key])) {
-                        $key = str_replace("'", "\\'", $key);
-                        fwrite($fp, \sprintf("    '%s' => [\n", $key));
-                        ksort($translations[$key]);
-
-                        foreach ($translations[$key] as $subKey => $subText) {
-                            $subKey = str_replace("'", "\\'", $subKey);
-                            $translation = str_replace("'", "\\'", $subText);
-                            fwrite($fp, \sprintf("        '%s' => '%s',\n", $subKey, $translation));
-                        }
-
-                        fwrite($fp, "    ],\n");
-                    } else {
-                        $key = str_replace("'", "\\'", $key);
-                        $translation = str_replace("'", "\\'", $text);
-                        fwrite($fp, \sprintf("    '%s' => '%s',\n", $key, $translation));
-                    }
-                }
+        foreach ($translations as $key => $text) {
+            if (empty($text)) {
+                continue;
             }
 
-            fwrite($fp, "];\n");
+            if (\is_array($text)) {
+                ksort($text);
+            }
 
-            @fclose($fp);
+            $catalogue[$key] = $text;
+        }
+
+        if (false === @file_put_contents($file, self::exportCatalogue($catalogue))) {
+            throw new \RuntimeException(Translator::getInstance()->trans('Failed to open translation file %file. Please be sure that this file is writable by your Web server', ['%file' => $file]));
         }
     }
 
