@@ -40,6 +40,21 @@ final class FrontCatalogApiTest extends ApiTestCase
         self::assertArrayHasKey('productSaleElements', $data);
     }
 
+    public function testFilteringOnATranslatedFieldAcceptsActiveLocalesOnly(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['title' => 'Locale probe']);
+
+        $response = $this->jsonRequest('GET', '/api/front/products?title=Locale+probe&locale=en_US');
+        self::assertJsonResponseSuccessful($response);
+
+        // The locale names a join alias: anything but an active locale is refused up front.
+        foreach (['zz_ZZ', "en_US'", 'en_US OR 1=1'] as $locale) {
+            $response = $this->jsonRequest('GET', '/api/front/products?title=Locale+probe&locale='.rawurlencode($locale));
+            self::assertSame(400, $response->getStatusCode(), \sprintf('locale "%s" should be refused', $locale));
+        }
+    }
+
     public function testGetCategoryByIdReturnsResource(): void
     {
         $factory = $this->createFixtureFactory();
