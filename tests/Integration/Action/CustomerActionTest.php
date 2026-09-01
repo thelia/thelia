@@ -17,15 +17,19 @@ namespace Thelia\Tests\Integration\Action;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\LogsInAsCustomer;
 
 final class CustomerActionTest extends IntegrationTestCase
 {
+    use LogsInAsCustomer;
+
     private EventDispatcherInterface $dispatcher;
     private FixtureFactory $factory;
 
@@ -190,5 +194,26 @@ final class CustomerActionTest extends IntegrationTestCase
             ->findOne();
 
         self::assertNull($result, 'Transaction rollback should have removed the customer from the previous test');
+    }
+
+    public function testLogoutRetiresTheRememberMeToken(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $customer->setRememberMeToken('issued-at-login')->save();
+        $this->loginAsCustomerInSession($customer);
+
+        $this->dispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::CUSTOMER_LOGOUT);
+
+        self::assertNull(CustomerQuery::create()->findPk($customer->getId())->getRememberMeToken());
+    }
+
+    public function testANewPasswordRetiresTheRememberMeToken(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $customer->setRememberMeToken('issued-under-the-old-password')->save();
+
+        $customer->setPassword('brand-new-password')->save();
+
+        self::assertNull(CustomerQuery::create()->findPk($customer->getId())->getRememberMeToken());
     }
 }

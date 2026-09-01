@@ -85,6 +85,18 @@ final class AdministratorActionTest extends ActionIntegrationTestCase
         self::assertNull($reloaded->getPasswordRenewToken());
     }
 
+    public function testUpdatePasswordRetiresTheRememberMeToken(): void
+    {
+        $admin = $this->factory->admin(['login' => 'admin-remember-me-test']);
+        $admin->setRememberMeToken('issued-under-the-old-password')->save();
+
+        $event = new AdministratorUpdatePasswordEvent($admin);
+        $event->setPassword('newPassword!');
+        $this->dispatch($event, TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD);
+
+        self::assertNull(AdminQuery::create()->findPk($admin->getId())->getRememberMeToken());
+    }
+
     public function testDeleteRemovesAdmin(): void
     {
         $admin = $this->factory->admin(['login' => 'admin-delete-test']);

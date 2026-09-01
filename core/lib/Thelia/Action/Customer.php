@@ -288,6 +288,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(/* @noinspection PhpUnusedParameterInspection */ ActionEvent $event): void
     {
+        // The remember-me cookie is checked against the token stored on the account: the
+        // account forgets it here, so a copy of the cookie kept elsewhere stops working.
+        $customer = $this->securityContext->getCustomerUser();
+
+        if ($customer instanceof CustomerModel) {
+            $customer->setRememberMeToken(null)->save();
+        }
+
         $this->securityContext->clearCustomerUser();
     }
 

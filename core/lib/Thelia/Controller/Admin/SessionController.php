@@ -225,6 +225,15 @@ class SessionController extends BaseAdminController
     {
         $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGOUT);
 
+        // The remember-me cookie is checked against the token stored on the account: the
+        // browser drops its copy below, the account forgets the token here, so a copy kept
+        // elsewhere stops working too.
+        $admin = $this->getSecurityContext()->getAdminUser();
+
+        if ($admin instanceof Admin) {
+            $admin->setRememberMeToken(null)->save();
+        }
+
         $this->getSecurityContext()->clearAdminUser();
 
         // Clear the remember me cookie, if any
