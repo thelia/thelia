@@ -132,6 +132,58 @@ final class TranslationActionTest extends ActionIntegrationTestCase
         self::assertFileDoesNotExist($filePath);
     }
 
+    public function testWriteTranslationFileKeepsTextsThatEndWithABackslash(): void
+    {
+        $filePath = $this->tmpDir.'/translations.php';
+
+        $texts = ['key1' => "Path 'C:\\'", 'key2' => 'Plain'];
+        $translated = ['key1' => 'Chemin C:\\', 'key2' => "L'ordinaire \\"];
+
+        $event = TranslationEvent::createWriteFileEvent($filePath, $texts, $translated, true);
+        $event->setLocale('fr_FR');
+        $event->setDomain('core');
+        $event->setCustomFallbackStrings([]);
+        $event->setGlobalFallbackStrings([]);
+        $event->setDeveloperMode(true);
+
+        $this->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
+
+        // The file is PHP source read back with require: whatever the texts hold, it must
+        // come back as the very same array.
+        self::assertSame(
+            ["Path 'C:\\'" => 'Chemin C:\\', 'Plain' => "L'ordinaire \\"],
+            require $filePath,
+        );
+    }
+
+    public function testWriteFallbackFileKeepsTextsThatEndWithABackslash(): void
+    {
+        $filePath = THELIA_LOCAL_DIR.'I18n'.DS.'zz_ZZ.php';
+        @unlink($filePath);
+
+        try {
+            $event = TranslationEvent::createWriteFileEvent(
+                $this->tmpDir.'/unused.php',
+                ['key1' => 'Path'],
+                [],
+                true,
+            );
+            $event->setLocale('zz_ZZ');
+            $event->setDomain('core');
+            $event->setCustomFallbackStrings(['key1' => 'Chemin C:\\']);
+            $event->setGlobalFallbackStrings(['key1' => "L'ordinaire \\"]);
+
+            $this->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
+
+            self::assertSame(
+                ['Path' => "L'ordinaire \\", 'core' => ['Path' => 'Chemin C:\\']],
+                require $filePath,
+            );
+        } finally {
+            @unlink($filePath);
+        }
+    }
+
     public function testGetTranslatableStringsReturnsEmptyForNonExistentDirectory(): void
     {
         $event = TranslationEvent::createGetStringsEvent(

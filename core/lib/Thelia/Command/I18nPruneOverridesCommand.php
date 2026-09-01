@@ -222,41 +222,21 @@ class I18nPruneOverridesCommand extends ContainerAwareCommand
      */
     private function writeOverrideFile(string $file, array $translations): void
     {
-        $fp = fopen($file, 'w');
-
-        if (false === $fp) {
-            throw new \RuntimeException(\sprintf('Failed to open translation file %s for writing.', $file));
-        }
-
-        fwrite($fp, '<'."?php\n\n");
-        fwrite($fp, "return [\n");
-
         ksort($translations);
 
-        foreach ($translations as $key => $value) {
+        foreach ($translations as &$value) {
             if (\is_array($value)) {
-                $escapedKey = str_replace("'", "\\'", (string) $key);
-                fwrite($fp, \sprintf("    '%s' => [\n", $escapedKey));
                 ksort($value);
-
-                foreach ($value as $subKey => $subText) {
-                    $escapedSubKey = str_replace("'", "\\'", (string) $subKey);
-                    $translation = str_replace("'", "\\'", (string) $subText);
-                    fwrite($fp, \sprintf("        '%s' => '%s',\n", $escapedSubKey, $translation));
-                }
-
-                fwrite($fp, "    ],\n");
-
-                continue;
             }
-
-            $escapedKey = str_replace("'", "\\'", (string) $key);
-            $translation = str_replace("'", "\\'", (string) $value);
-            fwrite($fp, \sprintf("    '%s' => '%s',\n", $escapedKey, $translation));
         }
+        unset($value);
 
-        fwrite($fp, "];\n");
+        // Written as PHP source and read back with require: var_export is the only quoting
+        // the parser cannot be talked out of, whatever the text holds.
+        $source = '<'."?php\n\nreturn ".var_export($translations, true).";\n";
 
-        fclose($fp);
+        if (false === @file_put_contents($file, $source)) {
+            throw new \RuntimeException(\sprintf('Failed to open translation file %s for writing.', $file));
+        }
     }
 }
