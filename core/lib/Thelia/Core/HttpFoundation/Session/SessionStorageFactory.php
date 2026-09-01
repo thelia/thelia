@@ -40,7 +40,9 @@ final readonly class SessionStorageFactory implements SessionStorageFactoryInter
         $lifetime = (int) ConfigQuery::read('session_config.lifetime', 0);
         $customSavePath = ConfigQuery::read('session_config.save_path', $this->defaultSavePath);
 
-        $options = [];
+        // Only ids php handed out are honoured: an id the browser made up (or was handed by
+        // someone else) starts a fresh session instead of being adopted.
+        $options = ['use_strict_mode' => true];
 
         if ($lifetime > 0) {
             $options['gc_maxlifetime'] = $lifetime;
