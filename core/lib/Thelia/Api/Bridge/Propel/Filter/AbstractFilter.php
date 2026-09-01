@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Filter;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Psr\Log\LoggerInterface;
@@ -172,6 +173,14 @@ abstract class AbstractFilter implements FilterInterface
         array $context,
     ) {
         $locale = $context['filters']['locale'] ?? Lang::getDefaultLanguage()->getLocale();
+
+        // The locale names the i18n join alias, so only a locale the eager loading
+        // extension actually joined (an active language) can be filtered or sorted on.
+        $activeLocales = array_map(static fn (Lang $lang): string => $lang->getLocale(), Lang::getActiveLangs()->getData());
+
+        if (!\is_string($locale) || !\in_array($locale, $activeLocales, true)) {
+            throw new InvalidArgumentException(\sprintf('Unknown locale "%s" for filtering "%s". Active locales: %s', \is_scalar($locale) ? (string) $locale : \gettype($locale), $property, implode(', ', $activeLocales)));
+        }
 
         return str_replace('_', '', $query->getTableMap()->getName()).'_lang_'.$locale.'.'.$property;
     }
