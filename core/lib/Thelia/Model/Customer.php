@@ -263,6 +263,9 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         if (null !== $password && '' !== trim($password)) {
             $this->setAlgo('PASSWORD_BCRYPT');
 
+            // A new password retires every remember-me cookie issued under the old one.
+            $this->setRememberMeToken(null);
+
             parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
         }
 
