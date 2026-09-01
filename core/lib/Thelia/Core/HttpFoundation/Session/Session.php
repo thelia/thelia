@@ -144,6 +144,10 @@ class Session extends BaseSession
 
     public function setCustomerUser(?UserInterface $user): static
     {
+        if (null !== $user) {
+            $this->renewIdOnAuthentication($this->getCustomerUser(), $user);
+        }
+
         $this->set('thelia.customer_user', $user);
 
         return $this;
@@ -161,9 +165,29 @@ class Session extends BaseSession
 
     public function setAdminUser(UserInterface $user): static
     {
+        $this->renewIdOnAuthentication($this->getAdminUser(), $user);
         $this->set('thelia.admin_user', $user);
 
         return $this;
+    }
+
+    /**
+     * A session that authenticates someone new gets a new id: the id the browser carried
+     * before the login was chosen before anyone was trusted, and may not have been chosen
+     * by this browser at all. Refreshing the same user in place (revalidation on every
+     * admin request) keeps the id, so parallel requests of that user stay on one session.
+     */
+    private function renewIdOnAuthentication(mixed $previous, UserInterface $user): void
+    {
+        if ($previous instanceof UserInterface && $previous->getId() === $user->getId()) {
+            return;
+        }
+
+        if (!$this->isStarted()) {
+            $this->start();
+        }
+
+        $this->migrate();
     }
 
     public function getAdminUser(): mixed
