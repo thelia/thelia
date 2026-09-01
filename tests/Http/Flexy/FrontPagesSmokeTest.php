@@ -32,6 +32,15 @@ final class FrontPagesSmokeTest extends WebIntegrationTestCase
         $this->assertPageRenders('/');
     }
 
+    public function testEveryPageCarriesTheDefaultResponseHeaders(): void
+    {
+        $this->client->request('GET', '/');
+
+        self::assertResponseHeaderSame('X-Content-Type-Options', 'nosniff');
+        self::assertResponseHeaderSame('X-Frame-Options', 'SAMEORIGIN');
+        self::assertResponseHeaderSame('Referrer-Policy', 'strict-origin-when-cross-origin');
+    }
+
     public function testAccountRedirectsWhenNotLoggedIn(): void
     {
         $this->client->request('GET', '/account');
