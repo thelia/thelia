@@ -640,6 +640,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
         );
 
+        // A module that does not serve this cart quotes nothing, which is not the
+        // same as quoting a free delivery.
+        if (!$deliveryPostageEvent->isValidModule()) {
+            throw new DeliveryException(\sprintf('Delivery module %s is not available for this cart', $deliveryModule->getCode()));
+        }
+
         $postage = $deliveryPostageEvent->getPostage();
 
         if (!$postage instanceof OrderPostage) {
