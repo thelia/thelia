@@ -308,7 +308,15 @@ if (isset($options['with-demo'])) {
     ];
 }
 
+// Without --admin_password the account gets a password nobody can guess, printed once at
+// the end of the run: a shared default would be the first thing tried on every new shop.
+$generatedAdminPassword = null;
+
 if (isset($options['with-admin'])) {
+    if (!isset($options['admin_password']) || '' === $options['admin_password']) {
+        $generatedAdminPassword = rtrim(strtr(base64_encode(random_bytes(15)), '+/', '-_'), '=');
+    }
+
     $commands[] = [
         'label' => 'Creating admin user',
         'input' => [
@@ -317,7 +325,7 @@ if (isset($options['with-admin'])) {
             '--first_name' => $options['admin_first_name'] ?? 'Admin',
             '--last_name' => $options['admin_last_name'] ?? 'Thelia',
             '--email' => $options['admin_email'] ?? 'admin@thelia.net',
-            '--password' => $options['admin_password'] ?? 'thelia',
+            '--password' => $generatedAdminPassword ?? $options['admin_password'],
         ],
     ];
 }
@@ -418,6 +426,11 @@ if ($errors > 0) {
 }
 
 echo "\nThelia installed successfully.\n";
+
+if (null !== $generatedAdminPassword) {
+    echo "\nAdministrator '".($options['admin_login'] ?? 'thelia')."' created with the password: {$generatedAdminPassword}\n";
+    echo "Write it down now, it is not stored anywhere else. Change it after the first login.\n";
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
