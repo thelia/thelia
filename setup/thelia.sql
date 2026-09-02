@@ -2079,7 +2079,7 @@ CREATE TABLE `form_firewall`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `form_name` VARCHAR(255) NOT NULL,
-    `ip_address` VARCHAR(15) NOT NULL,
+    `ip_address` VARCHAR(45) NOT NULL,
     `attempts` TINYINT DEFAULT 1,
     `created_at` DATETIME,
     `updated_at` DATETIME,
