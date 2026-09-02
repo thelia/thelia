@@ -125,12 +125,12 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Save the transaction/payment ref in the order.
      *
-     * @param int $orderId        the order ID
-     * @param int $transactionRef the transaction reference
+     * Gateways issue alphanumeric references ("PSP-4F2A-7C10"), and the column they are
+     * stored in is a 100-character string: the reference is carried as the string it is.
      *
      * @throws \Exception
      */
-    public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, int $orderId, int $transactionRef): void
+    public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, int $orderId, string $transactionRef): void
     {
         if (!($order = $this->getOrder($orderId)) instanceof Order) {
             return;

@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Controller\Front;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\OrderQuery;
 use Thelia\Module\BasePaymentModuleController;
 use Thelia\Test\IntegrationTestCase;
 
@@ -48,6 +50,27 @@ final class BasePaymentModuleControllerTest extends IntegrationTestCase
         $url = $this->urlOfRedirect(static fn (PaymentControllerUnderTest $controller) => $controller->redirectToFailurePage(42, null));
 
         self::assertStringEndsWith('/checkout/failed?order_id=42', $url);
+    }
+
+    /**
+     * Payment gateways name their transactions with references such as "PSP-4F2A-7C10":
+     * the column they are stored in is a 100-character string, so the reference the
+     * module hands over must reach it as it was issued.
+     */
+    public function testTheTransactionReferenceOfTheGatewayIsSavedOnTheOrder(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+
+        $this->controller()->saveTransactionRef(
+            $this->getService(EventDispatcherInterface::class),
+            (int) $order->getId(),
+            'PSP-4F2A-7C10',
+        );
+
+        self::assertSame(
+            'PSP-4F2A-7C10',
+            OrderQuery::create()->findPk($order->getId())->getTransactionRef(),
+        );
     }
 
     private function urlOfRedirect(callable $redirect): string
