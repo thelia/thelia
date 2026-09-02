@@ -43,19 +43,26 @@ final class UpdateTransactionTest extends IntegrationTestCase
 
     protected bool $useTransaction = false;
 
-    private string $initialVersion;
+    /**
+     * A completed run rewrites the version marker and the four variables derived from it,
+     * and this case runs outside a transaction: every one of them has to be put back, or
+     * the next test reading the version of the install reads the one this run left behind.
+     *
+     * @var array<string, string>
+     */
+    private array $initialVersionRows = [];
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->initialVersion = $this->readVersionMarker();
+        $this->initialVersionRows = $this->readVersionRows();
     }
 
     protected function tearDown(): void
     {
         $this->connection()->exec('DROP TABLE IF EXISTS `update_transaction_probe`');
-        $this->writeVersionMarker($this->initialVersion);
+        $this->writeVersionRows($this->initialVersionRows);
 
         parent::tearDown();
     }
@@ -161,6 +168,33 @@ final class UpdateTransactionTest extends IntegrationTestCase
     {
         $statement = $this->connection()->prepare("UPDATE `config` SET `value` = ? WHERE `name` = 'thelia_version'");
         $statement->execute([$version]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function readVersionRows(): array
+    {
+        $rows = [];
+        $statement = $this->connection()->query("SELECT `name`, `value` FROM `config` WHERE `name` LIKE 'thelia\\_%version'");
+
+        while (($row = $statement->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $rows[(string) $row['name']] = (string) $row['value'];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<string, string> $rows
+     */
+    private function writeVersionRows(array $rows): void
+    {
+        $statement = $this->connection()->prepare('UPDATE `config` SET `value` = ? WHERE `name` = ?');
+
+        foreach ($rows as $name => $value) {
+            $statement->execute([$value, $name]);
+        }
     }
 
     private function connection(): ConnectionInterface

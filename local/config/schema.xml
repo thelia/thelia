@@ -1711,7 +1711,7 @@
   <table name="form_firewall" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="form_name" required="true" size="255" type="VARCHAR" />
-    <column name="ip_address" required="true" size="15" type="VARCHAR" />
+    <column name="ip_address" required="true" size="45" type="VARCHAR" />
     <column defaultValue="1" name="attempts" type="TINYINT" />
     <index name="idx_form_firewall_form_name">
       <index-column name="form_name" />
