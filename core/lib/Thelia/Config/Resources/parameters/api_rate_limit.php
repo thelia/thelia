@@ -29,5 +29,9 @@ return static function (ContainerConfigurator $container): void {
         // stay well above the narrow one, or a shared office address would lock
         // itself out on the first colleague who mistypes.
         ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)', '5')
-        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)', '25');
+        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)', '25')
+        // Addresses and CIDR ranges exempt from the limits that are not about
+        // logging in, comma separated. Meant for a synchronisation that
+        // legitimately calls faster than a browser does.
+        ->set('env(THELIA_API_RATE_LIMIT_ALLOWLIST)', '');
 };
