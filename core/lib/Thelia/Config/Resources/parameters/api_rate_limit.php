@@ -28,15 +28,17 @@ return static function (ContainerConfigurator $container): void {
         // someone trying one password across many accounts. The wider one has to
         // stay well above the narrow one, or a shared office address would lock
         // itself out on the first colleague who mistypes.
-        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)', '5')
-        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)', '25')
+        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)', '10')
+        ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)', '50')
         // Token refreshes, per minute and per caller. A client refreshes once
-        // per token lifetime, so ten a minute is already generous.
-        ->set('env(THELIA_API_RATE_LIMIT_TOKEN_REFRESH)', '10')
+        // per token lifetime, so twenty a minute leaves room for a client that
+        // holds several sessions at once and still stops a caller working
+        // through refresh tokens.
+        ->set('env(THELIA_API_RATE_LIMIT_TOKEN_REFRESH)', '20')
         // Everything else, per minute.
-        ->set('env(THELIA_API_RATE_LIMIT_ANONYMOUS)', '120')
-        ->set('env(THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)', '600')
-        ->set('env(THELIA_API_RATE_LIMIT_ADMIN)', '1200')
+        ->set('env(THELIA_API_RATE_LIMIT_ANONYMOUS)', '200')
+        ->set('env(THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)', '800')
+        ->set('env(THELIA_API_RATE_LIMIT_ADMIN)', '2000')
         // Addresses and CIDR ranges exempt from the limits that are not about
         // logging in, comma separated. Meant for a synchronisation that
         // legitimately calls faster than a browser does.
