@@ -46,7 +46,11 @@ final class CoreConfigurationDefaultsTest extends TestCase
             'api_platform',
             ['defaults' => ['stateless' => true]],
             'defaults',
-            ['pagination_client_items_per_page' => true, 'stateless' => true],
+            [
+                'pagination_client_items_per_page' => true,
+                'pagination_maximum_items_per_page' => 100,
+                'stateless' => true,
+            ],
         ];
 
         yield 'framework session save path' => [

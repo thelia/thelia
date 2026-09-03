@@ -48,6 +48,52 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '1 hour',
             ],
+            // Login attempts on the two API login endpoints. The narrow window is
+            // per caller and per identifier, the wide one per caller: one stops
+            // passwords being tried on a single account, the other stops one
+            // password being tried across many. Both figures come from the
+            // environment (see parameters/api_rate_limit.php) so an operator can
+            // move them without touching the code. A sliding window is used
+            // rather than a fixed one so the budget cannot be spent twice around
+            // the moment a fixed window would roll over.
+            'api_login_per_client_and_identifier' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)%',
+                'interval' => '1 minute',
+            ],
+            'api_login_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)%',
+                'interval' => '1 minute',
+            ],
+            // Token refreshes. A client asks for one when its access token is
+            // about to expire, so a caller asking again and again is either
+            // misbuilt or trying refresh tokens one after the other.
+            'api_token_refresh_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_TOKEN_REFRESH)%',
+                'interval' => '1 minute',
+            ],
+            // Everything else under /api. An anonymous caller is counted per
+            // address; an authenticated one per account, so a whole office
+            // behind a single address is not held to one budget. The
+            // administration figure is the highest because one back-office
+            // screen fans out into several calls.
+            'api_anonymous' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_ANONYMOUS)%',
+                'interval' => '1 minute',
+            ],
+            'api_front_authenticated' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)%',
+                'interval' => '1 minute',
+            ],
+            'api_admin' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_ADMIN)%',
+                'interval' => '1 minute',
+            ],
         ],
     ], prepend: true);
 };

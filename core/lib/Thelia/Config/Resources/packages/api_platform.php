@@ -24,6 +24,15 @@ return static function (ContainerConfigurator $container): void {
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
+            // The caller picks its page size, so the page size needs a ceiling:
+            // without one a single call can ask the shop to load, hydrate and
+            // serialize a whole table in one response. A hundred is well above
+            // what the shipped themes ask for (thirty on the front, twenty-five
+            // in the back-office) and above the page sizes an integration
+            // usually walks a catalogue with. A project that needs a different
+            // ceiling overrides this key in its own api_platform configuration,
+            // and an operation that needs its own says so on its metadata.
+            'pagination_maximum_items_per_page' => 100,
             'stateless' => false,
         ],
         'mapping' => [
