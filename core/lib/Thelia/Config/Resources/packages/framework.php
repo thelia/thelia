@@ -48,6 +48,24 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '1 hour',
             ],
+            // Login attempts on the two API login endpoints. The narrow window is
+            // per caller and per identifier, the wide one per caller: one stops
+            // passwords being tried on a single account, the other stops one
+            // password being tried across many. Both figures come from the
+            // environment (see parameters/api_rate_limit.php) so an operator can
+            // move them without touching the code. A sliding window is used
+            // rather than a fixed one so the budget cannot be spent twice around
+            // the moment a fixed window would roll over.
+            'api_login_per_client_and_identifier' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)%',
+                'interval' => '1 minute',
+            ],
+            'api_login_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)%',
+                'interval' => '1 minute',
+            ],
         ],
     ], prepend: true);
 };
