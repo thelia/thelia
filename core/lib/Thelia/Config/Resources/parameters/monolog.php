@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 return static function (ContainerConfigurator $configurator): void {
     $configurator->extension('monolog', [
-        'channels' => ['deprecation'],
+        'channels' => ['deprecation', 'security'],
 
         'handlers' => [
             'main' => [
@@ -30,7 +30,21 @@ return static function (ContainerConfigurator $configurator): void {
                 'path' => '%kernel.logs_dir%/%kernel.environment%.log',
                 'level' => 'debug',
                 'max_files' => 7,
-                'channels' => ['!deprecation'],
+                'channels' => ['!deprecation', '!security'],
+            ],
+            // Refused authentications get a file of their own, and get there
+            // whatever else happens. The main handler only opens its buffer
+            // when something errors, so a warning on its own never reaches the
+            // disk — which is exactly the shape a run of failed logins has. A
+            // separate file is also what a log watcher wants to be pointed at,
+            // and it is kept longer: an attempt spread over weeks is only
+            // visible if weeks are still on disk.
+            'security_rotating' => [
+                'type' => 'rotating_file',
+                'path' => '%kernel.logs_dir%/security-%kernel.environment%.log',
+                'level' => 'warning',
+                'max_files' => 30,
+                'channels' => ['security'],
             ],
             'console' => [
                 'type' => 'console',
