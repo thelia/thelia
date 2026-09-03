@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\RateLimit;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Test\ApiTestCase;
 
@@ -31,6 +30,8 @@ use Thelia\Test\ApiTestCase;
  */
 final class ApiLoginThrottlingTest extends ApiTestCase
 {
+    use RateLimitTestEnvironment;
+
     private const int MAX_ATTEMPTS = 3;
 
     /**
@@ -39,30 +40,19 @@ final class ApiLoginThrottlingTest extends ApiTestCase
      */
     private const string CALLER = '192.0.2.';
 
-    private array $previousEnv = [];
-
     protected function setUp(): void
     {
-        // Set before the kernel boots: the container reads the value the first
-        // time a limiter is built and caches it for the rest of the request.
-        $this->overrideEnv('THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS', (string) self::MAX_ATTEMPTS);
-        $this->overrideEnv('THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT', '10000');
+        $this->setLimit('THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS', (string) self::MAX_ATTEMPTS);
+        $this->setLimit('THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT', '10000');
 
         parent::setUp();
+
+        $this->clearRateLimiterCounters();
     }
 
     protected function tearDown(): void
     {
-        foreach ($this->previousEnv as $name => $value) {
-            if (null === $value) {
-                unset($_ENV[$name], $_SERVER[$name]);
-                continue;
-            }
-
-            $_ENV[$name] = $_SERVER[$name] = $value;
-        }
-
-        $this->previousEnv = [];
+        $this->restoreLimits();
 
         parent::tearDown();
     }
@@ -177,27 +167,6 @@ final class ApiLoginThrottlingTest extends ApiTestCase
         );
 
         return $this->client->getResponse();
-    }
-
-    /**
-     * Creating a fixture leaves a synthetic request on the stack, which then
-     * shadows the login request: Symfony reads the caller and the identifier
-     * from the main request, and would count every attempt under the same key.
-     * Clearing the stack puts the request under test back in first position,
-     * the way a real one arrives.
-     */
-    private function clearRequestStack(): void
-    {
-        $requestStack = static::getContainer()->get(RequestStack::class);
-
-        while (null !== $requestStack->pop()) {
-        }
-    }
-
-    private function overrideEnv(string $name, string $value): void
-    {
-        $this->previousEnv[$name] = $_SERVER[$name] ?? null;
-        $_ENV[$name] = $_SERVER[$name] = $value;
     }
 
     private static function decode(Response $response): array

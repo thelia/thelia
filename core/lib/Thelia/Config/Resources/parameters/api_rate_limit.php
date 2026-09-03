@@ -30,6 +30,9 @@ return static function (ContainerConfigurator $container): void {
         // itself out on the first colleague who mistypes.
         ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS)', '5')
         ->set('env(THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)', '25')
+        // Token refreshes, per minute and per caller. A client refreshes once
+        // per token lifetime, so ten a minute is already generous.
+        ->set('env(THELIA_API_RATE_LIMIT_TOKEN_REFRESH)', '10')
         // Addresses and CIDR ranges exempt from the limits that are not about
         // logging in, comma separated. Meant for a synchronisation that
         // legitimately calls faster than a browser does.

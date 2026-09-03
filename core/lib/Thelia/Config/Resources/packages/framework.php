@@ -66,6 +66,14 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => '%env(int:THELIA_API_RATE_LIMIT_LOGIN_ATTEMPTS_PER_CLIENT)%',
                 'interval' => '1 minute',
             ],
+            // Token refreshes. A client asks for one when its access token is
+            // about to expire, so a caller asking again and again is either
+            // misbuilt or trying refresh tokens one after the other.
+            'api_token_refresh_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_TOKEN_REFRESH)%',
+                'interval' => '1 minute',
+            ],
         ],
     ], prepend: true);
 };
