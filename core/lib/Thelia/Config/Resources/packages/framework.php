@@ -74,6 +74,26 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => '%env(int:THELIA_API_RATE_LIMIT_TOKEN_REFRESH)%',
                 'interval' => '1 minute',
             ],
+            // Everything else under /api. An anonymous caller is counted per
+            // address; an authenticated one per account, so a whole office
+            // behind a single address is not held to one budget. The
+            // administration figure is the highest because one back-office
+            // screen fans out into several calls.
+            'api_anonymous' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_ANONYMOUS)%',
+                'interval' => '1 minute',
+            ],
+            'api_front_authenticated' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)%',
+                'interval' => '1 minute',
+            ],
+            'api_admin' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_ADMIN)%',
+                'interval' => '1 minute',
+            ],
         ],
     ], prepend: true);
 };

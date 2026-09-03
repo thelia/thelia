@@ -33,6 +33,10 @@ return static function (ContainerConfigurator $container): void {
         // Token refreshes, per minute and per caller. A client refreshes once
         // per token lifetime, so ten a minute is already generous.
         ->set('env(THELIA_API_RATE_LIMIT_TOKEN_REFRESH)', '10')
+        // Everything else, per minute.
+        ->set('env(THELIA_API_RATE_LIMIT_ANONYMOUS)', '120')
+        ->set('env(THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)', '600')
+        ->set('env(THELIA_API_RATE_LIMIT_ADMIN)', '1200')
         // Addresses and CIDR ranges exempt from the limits that are not about
         // logging in, comma separated. Meant for a synchronisation that
         // legitimately calls faster than a browser does.
