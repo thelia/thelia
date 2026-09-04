@@ -19,13 +19,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Api\Security\CartItemVoter;
 use Thelia\Api\Security\CartOwnership;
+use Thelia\Api\Security\GuestTokenClaims;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\GuestToken;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\Customer;
@@ -108,16 +109,84 @@ final class CartItemVoterTest extends IntegrationTestCase
         );
     }
 
-    private function vote(CartItem $subject, ?Customer $customer = null, ?int $sessionCartId = null): int
+    /**
+     * A guest holds the very customer row its token names, so the customer id says
+     * yes to every cart on that row — including the carts of everyone who checked out
+     * as a guest from the same address before. Only the cart the token was issued for
+     * belongs to this caller.
+     */
+    public function testAGuestIsGrantedTheCartItsTokenNames(): void
     {
+        $guest = $this->customer(42);
+        $cartItem = $this->cartItemInCart(cartId: 7, cartCustomerId: 42);
+
+        self::assertSame(
+            VoterInterface::ACCESS_GRANTED,
+            $this->vote($cartItem, customer: $guest, guestCartId: 7),
+        );
+    }
+
+    public function testAGuestIsDeniedAnotherCartOnTheAccountItShares(): void
+    {
+        $guest = $this->customer(42);
+        $cartItem = $this->cartItemInCart(cartId: 7, cartCustomerId: 42);
+
+        self::assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->vote($cartItem, customer: $guest, guestCartId: 8),
+        );
+    }
+
+    public function testAGuestTokenNamingNoCartOwnsNothing(): void
+    {
+        $guest = $this->customer(42);
+        $cartItem = $this->cartItemInCart(cartId: 7, cartCustomerId: 42);
+
+        self::assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->vote($cartItem, customer: $guest, guestCartId: null, asGuest: true),
+        );
+    }
+
+    /**
+     * The session a guest is checking out in still holds the cart, so a guest token
+     * must not be widened by it either.
+     */
+    public function testAGuestIsDeniedTheCartOfTheSessionItIsNotScopedTo(): void
+    {
+        $guest = $this->customer(42);
+        $cartItem = $this->cartItemInCart(cartId: 7, cartCustomerId: null);
+
+        self::assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->vote($cartItem, customer: $guest, sessionCartId: 7, guestCartId: 8),
+        );
+    }
+
+    private function vote(
+        CartItem $subject,
+        ?Customer $customer = null,
+        ?int $sessionCartId = null,
+        ?int $guestCartId = null,
+        bool $asGuest = false,
+    ): int {
+        $isGuest = $asGuest || null !== $guestCartId;
+        $token = $this->token($customer, $isGuest, $guestCartId);
+        $tokenStorage = new TokenStorage();
+
+        if (null !== $customer) {
+            $tokenStorage->setToken($token);
+        }
+
         $voter = new CartItemVoter(
             new CartOwnership(
-                $this->tokenStorage($customer),
+                $tokenStorage,
                 $this->requestStack($sessionCartId),
+                new GuestTokenClaims($tokenStorage),
             ),
         );
 
-        return $voter->vote($this->token($customer), $subject, [CartItemVoter::OWNER]);
+        return $voter->vote($token, $subject, [CartItemVoter::OWNER]);
     }
 
     private function customer(int $id): Customer
@@ -143,21 +212,17 @@ final class CartItemVoterTest extends IntegrationTestCase
         return (new CartItem())->setPropelModel($model);
     }
 
-    private function tokenStorage(?Customer $customer): TokenStorageInterface
-    {
-        $storage = new TokenStorage();
-
-        if (null !== $customer) {
-            $storage->setToken($this->token($customer));
-        }
-
-        return $storage;
-    }
-
-    private function token(?Customer $customer): TokenInterface
+    private function token(?Customer $customer, bool $asGuest = false, ?int $guestCartId = null): TokenInterface
     {
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($customer);
+        $token->method('getRoleNames')->willReturn($asGuest ? [GuestToken::ROLE] : ['ROLE_CUSTOMER']);
+        $token->method('hasAttribute')->willReturnCallback(
+            static fn (string $name): bool => $asGuest && GuestToken::CART_TOKEN_ATTRIBUTE === $name,
+        );
+        $token->method('getAttribute')->willReturnCallback(
+            static fn (string $name): mixed => GuestToken::CART_TOKEN_ATTRIBUTE === $name ? $guestCartId : null,
+        );
 
         return $token;
     }

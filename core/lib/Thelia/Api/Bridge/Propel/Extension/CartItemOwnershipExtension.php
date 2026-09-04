@@ -61,6 +61,25 @@ final readonly class CartItemOwnershipExtension implements QueryCollectionExtens
             return;
         }
 
+        // A guest is scoped to the one cart its token names, never to the customer row
+        // it authenticates as: the shop reuses the guest account behind an address, so
+        // that row is shared with every earlier visitor who ordered from the same
+        // address, and their baskets hang off it too. A guest token naming no cart owns
+        // no line, which is what the criterion below says.
+        if ($this->cartOwnership->isGuest()) {
+            $claimedCartId = $this->cartOwnership->guestCartId();
+
+            if (null !== $claimedCartId) {
+                $query->filterByCartId($claimedCartId);
+
+                return;
+            }
+
+            $query->add(CartItemTableMap::COL_CART_ID, null, Criteria::ISNULL);
+
+            return;
+        }
+
         $customerId = $this->cartOwnership->customerId();
 
         if (null !== $customerId) {

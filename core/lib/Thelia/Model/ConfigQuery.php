@@ -268,6 +268,17 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * How far this shop lets a visitor go without creating an account.
+     *
+     * The raw stored value: {@see \Thelia\Domain\Checkout\Enum\GuestCheckoutMode} turns
+     * it into one of the modes, and settles what an unknown value means.
+     */
+    public static function getGuestCheckoutMode(): string
+    {
+        return (string) self::read('guest_checkout_mode', 'disabled');
+    }
+
+    /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList(): array

@@ -349,9 +349,14 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
                 ->setVisible($event->getVisible() ? 1 : 0)
                 ->setVirtual($event->getVirtual() ? 1 : 0)
-                ->setBrandId($event->getBrandId() > 0 ? (int) $event->getBrandId() : null)
+                ->setBrandId($event->getBrandId() > 0 ? (int) $event->getBrandId() : null);
 
-                ->save($con);
+            // Null means the caller does not carry this field: leave the column untouched.
+            if (null !== $event->getGuestCheckoutForbidden()) {
+                $product->setGuestCheckoutForbidden((int) $event->getGuestCheckoutForbidden());
+            }
+
+            $product->save($con);
 
             // Update default PSE (if product has no attributes and the product's ref change)
             $defaultPseRefChange = $prevRef !== $product->getRef()

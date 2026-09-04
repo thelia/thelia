@@ -277,6 +277,30 @@ final class FixtureFactory
         return $customer;
     }
 
+    /**
+     * A customer who ordered without creating an account: no password, marked as a guest.
+     *
+     * customer() always sets a password, which is exactly what a guest must not have,
+     * and what tells the two apart everywhere the guest checkout is involved.
+     */
+    public function guestCustomer(
+        CustomerTitle $title,
+        array $overrides = [],
+    ): Customer {
+        $n = $this->next();
+
+        $customer = new Customer();
+        $customer->setIsGuest(1);
+        $customer->setTitleId($title->getId());
+        $customer->setFirstname($overrides['firstname'] ?? 'Guest');
+        $customer->setLastname($overrides['lastname'] ?? 'Visitor');
+        $customer->setEmail($overrides['email'] ?? 'guest-'.$n.'@test.com');
+        $customer->setEnable(0);
+        $customer->save($this->connection);
+
+        return $customer;
+    }
+
     public function admin(array $overrides = []): Admin
     {
         $n = $this->next();

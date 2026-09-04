@@ -34,6 +34,7 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\State\Provider\GuestOrderProvider;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -71,6 +72,24 @@ use Thelia\Model\OrderQuery;
             uriTemplate: '/front/account/orders/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
             security: 'object.customer.getId() == user.getId()',
+        ),
+        // Someone who ordered without an account has nothing to sign in with, so the
+        // signed link they were mailed is what identifies them. Deliberately outside
+        // /front/account, and deliberately anonymous: the provider is where the whole
+        // check lives — a rate limit spent before anything is read, then a signature
+        // that names one order and expires. Anything that does not add up is a 404,
+        // never a message that tells the caller which order numbers exist.
+        new Get(
+            uriTemplate: '/front/guest-orders/{token}',
+            uriVariables: ['token'],
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            // Open on purpose, and stated rather than left out: the caller holds no
+            // identity the security expression could read. GuestOrderProvider is where
+            // the whole check lives — the rate limit, the signature, the expiry — and it
+            // is the only thing standing in front of this operation.
+            security: 'true',
+            read: true,
+            provider: GuestOrderProvider::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],

@@ -75,7 +75,15 @@ readonly class PasswordResetService
             return;
         }
 
-        $customer = CustomerQuery::create()->filterByEmail($email)->findOne();
+        // Guest rows are excluded: they hold no password, so there is nothing to reset,
+        // and mailing a reset link for one would be a way to set a password on the row
+        // that carries somebody's guest orders without ever answering an activation code.
+        // A converted guest is still a guest row until its code is answered, and is
+        // refused here for the same reason.
+        $customer = CustomerQuery::create()
+            ->filterByEmail($email)
+            ->filterByIsGuest(0)
+            ->findOne();
 
         if (!$customer instanceof Customer) {
             return;
@@ -163,6 +171,13 @@ readonly class PasswordResetService
         }
 
         if ($expiresAt <= time()) {
+            return null;
+        }
+
+        // requestResetLink() never issues one for a guest row, but createToken() is
+        // public: refusing here too keeps a reset from becoming a way to set a password
+        // on a guest row, which is what the activation code is for.
+        if ($customer->isGuest()) {
             return null;
         }
 

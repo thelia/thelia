@@ -113,6 +113,37 @@ class SecurityContext
     }
 
     /**
+     * Check whether the session customer is a guest who is checking out rather than
+     * someone who signed in.
+     *
+     * A guest sits in the session under the same key as a signed-in customer, because
+     * the checkout needs a customer to build the order from. What tells them apart is
+     * the row itself — `customer.is_guest`, which stays 1 until an activation code is
+     * answered — and never a session flag: a flag is one write away from saying the
+     * opposite of the row, and the whole of what closes the account pages to a guest
+     * would go with it.
+     */
+    public function hasGuestCustomerUser(): bool
+    {
+        $customer = $this->getCustomerUser();
+
+        return $customer instanceof Customer && $customer->isGuest();
+    }
+
+    /**
+     * Check whether someone who actually signed in is in the session.
+     *
+     * This is what an account page means by "a customer is logged in": a guest holds no
+     * credentials and never proved the address they typed is theirs.
+     */
+    public function hasAuthenticatedCustomerUser(): bool
+    {
+        $customer = $this->getCustomerUser();
+
+        return $customer instanceof Customer && !$customer->isGuest();
+    }
+
+    /**
      * @return bool true if a user (either admin or customer) is logged in, false otherwise
      */
     final public function hasLoggedInUser(): bool
@@ -228,7 +259,7 @@ class SecurityContext
     public function checkRole(array $roles): ?UserInterface
     {
         // Find a user which matches the required roles.
-        $user = $this->getCustomerUser();
+        $user = $this->customerUserHoldingRoles();
 
         if (!$this->hasRequiredRole($user, $roles)) {
             $user = $this->getAdminUser();
@@ -239,6 +270,26 @@ class SecurityContext
         }
 
         return $user;
+    }
+
+    /**
+     * The session customer, but only when it is an account.
+     *
+     * A guest row answers ROLE_CUSTOMER like any other Customer — the roles come from
+     * the class, not from the row — so handing it to hasRequiredRole() would open every
+     * resource guarded by that role to someone who only typed an address. The guest
+     * checkout puts such a row in the session on purpose, so this is the one place the
+     * distinction has to be made before the roles are read.
+     */
+    private function customerUserHoldingRoles(): ?UserInterface
+    {
+        $customer = $this->getCustomerUser();
+
+        if (!$customer instanceof Customer) {
+            return null;
+        }
+
+        return $customer->isGuest() ? null : $customer;
     }
 
     /**

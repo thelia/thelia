@@ -88,6 +88,20 @@ use Thelia\Model\Map\AddressTableMap;
             uriTemplate: '/front/account/addresses/{id}',
             security: 'object.customer.getId() == user.getId()',
         ),
+        // Outside /front/account on purpose: that prefix is locked to ROLE_CUSTOMER by
+        // the firewall, and the lock stays exactly as strict — a guest never reaches an
+        // account endpoint. A guest checkout needs to write the address it is shipping
+        // to, so the write is offered here and nothing else is: there is no read and no
+        // list, because a guest has no address book to browse and the row it just wrote
+        // comes back in the response. That also settles what happens when two people
+        // check out as guests with the same address and land on the same customer row —
+        // neither of them can ever read what the other wrote.
+        new Post(
+            uriTemplate: '/front/guest/addresses',
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
+            security: 'is_granted("ROLE_GUEST")',
+            processor: CustomerAddressProcessor::class,
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
     denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],

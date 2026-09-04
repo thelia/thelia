@@ -110,10 +110,13 @@ final readonly class CheckoutFacade
     /**
      * Cancel the current order.
      *
+     * The tracking token stands in for the session a guest no longer has when they come
+     * back from a payment that failed.
+     *
      * @throws PropelException|\InvalidArgumentException
      */
-    public function cancelOrder(int $orderId): Order
+    public function cancelOrder(int $orderId, ?string $guestOrderToken = null): Order
     {
-        return $this->paymentService->cancel($orderId);
+        return $this->paymentService->cancel($orderId, $guestOrderToken);
     }
 }

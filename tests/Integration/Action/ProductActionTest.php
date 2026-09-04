@@ -265,4 +265,99 @@ final class ProductActionTest extends IntegrationTestCase
 
         return $event;
     }
+
+    public function testUpdatePersistsGuestCheckoutForbiddenInTheSameSave(): void
+    {
+        $product = $this->createVirtualProduct();
+        self::assertSame(0, $product->getGuestCheckoutForbidden());
+        $versionBefore = $product->getVersion();
+
+        // The title also changes here, so a version bump proves whether the
+        // flag was folded into Action\Product::update()'s own save() (one
+        // bump) or persisted by a save of its own beforehand (two bumps).
+        $event = $this->basicUpdateEvent($product, 'Guest checkout forbidden probe');
+        $event->setGuestCheckoutForbidden(true);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame(1, $reloaded->getGuestCheckoutForbidden());
+        self::assertSame(
+            $versionBefore + 1,
+            $reloaded->getVersion(),
+            'A single form save must produce a single version, not one per persisted field.',
+        );
+    }
+
+    public function testUpdateWithoutGuestCheckoutForbiddenLeavesTheColumnIntact(): void
+    {
+        $product = $this->createVirtualProduct();
+        $product->setGuestCheckoutForbidden(1)->save();
+
+        // No setGuestCheckoutForbidden() call: the event does not carry the field.
+        $event = $this->basicUpdateEvent($product, 'Untouched flag probe');
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame(1, $reloaded->getGuestCheckoutForbidden(), 'A caller that omits the field must not clear it.');
+    }
+
+    public function testUpdateRollsBackGuestCheckoutForbiddenWhenTheSaveFails(): void
+    {
+        $productA = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['ref' => 'DUP-REF-A'],
+        );
+        $productB = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['ref' => 'DUP-REF-B'],
+        );
+        self::assertSame(0, $productB->getGuestCheckoutForbidden());
+
+        // Reusing productA's ref trips the ref_UNIQUE constraint, so save()
+        // throws mid-transaction.
+        $event = $this->basicUpdateEvent($productB, 'Rollback probe');
+        $event->setRef($productA->getRef());
+        $event->setGuestCheckoutForbidden(true);
+
+        $caught = null;
+
+        try {
+            $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
+        } catch (\Throwable $exception) {
+            $caught = $exception;
+        }
+
+        self::assertNotNull($caught, 'A duplicate ref must make the save fail.');
+
+        $reloaded = ProductQuery::create()->findPk($productB->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('DUP-REF-B', $reloaded->getRef(), 'The ref change must have rolled back too.');
+        self::assertSame(
+            0,
+            $reloaded->getGuestCheckoutForbidden(),
+            'A rolled-back save must not leave the flag written.',
+        );
+    }
+
+    private function basicUpdateEvent(Product $product, string $title): ProductUpdateEvent
+    {
+        $event = new ProductUpdateEvent($product->getId());
+        $event
+            ->setLocale('en_US')
+            ->setRef($product->getRef())
+            ->setTitle($title)
+            ->setDefaultCategory($product->getDefaultCategoryId())
+            ->setVisible(true)
+            ->setVirtual(true);
+
+        return $event;
+    }
 }

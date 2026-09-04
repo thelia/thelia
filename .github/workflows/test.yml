@@ -41,6 +41,20 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer update --no-interaction --prefer-dist
 
+      - name: Restore the project schema the config package overwrote
+        # The thelia/config package installs into local/ and replaces the
+        # version-controlled local/config/schema.xml with its own copy. Until the
+        # package ships the guest checkout columns (release follow-up), the file
+        # committed in this repository is the source of truth for the CI build.
+        #
+        # The grep is the point of the step: a restore that silently did nothing would
+        # build models without the guest columns, and every guest test would fail far
+        # from here with an unrelated message.
+        run: |
+          git checkout -- local/config/schema.xml
+          grep -q is_guest local/config/schema.xml \
+            || { echo "::error::local/config/schema.xml has no is_guest column after the restore"; exit 1; }
+
       - name: Prepare the test database credentials
         # bin/test-prepare (run by `composer test`) reads these to create the test
         # database, build the Propel models and generate the JWT keys.

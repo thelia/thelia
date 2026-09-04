@@ -19,10 +19,15 @@ use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticato
 use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Customer\DTO\CustomerGuestDTO;
 use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
+use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Domain\Customer\Service\CustomerAuthenticator;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
+use Thelia\Domain\Customer\Service\CustomerGuestConversionService;
+use Thelia\Domain\Customer\Service\CustomerGuestRegistrationService;
 use Thelia\Domain\Customer\Service\CustomerRegistrationService;
 use Thelia\Domain\Customer\Service\CustomerRememberMeService;
 use Thelia\Domain\Customer\Service\CustomerUpdateService;
@@ -39,6 +44,8 @@ readonly class CustomerFacade
         private SecurityContext $securityContext,
         private CustomerCodeManager $customerCodeManager,
         private CustomerUpdateService $customerUpdateService,
+        private CustomerGuestRegistrationService $customerGuestRegistrationService,
+        private CustomerGuestConversionService $customerGuestConversionService,
     ) {
     }
 
@@ -98,6 +105,28 @@ readonly class CustomerFacade
     public function register(CustomerRegisterDTO $customerRegisterDTO): Customer
     {
         return $this->customerRegistrationService->registerCustomer($customerRegisterDTO);
+    }
+
+    /**
+     * Open the passwordless account an order placed without one hangs off, reusing the
+     * one the same address already has.
+     *
+     * @throws GuestCheckoutEmailAlreadyRegisteredException when the address belongs to a real account
+     */
+    public function registerGuest(CustomerGuestDTO $customerGuestDTO): Customer
+    {
+        return $this->customerGuestRegistrationService->registerGuest($customerGuestDTO);
+    }
+
+    /**
+     * Turn the guest account into a real one, with the password its owner just chose.
+     *
+     * @throws NotAGuestCustomerException                   when the account is not a guest
+     * @throws GuestCheckoutEmailAlreadyRegisteredException when a real account took the address meanwhile
+     */
+    public function convertGuestToCustomer(Customer $customer, string $plainPassword): Customer
+    {
+        return $this->customerGuestConversionService->convert($customer, $plainPassword);
     }
 
     /**

@@ -21,6 +21,7 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $postscriptum;
     protected $brand_id;
     protected $virtual_document_id;
+    protected ?bool $guestCheckoutForbidden = null;
 
     /**
      * @param int $product_id
@@ -105,5 +106,23 @@ class ProductUpdateEvent extends ProductCreateEvent
     public function getVirtualDocumentId()
     {
         return $this->virtual_document_id;
+    }
+
+    /**
+     * Null means the caller does not carry this field: leave the column untouched.
+     */
+    public function getGuestCheckoutForbidden(): ?bool
+    {
+        return $this->guestCheckoutForbidden;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setGuestCheckoutForbidden(?bool $guestCheckoutForbidden): static
+    {
+        $this->guestCheckoutForbidden = $guestCheckoutForbidden;
+
+        return $this;
     }
 }

@@ -36,6 +36,10 @@ readonly class CustomerAuthenticator
      */
     public function processLogin(Customer $customer): void
     {
+        // The shop's confirmation setting decides, as it always has. A converted guest
+        // does not slip through it: its row stays is_guest = 1 until the activation code
+        // is answered, and a guest row is not something the user providers ever return,
+        // so it never reaches this point at all.
         if (ConfigQuery::isCustomerEmailConfirmationEnable() && !$customer->getEnable()) {
             throw new CustomerNotEnabledException(Translator::getInstance()->trans('Customer account is disabled'));
         }

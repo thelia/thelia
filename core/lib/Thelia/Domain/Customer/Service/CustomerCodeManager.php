@@ -72,12 +72,20 @@ readonly class CustomerCodeManager
     }
 
     /**
+     * Open the account the code was mailed for.
+     *
+     * This is also where a converted guest stops being one: the conversion gives the row
+     * a password, and answering the code is the proof that the password was chosen by
+     * whoever reads the mailbox. Until then the row is still a guest, and a guest signs
+     * into nothing.
+     *
      * @throws \Exception
      */
     public function activateCustomerByCode(string $email, string $code): void
     {
-        $customer = CustomerQuery::create()->findOneByEmail($email);
-        if (!$customer) {
+        $customer = $this->pendingCustomerForCode($email, $code);
+
+        if (!$customer instanceof Customer) {
             throw new \Exception('Customer not found');
         }
 
@@ -86,6 +94,37 @@ readonly class CustomerCodeManager
         $customer->setConfirmationToken(null);
         $customer->setConfirmationTokenExpiresAt(null);
 
-        $customer->setEnable(1)->save();
+        $customer
+            ->setIsGuest(0)
+            ->setEnable(1)
+            ->save();
+    }
+
+    /**
+     * The row this code belongs to, among those sharing the address.
+     *
+     * An address can carry both a guest row and a real account: a guest row no longer
+     * blocks a registration, so the shop may hold one of each. The code itself is what
+     * tells them apart — it was mailed for exactly one of them — so the row whose pending
+     * token the code verifies against is the row being activated. Falling back to the
+     * plain lookup keeps the "no such account" answer of every other case unchanged.
+     */
+    private function pendingCustomerForCode(string $email, string $code): ?Customer
+    {
+        $fallback = null;
+
+        foreach (CustomerQuery::create()->filterByEmail($email)->find() as $candidate) {
+            $fallback ??= $candidate;
+
+            try {
+                $candidate->verifyActivationCode($code);
+            } catch (\Exception) {
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        return $fallback;
     }
 }

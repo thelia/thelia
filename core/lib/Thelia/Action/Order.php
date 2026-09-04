@@ -31,12 +31,14 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\OrderFacade;
+use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Base\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order as ModelOrder;
@@ -46,6 +48,7 @@ use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Tools\URL;
 
 /**
  * Class Order.
@@ -55,11 +58,19 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Where the shipped front office serves a guest order tracking link. Kept as a path
+     * rather than a route name so that the core never depends on a theme's routing.
+     */
+    private const GUEST_ORDER_TRACKING_PATH = '/order/track/';
+
     public function __construct(
         protected RequestStack $requestStack,
         protected MailerFactory $mailer,
         protected SecurityContext $securityContext,
         protected OrderFacade $orderFacade,
+        protected GuestOrderAccessService $guestOrderAccessService,
+        protected URL $urlManager,
     ) {
     }
 
@@ -162,7 +173,10 @@ class Order extends BaseAction implements EventSubscriberInterface
             $session?->getCurrency() ?? CurrencyModel::getDefaultCurrency(),
             $session?->getLang() ?? LangModel::getDefaultLanguage(),
             $session?->getSessionCart($dispatcher) ?? CartQuery::create()->findPk($order->getCartId()),
-            $session ? $this->securityContext->getCustomerUser() : $order->getCustomer(),
+            // The session customer when there is one — a signed-in customer or a guest
+            // checking out — and the one the order already names otherwise, which is how
+            // an order placed from the command line finds its customer.
+            $this->securityContext->getCustomerUser() ?? $order->getCustomer(),
         );
 
         $placedOrderEvent = new OrderEvent($placedOrder);
@@ -202,6 +216,19 @@ class Order extends BaseAction implements EventSubscriberInterface
         $session?->clearSessionCart($dispatcher);
 
         $session?->setOrder(new OrderModel());
+
+        // A guest was put in the session only to carry this order through the checkout,
+        // and the order is placed: leaving them there would hand the next person on this
+        // browser an identity nobody signed into. Read off the row rather than off a
+        // session flag — a row is a guest until its activation code is answered, and
+        // that is the only thing entitled to say so. The account it points at holds no
+        // password and no remember-me token, so there is nothing else to retire — hence
+        // no CUSTOMER_LOGOUT, whose job is precisely to retire those.
+        $sessionCustomer = $this->securityContext->getCustomerUser();
+
+        if ($sessionCustomer instanceof Customer && $sessionCustomer->isGuest()) {
+            $session?->clearCustomerUser();
+        }
     }
 
     /**
@@ -209,14 +236,46 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendConfirmationEmail(OrderEvent $event): void
     {
+        $order = $event->getOrder();
+        $customer = $order?->getCustomer();
+
         $this->mailer->sendEmailToCustomer(
             'order_confirmation',
-            $event->getOrder()?->getCustomer(),
+            $customer,
             [
-                'order_id' => $event->getOrder()?->getId(),
-                'order_ref' => $event->getOrder()?->getRef(),
+                'order_id' => $order?->getId(),
+                'order_ref' => $order?->getRef(),
+                ...$this->guestTrackingVariables($order),
             ],
         );
+    }
+
+    /**
+     * What a buyer with no account needs to find the order again.
+     *
+     * They have no account page to look it up on, so this mail is the only thing that
+     * ever carries the link. Both the token and a ready-made URL are passed: the token
+     * so that a theme can build the link on its own route, the URL so that the mail can
+     * show one without the core having to know which theme is installed. The path is
+     * the one the shipped front office serves, and a theme that moves it overrides the
+     * message template with its own link built from the token.
+     *
+     * @return array<string, string>
+     */
+    private function guestTrackingVariables(?ModelOrder $order): array
+    {
+        $customer = $order?->getCustomer();
+
+        if (!$order instanceof ModelOrder || null === $customer || !$customer->isGuest()) {
+            return [];
+        }
+
+        $token = $this->guestOrderAccessService->createToken($order);
+
+        return [
+            'guest_order_tracking_token' => $token,
+            'guest_order_tracking_url' => $this->urlManager->absoluteUrl(self::GUEST_ORDER_TRACKING_PATH.$token),
+        ];
     }
 
     /**

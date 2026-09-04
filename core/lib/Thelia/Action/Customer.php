@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
+use Thelia\Core\Event\Customer\CustomerGuestCreateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\Customer\CustomerResetPasswordEvent;
 use Thelia\Core\Event\LostPasswordEvent;
@@ -116,12 +117,51 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Open the passwordless account that carries an order placed without one.
+     *
+     * Nothing is mailed: the visitor asked for no account, so an activation code or a
+     * welcome message would announce one they never wanted. What they hear about is
+     * their order, through the order confirmation the checkout already sends.
+     *
+     * @throws PropelException
+     */
+    public function createGuest(CustomerGuestCreateEvent $event): void
+    {
+        $titleId = $event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId();
+
+        if (null === $titleId) {
+            throw new CustomerException('No customer title was given, and the shop has no default one to fall back on.');
+        }
+
+        $customer = new CustomerModel();
+        $customer
+            ->setIsGuest(1)
+            ->setTitleId($titleId)
+            ->setFirstname((string) $event->getFirstname())
+            ->setLastname((string) $event->getLastname())
+            ->setEmail($event->getEmail())
+            ->setEnable(0);
+
+        if (null !== $event->getLangId()) {
+            $customer->setLangId($event->getLangId());
+        }
+
+        $customer->save();
+
+        $event->setCustomer($customer);
+    }
+
+    /**
      * Send the customer what is needed to activate the account.
      *
      * This mails the activation code, which is the only mechanism the shipped
      * front office knows: the `customer_confirmation` mail this used to send
      * carries the Thelia 2 activation link, whose `/customer/confirm/{token}`
      * route belongs to the Front module and disappears with it.
+     *
+     * A shop that does not confirm addresses sends nothing from here, as it always has.
+     * The guest conversion does not go through this listener: it calls the code manager
+     * itself, so its activation code is mailed on every shop whatever the setting says.
      *
      * @throws PropelException
      */
@@ -330,6 +370,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::CUSTOMER_CREATEACCOUNT => ['create', 128],
             TheliaEvents::CREATE_CUSTOMER_MINIMAL => ['createMinimal', 128],
+            TheliaEvents::CUSTOMER_GUEST_CREATE => ['createGuest', 128],
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => ['modify', 128],
             TheliaEvents::CUSTOMER_UPDATEPROFILE => ['updateProfile', 128],
             TheliaEvents::CUSTOMER_LOGOUT => ['logout', 128],

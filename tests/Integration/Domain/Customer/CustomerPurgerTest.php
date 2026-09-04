@@ -104,6 +104,36 @@ final class CustomerPurgerTest extends IntegrationTestCase
         self::assertSame(1, $this->purger->countAccountsWithoutOrder(365));
     }
 
+    /**
+     * A guest gave the shop a name and an address just as a registered customer did,
+     * and the retention period runs from the same day. Nothing about being passwordless
+     * makes that data keepable for longer.
+     */
+    public function testAnonymizesAGuestThatNeverOrderedLikeAnyOtherAccount(): void
+    {
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $guest
+            ->setCreatedAt(new \DateTime('-400 days'))
+            ->save($this->getPropelConnection());
+
+        self::assertSame(1, $this->purger->anonymizeAccountsWithoutOrder(365));
+
+        self::assertTrue($this->isAnonymized($guest));
+    }
+
+    public function testAnonymizesAGuestIdleSinceItsLastOrder(): void
+    {
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $guest
+            ->setCreatedAt(new \DateTime('-2000 days'))
+            ->save($this->getPropelConnection());
+        $this->orderCreatedDaysAgo($guest, 1500);
+
+        self::assertSame(1, $this->purger->anonymizeAccountsAfterLastOrder(365));
+
+        self::assertTrue($this->isAnonymized($guest));
+    }
+
     private function customerCreatedDaysAgo(int $days): Customer
     {
         $customer = $this->factory->customer($this->factory->customerTitle());
