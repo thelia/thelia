@@ -144,6 +144,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // Opening a return writes a row and mails the customer, so an
+            // unauthenticated flood of requests is worth capping per caller.
+            // The limit is generous: a real customer opens a handful of returns,
+            // never dozens a minute.
+            'order_return_request_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 20,
+                'interval' => '1 hour',
+            ],
         ],
     ], prepend: true);
 };
