@@ -17,6 +17,7 @@ namespace Thelia\Test;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
+use Thelia\Model\Accessory;
 use Thelia\Model\Address;
 use Thelia\Model\Admin;
 use Thelia\Model\Attribute;
@@ -218,6 +219,25 @@ final class FixtureFactory
         );
 
         return $product;
+    }
+
+    /**
+     * Ties an accessory to a product at the given position, the way the back-office does.
+     *
+     * The position is written after the insert: Accessory::preInsert() overwrites it with the
+     * next free one, so a position asked for at creation time never survives.
+     */
+    public function accessory(Product $product, Product $accessory, int $position): Accessory
+    {
+        $link = new Accessory();
+        $link
+            ->setProductId($product->getId())
+            ->setAccessory($accessory->getId())
+            ->save($this->connection);
+
+        $link->setPosition($position)->save($this->connection);
+
+        return $link;
     }
 
     public function customer(
