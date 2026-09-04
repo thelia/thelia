@@ -28,6 +28,8 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturnQuery;
+use Thelia\Model\OrderReturnVersionQuery;
 
 /**
  * Erases the identifying data of a customer while keeping the accounting
@@ -71,6 +73,7 @@ final readonly class CustomerAnonymizer
 
         try {
             $this->anonymizeOrderAddresses($customer, $connection);
+            $this->anonymizeOrderReturns($customer, $connection);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
@@ -131,6 +134,27 @@ final readonly class CustomerAnonymizer
                 ->setPhone(null)
                 ->setCellphone(null)
                 ->save($connection);
+        }
+    }
+
+    /**
+     * A return stays attached to its order for the accounting record, but the
+     * free text the customer wrote when opening it is personal data: it is
+     * cleared in place. The versionable history keeps a full copy of every past
+     * revision, comment included, so those rows are dropped as well.
+     */
+    private function anonymizeOrderReturns(Customer $customer, ConnectionInterface $connection): void
+    {
+        $returns = OrderReturnQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->find($connection);
+
+        foreach ($returns as $return) {
+            $return->setCustomerComment(null)->save($connection);
+
+            OrderReturnVersionQuery::create()
+                ->filterById($return->getId())
+                ->delete($connection);
         }
     }
 

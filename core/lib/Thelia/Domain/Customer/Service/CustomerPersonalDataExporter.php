@@ -22,6 +22,8 @@ use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderReturn;
+use Thelia\Model\OrderReturnQuery;
 
 /**
  * Collects everything the shop knows about one person, as a nested array
@@ -33,7 +35,7 @@ use Thelia\Model\OrderAddress;
  */
 final readonly class CustomerPersonalDataExporter
 {
-    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'carts', 'newsletter'];
+    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter'];
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
@@ -53,6 +55,7 @@ final readonly class CustomerPersonalDataExporter
             'customer' => $this->exportAccount($customer),
             'addresses' => $this->exportAddresses($customer),
             'orders' => $this->exportOrders($customer),
+            'order_returns' => $this->exportOrderReturns($customer),
             'carts' => $this->exportCarts($customer),
             'newsletter' => $this->exportNewsletterSubscription($customer),
         ];
@@ -233,6 +236,50 @@ final readonly class CustomerPersonalDataExporter
         }
 
         return $coupons;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportOrderReturns(Customer $customer): array
+    {
+        $returns = [];
+
+        foreach (OrderReturnQuery::create()->filterByCustomerId($customer->getId())->orderById()->find() as $return) {
+            $returns[] = $this->exportOrderReturn($return);
+        }
+
+        return $returns;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function exportOrderReturn(OrderReturn $return): array
+    {
+        $lines = [];
+
+        foreach ($return->getOrderReturnLines() as $line) {
+            $lines[] = [
+                'product_reference' => $line->getOrderProduct()?->getProductRef(),
+                'title' => $line->getOrderProduct()?->getTitle(),
+                'quantity_requested' => $line->getQuantity(),
+                'quantity_received' => $line->getQuantityReceived(),
+                'refund_amount' => $line->getRefundAmount(),
+            ];
+        }
+
+        return [
+            'reference' => $return->getRef(),
+            'order_reference' => $return->getOrder()?->getRef(),
+            'status' => $return->getStatusCode(),
+            'reason' => $return->getReasonTitle(),
+            'expected_resolution' => $return->getExpectedResolution(),
+            'customer_comment' => $return->getCustomerComment(),
+            'refund_amount' => $return->getRefundAmount(),
+            'created_at' => $this->formatDate($return->getCreatedAt()),
+            'lines' => $lines,
+        ];
     }
 
     /**
