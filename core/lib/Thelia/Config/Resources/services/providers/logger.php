@@ -25,5 +25,4 @@ return static function (ContainerConfigurator $configurator): void {
         ->factory([param('thelia.logger.class'), 'getInstance']);
 
     $parameters->set('thelia.logger.class', Tlog::class);
-    $parameters->set('thelia.cache.namespace', 'thelia_cache');
 };
