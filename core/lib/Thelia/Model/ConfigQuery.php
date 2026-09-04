@@ -276,13 +276,18 @@ class ConfigQuery extends BaseConfigQuery
 
         $list = preg_split('/[,;]/', (string) self::read('store_notification_emails', $contactEmail));
 
-        $arr = [];
+        $addresses = [];
 
         foreach ($list as $item) {
-            $arr[] = trim($item);
+            // The setting holds an empty row on a fresh install, and a hand written list can
+            // carry a stray separator. An empty recipient is not an address: sent as one it
+            // fails the whole message on "does not comply with addr-spec of RFC 2822".
+            if ('' !== $address = trim((string) $item)) {
+                $addresses[] = $address;
+            }
         }
 
-        return $arr;
+        return $addresses;
     }
 
     /* smtp config */
