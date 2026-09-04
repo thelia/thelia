@@ -55,6 +55,10 @@ use Thelia\Api\Resource\OrderAddress;
 use Thelia\Api\Resource\OrderCoupon;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
+use Thelia\Api\Resource\OrderReturn;
+use Thelia\Api\Resource\OrderReturnLine;
+use Thelia\Api\Resource\OrderReturnReason;
+use Thelia\Api\Resource\OrderReturnStatus;
 use Thelia\Api\Resource\OrderStatus;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
@@ -124,6 +128,10 @@ final readonly class AdminApiResourcePermissions
         OrderProduct::class => AdminResources::ORDER,
         OrderProductTax::class => AdminResources::ORDER,
         OrderStatus::class => AdminResources::ORDER_STATUS,
+        OrderReturn::class => AdminResources::ORDER_RETURN,
+        OrderReturnLine::class => AdminResources::ORDER_RETURN,
+        OrderReturnStatus::class => AdminResources::ORDER_RETURN,
+        OrderReturnReason::class => AdminResources::ORDER_RETURN_REASON,
         Product::class => AdminResources::PRODUCT,
         ProductAssociatedContent::class => AdminResources::PRODUCT,
         ProductCategory::class => AdminResources::PRODUCT,

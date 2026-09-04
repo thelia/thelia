@@ -1,0 +1,212 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Api\Resource;
+
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use Propel\Runtime\Map\TableMap;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\Map\OrderReturnStatusTableMap;
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/admin/order_return_statutes',
+        ),
+        new Get(
+            uriTemplate: '/admin/order_return_statutes/{id}',
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
+)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/front/order_return_statutes',
+        ),
+        new Get(
+            uriTemplate: '/front/order_return_statutes/{id}',
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'code' => 'exact',
+    ],
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'position',
+    ],
+)]
+class OrderReturnStatus extends AbstractTranslatableResource
+{
+    public const GROUP_ADMIN_READ = 'admin:order_return_status:read';
+    public const GROUP_ADMIN_READ_SINGLE = 'admin:order_return_status:read:single';
+    public const GROUP_ADMIN_WRITE = 'admin:order_return_status:write';
+    public const GROUP_FRONT_READ = 'front:order_return_status:read';
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+    ])]
+    public ?int $id = null;
+
+    #[ApiProperty(identifier: true)]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_ADMIN_WRITE,
+        OrderReturn::GROUP_FRONT_READ,
+    ])]
+    public string $code;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+    ])]
+    public ?string $color = '#c3c3c3';
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?int $position = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?bool $protectedStatus = false;
+
+    #[Groups([self::GROUP_ADMIN_READ])]
+    public ?\DateTime $createdAt = null;
+
+    #[Groups([self::GROUP_ADMIN_READ])]
+    public ?\DateTime $updatedAt = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+    ])]
+    public I18nCollection $i18ns;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getProtectedStatus(): ?bool
+    {
+        return $this->protectedStatus;
+    }
+
+    public function setProtectedStatus(?bool $protectedStatus): self
+    {
+        $this->protectedStatus = $protectedStatus;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public static function getPropelRelatedTableMap(): ?TableMap
+    {
+        return new OrderReturnStatusTableMap();
+    }
+
+    public static function getI18nResourceClass(): string
+    {
+        return OrderReturnStatusI18n::class;
+    }
+}
