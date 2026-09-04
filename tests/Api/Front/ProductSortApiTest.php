@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Front;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Model\Category;
 use Thelia\Model\Product;
+use Thelia\Model\TaxRule;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -87,6 +89,51 @@ final class ProductSortApiTest extends ApiTestCase
         self::assertSame($default, $this->refsOf('order[bogus]=asc'));
         self::assertSame($default, $this->refsOf('order[title]=sideways&locale=en_US'));
         self::assertSame($default, $this->refsOf('order[createdAt]=sideways'));
+    }
+
+    /**
+     * Sorting is not filtering: a product the merchant never priced must not vanish from the
+     * listing the moment a visitor asks for a price order.
+     */
+    public function testOrderByPriceKeepsAProductWithoutASaleElement(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $taxRule = $factory->taxRule();
+        $currency = $factory->currency();
+
+        $factory->product($category, $taxRule, $currency, ['ref' => 'PRICE-LOW', 'basePrice' => 5.0]);
+        $factory->product($category, $taxRule, $currency, ['ref' => 'PRICE-HIGH', 'basePrice' => 50.0]);
+        $this->productWithoutASaleElement($category, $taxRule, 'PRICE-NONE');
+
+        $total = $this->totalOf('');
+
+        self::assertSame(3, $total);
+        self::assertSame($total, $this->totalOf('untaxed_price_order=asc'));
+        self::assertSame($total, $this->totalOf('untaxed_price_order=desc'));
+
+        // The priceless product is kept, and ranged last whichever way the prices are read.
+        self::assertSame(['PRICE-LOW', 'PRICE-HIGH', 'PRICE-NONE'], $this->refsOf('untaxed_price_order=asc'));
+        self::assertSame(['PRICE-HIGH', 'PRICE-LOW', 'PRICE-NONE'], $this->refsOf('untaxed_price_order=desc'));
+    }
+
+    /**
+     * Built without the fixture factory: Product::create() always makes a default sale element
+     * and its price, and this test is about a product that has neither.
+     */
+    private function productWithoutASaleElement(Category $category, TaxRule $taxRule, string $ref): Product
+    {
+        $product = new Product();
+        $product
+            ->setRef($ref)
+            ->setVisible(1)
+            ->setPosition(99)
+            ->setTaxRuleId($taxRule->getId())
+            ->save($this->getPropelConnection());
+
+        $product->setDefaultCategory($category->getId())->save($this->getPropelConnection());
+
+        return $product;
     }
 
     private function seedDatedProducts(): void
