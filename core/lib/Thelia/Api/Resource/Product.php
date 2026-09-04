@@ -115,6 +115,8 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'position',
         'productCategories.position',
+        'createdAt',
+        'updatedAt',
     ],
 )]
 #[ApiFilter(
