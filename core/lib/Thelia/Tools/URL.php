@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tools;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -42,7 +43,7 @@ class URL
     /** @var string a cache for the base URL scheme */
     private ?string $baseUrlScheme = null;
 
-    public function __construct(?RouterInterface $router = null, ?RewritingUrlMemoizer $memoizer = null)
+    public function __construct(?RouterInterface $router = null, ?RewritingUrlMemoizer $memoizer = null, private readonly ?RequestStack $requestStack = null)
     {
         // Allow singleton style calls once instantiated.
         // For this to work, the URL service has to be instantiated very early. This is done manually
@@ -91,6 +92,16 @@ class URL
      */
     public function getBaseUrl(bool $scheme_only = false): string
     {
+        // The request being served is the only source that is right from the first line of the
+        // dispatch: the router context is filled from the request by RouterListener, and the
+        // rewriting runs before that, so a url built during routing (the language switch
+        // redirect) would carry the configured default uri instead of the host being browsed.
+        if (null !== $request = $this->requestStack?->getMainRequest()) {
+            $schemeAndHost = $request->getSchemeAndHttpHost();
+
+            return $scheme_only ? $schemeAndHost : $schemeAndHost.$request->getBaseUrl();
+        }
+
         if (null === $this->baseUrlScheme) {
             $scheme = 'http';
             $port = 80;

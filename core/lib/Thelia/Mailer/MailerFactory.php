@@ -87,6 +87,12 @@ class MailerFactory
             $to[$recipient] = $storeName;
         }
 
+        if ([] === $to) {
+            Tlog::getInstance()->addError(\sprintf('Message %s not sent: no shop notification recipient is configured (store_notification_emails, Configuration > Store information).', $messageCode));
+
+            return;
+        }
+
         $this->sendEmailMessage(
             $messageCode,
             [ConfigQuery::getStoreEmail() => $storeName],

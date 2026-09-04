@@ -207,6 +207,20 @@ final class FixtureFactory
             ->setVisible($overrides['visible'] ?? 1)
             ->setPosition($overrides['position'] ?? $n);
 
+        // Timestampable only fills created_at when it is untouched, so setting it
+        // here survives the insert.
+        if (isset($overrides['createdAt'])) {
+            $product->setCreatedAt($overrides['createdAt']);
+        }
+
+        // A product has no product_i18n row unless a title is asked for, which is
+        // what makes an untranslated product testable.
+        if (isset($overrides['title'])) {
+            $product
+                ->setLocale($overrides['locale'] ?? 'en_US')
+                ->setTitle($overrides['title']);
+        }
+
         // Product::create() handles the full creation in a transaction:
         // persist the product, assign default category, create default PSE + price.
         $product->create(
@@ -217,6 +231,12 @@ final class FixtureFactory
             $overrides['baseWeight'] ?? 0.0,
             $overrides['baseQuantity'] ?? 0,
         );
+
+        // Product::create() saves the product several times, so updated_at can only
+        // be forced once the creation is over.
+        if (isset($overrides['updatedAt'])) {
+            $product->setUpdatedAt($overrides['updatedAt'])->save($this->connection);
+        }
 
         return $product;
     }

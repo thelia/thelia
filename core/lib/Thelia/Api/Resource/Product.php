@@ -32,6 +32,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\DepthProductFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\ProductPriceOrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter\ProductTitleOrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
@@ -115,6 +116,8 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'position',
         'productCategories.position',
+        'createdAt',
+        'updatedAt',
     ],
 )]
 #[ApiFilter(
@@ -131,6 +134,9 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 )]
 #[ApiFilter(
     filterClass: ProductPriceOrderFilter::class,
+)]
+#[ApiFilter(
+    filterClass: ProductTitleOrderFilter::class,
 )]
 #[ApiFilter(
     filterClass: DepthProductFilter::class,

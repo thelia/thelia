@@ -24,29 +24,47 @@ class ProductPriceOrderFilter extends AbstractFilter
 {
     private const PRICE_ORDER_NAME = 'untaxed_price_order';
 
+    private const SALE_ELEMENTS_JOIN_ALIAS = 'product_price_order_pse';
+
+    private const PRICE_JOIN_ALIAS = 'product_price_order_price';
+
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (self::PRICE_ORDER_NAME !== $property) {
             return;
         }
 
-        $direction = strtolower($value);
-
-        if ($direction === strtolower(OrderFilter::DIRECTION_ASC)) {
-            $query
-                ->useProductSaleElementsQuery()
-                ->useProductPriceQuery()
-                ->orderByPrice(Criteria::ASC)
-                ->endUse()
-                ->endUse();
-        } elseif ($direction === strtolower(OrderFilter::DIRECTION_DESC)) {
-            $query
-                ->useProductSaleElementsQuery()
-                ->useProductPriceQuery()
-                ->orderByPrice(Criteria::DESC)
-                ->endUse()
-                ->endUse();
+        if (!\is_scalar($value)) {
+            return;
         }
+
+        $direction = strtoupper((string) $value);
+
+        if (!\in_array($direction, [OrderFilter::DIRECTION_ASC, OrderFilter::DIRECTION_DESC], true)) {
+            return;
+        }
+
+        // Outer joins: sorting a listing is not filtering it, and a product with no sale
+        // element or no price in the asked currency must stay in the collection instead of
+        // disappearing the moment the visitor picks a price order.
+        $query
+            ->useProductSaleElementsQuery(self::SALE_ELEMENTS_JOIN_ALIAS, Criteria::LEFT_JOIN)
+                ->useProductPriceQuery(self::PRICE_JOIN_ALIAS, Criteria::LEFT_JOIN)
+                ->endUse()
+            ->endUse();
+
+        $priceColumn = self::PRICE_JOIN_ALIAS.'.price';
+
+        // Priceless products keep a NULL sort key: send them last in both directions.
+        $query->addAscendingOrderByColumn('ISNULL('.$priceColumn.')');
+
+        if (OrderFilter::DIRECTION_ASC === $direction) {
+            $query->addAscendingOrderByColumn($priceColumn);
+
+            return;
+        }
+
+        $query->addDescendingOrderByColumn($priceColumn);
     }
 
     public function getDescription(string $resourceClass): array

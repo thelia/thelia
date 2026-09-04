@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Category;
 use Thelia\Model\Product;
@@ -34,12 +33,6 @@ use Thelia\Test\WebIntegrationTestCase;
  * release cycle: a theme older than the accessories strip is reported as skipped rather than
  * failed.
  */
-/*
- * Each test runs in its own process: the front product resource is answered on the first
- * booted kernel of a process only, and a second one reads it back as null — which is a
- * limitation of the test harness, not of the page.
- */
-#[RunTestsInSeparateProcesses]
 final class ProductAccessoriesTest extends WebIntegrationTestCase
 {
     private const PRODUCT_TEMPLATE = 'product.html.twig';

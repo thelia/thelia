@@ -106,4 +106,25 @@ final class ConfigQueryTest extends IntegrationTestCase
     {
         self::assertTrue(ConfigQuery::checkAvailableStock());
     }
+
+    /**
+     * The setting exists with an empty value on a fresh install, and the shop notifications
+     * were then attempted with one blank recipient, which fails the whole message on the
+     * addr-spec of RFC 2822. An empty entry is not an address.
+     */
+    public function testTheNotificationRecipientsDropEmptyEntries(): void
+    {
+        ConfigQuery::write('store_notification_emails', '');
+        ConfigQuery::resetCache();
+
+        self::assertSame([], ConfigQuery::getNotificationEmailsList());
+
+        ConfigQuery::write('store_notification_emails', ' shop@example.com , ;other@example.com;');
+        ConfigQuery::resetCache();
+
+        self::assertSame(
+            ['shop@example.com', 'other@example.com'],
+            ConfigQuery::getNotificationEmailsList(),
+        );
+    }
 }
