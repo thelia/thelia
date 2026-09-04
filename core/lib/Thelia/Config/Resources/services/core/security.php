@@ -28,7 +28,11 @@ return static function (ContainerConfigurator $container): void {
         ->public();
 
     $container->parameters()
-        ->set('thelia.security.jwt_refresh_token_ttl', (int) ($_ENV['JWT_REFRESH_TOKEN_TTL'] ?? 2_592_000));
+        // How long a refresh token stays valid, in seconds. Read when the token
+        // is issued, not when the container is compiled, so a hosting that
+        // lowers it in .env.local does not have to clear the cache for it.
+        ->set('env(JWT_REFRESH_TOKEN_TTL)', '2592000')
+        ->set('thelia.security.jwt_refresh_token_ttl', '%env(int:JWT_REFRESH_TOKEN_TTL)%');
 
     $services->set(AuthenticationSuccessSubscriber::class)
         ->args([service(RefreshTokenService::class)])
