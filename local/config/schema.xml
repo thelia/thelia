@@ -808,6 +808,111 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
+  <table name="order_return_status" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="code" required="true" size="45" type="VARCHAR" />
+    <column name="equivalent_code" size="45" type="VARCHAR" />
+    <column name="color" size="7" type="CHAR" />
+    <column name="position" type="INTEGER" />
+    <column defaultValue="0" name="protected_status" type="BOOLEAN" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <unique name="order_return_status_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="order_return_reason" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="code" size="45" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column defaultValue="1" name="visible" type="BOOLEAN" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <unique name="order_return_reason_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
+  <table name="order_return" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="ref" size="45" type="VARCHAR" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column name="customer_id" required="true" type="INTEGER" />
+    <column name="status_id" required="true" type="INTEGER" />
+    <column description="the merchant-managed reason, NULL once that reason is deleted" name="reason_id" type="INTEGER" />
+    <column description="the reason label snapshot, kept when the reason is deleted" name="reason_title" size="255" type="VARCHAR" />
+    <column description="what the customer expects: refund, credit or exchange" name="expected_resolution" size="45" type="VARCHAR" />
+    <column name="customer_comment" type="LONGVARCHAR" />
+    <column description="the motive given by the merchant when the request is refused" name="refusal_reason" type="LONGVARCHAR" />
+    <column defaultValue="0.000000" description="the amount to refund, computed on the paid prices of the returned lines" name="refund_amount" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" description="whether the postage is included in the refundable amount" name="include_postage" type="BOOLEAN" />
+    <column defaultValue="0" description="true when the merchant opened the return without a customer request" name="created_by_admin" type="BOOLEAN" />
+    <foreign-key foreignTable="order" name="fk_order_return_order_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_order_return_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_return_status" name="fk_order_return_status_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="status_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_return_reason" name="fk_order_return_reason_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="reason_id" />
+    </foreign-key>
+    <index name="idx_order_return_order_id">
+      <index-column name="order_id" />
+    </index>
+    <index name="idx_order_return_customer_id">
+      <index-column name="customer_id" />
+    </index>
+    <index name="idx_order_return_status_id">
+      <index-column name="status_id" />
+    </index>
+    <index name="idx_order_return_reason_id">
+      <index-column name="reason_id" />
+    </index>
+    <unique name="order_return_ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="versionable">
+      <parameter name="log_created_at" value="true" />
+      <parameter name="log_created_by" value="true" />
+    </behavior>
+  </table>
+  <table name="order_return_line" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_return_id" required="true" type="INTEGER" />
+    <column name="order_product_id" required="true" type="INTEGER" />
+    <column description="the sale element to restock, snapshot from the order product" name="product_sale_elements_id" type="INTEGER" />
+    <column description="the quantity the customer asks to return" name="quantity" required="true" type="FLOAT" />
+    <column defaultValue="0" description="the quantity actually received by the merchant" name="quantity_received" type="FLOAT" />
+    <column description="the condition the returned goods were received in" name="received_condition" size="45" type="VARCHAR" />
+    <column defaultValue="0" description="whether the received goods can be sold again" name="resellable" type="BOOLEAN" />
+    <column defaultValue="0.000000" description="the paid taxed price for the returned quantity of this line" name="refund_amount" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="order_return" name="fk_order_return_line_order_return_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_return_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_product" name="fk_order_return_line_order_product_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_product_id" />
+    </foreign-key>
+    <index name="idx_order_return_line_order_return_id">
+      <index-column name="order_return_id" />
+    </index>
+    <index name="idx_order_return_line_order_product_id">
+      <index-column name="order_product_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="order_sequence" namespace="Thelia\Model">
     <column name="name" primaryKey="true" required="true" size="64" type="VARCHAR" />
     <column defaultValue="0" name="current_value" required="true" type="BIGINT" />

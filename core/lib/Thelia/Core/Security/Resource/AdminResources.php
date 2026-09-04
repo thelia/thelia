@@ -80,6 +80,8 @@ class AdminResources
     public const HOOK = 'admin.hook';
     public const MODULE_HOOK = 'admin.module-hook';
     public const ORDER = 'admin.order';
+    public const ORDER_RETURN = 'admin.order-return';
+    public const ORDER_RETURN_REASON = 'admin.configuration.order-return-reason';
     public const ORDER_STATUS = 'admin.configuration.order-status';
     public const PRODUCT = 'admin.product';
     public const PROFILE = 'admin.configuration.profile';
