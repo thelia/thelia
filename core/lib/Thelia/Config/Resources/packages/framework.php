@@ -39,6 +39,13 @@ return static function (ContainerConfigurator $container): void {
                 'thelia.cache.data_access' => [
                     'adapter' => 'cache.app',
                 ],
+                // API refresh tokens. Kept apart because it is the only pool
+                // whose eviction is visible to a user: losing an item here
+                // signs an API client out. Nothing empties it on a deployment
+                // or on a cache clear; each item carries its own lifetime.
+                'thelia.cache.security' => [
+                    'adapter' => 'cache.app',
+                ],
             ],
         ],
         'rate_limiter' => [

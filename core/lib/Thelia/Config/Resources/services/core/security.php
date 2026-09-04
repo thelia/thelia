@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Api\RefreshTokenController;
 use Thelia\Core\Security\RefreshToken\AuthenticationSuccessSubscriber;
 use Thelia\Core\Security\RefreshToken\RefreshTokenService;
@@ -30,12 +29,6 @@ return static function (ContainerConfigurator $container): void {
 
     $container->parameters()
         ->set('thelia.security.jwt_refresh_token_ttl', (int) ($_ENV['JWT_REFRESH_TOKEN_TTL'] ?? 2_592_000));
-
-    $services->set(RefreshTokenService::class)
-        ->args([
-            service(AdapterInterface::class),
-            param('thelia.security.jwt_refresh_token_ttl'),
-        ]);
 
     $services->set(AuthenticationSuccessSubscriber::class)
         ->args([service(RefreshTokenService::class)])

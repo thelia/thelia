@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Security\RefreshToken;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -25,9 +25,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * deletes the item before returning, so the same refresh token cannot
  * be replayed: callers MUST issue a fresh one in the same flow.
  *
- * Storage uses the shared `thelia.cache` adapter — pair it with a
- * persistent backend (Redis, filesystem) in production. Cache eviction
- * forces re-login.
+ * Storage is the `thelia.cache.security` pool, which nothing empties on a
+ * deployment or on a cache clear, so releasing a new version does not sign the
+ * API clients out. Eviction still forces a re-login: a cache server configured
+ * to drop the oldest keys under memory pressure will disconnect clients.
  */
 final readonly class RefreshTokenService
 {
@@ -38,7 +39,8 @@ final readonly class RefreshTokenService
     private const TOKEN_BYTES = 64;
 
     public function __construct(
-        private AdapterInterface $cache,
+        #[Autowire(service: 'thelia.cache.security')]
+        private CacheItemPoolInterface $cache,
         #[Autowire(param: 'thelia.security.jwt_refresh_token_ttl')]
         private int $ttl,
     ) {

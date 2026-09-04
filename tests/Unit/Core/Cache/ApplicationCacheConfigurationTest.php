@@ -43,6 +43,11 @@ final class ApplicationCacheConfigurationTest extends TestCase
         self::assertSame('/srv/shop/prod', $this->parameters()['env(THELIA_CACHE_PREFIX_SEED)']);
     }
 
+    public function testTheRefreshTokensGetTheirOwnPool(): void
+    {
+        self::assertArrayHasKey('thelia.cache.security', $this->frameworkCache()['pools']);
+    }
+
     public function testAnInstallationThatConfiguresNothingStaysOnItsOwnDisk(): void
     {
         $parameters = $this->parameters();
