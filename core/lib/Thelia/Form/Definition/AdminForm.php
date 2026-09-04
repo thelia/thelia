@@ -24,7 +24,7 @@ final class AdminForm
     public const ADMIN_LOGIN = 'thelia.admin.login';
     public const ADMIN_LOST_PASSWORD = 'thelia.admin.lostpassword';
     public const ADMIN_CREATE_PASSWORD = 'thelia.admin.createpassword';
-    public const SEO = 'thelia.admin.seo';
+    public const SEO = 'thelia_seo';
     public const CUSTOMER_CREATE = 'thelia.admin.customer.create';
     public const CUSTOMER_UPDATE = 'thelia.admin.customer.update';
     public const ADDRESS_CREATE = 'thelia.admin.address.create';
