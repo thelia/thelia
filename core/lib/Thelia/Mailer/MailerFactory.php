@@ -88,7 +88,7 @@ class MailerFactory
         }
 
         if ([] === $to) {
-            Tlog::getInstance()->addWarning(\sprintf('Message %s not sent: no shop notification recipient is configured (store_notification_emails, Configuration > Store information).', $messageCode));
+            Tlog::getInstance()->addError(\sprintf('Message %s not sent: no shop notification recipient is configured (store_notification_emails, Configuration > Store information).', $messageCode));
 
             return;
         }
