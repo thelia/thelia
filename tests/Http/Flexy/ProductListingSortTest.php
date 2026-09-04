@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
-use Thelia\Api\Service\DataAccess\AttributeAccessService;
 use Thelia\Model\Category;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
@@ -30,17 +29,6 @@ use Thelia\Test\WebIntegrationTestCase;
 final class ProductListingSortTest extends WebIntegrationTestCase
 {
     private const CATEGORY_URL = 'flexy-sort-test-category.html';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // AttributeAccessService memoizes the object a rewritten url resolves to in a static
-        // property that nothing ever clears, so every page rendered after the first one in this
-        // process would be served the category of the first test. Reset it between tests.
-        $cache = new \ReflectionProperty(AttributeAccessService::class, 'dataAccessCache');
-        $cache->setValue(null, []);
-    }
 
     public function testTheNewestSortListsTheMostRecentProductFirst(): void
     {

@@ -16,10 +16,13 @@ namespace Thelia\Api\Service\DataAccess;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
@@ -41,6 +44,13 @@ use Thelia\Tools\DateTimeFormat;
 
 class AttributeAccessService
 {
+    /**
+     * The object each attr() family resolves to, held for the duration of one request: a page
+     * asks for a dozen attributes of the same object and every one of them would replay the
+     * query. Reset on every main request, the way ResourceMemoizer and RewritingUrlMemoizer
+     * are: the store outlives the request under a persistent runtime (FrankenPHP, RoadRunner)
+     * and inside a test process, and would then serve the object of an earlier request.
+     */
     private static array $dataAccessCache = [];
 
     public function __construct(
@@ -484,5 +494,18 @@ class AttributeAccessService
         return $request->attributes->get($key)
             ?? $request->request->get($key)
             ?? $request->query->get($key);
+    }
+
+    public static function clearCache(): void
+    {
+        self::$dataAccessCache = [];
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 4096)]
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        if ($event->isMainRequest()) {
+            self::clearCache();
+        }
     }
 }
