@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Core\Cache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -53,6 +54,20 @@ final class ApplicationCacheConfigurationTest extends TestCase
         $parameters = $this->parameters();
 
         self::assertSame('', $parameters['env(THELIA_CACHE_DSN)']);
+    }
+
+    public function testThePoolsCanBePruned(): void
+    {
+        $container = new ContainerBuilder();
+        $this->load($container, 'services/core/cache.php');
+
+        $class = $container->getDefinition('thelia.cache.adapter')->getClass();
+
+        self::assertIsString($class);
+        self::assertTrue(
+            is_a($class, PruneableInterface::class, true),
+            'CachePoolPrunerPass reads the class of the adapter, so cache:pool:prune only reaches the application pools if it is pruneable.',
+        );
     }
 
     public function testThePoolsLiveOutsideTheContainerCacheDirectory(): void

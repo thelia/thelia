@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Core\Cache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\PruneableInterface;
+use Thelia\Core\Cache\ApplicationCacheAdapter;
 use Thelia\Core\Cache\CacheAdapterFactory;
 
 /**
@@ -32,14 +35,33 @@ final class CacheAdapterFactoryTest extends TestCase
     {
         $adapter = CacheAdapterFactory::create('probe', 0, '', sys_get_temp_dir().'/thelia-cache-factory-test');
 
-        self::assertInstanceOf(FilesystemAdapter::class, $adapter);
+        self::assertInstanceOf(ApplicationCacheAdapter::class, $adapter);
+        self::assertInstanceOf(FilesystemAdapter::class, $adapter->inner());
     }
 
     public function testBlankSpaceCountsAsNoDataSourceName(): void
     {
         $adapter = CacheAdapterFactory::create('probe', 0, '   ', sys_get_temp_dir().'/thelia-cache-factory-test');
 
-        self::assertInstanceOf(FilesystemAdapter::class, $adapter);
+        self::assertInstanceOf(FilesystemAdapter::class, $adapter->inner());
+    }
+
+    public function testTheFileSystemCacheStaysPruneable(): void
+    {
+        $adapter = CacheAdapterFactory::create('probe', 0, '', sys_get_temp_dir().'/thelia-cache-factory-test');
+
+        self::assertInstanceOf(PruneableInterface::class, $adapter);
+        self::assertTrue($adapter->prune(), 'Expired entries nothing reads again are only removed by cache:pool:prune.');
+    }
+
+    public function testABackendThatExpiresItsOwnKeysReportsNothingToPrune(): void
+    {
+        // cache:pool:prune calls prune() on every pool it was handed and turns
+        // a false into "could not be pruned" plus a non zero exit code. A cache
+        // server has nothing to prune, which is not a failure.
+        $adapter = new ApplicationCacheAdapter(new ArrayAdapter());
+
+        self::assertTrue($adapter->prune());
     }
 
     public function testARedisDataSourceNameMovesTheCacheToRedis(): void
@@ -55,7 +77,7 @@ final class CacheAdapterFactoryTest extends TestCase
             sys_get_temp_dir().'/thelia-cache-factory-test',
         );
 
-        self::assertInstanceOf(RedisAdapter::class, $adapter);
+        self::assertInstanceOf(RedisAdapter::class, $adapter->inner());
     }
 
     public function testAnUnsupportedSchemeNamesTheVariableAndTheDataSourceName(): void

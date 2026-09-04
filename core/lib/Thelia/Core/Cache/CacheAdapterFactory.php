@@ -20,6 +20,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Builds the backend every application cache pool is stored in.
@@ -33,6 +34,10 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  * falling back to the disk: a shop that believes its cache is shared while each
  * front end keeps its own would serve inconsistent pages and sign API clients
  * out at random.
+ *
+ * Every backend is returned wrapped in {@see ApplicationCacheAdapter}, so the
+ * pools have one class whatever the data source name says. Symfony reads that
+ * class when it compiles the container, well before the variable is looked at.
  */
 final class CacheAdapterFactory
 {
@@ -53,15 +58,15 @@ final class CacheAdapterFactory
         #[\SensitiveParameter] string $dsn,
         string $directory,
         ?MarshallerInterface $marshaller = null,
-    ): AdapterInterface {
+    ): ApplicationCacheAdapter {
         $dsn = trim($dsn);
 
         if ('' === $dsn) {
-            return new FilesystemAdapter($namespace, $defaultLifetime, $directory, $marshaller);
+            return new ApplicationCacheAdapter(new FilesystemAdapter($namespace, $defaultLifetime, $directory, $marshaller));
         }
 
         try {
-            return self::remote($dsn, $namespace, $defaultLifetime, $marshaller);
+            return new ApplicationCacheAdapter(self::remote($dsn, $namespace, $defaultLifetime, $marshaller));
         } catch (\Throwable $failure) {
             throw new \InvalidArgumentException(\sprintf('%s is set to "%s", which cannot be used as a cache backend: %s', self::DSN_VARIABLE, self::withoutPassword($dsn), $failure->getMessage()), 0, $failure);
         }
@@ -72,7 +77,7 @@ final class CacheAdapterFactory
         string $namespace,
         int $defaultLifetime,
         ?MarshallerInterface $marshaller,
-    ): AdapterInterface {
+    ): AdapterInterface&CacheInterface {
         $scheme = strstr($dsn, ':', true);
 
         if (!\in_array($scheme, self::REMOTE_SCHEMES, true)) {

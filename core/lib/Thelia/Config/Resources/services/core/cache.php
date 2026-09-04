@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Thelia\Core\Cache\ApplicationCacheAdapter;
 use Thelia\Core\Cache\CacheAdapterFactory;
 
 return static function (ContainerConfigurator $container): void {
@@ -24,8 +25,10 @@ return static function (ContainerConfigurator $container): void {
     // Backend of every application cache pool, cache.app included. Which one it
     // is depends on THELIA_CACHE_DSN and on nothing else, so a shop moves from
     // the local disk to a shared cache server without a line of code changing.
-    // The first two arguments belong to Symfony: it replaces them per pool.
-    $services->set('thelia.cache.adapter', AdapterInterface::class)
+    // The first two arguments belong to Symfony: it replaces them per pool, and
+    // it reads the class below to decide whether a pool can be pruned, so every
+    // backend answers under the same one.
+    $services->set('thelia.cache.adapter', ApplicationCacheAdapter::class)
         ->abstract()
         ->factory([CacheAdapterFactory::class, 'create'])
         ->args([
