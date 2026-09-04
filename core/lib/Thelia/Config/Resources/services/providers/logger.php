@@ -14,16 +14,11 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Log\Tlog;
-
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
-    $parameters = $configurator->parameters();
 
-    // Logger
+    // Logger. The class is a parameter so a project can substitute its own;
+    // it is declared once, in parameters/thelia_core.php.
     $services->set('thelia.logger', '%thelia.logger.class%')
         ->factory([param('thelia.logger.class'), 'getInstance']);
-
-    $parameters->set('thelia.logger.class', Tlog::class);
-    $parameters->set('thelia.cache.namespace', 'thelia_cache');
 };

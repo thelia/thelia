@@ -20,12 +20,30 @@ return static function (ContainerConfigurator $container): void {
             'save_path' => '%kernel.project_dir%/var/sessions/%kernel.environment%',
         ],
         'cache' => [
+            // The hosting decides where the application cache is stored, with
+            // THELIA_CACHE_DSN. Empty, it stays on the local file system.
+            'app' => 'thelia.cache.adapter',
+            // Namespace every pool key with the install path and the
+            // environment, so a shared cache server can serve several shops,
+            // and dev and prod of one shop, without any of them reading the
+            // keys of another. THELIA_CACHE_PREFIX_SEED overrides it when the
+            // same shop is deployed under different paths. Symfony inlines the
+            // seed when the container is compiled, so a change takes effect on
+            // the next cache clear, and no cast may be applied here.
+            'prefix_seed' => '%env(THELIA_CACHE_PREFIX_SEED)%',
             'pools' => [
                 // Dedicated pool for the in-process data access layer
                 // (DataAccessService::resources). Disabled by default; enable
                 // per project with THELIA_DATA_ACCESS_CACHE=1. Clearing this
                 // pool never affects the rest of the application cache.
                 'thelia.cache.data_access' => [
+                    'adapter' => 'cache.app',
+                ],
+                // API refresh tokens. Kept apart because it is the only pool
+                // whose eviction is visible to a user: losing an item here
+                // signs an API client out. Nothing empties it on a deployment
+                // or on a cache clear; each item carries its own lifetime.
+                'thelia.cache.security' => [
                     'adapter' => 'cache.app',
                 ],
             ],
