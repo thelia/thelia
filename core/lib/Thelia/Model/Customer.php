@@ -256,7 +256,9 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
      */
     public function setPassword(?string $password = null): static
     {
-        if ($this->isNew() && (null === $password || '' === trim($password))) {
+        // A guest is created without one on purpose: the account exists to carry an
+        // order, and it gets a password only if its owner later completes it.
+        if ($this->isNew() && !$this->isGuest() && (null === $password || '' === trim($password))) {
             throw new InvalidArgumentException('customer password is mandatory on creation');
         }
 
@@ -270,6 +272,17 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         }
 
         return $this;
+    }
+
+    /**
+     * Whether this customer ordered without creating an account.
+     *
+     * The generated accessor answers the TINYINT column as an int, and every caller
+     * asks a yes-or-no question.
+     */
+    public function isGuest(): bool
+    {
+        return (bool) $this->getIsGuest();
     }
 
     public function erasePassword()

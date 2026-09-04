@@ -57,6 +57,7 @@
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
+    <column defaultValue="0" description="the product may only be bought from an account, so a cart holding it is refused the guest checkout" name="guest_checkout_forbidden" required="true" type="TINYINT" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -419,6 +420,7 @@
     <column name="confirmation_token" size="255" type="VARCHAR" />
     <column name="confirmation_token_expires_at" type="DATE" />
     <column description="when the identifying data of the account was erased, NULL as long as the account carries an identity" name="anonymized_at" type="TIMESTAMP" />
+    <column defaultValue="0" description="the customer ordered without creating an account and carries no password, until the account is completed" name="is_guest" required="true" type="TINYINT" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>

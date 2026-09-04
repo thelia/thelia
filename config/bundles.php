@@ -20,4 +20,8 @@ return [
     BackOfficeDefaultBundle\BackOfficeDefaultBundle::class => ['all' => true],
     BackOfficeDefaultTwigBundle\BackOfficeDefaultTwigBundle::class => ['all' => true],
     FlexyBundle\FlexyBundle::class => ['all' => true],
+    Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
+    Symfonycasts\SassBundle\SymfonycastsSassBundle::class => ['all' => true],
+    TalesFromADev\Twig\Extra\Tailwind\Bridge\Symfony\Bundle\TalesFromADevTwigExtraTailwindBundle::class => ['all' => true],
+    Symfonycasts\TailwindBundle\SymfonycastsTailwindBundle::class => ['all' => true],
 ];

@@ -28,6 +28,7 @@ use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
@@ -36,6 +37,12 @@ class Session extends BaseSession
 {
     protected static ?Cart $transientCart = null;
     public const SESSION_CART_ID_NAME = 'thelia.cart_id';
+
+    /**
+     * @deprecated the guest state is carried by customer.is_guest; nothing writes this
+     *             key any more, and clearCustomerUser() only drops it from older sessions
+     */
+    public const SESSION_CUSTOMER_IS_GUEST = 'thelia.customer_is_guest';
 
     #[Required]
     public ?LangService $langService = null;
@@ -160,7 +167,39 @@ class Session extends BaseSession
 
     public function clearCustomerUser(): mixed
     {
+        // Only to drop the key sessions created before the guest state moved onto the
+        // customer row. Nothing writes it any more.
+        $this->remove(self::SESSION_CUSTOMER_IS_GUEST);
+
         return $this->remove('thelia.customer_user');
+    }
+
+    /**
+     * Kept so that callers written against the session flag still run. It does nothing.
+     *
+     * Whether the session customer is a guest is read off the row it points at, and the
+     * row is the only thing entitled to say so: `customer.is_guest` stays 1 until the
+     * activation code is answered. A flag anyone could set to false would take a guest
+     * row straight into the account pages, which is exactly what it used to do.
+     *
+     * Sign a real customer in — TheliaEvents::CUSTOMER_LOGIN — and this answers false on
+     * its own, because the session then points at an account.
+     *
+     * @deprecated the guest state is carried by customer.is_guest; this setter has no effect
+     */
+    public function setCustomerGuest(bool $isGuest): static
+    {
+        return $this;
+    }
+
+    /**
+     * Whether the customer this session points at ordered without an account.
+     */
+    public function isCustomerGuest(): bool
+    {
+        $customer = $this->getCustomerUser();
+
+        return $customer instanceof Customer && $customer->isGuest();
     }
 
     public function setAdminUser(UserInterface $user): static

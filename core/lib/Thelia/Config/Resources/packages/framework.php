@@ -112,6 +112,38 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => '%env(int:THELIA_API_RATE_LIMIT_ADMIN)%',
                 'interval' => '1 minute',
             ],
+            // A guest order tracking link is the only thing standing between a stranger
+            // and someone else's order, and it names the order by a small number, so a
+            // caller who cannot guess the signature can still try. Both windows are
+            // needed: the per-order one keeps a single order from being hammered, the
+            // per-client one stops a single caller from walking the order numbers.
+            // Room for someone reloading their own tracking page, none for a sweep.
+            'guest_order_access_per_order' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '15 minutes',
+            ],
+            'guest_order_access_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 30,
+                'interval' => '15 minutes',
+            ],
+            // Opening a guest account takes no credential: it writes a customer row and
+            // hands back a token for whatever address it is given. Both windows are
+            // needed: the per-address one keeps one mailbox from being used over and
+            // over to probe whether it already has an account, the per-client one stops
+            // a single caller from walking a list of addresses or filling the table.
+            // Room for a visitor correcting a typo and starting over, none for a sweep.
+            'guest_registration_per_address' => [
+                'policy' => 'sliding_window',
+                'limit' => 5,
+                'interval' => '1 hour',
+            ],
+            'guest_registration_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 20,
+                'interval' => '1 hour',
+            ],
         ],
     ], prepend: true);
 };

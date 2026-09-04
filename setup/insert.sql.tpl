@@ -90,7 +90,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (79, 'store_eori', '', 0, 1, NOW(), NOW()),
 (80, 'store_vat_exempt', '0', 0, 1, NOW(), NOW()),
 (81, 'store_registration_exempt', '0', 0, 1, NOW(), NOW()),
-(82, 'store_legal_mentions', '', 0, 1, NOW(), NOW())
+(82, 'store_legal_mentions', '', 0, 1, NOW(), NOW()),
+(83, 'guest_checkout_mode', 'disabled', 0, 0, NOW(), NOW())
 
 ;
 

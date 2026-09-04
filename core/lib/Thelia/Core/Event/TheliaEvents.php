@@ -122,6 +122,9 @@ final class TheliaEvents
     /** sent on customer account simple creation. */
     public const CREATE_CUSTOMER_MINIMAL = 'action.create.customer.minimal';
 
+    /** Sent to open the passwordless account that carries an order placed without one. */
+    public const CUSTOMER_GUEST_CREATE = 'action.create.customer.guest';
+
     /** sent on customer account update. */
     public const CUSTOMER_UPDATEACCOUNT = 'action.updateCustomer';
 

@@ -26,9 +26,21 @@ use Thelia\Model\Base\CustomerQuery as BaseCustomerQuery;
  */
 class CustomerQuery extends BaseCustomerQuery
 {
-    public static function getCustomerByEmail($email)
+    /**
+     * The account registered on an address, if there is one.
+     *
+     * Guest rows are not accounts and never come back from here. The checkout writes one
+     * for whoever types an address, so a guest row proves nothing about who owns the
+     * address: it must not stand in the way of that address being registered, and it must
+     * not be handed to anything that means "the customer behind this address". A guest
+     * that chose a password is still a guest row until its activation code is answered.
+     */
+    public static function getCustomerByEmail($email): ?Customer
     {
-        return self::create()->findOneByEmail($email);
+        return self::create()
+            ->filterByEmail($email)
+            ->filterByIsGuest(0)
+            ->findOne();
     }
 
     public static function getMonthlyNewCustomersStats($month, $year)

@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Controller\Front;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Test\IntegrationTestCase;
@@ -39,6 +40,28 @@ final class BaseFrontControllerTest extends IntegrationTestCase
     public function testAnAnonymousVisitorIsSentToTheLoginPage(): void
     {
         $this->assertRedirectsTo('/customer/login', static fn (FrontControllerUnderTest $controller) => $controller->checkAuth());
+    }
+
+    /**
+     * A guest checking out sits in the session under the very key a signed-in customer
+     * does, because the checkout needs a customer to build the order from. They proved
+     * nothing about the address they typed, so every page behind checkAuth() — the
+     * order history, the address book, the account form — stays shut to them.
+     */
+    public function testAGuestCheckingOutIsSentToTheLoginPageLikeAnyVisitor(): void
+    {
+        $session = $this->session();
+        // Nothing marks them beyond the row itself: a guest is a customer whose
+        // customer.is_guest is still 1, and putting it in the session is all it takes.
+        $session->setCustomerUser(
+            $this->createFixtureFactory()->guestCustomer($this->createFixtureFactory()->customerTitle()),
+        );
+
+        try {
+            $this->assertRedirectsTo('/customer/login', static fn (FrontControllerUnderTest $controller) => $controller->checkAuth());
+        } finally {
+            $session->clearCustomerUser();
+        }
     }
 
     public function testAnEmptyCartIsSentBackToTheCartPage(): void
@@ -73,6 +96,14 @@ final class BaseFrontControllerTest extends IntegrationTestCase
         }
 
         self::fail(\sprintf('Expected a RedirectException towards "%s".', $expectedPath));
+    }
+
+    private function session(): Session
+    {
+        $session = static::getContainer()->get('request_stack')->getCurrentRequest()?->getSession();
+        self::assertInstanceOf(Session::class, $session);
+
+        return $session;
     }
 
     private function controller(): FrontControllerUnderTest

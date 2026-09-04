@@ -66,6 +66,7 @@ use Thelia\Core\Propel\PropelInitService;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Security\Http\Authentication\ThrottledLoginFailureHandler;
 use Thelia\Core\Security\RateLimiter\ApiLoginRateLimiter;
+use Thelia\Core\Security\UserChecker\CustomerUserChecker;
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Core\Serializer\SerializerInterface;
@@ -691,6 +692,10 @@ class TheliaKernel extends Kernel
                     'pattern' => '^/api/front/login',
                     'stateless' => true,
                     'provider' => 'customer_provider',
+                    // Without it the login checks the password and nothing else, and an
+                    // account the shop closed pending its activation code is handed a
+                    // token all the same.
+                    'user_checker' => CustomerUserChecker::class,
                     'json_login' => [
                         'check_path' => '/api/front/login',
                         'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',

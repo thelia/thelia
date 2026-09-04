@@ -70,7 +70,10 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
                 throw new WrongPasswordException(\sprintf("Wrong password for user '%s'.", $username));
             }
 
-            // Customer email confirmation feature is available since Thelia 2.3.4
+            // Customer email confirmation feature is available since Thelia 2.3.4.
+            // A converted guest does not depend on this setting to stay closed: its row
+            // stays is_guest = 1 until its activation code is answered, and the user
+            // provider above never returns a guest row.
             if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer && (null !== $user->getConfirmationToken() && !$user->getEnable())) {
                 throw (new CustomerNotConfirmedException())->setUser($user);
             }

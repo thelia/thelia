@@ -32,9 +32,14 @@ class BaseFrontController extends BaseController
      */
     protected string $currentRouter = 'router';
 
+    /**
+     * A guest checking out sits in the session under the customer key, so asking only
+     * whether a customer is there would open every account page to them. They proved
+     * nothing about the address they typed, so they are sent to sign in like a visitor.
+     */
     public function checkAuth(): void
     {
-        if (false === $this->getSecurityContext()->hasCustomerUser()) {
+        if (false === $this->getSecurityContext()->hasAuthenticatedCustomerUser()) {
             throw new RedirectException($this->retrieveUrlFromRouteId('customer_login'));
         }
     }

@@ -18,12 +18,19 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\CustomerQuery;
 
+/**
+ * The account behind a remember-me cookie.
+ *
+ * Guest rows are excluded like everywhere else a session is handed out: they hold no
+ * credentials, and a converted guest stays one until its activation code is answered.
+ */
 class CustomerTokenUserProvider extends TokenUserProvider
 {
     public function getUser(array $key): UserInterface
     {
         if (null === $customer = CustomerQuery::create()
             ->filterByEmail($key['username'], Criteria::EQUAL)
+            ->filterByIsGuest(0)
             ->filterByRememberMeSerial($key['serial'], Criteria::EQUAL)
             ->filterByRememberMeToken($key['token'], Criteria::EQUAL)
             ->findOne()) {

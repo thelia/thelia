@@ -37,7 +37,8 @@
         "symfony/flex": "^2.4",
         "thelia/flexy": "^1.0",
         "ext-simplexml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "symfony/webpack-encore-bundle": "^2.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.*",

@@ -614,10 +614,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         int $moduleId,
         int $deliveryAddressId,
     ): OrderPostage {
-        if (!$this->securityContext->getCustomerUser()) {
-            throw new \Exception('Customer not found !');
-        }
-
         $deliveryModule = ModuleQuery::create()->filterById($moduleId)->findOne();
 
         if (null === $deliveryModule) {
