@@ -22,7 +22,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     // URL management
     $services->set(URL::class)
-        ->args([service('router'), service(RewritingUrlMemoizer::class)]);
+        ->args([service('router'), service(RewritingUrlMemoizer::class), service('request_stack')]);
 
     $services->alias('thelia.url.manager', URL::class)
         ->public();
