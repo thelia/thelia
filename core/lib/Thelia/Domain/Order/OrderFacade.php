@@ -17,7 +17,10 @@ namespace Thelia\Domain\Order;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Checkout\Service\ConsentAcceptanceStore;
+use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
@@ -37,6 +40,7 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatusQuery;
@@ -55,11 +59,18 @@ readonly class OrderFacade
         private OrderRefGeneratorInterface $orderRefGenerator,
         private StockDecrementer $stockDecrementer,
         private PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
+        private ConsentProvider $consentProvider,
+        private ConsentAcceptanceStore $consentAcceptanceStore,
+        private RequestStack $requestStack,
     ) {
     }
 
     /**
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
+     * @param bool $recordConsentAnswers     whether the buyer's consent answers get frozen onto the order. Only the
+     *                                       checkout tunnel has answers to freeze: an order created outside of it
+     *                                       (the back office, the command line) has no buyer at the keyboard, so
+     *                                       there is nothing to record and no session to purge afterwards.
      *
      * @throws \Exception
      * @throws PropelException
@@ -72,6 +83,7 @@ readonly class OrderFacade
         CartModel $cart,
         UserInterface $customer,
         bool $useOrderDefinedAddresses = false,
+        bool $recordConsentAnswers = true,
     ): ModelOrder {
         if (null === $customer->getId()) {
             throw new TheliaProcessException('Customer identifier is required');
@@ -107,6 +119,10 @@ readonly class OrderFacade
             $placedOrder->save($connection);
 
             $this->persistPostageTaxBreakdown($placedOrder, $cart, $taxCountry, $lang, $connection);
+
+            if ($recordConsentAnswers) {
+                $this->persistConsentAcceptances($placedOrder, $lang, $connection);
+            }
 
             $manageStockOnCreation = $placedOrder->isStockManagedOnOrderCreation($dispatcher);
 
@@ -195,6 +211,12 @@ readonly class OrderFacade
 
             $this->orderTransactionManager->commit($connection);
 
+            if ($recordConsentAnswers) {
+                // Only once the answers are on the order: dropped before the commit, a
+                // rollback would leave the buyer with boxes to tick again and no way to know it.
+                $this->consentAcceptanceStore->clear();
+            }
+
             return $placedOrder;
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
@@ -238,6 +260,44 @@ readonly class OrderFacade
                 ->setDescription($line->description)
                 ->setUntaxedAmount((string) $line->untaxedAmount)
                 ->setAmount((string) $line->amount)
+                ->save($connection);
+        }
+    }
+
+    /**
+     * Freezes what the buyer answered to every consent the shop was asking for.
+     *
+     * One row per active consent, ticked or not: a refusal is as much of an answer as an
+     * acceptance, and an order with no row for an optional consent would later read as
+     * an order placed before that consent existed. The wording is copied the way
+     * order_product.title is, so that rewording or deleting the consent afterwards
+     * cannot change what the buyer is on record as having agreed to. The address is the
+     * one the answer came from.
+     *
+     * Only called for orders placed through the checkout tunnel — see the
+     * $recordConsentAnswers guard in createOrder(). An order created from the back
+     * office or the command line has no buyer answering boxes, so it gets no rows here:
+     * writing "declined" against the admin's IP would be a false record, not a proof.
+     *
+     * @throws PropelException
+     */
+    private function persistConsentAcceptances(
+        ModelOrder $placedOrder,
+        LangModel $lang,
+        ConnectionInterface $connection,
+    ): void {
+        $acceptances = $this->consentAcceptanceStore->all();
+        $ipAddress = $this->requestStack->getMainRequest()?->getClientIp();
+
+        foreach ($this->consentProvider->activeConsents() as $consent) {
+            $code = (string) $consent->getCode();
+
+            (new OrderConsent())
+                ->setOrderId($placedOrder->getId())
+                ->setConsentCode($code)
+                ->setTitle($this->consentProvider->title($consent, $lang->getLocale()))
+                ->setAccepted(($acceptances[$code] ?? false) ? 1 : 0)
+                ->setIpAddress($ipAddress)
                 ->save($connection);
         }
     }
