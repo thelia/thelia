@@ -58,6 +58,7 @@ use Thelia\Config\DatabaseConfiguration;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\LoggingDefaults;
 use Thelia\Core\DependencyInjection\TheliaContainer;
@@ -249,6 +250,14 @@ class TheliaKernel extends Kernel
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
+
+            // ConfigQuery::read() falls back to a full table read when nothing has
+            // warmed it yet, and the debug logger reads its own configuration while
+            // the container is still being built. The Base model class this needs
+            // only exists once the call above has generated it, so this cannot run
+            // any earlier - a cold cache (fresh install, cold CI) has no such class
+            // to autoload yet.
+            ConfigCacheService::warmFromSharedEntry($this->getCacheDir());
         }
     }
 

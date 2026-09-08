@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Cache;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Thelia\Model\ConfigQuery;
 
@@ -30,8 +31,46 @@ class ConfigCacheService
 {
     public const CACHE_KEY = 'thelia_config';
 
+    /**
+     * Namespace of the pool holding the entry.
+     *
+     * Given to the container's pool definition as a literal, not read back
+     * from it: {@see warmFromSharedEntry()} has to reach the same files
+     * before there is a container to ask, and only a value known in advance
+     * lets it. It only ever finds them when THELIA_CACHE_DSN is empty, the
+     * pool then being the plain local FilesystemAdapter this builds by hand;
+     * a remote backend leaves the pre-boot read a miss, same as an empty one.
+     */
+    public const CACHE_NAMESPACE = 'thelia_cache';
+
     public function __construct(protected AdapterInterface $cache)
     {
+    }
+
+    /**
+     * Hands the stored configuration over before there is a container.
+     *
+     * The debug logger reads its own configuration while Propel is being
+     * wired up, long before this service exists, and with nothing warmed
+     * {@see ConfigQuery::read()} read the whole table straight from the
+     * database - on every single request. This reads the shared entry and
+     * nothing else: filling it stays the business of the service, so a miss
+     * simply leaves the configuration unwarmed, exactly as before.
+     */
+    public static function warmFromSharedEntry(string $cacheDirectory): void
+    {
+        $item = (new FilesystemAdapter(self::CACHE_NAMESPACE, 0, $cacheDirectory))
+            ->getItem(self::CACHE_KEY);
+
+        if (!$item->isHit()) {
+            return;
+        }
+
+        $configs = $item->get();
+
+        if (\is_array($configs)) {
+            ConfigQuery::initCache($configs);
+        }
     }
 
     public function initCacheConfigs(bool $force = false): void

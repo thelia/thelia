@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\Cache;
 
+use PHPUnit\Framework\Attributes\Test;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -36,6 +39,10 @@ final class ConfigCacheServiceTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         unset($_ENV[self::ENV_NAME]);
+
+        // The rolled back transaction leaves the entry describing rows that
+        // are gone, so it goes with the test.
+        $this->sharedEntryPool()->deleteItem(ConfigCacheService::CACHE_KEY);
         ConfigQuery::resetCache();
 
         parent::tearDown();
@@ -97,6 +104,76 @@ final class ConfigCacheServiceTest extends IntegrationTestCase
             1,
             self::countSqlQueriesSelectingFrom($statements, 'config'),
             'Applying the override on read must not cost a query.',
+        );
+    }
+
+    #[Test]
+    public function theSharedEntryIsHandedOverBeforeThereIsAContainer(): void
+    {
+        $this->getService(ConfigCacheService::class)->initCacheConfigs();
+        ConfigQuery::resetCache();
+
+        $statements = $this->recordSqlQueries(static function (): void {
+            ConfigCacheService::warmFromSharedEntry(static::$kernel->getCacheDir());
+
+            ConfigQuery::read('store_name');
+        });
+
+        self::assertSame(
+            0,
+            self::countSqlQueriesSelectingFrom($statements, 'config'),
+            'Reading the configuration before the container is built must not reach the database.',
+        );
+    }
+
+    #[Test]
+    public function nothingIsHandedOverWhenThereIsNoSharedEntry(): void
+    {
+        $this->sharedEntryPool()->deleteItem(ConfigCacheService::CACHE_KEY);
+        ConfigQuery::resetCache();
+
+        $statements = $this->recordSqlQueries(static function (): void {
+            ConfigCacheService::warmFromSharedEntry(static::$kernel->getCacheDir());
+
+            ConfigQuery::read('store_name');
+        });
+
+        self::assertSame(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'config'),
+            'With no entry to hand over, the table is read as it always was.',
+        );
+    }
+
+    #[Test]
+    public function writingAConfigurationValueDropsTheSharedEntry(): void
+    {
+        $this->getService(ConfigCacheService::class)->initCacheConfigs();
+
+        self::assertTrue(
+            $this->sharedEntryPool()->getItem(ConfigCacheService::CACHE_KEY)->isHit(),
+            'sanity: the entry has to be there before a write can drop it',
+        );
+
+        ConfigQuery::write(self::CONFIG_NAME, 'written');
+
+        self::assertFalse(
+            $this->sharedEntryPool()->getItem(ConfigCacheService::CACHE_KEY)->isHit(),
+            'A write has to drop the entry: it carries no expiry of its own, so nothing else would ever refresh it.',
+        );
+        self::assertSame('written', ConfigQuery::read(self::CONFIG_NAME));
+    }
+
+    /**
+     * A pool object of its own, on the same files: an adapter keeps what it
+     * has read in memory, and these assertions are about what is on disk.
+     */
+    private function sharedEntryPool(): CacheItemPoolInterface
+    {
+        return new FilesystemAdapter(
+            ConfigCacheService::CACHE_NAMESPACE,
+            0,
+            static::$kernel->getCacheDir(),
         );
     }
 }

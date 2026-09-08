@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Thelia\Core\Cache\ApplicationCacheAdapter;
 use Thelia\Core\Cache\CacheAdapterFactory;
+use Thelia\Core\Cache\ConfigCacheService;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();
@@ -42,16 +43,40 @@ return static function (ContainerConfigurator $container): void {
         ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
         ->tag('monolog.logger', ['channel' => 'cache']);
 
-    // Configuration and feed cache, deliberately tied to the container cache
-    // directory: it is meant to go away with cache:clear.
+    // Feed cache, deliberately tied to the container cache directory: it is
+    // meant to go away with cache:clear. Each item carries its own lifetime,
+    // set by Feed::buildArray() from the loop's timeout argument.
     $services->set(AdapterInterface::class, FilesystemAdapter::class)
         ->public()
         ->args([
             '%thelia.cache.namespace%',
-            '600',
+            600,
             '%kernel.cache_dir%',
         ]);
 
     $services->alias('thelia.cache', AdapterInterface::class)
         ->public();
+
+    // The configuration table, shared with every other process of the shop the
+    // same way cache.app is: THELIA_CACHE_DSN decides the backend, empty or not.
+    // Kept apart from cache.app itself and tied to the container cache directory
+    // rather than to thelia.cache.directory, so it goes away with cache:clear -
+    // the one safety net left for a row changed outside ConfigQuery::write(),
+    // a raw migration or a restored backup among them.
+    //
+    // No lifetime: the entry is dropped by whatever writes what it was built
+    // from (the configuration table, through ModelConfigListener), never by
+    // age. An expiry on top of that only bought a full re-read of the table
+    // every ten minutes, for an answer that had not changed.
+    $services->set('thelia.cache.config.adapter', ApplicationCacheAdapter::class)
+        ->factory([CacheAdapterFactory::class, 'create'])
+        ->args([
+            ConfigCacheService::CACHE_NAMESPACE,
+            0,
+            '%env(THELIA_CACHE_DSN)%',
+            '%kernel.cache_dir%',
+            service('cache.default_marshaller')->ignoreOnInvalid(),
+        ])
+        ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+        ->tag('monolog.logger', ['channel' => 'cache']);
 };
