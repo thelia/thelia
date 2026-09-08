@@ -756,7 +756,7 @@ readonly class ApiResourcePropelTransformerService
             }
         }
 
-        $propelModel->setLocale($this->serializedLocale($context, $langs));
+        $propelModel->setLocale($this->serializationLocale($context, $langs));
     }
 
     /**
@@ -773,7 +773,7 @@ readonly class ApiResourcePropelTransformerService
      *
      * @param Collection<int, Lang> $langs
      */
-    private function serializedLocale(array $context, Collection $langs): string
+    public function serializationLocale(array $context, Collection $langs): string
     {
         $requested = $context['filters']['locale'] ?? null;
         $default = null;

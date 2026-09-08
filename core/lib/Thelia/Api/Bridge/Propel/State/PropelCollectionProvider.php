@@ -25,6 +25,7 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\PropelRelationPreloader;
 use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Api\Service\API\PublicUrlPreloader;
 use Thelia\Model\Lang;
 
 readonly class PropelCollectionProvider implements ProviderInterface
@@ -32,6 +33,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private PropelRelationPreloader $propelRelationPreloader,
+        private PublicUrlPreloader $publicUrlPreloader,
         private iterable $propelCollectionExtensions = [],
     ) {
     }
@@ -80,28 +82,28 @@ readonly class PropelCollectionProvider implements ProviderInterface
             $this->propelRelationPreloader->preload($models, $resourceClass, $context);
         }
 
-        if ($results instanceof PropelModelPager) {
-            $resources = array_map(
-                fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
-                    resourceClass: $resourceClass,
-                    propelModel: $propelModel,
-                    context: $context,
-                    langs: $langs,
-                ),
-                iterator_to_array($results->getResults())
-            );
-
-            return new PropelPaginator($results, $resources);
-        }
-
-        return array_map(
+        $resources = array_map(
             fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $resourceClass,
                 propelModel: $propelModel,
                 context: $context,
                 langs: $langs,
             ),
-            iterator_to_array($results),
+            iterator_to_array($results instanceof PropelModelPager ? $results->getResults() : $results),
         );
+
+        // The serializer is about to ask each resource for its public url, and
+        // each of those resolves a rewritten url of its own. Filling the memo
+        // for the page is one read per view instead of one per item.
+        $this->publicUrlPreloader->preload(
+            $resources,
+            $this->apiResourcePropelTransformerService->serializationLocale($context, $langs),
+        );
+
+        if ($results instanceof PropelModelPager) {
+            return new PropelPaginator($results, $resources);
+        }
+
+        return $resources;
     }
 }
