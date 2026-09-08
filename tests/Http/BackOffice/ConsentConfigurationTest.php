@@ -211,6 +211,31 @@ final class ConsentConfigurationTest extends WebIntegrationTestCase
         self::assertStringContainsString('I accept the terms and conditions of sale', $content);
     }
 
+    public function testOrderDetailPageShowsWhenTheBoxWasAnswered(): void
+    {
+        $this->loginAdmin();
+
+        $factory = new FixtureFactory($this->getPropelConnection());
+        $order = $factory->order();
+
+        (new OrderConsent())
+            ->setOrderId((int) $order->getId())
+            ->setConsentCode(Consent::CODE_TERMS_AND_CONDITIONS)
+            ->setTitle('I accept the terms and conditions of sale')
+            ->setAccepted(1)
+            ->setAnsweredAt(new \DateTimeImmutable('2020-02-03 14:05:00'))
+            ->save($this->getPropelConnection());
+
+        $this->client->request('GET', \sprintf('/admin/order/update/%d', $order->getId()));
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        self::assertStringContainsString(
+            '03/02/2020 14:05',
+            (string) $this->client->getResponse()->getContent(),
+            'The order sheet shows when the buyer answered the box, not when the order was written.',
+        );
+    }
+
     public function testOrderDetailPageHidesConsentsBlockWhenOrderHasNone(): void
     {
         $this->loginAdmin();

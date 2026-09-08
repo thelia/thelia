@@ -29,6 +29,7 @@ use Thelia\Domain\Checkout\Exception\MissingConsentException;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentAcceptanceStore;
+use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
@@ -177,6 +178,73 @@ final class CheckoutConsentTest extends ActionIntegrationTestCase
         self::assertSame('The terms of sale, first wording', $rows[0]->getTitle());
     }
 
+    /**
+     * The window the existing rewording test leaves open: between the moment the buyer
+     * ticks the box and the moment they pay, the merchant edits the sentence. What goes
+     * on the order has to be what was on screen when they ticked — reading the wording
+     * back from the database at commit time would record a sentence nobody ever saw.
+     */
+    public function testRewordingAConsentBetweenTheBoxAndThePaymentDoesNotAlterTheProof(): void
+    {
+        $consent = $this->createConsent(
+            'cgv-test',
+            'The terms of sale, as the buyer read them',
+            mandatory: true,
+            description: 'The long text, as the buyer read it',
+        );
+        $fixtures = $this->createCheckoutReadyCart();
+
+        $this->acceptances(['cgv-test' => true]);
+
+        $consent
+            ->setLocale('en_US')
+            ->setTitle('The terms of sale, reworded before they paid')
+            ->setDescription('The long text, reworded before they paid')
+            ->save($this->getPropelConnection());
+        $this->getService(ConsentProvider::class)->forgetCache();
+
+        $order = $this->checkout($fixtures);
+        $rows = $this->orderConsentsOf($order);
+
+        self::assertCount(1, $rows);
+        self::assertSame('The terms of sale, as the buyer read them', $rows[0]->getTitle());
+        self::assertSame('The long text, as the buyer read it', $rows[0]->getDescription());
+    }
+
+    public function testTheProofCarriesTheMomentTheBoxWasAnsweredRatherThanTheOrderDate(): void
+    {
+        $this->createConsent('cgv-test', 'The terms of sale', mandatory: true);
+        $fixtures = $this->createCheckoutReadyCart();
+
+        $answeredBefore = new \DateTimeImmutable();
+        $this->acceptances(['cgv-test' => true]);
+
+        $order = $this->checkout($fixtures);
+        $rows = $this->orderConsentsOf($order);
+
+        $answeredAt = $rows[0]->getAnsweredAt();
+        self::assertInstanceOf(\DateTimeInterface::class, $answeredAt);
+        self::assertGreaterThanOrEqual($answeredBefore->getTimestamp(), $answeredAt->getTimestamp());
+        self::assertLessThanOrEqual((int) $rows[0]->getCreatedAt()?->getTimestamp(), $answeredAt->getTimestamp());
+    }
+
+    public function testAnOptionalConsentTheBuyerNeverAnsweredIsRecordedWithTheWordingOfTheDay(): void
+    {
+        $this->createConsent('cgv-test', 'The terms of sale', mandatory: true);
+        $this->createConsent('newsletter-test', 'Send me the newsletter', mandatory: false);
+        $fixtures = $this->createCheckoutReadyCart();
+
+        // Only the mandatory box is answered: the optional one was never touched.
+        $this->acceptances(['cgv-test' => true]);
+
+        $rows = $this->orderConsentsOf($this->checkout($fixtures));
+
+        self::assertCount(2, $rows);
+        self::assertFalse($rows[1]->isAccepted());
+        self::assertSame('Send me the newsletter', $rows[1]->getTitle(), 'An unanswered box still needs a wording on the order, and the only one available is the current one.');
+        self::assertNotNull($rows[1]->getAnsweredAt());
+    }
+
     public function testATurnedOffConsentIsNeitherRequiredNorCopiedWhilePastRowsStay(): void
     {
         $consent = $this->createConsent('cgv-test', 'The terms of sale', mandatory: true);
@@ -254,21 +322,37 @@ final class CheckoutConsentTest extends ActionIntegrationTestCase
     }
 
     /**
+     * Answers the boxes the way the payment step does: with the wording that was on
+     * screen when the buyer clicked, not with a code the store would look up later.
+     *
      * @param array<string, bool> $acceptances
      */
     private function acceptances(array $acceptances): void
     {
-        $this->getService(ConsentAcceptanceStore::class)->replace($acceptances);
+        $answers = [];
+
+        foreach ($acceptances as $code => $accepted) {
+            $consent = ConsentQuery::create()->findOneByCode($code, $this->getPropelConnection());
+
+            $answers[$code] = [
+                'accepted' => $accepted,
+                'title' => (string) $consent?->setLocale('en_US')->getTitle(),
+                'description' => (string) $consent?->setLocale('en_US')->getDescription(),
+            ];
+        }
+
+        $this->getService(ConsentAcceptanceStore::class)->replace($answers);
     }
 
-    private function createConsent(string $code, string $title, bool $mandatory): Consent
+    private function createConsent(string $code, string $title, bool $mandatory, ?string $description = null): Consent
     {
         $consent = (new Consent())
             ->setCode($code)
             ->setMandatory($mandatory ? 1 : 0)
             ->setActive(1)
             ->setLocale('en_US')
-            ->setTitle($title);
+            ->setTitle($title)
+            ->setDescription($description);
         $consent->save($this->getPropelConnection());
 
         return $consent;

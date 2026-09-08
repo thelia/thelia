@@ -269,10 +269,15 @@ readonly class OrderFacade
      *
      * One row per active consent, ticked or not: a refusal is as much of an answer as an
      * acceptance, and an order with no row for an optional consent would later read as
-     * an order placed before that consent existed. The wording is copied the way
-     * order_product.title is, so that rewording or deleting the consent afterwards
-     * cannot change what the buyer is on record as having agreed to. The address is the
-     * one the answer came from.
+     * an order placed before that consent existed.
+     *
+     * Everything comes from the answer held in the session — the wording, the long text
+     * and the moment the box was answered — and nothing is read back from the consent
+     * table. That is the whole point: a merchant who rewords a consent between the tick
+     * and the payment must not end up with an order stating the buyer agreed to a
+     * sentence they never saw. The one legitimate re-read is the consent nobody
+     * answered: there is no displayed wording to copy, so the current one goes down
+     * against a refusal. The address is the one the answer came from.
      *
      * Only called for orders placed through the checkout tunnel — see the
      * $recordConsentAnswers guard in createOrder(). An order created from the back
@@ -286,17 +291,21 @@ readonly class OrderFacade
         LangModel $lang,
         ConnectionInterface $connection,
     ): void {
-        $acceptances = $this->consentAcceptanceStore->all();
+        $answers = $this->consentAcceptanceStore->answers();
         $ipAddress = $this->requestStack->getMainRequest()?->getClientIp();
+        $locale = (string) $lang->getLocale();
 
         foreach ($this->consentProvider->activeConsents() as $consent) {
             $code = (string) $consent->getCode();
+            $answer = $answers[$code] ?? null;
 
             (new OrderConsent())
                 ->setOrderId($placedOrder->getId())
                 ->setConsentCode($code)
-                ->setTitle($this->consentProvider->title($consent, $lang->getLocale()))
-                ->setAccepted(($acceptances[$code] ?? false) ? 1 : 0)
+                ->setTitle($answer['title'] ?? $this->consentProvider->title($consent, $locale))
+                ->setDescription($answer['description'] ?? $this->consentProvider->description($consent, $locale))
+                ->setAccepted(($answer['accepted'] ?? false) ? 1 : 0)
+                ->setAnsweredAt($answer['answeredAt'] ?? new \DateTimeImmutable())
                 ->setIpAddress($ipAddress)
                 ->save($connection);
         }

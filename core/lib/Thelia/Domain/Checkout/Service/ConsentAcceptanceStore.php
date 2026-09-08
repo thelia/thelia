@@ -25,8 +25,17 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * leave a record of consents behind. The proof is written once, on the order itself,
  * by OrderFacade — from here.
  *
+ * An answer is more than a yes or a no: it carries the wording and the long text the
+ * buyer had in front of them, and the moment they answered. That is what makes the row
+ * written on the order a proof rather than a claim — a merchant who rewords a consent
+ * between the tick and the payment must not end up with an order saying the buyer
+ * agreed to a sentence they never read. Which is also why an answer left unchanged
+ * keeps the wording it was given with, whatever the shop has published since.
+ *
  * Every read tolerates the absence of a session, because an order can be created
  * without one: the back office does it, and so does a command line.
+ *
+ * @phpstan-type ConsentAnswer array{accepted: bool, title: string, description: string, answeredAt: \DateTimeImmutable}
  */
 final readonly class ConsentAcceptanceStore
 {
@@ -41,16 +50,38 @@ final readonly class ConsentAcceptanceStore
      */
     public function all(): array
     {
-        $acceptances = $this->session()?->get(self::SESSION_KEY, []);
+        return array_map(
+            static fn (array $answer): bool => $answer['accepted'],
+            $this->answers(),
+        );
+    }
 
-        if (!\is_array($acceptances)) {
+    /**
+     * The answers as they were given: what was ticked, what was on screen, and when.
+     *
+     * @return array<string, ConsentAnswer> by consent code
+     */
+    public function answers(): array
+    {
+        $stored = $this->session()?->get(self::SESSION_KEY, []);
+
+        if (!\is_array($stored)) {
             return [];
         }
 
         $answers = [];
 
-        foreach ($acceptances as $code => $accepted) {
-            $answers[(string) $code] = (bool) $accepted;
+        foreach ($stored as $code => $answer) {
+            if (!\is_array($answer)) {
+                continue;
+            }
+
+            $answers[(string) $code] = [
+                'accepted' => (bool) ($answer['accepted'] ?? false),
+                'title' => (string) ($answer['title'] ?? ''),
+                'description' => (string) ($answer['description'] ?? ''),
+                'answeredAt' => new \DateTimeImmutable((string) ($answer['answeredAt'] ?? 'now')),
+            ];
         }
 
         return $answers;
@@ -58,31 +89,41 @@ final readonly class ConsentAcceptanceStore
 
     public function isAccepted(string $code): bool
     {
-        return $this->all()[$code] ?? false;
+        return $this->answers()[$code]['accepted'] ?? false;
     }
 
     /**
      * Records the answers of one submission, replacing the previous ones.
      *
      * A box left unticked is an answer too — the buyer declined — so the caller passes
-     * every consent it displayed, not only the ones that came back ticked.
+     * every consent it displayed, not only the ones that came back ticked, along with
+     * the wording it displayed them under.
      *
-     * @param array<string, bool> $acceptances the answer given to each consent, by consent code
+     * An answer whose value has not moved keeps the wording and the timestamp it was
+     * first given: ticking one box must not restamp, nor re-word, the boxes around it.
+     *
+     * @param array<string, array{accepted: bool, title: string, description: string}> $answers by consent code
      */
-    public function replace(array $acceptances): void
+    public function replace(array $answers): void
     {
-        $answers = [];
+        $previous = $this->answers();
+        $answeredAt = new \DateTimeImmutable();
+        $stored = [];
 
-        foreach ($acceptances as $code => $accepted) {
-            $answers[(string) $code] = (bool) $accepted;
+        foreach ($answers as $code => $answer) {
+            $code = (string) $code;
+            $accepted = (bool) $answer['accepted'];
+            $unchanged = isset($previous[$code]) && $previous[$code]['accepted'] === $accepted;
+
+            $stored[$code] = [
+                'accepted' => $accepted,
+                'title' => $unchanged ? $previous[$code]['title'] : $answer['title'],
+                'description' => $unchanged ? $previous[$code]['description'] : $answer['description'],
+                'answeredAt' => ($unchanged ? $previous[$code]['answeredAt'] : $answeredAt)->format(\DATE_ATOM),
+            ];
         }
 
-        $this->session()?->set(self::SESSION_KEY, $answers);
-    }
-
-    public function accept(string $code, bool $accepted = true): void
-    {
-        $this->replace([...$this->all(), $code => $accepted]);
+        $this->session()?->set(self::SESSION_KEY, $stored);
     }
 
     public function clear(): void

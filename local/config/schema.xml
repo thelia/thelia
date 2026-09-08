@@ -1564,7 +1564,9 @@
     <column name="order_id" required="true" type="INTEGER" />
     <column description="the consent this answer is about, kept as a plain code: the consent may be deleted, the proof stays" name="consent_code" required="true" size="64" type="VARCHAR" />
     <column description="the wording the buyer was shown, frozen the way order_product.title is" name="title" required="true" size="255" type="VARCHAR" />
+    <column description="the long text shown under the box, frozen alongside the wording" name="description" type="CLOB" />
     <column defaultValue="0" description="whether the box was ticked" name="accepted" required="true" type="TINYINT" />
+    <column description="when the buyer answered the box, which precedes the order it ends up on" name="answered_at" type="TIMESTAMP" />
     <column description="the address the answer came from, null when the order was not placed over HTTP" name="ip_address" size="45" type="VARCHAR" />
     <foreign-key foreignTable="order" name="fk_order_consent_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
