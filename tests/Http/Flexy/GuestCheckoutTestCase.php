@@ -254,14 +254,19 @@ abstract class GuestCheckoutTestCase extends WebIntegrationTestCase
         OrderTableMap::clearRelatedInstancePool();
     }
 
+    /**
+     * The query string is left out of the comparison: a redirection to the login page
+     * carries the page to come back to, and none of these assertions are about that.
+     */
     protected function assertResponseRedirectsTo(string $path): void
     {
         $response = $this->client->getResponse();
+        $location = (string) $response->headers->get('Location');
 
         self::assertTrue($response->isRedirect(), 'The request must answer with a redirect.');
         self::assertStringEndsWith(
             $path,
-            (string) $response->headers->get('Location'),
+            parse_url($location, \PHP_URL_PATH) ?: $location,
             \sprintf('The redirect must lead to "%s".', $path),
         );
     }
