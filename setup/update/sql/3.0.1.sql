@@ -168,13 +168,20 @@ UPDATE `consent`
       AND `content_id` IS NULL
       AND @terms_content_id IS NOT NULL;
 
+-- Every language the shop has, not just the two written here: a locale left without a
+-- row makes I18n fall back to the shop default and, failing that, forge the literal
+-- string "DEFAULT TITLE" — which is what the buyer would be asked to tick, and what
+-- would be frozen on their order as the proof of what they accepted. The fresh install
+-- seeds all its locales the same way (see setup/insert.sql).
 INSERT IGNORE INTO `consent_i18n` (`id`, `locale`, `title`, `description`)
-    SELECT `consent`.`id`, 'en_US', 'I have read and accept the terms and conditions of sale', NULL
-    FROM `consent` WHERE `consent`.`code` = 'terms_and_conditions';
-
-INSERT IGNORE INTO `consent_i18n` (`id`, `locale`, `title`, `description`)
-    SELECT `consent`.`id`, 'fr_FR', 'J\'ai lu et j\'accepte les conditions générales de vente', NULL
-    FROM `consent` WHERE `consent`.`code` = 'terms_and_conditions';
+    SELECT `consent`.`id`, `lang`.`locale`,
+           CASE WHEN `lang`.`locale` = 'fr_FR'
+                THEN 'J\'ai lu et j\'accepte les conditions générales de vente'
+                ELSE 'I have read and accept the terms and conditions of sale'
+           END,
+           NULL
+    FROM `consent` CROSS JOIN `lang`
+    WHERE `consent`.`code` = 'terms_and_conditions';
 
 -- The back office needs the resource to exist before a profile can be granted it.
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES

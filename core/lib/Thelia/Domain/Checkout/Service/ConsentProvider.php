@@ -14,10 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Consent;
+use Thelia\Model\ConsentI18nQuery;
 use Thelia\Model\ConsentQuery;
 use Thelia\Tools\I18n;
 
@@ -74,11 +76,39 @@ final class ConsentProvider implements EventSubscriberInterface
      * The wording to show the buyer, and the one to freeze on their order.
      *
      * Resolved the way the product title frozen on an order line is: the asked locale
-     * first, the shop default next.
+     * first, the shop default next. What it never returns is the "DEFAULT TITLE"
+     * placeholder I18n forges when it finds neither — hence the empty $needed. A box
+     * saying that means nothing to the buyer, and a row saying that proves nothing to
+     * the merchant, so any wording the shop actually wrote comes first, and the code of
+     * the consent last: technical, but true.
      */
     public function title(Consent $consent, string $locale): string
     {
-        return (string) I18n::forceI18nRetrieving($locale, 'Consent', $consent->getId())->getTitle();
+        $title = (string) I18n::forceI18nRetrieving($locale, 'Consent', $consent->getId(), [])->getTitle();
+
+        if ('' !== $title) {
+            return $title;
+        }
+
+        $written = ConsentI18nQuery::create()
+            ->filterById($consent->getId())
+            ->filterByTitle(null, Criteria::ISNOTNULL)
+            ->filterByTitle('', Criteria::NOT_EQUAL)
+            ->orderByLocale()
+            ->findOne();
+
+        return (string) ($written?->getTitle() ?? $consent->getCode());
+    }
+
+    /**
+     * The long text shown under the box, and frozen on the order beside the wording.
+     *
+     * No fallback wording here, unlike the title: an untranslated long text is left
+     * empty and its paragraph is simply not rendered.
+     */
+    public function description(Consent $consent, string $locale): string
+    {
+        return (string) I18n::forceI18nRetrieving($locale, 'Consent', $consent->getId(), [])->getDescription();
     }
 
     public function forgetCache(): void

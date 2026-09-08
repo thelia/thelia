@@ -24,7 +24,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Consent as ConsentModel;
+use Thelia\Model\ConsentI18nQuery;
 use Thelia\Model\ConsentQuery;
+use Thelia\Model\Lang;
 
 /**
  * The merchant's side of the checkout consents: the list of boxes the buyer is shown at
@@ -52,6 +54,8 @@ class Consent extends BaseAction implements EventSubscriberInterface
             ->setDescription($event->getDescription())
             ->save();
 
+        $this->fillShopLanguage($consent, $event->getLocale(), $event->getTitle(), $event->getDescription());
+
         $event->setConsent($consent);
     }
 
@@ -67,6 +71,8 @@ class Consent extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
             ->save();
+
+        $this->fillShopLanguage($consent, $event->getLocale(), $event->getTitle(), $event->getDescription());
 
         $event->setConsent($consent);
     }
@@ -105,6 +111,46 @@ class Consent extends BaseAction implements EventSubscriberInterface
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(ConsentQuery::create(), $event, $dispatcher);
+    }
+
+    /**
+     * Makes sure the shop language never ends up without a wording for the consent.
+     *
+     * The back office writes one language at a time, and the language it is being read
+     * in is not necessarily the one of the shop: a merchant working in French on a shop
+     * whose default language is English produces a consent with no English wording in
+     * three clicks. I18n then forges the literal string "DEFAULT TITLE" — shown to the
+     * buyer on a box they must tick, and frozen on their order as the proof. Copying
+     * what was just written is a poor translation, and a far better placeholder.
+     *
+     * A wording the shop language already has is left alone: this fills a hole, it does
+     * not overwrite a translation.
+     */
+    private function fillShopLanguage(ConsentModel $consent, string $writtenLocale, ?string $title, ?string $description): void
+    {
+        $shopLocale = (string) Lang::getDefaultLanguage()->getLocale();
+
+        if ($shopLocale === $writtenLocale) {
+            return;
+        }
+
+        $shopWording = ConsentI18nQuery::create()
+            ->filterById($consent->getId())
+            ->filterByLocale($shopLocale)
+            ->findOne();
+
+        if (null !== $shopWording && '' !== (string) $shopWording->getTitle()) {
+            return;
+        }
+
+        $consent
+            ->setLocale($shopLocale)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->save();
+
+        // The caller reads the consent back in the language it was written in.
+        $consent->setLocale($writtenLocale);
     }
 
     private function getConsent(int $consentId): ConsentModel

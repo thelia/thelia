@@ -21,6 +21,7 @@ use Thelia\Core\Event\Consent\ConsentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\Consent;
+use Thelia\Model\ConsentI18nQuery;
 use Thelia\Model\ConsentQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -164,6 +165,87 @@ final class ConsentActionTest extends ActionIntegrationTestCase
         self::assertLessThan(
             ConsentQuery::create()->findPk($first->getId())?->getPosition(),
             ConsentQuery::create()->findPk($second->getId())?->getPosition(),
+        );
+    }
+
+    /**
+     * The wording of a consent is written in one language at a time, and the language of
+     * the back office is not necessarily the one of the shop. Without a row in the shop
+     * language, I18n forges a "DEFAULT TITLE" placeholder — which the buyer would be
+     * asked to tick, and which would be frozen on their order as the proof.
+     */
+    public function testCreatingAConsentInAnotherLanguageAlsoFillsTheShopLanguage(): void
+    {
+        $event = (new ConsentCreateEvent())
+            ->setCode('newsletter-optin')
+            ->setLocale('fr_FR')
+            ->setTitle('Je souhaite recevoir des offres')
+            ->setDescription('Vous pouvez vous désinscrire à tout moment.')
+            ->setMandatory(0)
+            ->setActive(1);
+
+        $this->dispatch($event, TheliaEvents::CONSENT_CREATE);
+
+        $consent = $event->getConsent();
+        self::assertNotNull($consent);
+
+        $shopWording = ConsentI18nQuery::create()
+            ->filterById($consent->getId())
+            ->filterByLocale('en_US')
+            ->findOne();
+
+        self::assertNotNull($shopWording, 'The shop language must never be left without a wording.');
+        self::assertSame('Je souhaite recevoir des offres', $shopWording->getTitle());
+        self::assertSame('Vous pouvez vous désinscrire à tout moment.', $shopWording->getDescription());
+    }
+
+    public function testUpdatingAConsentInAnotherLanguageFillsTheShopLanguageWhenItIsMissing(): void
+    {
+        $consent = (new Consent())
+            ->setCode('newsletter-optin')
+            ->setMandatory(0)
+            ->setActive(1)
+            ->setLocale('fr_FR')
+            ->setTitle('Ancien libellé');
+        $consent->save($this->getPropelConnection());
+
+        $this->dispatch(
+            (new ConsentUpdateEvent($consent->getId()))
+                ->setLocale('fr_FR')
+                ->setTitle('Nouveau libellé')
+                ->setDescription(null)
+                ->setMandatory(0)
+                ->setActive(1),
+            TheliaEvents::CONSENT_UPDATE,
+        );
+
+        $shopWording = ConsentI18nQuery::create()
+            ->filterById($consent->getId())
+            ->filterByLocale('en_US')
+            ->findOne();
+
+        self::assertNotNull($shopWording);
+        self::assertSame('Nouveau libellé', $shopWording->getTitle());
+    }
+
+    public function testUpdatingAConsentLeavesAWordingTheShopLanguageAlreadyHas(): void
+    {
+        $consent = $this->createConsent('newsletter-optin', 'The English wording');
+
+        $this->dispatch(
+            (new ConsentUpdateEvent($consent->getId()))
+                ->setLocale('fr_FR')
+                ->setTitle('Le libellé français')
+                ->setDescription(null)
+                ->setMandatory(0)
+                ->setActive(1),
+            TheliaEvents::CONSENT_UPDATE,
+        );
+
+        self::assertSame(
+            'The English wording',
+            ConsentI18nQuery::create()->filterById($consent->getId())->filterByLocale('en_US')->findOne()?->getTitle(),
+            'Filling in the shop language is a last resort, not a translation that overwrites one.',
         );
     }
 
