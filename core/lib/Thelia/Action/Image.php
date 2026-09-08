@@ -194,9 +194,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             return;
         }
 
-        $imagine = $this->createImagineInstance();
-        $image = $imagine->open($cacheFilePath);
-        $event->setImageObject($image);
+        // Opening the cache file decodes it in full: a caller that only wants the
+        // url or the path (uploading a file, transforming an API resource) never
+        // triggers it, and one that wants pixel data (the Smarty image loop, for
+        // IMAGE_WIDTH/IMAGE_HEIGHT) still gets it, decoded once.
+        $event->setImageObjectSupplier(fn (): ImageInterface => $this->createImagineInstance()->open($cacheFilePath));
     }
 
     /**
