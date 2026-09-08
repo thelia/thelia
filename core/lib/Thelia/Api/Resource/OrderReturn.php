@@ -32,6 +32,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\State\Processor\OrderReturnAdminCreateProcessor;
 use Thelia\Api\State\Processor\OrderReturnFrontCreateProcessor;
 use Thelia\Api\State\Processor\OrderReturnTransitionProcessor;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Map\OrderReturnTableMap;
 use Thelia\Model\OrderReturn as OrderReturnModel;
 
@@ -50,13 +51,16 @@ use Thelia\Model\OrderReturn as OrderReturnModel;
         ),
         new Patch(
             uriTemplate: '/admin/order_returns/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_UPDATE]],
         ),
         new Post(
             uriTemplate: '/admin/order_returns/{id}/transition',
+            status: 200,
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_TRANSITION]],
             input: OrderReturnTransitionInput::class,
             read: false,
             processor: OrderReturnTransitionProcessor::class,
+            extraProperties: ['admin_access' => AccessManager::UPDATE],
         ),
         new Delete(
             uriTemplate: '/admin/order_returns/{id}',
@@ -115,6 +119,11 @@ class OrderReturn implements PropelResourceInterface
     public const GROUP_ADMIN_READ = 'admin:order_return:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_return:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_return:write';
+    // Post-creation admin edition. Deliberately excludes `order` and
+    // `orderReturnLines`: those go through OrderReturnHydrator at creation so the
+    // eligibility check and refund computation run, and must not be mutated by the
+    // generic Patch processor, which bypasses them.
+    public const GROUP_ADMIN_UPDATE = 'admin:order_return:update';
     public const GROUP_ADMIN_TRANSITION = 'admin:order_return:transition';
     public const GROUP_FRONT_READ = 'front:order_return:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:order_return:read:single';
@@ -158,6 +167,7 @@ class OrderReturn implements PropelResourceInterface
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
+        self::GROUP_ADMIN_UPDATE,
         self::GROUP_FRONT_READ,
         self::GROUP_FRONT_WRITE,
     ])]
@@ -182,6 +192,7 @@ class OrderReturn implements PropelResourceInterface
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
+        self::GROUP_ADMIN_UPDATE,
         self::GROUP_FRONT_READ,
         self::GROUP_FRONT_WRITE,
     ])]
@@ -190,12 +201,13 @@ class OrderReturn implements PropelResourceInterface
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_ADMIN_WRITE,
+        self::GROUP_ADMIN_UPDATE,
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_WRITE,
     ])]
     public ?string $customerComment = null;
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_UPDATE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $refusalReason = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
