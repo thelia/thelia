@@ -25,6 +25,7 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\Exception\MissingConsentException;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
@@ -304,6 +305,24 @@ final class CheckoutConsentTest extends ActionIntegrationTestCase
             [],
             $this->orderConsentsOf($placedOrder),
             'A manual order has no buyer ticking boxes, so it must not be recorded as having answered — accepted or refused — any consent.',
+        );
+    }
+
+    /**
+     * The refusal is the last thing a buyer reads before their order is turned away, and
+     * it names a box worded in their own language. An untranslated sentence there reads
+     * as a bug in the middle of the most sensitive step of the checkout.
+     */
+    public function testTheRefusalIsWordedInTheBuyersLanguage(): void
+    {
+        self::assertSame(
+            'Vous devez accepter « Les conditions de vente » pour passer commande.',
+            Translator::getInstance()->trans(
+                'You must accept "%consent" to place this order.',
+                ['%consent' => 'Les conditions de vente'],
+                'core',
+                'fr_FR',
+            ),
         );
     }
 

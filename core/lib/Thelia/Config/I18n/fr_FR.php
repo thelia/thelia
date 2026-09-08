@@ -722,6 +722,7 @@ return [
     'You can not delete it.' => "Il n'est pas possible de le supprimer",
     "You don't need to use commas or other punctuations." => "Vous n'avez pas besoin d'utiliser de virgules ou d'autres signes de ponctuation",
     'You have to configure your store email first !' => "Vous devez d'abord configurer l'e-mail de votre boutique !",
+    'You must accept "%consent" to place this order.' => 'Vous devez accepter « %consent » pour passer commande.',
     'You must choose a billing address before using this coupon.' => 'Vous devez sélectionner une adresse de facturation avant d\'utiliser ce coupon.',
     'You must choose a delivery address before using this coupon.' => 'Vous devez sélectionner une adresse de livraison avant d\'utiliser ce coupon.',
     'You must select at least one attribute.' => 'Vous devez choisir au moins une déclinaison.',
