@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,12 +34,14 @@ use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Domain\Customer\Exception\InvalidPasswordResetTokenException;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
+use Thelia\Domain\Customer\Service\CustomerGuestConversionService;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Domain\Customer\Service\PasswordResetService;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 
@@ -62,6 +65,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected CartContext $cartContext,
         protected PasswordResetService $passwordResetService,
         protected CustomerCodeManager $customerCodeManager,
+        protected CustomerGuestConversionService $customerGuestConversionService,
     ) {
     }
 
@@ -89,8 +93,28 @@ class Customer extends BaseAction implements EventSubscriberInterface
         );
     }
 
+    /**
+     * Register an account from the shop's own signup form.
+     *
+     * An address that already carries a passwordless record — someone who ordered
+     * without an account — completes that record rather than opening a second one beside
+     * it: the orders, the addresses and the history hang off it, and the promise made to
+     * a buyer who orders without an account is that signing up later brings them back to
+     * what they bought.
+     *
+     * @throws PropelException
+     */
     public function createMinimal(CustomerCreateOrUpdateMinimalEvent $event): void
     {
+        $guestRecord = $this->guestRecordOn((string) $event->getEmail());
+
+        if ($guestRecord instanceof CustomerModel) {
+            $this->completeGuestRecord($guestRecord, $event);
+            $event->setCustomer($guestRecord);
+
+            return;
+        }
+
         $customer = new CustomerModel();
 
         $customer->createOrUpdateWithoutAddress(
@@ -114,6 +138,58 @@ class Customer extends BaseAction implements EventSubscriberInterface
         );
 
         $event->setCustomer($customer);
+    }
+
+    /**
+     * The passwordless record an address already carries, if there is one to complete.
+     *
+     * An anonymized record is not one: its identifying data is gone, so there is nothing
+     * left to hand back and nothing that says the person signing up is the one it was
+     * emptied for.
+     *
+     * @throws PropelException
+     */
+    private function guestRecordOn(string $email): ?CustomerModel
+    {
+        if ('' === trim($email)) {
+            return null;
+        }
+
+        return CustomerQuery::create()
+            ->filterByEmail($email)
+            ->filterByIsGuest(1)
+            ->filterByAnonymizedAt(null, Criteria::ISNULL)
+            ->orderById(Criteria::DESC)
+            ->findOne();
+    }
+
+    /**
+     * Put the password the signup form asked for on the record the orders hang off.
+     *
+     * The same path as completing the account from an order tracking link: the record
+     * keeps `is_guest` until the activation code is answered, so what is written here
+     * opens nothing on its own. Ordering without an account is open to everyone, so an
+     * address in that record proves nothing about who typed it, and reading the mailbox
+     * is what tells the two apart.
+     *
+     * @throws PropelException
+     */
+    private function completeGuestRecord(
+        CustomerModel $guestRecord,
+        CustomerCreateOrUpdateMinimalEvent $event,
+    ): void {
+        $guestRecord
+            ->setTitleId($event->getTitle())
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname());
+
+        if (null !== $event->getLangId()) {
+            $guestRecord->setLangId($event->getLangId());
+        }
+
+        $guestRecord->save();
+
+        $this->customerGuestConversionService->convert($guestRecord, (string) $event->getPassword());
     }
 
     /**

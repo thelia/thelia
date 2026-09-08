@@ -95,10 +95,14 @@ abstract class GuestCheckoutTestCase extends WebIntegrationTestCase
         $cart = $this->cartOpenedAfter($highestCartIdBefore);
 
         $fixtures = $this->fixtures();
+
+        // Titled on purpose: the cart page renders every line through a component whose
+        // title is a non-nullable string, so an untranslated product takes the page down.
         $product = $fixtures->product(
             $fixtures->category(),
             $fixtures->taxRule(),
             $fixtures->currency(),
+            ['title' => 'A product in the cart'],
         );
 
         if ($guestCheckoutForbidden) {

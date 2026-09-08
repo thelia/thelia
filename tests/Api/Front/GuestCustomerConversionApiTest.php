@@ -79,6 +79,33 @@ final class GuestCustomerConversionApiTest extends ApiTestCase
         );
     }
 
+    /**
+     * A headless front that reads 201 believes the account is open, and offers a sign-in
+     * that cannot work: the record stays a guest until the activation code is answered.
+     * The status says the request was accepted and not completed, and the payload says
+     * what is still owed.
+     */
+    public function testTheAnswerSaysTheAccountIsStillWaitingForItsCode(): void
+    {
+        $this->enableGuestCheckout();
+
+        [, $guest] = $this->registerGuest();
+        $response = $this->convert($guest['id'], ['password' => 'a-chosen-password'], $guest['token']);
+
+        self::assertSame(
+            202,
+            $response->getStatusCode(),
+            'Accepted, not done: nothing can be signed into yet.',
+        );
+
+        $payload = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertTrue(
+            $payload['activationCodeRequired'] ?? false,
+            'The answer has to say what the caller is still waiting on.',
+        );
+    }
+
     private function login(string $email, string $password): \Symfony\Component\HttpFoundation\Response
     {
         $this->client->request(

@@ -21,10 +21,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\Customer\CustomerAnonymizeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Erases the identifying data of one customer, keeping the orders.
+ * Erases the identifying data of a customer, keeping the orders.
+ *
+ * An email address may carry more than one row: ordering without an account opens one,
+ * and registering later opens another. An erasure request is about the person behind the
+ * address, so every row it carries is erased — reading only the first would leave the
+ * other one's name, addresses and orders untouched, and say nothing about it.
  */
 class CustomerAnonymizeCommand extends ContainerAwareCommand
 {
@@ -42,19 +48,31 @@ class CustomerAnonymizeCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = (string) $input->getArgument('email');
-        $customer = CustomerQuery::create()->findOneByEmail($email);
+        $customers = CustomerQuery::create()->filterByEmail($email)->orderById()->find();
 
-        if (null === $customer) {
+        if (0 === $customers->count()) {
             $output->writeln(\sprintf('<error>No customer found with email "%s".</error>', $email));
 
             return 1;
         }
 
+        $references = implode(', ', array_map(
+            static fn (Customer $customer): string => (string) $customer->getRef(),
+            iterator_to_array($customers),
+        ));
+
+        $output->writeln(\sprintf(
+            '<info>%d customer record(s) found on "%s": %s</info>',
+            $customers->count(),
+            $email,
+            $references,
+        ));
+
         if (!$input->getOption('force')) {
             $question = new ConfirmationQuestion(
                 \sprintf(
-                    'Anonymize customer %s (%s)? This cannot be undone. [y/N] ',
-                    $customer->getRef(),
+                    'Anonymize %d record(s) on %s? This cannot be undone. [y/N] ',
+                    $customers->count(),
                     $email,
                 ),
                 false,
@@ -67,14 +85,16 @@ class CustomerAnonymizeCommand extends ContainerAwareCommand
             }
         }
 
-        $this->getDispatcher()->dispatch(
-            new CustomerAnonymizeEvent($customer),
-            TheliaEvents::CUSTOMER_ANONYMIZE,
-        );
+        foreach ($customers as $customer) {
+            $this->getDispatcher()->dispatch(
+                new CustomerAnonymizeEvent($customer),
+                TheliaEvents::CUSTOMER_ANONYMIZE,
+            );
+        }
 
         $output->writeln(\sprintf(
-            '<info>Customer %s anonymized. Orders kept, account disabled.</info>',
-            $customer->getRef(),
+            '<info>%d customer record(s) anonymized. Orders kept, accounts disabled.</info>',
+            $customers->count(),
         ));
 
         return 0;

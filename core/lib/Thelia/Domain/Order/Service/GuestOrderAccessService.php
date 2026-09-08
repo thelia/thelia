@@ -25,13 +25,17 @@ use Thelia\Model\OrderQuery;
  * A guest has no account to sign into, so the link is the only thing that identifies
  * the person entitled to see the order. It is signed rather than stored: it names the
  * order and the moment it stops being accepted, and it is signed together with the
- * address and the password hash of the customer behind it. Nothing is written when a
- * link is handed out, a link issued for one order cannot be replayed on another, and a
- * link stops being accepted the moment the address or the password behind it changes.
+ * address behind it and with whether that record is still a passwordless one. Nothing is
+ * written when a link is handed out, a link issued for one order cannot be replayed on
+ * another, and a link stops being accepted the moment the address changes or the account
+ * is opened.
  *
- * A guest carries an empty password hash, so converting the guest account into a real
- * one invalidates every link issued while it was a guest — which is what should happen:
- * from then on the orders are reached by signing in.
+ * Deliberately not the password hash: a buyer who chooses a password is still a guest
+ * until the activation code is answered, so signing the hash killed the link at the very
+ * moment it was the only way back to the order — the buyer could neither sign in nor
+ * reopen their link, and a code that never arrived put the order out of reach for good.
+ * What is signed is the state that actually decides, so the link dies when the account
+ * becomes usable and not before.
  */
 final readonly class GuestOrderAccessService
 {
@@ -77,7 +81,7 @@ final readonly class GuestOrderAccessService
                 $orderId,
                 $expiresAt,
                 (string) $customer?->getEmail(),
-                (string) $customer?->getPassword(),
+                true === $customer?->isGuest(),
             ),
         );
     }
@@ -88,41 +92,72 @@ final readonly class GuestOrderAccessService
      */
     public function findOrderForToken(string $token): ?Order
     {
+        [$order, $accountWasOpened] = $this->resolve($token);
+
+        return $accountWasOpened ? null : $order;
+    }
+
+    /**
+     * The order a link would still open, were the account it belongs to not open already.
+     *
+     * The one case worth telling the buyer about: their order is not gone, it is behind a
+     * sign-in. Everything else — expired, forged, naming no order — stays indistinguishable
+     * from everything else, so a token nobody was issued learns nothing from asking.
+     */
+    public function findOrderNowBehindAnAccount(string $token): ?Order
+    {
+        [$order, $accountWasOpened] = $this->resolve($token);
+
+        return $accountWasOpened ? $order : null;
+    }
+
+    /**
+     * @return array{0: ?Order, 1: bool} the order the token names, and whether it is only
+     *                                   turned away because the account has been opened
+     */
+    private function resolve(string $token): array
+    {
         $parts = explode('.', $token);
 
         if (3 !== \count($parts)) {
-            return null;
+            return [null, false];
         }
 
         [$rawOrderId, $rawExpiresAt, $signature] = $parts;
 
         if (!ctype_digit($rawOrderId) || !ctype_digit($rawExpiresAt)) {
-            return null;
+            return [null, false];
         }
 
         $orderId = (int) $rawOrderId;
         $expiresAt = (int) $rawExpiresAt;
         $order = OrderQuery::create()->findPk($orderId);
         $customer = $order?->getCustomer();
+        $email = (string) $customer?->getEmail();
 
-        // Signed even when the order is gone, and always compared, so an id that names
-        // no order and a signature that does not match take the same path and the same time.
-        $expectedSignature = $this->sign(
-            $orderId,
-            $expiresAt,
-            (string) $customer?->getEmail(),
-            (string) $customer?->getPassword(),
-        );
+        // Both variants are computed for every token, so that telling the two apart costs
+        // the same work whichever one matches — and so that an id that names no order and
+        // a signature that does not match take the same path.
+        $whileAGuest = $this->sign($orderId, $expiresAt, $email, true);
+        $onceAnAccount = $this->sign($orderId, $expiresAt, $email, false);
 
-        if (!hash_equals($expectedSignature, $signature) || !$order instanceof Order) {
-            return null;
+        $issuedByThisShop = hash_equals($whileAGuest, $signature) || hash_equals($onceAnAccount, $signature);
+
+        if (!$issuedByThisShop || !$order instanceof Order) {
+            return [null, false];
         }
 
         if ($expiresAt <= time()) {
-            return null;
+            return [null, false];
         }
 
-        return $order;
+        // The link is the way in only while there is no account to sign into. An opened
+        // account is the buyer's own order waiting behind a sign-in, not a dead link.
+        if (true !== $customer?->isGuest()) {
+            return [$order, true];
+        }
+
+        return [$order, false];
     }
 
     public function getLinkLifetimeInSeconds(): int
@@ -137,7 +172,7 @@ final readonly class GuestOrderAccessService
         return $configured > 0 ? $configured : self::DEFAULT_LINK_LIFETIME_IN_SECONDS;
     }
 
-    private function sign(int $orderId, int $expiresAt, string $email, string $passwordHash): string
+    private function sign(int $orderId, int $expiresAt, string $email, bool $recordIsStillAGuest): string
     {
         $key = hash_hmac(
             self::SIGNATURE_ALGORITHM,
@@ -148,7 +183,7 @@ final readonly class GuestOrderAccessService
 
         return hash_hmac(
             self::SIGNATURE_ALGORITHM,
-            implode("\0", [$orderId, $expiresAt, $email, $passwordHash]),
+            implode("\0", [$orderId, $expiresAt, $email, $recordIsStillAGuest ? 'guest' : 'account']),
             $key,
         );
     }

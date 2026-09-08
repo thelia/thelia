@@ -87,12 +87,32 @@ final class GuestOrderAccessServiceTest extends IntegrationTestCase
     }
 
     /**
-     * The password hash of the customer is part of what is signed, and a guest has
-     * none. Completing the account gives it one, which retires every link handed out
-     * while there was no account to sign into — from then on the order is reached the
-     * way every other customer reaches theirs.
+     * Choosing a password opens nothing: the record stays a guest until the activation
+     * code is answered, so the buyer can neither sign in nor be sent a reset link. The
+     * link has to carry them through that gap — otherwise a code that never arrives puts
+     * the order out of reach for good.
      */
-    public function testALinkStopsWorkingOnceTheGuestCompletesTheAccount(): void
+    public function testTheLinkOutlivesThePasswordBeingChosen(): void
+    {
+        $guest = $this->guest();
+        $order = $this->factory->order($guest);
+        $token = $this->service->createToken($order);
+
+        $this->getService(CustomerGuestConversionService::class)->convert($guest, 'a-chosen-password');
+
+        self::assertInstanceOf(
+            Order::class,
+            $this->service->findOrderForToken($token),
+            'Between the password being chosen and the code being answered there is no other way in.',
+        );
+    }
+
+    /**
+     * What retires the link is the account becoming usable, which is what the activation
+     * code decides. From then on the order is reached the way every other customer
+     * reaches theirs.
+     */
+    public function testALinkStopsWorkingOnceTheAccountIsOpen(): void
     {
         $guest = $this->guest();
         $order = $this->factory->order($guest);
@@ -100,11 +120,50 @@ final class GuestOrderAccessServiceTest extends IntegrationTestCase
 
         self::assertInstanceOf(Order::class, $this->service->findOrderForToken($token));
 
-        $this->getService(CustomerGuestConversionService::class)->convert($guest, 'a-chosen-password');
+        $guest->setIsGuest(0)->setEnable(1)->save();
 
         self::assertNull(
             $this->service->findOrderForToken($token),
-            'A link issued to a guest must not survive the account it belonged to gaining a password.',
+            'A link issued to a guest must not survive the account it belonged to being opened.',
+        );
+    }
+
+    /**
+     * Told apart from a dead link, and from a dead link only: a buyer sent back to their
+     * own order has to learn that it is waiting behind a sign-in, while a token nobody
+     * was ever issued must learn nothing at all.
+     */
+    public function testALinkRetiredByAnOpenedAccountIsRecognisedAsSuch(): void
+    {
+        $guest = $this->guest();
+        $order = $this->factory->order($guest);
+        $token = $this->service->createToken($order);
+
+        $guest->setIsGuest(0)->setEnable(1)->save();
+
+        $found = $this->service->findOrderNowBehindAnAccount($token);
+
+        self::assertInstanceOf(Order::class, $found);
+        self::assertSame($order->getId(), $found->getId());
+    }
+
+    public function testAForgedOrExpiredLinkIsNeverTakenForOneRetiredByAnAccount(): void
+    {
+        $guest = $this->guest();
+        $order = $this->factory->order($guest);
+        [$orderId, $expiresAt] = explode('.', $this->service->createToken($order));
+
+        $guest->setIsGuest(0)->setEnable(1)->save();
+
+        self::assertNull(
+            $this->service->findOrderNowBehindAnAccount(
+                \sprintf('%s.%s.%s', $orderId, $expiresAt, bin2hex(random_bytes(32))),
+            ),
+            'A forged token must say nothing, whatever the state of the account it aims at.',
+        );
+        self::assertNull(
+            $this->service->findOrderNowBehindAnAccount($this->service->createToken($order, -1)),
+            'Nor must an expired one.',
         );
     }
 

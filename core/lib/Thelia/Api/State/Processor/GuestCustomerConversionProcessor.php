@@ -83,6 +83,9 @@ final readonly class GuestCustomerConversionProcessor implements ProcessorInterf
         $response->email = $converted->getEmail();
         $response->firstname = $converted->getFirstname();
         $response->lastname = $converted->getLastname();
+        // The record is still a guest: the password is written, the account is not open,
+        // and the code mailed to the address is what opens it.
+        $response->activationCodeRequired = $converted->isGuest();
 
         return $response;
     }

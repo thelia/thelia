@@ -16,6 +16,7 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
@@ -53,11 +54,15 @@ use Thelia\Api\State\Processor\GuestCustomerRegistrationProcessor;
         // Also open, and authorized inside the processor rather than here: it accepts
         // either the guest's own token or a valid order tracking token, and a security
         // expression cannot see the second one — it arrives in the body.
+        // Accepted, not completed: the password is written but the record stays a guest
+        // until the activation code mailed to the address is answered, so a caller that
+        // read 201 would offer a sign-in that cannot work yet.
         new Post(
             uriTemplate: '/front/guest-customers/{id}/convert',
+            status: Response::HTTP_ACCEPTED,
             denormalizationContext: ['groups' => [self::GROUP_FRONT_CONVERT]],
             validationContext: ['groups' => [self::GROUP_FRONT_CONVERT]],
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
+            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_CONVERTED]],
             read: false,
             processor: GuestCustomerConversionProcessor::class,
         ),
@@ -68,6 +73,7 @@ final class GuestCustomer
     public const GROUP_FRONT_READ = 'front:guest_customer:read';
     public const GROUP_FRONT_WRITE = 'front:guest_customer:write';
     public const GROUP_FRONT_CONVERT = 'front:guest_customer:convert';
+    public const GROUP_FRONT_CONVERTED = 'front:guest_customer:converted';
 
     #[Groups([self::GROUP_FRONT_READ])]
     public ?int $id = null;
@@ -119,4 +125,13 @@ final class GuestCustomer
 
     #[Groups([self::GROUP_FRONT_READ])]
     public ?int $cartId = null;
+
+    /**
+     * Whether the account still has to be opened by the code mailed to its address.
+     *
+     * Only on the conversion answer, and true for as long as that is what happens: a
+     * caller reads it rather than inferring an open account from a success status.
+     */
+    #[Groups([self::GROUP_FRONT_CONVERTED])]
+    public ?bool $activationCodeRequired = null;
 }

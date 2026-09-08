@@ -52,21 +52,20 @@ final class GuestAccountConversionTest extends GuestCheckoutTestCase
         );
     }
 
-    public function testTheOfferIsNotMadeForAnOrderOfARealAccount(): void
+    /**
+     * The tracking link exists for buyers who have no account to sign into. An order
+     * that hangs off one is reached through it, and the page says so.
+     */
+    public function testAnOrderOfARealAccountIsReachedBySigningIn(): void
     {
         $this->skipUnlessTheThemeHasTheTrackingPage();
 
         $fixtures = $this->fixtures();
         $order = $fixtures->order($fixtures->customer($fixtures->customerTitle()));
 
-        $crawler = $this->client->request('GET', '/order/track/'.$this->tokenFor($order));
+        $this->client->request('GET', '/order/track/'.$this->tokenFor($order));
 
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
-        self::assertCount(
-            0,
-            $crawler->filter('a[href$="/account"]'),
-            'There is nothing to complete on an account that already has an owner.',
-        );
+        $this->assertResponseRedirectsTo('/customer/login');
     }
 
     public function testChoosingAPasswordCompletesTheAccountWithoutSigningIn(): void
@@ -142,7 +141,12 @@ final class GuestAccountConversionTest extends GuestCheckoutTestCase
         }
     }
 
-    public function testTheLinkStopsWorkingOnceTheAccountIsCompleted(): void
+    /**
+     * Choosing a password opens nothing — the record stays a guest until the code is
+     * answered — and until then the link is the only way back to the order: the buyer
+     * can neither sign in nor be sent a reset link.
+     */
+    public function testTheLinkKeepsWorkingWhileTheAccountWaitsForItsCode(): void
     {
         $this->skipUnlessTheThemeHasTheTrackingPage();
 
@@ -156,9 +160,41 @@ final class GuestAccountConversionTest extends GuestCheckoutTestCase
         $this->client->request('GET', '/order/track/'.$token);
 
         self::assertSame(
-            404,
+            200,
             $this->client->getResponse()->getStatusCode(),
-            'A link signed against the old password hash must stop being accepted.',
+            'Between choosing a password and answering the code there is no other way in.',
+        );
+    }
+
+    /**
+     * Once the account is open the order is reached by signing in — so the link says so
+     * rather than answering that the page does not exist, which is what the buyer would
+     * read as "my order is gone".
+     */
+    public function testTheLinkSendsTheBuyerToSignInOnceTheAccountIsOpen(): void
+    {
+        $this->skipUnlessTheThemeHasTheTrackingPage();
+
+        $guest = $this->guest();
+        $order = $this->guestOrder($guest);
+        $token = $this->tokenFor($order);
+
+        $this->client->submit($this->accountFormFor($order, $token));
+
+        $guest->setIsGuest(0)->setEnable(1)->save();
+
+        $this->client->restart();
+        $this->forgetHydratedModels();
+        $this->client->request('GET', '/order/track/'.$token);
+
+        $this->assertResponseRedirectsTo('/customer/login');
+
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString(
+            'in your customer account',
+            $crawler->text(),
+            'The page the buyer lands on has to say why their link no longer opens the order.',
         );
     }
 
