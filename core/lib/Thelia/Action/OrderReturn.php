@@ -88,8 +88,6 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         $connection->beginTransaction();
 
         try {
-            // Lock the return row for the whole transition so two concurrent
-            // requests cannot both pass the guard and restock/refund twice.
             $lock = $connection->prepare('SELECT `id` FROM `order_return` WHERE `id` = :id FOR UPDATE');
             $lock->bindValue(':id', $return->getId(), \PDO::PARAM_INT);
             $lock->execute();

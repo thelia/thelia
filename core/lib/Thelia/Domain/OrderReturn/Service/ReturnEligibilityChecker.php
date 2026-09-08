@@ -213,10 +213,7 @@ final class ReturnEligibilityChecker
     }
 
     /**
-     * Assert the postage of the order is not already carried by another still-open
-     * return, so it is never refunded twice across partial returns of the same order.
-     *
-     * @param int|null $excludeReturnId a return to leave out of the check, typically the one being edited
+     * Assert the postage of the order is not already carried by another still-open return.
      *
      * @throws ReturnNotAllowedException
      */

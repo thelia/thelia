@@ -20,11 +20,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Thelia\Model\Customer;
 
 /**
- * Caps how often a single caller may open a return, so the endpoint that writes
- * a row and mails the customer cannot be flooded. Both the Flexy front and the
- * front API consume the same budget, keyed on the authenticated customer when
- * one is known (so rotating IPs cannot widen the budget), and on the client IP
- * otherwise.
+ * Caps how often a caller may open a return, keyed on the authenticated customer
+ * when known and on the client IP otherwise.
  */
 readonly class ReturnRequestLimiter
 {
@@ -35,12 +32,6 @@ readonly class ReturnRequestLimiter
     ) {
     }
 
-    /**
-     * Whether one more return may be opened by this caller. The budget is keyed on
-     * the authenticated customer id when available, otherwise on the client IP. A
-     * request with neither is not throttled, exactly as the login throttler behaves,
-     * rather than being blocked outright.
-     */
     public function allows(?Customer $customer = null): bool
     {
         $key = null !== $customer?->getId()

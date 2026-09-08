@@ -119,10 +119,6 @@ class OrderReturn implements PropelResourceInterface
     public const GROUP_ADMIN_READ = 'admin:order_return:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_return:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_return:write';
-    // Post-creation admin edition. Deliberately excludes `order` and
-    // `orderReturnLines`: those go through OrderReturnHydrator at creation so the
-    // eligibility check and refund computation run, and must not be mutated by the
-    // generic Patch processor, which bypasses them.
     public const GROUP_ADMIN_UPDATE = 'admin:order_return:update';
     public const GROUP_ADMIN_TRANSITION = 'admin:order_return:transition';
     public const GROUP_FRONT_READ = 'front:order_return:read';

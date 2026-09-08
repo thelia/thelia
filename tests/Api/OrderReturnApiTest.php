@@ -154,13 +154,11 @@ final class OrderReturnApiTest extends ApiTestCase
             ->findOne($this->getPropelConnection());
 
         self::assertNotNull($created);
-        // The owner and the initial status are server-owned, never taken from the body.
         self::assertFalse((bool) $created->getCreatedByAdmin());
         self::assertSame(
             (int) OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_REQUESTED),
             (int) $created->getStatusId(),
         );
-        // Refund is computed from the paid line price (1 x 10.00), not from the request.
         self::assertSame(10.0, (float) $created->getRefundAmount());
     }
 

@@ -93,9 +93,6 @@ final readonly class AdminApiPermissionListener
             return;
         }
 
-        // An operation may override the HTTP-verb mapping through its
-        // extraProperties['admin_access'], so an action POST (e.g. a state
-        // transition) is guarded by the access it really performs, not CREATE.
         $operation = $request->attributes->get('_api_operation');
         $access = ($operation instanceof Operation ? ($operation->getExtraProperties()['admin_access'] ?? null) : null)
             ?? self::METHOD_ACCESSES[$request->getMethod()] ?? null;
