@@ -165,5 +165,6 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
     }
 
     $serviceConfigurator->get(ConfigCacheService::class)
-        ->public();
+        ->public()
+        ->arg('$cache', service('thelia.cache.config.adapter'));
 };

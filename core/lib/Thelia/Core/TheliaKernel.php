@@ -58,6 +58,7 @@ use Thelia\Config\DatabaseConfiguration;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\LoggingDefaults;
 use Thelia\Core\DependencyInjection\TheliaContainer;
@@ -230,6 +231,12 @@ class TheliaKernel extends Kernel
         if (isset($this->propelInitService)) {
             return;
         }
+
+        // The debug logger reads its own configuration while Propel is still
+        // being wired up below, long before the container exists to hand it
+        // ConfigCacheService: warm ConfigQuery's memo straight from the shared
+        // entry, so that read costs no query either.
+        ConfigCacheService::warmFromSharedEntry($this->getCacheDir());
 
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
