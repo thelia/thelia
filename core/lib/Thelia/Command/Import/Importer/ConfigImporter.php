@@ -17,6 +17,8 @@ namespace Thelia\Command\Import\Importer;
 use Thelia\Command\Import\AbstractDemoImporter;
 use Thelia\Command\Import\DemoImportContext;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Consent;
+use Thelia\Model\ConsentQuery;
 
 final class ConfigImporter extends AbstractDemoImporter
 {
@@ -39,6 +41,15 @@ final class ConfigImporter extends AbstractDemoImporter
         ConfigQuery::write('store_city', 'Clermont-Ferrand');
         ConfigQuery::write('store_phone', '+(33)444053102');
         ConfigQuery::write('information_folder_id', $context->foldersByTitle['Information']->getId());
-        ConfigQuery::write('terms_conditions_content_id', $context->contentsByTitle['Terms and Conditions']->getId());
+
+        $termsContentId = $context->contentsByTitle['Terms and Conditions']->getId();
+        ConfigQuery::write('terms_conditions_content_id', $termsContentId);
+
+        // The box the buyer ticks at the payment step points at the terms the demo shop
+        // actually publishes, rather than at nothing.
+        ConsentQuery::create()
+            ->findOneByCode(Consent::CODE_TERMS_AND_CONDITIONS)
+            ?->setContentId($termsContentId)
+            ->save();
     }
 }

@@ -31,6 +31,8 @@ use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderConsent;
+use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Test\FixtureFactory;
@@ -87,6 +89,26 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         self::assertNull($reloaded->getRememberMeSerial());
         self::assertNull($reloaded->getConfirmationToken());
         self::assertSame(0, $reloaded->getEnable());
+    }
+
+    /**
+     * The consent rows are the shop's evidence that the buyer agreed to something, so
+     * what they agreed to stays. The address they agreed from is what identifies them,
+     * and goes with the rest of the identity.
+     */
+    public function testAnonymizeErasesTheAddressTheConsentsWereGivenFrom(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $order = $customer->getOrders()->getFirst();
+        self::assertInstanceOf(Order::class, $order);
+
+        $this->anonymize($customer);
+
+        $orderConsent = OrderConsentQuery::create()->filterByOrderId($order->getId())->findOne();
+        self::assertNotNull($orderConsent, 'Anonymizing must not delete the record of what was agreed to.');
+        self::assertNull($orderConsent->getIpAddress());
+        self::assertSame('I accept the terms and conditions of sale', $orderConsent->getTitle());
+        self::assertTrue($orderConsent->isAccepted());
     }
 
     public function testAnonymizeStampsTheAccountWithTheErasureDate(): void
@@ -352,6 +374,14 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             ->setPrice('99.99')
             ->setWasNew(0)
             ->setWasInPromo(0)
+            ->save($this->getPropelConnection());
+
+        (new OrderConsent())
+            ->setOrderId($order->getId())
+            ->setConsentCode('terms_and_conditions')
+            ->setTitle('I accept the terms and conditions of sale')
+            ->setAccepted(1)
+            ->setIpAddress('203.0.113.7')
             ->save($this->getPropelConnection());
 
         // The factory already created the cart backing the order; add one more

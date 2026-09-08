@@ -1536,6 +1536,46 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="consent" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the name the checkout, the order rows and the code refer this consent by" name="code" required="true" size="64" type="VARCHAR" />
+    <column description="the content holding the text the buyer consents to, when the shop published one" name="content_id" type="INTEGER" />
+    <column defaultValue="0" description="the order is refused as long as this consent is not accepted" name="mandatory" required="true" type="TINYINT" />
+    <column defaultValue="1" description="a consent turned off is no longer asked for, and is kept so the acceptances already collected keep their meaning" name="active" required="true" type="TINYINT" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="LONGVARCHAR" />
+    <foreign-key foreignTable="content" name="fk_consent_content_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="content_id" />
+    </foreign-key>
+    <unique name="consent_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <index name="idx_consent_content_id">
+      <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
+  <table name="order_consent" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column description="the consent this answer is about, kept as a plain code: the consent may be deleted, the proof stays" name="consent_code" required="true" size="64" type="VARCHAR" />
+    <column description="the wording the buyer was shown, frozen the way order_product.title is" name="title" required="true" size="255" type="VARCHAR" />
+    <column description="the long text shown under the box, frozen alongside the wording" name="description" type="CLOB" />
+    <column defaultValue="0" description="whether the box was ticked" name="accepted" required="true" type="TINYINT" />
+    <column description="when the buyer answered the box, which precedes the order it ends up on" name="answered_at" type="TIMESTAMP" />
+    <column description="the address the answer came from, null when the order was not placed over HTTP" name="ip_address" size="45" type="VARCHAR" />
+    <foreign-key foreignTable="order" name="fk_order_consent_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <index name="idx_order_consent_order_id">
+      <index-column name="order_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />

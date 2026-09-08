@@ -167,7 +167,33 @@ final readonly class CustomerPersonalDataExporter
             'delivery_address' => $this->exportOrderAddress($order->getOrderAddressRelatedByDeliveryOrderAddressId()),
             'products' => $this->exportOrderProducts($order),
             'coupons' => $this->exportOrderCoupons($order),
+            'consents' => $this->exportOrderConsents($order),
         ];
+    }
+
+    /**
+     * What the buyer answered to each consent, and the address they answered from.
+     *
+     * The address is personal data the shop keeps deliberately — it is half of what
+     * makes the acceptance evidence — so it belongs in what the person can ask for.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportOrderConsents(Order $order): array
+    {
+        $consents = [];
+
+        foreach ($order->getOrderConsents() as $orderConsent) {
+            $consents[] = [
+                'code' => $orderConsent->getConsentCode(),
+                'title' => $orderConsent->getTitle(),
+                'accepted' => $orderConsent->isAccepted(),
+                'ip_address' => $orderConsent->getIpAddress(),
+                'answered_at' => $this->formatDate($orderConsent->getAnsweredAt() ?? $orderConsent->getCreatedAt()),
+            ];
+        }
+
+        return $consents;
     }
 
     /**

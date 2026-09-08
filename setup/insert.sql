@@ -2070,7 +2070,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (49, 'admin.customer.title', NOW(), NOW()),
-(50, 'admin.configuration.order-status', NOW(), NOW())
+(50, 'admin.configuration.order-status', NOW(), NOW()),
+(51, 'admin.configuration.consent', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -14300,6 +14301,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'cs_CZ', NULL, NULL, NULL, NULL),
     (49, 'cs_CZ', NULL, NULL, NULL, NULL),
     (50, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (51, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -14349,6 +14351,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'de_DE', 'Back-Office Suchfunktion', NULL, NULL, NULL),
     (49, 'de_DE', 'Kunde-Andere', NULL, NULL, NULL),
     (50, 'de_DE', NULL, NULL, NULL, NULL),
+    (51, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -14398,6 +14401,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'en_US', 'Back-office search function', NULL, NULL, NULL),
     (49, 'en_US', 'Customer title', NULL, NULL, NULL),
     (50, 'en_US', 'Configuration order status', NULL, NULL, NULL),
+    (51, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -14447,6 +14451,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'es_ES', 'Función de búsqueda de back office', NULL, NULL, NULL),
     (49, 'es_ES', 'Estado civil cliente', NULL, NULL, NULL),
     (50, 'es_ES', NULL, NULL, NULL, NULL),
+    (51, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -14496,6 +14501,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'fr_FR', 'Fonction de recherche dans l\'administration', NULL, NULL, NULL),
     (49, 'fr_FR', 'civilité client', NULL, NULL, NULL),
     (50, 'fr_FR', NULL, NULL, NULL, NULL),
+    (51, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -14545,6 +14551,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'it_IT', NULL, NULL, NULL, NULL),
     (49, 'it_IT', NULL, NULL, NULL, NULL),
     (50, 'it_IT', NULL, NULL, NULL, NULL),
+    (51, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -14594,6 +14601,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'nl_NL', 'Zoekfunctie van de backoffice', NULL, NULL, NULL),
     (49, 'nl_NL', 'Aanhef', NULL, NULL, NULL),
     (50, 'nl_NL', 'Configuratie van de bestelstatussen', NULL, NULL, NULL),
+    (51, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -14642,7 +14650,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, 'ru_RU', 'Управление административными модулями', NULL, NULL, NULL),
     (47, 'ru_RU', 'Поиск по админке', NULL, NULL, NULL),
     (49, 'ru_RU', 'Заголовок клиента', NULL, NULL, NULL),
-    (50, 'ru_RU', NULL, NULL, NULL, NULL)
+    (50, 'ru_RU', NULL, NULL, NULL, NULL),
+    (51, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 
@@ -14719,4 +14728,35 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (7, 'ru_RU', 'Письмо подтверждения подписки на рассылку новостей', 'Подписка на рассылку новостей {{ config(\"store_name\") }}', NULL, NULL),
     (8, 'ru_RU', NULL, NULL, NULL, NULL),
     (9, 'ru_RU', NULL, NULL, NULL, NULL)
+;
+
+/**
+Checkout consents
+
+The terms and conditions of sale are a consent like any other in the list, so that a
+shop manages them where it manages the rest. What makes them special is that they
+cannot be deleted, and that they arrive mandatory: an order nobody agreed to any terms
+for is not one a shop wants to have taken.
+
+`content_id` is left null here. It mirrors the `terms_conditions_content_id` setting,
+which a fresh shop has no value for yet — there is no content to point at until the
+merchant writes one. Filling it with 0 would name a content that does not exist.
+*/
+INSERT INTO `consent` (`id`, `code`, `content_id`, `mandatory`, `active`, `position`, `created_at`, `updated_at`) VALUES
+(1, 'terms_and_conditions', NULL, 1, 1, 1, NOW(), NOW())
+;
+
+/**
+Every seeded locale gets a row, falling back to the English wording where the sentence
+is not translated yet: a box the buyer has to tick before paying may not come up blank.
+*/
+INSERT INTO `consent_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (1, 'cs_CZ', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'de_DE', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'en_US', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'es_ES', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'fr_FR', 'J\'ai lu et j\'accepte les conditions générales de vente', NULL),
+    (1, 'it_IT', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'nl_NL', 'I have read and accept the terms and conditions of sale', NULL),
+    (1, 'ru_RU', 'I have read and accept the terms and conditions of sale', NULL)
 ;
