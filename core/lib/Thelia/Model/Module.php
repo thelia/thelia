@@ -35,7 +35,10 @@ class Module extends BaseModule implements FileModelParentInterface
     {
         ModuleQuery::resetActivated();
 
-        parent::postSave();
+        // The connection has to be handed over: the generated parent only
+        // dispatches ModuleEvent::POST_SAVE when it has one, so dropping it
+        // here left every listener on a module write silently unreachable.
+        parent::postSave($con);
     }
 
     public function getTranslationDomain(): string

@@ -41,6 +41,20 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer update --no-interaction --prefer-dist
 
+      - name: Restore the project schema the config package overwrote
+        # Same step, and same reason, as the CI workflow: the thelia/config package
+        # installs into local/ and replaces the version-controlled
+        # local/config/schema.xml with its own copy. Without the restore, the models
+        # this job builds have no guest checkout columns and PHPStan reports their
+        # accessors as undefined methods, on every pull request at once.
+        #
+        # The grep is the point of the step: a restore that silently did nothing would
+        # bring those errors straight back.
+        run: |
+          git checkout -- local/config/schema.xml
+          grep -q is_guest local/config/schema.xml \
+            || { echo "::error::local/config/schema.xml has no is_guest column after the restore"; exit 1; }
+
       - name: Prepare test env (builds the Propel models via App\Kernel)
         run: |
           printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local

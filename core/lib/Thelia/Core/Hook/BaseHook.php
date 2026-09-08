@@ -71,6 +71,19 @@ abstract class BaseHook implements BaseHookInterface
     public ?ParserInterface $parser = null;
     public ?AssetResolverInterface $assetsResolver = null;
 
+    /**
+     * Module class name per module code, or null when the code has no row.
+     *
+     * Every hook class of a module resolves its module in its constructor, and
+     * a back-office screen builds a dozen of them: without a memo the same row
+     * is read once per hook class. Written and dropped only here and by
+     * {@see \Thelia\Core\EventListener\HookModuleCacheListener}, which drops
+     * it as soon as a module row is written or deleted.
+     *
+     * @var array<string, class-string<BaseModule>|null>
+     */
+    private static array $moduleClassNames = [];
+
     public function __construct(
         ?EventDispatcherInterface $dispatcher = null,
         ?ParserResolver $parserResolver = null,
@@ -85,15 +98,28 @@ abstract class BaseHook implements BaseHookInterface
 
         $moduleCode = explode('\\', static::class)[0];
 
-        $moduleDatabase = ModuleQuery::create()
-            ->findOneByCode($moduleCode);
+        if (!\array_key_exists($moduleCode, self::$moduleClassNames)) {
+            $moduleDatabase = ModuleQuery::create()
+                ->findOneByCode($moduleCode);
 
-        if ($moduleDatabase instanceof Module) {
-            $moduleClass = $moduleDatabase->getFullNamespace();
+            self::$moduleClassNames[$moduleCode] = $moduleDatabase instanceof Module
+                ? $moduleDatabase->getFullNamespace()
+                : null;
+        }
+
+        if (null !== $moduleClass = self::$moduleClassNames[$moduleCode]) {
             $this->module = new $moduleClass();
         }
 
         $this->translator = Translator::getInstance();
+    }
+
+    /**
+     * @internal
+     */
+    public static function resetModuleClassNameCache(): void
+    {
+        self::$moduleClassNames = [];
     }
 
     /**
