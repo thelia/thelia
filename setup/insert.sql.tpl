@@ -91,7 +91,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (80, 'store_vat_exempt', '0', 0, 1, NOW(), NOW()),
 (81, 'store_registration_exempt', '0', 0, 1, NOW(), NOW()),
 (82, 'store_legal_mentions', '', 0, 1, NOW(), NOW()),
-(83, 'guest_checkout_mode', 'disabled', 0, 0, NOW(), NOW())
+(83, 'guest_checkout_mode', 'disabled', 0, 0, NOW(), NOW()),
+(84, 'order_return_enabled', '0', 0, 0, NOW(), NOW()),
+(85, 'order_return_window_days', '14', 0, 0, NOW(), NOW()),
+(86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2018,6 +2021,22 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 (5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
+INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
+(2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
+(3, 'accepted', '#5cb85c', 3, 1, NOW(), NOW()),
+(4, 'refused', '#dc3545', 4, 1, NOW(), NOW()),
+(5, 'received', '#986dff', 5, 1, NOW(), NOW()),
+(6, 'settled', '#20c997', 6, 1, NOW(), NOW()),
+(7, 'expired', '#6c757d', 7, 1, NOW(), NOW());
+
+INSERT INTO `order_return_reason`(`id`, `code`, `position`, `visible`, `created_at`, `updated_at`) VALUES
+(1, 'not_conform', 1, 1, NOW(), NOW()),
+(2, 'defective', 2, 1, NOW(), NOW()),
+(3, 'wrong_item', 3, 1, NOW(), NOW()),
+(4, 'no_longer_needed', 4, 1, NOW(), NOW()),
+(5, 'other', 5, 1, NOW(), NOW());
+
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
 */
@@ -2070,7 +2089,9 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (49, 'admin.customer.title', NOW(), NOW()),
-(50, 'admin.configuration.order-status', NOW(), NOW())
+(50, 'admin.configuration.order-status', NOW(), NOW()),
+(51, 'admin.order-return', NOW(), NOW()),
+(52, 'admin.configuration.order-return-reason', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2082,7 +2103,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
 (7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
-(9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW())
+(9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
+(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW())
 ;
 
 /**
@@ -3681,6 +3703,30 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
 {% endfor %}
 ;
 
+INSERT INTO `order_return_status_i18n`(`id`, `locale`, `title`) VALUES
+{% for locale in locales %}
+    (1, '{{ locale }}', {{ intl('Requested', locale) }}),
+    (2, '{{ locale }}', {{ intl('Information awaited', locale) }}),
+    (3, '{{ locale }}', {{ intl('Accepted', locale) }}),
+    (4, '{{ locale }}', {{ intl('Refused', locale) }}),
+    (5, '{{ locale }}', {{ intl('Received', locale) }}),
+    (6, '{{ locale }}', {{ intl('Settled', locale) }}),
+    (7, '{{ locale }}', {{ intl('Expired', locale) }}){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
+
+INSERT INTO `order_return_reason_i18n`(`id`, `locale`, `title`) VALUES
+{% for locale in locales %}
+    (1, '{{ locale }}', {{ intl('Product not as described', locale) }}),
+    (2, '{{ locale }}', {{ intl('Defective product', locale) }}),
+    (3, '{{ locale }}', {{ intl('Wrong item received', locale) }}),
+    (4, '{{ locale }}', {{ intl('No longer needed', locale) }}),
+    (5, '{{ locale }}', {{ intl('Other', locale) }}){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
+
 INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {% for locale in locales %}
     (1, '{{ locale }}', {{ intl('Address', locale) }}, NULL, NULL, NULL),
@@ -3731,7 +3777,9 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, '{{ locale }}', {{ intl('Administration profiles management', locale) }}, NULL, NULL, NULL),
     (47, '{{ locale }}', {{ intl('Back-office search function', locale) }}, NULL, NULL, NULL),
     (49, '{{ locale }}', {{ intl('Customer title', locale) }}, NULL, NULL, NULL),
-    (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL),
+    (51, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
+    (52, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -3747,7 +3795,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (6, '{{ locale }}', {{ intl('Mail sent to an administrator who requested a new password', locale) }}, {{ intl('New password request on %store', locale) }}, NULL, NULL),
     (7, '{{ locale }}', {{ intl('Newsletter subscription confirmation mail', locale) }}, {{ intl('Your subscription to %store newsletter', locale) }}, NULL, NULL),
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
-    (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
+    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
