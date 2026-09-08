@@ -287,6 +287,50 @@ final class GuestCheckoutSessionTest extends GuestCheckoutTestCase
         );
     }
 
+    /**
+     * A buyer who orders again from the same address, having typed the very same thing,
+     * must not leave a second copy of it behind: the record is shared, so the copies pile
+     * up on it, and the day they open an account they find their own address several
+     * times over.
+     */
+    public function testOrderingTwiceFromTheSameAddressDoesNotWriteItTwice(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+
+        $this->identifyAsAGuestLivingAt(self::FIRST_BUYER_STREET);
+
+        $guestId = $this->guestCustomerOf(self::GUEST_EMAIL)?->getId();
+
+        $this->client->restart();
+        $this->identifyAsAGuestLivingAt(self::FIRST_BUYER_STREET);
+
+        self::assertCount(
+            1,
+            AddressQuery::create()->filterByCustomerId($guestId)->find(),
+            'The same address typed twice is one address.',
+        );
+    }
+
+    public function testADifferentAddressOnTheSameEmailIsStillWritten(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+
+        $this->identifyAsAGuestLivingAt(self::FIRST_BUYER_STREET);
+
+        $guestId = $this->guestCustomerOf(self::GUEST_EMAIL)?->getId();
+
+        $this->client->restart();
+        $this->identifyAsAGuestLivingAt(self::SECOND_BUYER_STREET);
+
+        self::assertCount(
+            2,
+            AddressQuery::create()->filterByCustomerId($guestId)->find(),
+            'Two different addresses are two addresses, whoever typed them.',
+        );
+    }
+
     private function identifyAsAGuestLivingAt(string $street): void
     {
         $this->openASessionWithACart();
