@@ -51,12 +51,14 @@ class Lang extends BaseLang
     }
 
     /**
-     * The active languages, read once per request.
+     * The active languages, read once per process.
      *
      * The API bridge asks for them every time it transforms a model or eager-loads a
-     * collection: a page rendering a dozen resources reread the same rows a dozen times.
-     * Reset by {@see \Thelia\Core\EventListener\ActiveLangsCacheListener} at the start of
-     * every request and console command, and whenever a language is saved or deleted.
+     * collection: a page rendering a dozen resources reread the same rows a dozen times,
+     * and so would every request after it in a persistent worker runtime (FrankenPHP,
+     * RoadRunner) with nothing memoized across them. Dropped by
+     * {@see \Thelia\Core\EventListener\ActiveLangsCacheListener} whenever a language is
+     * saved or deleted, and between console commands sharing one process.
      *
      * @return ObjectCollection<Lang>
      */
