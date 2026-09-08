@@ -755,6 +755,42 @@ readonly class ApiResourcePropelTransformerService
                 $apiResource->addI18n($i18nResource, $lang->getLocale());
             }
         }
+
+        $propelModel->setLocale($this->serializedLocale($context, $langs));
+    }
+
+    /**
+     * The locale the read is answering in.
+     *
+     * The payload carries a translation per active language, so most of it needs
+     * no single locale. A rewritten url does: it belongs to one language, and
+     * `getPublicUrl()` asks the model which one it is holding. The loop above is
+     * the last thing to touch that, and what it leaves behind is an accident of
+     * the languages it walked, so the locale has to be set on purpose. A read
+     * naming one gets it; the others get the shop's default language, which is
+     * the only locale this layer knows about. Both come from values already in
+     * hand, at no query.
+     *
+     * @param Collection<int, Lang> $langs
+     */
+    private function serializedLocale(array $context, Collection $langs): string
+    {
+        $requested = $context['filters']['locale'] ?? null;
+        $default = null;
+
+        foreach ($langs as $lang) {
+            if ($requested === $lang->getLocale()) {
+                return $lang->getLocale();
+            }
+
+            if ($lang->getByDefault()) {
+                $default = $lang->getLocale();
+            }
+        }
+
+        // An installation always has a default language, and a shop left without
+        // one has nothing to answer here.
+        return $default ?? Lang::getDefaultLanguage()->getLocale();
     }
 
     private function hasCompositeIdentifiersAlready(
