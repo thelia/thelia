@@ -921,7 +921,7 @@ class TheliaKernel extends Kernel
         $cacheFile = $this->getCacheDir().DS.'module_template_dirs.php';
 
         if (file_exists($cacheFile)) {
-            return require $cacheFile;
+            return self::templateDirsStillOnDisk(require $cacheFile);
         }
 
         $dirs = [];
@@ -957,5 +957,40 @@ class TheliaKernel extends Kernel
         }
 
         return $dirs;
+    }
+
+    /**
+     * Drops the directories a module has taken away since the list was written.
+     *
+     * The list is written once and read on every request afterwards, so it
+     * outlives what it describes: a template directory removed by an upgrade,
+     * or a module deleted from the disk while its row stays. A parser handed a
+     * directory that is not there refuses to load anything at all, which takes
+     * the whole back office down with a message naming a path rather than the
+     * stale list. Leaving the entry out keeps the shop standing, and the log
+     * says which module to clear the cache for.
+     *
+     * @param list<array{int, string, string, string}> $templateDirs
+     *
+     * @return list<array{int, string, string, string}>
+     */
+    private static function templateDirsStillOnDisk(array $templateDirs): array
+    {
+        $stillOnDisk = [];
+
+        foreach ($templateDirs as $templateDir) {
+            if (is_dir($templateDir[2])) {
+                $stillOnDisk[] = $templateDir;
+                continue;
+            }
+
+            Tlog::getInstance()->addWarning(\sprintf(
+                'Template directory "%s" of module %s is no longer on disk: it is left out of the parsers until the cache is cleared.',
+                $templateDir[2],
+                $templateDir[3],
+            ));
+        }
+
+        return $stillOnDisk;
     }
 }
