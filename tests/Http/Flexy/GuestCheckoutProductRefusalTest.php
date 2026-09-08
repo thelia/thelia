@@ -104,6 +104,7 @@ final class GuestCheckoutProductRefusalTest extends GuestCheckoutTestCase
             $fixtures->category(),
             $fixtures->taxRule(),
             $fixtures->currency(),
+            ['title' => 'A product that requires an account'],
         );
         $product->setGuestCheckoutForbidden(1)->save();
 

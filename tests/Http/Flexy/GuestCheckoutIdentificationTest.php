@@ -65,23 +65,56 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         );
     }
 
-    public function testTheIdentificationPageDoesNotOfferToOrderWithoutAnAccountWhenTheShopRequiresOne(): void
+    /**
+     * The page has nothing left to offer on a shop that requires an account: the choice
+     * it exists to present is down to one. Reachable by a bookmark or a shared link, it
+     * would otherwise stand as an orphan page of a feature the shop never turned on.
+     */
+    public function testTheIdentificationPageIsNotServedWhenTheShopRequiresAnAccount(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Disabled);
         $this->openASessionWithACart();
 
-        $crawler = $this->requestIdentificationPage();
+        $this->client->request('GET', '/checkout/identify');
 
-        self::assertCount(
-            0,
-            $crawler->filter('form[name="flexybundle_form_guest_checkout"]'),
-            'A shop that requires an account must not put the guest form on the page.',
+        $this->assertResponseRedirectsTo('/customer/login');
+    }
+
+    /**
+     * The step trail of the cart page names the step the buyer is actually taken to. It
+     * announced the delivery step while the next screen turned out to be the
+     * identification one, so the trail renamed itself between two pages.
+     */
+    public function testTheCartAnnouncesTheIdentificationStepWhenThatIsWhereItLeads(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->client->request('GET', '/checkout/cart');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringContainsString(
+            'Identification',
+            $crawler->filter('.CheckoutSteps')->text(''),
+            'The trail must name the step the "next" button leads to.',
         );
-        self::assertGreaterThan(
-            0,
-            $crawler->filter('form[name="thelia_customer_login"]')->count(),
-            'The sign-in block stays, whatever the setting.',
+    }
+
+    public function testTheCartStillAnnouncesTheDeliveryStepOnAShopThatRequiresAnAccount(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Disabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->client->request('GET', '/checkout/cart');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringNotContainsString(
+            'Identification',
+            $crawler->filter('.CheckoutSteps')->text(''),
+            'A shop with no identification step must not announce one.',
         );
     }
 
@@ -95,13 +128,11 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         $this->setGuestCheckoutMode(GuestCheckoutMode::EnabledUnlessProductForbids);
         $this->openASessionWithACart(guestCheckoutForbidden: true);
 
-        $crawler = $this->requestIdentificationPage();
+        $this->client->request('GET', '/checkout/identify');
 
-        self::assertCount(
-            0,
-            $crawler->filter('form[name="flexybundle_form_guest_checkout"]'),
-            'A cart holding a product that requires an account must not offer to order without one.',
-        );
+        // Nothing left to choose between: the page is not served at all, rather than
+        // served with the offer taken out of it.
+        $this->assertResponseRedirectsTo('/customer/login');
     }
 
     public function testACartWithoutSuchAProductIsStillOfferedTheGuestCheckoutInThatMode(): void
@@ -197,7 +228,7 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         $this->submitGuestFormWithoutTheConsentBox();
 
         self::assertSame(
-            200,
+            422,
             $this->client->getResponse()->getStatusCode(),
             'The form comes back rather than placing an order under a consent nobody gave.',
         );
