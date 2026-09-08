@@ -21,6 +21,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderReturnLineQuery;
+use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 
@@ -131,7 +132,7 @@ final class ReturnEligibilityChecker
         }
 
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order does not belong to the customer.');
+            throw new ReturnNotAllowedException('This order cannot be used for a return.');
         }
 
         if (!$this->isWithinReturnWindow($order)) {
@@ -191,7 +192,7 @@ final class ReturnEligibilityChecker
         ?int $excludeReturnId = null,
     ): void {
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order does not belong to the customer.');
+            throw new ReturnNotAllowedException('This order cannot be used for a return.');
         }
 
         if ((int) $orderProduct->getOrderId() !== (int) $order->getId()) {
@@ -208,6 +209,30 @@ final class ReturnEligibilityChecker
 
         if ($quantity > $this->remainingReturnableQuantity($orderProduct, $excludeReturnId)) {
             throw new ReturnNotAllowedException('The returned quantity exceeds the returnable quantity of this line.');
+        }
+    }
+
+    /**
+     * Assert the postage of the order is not already carried by another still-open
+     * return, so it is never refunded twice across partial returns of the same order.
+     *
+     * @param int|null $excludeReturnId a return to leave out of the check, typically the one being edited
+     *
+     * @throws ReturnNotAllowedException
+     */
+    public function assertPostageNotAlreadyReturned(Order $order, ?int $excludeReturnId = null): void
+    {
+        $query = OrderReturnQuery::create()
+            ->filterByOrderId((int) $order->getId())
+            ->filterByIncludePostage(true)
+            ->filterByStatusId($this->consumingStatusIds(), Criteria::IN);
+
+        if (null !== $excludeReturnId) {
+            $query->filterById($excludeReturnId, Criteria::NOT_EQUAL);
+        }
+
+        if ($query->count() > 0) {
+            throw new ReturnNotAllowedException('The postage of this order is already included in another return.');
         }
     }
 

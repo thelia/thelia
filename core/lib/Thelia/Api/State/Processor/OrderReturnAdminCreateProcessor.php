@@ -48,12 +48,14 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
             $order = OrderQuery::create()->findPk($data->getOrder()->getId());
             $customer = $order?->getCustomer();
 
-            if ($customer instanceof Customer) {
-                try {
-                    $this->hydrator->hydrate($data, $customer, true);
-                } catch (ReturnNotAllowedException $exception) {
-                    throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-                }
+            if (!$customer instanceof Customer) {
+                throw new UnprocessableEntityHttpException('The order does not exist or has no customer.');
+            }
+
+            try {
+                $this->hydrator->hydrate($data, $customer, true);
+            } catch (ReturnNotAllowedException $exception) {
+                throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
             }
         }
 

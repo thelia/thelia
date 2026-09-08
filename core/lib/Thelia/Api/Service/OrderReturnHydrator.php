@@ -70,6 +70,10 @@ final readonly class OrderReturnHydrator
         foreach ($data->getOrderReturnLines() as $line) {
             $orderProduct = OrderProductQuery::create()->findPk($line->getOrderProduct()->getId());
 
+            if (null === $orderProduct) {
+                throw new ReturnNotAllowedException('Unknown order product in a return line.');
+            }
+
             $this->eligibility->assertReturnable($order, $customer, $orderProduct, $line->getQuantity());
 
             $line->setProductSaleElementsId($orderProduct->getProductSaleElementsId());
@@ -90,9 +94,10 @@ final readonly class OrderReturnHydrator
         }
 
         if ($data->getIncludePostage()) {
+            $this->eligibility->assertPostageNotAlreadyReturned($order);
             $total += (float) $order->getPostage() + (float) $order->getPostageTax();
         }
 
-        $data->setRefundAmount($total);
+        $data->setRefundAmount(round($total, 2));
     }
 }

@@ -16,6 +16,7 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -48,10 +49,14 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        $customer = $this->tokenStorage->getToken()?->getUser();
+        if ($data instanceof OrderReturnResource) {
+            $customer = $this->tokenStorage->getToken()?->getUser();
 
-        if ($data instanceof OrderReturnResource && $customer instanceof Customer) {
-            if (!$this->limiter->allows()) {
+            if (!$customer instanceof Customer) {
+                throw new AccessDeniedHttpException('A customer must be authenticated to open a return.');
+            }
+
+            if (!$this->limiter->allows($customer)) {
                 throw new TooManyRequestsHttpException(message: 'Too many return requests, please try again later.');
             }
 
