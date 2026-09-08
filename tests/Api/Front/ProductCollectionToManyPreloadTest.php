@@ -14,11 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
-use Propel\Runtime\Propel;
 use Thelia\Model\Currency;
 use Thelia\Model\Product;
 use Thelia\Model\ProductPrice;
 use Thelia\Test\ApiTestCase;
+use Thelia\Test\Trait\ForgetsPooledModels;
 use Thelia\Test\Trait\RecordsSqlQueries;
 
 /**
@@ -31,6 +31,7 @@ use Thelia\Test\Trait\RecordsSqlQueries;
  */
 final class ProductCollectionToManyPreloadTest extends ApiTestCase
 {
+    use ForgetsPooledModels;
     use RecordsSqlQueries;
 
     private const PRODUCT_COUNT = 4;
@@ -40,7 +41,7 @@ final class ProductCollectionToManyPreloadTest extends ApiTestCase
         $products = $this->catalogue();
 
         $payload = [];
-        $statements = $this->withInstancePooling(function () use (&$payload): void {
+        $statements = $this->recordSqlQueriesWithoutPooledModels(function () use (&$payload): void {
             $payload = $this->readJson('/api/front/products');
         });
 
@@ -63,32 +64,6 @@ final class ProductCollectionToManyPreloadTest extends ApiTestCase
 
             foreach ($member['productSaleElements'] as $saleElement) {
                 self::assertNotEmpty($saleElement['productPrices'] ?? []);
-            }
-        }
-    }
-
-    /**
-     * Instance pooling is what hands a preloaded row back to its parent, and
-     * the test suite turns it off to keep rolled back rows out of the next
-     * test. Turn it back on around the measured request only, then empty the
-     * pools it filled.
-     *
-     * @return list<string>
-     */
-    private function withInstancePooling(callable $work): array
-    {
-        $wasEnabled = Propel::isInstancePoolingEnabled();
-        Propel::enableInstancePooling();
-
-        try {
-            return $this->recordSqlQueries($work);
-        } finally {
-            foreach (Propel::getServiceContainer()->getDatabaseMap('thelia')->getTables() as $tableMap) {
-                $tableMap->clearInstancePool();
-            }
-
-            if (!$wasEnabled) {
-                Propel::disableInstancePooling();
             }
         }
     }

@@ -21,9 +21,11 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
+use Thelia\Api\Bridge\Propel\Service\PropelRelationPreloader;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\State\Provider\TFiltersProvider;
 use Thelia\Model\LangQuery;
@@ -32,6 +34,7 @@ readonly class PropelItemProvider implements ProviderInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private PropelRelationPreloader $propelRelationPreloader,
         private EventDispatcherInterface $eventDispatcher,
         private TFiltersProvider $filtersProvider,
         private iterable $propelItemExtensions = [],
@@ -71,10 +74,19 @@ readonly class PropelItemProvider implements ProviderInterface
             $extension->applyToItem($query, $resourceClass, $operation, $context);
         }
 
-        $propelModel = $query->findOne();
+        // findOne() is limit(1) plus a formatter that keeps a single row. Keeping
+        // the collection it came in costs the same query and gives the preloader
+        // something to read the relations of the row from, in one statement each
+        // instead of one per relation of every nested row.
+        $models = $query->limit(1)->find();
+        $propelModel = $models->getFirst();
 
         if (null === $propelModel) {
             return null;
+        }
+
+        if ($models instanceof ObjectCollection) {
+            $this->propelRelationPreloader->preload($models, $resourceClass, $context);
         }
 
         $langs = null;
