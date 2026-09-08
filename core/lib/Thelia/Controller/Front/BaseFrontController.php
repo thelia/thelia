@@ -19,6 +19,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Domain\Customer\Service\AuthenticationReturnUrl;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 
@@ -40,7 +41,10 @@ class BaseFrontController extends BaseController
     public function checkAuth(): void
     {
         if (false === $this->getSecurityContext()->hasAuthenticatedCustomerUser()) {
-            throw new RedirectException($this->retrieveUrlFromRouteId('customer_login'));
+            // The guarded page travels with the redirection: signing in is a detour, and
+            // dropping the visitor on their account afterwards leaves them to find their
+            // own way back to the cart, the checkout step or the order they asked for.
+            throw new RedirectException($this->retrieveUrlFromRouteId('customer_login', [AuthenticationReturnUrl::PARAMETER => $this->getRequest()->getRequestUri()]));
         }
     }
 

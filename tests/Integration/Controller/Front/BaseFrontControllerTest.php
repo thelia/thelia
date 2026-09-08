@@ -20,6 +20,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Customer\Service\AuthenticationReturnUrl;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -40,6 +41,26 @@ final class BaseFrontControllerTest extends IntegrationTestCase
     public function testAnAnonymousVisitorIsSentToTheLoginPage(): void
     {
         $this->assertRedirectsTo('/customer/login', static fn (FrontControllerUnderTest $controller) => $controller->checkAuth());
+    }
+
+    /**
+     * The page that was asked for comes back once the visitor has signed in, so the
+     * redirection names it.
+     */
+    public function testTheGuardedPageTravelsWithTheRedirectionToTheLoginPage(): void
+    {
+        try {
+            $this->controller()->checkAuth();
+        } catch (RedirectException $redirect) {
+            self::assertStringContainsString(
+                AuthenticationReturnUrl::PARAMETER.'='.rawurlencode('/'),
+                $redirect->getUrl(),
+            );
+
+            return;
+        }
+
+        self::fail('Expected a RedirectException towards the login page.');
     }
 
     /**
@@ -90,7 +111,9 @@ final class BaseFrontControllerTest extends IntegrationTestCase
         try {
             $guard($this->controller());
         } catch (RedirectException $redirect) {
-            self::assertStringEndsWith($expectedPath, $redirect->getUrl());
+            // The query string a guard may append (the page to come back to, for the
+            // login) is not what these assertions are about.
+            self::assertStringEndsWith($expectedPath, parse_url($redirect->getUrl(), \PHP_URL_PATH) ?: $redirect->getUrl());
 
             return;
         }
