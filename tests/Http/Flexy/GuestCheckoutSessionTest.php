@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use Thelia\Api\Security\GuestRegistrationLimiter;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CartQuery;
@@ -188,9 +189,10 @@ final class GuestCheckoutSessionTest extends GuestCheckoutTestCase
         $crawler = $this->client->submit($this->guestFormOf($this->requestIdentificationPage()));
 
         self::assertSame(
-            200,
+            422,
             $this->client->getResponse()->getStatusCode(),
-            'The page comes back rather than sending the buyer on with an order nobody owns.',
+            'The page comes back rather than sending the buyer on with an order nobody owns, '
+            .'and it has to say so it is a refusal or the tunnel paints nothing.',
         );
         self::assertStringContainsString(
             'already has an account',
@@ -242,13 +244,46 @@ final class GuestCheckoutSessionTest extends GuestCheckoutTestCase
         ]);
 
         self::assertSame(
-            200,
+            422,
             $this->client->getResponse()->getStatusCode(),
             'The form comes back rather than writing an address nobody can deliver an invoice to.',
         );
         self::assertNull(
             $this->guestCustomerOf(self::GUEST_EMAIL),
             'Nothing may be opened on a submission the form refuses.',
+        );
+    }
+
+    /**
+     * The tunnel navigates client-side, and the client-side navigation drops a form
+     * response that answers 200 without redirecting — the buyer then clicks and nothing
+     * moves, whatever the page holds. Every refusal of this form therefore has to answer
+     * with a status that says it is one, this one included.
+     */
+    public function testTheFormSaysItIsARefusalWhenTooManyAttemptsWereMade(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+
+        $limiter = $this->getService(GuestRegistrationLimiter::class);
+
+        // Spent before the submission, the way a buyer who kept retrying would have.
+        do {
+            $budgetLeft = $limiter->allows(self::GUEST_EMAIL);
+        } while ($budgetLeft);
+
+        $this->openASessionWithACart();
+        $crawler = $this->client->submit($this->guestFormOf($this->requestIdentificationPage()));
+
+        self::assertSame(
+            422,
+            $this->client->getResponse()->getStatusCode(),
+            'A buyer who is turned away has to be told, and a 200 here is painted by nothing.',
+        );
+        self::assertStringContainsString(
+            'Too many attempts',
+            $crawler->text(),
+            'The reason has to be on the page that comes back.',
         );
     }
 
