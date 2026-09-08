@@ -59,6 +59,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Core\DependencyInjection\LoggingDefaults;
 use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
@@ -377,6 +378,10 @@ class TheliaKernel extends Kernel
         $container = parent::buildContainer();
 
         $this->loadService($container);
+
+        // Prepended once the config/packages of the shop have been read, so
+        // that what the shop wrote about logging is what the shop gets.
+        LoggingDefaults::prependTo($container);
 
         $this->loadAutoConfigureInterfaces($container);
         $this->loadUtilsXmlConfiguration($container);
