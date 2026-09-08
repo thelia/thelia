@@ -12,13 +12,50 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+namespace Thelia\Core\DependencyInjection;
 
-return static function (ContainerConfigurator $configurator): void {
-    $configurator->extension('monolog', [
-        'channels' => ['deprecation', 'security'],
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-        'handlers' => [
+/**
+ * The logging a shop gets when it has not written its own.
+ *
+ * These are defaults, so they are prepended, and they are prepended in groups:
+ * a group holding a handler the application names is dropped whole.
+ *
+ * Merging into a handler the application named would be worse than useless,
+ * because most handler options belong to one handler type - a shop turning
+ * "main" into a plain stream would inherit `action_level` and
+ * `excluded_http_codes` from the fingers-crossed default below, and the
+ * configuration would be refused. And a group is the unit rather than a
+ * handler because a buffering handler is nothing without the handler it writes
+ * through: leaving "main_stream" behind, once a shop has written its own
+ * "main", would put a second handler on the same file.
+ */
+final class LoggingDefaults
+{
+    public static function prependTo(ContainerBuilder $container): void
+    {
+        $handlers = [];
+        $named = self::handlersOfTheApplication($container);
+
+        foreach (self::handlerGroups() as $group) {
+            if ([] === array_intersect_key($group, $named)) {
+                $handlers += $group;
+            }
+        }
+
+        $container->prependExtensionConfig('monolog', [
+            'channels' => ['deprecation', 'security'],
+            'handlers' => $handlers,
+        ]);
+    }
+
+    /**
+     * @return list<array<string, array<string, mixed>>>
+     */
+    private static function handlerGroups(): array
+    {
+        return [[
             'main' => [
                 'type' => 'fingers_crossed',
                 'action_level' => 'error',
@@ -32,6 +69,7 @@ return static function (ContainerConfigurator $configurator): void {
                 'max_files' => 7,
                 'channels' => ['!deprecation'],
             ],
+        ], [
             // Refused authentications get a file of their own, and get there
             // whatever else happens. The main handler only opens its buffer
             // when something errors, so a warning on its own never reaches the
@@ -54,11 +92,13 @@ return static function (ContainerConfigurator $configurator): void {
                 'max_files' => 30,
                 'channels' => ['security'],
             ],
+        ], [
             'console' => [
                 'type' => 'console',
                 'process_psr_3_messages' => false,
                 'channels' => ['!event', '!doctrine', '!deprecation'],
             ],
+        ], [
             'deprecations_rotating' => [
                 'type' => 'rotating_file',
                 'path' => '%kernel.logs_dir%/deprecations-%kernel.environment%.log',
@@ -66,6 +106,22 @@ return static function (ContainerConfigurator $configurator): void {
                 'max_files' => 2,
                 'channels' => ['deprecation'],
             ],
-        ],
-    ]);
-};
+        ]];
+    }
+
+    /**
+     * @return array<string, true> the handler names the application has declared
+     */
+    private static function handlersOfTheApplication(ContainerBuilder $container): array
+    {
+        $names = [];
+
+        foreach ($container->getExtensionConfig('monolog') as $configuration) {
+            foreach (array_keys($configuration['handlers'] ?? []) as $name) {
+                $names[$name] = true;
+            }
+        }
+
+        return $names;
+    }
+}
