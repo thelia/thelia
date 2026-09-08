@@ -147,6 +147,9 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getCart(),
                 $event->getCustomer(),
                 $event->getUseOrderDefinedAddresses(),
+                // Placed from the back office: there is no buyer ticking boxes, so there
+                // is nothing to freeze as a consent answer.
+                recordConsentAnswers: false,
             ),
         );
 

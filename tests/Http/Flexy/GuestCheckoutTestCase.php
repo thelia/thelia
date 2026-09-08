@@ -95,10 +95,14 @@ abstract class GuestCheckoutTestCase extends WebIntegrationTestCase
         $cart = $this->cartOpenedAfter($highestCartIdBefore);
 
         $fixtures = $this->fixtures();
+
+        // Titled on purpose: the cart page renders every line through a component whose
+        // title is a non-nullable string, so an untranslated product takes the page down.
         $product = $fixtures->product(
             $fixtures->category(),
             $fixtures->taxRule(),
             $fixtures->currency(),
+            ['title' => 'A product in the cart'],
         );
 
         if ($guestCheckoutForbidden) {
@@ -254,14 +258,19 @@ abstract class GuestCheckoutTestCase extends WebIntegrationTestCase
         OrderTableMap::clearRelatedInstancePool();
     }
 
+    /**
+     * The query string is left out of the comparison: a redirection to the login page
+     * carries the page to come back to, and none of these assertions are about that.
+     */
     protected function assertResponseRedirectsTo(string $path): void
     {
         $response = $this->client->getResponse();
+        $location = (string) $response->headers->get('Location');
 
         self::assertTrue($response->isRedirect(), 'The request must answer with a redirect.');
         self::assertStringEndsWith(
             $path,
-            (string) $response->headers->get('Location'),
+            parse_url($location, \PHP_URL_PATH) ?: $location,
             \sprintf('The redirect must lead to "%s".', $path),
         );
     }

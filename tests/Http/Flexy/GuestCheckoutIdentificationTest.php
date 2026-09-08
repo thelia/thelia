@@ -16,6 +16,8 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Customer\CustomerFacade;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 
@@ -65,23 +67,56 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         );
     }
 
-    public function testTheIdentificationPageDoesNotOfferToOrderWithoutAnAccountWhenTheShopRequiresOne(): void
+    /**
+     * The page has nothing left to offer on a shop that requires an account: the choice
+     * it exists to present is down to one. Reachable by a bookmark or a shared link, it
+     * would otherwise stand as an orphan page of a feature the shop never turned on.
+     */
+    public function testTheIdentificationPageIsNotServedWhenTheShopRequiresAnAccount(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Disabled);
         $this->openASessionWithACart();
 
-        $crawler = $this->requestIdentificationPage();
+        $this->client->request('GET', '/checkout/identify');
 
-        self::assertCount(
-            0,
-            $crawler->filter('form[name="flexybundle_form_guest_checkout"]'),
-            'A shop that requires an account must not put the guest form on the page.',
+        $this->assertResponseRedirectsTo('/customer/login');
+    }
+
+    /**
+     * The step trail of the cart page names the step the buyer is actually taken to. It
+     * announced the delivery step while the next screen turned out to be the
+     * identification one, so the trail renamed itself between two pages.
+     */
+    public function testTheCartAnnouncesTheIdentificationStepWhenThatIsWhereItLeads(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->client->request('GET', '/checkout/cart');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringContainsString(
+            'Identification',
+            $crawler->filter('.CheckoutSteps')->text(''),
+            'The trail must name the step the "next" button leads to.',
         );
-        self::assertGreaterThan(
-            0,
-            $crawler->filter('form[name="thelia_customer_login"]')->count(),
-            'The sign-in block stays, whatever the setting.',
+    }
+
+    public function testTheCartStillAnnouncesTheDeliveryStepOnAShopThatRequiresAnAccount(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Disabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->client->request('GET', '/checkout/cart');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringNotContainsString(
+            'Identification',
+            $crawler->filter('.CheckoutSteps')->text(''),
+            'A shop with no identification step must not announce one.',
         );
     }
 
@@ -95,13 +130,11 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         $this->setGuestCheckoutMode(GuestCheckoutMode::EnabledUnlessProductForbids);
         $this->openASessionWithACart(guestCheckoutForbidden: true);
 
-        $crawler = $this->requestIdentificationPage();
+        $this->client->request('GET', '/checkout/identify');
 
-        self::assertCount(
-            0,
-            $crawler->filter('form[name="flexybundle_form_guest_checkout"]'),
-            'A cart holding a product that requires an account must not offer to order without one.',
-        );
+        // Nothing left to choose between: the page is not served at all, rather than
+        // served with the offer taken out of it.
+        $this->assertResponseRedirectsTo('/customer/login');
     }
 
     public function testACartWithoutSuchAProductIsStillOfferedTheGuestCheckoutInThatMode(): void
@@ -197,7 +230,7 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         $this->submitGuestFormWithoutTheConsentBox();
 
         self::assertSame(
-            200,
+            422,
             $this->client->getResponse()->getStatusCode(),
             'The form comes back rather than placing an order under a consent nobody gave.',
         );
@@ -255,6 +288,90 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
      * The consent box is a checkbox: unticking it takes the field out of the submission
      * altogether, which is what the browser does and what a `$form[...] = ''` would not.
      */
+    /**
+     * A professional buyer has parcels delivered in the name of their company, and a
+     * carrier reads that name off the label — the billing block asked for one and the
+     * delivery block did not.
+     */
+    public function testTheDeliveryBlockAsksForACompanyName(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->requestIdentificationPage();
+
+        self::assertCount(
+            1,
+            $crawler->filter('[name="flexybundle_form_guest_checkout[company]"]'),
+            'The delivery address must offer a company name, as the billing one does.',
+        );
+    }
+
+    public function testTheCompanyNameTypedOnTheDeliveryBlockIsWrittenOnTheAddress(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $this->client->submit($this->guestFormOf($this->requestIdentificationPage(), [
+            'flexybundle_form_guest_checkout[company]' => 'Dupont et Fils',
+        ]));
+
+        $this->assertResponseRedirectsTo('/checkout/delivery');
+
+        $guest = $this->guestCustomerOf(self::GUEST_EMAIL);
+
+        self::assertSame(
+            'Dupont et Fils',
+            AddressQuery::create()->filterByCustomerId($guest?->getId())->findOne()?->getCompany(),
+        );
+    }
+
+    /**
+     * The box is the consent the order is placed under, so the buyer has to be able to
+     * read what they are agreeing to — and the merchant to show which text it was.
+     */
+    public function testTheConsentBoxLinksToTheDocumentTheShopDesignates(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $content = $this->fixtures()->content($this->fixtures()->folder(), ['title' => 'Privacy policy']);
+        ConfigQuery::write('terms_conditions_content_id', (string) $content->getId());
+
+        $crawler = $this->requestIdentificationPage();
+
+        self::assertStringContainsString(
+            'Privacy policy',
+            $crawler->filter('form[name="flexybundle_form_guest_checkout"]')->text(''),
+            'The document the box commits the buyer to has to be reachable from the box.',
+        );
+    }
+
+    /**
+     * A box that is not compulsory must not be marked as one: the sign-in block of this
+     * page carried the asterisk the login page does not.
+     */
+    public function testTheRememberMeBoxIsNotMarkedAsCompulsory(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->requestIdentificationPage();
+
+        $rememberMe = $crawler->filter('input[name="thelia_customer_login[remember_me]"]')->closest('label');
+
+        self::assertNotNull($rememberMe, 'The sign-in block must offer the box.');
+        self::assertStringNotContainsString(
+            '*',
+            $rememberMe->text(''),
+            'Nothing is asked of the buyer by ticking it.',
+        );
+    }
+
     private function submitGuestFormWithoutTheConsentBox(): void
     {
         $prefix = 'flexybundle_form_guest_checkout';

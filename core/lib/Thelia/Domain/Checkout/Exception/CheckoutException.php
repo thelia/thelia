@@ -18,9 +18,13 @@ use Thelia\Core\Translation\Translator;
 
 abstract class CheckoutException extends \RuntimeException
 {
-    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
+    /**
+     * @param array<string, string> $parameters placeholders of the message, substituted whether or
+     *                                          not the shop has a translation for it
+     */
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null, array $parameters = [])
     {
-        $message = Translator::getInstance()->trans($message);
+        $message = Translator::getInstance()->trans($message, $parameters);
         parent::__construct($message, $code, $previous);
     }
 }

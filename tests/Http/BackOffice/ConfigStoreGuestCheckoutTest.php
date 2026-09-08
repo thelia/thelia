@@ -72,8 +72,7 @@ final class ConfigStoreGuestCheckoutTest extends WebIntegrationTestCase
     {
         $this->loginAdmin();
 
-        $this->client->request('GET', '/admin/configuration/store');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/configuration/store');
         $content = (string) $this->client->getResponse()->getContent();
 
         self::assertStringContainsString('config-store-guest-checkout-mode', $content);
@@ -95,8 +94,8 @@ final class ConfigStoreGuestCheckoutTest extends WebIntegrationTestCase
             ? GuestCheckoutMode::EnabledUnlessProductForbids
             : GuestCheckoutMode::Enabled;
 
-        $crawler = $this->client->request('GET', '/admin/configuration/store');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/configuration/store');
+        $crawler = $this->client->getCrawler();
 
         $button = $crawler->filter('[data-testid="config-store-save-stay"]');
         self::assertGreaterThan(0, $button->count(), 'The store configuration form must expose its Save button.');

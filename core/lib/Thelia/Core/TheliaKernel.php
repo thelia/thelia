@@ -54,10 +54,12 @@ use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
 use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Core\DependencyInjection\LoggingDefaults;
 use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
@@ -215,9 +217,20 @@ class TheliaKernel extends Kernel
     /**
      * @throws \Throwable
      */
-    protected function initializeContainer(): void
+    /**
+     * Initializes Propel, building its cache if necessary.
+     *
+     * Idempotent: whether the request or the console gets here first, the
+     * database is configured once.
+     *
+     * @throws \Throwable
+     */
+    private function initializePropel(): void
     {
-        // initialize Propel, building its cache if necessary
+        if (isset($this->propelInitService)) {
+            return;
+        }
+
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR,
@@ -237,6 +250,11 @@ class TheliaKernel extends Kernel
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
         }
+    }
+
+    protected function initializeContainer(): void
+    {
+        $this->initializePropel();
 
         parent::initializeContainer();
 
@@ -361,6 +379,10 @@ class TheliaKernel extends Kernel
 
         $this->loadService($container);
 
+        // Prepended once the config/packages of the shop have been read, so
+        // that what the shop wrote about logging is what the shop gets.
+        LoggingDefaults::prependTo($container);
+
         $this->loadAutoConfigureInterfaces($container);
         $this->loadUtilsXmlConfiguration($container);
 
@@ -433,8 +455,23 @@ class TheliaKernel extends Kernel
             return false;
         }
 
+        // Once Propel is configured, the question goes to the connection the
+        // request is going to work on anyway. Asking it on a connection of its
+        // own cost a TCP handshake and a query on every single request,
+        // whatever the request did afterwards - the most expensive thing a
+        // request needing no data at all could do, on a remote database.
+        if (Propel::getServiceContainer()->hasConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME)) {
+            try {
+                return self::shopHasConfiguration(
+                    Propel::getConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME),
+                );
+            } catch (\Throwable) {
+                return false;
+            }
+        }
+
         try {
-            $connection = new \PDO(
+            return self::shopHasConfiguration(new \PDO(
                 \sprintf('mysql:host=%s;dbname=%s;port=%s',
                     $host,
                     self::resolveEnv('DATABASE_NAME', ''),
@@ -442,18 +479,25 @@ class TheliaKernel extends Kernel
                 ),
                 self::resolveEnv('DATABASE_USER', ''),
                 self::resolveEnv('DATABASE_PASSWORD', ''),
-            );
-            $result = $connection->query('SELECT id FROM `config`');
-            $found = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
-
-            if ($found) {
-                self::$installed = true;
-            }
-
-            return $found;
-        } catch (\Exception $e) {
+            ));
+        } catch (\Exception) {
             return false;
         }
+    }
+
+    /**
+     * @param ConnectionInterface|\PDO $connection
+     */
+    private static function shopHasConfiguration(object $connection): bool
+    {
+        $result = $connection->query('SELECT id FROM `config`');
+        $found = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
+
+        if ($found) {
+            self::$installed = true;
+        }
+
+        return $found;
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
@@ -777,10 +821,6 @@ class TheliaKernel extends Kernel
      */
     private function preBoot(): ContainerInterface
     {
-        if (!self::isInstalled()) {
-            throw new \RuntimeException('Thelia is not installed');
-        }
-
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
@@ -792,6 +832,20 @@ class TheliaKernel extends Kernel
         }
 
         $this->initializeBundles();
+
+        // Configuring Propel is what answers whether the shop is installed,
+        // and it answers on the connection the request works on. Asked before,
+        // the question opened a connection of its own, ran one query and
+        // closed it, on every single request - the most expensive thing a
+        // request needing no data at all could do, on a remote database. The
+        // container is still not built until the answer is yes: it needs the
+        // Propel models a shop that is not installed has not generated.
+        $this->initializePropel();
+
+        if (!self::isInstalled()) {
+            throw new \RuntimeException('Thelia is not installed');
+        }
+
         $this->initializeContainer();
 
         $container = $this->container;
@@ -921,7 +975,7 @@ class TheliaKernel extends Kernel
         $cacheFile = $this->getCacheDir().DS.'module_template_dirs.php';
 
         if (file_exists($cacheFile)) {
-            return require $cacheFile;
+            return self::templateDirsStillOnDisk(require $cacheFile);
         }
 
         $dirs = [];
@@ -957,5 +1011,40 @@ class TheliaKernel extends Kernel
         }
 
         return $dirs;
+    }
+
+    /**
+     * Drops the directories a module has taken away since the list was written.
+     *
+     * The list is written once and read on every request afterwards, so it
+     * outlives what it describes: a template directory removed by an upgrade,
+     * or a module deleted from the disk while its row stays. A parser handed a
+     * directory that is not there refuses to load anything at all, which takes
+     * the whole back office down with a message naming a path rather than the
+     * stale list. Leaving the entry out keeps the shop standing, and the log
+     * says which module to clear the cache for.
+     *
+     * @param list<array{int, string, string, string}> $templateDirs
+     *
+     * @return list<array{int, string, string, string}>
+     */
+    private static function templateDirsStillOnDisk(array $templateDirs): array
+    {
+        $stillOnDisk = [];
+
+        foreach ($templateDirs as $templateDir) {
+            if (is_dir($templateDir[2])) {
+                $stillOnDisk[] = $templateDir;
+                continue;
+            }
+
+            Tlog::getInstance()->addWarning(\sprintf(
+                'Template directory "%s" of module %s is no longer on disk: it is left out of the parsers until the cache is cleared.',
+                $templateDir[2],
+                $templateDir[3],
+            ));
+        }
+
+        return $stillOnDisk;
     }
 }

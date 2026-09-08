@@ -90,8 +90,7 @@ final class CustomerGuestCheckoutTest extends WebIntegrationTestCase
         ]);
 
         // Both rows show up and the guest one carries the badge markup.
-        $this->client->request('GET', '/admin/customers?q=badge-probe');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/customers?q=badge-probe');
         $content = (string) $this->client->getResponse()->getContent();
 
         self::assertStringContainsString('bo-customer-guest', $content, 'The guest badge markup must be present on the list.');
@@ -99,15 +98,13 @@ final class CustomerGuestCheckoutTest extends WebIntegrationTestCase
         self::assertStringContainsString('Roger', $content);
 
         // guest=with isolates the guest customer.
-        $this->client->request('GET', '/admin/customers?guest=with&q=badge-probe');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/customers?guest=with&q=badge-probe');
         $guestOnly = (string) $this->client->getResponse()->getContent();
         self::assertStringContainsString('Gustave', $guestOnly);
         self::assertStringNotContainsString('Roger', $guestOnly);
 
         // guest=without isolates the registered customer.
-        $this->client->request('GET', '/admin/customers?guest=without&q=badge-probe');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/customers?guest=without&q=badge-probe');
         $registeredOnly = (string) $this->client->getResponse()->getContent();
         self::assertStringContainsString('Roger', $registeredOnly);
         self::assertStringNotContainsString('Gustave', $registeredOnly);
@@ -125,16 +122,14 @@ final class CustomerGuestCheckoutTest extends WebIntegrationTestCase
         $guest = $factory->guestCustomer($title, ['email' => 'guest-mention-probe@test.com']);
         $registered = $factory->customer($title, ['email' => 'registered-mention-probe@test.com']);
 
-        $this->client->request('GET', '/admin/customer/update?customer_id='.$guest->getId());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/customer/update?customer_id='.$guest->getId());
         self::assertStringContainsString(
             'customer-edit-guest-badge',
             (string) $this->client->getResponse()->getContent(),
             'A guest customer fiche must carry the guest mention.',
         );
 
-        $this->client->request('GET', '/admin/customer/update?customer_id='.$registered->getId());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/customer/update?customer_id='.$registered->getId());
         self::assertStringNotContainsString(
             'customer-edit-guest-badge',
             (string) $this->client->getResponse()->getContent(),

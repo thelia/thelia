@@ -92,8 +92,8 @@ final class ProductGuestCheckoutForbiddenTest extends WebIntegrationTestCase
         // Pulled from the product list's create-product modal rather than the
         // edit page (see the class docblock): both forms share the same
         // csrf_token_id ('admin.product'), so the token is valid for either.
-        $crawler = $this->client->request('GET', '/admin/products');
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertPageRenders('/admin/products');
+        $crawler = $this->client->getCrawler();
         $token = $crawler->filter('[name="thelia_product_creation[_token]"]')->attr('value');
         self::assertNotNull($token, 'The product list must render a CSRF token this test can reuse.');
 

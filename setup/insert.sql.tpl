@@ -2090,8 +2090,9 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (47, 'admin.search', NOW(), NOW()),
 (49, 'admin.customer.title', NOW(), NOW()),
 (50, 'admin.configuration.order-status', NOW(), NOW()),
-(51, 'admin.order-return', NOW(), NOW()),
-(52, 'admin.configuration.order-return-reason', NOW(), NOW())
+(51, 'admin.configuration.consent', NOW(), NOW()),
+(52, 'admin.order-return', NOW(), NOW()),
+(53, 'admin.configuration.order-return-reason', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3778,8 +3779,9 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, '{{ locale }}', {{ intl('Back-office search function', locale) }}, NULL, NULL, NULL),
     (49, '{{ locale }}', {{ intl('Customer title', locale) }}, NULL, NULL, NULL),
     (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL),
-    (51, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
-    (52, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
+    (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
+    (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -3797,6 +3799,33 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
     (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
+
+/**
+Checkout consents
+
+The terms and conditions of sale are a consent like any other in the list, so that a
+shop manages them where it manages the rest. What makes them special is that they
+cannot be deleted, and that they arrive mandatory: an order nobody agreed to any terms
+for is not one a shop wants to have taken.
+
+`content_id` is left null here. It mirrors the `terms_conditions_content_id` setting,
+which a fresh shop has no value for yet — there is no content to point at until the
+merchant writes one. Filling it with 0 would name a content that does not exist.
+*/
+INSERT INTO `consent` (`id`, `code`, `content_id`, `mandatory`, `active`, `position`, `created_at`, `updated_at`) VALUES
+(1, 'terms_and_conditions', NULL, 1, 1, 1, NOW(), NOW())
+;
+
+/**
+Every seeded locale gets a row, falling back to the English wording where the sentence
+is not translated yet: a box the buyer has to tick before paying may not come up blank.
+*/
+INSERT INTO `consent_i18n` (`id`, `locale`, `title`, `description`) VALUES
+{% for locale in locales %}
+    (1, '{{ locale }}', {{ intl('I have read and accept the terms and conditions of sale', locale, true) }}, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

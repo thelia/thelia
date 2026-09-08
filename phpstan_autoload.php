@@ -22,31 +22,51 @@ $loader = require 'vendor/autoload.php';
 // class graph, regardless of database availability. We bypass the full kernel
 // boot (which would crash on autoload-time references to the still-missing
 // Base classes) and call the build steps that don't need a connection.
+// PHPStan runs this bootstrap once per parallel worker. The generation below
+// writes every worker into the same var/propel/test paths, and two workers
+// building at once lose each other's temp files halfway through a rename
+// ("Cannot rename …schema.tmp/TheliaMain.schema.xmlXXXX: No such file or
+// directory"). One worker builds under an exclusive lock; the others wait on
+// it and then find the models already there.
 $baseModelDir = THELIA_ROOT.'var'.DS.'propel'.DS.'test'.DS.'model'.DS.'Thelia'.DS.'Model'.DS.'Base';
 if (!is_dir($baseModelDir)) {
-    $schemaLocator = new Thelia\Core\Propel\Schema\SchemaLocator(
-        THELIA_CONF_DIR,
-        THELIA_MODULE_DIR,
-        THELIA_LOCAL_MODULE_DIR,
-    );
+    if (!is_dir(THELIA_ROOT.'var')) {
+        mkdir(THELIA_ROOT.'var', 0755, true);
+    }
 
-    $propelInit = new Thelia\Core\Propel\PropelInitService(
-        environment: 'test',
-        debug: false,
-        envParameters: [
-            'thelia.database_host' => '',
-            'thelia.database_port' => '3306',
-            'thelia.database_name' => '',
-            'thelia.database_user' => '',
-            'thelia.database_password' => '',
-        ],
-        schemaLocator: $schemaLocator,
-    );
+    $lock = fopen(THELIA_ROOT.'var'.DS.'propel-phpstan-build.lock', 'c');
+    flock($lock, \LOCK_EX);
 
-    $propelInit->buildPropelConfig();
-    $propelInit->buildPropelInitFile();
-    $propelInit->buildPropelGlobalSchema();
-    $propelInit->buildPropelModels();
+    try {
+        if (!is_dir($baseModelDir)) {
+            $schemaLocator = new Thelia\Core\Propel\Schema\SchemaLocator(
+                THELIA_CONF_DIR,
+                THELIA_MODULE_DIR,
+                THELIA_LOCAL_MODULE_DIR,
+            );
+
+            $propelInit = new Thelia\Core\Propel\PropelInitService(
+                environment: 'test',
+                debug: false,
+                envParameters: [
+                    'thelia.database_host' => '',
+                    'thelia.database_port' => '3306',
+                    'thelia.database_name' => '',
+                    'thelia.database_user' => '',
+                    'thelia.database_password' => '',
+                ],
+                schemaLocator: $schemaLocator,
+            );
+
+            $propelInit->buildPropelConfig();
+            $propelInit->buildPropelInitFile();
+            $propelInit->buildPropelGlobalSchema();
+            $propelInit->buildPropelModels();
+        }
+    } finally {
+        flock($lock, \LOCK_UN);
+        fclose($lock);
+    }
 }
 
 $loader->addPsr4('', THELIA_ROOT.'var/propel/test/model');

@@ -17,13 +17,19 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Customer\CustomerPersonalDataExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Writes everything the shop knows about one customer as JSON.
+ * Writes everything the shop knows about an email address as JSON.
+ *
+ * An address may carry more than one row: ordering without an account opens one, and
+ * registering later opens another. The export is therefore a list, one entry per row —
+ * an export that stopped at the first would hand the buyer half of their own history
+ * without saying so.
  */
 class CustomerPersonalDataExportCommand extends ContainerAwareCommand
 {
@@ -44,19 +50,33 @@ class CustomerPersonalDataExportCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = (string) $input->getArgument('email');
-        $customer = CustomerQuery::create()->findOneByEmail($email);
+        $customers = CustomerQuery::create()->filterByEmail($email)->orderById()->find();
 
-        if (null === $customer) {
+        if (0 === $customers->count()) {
             $output->writeln(\sprintf('<error>No customer found with email "%s".</error>', $email));
 
             return 1;
         }
 
-        $event = new CustomerPersonalDataExportEvent($customer);
-        $this->getDispatcher()->dispatch($event, TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT);
+        $personalData = [];
+
+        foreach ($customers as $customer) {
+            $event = new CustomerPersonalDataExportEvent($customer);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT);
+
+            $personalData[] = $event->getPersonalData();
+        }
+
+        // Beside the JSON rather than in it: the export goes to the standard output when
+        // no file is asked for, and a count written there would not be JSON any more.
+        $this->countOutput($output)->writeln(\sprintf(
+            '<info>%d customer record(s) found on "%s".</info>',
+            $customers->count(),
+            $email,
+        ));
 
         $json = json_encode(
-            $event->getPersonalData(),
+            $personalData,
             \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR,
         );
 
@@ -77,5 +97,10 @@ class CustomerPersonalDataExportCommand extends ContainerAwareCommand
         $output->writeln(\sprintf('<info>Personal data of %s written to %s</info>', $email, $outputFile));
 
         return 0;
+    }
+
+    private function countOutput(OutputInterface $output): OutputInterface
+    {
+        return $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
     }
 }

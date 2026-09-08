@@ -1832,6 +1832,59 @@ CREATE TABLE `order_postage_tax`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- consent
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `consent`;
+
+CREATE TABLE `consent`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the checkout, the order rows and the code refer this consent by',
+    `content_id` INTEGER COMMENT 'the content holding the text the buyer consents to, when the shop published one',
+    `mandatory` TINYINT DEFAULT 0 NOT NULL COMMENT 'the order is refused as long as this consent is not accepted',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a consent turned off is no longer asked for, and is kept so the acceptances already collected keep their meaning',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `consent_code_UNIQUE` (`code`),
+    INDEX `idx_consent_content_id` (`content_id`),
+    CONSTRAINT `fk_consent_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_consent
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_consent`;
+
+CREATE TABLE `order_consent`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `consent_code` VARCHAR(64) NOT NULL COMMENT 'the consent this answer is about, kept as a plain code: the consent may be deleted, the proof stays',
+    `title` VARCHAR(255) NOT NULL COMMENT 'the wording the buyer was shown, frozen the way order_product.title is',
+    `description` LONGTEXT COMMENT 'the long text shown under the box, frozen alongside the wording',
+    `accepted` TINYINT DEFAULT 0 NOT NULL COMMENT 'whether the box was ticked',
+    `answered_at` DATETIME COMMENT 'when the buyer answered the box, which precedes the order it ends up on',
+    `ip_address` VARCHAR(45) COMMENT 'the address the answer came from, null when the order was not placed over HTTP',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_consent_order_id` (`order_id`),
+    CONSTRAINT `fk_order_consent_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- newsletter
 -- ---------------------------------------------------------------------
 
@@ -3161,6 +3214,25 @@ CREATE TABLE `module_image_i18n`
     CONSTRAINT `module_image_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `module_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- consent_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `consent_i18n`;
+
+CREATE TABLE `consent_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `consent_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `consent` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 

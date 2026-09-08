@@ -322,6 +322,15 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         parent::doAddProductCategory($productCategory);
 
+        // Propel associates a link every time it hydrates one, not only when a
+        // link is being created: the join that reads a category with its
+        // products lands here once per row. Numbering there cost a query per row
+        // and replaced the position the row carries with a number nothing writes
+        // back.
+        if (!$productCategory->isNew()) {
+            return;
+        }
+
         $productCategoryPosition = ProductCategoryQuery::create()
             ->filterByCategoryId($productCategory->getCategoryId())
             ->orderByPosition(Criteria::DESC)

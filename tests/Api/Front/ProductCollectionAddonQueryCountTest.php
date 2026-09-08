@@ -85,6 +85,27 @@ final class ProductCollectionAddonQueryCountTest extends ApiTestCase
         );
     }
 
+    /**
+     * A resource identified by its relations builds its IRI out of them, so the
+     * transformer walks back up to the parent whatever the groups return. That
+     * parent is the product being read, already built with its addons, and
+     * building them a second time bought the addon's rows twice per product.
+     */
+    public function testTheSingleReadBuildsTheAddonOnce(): void
+    {
+        $product = $this->productWithALibraryImage();
+
+        $statements = $this->recordSqlQueries(function () use ($product): void {
+            $this->readJson('/api/front/products/'.$product->getId());
+        });
+
+        self::assertSame(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'library_item_image'),
+            'The read returns one product, so the addon resolves its rows once.',
+        );
+    }
+
     private function productWithALibraryImage(): Product
     {
         $factory = $this->createFixtureFactory();
