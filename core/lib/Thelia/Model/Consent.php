@@ -23,9 +23,11 @@ class Consent extends BaseConsent
     use PositionManagementTrait;
 
     /**
-     * The terms and conditions of sale. Created by the installer and by the update,
-     * always mandatory, and refused deletion: a shop without it would take orders
-     * nobody agreed to any terms for.
+     * The terms and conditions of sale. Created mandatory by the installer, and refused
+     * deletion for good: a shop without the row would lose the proof it collected under
+     * it. Whether it is still required, and still asked for at all, stays the
+     * merchant's to decide — a theme that cannot display the box would otherwise stop
+     * the checkout dead.
      */
     public const CODE_TERMS_AND_CONDITIONS = 'terms_and_conditions';
 

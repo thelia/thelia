@@ -31,9 +31,10 @@ use Thelia\Model\ConsentQuery;
  * the payment step.
  *
  * Codes listed in Consent::UNDELETABLE_CODES are the ones a shop cannot do without —
- * the terms and conditions, for one. They are refused deletion, and refused the two
- * edits that amount to the same thing: turning them off, and making them optional.
- * Everything else about them stays editable, the wording first of all.
+ * the terms and conditions, for one. They are refused deletion, and nothing else: a
+ * shop whose theme cannot display the box yet has to be able to stop asking for it, or
+ * its checkout is over. Turning one off, making it optional and rewording it stay the
+ * merchant's call; the row itself stays, with the proof it already collected.
  */
 class Consent extends BaseAction implements EventSubscriberInterface
 {
@@ -60,8 +61,8 @@ class Consent extends BaseAction implements EventSubscriberInterface
 
         $consent
             ->setContentId($event->getContentId())
-            ->setMandatory($consent->isDeletable() ? $event->getMandatory() : 1)
-            ->setActive($consent->isDeletable() ? $event->getActive() : 1)
+            ->setMandatory($event->getMandatory())
+            ->setActive($event->getActive())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
@@ -78,7 +79,7 @@ class Consent extends BaseAction implements EventSubscriberInterface
         $consent = $this->getConsent($event->getConsentId());
 
         if (!$consent->isDeletable()) {
-            throw new \LogicException(Translator::getInstance()->trans('The consent "%code" is required by the shop and cannot be deleted or turned off. Only its wording can be changed.', ['%code' => (string) $consent->getCode()]));
+            throw new \LogicException(Translator::getInstance()->trans('The consent "%code" is required by the shop and cannot be deleted. It can still be turned off, or made optional.', ['%code' => (string) $consent->getCode()]));
         }
 
         $consent->delete();
@@ -89,16 +90,10 @@ class Consent extends BaseAction implements EventSubscriberInterface
     /**
      * Turning a consent off keeps the acceptances already collected under it, which is
      * what makes it the answer to "stop asking for this" rather than deletion.
-     *
-     * @throws \LogicException when the consent is one the shop may not do without
      */
     public function toggleActive(ConsentToggleActiveEvent $event): void
     {
         $consent = $this->getConsent($event->getConsentId());
-
-        if (!$consent->isDeletable()) {
-            throw new \LogicException(Translator::getInstance()->trans('The consent "%code" is required by the shop and cannot be turned off.', ['%code' => (string) $consent->getCode()]));
-        }
 
         $consent
             ->setActive($consent->isActive() ? 0 : 1)

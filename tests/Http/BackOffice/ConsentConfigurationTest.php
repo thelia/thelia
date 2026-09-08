@@ -135,6 +135,60 @@ final class ConsentConfigurationTest extends WebIntegrationTestCase
         self::assertTrue($created->isActive(), 'A freshly created consent defaults to active.');
     }
 
+    /**
+     * A shop whose front-office theme cannot display the box has to be able to stop
+     * requiring it from the screen where it manages the rest — not through hand-written
+     * SQL. Deletion is the only thing the terms and conditions still refuse.
+     */
+    public function testTheTermsAndConditionsConsentCanBeMadeOptionalFromTheBackOffice(): void
+    {
+        $this->loginAdmin();
+
+        $terms = ConsentQuery::create()->findOneByCode(Consent::CODE_TERMS_AND_CONDITIONS);
+        self::assertNotNull($terms);
+
+        $crawler = $this->client->request('GET', \sprintf('/admin/configuration/consent/update/%d', $terms->getId()));
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $submit = $crawler->filter('[data-testid="consent-edit-submit"]');
+        self::assertGreaterThan(0, $submit->count());
+
+        $form = $submit->form();
+        $form['thelia_consent_modification[mandatory]']->untick();
+        $this->client->submit($form);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+        self::assertFalse(
+            ConsentQuery::create()->findPk($terms->getId())?->isMandatory(),
+            'The merchant must be able to stop requiring the box from the back office.',
+        );
+
+        // And back again, the day the theme knows how to show it.
+        $crawler = $this->client->request('GET', \sprintf('/admin/configuration/consent/update/%d', $terms->getId()));
+        $form = $crawler->filter('[data-testid="consent-edit-submit"]')->form();
+        $form['thelia_consent_modification[mandatory]']->tick();
+        $this->client->submit($form);
+
+        self::assertTrue(ConsentQuery::create()->findPk($terms->getId())?->isMandatory());
+    }
+
+    public function testTheTermsAndConditionsConsentKeepsItsActivationSwitch(): void
+    {
+        $this->loginAdmin();
+
+        $terms = ConsentQuery::create()->findOneByCode(Consent::CODE_TERMS_AND_CONDITIONS);
+        self::assertNotNull($terms);
+
+        $crawler = $this->client->request('GET', '/admin/configuration/consent');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $switch = $crawler->filter(\sprintf(
+            'a[data-testid="datatable-active-toggle"][href*="consent_id=%d"]',
+            $terms->getId(),
+        ));
+        self::assertGreaterThan(0, $switch->count(), 'The terms and conditions consent must expose a working activation switch, not a readonly one.');
+    }
+
     public function testOrderDetailPageShowsAcceptedConsents(): void
     {
         $this->loginAdmin();

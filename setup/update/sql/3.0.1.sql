@@ -152,8 +152,13 @@ SET @terms_content_id := (
       AND EXISTS (SELECT 1 FROM `content` WHERE `content`.`id` = CAST(`config`.`value` AS UNSIGNED))
 );
 
+-- Seeded optional, where a fresh install seeds it mandatory. A shop that updates its
+-- core keeps whatever front-office theme it had, and a theme that predates this release
+-- displays no box at all: made mandatory here, the consent would refuse every order and
+-- the checkout would simply stop. Optional, the shop keeps selling, and the merchant
+-- ticks "mandatory" in the back office the day their theme shows the box.
 INSERT IGNORE INTO `consent` (`code`, `content_id`, `mandatory`, `active`, `position`, `created_at`, `updated_at`) VALUES
-    ('terms_and_conditions', @terms_content_id, 1, 1, 1, NOW(), NOW());
+    ('terms_and_conditions', @terms_content_id, 0, 1, 1, NOW(), NOW());
 
 -- Replaying the update must not undo a choice the merchant made in the back office, so
 -- the link is only filled in while it is still empty.

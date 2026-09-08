@@ -91,38 +91,49 @@ final class ConsentActionTest extends ActionIntegrationTestCase
         }
     }
 
-    public function testTheTermsAndConditionsConsentCannotBeTurnedOff(): void
+    /**
+     * A shop whose theme cannot yet display the box has to be able to stop asking for
+     * it, or its checkout is over. Deletion stays refused, turning off does not.
+     */
+    public function testTheTermsAndConditionsConsentCanBeTurnedOffAndBackOn(): void
     {
         $consent = $this->termsAndConditionsConsent();
 
-        $this->expectException(\LogicException::class);
+        $this->dispatch(new ConsentToggleActiveEvent($consent->getId()), TheliaEvents::CONSENT_TOGGLE_ACTIVE);
+        self::assertSame(0, ConsentQuery::create()->findPk($consent->getId())?->getActive());
 
-        try {
-            $this->dispatch(new ConsentToggleActiveEvent($consent->getId()), TheliaEvents::CONSENT_TOGGLE_ACTIVE);
-        } finally {
-            $reloaded = ConsentQuery::create()->findPk($consent->getId());
-            self::assertNotNull($reloaded);
-            self::assertSame(1, $reloaded->getActive());
-        }
+        $this->dispatch(new ConsentToggleActiveEvent($consent->getId()), TheliaEvents::CONSENT_TOGGLE_ACTIVE);
+        self::assertSame(1, ConsentQuery::create()->findPk($consent->getId())?->getActive());
     }
 
-    public function testTheTermsAndConditionsConsentStaysMandatoryThroughAnUpdate(): void
+    public function testTheTermsAndConditionsConsentCanBeMadeOptionalAndRequiredAgain(): void
     {
         $consent = $this->termsAndConditionsConsent();
 
-        $event = (new ConsentUpdateEvent($consent->getId()))
-            ->setLocale('en_US')
-            ->setTitle('Reworded terms')
-            ->setMandatory(0)
-            ->setActive(0);
-
-        $this->dispatch($event, TheliaEvents::CONSENT_UPDATE);
+        $this->dispatch(
+            (new ConsentUpdateEvent($consent->getId()))
+                ->setLocale('en_US')
+                ->setTitle('Reworded terms')
+                ->setMandatory(0)
+                ->setActive(1),
+            TheliaEvents::CONSENT_UPDATE,
+        );
 
         $reloaded = ConsentQuery::create()->findPk($consent->getId());
         self::assertNotNull($reloaded);
         self::assertSame('Reworded terms', $reloaded->setLocale('en_US')->getTitle(), 'The wording stays the merchant\'s to write.');
-        self::assertSame(1, $reloaded->getMandatory());
-        self::assertSame(1, $reloaded->getActive());
+        self::assertSame(0, $reloaded->getMandatory(), 'A shop must be able to stop requiring the box while its theme cannot display it.');
+
+        $this->dispatch(
+            (new ConsentUpdateEvent($consent->getId()))
+                ->setLocale('en_US')
+                ->setTitle('Reworded terms')
+                ->setMandatory(1)
+                ->setActive(1),
+            TheliaEvents::CONSENT_UPDATE,
+        );
+
+        self::assertSame(1, ConsentQuery::create()->findPk($consent->getId())?->getMandatory());
     }
 
     public function testToggleActiveTurnsAConsentOffAndBackOn(): void
