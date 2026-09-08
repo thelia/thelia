@@ -29,24 +29,18 @@ class PaginationExtension implements QueryResultCollectionExtensionInterface
     {
     }
 
-    private function getPagination(ModelCriteria $query, ?Operation $operation, array $context): ?array
+    private function getPagination(?Operation $operation, array $context): ?array
     {
-        $enabled = $this->pagination->isEnabled($operation, $context);
-
-        if (!$enabled) {
+        if (!$this->pagination->isEnabled($operation, $context)) {
             return null;
         }
 
-        $context = $this->addCountToContext($query, $context);
-
+        // Pagination reads a total only to walk back from the end of a GraphQL
+        // `last` window, and that is the offset getResult() throws away below.
+        // Counting here therefore answered nothing, and ran the heaviest
+        // statement of the page a second time: the pager counts the rows itself,
+        // and that is the total the response carries.
         return $this->pagination->getPagination($operation, $context);
-    }
-
-    private function addCountToContext(ModelCriteria $query, array $context): array
-    {
-        $context['count'] = $query->count();
-
-        return $context;
     }
 
     public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool
@@ -56,7 +50,7 @@ class PaginationExtension implements QueryResultCollectionExtensionInterface
 
     public function getResult(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = [])
     {
-        if (null === $pagination = $this->getPagination($query, $operation, $context)) {
+        if (null === $pagination = $this->getPagination($operation, $context)) {
             return $query->find();
         }
 
