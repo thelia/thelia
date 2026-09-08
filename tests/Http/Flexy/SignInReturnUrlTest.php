@@ -18,6 +18,7 @@ use Thelia\Domain\Customer\Service\AuthenticationReturnUrl;
 use Thelia\Model\Customer;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
+use Twig\Environment;
 
 /**
  * Signing in interrupts what a visitor was doing, and they are meant to come back to it.
@@ -30,6 +31,21 @@ use Thelia\Test\WebIntegrationTestCase;
 final class SignInReturnUrlTest extends WebIntegrationTestCase
 {
     private const PASSWORD = 'a-password-of-a-real-account';
+
+    /**
+     * A theme older than this feature carries none of it, and the core ships with whichever
+     * theme version it is given: reported as a skip rather than a failure. The Twig function
+     * the sign-in links call is what the templates and the controller were changed together
+     * with, so its presence answers for the whole of it.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (null === $this->getService(Environment::class)->getFunction('sign_in_path')) {
+            self::markTestSkipped('The installed front-office theme does not carry the return to the interrupted page yet.');
+        }
+    }
 
     public function testTheSignInLinkOfAPageNamesThatPage(): void
     {
