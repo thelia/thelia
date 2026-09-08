@@ -596,7 +596,12 @@ readonly class ApiResourcePropelTransformerService
                             context: $context,
                             langs: $langs,
                             withRelation: false,
-                            withAddon: $withAddon,
+                            // This is the way back up to the parent, which the
+                            // caller is already holding, addons built and all.
+                            // Building them again bought every row an addon
+                            // resolves a second time, once per child of every
+                            // resource identified by its relations.
+                            withAddon: false,
                         ),
                     );
                     continue 2;
@@ -756,7 +761,7 @@ readonly class ApiResourcePropelTransformerService
             }
         }
 
-        $propelModel->setLocale($this->serializedLocale($context, $langs));
+        $propelModel->setLocale($this->serializationLocale($context, $langs));
     }
 
     /**
@@ -773,7 +778,7 @@ readonly class ApiResourcePropelTransformerService
      *
      * @param Collection<int, Lang> $langs
      */
-    private function serializedLocale(array $context, Collection $langs): string
+    public function serializationLocale(array $context, Collection $langs): string
     {
         $requested = $context['filters']['locale'] ?? null;
         $default = null;

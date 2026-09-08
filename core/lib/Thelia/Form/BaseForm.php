@@ -35,6 +35,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\RedirectUrl;
 use Thelia\Tools\URL;
 
 /**
@@ -212,7 +213,7 @@ abstract class BaseForm implements FormInterface
      */
     public function hasErrorUrl(): bool
     {
-        return null !== $this->form->get('error_url')->getData();
+        return $this->hasDefinedUrl('error_url');
     }
 
     /**
@@ -233,7 +234,19 @@ abstract class BaseForm implements FormInterface
      */
     public function hasSuccessUrl(): bool
     {
-        return null !== $this->form->get('success_url')->getData();
+        return $this->hasDefinedUrl('success_url');
+    }
+
+    /**
+     * A template that always renders the hidden field submits an empty string when it has
+     * no URL to give: that is no URL at all, and answering true here would send the visitor
+     * to the shop home page instead of wherever the controller would have taken them.
+     */
+    private function hasDefinedUrl(string $parameterName): bool
+    {
+        $url = $this->form->get($parameterName)->getData();
+
+        return \is_string($url) && '' !== trim($url);
     }
 
     /**
@@ -264,31 +277,11 @@ abstract class BaseForm implements FormInterface
 
     /**
      * A redirection URL is considered safe when it is a relative path, or an absolute
-     * http(s) URL whose host matches the current request host. Protocol-relative URLs,
-     * backslash tricks and non-http schemes (javascript:, data:, file:, ...) are rejected.
+     * http(s) URL whose host matches the current request host.
      */
     private function isSafeRedirectUrl(string $url): bool
     {
-        $url = trim($url);
-
-        if ('' === $url || str_starts_with($url, '//') || str_contains($url, '\\')) {
-            return false;
-        }
-
-        if (preg_match('#^https?://#i', $url)) {
-            $host = parse_url($url, \PHP_URL_HOST);
-
-            return \is_string($host) && '' !== $host
-                && isset($this->request)
-                && 0 === strcasecmp($host, $this->request->getHost());
-        }
-
-        // Reject any other scheme (javascript:, data:, file:, https:evil.com, ...).
-        if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $url)) {
-            return false;
-        }
-
-        return true;
+        return isset($this->request) && RedirectUrl::isSafe($url, $this->request->getHost());
     }
 
     public function createView()

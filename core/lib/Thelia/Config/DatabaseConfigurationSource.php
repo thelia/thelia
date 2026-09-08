@@ -27,6 +27,15 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DatabaseConfigurationSource
 {
+    /**
+     * Character set of a connection that does not name one itself.
+     *
+     * "utf8" is an alias for utf8mb3 in MySQL and MariaDB: it stores three
+     * bytes per character and rejects everything outside the Basic Multilingual
+     * Plane, emoji included.
+     */
+    public const DEFAULT_CHARSET = 'utf8mb4';
+
     /** Map of [connection name => connection ParameterBag]. */
     protected array $connections;
 
@@ -48,7 +57,7 @@ class DatabaseConfigurationSource
                     'driver' => 'mysql',
                     'user' => $envParameters['thelia.database_user'],
                     'password' => $envParameters['thelia.database_password'],
-                    'dsn' => \sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port']),
+                    'dsn' => \sprintf('mysql:host=%s;dbname=%s;port=%s;charset=%s', $envParameters['thelia.database_host'], $envParameters['thelia.database_name'], $envParameters['thelia.database_port'], self::DEFAULT_CHARSET),
                     'classname' => ConnectionWrapper::class,
                 ],
                 $envParameters,
@@ -133,18 +142,14 @@ class DatabaseConfigurationSource
         foreach ($this->connections as $connectionName => $connectionParameterBag) {
             $propelConnections[$connectionName] = [
                 'adapter' => $connectionParameterBag->get('driver'),
-                'dsn' => $connectionParameterBag->get('dsn'),
+                // The character set travels in the DSN, where pdo_mysql applies
+                // it while the connection is being opened. Asking for it with a
+                // SET NAMES afterwards costs a round trip on every single
+                // connection, and a remote database charges for each one.
+                'dsn' => self::withCharset($connectionParameterBag->get('dsn')),
                 'user' => $connectionParameterBag->get('user'),
                 'password' => $connectionParameterBag->get('password'),
                 'classname' => $connectionParameterBag->get('classname'),
-                'settings' => [
-                    'queries' => [
-                        // "utf8" is an alias for utf8mb3 in MySQL and MariaDB: it
-                        // stores three bytes per character and rejects everything
-                        // outside the Basic Multilingual Plane, emoji included.
-                        "SET NAMES 'utf8mb4'",
-                    ],
-                ],
             ];
         }
 
@@ -166,12 +171,30 @@ class DatabaseConfigurationSource
         $theliaConnectionParameterBag = $this->connections[DatabaseConfiguration::THELIA_CONNECTION_NAME];
 
         return new \PDO(
-            $theliaConnectionParameterBag->get('dsn'),
+            self::withCharset($theliaConnectionParameterBag->get('dsn')),
             $theliaConnectionParameterBag->get('user'),
             $theliaConnectionParameterBag->get('password'),
-            [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'",
-            ],
         );
+    }
+
+    /**
+     * Names the character set in a MySQL DSN that does not name one already.
+     *
+     * A connection described in a database.yml carries its DSN verbatim, so a
+     * shop that has chosen a character set keeps it.
+     */
+    public static function withCharset(string $dsn): string
+    {
+        if (!str_starts_with($dsn, 'mysql:')) {
+            return $dsn;
+        }
+
+        foreach (explode(';', substr($dsn, \strlen('mysql:'))) as $parameter) {
+            if (str_starts_with(strtolower(ltrim($parameter)), 'charset=')) {
+                return $dsn;
+            }
+        }
+
+        return rtrim($dsn, ';').';charset='.self::DEFAULT_CHARSET;
     }
 }

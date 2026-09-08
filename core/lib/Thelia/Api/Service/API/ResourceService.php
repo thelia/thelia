@@ -21,7 +21,6 @@ use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use Thelia\Tools\URL;
 
 readonly class ResourceService
 {
@@ -39,6 +38,7 @@ readonly class ResourceService
         private LangService $localeService,
         private ResourceMemoizer $memoizer,
         private ResourceCache $resourceCache,
+        private PublicUrlPreloader $publicUrlPreloader,
     ) {
     }
 
@@ -111,7 +111,7 @@ readonly class ResourceService
             // getPublicUrl() is itself serialized through GROUP_*_READ, so the Serializer
             // below is about to call it once per item: the batch lookup has to run before
             // that normalization, not before the addPublicUrl() call it feeds afterward.
-            $this->preloadPublicUrls($result, $currentLocale);
+            $this->publicUrlPreloader->preload($result, $currentLocale);
         }
 
         $normalizedData = $this->normalizer->normalizeData($result, $context, $format);
@@ -220,36 +220,6 @@ readonly class ResourceService
         }
 
         return $finalNormalizedData;
-    }
-
-    /**
-     * Fills the rewritten url cache for the whole collection in one query per
-     * view name, instead of one query per item once addUrlToEntry() starts
-     * calling getUrl() in a loop.
-     *
-     * @param iterable<mixed> $resources
-     */
-    private function preloadPublicUrls(iterable $resources, string $currentLocale): void
-    {
-        $viewIdsByView = [];
-
-        foreach ($resources as $resource) {
-            if (!method_exists($resource, 'getUrl') || !method_exists($resource, 'getRewrittenUrlViewName')) {
-                continue;
-            }
-
-            $view = $resource->getRewrittenUrlViewName();
-
-            if ('' === $view) {
-                continue;
-            }
-
-            $viewIdsByView[$view][] = $resource->getId();
-        }
-
-        foreach ($viewIdsByView as $view => $viewIds) {
-            URL::getInstance()->preloadRewrittenUrls($view, $currentLocale, $viewIds);
-        }
     }
 
     private function addUrlToEntry(mixed $resource, array $entry, string $currentLocale): array

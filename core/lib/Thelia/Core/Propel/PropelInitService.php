@@ -17,6 +17,7 @@ namespace Thelia\Core\Propel;
 use Propel\Generator\Command\ConfigConvertCommand;
 use Propel\Generator\Command\ModelBuildCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\Exception\ConnectionException;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
@@ -233,18 +234,24 @@ class PropelInitService
      */
     public function init(bool $force = false): bool
     {
-        if (!$force && !TheliaKernel::isInstalled()) {
-            return false;
-        }
-
         $this->waitForConcurrentBuild();
 
         // Fast path must not purge the cache on failure: a transient error on one worker
         // would otherwise cascade into a pool-wide outage. Let exceptions bubble.
         if (!$force && $this->isCacheComplete()) {
-            $this->loadPropelRuntime();
+            // Propel is loaded before the shop is asked whether it is
+            // installed, so the question is put to the connection the request
+            // works on anyway. The other way round it cost a second
+            // connection, its handshake and a query, on every single request.
+            if (!$this->loadPropelRuntime()) {
+                return false;
+            }
 
-            return true;
+            return TheliaKernel::isInstalled();
+        }
+
+        if (!$force && !TheliaKernel::isInstalled()) {
+            return false;
         }
 
         $lock = (new LockFactory(new FlockStore()))->createLock('propel-cache-generation');
@@ -262,9 +269,7 @@ class PropelInitService
             }
 
             if (!$force && $this->isCacheComplete()) {
-                $this->loadPropelRuntime();
-
-                return true;
+                return $this->loadPropelRuntime() && TheliaKernel::isInstalled();
             }
 
             (new Filesystem())->mkdir(\dirname($buildingFlag));
@@ -336,17 +341,28 @@ class PropelInitService
             && file_get_contents($hashFile) === file_get_contents($modelHashFile);
     }
 
-    private function loadPropelRuntime(): void
+    /**
+     * @return bool false when no database answers behind the configured
+     *              credentials, which is the shop the installer is there for
+     */
+    private function loadPropelRuntime(): bool
     {
         require_once $this->getPropelInitFile();
 
-        $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
+        try {
+            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
+        } catch (ConnectionException|\PDOException) {
+            return false;
+        }
+
         $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
         if ($this->debug) {
             Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
             $theliaDatabaseConnection->useDebug(true);
         }
+
+        return true;
     }
 
     public function getPropelCacheDir(): string
