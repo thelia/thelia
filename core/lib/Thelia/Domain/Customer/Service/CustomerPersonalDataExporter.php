@@ -189,7 +189,7 @@ final readonly class CustomerPersonalDataExporter
                 'title' => $orderConsent->getTitle(),
                 'accepted' => $orderConsent->isAccepted(),
                 'ip_address' => $orderConsent->getIpAddress(),
-                'answered_at' => $this->formatDate($orderConsent->getCreatedAt()),
+                'answered_at' => $this->formatDate($orderConsent->getAnsweredAt() ?? $orderConsent->getCreatedAt()),
             ];
         }
 
