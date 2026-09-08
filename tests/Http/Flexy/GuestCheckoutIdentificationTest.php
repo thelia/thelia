@@ -16,6 +16,8 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Customer\CustomerFacade;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 
@@ -286,6 +288,90 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
      * The consent box is a checkbox: unticking it takes the field out of the submission
      * altogether, which is what the browser does and what a `$form[...] = ''` would not.
      */
+    /**
+     * A professional buyer has parcels delivered in the name of their company, and a
+     * carrier reads that name off the label — the billing block asked for one and the
+     * delivery block did not.
+     */
+    public function testTheDeliveryBlockAsksForACompanyName(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->requestIdentificationPage();
+
+        self::assertCount(
+            1,
+            $crawler->filter('[name="flexybundle_form_guest_checkout[company]"]'),
+            'The delivery address must offer a company name, as the billing one does.',
+        );
+    }
+
+    public function testTheCompanyNameTypedOnTheDeliveryBlockIsWrittenOnTheAddress(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $this->client->submit($this->guestFormOf($this->requestIdentificationPage(), [
+            'flexybundle_form_guest_checkout[company]' => 'Dupont et Fils',
+        ]));
+
+        $this->assertResponseRedirectsTo('/checkout/delivery');
+
+        $guest = $this->guestCustomerOf(self::GUEST_EMAIL);
+
+        self::assertSame(
+            'Dupont et Fils',
+            AddressQuery::create()->filterByCustomerId($guest?->getId())->findOne()?->getCompany(),
+        );
+    }
+
+    /**
+     * The box is the consent the order is placed under, so the buyer has to be able to
+     * read what they are agreeing to — and the merchant to show which text it was.
+     */
+    public function testTheConsentBoxLinksToTheDocumentTheShopDesignates(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $content = $this->fixtures()->content($this->fixtures()->folder(), ['title' => 'Privacy policy']);
+        ConfigQuery::write('terms_conditions_content_id', (string) $content->getId());
+
+        $crawler = $this->requestIdentificationPage();
+
+        self::assertStringContainsString(
+            'Privacy policy',
+            $crawler->filter('form[name="flexybundle_form_guest_checkout"]')->text(''),
+            'The document the box commits the buyer to has to be reachable from the box.',
+        );
+    }
+
+    /**
+     * A box that is not compulsory must not be marked as one: the sign-in block of this
+     * page carried the asterisk the login page does not.
+     */
+    public function testTheRememberMeBoxIsNotMarkedAsCompulsory(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $crawler = $this->requestIdentificationPage();
+
+        $rememberMe = $crawler->filter('input[name="thelia_customer_login[remember_me]"]')->closest('label');
+
+        self::assertNotNull($rememberMe, 'The sign-in block must offer the box.');
+        self::assertStringNotContainsString(
+            '*',
+            $rememberMe->text(''),
+            'Nothing is asked of the buyer by ticking it.',
+        );
+    }
+
     private function submitGuestFormWithoutTheConsentBox(): void
     {
         $prefix = 'flexybundle_form_guest_checkout';
