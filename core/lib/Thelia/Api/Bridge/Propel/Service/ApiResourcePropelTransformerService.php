@@ -596,7 +596,12 @@ readonly class ApiResourcePropelTransformerService
                             context: $context,
                             langs: $langs,
                             withRelation: false,
-                            withAddon: $withAddon,
+                            // This is the way back up to the parent, which the
+                            // caller is already holding, addons built and all.
+                            // Building them again bought every row an addon
+                            // resolves a second time, once per child of every
+                            // resource identified by its relations.
+                            withAddon: false,
                         ),
                     );
                     continue 2;
