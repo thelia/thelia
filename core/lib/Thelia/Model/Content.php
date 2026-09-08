@@ -189,6 +189,15 @@ class Content extends BaseContent implements FileModelParentInterface
     {
         parent::doAddContentFolder($contentFolder);
 
+        // Propel associates a link every time it hydrates one, not only when a
+        // link is being created: the join that reads a folder with its
+        // contents lands here once per row. Numbering there cost a query per row
+        // and replaced the position the row carries with a number nothing writes
+        // back.
+        if (!$contentFolder->isNew()) {
+            return;
+        }
+
         $contentFolderPosition = ContentFolderQuery::create()
             ->filterByFolderId($contentFolder->getFolderId())
             ->orderByPosition(Criteria::DESC)
