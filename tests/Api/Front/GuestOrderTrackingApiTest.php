@@ -104,7 +104,13 @@ final class GuestOrderTrackingApiTest extends ApiTestCase
         self::assertSame(404, $response->getStatusCode());
     }
 
-    public function testTheLinkStopsWorkingOnceTheAccountIsCompleted(): void
+    /**
+     * Choosing a password is not the moment the account opens: the activation code sent
+     * by mail still has to be answered, and until it is, the buyer can neither sign in
+     * nor reach the order any other way. So the link outlives the password, and dies
+     * with the account it is being replaced by.
+     */
+    public function testTheLinkOutlivesThePasswordWhileTheAccountIsStillWaitingOnItsCode(): void
     {
         $factory = $this->createFixtureFactory();
         $guest = $factory->guestCustomer($factory->customerTitle());
@@ -119,12 +125,29 @@ final class GuestOrderTrackingApiTest extends ApiTestCase
             ['password' => 'a-chosen-password', 'orderToken' => $token],
         );
 
+        self::assertJsonResponseSuccessful(
+            $this->jsonRequest('GET', '/api/front/guest-orders/'.$token),
+            'A password that has not been activated yet leaves the buyer nothing else to reach the order with.',
+        );
+    }
+
+    public function testTheLinkStopsWorkingOnceTheAccountIsOpen(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $guest = $factory->guestCustomer($factory->customerTitle());
+        $order = $factory->order($guest);
+        $token = $this->trackingToken($order);
+
+        self::assertJsonResponseSuccessful($this->jsonRequest('GET', '/api/front/guest-orders/'.$token));
+
+        $guest->setPassword('a-chosen-password')->setIsGuest(0)->setEnable(1)->save();
+
         $response = $this->jsonRequest('GET', '/api/front/guest-orders/'.$token);
 
         self::assertSame(
             404,
             $response->getStatusCode(),
-            'From the moment the account has a password, its orders are reached by signing in.',
+            'From the moment the account is open, its orders are reached by signing in.',
         );
     }
 
