@@ -27,6 +27,7 @@ use Thelia\Model\CustomerVersionQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -37,8 +38,9 @@ use Thelia\Model\OrderQuery;
  * reference, their invoice number and date, their amounts, their taxes, their
  * coupons and their status history. What disappears is who placed them: the
  * account identity, the address book, the identity frozen on the invoice and
- * delivery order addresses, the carts, the newsletter subscription and the
- * identity the administrator audit trail recorded about that customer.
+ * delivery order addresses, the carts, the newsletter subscription, the address
+ * the consents of the checkout were accepted from, and the identity the
+ * administrator audit trail recorded about that customer.
  *
  * The country and state of an order address are kept, because they justify
  * the tax rate applied on the order.
@@ -71,6 +73,7 @@ final readonly class CustomerAnonymizer
 
         try {
             $this->anonymizeOrderAddresses($customer, $connection);
+            $this->anonymizeOrderConsents($customer, $connection);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
@@ -132,6 +135,28 @@ final readonly class CustomerAnonymizer
                 ->setCellphone(null)
                 ->save($connection);
         }
+    }
+
+    /**
+     * The consent rows of an order are the record of what the buyer agreed to, and
+     * that record is kept: the wording, the answer and the date all stay. The client
+     * address goes, because it identifies the person rather than what they agreed to.
+     */
+    private function anonymizeOrderConsents(Customer $customer, ConnectionInterface $connection): void
+    {
+        $orderIds = OrderQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->select('Id')
+            ->find($connection)
+            ->toArray();
+
+        if ([] === $orderIds) {
+            return;
+        }
+
+        OrderConsentQuery::create()
+            ->filterByOrderId($orderIds)
+            ->update(['IpAddress' => null], $connection);
     }
 
     /**

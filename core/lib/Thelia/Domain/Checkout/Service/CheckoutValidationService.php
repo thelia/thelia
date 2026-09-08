@@ -21,12 +21,15 @@ use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
+use Thelia\Domain\Checkout\Exception\MissingConsentException;
 use Thelia\Model\Cart;
 
 readonly class CheckoutValidationService
 {
-    public function __construct(private CartGuard $cartGuard)
-    {
+    public function __construct(
+        private CartGuard $cartGuard,
+        private ConsentGuard $consentGuard,
+    ) {
     }
 
     /**
@@ -35,6 +38,7 @@ readonly class CheckoutValidationService
      * @throws IncompleteInvoiceAddressException
      * @throws InvalidDeliveryException
      * @throws InvalidPaymentException
+     * @throws MissingConsentException
      * @throws PropelException
      */
     public function validateForOrder(Cart $cart): void
@@ -43,5 +47,9 @@ readonly class CheckoutValidationService
         $this->cartGuard->checkValidDelivery($cart);
         $this->cartGuard->checkInvoiceAddressLegalIdentifiers($cart);
         $this->cartGuard->checkValidPayment($cart);
+
+        // Last, so that a buyer who still has an address or a delivery choice to make is
+        // told about that first rather than about a box they have not reached yet.
+        $this->consentGuard->checkMandatoryConsentsAccepted();
     }
 }

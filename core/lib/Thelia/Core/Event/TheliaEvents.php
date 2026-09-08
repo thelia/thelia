@@ -460,6 +460,14 @@ final class TheliaEvents
     public const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = 'action.removeAttributeFromAllTemplate';
     public const ATTRIBUTE_ADD_TO_ALL_TEMPLATES = 'action.addAttributeToAllTemplate';
 
+    // -- Checkout consents management ---------------------------------------
+
+    public const CONSENT_CREATE = 'action.createConsent';
+    public const CONSENT_UPDATE = 'action.updateConsent';
+    public const CONSENT_DELETE = 'action.deleteConsent';
+    public const CONSENT_UPDATE_POSITION = 'action.updateConsentPosition';
+    public const CONSENT_TOGGLE_ACTIVE = 'action.toggleConsentActive';
+
     // -- Features management ---------------------------------------------
 
     public const FEATURE_CREATE = 'action.createFeature';

@@ -21,6 +21,7 @@ use Thelia\Domain\Customer\Service\CustomerPersonalDataExporter;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Model\Customer;
 use Thelia\Model\Newsletter;
+use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderProduct;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
@@ -64,6 +65,15 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
         self::assertNotNull($order['delivery_address']);
         self::assertCount(1, $order['products']);
         self::assertSame('REF-EXPORTER', $order['products'][0]['product_reference']);
+
+        // The address the consent was given from is personal data the shop keeps on
+        // purpose, so the person can ask for it.
+        self::assertCount(1, $order['consents']);
+        self::assertSame('terms_and_conditions', $order['consents'][0]['code']);
+        self::assertSame('I accept the terms and conditions of sale', $order['consents'][0]['title']);
+        self::assertTrue($order['consents'][0]['accepted']);
+        self::assertSame('203.0.113.7', $order['consents'][0]['ip_address']);
+        self::assertNotNull($order['consents'][0]['answered_at']);
 
         self::assertNotEmpty($personalData['carts']);
 
@@ -154,6 +164,14 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
             ->setPrice('99.99')
             ->setWasNew(0)
             ->setWasInPromo(0)
+            ->save($this->getPropelConnection());
+
+        (new OrderConsent())
+            ->setOrderId($order->getId())
+            ->setConsentCode('terms_and_conditions')
+            ->setTitle('I accept the terms and conditions of sale')
+            ->setAccepted(1)
+            ->setIpAddress('203.0.113.7')
             ->save($this->getPropelConnection());
 
         return $customer;

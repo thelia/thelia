@@ -76,6 +76,9 @@ class CustomerLogin extends BruteforceForm
             ])
             ->add('remember_me', CheckboxType::class, [
                 'value' => 'yes',
+                // CheckboxType is required by default, which marks the box `required` in
+                // the browser: staying signed in is an offer, not a condition of signing in.
+                'required' => false,
                 'label' => Translator::getInstance()->trans('Remember me ?'),
                 'label_attr' => [
                     'for' => 'remember_me',
