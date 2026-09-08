@@ -54,6 +54,7 @@ use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
 use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
@@ -215,9 +216,20 @@ class TheliaKernel extends Kernel
     /**
      * @throws \Throwable
      */
-    protected function initializeContainer(): void
+    /**
+     * Initializes Propel, building its cache if necessary.
+     *
+     * Idempotent: whether the request or the console gets here first, the
+     * database is configured once.
+     *
+     * @throws \Throwable
+     */
+    private function initializePropel(): void
     {
-        // initialize Propel, building its cache if necessary
+        if (isset($this->propelInitService)) {
+            return;
+        }
+
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR,
@@ -237,6 +249,11 @@ class TheliaKernel extends Kernel
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
         }
+    }
+
+    protected function initializeContainer(): void
+    {
+        $this->initializePropel();
 
         parent::initializeContainer();
 
@@ -433,8 +450,23 @@ class TheliaKernel extends Kernel
             return false;
         }
 
+        // Once Propel is configured, the question goes to the connection the
+        // request is going to work on anyway. Asking it on a connection of its
+        // own cost a TCP handshake and a query on every single request,
+        // whatever the request did afterwards - the most expensive thing a
+        // request needing no data at all could do, on a remote database.
+        if (Propel::getServiceContainer()->hasConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME)) {
+            try {
+                return self::shopHasConfiguration(
+                    Propel::getConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME),
+                );
+            } catch (\Throwable) {
+                return false;
+            }
+        }
+
         try {
-            $connection = new \PDO(
+            return self::shopHasConfiguration(new \PDO(
                 \sprintf('mysql:host=%s;dbname=%s;port=%s',
                     $host,
                     self::resolveEnv('DATABASE_NAME', ''),
@@ -442,18 +474,25 @@ class TheliaKernel extends Kernel
                 ),
                 self::resolveEnv('DATABASE_USER', ''),
                 self::resolveEnv('DATABASE_PASSWORD', ''),
-            );
-            $result = $connection->query('SELECT id FROM `config`');
-            $found = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
-
-            if ($found) {
-                self::$installed = true;
-            }
-
-            return $found;
-        } catch (\Exception $e) {
+            ));
+        } catch (\Exception) {
             return false;
         }
+    }
+
+    /**
+     * @param ConnectionInterface|\PDO $connection
+     */
+    private static function shopHasConfiguration(object $connection): bool
+    {
+        $result = $connection->query('SELECT id FROM `config`');
+        $found = $result && (false !== $result->fetch(\PDO::FETCH_ASSOC));
+
+        if ($found) {
+            self::$installed = true;
+        }
+
+        return $found;
     }
 
     private function loadAutoConfigureInterfaces(ContainerBuilder $container): void
@@ -777,10 +816,6 @@ class TheliaKernel extends Kernel
      */
     private function preBoot(): ContainerInterface
     {
-        if (!self::isInstalled()) {
-            throw new \RuntimeException('Thelia is not installed');
-        }
-
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
@@ -792,6 +827,20 @@ class TheliaKernel extends Kernel
         }
 
         $this->initializeBundles();
+
+        // Configuring Propel is what answers whether the shop is installed,
+        // and it answers on the connection the request works on. Asked before,
+        // the question opened a connection of its own, ran one query and
+        // closed it, on every single request - the most expensive thing a
+        // request needing no data at all could do, on a remote database. The
+        // container is still not built until the answer is yes: it needs the
+        // Propel models a shop that is not installed has not generated.
+        $this->initializePropel();
+
+        if (!self::isInstalled()) {
+            throw new \RuntimeException('Thelia is not installed');
+        }
+
         $this->initializeContainer();
 
         $container = $this->container;
