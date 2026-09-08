@@ -232,12 +232,6 @@ class TheliaKernel extends Kernel
             return;
         }
 
-        // The debug logger reads its own configuration while Propel is still
-        // being wired up below, long before the container exists to hand it
-        // ConfigCacheService: warm ConfigQuery's memo straight from the shared
-        // entry, so that read costs no query either.
-        ConfigCacheService::warmFromSharedEntry($this->getCacheDir());
-
         $this->propelSchemaLocator = new SchemaLocator(
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR,
@@ -256,6 +250,14 @@ class TheliaKernel extends Kernel
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
+
+            // ConfigQuery::read() falls back to a full table read when nothing has
+            // warmed it yet, and the debug logger reads its own configuration while
+            // the container is still being built. The Base model class this needs
+            // only exists once the call above has generated it, so this cannot run
+            // any earlier - a cold cache (fresh install, cold CI) has no such class
+            // to autoload yet.
+            ConfigCacheService::warmFromSharedEntry($this->getCacheDir());
         }
     }
 
