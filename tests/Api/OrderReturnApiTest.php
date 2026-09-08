@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api;
 
 use Thelia\Model\Customer;
-use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnStatus;

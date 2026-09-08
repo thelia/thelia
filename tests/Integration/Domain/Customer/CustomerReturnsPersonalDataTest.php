@@ -17,7 +17,6 @@ namespace Thelia\Tests\Integration\Domain\Customer;
 use Thelia\Domain\Customer\Service\CustomerAnonymizer;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataExporter;
 use Thelia\Model\Customer;
-use Thelia\Model\Order;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatus;
