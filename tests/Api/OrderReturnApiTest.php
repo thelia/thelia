@@ -14,9 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api;
 
+use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
+use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\OrderStatus;
@@ -123,6 +127,117 @@ final class OrderReturnApiTest extends ApiTestCase
         self::assertSame(422, $response->getStatusCode());
     }
 
+    public function testACustomerOpensAReturnOnTheirOwnOrder(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $token,
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()
+            ->filterByCustomerId((int) $customer->getId())
+            ->findOne($this->getPropelConnection());
+
+        self::assertNotNull($created);
+        // The owner and the initial status are server-owned, never taken from the body.
+        self::assertFalse((bool) $created->getCreatedByAdmin());
+        self::assertSame(
+            (int) OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_REQUESTED),
+            (int) $created->getStatusId(),
+        );
+        // Refund is computed from the paid line price (1 x 10.00), not from the request.
+        self::assertSame(10.0, (float) $created->getRefundAmount());
+    }
+
+    public function testAnAdminOpensAReturnOnBehalfOfACustomer(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $token = $this->authenticateAsAdmin();
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/order_returns',
+            [
+                'order' => '/api/admin/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/admin/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $token,
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()
+            ->filterByCustomerId((int) $customer->getId())
+            ->findOne($this->getPropelConnection());
+
+        self::assertNotNull($created);
+        self::assertTrue((bool) $created->getCreatedByAdmin());
+    }
+
+    public function testACustomerCannotOpenAReturnWhenTheFeatureIsDisabled(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '0');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $token,
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testACustomerCannotReturnMoreThanTheOrderedQuantity(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 5.0],
+                ],
+            ],
+            token: $token,
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
     private function customer(): Customer
     {
         return $this->factory->customer($this->factory->customerTitle());
@@ -131,6 +246,31 @@ final class OrderReturnApiTest extends ApiTestCase
     private function returnFor(Customer $customer, string $statusCode): OrderReturn
     {
         $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+        $this->orderProductFor($order);
+
+        $status = OrderReturnStatusQuery::create()->findOneByCode($statusCode);
+
+        $return = (new OrderReturn())
+            ->setOrder($order)
+            ->setCustomer($customer)
+            ->setOrderReturnStatus($status);
+        $return->save($this->getPropelConnection());
+
+        return $return;
+    }
+
+    /**
+     * @return array{0: Order, 1: OrderProductModel}
+     */
+    private function paidOrderWithProduct(Customer $customer): array
+    {
+        $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+
+        return [$order, $this->orderProductFor($order)];
+    }
+
+    private function orderProductFor(Order $order): OrderProductModel
+    {
         $orderProduct = (new OrderProductModel())
             ->setOrderId((int) $order->getId())
             ->setProductRef('REF-'.uniqid())
@@ -145,14 +285,6 @@ final class OrderReturnApiTest extends ApiTestCase
             ->setVirtual(0);
         $orderProduct->save($this->getPropelConnection());
 
-        $status = OrderReturnStatusQuery::create()->findOneByCode($statusCode);
-
-        $return = (new OrderReturn())
-            ->setOrder($order)
-            ->setCustomer($customer)
-            ->setOrderReturnStatus($status);
-        $return->save($this->getPropelConnection());
-
-        return $return;
+        return $orderProduct;
     }
 }
