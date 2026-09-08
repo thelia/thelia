@@ -236,6 +236,20 @@ final class OrderReturnApiTest extends ApiTestCase
         self::assertSame(422, $response->getStatusCode());
     }
 
+    public function testAStatusIsReadableByIdAndByCode(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $requested = OrderReturnStatusQuery::create()->findOneByCode(OrderReturnStatus::CODE_REQUESTED);
+        self::assertNotNull($requested);
+
+        self::assertJsonResponseSuccessful(
+            $this->jsonRequest('GET', '/api/admin/order_return_statutes/'.$requested->getId(), token: $token),
+        );
+        self::assertJsonResponseSuccessful(
+            $this->jsonRequest('GET', '/api/admin/order_return_statutes/code/'.OrderReturnStatus::CODE_REQUESTED, token: $token),
+        );
+    }
+
     private function customer(): Customer
     {
         return $this->factory->customer($this->factory->customerTitle());

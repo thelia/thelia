@@ -32,6 +32,12 @@ use Thelia\Model\Map\OrderReturnStatusTableMap;
         ),
         new Get(
             uriTemplate: '/admin/order_return_statutes/{id}',
+            uriVariables: ['id'],
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+        ),
+        new Get(
+            uriTemplate: '/admin/order_return_statutes/code/{code}',
+            uriVariables: ['code'],
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
     ],
@@ -45,6 +51,11 @@ use Thelia\Model\Map\OrderReturnStatusTableMap;
         ),
         new Get(
             uriTemplate: '/front/order_return_statutes/{id}',
+            uriVariables: ['id'],
+        ),
+        new Get(
+            uriTemplate: '/front/order_return_statutes/code/{code}',
+            uriVariables: ['code'],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
