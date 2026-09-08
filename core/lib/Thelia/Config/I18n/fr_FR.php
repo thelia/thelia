@@ -557,6 +557,7 @@ return [
     'The %name module definition has not been initialized.' => 'La définition du module %name n\'a pas été initialisée.',
     'The %name module descriptor has not been initialized.' => 'La descripteur du module %name n\'a pas été initialisée.',
     "The %obj_name id '%id' doesn't exist" => "%obj_name avec l'ID  '%id' n'existe pas",
+    'The billing address is missing information an invoice requires' => 'L\'adresse de facturation ne comporte pas toutes les informations qu\'une facture exige',
     'The checksum of this SIRET number is invalid, please check the number you typed.' => 'La clé de ce numéro SIRET est invalide, veuillez vérifier le numéro saisi.',
     'The checksum of this VAT number is invalid, please check the number you typed.' => 'La clé de ce numéro de TVA est invalide, veuillez vérifier le numéro saisi.',
     'The HTML TITLE element is the most important element on your web page.' => 'L\'élément HTML TITLE est le plus important dans votre page',
