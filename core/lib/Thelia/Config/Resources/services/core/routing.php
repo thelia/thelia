@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Routing\Loader\XmlFileLoader;
 use Thelia\Core\Routing\ModuleAttributeLoader;
@@ -77,11 +78,25 @@ return static function (ContainerConfigurator $container): void {
             service('request.context'),
         ]);
 
-    // Router listener
+    // Router listener.
+    //
+    // FrameworkBundle registers a RouterListener of its own, on the same
+    // events, and its copy answers kernel.request at the same priority 32. At
+    // equal priority the order comes down to the order the two were
+    // registered in, and whichever runs second returns at once because
+    // _controller is already set - so which of the two actually routed the
+    // request was left to chance, and only this one has the rewriting router
+    // in its chain. One point of priority puts it strictly in front.
+    //
+    // The events are declared here rather than taken from the class, so the
+    // one priority that is deliberately not the class's is visible. The test
+    // RouterListenerPriorityTest keeps the list in step with the class.
     $services->set('listener.router', RouterListener::class)
         ->args([
             service('router.chainRequest'),
             service('request_stack'),
         ])
-        ->tag('kernel.event_subscriber');
+        ->tag('kernel.event_listener', ['event' => KernelEvents::REQUEST, 'method' => 'onKernelRequest', 'priority' => 33])
+        ->tag('kernel.event_listener', ['event' => KernelEvents::FINISH_REQUEST, 'method' => 'onKernelFinishRequest', 'priority' => 0])
+        ->tag('kernel.event_listener', ['event' => KernelEvents::EXCEPTION, 'method' => 'onKernelException', 'priority' => -64]);
 };
