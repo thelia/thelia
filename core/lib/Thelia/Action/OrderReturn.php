@@ -82,20 +82,28 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             throw new ReturnNotAllowedException('The target return status does not exist.');
         }
 
-        $fromCode = $return->getStatusCode();
         $toCode = $targetStatus->getEffectiveCode();
-
-        if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, $toCode)) {
-            throw new ReturnNotAllowedException(\sprintf('The return cannot move from "%s" to "%s".', $fromCode ?? 'none', $toCode));
-        }
 
         $connection = Propel::getConnection(OrderReturnTableMap::DATABASE_NAME);
         $connection->beginTransaction();
 
         try {
+            // Lock the return row for the whole transition so two concurrent
+            // requests cannot both pass the guard and restock/refund twice.
+            $lock = $connection->prepare('SELECT `id` FROM `order_return` WHERE `id` = :id FOR UPDATE');
+            $lock->bindValue(':id', $return->getId(), \PDO::PARAM_INT);
+            $lock->execute();
+            $return->reload(true, $connection);
+
+            $fromCode = $return->getStatusCode();
+
+            if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, $toCode)) {
+                throw new ReturnNotAllowedException(\sprintf('The return cannot move from "%s" to "%s".', $fromCode ?? 'none', $toCode));
+            }
+
             if (OrderReturnStatus::CODE_RECEIVED === $toCode) {
                 $this->restockReceivedLines($return, $connection);
-                $return->setRefundAmount((string) $this->refundCalculator->compute($return, true));
+                $return->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''));
             }
 
             if (OrderReturnStatus::CODE_REFUSED === $toCode && null !== $event->getRefusalReason()) {
