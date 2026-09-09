@@ -24,6 +24,7 @@ use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\PropelRelationPreloader;
 use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
+use Thelia\Api\Resource\CollectionPreloadableInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Service\API\PublicUrlPreloader;
 use Thelia\Model\Lang;
@@ -91,6 +92,13 @@ readonly class PropelCollectionProvider implements ProviderInterface
             ),
             iterator_to_array($results instanceof PropelModelPager ? $results->getResults() : $results),
         );
+
+        // A resource answering a field out of a query of its own reads it for the
+        // whole page here, for the same reason: the serializer is about to ask each
+        // member, and one statement per member grows with the page.
+        if (is_subclass_of($resourceClass, CollectionPreloadableInterface::class)) {
+            $resourceClass::preloadCollection($resources);
+        }
 
         // The serializer is about to ask each resource for its public url, and
         // each of those resolves a rewritten url of its own. Filling the memo

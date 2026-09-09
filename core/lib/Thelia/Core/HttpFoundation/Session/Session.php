@@ -288,6 +288,15 @@ class Session extends BaseSession
             ? CartQuery::create()->findPk($cartId)
             : self::$transientCart;
 
+        // A cart that has been deleted is no cart at all. The transient cart is held
+        // in a static, so nothing invalidates it when the cart it points at goes:
+        // handing it back gives the caller an object every save() on it rejects.
+        if (null !== $cart && $cart->isDeleted()) {
+            self::$transientCart = null;
+            $this->remove(self::SESSION_CART_ID_NAME);
+            $cart = null;
+        }
+
         if (null !== $cart && $this->isValidCart($cart)) {
             return $cart;
         }

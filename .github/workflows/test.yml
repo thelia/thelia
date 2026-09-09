@@ -54,6 +54,8 @@ jobs:
           git checkout -- local/config/schema.xml
           grep -q is_guest local/config/schema.xml \
             || { echo "::error::local/config/schema.xml has no is_guest column after the restore"; exit 1; }
+          grep -q audience_mode local/config/schema.xml \
+            || { echo "::error::local/config/schema.xml has no audience_mode column after the restore"; exit 1; }
 
       - name: Prepare the test database credentials
         # bin/test-prepare (run by `composer test`) reads these to create the test

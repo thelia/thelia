@@ -197,4 +197,80 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     SELECT `resource`.`id`, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL
     FROM `resource` WHERE `resource`.`code` = 'admin.configuration.consent';
 
+-- ---------------------------------------------------------------------
+-- Reserved sales and their countdown
+--
+-- A sale used to be for everyone: whoever saw the product got the discount.
+-- `audience_mode` is what opens an operation to a part of the customers only —
+-- 0 everyone, as every operation already on file, 1 the customers named on it
+-- in `sale_customer`, 2 the customer groups it is opened to (the groups
+-- themselves come later, the value is reserved here so the meaning of the
+-- column never shifts). `hide_products` decides what a visitor the operation
+-- is not open to sees: nothing at all, or the products at their usual price.
+--
+-- `countdown_mode` drives the urgency shown to the buyer: 0 no countdown,
+-- 1 from `countdown_lead_hours` before the end date, 2 from the opening. The
+-- lead is nullable because it is only read in mode 1.
+--
+-- `sale` is not versionable, so nothing is mirrored in a _version table.
+--
+-- Existing rows take the defaults: every operation already on file stays
+-- public, keeps showing its products and shows no countdown.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale' AND `COLUMN_NAME` = 'audience_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `sale` ADD `audience_mode` TINYINT DEFAULT 0 NOT NULL COMMENT \'who the operation is open to: 0 everyone, 1 the customers named on it, 2 the customer groups named on it\' AFTER `price_offset_type`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale' AND `COLUMN_NAME` = 'hide_products');
+SET @statement := IF(@add_column, 'ALTER TABLE `sale` ADD `hide_products` TINYINT(1) DEFAULT 0 NOT NULL COMMENT \'the products of a reserved operation are hidden from the visitors it is not open to, instead of being shown at their usual price\' AFTER `audience_mode`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale' AND `COLUMN_NAME` = 'countdown_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `sale` ADD `countdown_mode` TINYINT DEFAULT 0 NOT NULL COMMENT \'when the countdown is shown: 0 never, 1 from countdown_lead_hours before the end, 2 from the opening\' AFTER `hide_products`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale' AND `COLUMN_NAME` = 'countdown_lead_hours');
+SET @statement := IF(@add_column, 'ALTER TABLE `sale` ADD `countdown_lead_hours` INTEGER NULL COMMENT \'how many hours before the end date the countdown starts showing, read only when countdown_mode is 1\' AFTER `countdown_mode`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The front office asks on every product page whether an active operation is
+-- reserved, so the answer has to come from an index rather than a table scan.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale' AND `INDEX_NAME` = 'idx_sales_active_audience_mode');
+SET @statement := IF(@add_index, 'ALTER TABLE `sale` ADD INDEX `idx_sales_active_audience_mode` (`active`, `audience_mode`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+-- The customers an operation is reserved for, when `audience_mode` is 1. Both
+-- sides cascade: the list has no meaning without its operation, and a customer
+-- who is deleted or purged leaves no trace on the operations they were named on.
+CREATE TABLE IF NOT EXISTS `sale_customer`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL COMMENT 'a customer the operation is reserved for, read when audience_mode is 1',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_sale_customer_sales_id_customer_id` (`sale_id`, `customer_id`),
+    INDEX `fk_sale_customer_customer_idx` (`customer_id`),
+    CONSTRAINT `fk_sale_customer_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_customer_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

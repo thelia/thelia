@@ -16,6 +16,7 @@ namespace Thelia\Api\Service\API;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Thelia\Domain\Sale\SaleAudienceChecker;
 
 /**
  * Cross-request cache for the data access layer.
@@ -25,11 +26,19 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * survives across requests. Disabled by default; only user-independent paths
  * (the configured allow list) are eligible, and the whole pool is flushed on
  * any catalog change (see ResourceCacheInvalidationListener).
+ *
+ * The key holds the path, the format and the locale, and deliberately not who
+ * is asking — which is only sound while the answer is the same for everybody.
+ * A running reserved operation breaks that for the catalog: two visitors asking
+ * for the same product are owed two different prices. Those paths are therefore
+ * bypassed for as long as such an operation runs, and cached again the moment
+ * none does, so a shop that never runs one keeps every bit of its cache.
  */
 readonly class ResourceCache
 {
     /**
      * @param string[] $allowedPrefixes
+     * @param string[] $reservedSaleSensitivePrefixes
      */
     public function __construct(
         #[Autowire(service: 'thelia.cache.data_access')]
@@ -40,6 +49,9 @@ readonly class ResourceCache
         private int $ttl,
         #[Autowire(param: 'thelia.api.data_access.cache.allowed_prefixes')]
         private array $allowedPrefixes,
+        #[Autowire(param: 'thelia.api.data_access.cache.reserved_sale_sensitive_prefixes')]
+        private array $reservedSaleSensitivePrefixes,
+        private SaleAudienceChecker $saleAudienceChecker,
     ) {
     }
 
@@ -78,7 +90,25 @@ readonly class ResourceCache
     {
         foreach ($this->allowedPrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
-                return true;
+                return !$this->answerDependsOnWhoIsAsking($path);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether the answer to this path stopped being the same for everybody.
+     *
+     * The operations are only asked about for a path a reserved price can travel
+     * on, and the answer is memoised for the request: a shop with no reserved
+     * operation pays one indexed existence check per request for its whole cache.
+     */
+    private function answerDependsOnWhoIsAsking(string $path): bool
+    {
+        foreach ($this->reservedSaleSensitivePrefixes as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return $this->saleAudienceChecker->hasActiveReservedSale();
             }
         }
 

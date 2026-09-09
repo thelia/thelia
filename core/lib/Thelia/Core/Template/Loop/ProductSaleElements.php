@@ -24,6 +24,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Sale\ReservedSalePriceCatalog;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Currency as CurrencyModel;
@@ -59,8 +61,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 {
     protected $timestampable = true;
 
+    private ?CurrencyModel $currency = null;
+
     public function __construct(
         protected readonly TaxEngine $taxEngine,
+        protected readonly ReservedSaleVisibility $reservedSaleVisibility,
+        protected readonly ReservedSalePriceCatalog $reservedSalePriceCatalog,
     ) {
     }
 
@@ -108,6 +114,13 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function buildModelCriteria(): ModelCriteria
     {
         $search = ProductSaleElementsQuery::create();
+
+        // A private drop hides its products from the front, the back office
+        // included in nothing: an administrator setting it up has to see what is
+        // in it.
+        if (!$this->getBackendContext()) {
+            $this->reservedSaleVisibility->applyTo($search, ProductSaleElementsTableMap::COL_PRODUCT_ID);
+        }
 
         $id = $this->getId();
         $product = $this->getProduct();
@@ -226,6 +239,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $currency = $this->getMainRequest()->getSession()->getCurrency();
         }
 
+        // parseResults() prices the rows in the same currency the query selected
+        // them in, and has no argument of its own to read it from.
+        $this->currency = $currency;
+
         $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
@@ -261,9 +278,26 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $discount = (float) $securityContext->getCustomerUser()->getDiscount();
         }
 
+        $reservedPrices = $this->reservedPrices();
+
         /** @var \Thelia\Model\ProductSaleElements $PSEValue */
         foreach ($loopResult->getResultDataCollection() as $PSEValue) {
             $loopResultRow = new LoopResultRow($PSEValue);
+
+            $isPromo = 1 === $PSEValue->getPromo() ? 1 : 0;
+
+            // A reserved operation writes nothing in the catalog, so its price is
+            // substituted here — in the virtual column the price getters read, so
+            // that the customer discount and the tax are applied to it exactly the
+            // way they are applied to a public promo price. The promo flag itself is
+            // only raised for the row: the model belongs to the catalog, and the
+            // catalog is where a reserved price deliberately leaves no trace.
+            $reservedPrice = $reservedPrices[$PSEValue->getId()] ?? null;
+
+            if (null !== $reservedPrice) {
+                $PSEValue->setVirtualColumn('price_PROMO_PRICE', $reservedPrice->untaxedPromoPrice);
+                $isPromo = 1;
+            }
 
             $price = $PSEValue->getPrice('price_PRICE', $discount);
 
@@ -292,7 +326,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $loopResultRow
                 ->set('ID', $PSEValue->getId())
                 ->set('QUANTITY', $PSEValue->getQuantity())
-                ->set('IS_PROMO', 1 === $PSEValue->getPromo() ? 1 : 0)
+                ->set('IS_PROMO', $isPromo)
                 ->set('VISIBLE', $PSEValue->getVisible())
                 ->set('POSITION', $PSEValue->getPosition())
                 ->set('IS_NEW', 1 === $PSEValue->getNewness() ? 1 : 0)
@@ -313,6 +347,27 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         return $loopResult;
+    }
+
+    /**
+     * The reserved prices of the current visitor, resolved once for the whole
+     * request rather than once per row.
+     *
+     * Empty in the back office: the catalog is what it edits, and a reserved price
+     * is deliberately not part of the catalog.
+     *
+     * @return array<int, \Thelia\Domain\Sale\ReservedPrice>
+     */
+    private function reservedPrices(): array
+    {
+        if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
+            return [];
+        }
+
+        return $this->reservedSalePriceCatalog->prices(
+            $this->currency,
+            $this->reservedSaleVisibility->currentCustomer(),
+        );
     }
 
     /**

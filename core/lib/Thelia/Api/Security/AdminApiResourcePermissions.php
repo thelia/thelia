@@ -64,6 +64,7 @@ use Thelia\Api\Resource\ProductImage;
 use Thelia\Api\Resource\ProductPrice;
 use Thelia\Api\Resource\ProductSaleElements;
 use Thelia\Api\Resource\ProductSaleElementsProductImage;
+use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\State;
 use Thelia\Api\Resource\Tax;
 use Thelia\Api\Resource\TaxRule;
@@ -132,6 +133,7 @@ final readonly class AdminApiResourcePermissions
         ProductPrice::class => AdminResources::PRODUCT,
         ProductSaleElements::class => AdminResources::PRODUCT,
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
+        Sale::class => AdminResources::SALES,
         State::class => AdminResources::STATE,
         Tax::class => AdminResources::TAX,
         TaxRule::class => AdminResources::TAX,

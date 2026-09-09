@@ -28,6 +28,7 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Sale\SaleDiscountCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Model\Country as CountryModel;
@@ -36,6 +37,8 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale as SaleModel;
+use Thelia\Model\SaleCustomer;
+use Thelia\Model\SaleCustomerQuery;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleOffsetCurrencyQuery;
 use Thelia\Model\SaleProduct;
@@ -51,6 +54,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TaxCalculatorFactoryInterface $taxCalculatorFactory,
+        private readonly SaleDiscountCalculator $saleDiscountCalculator,
     ) {
     }
 
@@ -90,18 +94,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->findOne($con);
 
                 if (null !== $productPrice) {
-                    // Get the taxed price
-                    $priceWithTax = $taxCalculator->getTaxedPrice((float) $productPrice->getPrice());
-
-                    // Remove the price offset to get the taxed promo price
-                    $promoPrice = match ($offsetType) {
-                        SaleModel::OFFSET_TYPE_AMOUNT => max(0, $priceWithTax - $offset),
-                        SaleModel::OFFSET_TYPE_PERCENTAGE => $priceWithTax * (1 - $offset / 100),
-                        default => $priceWithTax,
-                    };
-
-                    // and then get the untaxed promo price.
-                    $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);
+                    $promoPrice = $this->saleDiscountCalculator->computeUntaxedPromoPrice(
+                        (float) $productPrice->getPrice(),
+                        $offsetType,
+                        (float) $offset,
+                        $taxCalculator,
+                    );
 
                     $productPrice
                         ->setPromoPrice((string) $promoPrice)
@@ -120,12 +118,28 @@ class Sale extends BaseAction implements EventSubscriberInterface
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
     {
-        $taxCalculator = $this->taxCalculatorFactory->createTaxCalculator();
-
         $sale = $event->getSale();
 
+        if (null === $sale) {
+            return;
+        }
+
+        // A reserved operation is not a catalog price: `product_sale_elements.promo` and
+        // `product_price.promo_price` are what every visitor reads, and its discount is
+        // resolved per customer instead (see Thelia\Domain\Sale\ReservedSalePriceResolver).
+        //
+        // The whole method is skipped, the reset of `promo` below included: that reset
+        // covers every sale element of every product of the operation, so running it for
+        // a reserved one would wipe the discount a public operation wrote on a product
+        // both of them include.
+        if ($sale->isReserved()) {
+            return;
+        }
+
+        $taxCalculator = $this->taxCalculatorFactory->createTaxCalculator();
+
         // Get all selected product sale elements for this sale
-        if (null === $sale || null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()->find()) {
+        if (null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()->find()) {
             return;
         }
         $saleOffsetByCurrency = $sale->getPriceOffsets();
@@ -214,9 +228,45 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setSaleLabel($event->getSaleLabel())
+            ->setAudienceMode($event->getAudienceMode())
+            ->setHideProducts($event->getHideProducts())
+            ->setCountdownMode($event->getCountdownMode())
+            ->setCountdownLeadHours($event->getCountdownLeadHours())
             ->save();
 
+        $this->syncTargetedCustomers($sale, $event->getAudienceMode(), $event->getCustomerIds());
+
         $event->setSale($sale);
+    }
+
+    /**
+     * Bring `sale_customer` in line with the selection, the way update() does for
+     * `sale_product`: delete then insert, so a customer taken out of the selection
+     * loses the row and not just the reading of it.
+     *
+     * An operation open to everyone keeps no audience at all: leaving the rows behind
+     * would silently make it reserved again the moment someone flips the mode back.
+     *
+     * @param array<int|string, int|string> $customerIds
+     */
+    private function syncTargetedCustomers(
+        SaleModel $sale,
+        int $audienceMode,
+        array $customerIds,
+        ?ConnectionInterface $con = null,
+    ): void {
+        SaleCustomerQuery::create()->filterBySaleId($sale->getId())->delete($con);
+
+        if (SaleModel::AUDIENCE_MODE_CUSTOMERS !== $audienceMode) {
+            return;
+        }
+
+        foreach (array_unique(array_map('intval', $customerIds)) as $customerId) {
+            (new SaleCustomer())
+                ->setSaleId($sale->getId())
+                ->setCustomerId($customerId)
+                ->save($con);
+        }
     }
 
     /**
@@ -247,6 +297,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->setEndDate($event->getEndDate())
                     ->setPriceOffsetType($event->getPriceOffsetType())
                     ->setDisplayInitialPrice($event->getDisplayInitialPrice())
+                    ->setAudienceMode($event->getAudienceMode())
+                    ->setHideProducts($event->getHideProducts())
+                    ->setCountdownMode($event->getCountdownMode())
+                    ->setCountdownLeadHours($event->getCountdownLeadHours())
                     ->setLocale($event->getLocale())
                     ->setSaleLabel($event->getSaleLabel())
                     ->setTitle($event->getTitle())
@@ -269,6 +323,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
                         ->setPriceOffsetValue((float) $priceOffset)
                         ->save($con);
                 }
+
+                // Update the audience the operation is reserved for
+                $this->syncTargetedCustomers($sale, $event->getAudienceMode(), $event->getCustomerIds(), $con);
 
                 // Update products
                 SaleProductQuery::create()->filterBySaleId($sale->getId())->delete($con);

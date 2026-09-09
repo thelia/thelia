@@ -25,6 +25,30 @@ parameters:
 			path: core/lib/Thelia/Api/Bridge/Propel/Service/ApiResourcePropelTransformerService.php
 
 		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Sale\:\:getLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Sale.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Sale\:\:getTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Sale.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Sale\:\:isNew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Sale.php
+
+		-
+			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Sale\:\:setLocale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/lib/Thelia/Api/Resource/Sale.php
+
+		-
 			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Brand\:\:getLocale\(\)\.$#'
 			identifier: method.notFound
 			count: 1

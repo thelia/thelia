@@ -24,6 +24,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Routing\Rewriting\Exception\UrlRewritingException;
 use Thelia\Core\Routing\Rewriting\RewritingResolver;
 use Thelia\Model\Admin;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -60,11 +61,30 @@ readonly class LangService
         $request->setLocale($lang->getLocale());
     }
 
+    /**
+     * The language of the back-office interface, which is not the language of the
+     * shop: they live under two different session keys, and a session serves both
+     * at once — an admin who switches their interface to English must not see the
+     * storefront they browse in the same browser switch with it.
+     */
+    public function setAdminLang(Lang $lang): void
+    {
+        $request = $this->requestStack->getMainRequest();
+
+        if (!$request instanceof Request || !$request->hasSession()) {
+            return;
+        }
+
+        $request->getSession()->setAdminLang($lang);
+        $request->setLocale($lang->getLocale());
+    }
+
     public function handleLang(Session $session, Request $request): Response|Lang|null
     {
         if (true === Request::$isAdminEnv) {
             $lang = $this->resolveAdminLanguageFromRequest($request);
             $session->setAdminLang($lang);
+            $this->persistAdminInterfaceLanguage($session, $request, $lang);
 
             return $lang;
         }
@@ -111,8 +131,14 @@ readonly class LangService
     {
         $requestedLangCodeOrLocale = $request->query->get('lang');
 
-        if (null !== $requestedLangCodeOrLocale) {
-            $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+        if (\is_string($requestedLangCodeOrLocale) && '' !== $requestedLangCodeOrLocale) {
+            // A code ("fr") is what the back-office language switcher sends, a locale
+            // ("fr_FR") is what a hand-written url or a module link may send, and the
+            // front-office resolver has always taken both: reading only the code here
+            // silently answered such a request with the language already in place.
+            $lang = \strlen($requestedLangCodeOrLocale) > 2
+                ? LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale)
+                : LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
 
             if ($lang instanceof Lang) {
                 return $lang;
@@ -155,6 +181,41 @@ readonly class LangService
                 }
             }
         }
+    }
+
+    /**
+     * The interface language an administrator picks is a preference of theirs, and
+     * admin.locale is where that preference already lives: it is what
+     * resolveAdminLanguageFromAdmin() reads back when a session starts with no
+     * language of its own. Writing it here is what makes the choice outlive the
+     * session it was made in — until now the switch was session-deep only, and a
+     * logout took it away.
+     *
+     * Only an explicit switch writes: a plain page view carries no "lang" and
+     * resolves to the language that is already stored.
+     */
+    private function persistAdminInterfaceLanguage(Session $session, Request $request, Lang $lang): void
+    {
+        if (null === $request->query->get('lang')) {
+            return;
+        }
+
+        $adminUser = $session->getAdminUser();
+
+        if (!$adminUser instanceof Admin) {
+            return;
+        }
+
+        // The administrator carried by the session was deserialized from it and may
+        // hold stale columns: the row is read again so that saving the locale cannot
+        // write anything else back with it.
+        $admin = AdminQuery::create()->findPk($adminUser->getId());
+
+        if (!$admin instanceof Admin || $admin->getLocale() === $lang->getLocale()) {
+            return;
+        }
+
+        $admin->setLocale($lang->getLocale())->save();
     }
 
     private function getLanguageFromRequestParameters(Request $request): ?Lang
