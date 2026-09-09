@@ -64,6 +64,7 @@ use Thelia\Model\Map\CurrencyTableMap;
             uriTemplate: '/front/currencies/{id}',
         ),
     ],
+    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
@@ -97,6 +98,8 @@ class Currency extends AbstractTranslatableResource
     public const GROUP_ADMIN_READ_SINGLE = 'admin:currency:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:currency:write';
 
+    public const GROUP_FRONT_READ = 'front:currency:read';
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         Order::GROUP_ADMIN_READ,
@@ -109,6 +112,7 @@ class Currency extends AbstractTranslatableResource
         ProductSaleElements::GROUP_ADMIN_WRITE,
         Order::GROUP_ADMIN_WRITE,
         Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
@@ -121,6 +125,7 @@ class Currency extends AbstractTranslatableResource
         Cart::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
     ])]
     public ?string $code = null;
 
@@ -133,6 +138,7 @@ class Currency extends AbstractTranslatableResource
         Cart::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
     ])]
     public ?string $isocodeNumeric = null;
 
@@ -144,22 +150,23 @@ class Currency extends AbstractTranslatableResource
         Cart::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
     ])]
     public ?string $symbol = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?string $format = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?float $rate = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?bool $visible = null;
 
-    #[Groups([self::GROUP_ADMIN_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?bool $byDefault = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -168,7 +175,7 @@ class Currency extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
