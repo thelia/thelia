@@ -34,6 +34,34 @@ test.describe('Back-office — language list (BO Twig)', () => {
     await expect(list.urlForm).toBeVisible();
   });
 
+  // Guards the wiring of the "default" radio: the Stimulus values it reads must
+  // sit on the element carrying data-controller, not on the input below it. When
+  // they drift apart the radio still ticks under the cursor and nothing is saved.
+  test('picking another language as default saves it', async ({ page }) => {
+    const list = new LanguageListPage(page);
+    await list.goto();
+    await list.expectLoaded();
+
+    const initialDefault = await list.checkedDefaultValue();
+    expect(initialDefault, 'a language must be flagged as default').not.toBeNull();
+
+    const values = await list.defaultRadios.evaluateAll((inputs) =>
+      inputs.map((input) => (input as HTMLInputElement).value),
+    );
+    const other = values.find((value) => value !== initialDefault);
+    expect(other, 'the demo dataset must ship more than one language').toBeTruthy();
+
+    // Read the outcome from a fresh render: right after the click the ticked
+    // radio only reflects what the cursor did, saved or not.
+    await list.defaultRadioFor(Number(other)).check();
+    await list.goto();
+    expect(await list.checkedDefaultValue()).toBe(other);
+
+    await list.defaultRadioFor(Number(initialDefault)).check();
+    await list.goto();
+    expect(await list.checkedDefaultValue()).toBe(initialDefault);
+  });
+
   test('create button opens the create modal', async ({ page }) => {
     const list = new LanguageListPage(page);
     await list.goto();
