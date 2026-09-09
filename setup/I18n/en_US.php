@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 return [
+    'Return status update sent to the customer' => 'Return status update sent to the customer',
+    'Update on your return {{ return_ref }}' => 'Update on your return {{ return_ref }}',
     '"Remember me" cookie expiration time, in seconds, for administration users' => '"Remember me" cookie expiration time, in seconds, for administration users',
     '"Remember me" cookie expiration time, in seconds, for customer users' => '"Remember me" cookie expiration time, in seconds, for customer users',
     '"Remember me" cookie name for administration users' => '"Remember me" cookie name for administration users',

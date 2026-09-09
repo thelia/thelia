@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 return [
+    'Return status update sent to the customer' => 'Actualización del estado de la devolución enviada al cliente',
+    'Update on your return {{ return_ref }}' => 'Actualización de tu devolución {{ return_ref }}',
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Fecha de caducidad de cookie "recuerdame", en segundos, para los usuarios de la administración',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Fecha de caducidad de cookie "Acuérdate de mi", en segundos, para los usuarios cliente',
     '"Remember me" cookie name for administration users' => 'Nombre de la cookie "Recordarme" para los usuarios de administración',
