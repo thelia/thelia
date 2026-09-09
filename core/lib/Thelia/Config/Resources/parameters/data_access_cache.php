@@ -43,5 +43,13 @@ return static function (ContainerConfigurator $container): void {
             '/api/front/countries',
             '/api/front/currencies',
             '/api/front/taxes',
+        ])
+        // Of the paths above, the ones a reserved price travels on: a running
+        // reserved operation owes two visitors two different prices for the same
+        // product, and the cache key holds no customer. They are bypassed for as
+        // long as such an operation runs, and cached again as soon as none does.
+        ->set('thelia.api.data_access.cache.reserved_sale_sensitive_prefixes', [
+            '/api/front/products',
+            '/api/front/product_sale_elements',
         ]);
 };

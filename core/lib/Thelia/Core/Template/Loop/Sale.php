@@ -24,6 +24,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\SaleQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
@@ -48,6 +49,11 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
+    public function __construct(
+        protected readonly ReservedSaleVisibility $reservedSaleVisibility,
+    ) {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -117,6 +123,12 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     public function buildModelCriteria(): ModelCriteria
     {
         $search = SaleQuery::create();
+
+        // A reserved operation is only part of the front for the customers it names.
+        // The back office lists every one of them: that is where they are set up.
+        if (!$this->getBackendContext()) {
+            $this->reservedSaleVisibility->applyToSales($search);
+        }
 
         /* manage translations */
         $this->configureI18nProcessing($search, ['TITLE', 'SALE_LABEL', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM']);
@@ -215,9 +227,12 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
+        $now = new \DateTime();
+
         /** @var \Thelia\Model\Sale $sale */
         foreach ($loopResult->getResultDataCollection() as $sale) {
             $loopResultRow = new LoopResultRow($sale);
+            $shouldDisplayCountdown = $sale->shouldDisplayCountdown($now);
 
             switch ($sale->getPriceOffsetType()) {
                 case \Thelia\Model\Sale::OFFSET_TYPE_AMOUNT:
@@ -249,7 +264,23 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 ->set('HAS_END_DATE', $sale->hasEndDate() ? 1 : 0)
                 ->set('PRICE_OFFSET_TYPE', $priceOffsetType)
                 ->set('PRICE_OFFSET_SYMBOL', $priceOffsetSymbol)
-                ->set('PRICE_OFFSET_VALUE', $sale->getVirtualColumn('price_offset_value'));
+                ->set('PRICE_OFFSET_VALUE', $sale->getVirtualColumn('price_offset_value'))
+                ->set('URL', $this->getReturnUrl() ? $sale->getUrl($this->locale) : null)
+                ->set('AUDIENCE_MODE', $sale->getAudienceMode())
+                ->set('HIDE_PRODUCTS', $sale->getHideProducts() ? 1 : 0)
+                ->set('COUNTDOWN_MODE', $sale->getCountdownMode())
+                ->set('COUNTDOWN_LEAD_HOURS', $sale->getCountdownLeadHours())
+                ->set('SHOULD_DISPLAY_COUNTDOWN', $shouldDisplayCountdown ? 1 : 0)
+                // How long the operation still has to run, or null when no countdown
+                // is due. Never negative: a template printing a negative number
+                // would render it, and an operation that is over has nothing left
+                // to count down.
+                ->set(
+                    'COUNTDOWN_REMAINING_SECONDS',
+                    $shouldDisplayCountdown
+                        ? max(0, $sale->getEndDate()->getTimestamp() - $now->getTimestamp())
+                        : null,
+                );
 
             $this->addOutputFields($loopResultRow, $sale);
             $loopResult->addRow($loopResultRow);

@@ -27,6 +27,8 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Sale\ReservedSalePriceCatalog;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Log\Tlog;
@@ -97,8 +99,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $timestampable = true;
     protected $versionable = true;
 
+    private ?CurrencyModel $currency = null;
+
     public function __construct(
         protected readonly TaxEngine $taxEngine,
+        protected readonly ReservedSaleVisibility $reservedSaleVisibility,
+        protected readonly ReservedSalePriceCatalog $reservedSalePriceCatalog,
     ) {
     }
 
@@ -251,10 +257,26 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxState = $this->taxEngine->getDeliveryState();
 
         $securityContext = $this->securityContext;
+        $reservedPrices = $this->reservedPrices();
 
         /** @var ProductModel $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
             $loopResultRow = new LoopResultRow($product);
+
+            // A reserved operation writes nothing in the catalog, so its price is
+            // substituted here — in the virtual columns the rest of this method
+            // reads, so that the customer discount and the tax are applied to it
+            // exactly the way they are applied to a public promo price.
+            //
+            // Only the display is corrected: the `min_price` / `max_price` filters
+            // and the price orders stay on the raw columns, so a page ordered by
+            // price orders a named customer's catalog by its public prices.
+            $reservedPrice = $reservedPrices[(int) $product->getVirtualColumn('pse_id')] ?? null;
+
+            if (null !== $reservedPrice) {
+                $product->setVirtualColumn('promo_price', $reservedPrice->untaxedPromoPrice);
+                $product->setVirtualColumn('is_promo', 1);
+            }
 
             $price = $product->getVirtualColumn('price');
 
@@ -338,6 +360,17 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getRealLowestPrice();
+            $isPromo = $product->getVirtualColumn('main_product_is_promo');
+
+            // The complex loop prices a product by the lowest of its sale elements,
+            // so a reserved operation only changes that price when it beats it — the
+            // operation may well cover one combination out of five.
+            $reservedLowestPrice = $this->reservedLowestPriceFor($product);
+
+            if (null !== $reservedLowestPrice && $reservedLowestPrice < (float) $price) {
+                $price = $reservedLowestPrice;
+                $isPromo = 1;
+            }
 
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $price *= (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
@@ -359,7 +392,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set('BEST_PRICE', $price)
                 ->set('BEST_PRICE_TAX', $taxedPrice - $price)
                 ->set('BEST_TAXED_PRICE', $taxedPrice)
-                ->set('IS_PROMO', $product->getVirtualColumn('main_product_is_promo'))
+                ->set('IS_PROMO', $isPromo)
                 ->set('IS_NEW', $product->getVirtualColumn('main_product_is_new'));
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
@@ -560,6 +593,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $currency = $this->resolveCurrency();
 
+        // parseResults() prices the rows in the same currency the query selected
+        // them in, and has no argument of its own to read it from.
+        $this->currency = $currency;
+
         $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
@@ -568,6 +605,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $isProductPriceFirstLeftJoin = [];
 
         $search = ProductQuery::create();
+
+        // A private drop hides its products from the front, and from the front only:
+        // an administrator setting the operation up has to see what is in it.
+        if (!$this->getBackendContext()) {
+            $this->reservedSaleVisibility->applyTo($search, ProductTableMap::COL_ID);
+        }
 
         $complex = $this->getComplex();
 
@@ -980,6 +1023,17 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->addJoinObject($salesJoin, 'SalePriceDisplay')
             ->addJoinCondition('SalePriceDisplay', '`SalePriceDisplay`.`active` = 1');
 
+        // An operation the visitor is not part of has nothing to say about the price
+        // they are shown: without this, a reserved operation could turn the struck
+        // through catalog price off for a visitor who is not getting its discount.
+        // The back office keeps reading whatever operation covers the product.
+        if (!$this->getBackendContext() && $this->reservedSaleVisibility->hasActiveReservedSale()) {
+            $search->addJoinCondition(
+                'SalePriceDisplay',
+                $this->reservedSaleVisibility->saleIsOpenToVisitorClause('SalePriceDisplay'),
+            );
+        }
+
         // ... to get the DISPLAY_INITIAL_PRICE column !
         $search->withColumn('`SalePriceDisplay`.DISPLAY_INITIAL_PRICE', 'display_initial_price');
 
@@ -1049,6 +1103,40 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search->withColumn('`CategorySelect`.DEFAULT_CATEGORY', 'is_default_category');
 
         return $manualOrderAllowed;
+    }
+
+    /**
+     * The reserved prices of the current visitor, resolved once for the whole
+     * request rather than once per row.
+     *
+     * Empty in the back office: the catalog is what it edits, and a reserved price
+     * is deliberately not part of the catalog.
+     *
+     * @return array<int, \Thelia\Domain\Sale\ReservedPrice>
+     */
+    private function reservedPrices(): array
+    {
+        if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
+            return [];
+        }
+
+        return $this->reservedSalePriceCatalog->prices(
+            $this->currency,
+            $this->reservedSaleVisibility->currentCustomer(),
+        );
+    }
+
+    private function reservedLowestPriceFor(ProductModel $product): ?float
+    {
+        if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
+            return null;
+        }
+
+        return $this->reservedSalePriceCatalog->lowestPriceForProduct(
+            (int) $product->getId(),
+            $this->currency,
+            $this->reservedSaleVisibility->currentCustomer(),
+        );
     }
 
     private function resolveCurrency(): CurrencyModel

@@ -32,6 +32,9 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Service\CartAddressService;
+use Thelia\Domain\Sale\ReservedPrice;
+use Thelia\Domain\Sale\ReservedSalePriceResolver;
+use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
@@ -67,6 +70,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ContainerInterface $container,
         protected CartAddressService $cartAddressService,
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
+        protected ReservedSalePriceResolver $reservedSalePriceResolver,
+        protected SaleAudienceChecker $saleAudienceChecker,
     ) {
     }
 
@@ -227,7 +232,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart = $event->getCart();
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
-        $currency = $cart->getCurrency();
         $customer = $cart->getCustomer();
         $discount = 0.0;
 
@@ -268,12 +272,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $cartItem->addQuantity($quantity)->save();
         } else {
             $productPrices = $productSaleElements->getPricesByCurrency(
-                $currency ?? CurrencyModel::getDefaultCurrency(),
+                $this->currencyOf($cart),
                 $discount,
             );
 
             $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
         }
+
+        $this->settleReservedPrices($cart);
 
         $event->setCartItem($cartItem);
     }
@@ -327,6 +333,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $event->setCartItem(
                     $this->updateQuantity($dispatcher, $cartItem, $quantity),
                 );
+
+                $cart->clearCartItems();
+                $this->settleReservedPrices($cart);
             }
         }
     }
@@ -355,6 +364,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Update the price, the promo price and the special offer status of the items of a cart, so that
      * they always reflect the current catalog prices, in the given currency.
+     *
+     * The reserved operations of the cart's customer are settled here too, in one
+     * batch for the whole cart: a customer taken out of a selection, or an operation
+     * that has ended, falls back to the catalog price on the next refresh, which is
+     * what makes a line written weeks ago a price the shop still stands behind.
      */
     protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency): void
     {
@@ -366,6 +380,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $discount = (float) $customer->getDiscount();
         }
 
+        $reservedPrices = $this->reservedSalePriceResolver->resolve(
+            $this->saleElementIdsOf($cart),
+            $currency,
+            $customer,
+        );
+
         // cart item
         foreach ($cart->getCartItems() as $cartItem) {
             $productSaleElements = $cartItem->getProductSaleElements();
@@ -376,19 +396,113 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
 
-            // Nothing changed in the catalog, leave this item alone.
+            [$promo, $promoPrice] = $this->promoOfLine(
+                $productSaleElements,
+                $productPrice,
+                $reservedPrices,
+                $discount,
+            );
+
+            // Nothing changed for this item, leave it alone. The comparison is made on
+            // the settled values, reserved price included: comparing the catalog ones
+            // would keep a line at a reserved price the customer has since lost.
             if ((float) $cartItem->getPrice() === (float) $productPrice->getPrice()
-                && (float) $cartItem->getPromoPrice() === (float) $productPrice->getPromoPrice()
-                && (int) $cartItem->getPromo() === (int) $productSaleElements->getPromo()) {
+                && (float) $cartItem->getPromoPrice() === $promoPrice
+                && (int) $cartItem->getPromo() === $promo) {
                 continue;
             }
 
             $cartItem
                 ->setPrice((string) $productPrice->getPrice())
-                ->setPromoPrice((string) $productPrice->getPromoPrice())
-                ->setPromo($productSaleElements->getPromo())
+                ->setPromoPrice((string) $promoPrice)
+                ->setPromo($promo)
                 ->save();
         }
+    }
+
+    /**
+     * Settle the reserved prices of a cart that the visitor just changed.
+     *
+     * Signing in is not the only moment entitlement moves: a customer taken out of a
+     * selection, or an operation that ends, while the cart sits open must not keep the
+     * reserved price on the next line the visitor touches — and a customer who has just
+     * become entitled should get it there. Guarded by the same indexed, per-request
+     * memoised check as the sign-in path, so a shop with no reserved operation running
+     * keeps the behaviour, and the queries, it had.
+     */
+    private function settleReservedPrices(CartModel $cart): void
+    {
+        if (!$this->saleAudienceChecker->hasActiveReservedSale()) {
+            return;
+        }
+
+        $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
+    }
+
+    /**
+     * The currency a cart is priced in, from the one place that decides it.
+     *
+     * The catalog prices of a line and the reserved price it is compared against are
+     * read through this, so the two can never come from different currencies.
+     */
+    private function currencyOf(CartModel $cart): CurrencyModel
+    {
+        return $cart->getCurrency() ?? CurrencyModel::getDefaultCurrency();
+    }
+
+    /**
+     * @return list<int> the sale elements the cart holds a line for
+     */
+    private function saleElementIdsOf(CartModel $cart): array
+    {
+        $saleElementIds = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (null !== $saleElementId = $cartItem->getProductSaleElementsId()) {
+                $saleElementIds[] = (int) $saleElementId;
+            }
+        }
+
+        return $saleElementIds;
+    }
+
+    /**
+     * The special offer a cart line carries: the catalog one, unless a reserved
+     * operation resolved a better price for this customer.
+     *
+     * The resolver only hands back a price that beats the one the sale element is
+     * on sale for right now, so a public special offer cheaper than the reserved
+     * operation simply stays.
+     *
+     * @param array<int, ReservedPrice> $reservedPrices as resolved for the whole batch
+     *
+     * @return array{0: int, 1: float} the promo flag, and the untaxed promo price
+     */
+    private function promoOfLine(
+        ProductSaleElements $productSaleElements,
+        ProductPriceTools $catalogPrices,
+        array $reservedPrices,
+        float $discount,
+    ): array {
+        $reservedPrice = $reservedPrices[(int) $productSaleElements->getId()] ?? null;
+
+        if (null === $reservedPrice) {
+            return [(int) $productSaleElements->getPromo(), round((float) $catalogPrices->getPromoPrice(), 6)];
+        }
+
+        $promoPrice = $reservedPrice->untaxedPromoPrice;
+
+        // A customer discount rate applies on top, the way getPricesByCurrency()
+        // applies it to the catalog prices. It scales both prices by the same
+        // factor, so it never changes which of the two is the lower one.
+        if ($discount > 0) {
+            $promoPrice *= 1 - $discount / 100;
+        }
+
+        // `cart_item.promo_price` is a DECIMAL(16,6): rounding here is what makes
+        // the value written and the value read back compare equal, so a refresh
+        // that changes nothing writes nothing.
+        return [1, round($promoPrice, 6)];
     }
 
     /**
@@ -418,6 +532,26 @@ class Cart extends BaseAction implements EventSubscriberInterface
         float $quantity,
         ProductPriceTools $productPrices,
     ): CartItem {
+        // The line is the proof of the price the shop agreed to: an order is built
+        // from it, so a reserved price has to be written down here and not worked
+        // out again later, when the operation may well be over.
+        $customer = $cart->getCustomer();
+        $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
+
+        [$promo, $promoPrice] = $this->promoOfLine(
+            $productSaleElements,
+            $productPrices,
+            // The same currency the catalog prices of this line were read in: the two
+            // are compared against each other, so resolving them apart would let a
+            // reserved price in one currency undercut a catalog price in another.
+            $this->reservedSalePriceResolver->resolve(
+                [(int) $productSaleElements->getId()],
+                $this->currencyOf($cart),
+                $customer,
+            ),
+            $discount,
+        );
+
         $cartItem = new CartItem();
         $cartItem->setDispatcher($dispatcher);
         $cartItem
@@ -426,8 +560,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
             ->setPrice((string) $productPrices->getPrice())
-            ->setPromoPrice((string) $productPrices->getPromoPrice())
-            ->setPromo($productSaleElements->getPromo())
+            ->setPromoPrice((string) $promoPrice)
+            ->setPromo($promo)
             ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30))
             ->save();
 
@@ -577,8 +711,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // If the customer has a discount, whe have to duplicate the cart,
             // so that the discount will be applied to the products in cart.
             // getDiscount() maps a DECIMAL column, so it returns a string such as '0.000000'.
-            if (null === $cart->getCustomerId() && (0.0 === (float) $customer->getDiscount() || 0 === $cart->countCartItems())) {
-                // If no discount, or an empty cart, there's no need to duplicate.
+            //
+            // A shop running a reserved operation has to reprice the cart at sign-in
+            // for the same reason: what the visitor filled it with is the public
+            // price, and the customer they turned out to be may be entitled to
+            // better. The check is one indexed query, memoised for the request, so a
+            // shop with no reserved operation keeps the behaviour it had.
+            $needsRepricing = 0.0 !== (float) $customer->getDiscount()
+                || $this->saleAudienceChecker->hasActiveReservedSale();
+
+            if (null === $cart->getCustomerId() && (!$needsRepricing || 0 === $cart->countCartItems())) {
+                // Nothing to reprice, or an empty cart: there's no need to duplicate.
                 $duplicateCart = false;
             }
 

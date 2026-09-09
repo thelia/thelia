@@ -2157,11 +2157,16 @@ CREATE TABLE `sale`
     `start_date` DATETIME,
     `end_date` DATETIME,
     `price_offset_type` TINYINT,
+    `audience_mode` TINYINT DEFAULT 0 NOT NULL COMMENT 'who the operation is open to: 0 everyone, 1 the customers named on it, 2 the customer groups named on it',
+    `hide_products` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the products of a reserved operation are hidden from the visitors it is not open to, instead of being shown at their usual price',
+    `countdown_mode` TINYINT DEFAULT 0 NOT NULL COMMENT 'when the countdown is shown: 0 never, 1 from countdown_lead_hours before the end, 2 from the opening',
+    `countdown_lead_hours` INTEGER COMMENT 'how many hours before the end date the countdown starts showing, read only when countdown_mode is 1',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_sales_active_start_end_date` (`active`, `start_date`, `end_date`),
-    INDEX `idx_sales_active` (`active`)
+    INDEX `idx_sales_active` (`active`),
+    INDEX `idx_sales_active_audience_mode` (`active`, `audience_mode`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -2217,6 +2222,32 @@ CREATE TABLE `sale_product`
     CONSTRAINT `fk_sale_product_attribute_av_id`
         FOREIGN KEY (`attribute_av_id`)
         REFERENCES `attribute_av` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_customer
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_customer`;
+
+CREATE TABLE `sale_customer`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL COMMENT 'a customer the operation is reserved for, read when audience_mode is 1',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_sale_customer_sales_id_customer_id` (`sale_id`, `customer_id`),
+    INDEX `fk_sale_customer_customer_idx` (`customer_id`),
+    CONSTRAINT `fk_sale_customer_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_customer_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
