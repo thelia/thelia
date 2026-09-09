@@ -13,6 +13,18 @@ declare(strict_types=1);
  */
 
 return [
+    'Requested' => 'Solicitada',
+    'Information awaited' => 'A la espera de información',
+    'Accepted' => 'Aceptada',
+    'Refused' => 'Rechazada',
+    'Received' => 'Recibida',
+    'Settled' => 'Resuelta',
+    'Expired' => 'Caducada',
+    'Product not as described' => 'Producto no coincide con la descripción',
+    'Defective product' => 'Producto defectuoso',
+    'Wrong item received' => 'Artículo equivocado recibido',
+    'No longer needed' => 'Ya no se necesita',
+    'Other' => 'Otro',
     'Return status update sent to the customer' => 'Actualización del estado de la devolución enviada al cliente',
     'Update on your return {{ return_ref }}' => 'Actualización de tu devolución {{ return_ref }}',
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Fecha de caducidad de cookie "recuerdame", en segundos, para los usuarios de la administración',

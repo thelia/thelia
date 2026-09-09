@@ -13,6 +13,18 @@ declare(strict_types=1);
  */
 
 return [
+    'Requested' => 'Aangevraagd',
+    'Information awaited' => 'Wachten op informatie',
+    'Accepted' => 'Geaccepteerd',
+    'Refused' => 'Geweigerd',
+    'Received' => 'Ontvangen',
+    'Settled' => 'Afgehandeld',
+    'Expired' => 'Verlopen',
+    'Product not as described' => 'Product niet zoals beschreven',
+    'Defective product' => 'Defect product',
+    'Wrong item received' => 'Verkeerd artikel ontvangen',
+    'No longer needed' => 'Niet langer nodig',
+    'Other' => 'Overig',
     'Return status update sent to the customer' => 'Update van de retourstatus naar de klant verzonden',
     'Update on your return {{ return_ref }}' => 'Update over je retour {{ return_ref }}',
     'A {{ config("store_name") }} account has been created for you' => 'Er is een {{ config("store_name") }}-account voor u aangemaakt',

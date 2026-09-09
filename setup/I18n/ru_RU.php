@@ -13,6 +13,18 @@ declare(strict_types=1);
  */
 
 return [
+    'Requested' => 'Запрошен',
+    'Information awaited' => 'Ожидается информация',
+    'Accepted' => 'Принят',
+    'Refused' => 'Отклонён',
+    'Received' => 'Получен',
+    'Settled' => 'Урегулирован',
+    'Expired' => 'Истёк',
+    'Product not as described' => 'Товар не соответствует описанию',
+    'Defective product' => 'Бракованный товар',
+    'Wrong item received' => 'Получен неверный товар',
+    'No longer needed' => 'Больше не нужен',
+    'Other' => 'Другое',
     'Return status update sent to the customer' => 'Обновление статуса возврата отправлено клиенту',
     'Update on your return {{ return_ref }}' => 'Обновление по вашему возврату {{ return_ref }}',
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Время жизни cookie "Запомнить меня" в секундах, для админов',
