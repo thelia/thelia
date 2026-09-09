@@ -273,4 +273,116 @@ CREATE TABLE IF NOT EXISTS `sale_customer`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- Types of relation between products
+--
+-- The accessory a shop already had is now one relation among several, told apart
+-- by `accessory.type_id`. The table `accessory` itself is kept, columns and all:
+-- modules query `AccessoryQuery` directly, and every relation already saved has
+-- to stay exactly where the merchant put it.
+--
+-- Three types ship with the release. `accessory` is the one the existing rows
+-- take, and the one the core names by code when the back office adds an
+-- accessory, so it may not be deleted. `reciprocal` is set on the complementary
+-- products alone: relating a mug to a coffee maker is worth stating both ways,
+-- where an accessory or a higher-end model reads in one direction only.
+--
+-- The column arrives nullable, is filled in, and only then is required. Adding a
+-- NOT NULL column with no default to a table that already has rows is refused
+-- outright in strict mode, which is what a shop with accessories would hit.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `product_association_type`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the relations, the front-office blocks and the code refer this type by',
+    `visible` TINYINT DEFAULT 1 NOT NULL COMMENT 'a type turned off is no longer offered nor displayed, and is kept so the relations already saved keep their meaning',
+    `reciprocal` TINYINT DEFAULT 0 NOT NULL COMMENT 'relating a product to another also writes the relation the other way round',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_association_type_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `product_association_type_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `product_association_type_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `product_association_type` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+INSERT IGNORE INTO `product_association_type` (`code`, `visible`, `reciprocal`, `position`, `created_at`, `updated_at`) VALUES
+    ('accessory', 1, 0, 1, NOW(), NOW()),
+    ('cross_selling', 1, 1, 2, NOW(), NOW()),
+    ('up_selling', 1, 0, 3, NOW(), NOW());
+
+-- Every language the shop has, not just the two written here: a locale left
+-- without a row makes I18n fall back to the shop default and, failing that,
+-- forge the literal string "DEFAULT TITLE" — which is what would then title a
+-- block of the product sheet. The fresh install seeds all its locales the same
+-- way (see setup/insert.sql).
+INSERT IGNORE INTO `product_association_type_i18n` (`id`, `locale`, `title`, `description`)
+    SELECT `product_association_type`.`id`, `lang`.`locale`,
+           CASE `product_association_type`.`code`
+               WHEN 'accessory' THEN IF(`lang`.`locale` = 'fr_FR', 'Accessoires', 'Accessories')
+               WHEN 'cross_selling' THEN IF(`lang`.`locale` = 'fr_FR', 'Produits complémentaires', 'Complementary products')
+               ELSE IF(`lang`.`locale` = 'fr_FR', 'Modèles supérieurs', 'Higher-end models')
+           END,
+           CASE `product_association_type`.`code`
+               WHEN 'accessory' THEN IF(`lang`.`locale` = 'fr_FR', 'Produits qui complètent celui-ci, comme une housse ou une pièce détachée', 'Products that complete this one, such as a case or a spare part')
+               WHEN 'cross_selling' THEN IF(`lang`.`locale` = 'fr_FR', 'Produits qui vont bien avec celui-ci', 'Products that go well with this one')
+               ELSE IF(`lang`.`locale` = 'fr_FR', 'Produits de même nature, une gamme au-dessus de celui-ci', 'Products of the same kind, a range above this one')
+           END
+    FROM `product_association_type` CROSS JOIN `lang`
+    WHERE `product_association_type`.`code` IN ('accessory', 'cross_selling', 'up_selling');
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'accessory' AND `COLUMN_NAME` = 'type_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `accessory` ADD `type_id` INTEGER NULL COMMENT \'what the relation means: an accessory, a cross-sell, an up-sell, or a type the merchant declared\' AFTER `accessory`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- Every relation saved before this release is an accessory, which is the whole
+-- point of keeping the table: the merchant finds their accessories where they
+-- left them, in the accessory block, at the position they gave them.
+SET @accessory_type_id := (SELECT `id` FROM `product_association_type` WHERE `code` = 'accessory');
+
+UPDATE `accessory`
+    SET `type_id` = @accessory_type_id
+    WHERE `type_id` IS NULL
+      AND @accessory_type_id IS NOT NULL;
+
+SET @require_column := (
+    SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS`
+    WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'accessory' AND `COLUMN_NAME` = 'type_id' AND `IS_NULLABLE` = 'YES'
+) AND (SELECT COUNT(*) = 0 FROM `accessory` WHERE `type_id` IS NULL);
+SET @statement := IF(@require_column, 'ALTER TABLE `accessory` MODIFY `type_id` INTEGER NOT NULL COMMENT \'what the relation means: an accessory, a cross-sell, an up-sell, or a type the merchant declared\'', 'DO 0');
+PREPARE require_column_statement FROM @statement;
+EXECUTE require_column_statement;
+DEALLOCATE PREPARE require_column_statement;
+
+-- The index serves a single block of a product sheet in one read, which is how
+-- the front office asks for it. The two indexes the table already had are left
+-- alone: modules still query the table by product alone.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'accessory' AND `INDEX_NAME` = 'idx_accessory_product_id_type_id_position');
+SET @statement := IF(@add_index, 'ALTER TABLE `accessory` ADD INDEX `idx_accessory_product_id_type_id_position` (`product_id`, `type_id`, `position`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+-- RESTRICT, not CASCADE: deleting a type a merchant still uses would take their
+-- relations with it, silently. The back office refuses the deletion instead.
+SET @add_constraint := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'accessory' AND `CONSTRAINT_NAME` = 'fk_accessory_type_id');
+SET @statement := IF(@add_constraint, 'ALTER TABLE `accessory` ADD CONSTRAINT `fk_accessory_type_id` FOREIGN KEY (`type_id`) REFERENCES `product_association_type` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT', 'DO 0');
+PREPARE add_constraint_statement FROM @statement;
+EXECUTE add_constraint_statement;
+DEALLOCATE PREPARE add_constraint_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

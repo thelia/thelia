@@ -23,11 +23,13 @@ class Accessory extends BaseAccessory
     use PositionManagementTrait;
 
     /**
-     * Calculate next position relative to our product.
+     * Calculate next position relative to our product and relation type.
      */
     protected function addCriteriaToPositionQuery($query): void
     {
-        $query->filterByProductId($this->getProductId());
+        $query
+            ->filterByProductId($this->getProductId())
+            ->filterByTypeId($this->getTypeId());
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool

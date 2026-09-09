@@ -995,6 +995,25 @@ CREATE TABLE `module`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- product_association_type
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_association_type`;
+
+CREATE TABLE `product_association_type`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the relations, the front-office blocks and the code refer this type by',
+    `visible` TINYINT DEFAULT 1 NOT NULL COMMENT 'a type turned off is no longer offered nor displayed, and is kept so the relations already saved keep their meaning',
+    `reciprocal` TINYINT DEFAULT 0 NOT NULL COMMENT 'relating a product to another also writes the relation the other way round',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_association_type_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- accessory
 -- ---------------------------------------------------------------------
 
@@ -1005,12 +1024,14 @@ CREATE TABLE `accessory`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `accessory` INTEGER NOT NULL,
+    `type_id` INTEGER NOT NULL COMMENT 'what the relation means: an accessory, a cross-sell, an up-sell, or a type the merchant declared',
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_address_product_id` (`product_id`),
     INDEX `idx_address_accessory` (`accessory`),
+    INDEX `idx_accessory_product_id_type_id_position` (`product_id`, `type_id`, `position`),
     CONSTRAINT `fk_accessory_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -1020,7 +1041,12 @@ CREATE TABLE `accessory`
         FOREIGN KEY (`accessory`)
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_accessory_type_id`
+        FOREIGN KEY (`type_id`)
+        REFERENCES `product_association_type` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -2997,6 +3023,25 @@ CREATE TABLE `module_i18n`
     CONSTRAINT `module_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_association_type_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_association_type_i18n`;
+
+CREATE TABLE `product_association_type_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `product_association_type_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `product_association_type` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 

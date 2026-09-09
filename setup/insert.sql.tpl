@@ -3780,3 +3780,36 @@ INSERT INTO `consent_i18n` (`id`, `locale`, `title`, `description`) VALUES
 
 {% endfor %}
 ;
+
+/**
+Types of relation between products
+
+Three types ship with a shop, and the accessory is the one the shop already had: every
+relation saved before this release is an accessory, and the code `accessory` is what the
+core itself asks for when the back office adds one. Deleting that row is refused for good
+— the relations already saved hang off it, and `addAccessory()` names it by code.
+
+`reciprocal` is set on the complementary products alone. Relating a mug to a coffee maker
+is worth stating both ways, where an accessory or a higher-end model reads in one
+direction only: a case is an accessory of the phone, the phone is not an accessory of the
+case.
+*/
+INSERT INTO `product_association_type` (`id`, `code`, `visible`, `reciprocal`, `position`, `created_at`, `updated_at`) VALUES
+(1, 'accessory', 1, 0, 1, NOW(), NOW()),
+(2, 'cross_selling', 1, 1, 2, NOW(), NOW()),
+(3, 'up_selling', 1, 0, 3, NOW(), NOW())
+;
+
+/**
+Every seeded locale gets a row, falling back to the English wording where the label is not
+translated yet: the back office titles a block of the product sheet with it, and an empty
+title would leave the merchant with an unnamed block.
+*/
+INSERT INTO `product_association_type_i18n` (`id`, `locale`, `title`, `description`) VALUES
+{% for locale in locales %}
+    (1, '{{ locale }}', {{ intl('Accessories', locale, true) }}, {{ intl('Products that complete this one, such as a case or a spare part', locale, true) }}),
+    (2, '{{ locale }}', {{ intl('Complementary products', locale, true) }}, {{ intl('Products that go well with this one', locale, true) }}),
+    (3, '{{ locale }}', {{ intl('Higher-end models', locale, true) }}, {{ intl('Products of the same kind, a range above this one', locale, true) }}){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
