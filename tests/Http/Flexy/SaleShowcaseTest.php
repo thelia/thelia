@@ -112,6 +112,41 @@ final class SaleShowcaseTest extends WebIntegrationTestCase
         );
     }
 
+    /**
+     * Naming the discount and asking for a countdown are two independent settings of an
+     * operation: a merchant who sets the second one without the first still gets the
+     * countdown where the shopper decides, on the card and on the product sheet.
+     */
+    public function testTheCountdownShowsOnAListingCardOfALabellessOperation(): void
+    {
+        $factory = $this->factory();
+        $category = $this->category($factory);
+        $product = $this->product($factory, $category, 'Labelless countdown product');
+        $category->setRewrittenUrl('en_US', 'flexy-sale-labelless-countdown-test.html');
+
+        $sale = $this->runningSale($factory, [
+            'saleLabel' => '',
+            'countdownMode' => Sale::COUNTDOWN_MODE_FROM_OPENING,
+        ]);
+        $factory->saleProduct($sale, $product);
+
+        $this->assertPageRenders('/flexy-sale-labelless-countdown-test.html');
+
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertStringContainsString('Labelless countdown product', $content);
+        self::assertStringContainsString(
+            self::COUNTDOWN_MARKER,
+            $content,
+            'A countdown asked for by the operation must show even when the discount has no label.',
+        );
+        self::assertStringNotContainsString(
+            'Tag--sale',
+            $content,
+            'An operation with no label must not print an empty label tag.',
+        );
+    }
+
     public function testAProductInARunningSaleCarriesItsLabelOnItsListingCard(): void
     {
         $factory = $this->factory();

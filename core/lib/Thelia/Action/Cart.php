@@ -279,6 +279,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
         }
 
+        $this->settleReservedPrices($cart);
+
         $event->setCartItem($cartItem);
     }
 
@@ -331,6 +333,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $event->setCartItem(
                     $this->updateQuantity($dispatcher, $cartItem, $quantity),
                 );
+
+                $cart->clearCartItems();
+                $this->settleReservedPrices($cart);
             }
         }
     }
@@ -413,6 +418,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->setPromo($promo)
                 ->save();
         }
+    }
+
+    /**
+     * Settle the reserved prices of a cart that the visitor just changed.
+     *
+     * Signing in is not the only moment entitlement moves: a customer taken out of a
+     * selection, or an operation that ends, while the cart sits open must not keep the
+     * reserved price on the next line the visitor touches — and a customer who has just
+     * become entitled should get it there. Guarded by the same indexed, per-request
+     * memoised check as the sign-in path, so a shop with no reserved operation running
+     * keeps the behaviour, and the queries, it had.
+     */
+    private function settleReservedPrices(CartModel $cart): void
+    {
+        if (!$this->saleAudienceChecker->hasActiveReservedSale()) {
+            return;
+        }
+
+        $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
     }
 
     /**

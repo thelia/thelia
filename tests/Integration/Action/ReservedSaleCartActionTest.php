@@ -21,6 +21,7 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -143,6 +144,69 @@ final class ReservedSaleCartActionTest extends ActionIntegrationTestCase
 
         self::assertSame(1, (int) $signedIn->getPromo());
         self::assertSame(self::RESERVED_PRICE, $signedIn->getRealPrice());
+    }
+
+    /**
+     * Entitlement can move while the cart sits open, and the visitor never signs in
+     * again: changing the quantity of a line is the moment to settle the price, not a
+     * moment to carry a price the shop no longer owes.
+     */
+    public function testChangingAQuantityDropsAReservedPriceTheCustomerHasLost(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->catalogProduct($currency);
+        $customer = $this->newCustomer();
+        $sale = $this->reservedOperationOn($product, $currency, $customer);
+
+        $cart = $this->factory->cart($customer);
+        $item = $this->addToCart($cart, $product);
+        self::assertSame(self::RESERVED_PRICE, $item->getRealPrice());
+
+        SaleCustomerQuery::create()->filterBySaleId($sale->getId())->delete();
+
+        $changed = $this->changeQuantity($cart, $item, 3);
+
+        self::assertSame(3, (int) $changed->getQuantity());
+        self::assertSame(0, (int) $changed->getPromo());
+        self::assertSame(self::CATALOG_PRICE, $changed->getRealPrice());
+    }
+
+    /**
+     * The other way round: a customer named on the operation after filling their cart
+     * gets the price on the next line they touch, without signing out and back in.
+     */
+    public function testChangingAQuantityAppliesAReservedPriceTheCustomerHasGained(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->catalogProduct($currency);
+        $customer = $this->newCustomer();
+        $sale = $this->reservedOperationOn($product, $currency, $this->newCustomer());
+
+        $cart = $this->factory->cart($customer);
+        $item = $this->addToCart($cart, $product);
+        self::assertSame(self::CATALOG_PRICE, $item->getRealPrice());
+
+        $this->factory->saleCustomer($sale, $customer);
+
+        $changed = $this->changeQuantity($cart, $item, 2);
+
+        self::assertSame(1, (int) $changed->getPromo());
+        self::assertSame(self::RESERVED_PRICE, $changed->getRealPrice());
+    }
+
+    private function changeQuantity(Cart $cart, \Thelia\Model\CartItem $cartItem, int $quantity): \Thelia\Model\CartItem
+    {
+        $event = new CartEvent($cart);
+        $event
+            ->setCartItemId($cartItem->getId())
+            ->setQuantity($quantity);
+
+        $this->dispatch($event, TheliaEvents::CART_UPDATEITEM);
+
+        $cartItem->clearAllReferences();
+
+        return CartItemQuery::create()->findPk($cartItem->getId())
+            ?? self::fail('The changed line is gone from the cart.');
     }
 
     private function reservedOperationOn(Product $product, Currency $currency, Customer $customer): Sale
