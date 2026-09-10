@@ -57,6 +57,8 @@ use Thelia\Model\Sale;
 use Thelia\Model\SaleCustomer;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleProduct;
+use Thelia\Model\Tag;
+use Thelia\Model\TagElement;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
@@ -824,5 +826,30 @@ final class FixtureFactory
         $order->save($this->connection);
 
         return $order;
+    }
+
+    public function tag(array $overrides = []): Tag
+    {
+        $n = $this->next();
+
+        $tag = new Tag();
+        // The unique index folds case and Latin accents, so a fixed label would
+        // collide across tests: the counter keeps each fixture its own tag.
+        $tag->setLabel($overrides['label'] ?? 'Tag '.$n);
+        $tag->setColorCode($overrides['colorCode'] ?? '#1A2B3C');
+        $tag->save($this->connection);
+
+        return $tag;
+    }
+
+    public function tagElement(Tag $tag, string $elementKey, int $elementId): TagElement
+    {
+        $link = new TagElement();
+        $link->setTagId($tag->getId());
+        $link->setElementKey($elementKey);
+        $link->setElementId($elementId);
+        $link->save($this->connection);
+
+        return $link;
     }
 }

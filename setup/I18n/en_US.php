@@ -312,6 +312,7 @@ return [
     'Configuration / Profile' => 'Configuration / Profile',
     'Configuration / Shipping-zone' => 'Configuration / Shipping-zone',
     'Configuration / System Log' => 'Configuration / System Log',
+    'Configuration / Tag' => 'Configuration / Tag',
     'Configuration / Tax' => 'Configuration / Tax',
     'Configuration / Template' => 'Configuration / Template',
     'Configuration checkout consents' => 'Configuration checkout consents',

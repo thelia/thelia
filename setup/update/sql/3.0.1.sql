@@ -273,4 +273,66 @@ CREATE TABLE IF NOT EXISTS `sale_customer`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- Tags on shop objects
+--
+-- `tag` holds the free-text markers an administrator writes, `tag_element`
+-- attaches them by an element key and an identifier instead of a foreign key,
+-- so the same tag reaches customers now and other objects later without a
+-- second pivot table.
+--
+-- CREATE TABLE IF NOT EXISTS is idempotent on its own, so these two need none
+-- of the information_schema guarding the column additions above require: it is
+-- ALTER TABLE ADD that has no IF NOT EXISTS on MySQL, not CREATE TABLE.
+--
+-- The DDL is copied from the Propel output in setup/thelia.sql, collation
+-- included. A shop upgrading and a shop installing fresh must not end up with
+-- different collations on `label`, because the collation is what makes the
+-- uniqueness of a tag case- and accent-insensitive.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `tag`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `label` VARCHAR(100) NOT NULL,
+    `color_code` VARCHAR(7),
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `tag_label_unique` (`label`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `tag_element`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tag_id` INTEGER NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `tag_element_unique` (`tag_id`, `element_key`, `element_id`),
+    INDEX `tag_element_element_idx` (`element_key`, `element_id`),
+    CONSTRAINT `fk_tag_element_tag_id`
+        FOREIGN KEY (`tag_id`)
+            REFERENCES `tag` (`id`)
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The tag vocabulary is its own admin resource, so a profile can be allowed to
+-- rename or merge tags without being allowed to edit customers, and the other
+-- way round. A resource code the `resource` table does not hold can be granted
+-- to nobody, so an upgrading shop needs the row too.
+--
+-- `code` is unique, so INSERT IGNORE is the idempotency, and the id is left to
+-- AUTO_INCREMENT: on an upgrading shop the ids the fresh seed uses may already
+-- belong to a module. The i18n row therefore looks its parent up by code rather
+-- than by a hard-coded id. English only, as translations are collected before a
+-- release.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.tag', NOW(), NOW());
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`)
+    SELECT `id`, 'en_US', 'Configuration / Tag' FROM `resource` WHERE `code` = 'admin.configuration.tag';
+
 SET FOREIGN_KEY_CHECKS = 1;

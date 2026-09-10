@@ -23,6 +23,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Newsletter;
 use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderProduct;
+use Thelia\Model\TagElement;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -130,6 +131,34 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
         $this->expectException(\LogicException::class);
 
         (new CustomerPersonalDataExporter([$provider]))->export($customer);
+    }
+
+    /**
+     * The tags an administrator put on a customer are internal markers, and the
+     * file handed to that customer must carry no trace of them — not even an
+     * empty section, which is why the clean-up lives in CustomerAnonymizer
+     * rather than behind CustomerPersonalDataProviderInterface: the exporter
+     * writes a section for every provider it holds, empty or not.
+     */
+    public function testExportCarriesNoTagSectionForATaggedCustomer(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $tag = $this->factory->tag(['label' => 'Bad payer']);
+        $this->factory->tagElement($tag, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+
+        $event = new CustomerPersonalDataExportEvent($customer);
+        $this->getService(EventDispatcherInterface::class)->dispatch(
+            $event,
+            TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT,
+        );
+
+        $personalData = $event->getPersonalData();
+
+        self::assertSame(CustomerPersonalDataExporter::CORE_SECTION_NAMES, array_keys($personalData));
+
+        // The label itself, wherever it might have slipped in. Not a naive search
+        // for "tag": "postage" contains it.
+        self::assertStringNotContainsString('Bad payer', json_encode($personalData, \JSON_THROW_ON_ERROR));
     }
 
     private function createCustomerWithHistory(): Customer

@@ -3817,5 +3817,47 @@ CREATE TABLE `choice_filter_other_i18n`
             REFERENCES `choice_filter_other` (`id`)
             ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- tag
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tag`;
+
+CREATE TABLE `tag`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `label` VARCHAR(100) NOT NULL,
+    `color_code` VARCHAR(7),
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `tag_label_unique` (`label`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- tag_element
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tag_element`;
+
+CREATE TABLE `tag_element`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tag_id` INTEGER NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `tag_element_unique` (`tag_id`, `element_key`, `element_id`),
+    INDEX `tag_element_element_idx` (`element_key`, `element_id`),
+    CONSTRAINT `fk_tag_element_tag_id`
+        FOREIGN KEY (`tag_id`)
+            REFERENCES `tag` (`id`)
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

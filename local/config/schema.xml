@@ -2159,4 +2159,47 @@
 
     <behavior name="timestampable" />
   </table>
+
+  <!-- A tag is a free-text marker an administrator puts on a shop object, and
+       tag_element attaches it by an element key and an identifier rather than by
+       a foreign key, so the same tag reaches customers today and orders or
+       products later without a second pivot table. The price of that reach is
+       that no foreign key guards element_id: Customer::postDelete() clears the
+       rows of a deleted customer, and every further taggable model owes the same
+       hook. Uniqueness sits on label alone; under utf8mb4_general_ci that also
+       folds case and Latin accents, which is the wanted de-duplication. -->
+  <table name="tag" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="label" required="true" size="100" type="VARCHAR" />
+    <column name="color_code" size="7" type="VARCHAR" />
+
+    <unique name="tag_label_unique">
+      <unique-column name="label" />
+    </unique>
+
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="tag_element" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tag_id" required="true" type="INTEGER" />
+    <column name="element_key" required="true" size="100" type="VARCHAR" />
+    <column name="element_id" required="true" type="INTEGER" />
+
+    <foreign-key foreignTable="tag" name="fk_tag_element_tag_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="tag_id" />
+    </foreign-key>
+
+    <unique name="tag_element_unique">
+      <unique-column name="tag_id" />
+      <unique-column name="element_key" />
+      <unique-column name="element_id" />
+    </unique>
+    <index name="tag_element_element_idx">
+      <index-column name="element_key" />
+      <index-column name="element_id" />
+    </index>
+
+    <behavior name="timestampable" />
+  </table>
 </database>

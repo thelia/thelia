@@ -98,6 +98,7 @@ class AdminResources
     public const SALES = 'admin.sales';
     public const API = 'admin.configuration.api';
     public const TITLE = 'admin.customer.title';
+    public const TAG = 'admin.configuration.tag';
 
     /**
      * Create a new AdminRessources instance.

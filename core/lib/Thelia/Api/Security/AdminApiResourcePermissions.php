@@ -66,6 +66,8 @@ use Thelia\Api\Resource\ProductSaleElements;
 use Thelia\Api\Resource\ProductSaleElementsProductImage;
 use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\State;
+use Thelia\Api\Resource\Tag;
+use Thelia\Api\Resource\TagElement;
 use Thelia\Api\Resource\Tax;
 use Thelia\Api\Resource\TaxRule;
 use Thelia\Api\Resource\TaxRuleCountry;
@@ -135,6 +137,13 @@ final readonly class AdminApiResourcePermissions
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
         Sale::class => AdminResources::SALES,
         State::class => AdminResources::STATE,
+        Tag::class => AdminResources::TAG,
+        // Attaching a tag to a customer is editing that customer, so the
+        // attachment answers to the customer code rather than to the tag one:
+        // a profile allowed to manage the tag vocabulary is not thereby allowed
+        // to read who carries what. The day another object becomes taggable this
+        // single mapping stops being enough and has to split by element key.
+        TagElement::class => AdminResources::CUSTOMER,
         Tax::class => AdminResources::TAX,
         TaxRule::class => AdminResources::TAX,
         TaxRuleCountry::class => AdminResources::TAX,

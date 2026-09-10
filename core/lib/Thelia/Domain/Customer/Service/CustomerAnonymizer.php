@@ -29,6 +29,8 @@ use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\TagElement;
+use Thelia\Model\TagElementQuery;
 
 /**
  * Erases the identifying data of a customer while keeping the accounting
@@ -77,6 +79,7 @@ final readonly class CustomerAnonymizer
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
+            $this->deleteTagAttachments($customer, $connection);
             $this->anonymizeAccount($customer, $connection);
             $this->anonymizeAdminLogs($customer, $connection);
 
@@ -163,6 +166,24 @@ final readonly class CustomerAnonymizer
      * A cart holds a copy of the delivery and invoice addresses, so the cart
      * addresses are deleted along with the carts themselves.
      */
+    /**
+     * The tags an administrator put on this customer say something about the
+     * person, so anonymizing drops them with the rest of the identity.
+     *
+     * Deliberately not a CustomerPersonalDataProviderInterface: the exporter
+     * writes a section for every provider it holds, even an empty one, and the
+     * export handed to the customer must carry no trace of the internal
+     * markers. Tags are core, so the clean-up belongs here, in the same
+     * transaction as the rest.
+     */
+    private function deleteTagAttachments(Customer $customer, ConnectionInterface $connection): void
+    {
+        TagElementQuery::create()
+            ->filterByElementKey(TagElement::ELEMENT_KEY_CUSTOMER)
+            ->filterByElementId($customer->getId())
+            ->delete($connection);
+    }
+
     private function deleteCarts(Customer $customer, ConnectionInterface $connection): void
     {
         $carts = CartQuery::create()->filterByCustomerId($customer->getId())->find($connection);

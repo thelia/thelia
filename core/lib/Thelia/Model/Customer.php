@@ -396,6 +396,26 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         return true;
     }
 
+    public function postDelete(?ConnectionInterface $con = null): void
+    {
+        parent::postDelete($con);
+
+        // `tag_element` attaches a tag by an element key and an identifier, so no
+        // foreign key deletes these rows with the customer: without this hook a
+        // deleted customer leaves its attachments behind, still listed by the
+        // admin API and still to be stepped around by every reader. `meta_data`
+        // carries the same key-and-identifier shape and has no such clean-up
+        // anywhere in core, which is the precedent this deliberately does not
+        // follow.
+        //
+        // A bulk `CustomerQuery::create()->delete()` never reaches this hook.
+        // The tag:prune-orphans command is the net under that case.
+        TagElementQuery::create()
+            ->filterByElementKey(TagElement::ELEMENT_KEY_CUSTOMER)
+            ->filterByElementId($this->getId())
+            ->delete($con);
+    }
+
     public function getUserIdentifier(): string
     {
         return $this->getEmail();

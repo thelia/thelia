@@ -306,6 +306,7 @@ return [
     'Configuration / Profile' => 'Configuration / Profil',
     'Configuration / Shipping-zone' => 'Configuration / Zone de livraison',
     'Configuration / System Log' => 'Configuration / Logs système',
+    'Configuration / Tag' => 'Configuration / Étiquette',
     'Configuration / Tax' => 'Configuration / Taxe',
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration checkout consents' => 'Configuration des consentements du tunnel de commande',
