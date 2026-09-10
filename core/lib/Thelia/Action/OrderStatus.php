@@ -24,6 +24,7 @@ use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus as OrderStatusModel;
 use Thelia\Model\OrderStatusQuery;
@@ -35,6 +36,11 @@ use Thelia\Model\OrderStatusQuery;
  */
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        protected OrderStatusTransitionWriter $transitionWriter,
+    ) {
+    }
+
     public function create(OrderStatusCreateEvent $event): void
     {
         $this->createOrUpdate($event, new OrderStatusModel());
@@ -60,6 +66,10 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         if (null !== OrderQuery::create()->findOneByStatusId($orderStatus->getId())) {
             throw new \Exception(Translator::getInstance()->trans('Some commands use this status.').' '.Translator::getInstance()->trans('You can not delete it.'));
         }
+
+        // The graph and the actions naming this status go with it: the foreign keys
+        // restrict, so that nothing else ever reshapes the graph silently.
+        $this->transitionWriter->forgetStatus($orderStatus->getId());
 
         $orderStatus->delete();
 

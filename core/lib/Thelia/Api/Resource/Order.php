@@ -34,6 +34,7 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\State\Processor\OrderProcessor;
 use Thelia\Api\State\Provider\GuestOrderProvider;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
@@ -52,9 +53,11 @@ use Thelia\Model\OrderQuery;
         ),
         new Put(
             uriTemplate: '/admin/orders/{id}',
+            processor: OrderProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/orders/{id}',
+            processor: OrderProcessor::class,
         ),
         new Delete(
             uriTemplate: '/admin/orders/{id}',

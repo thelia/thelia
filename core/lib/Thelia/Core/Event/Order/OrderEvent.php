@@ -34,6 +34,8 @@ class OrderEvent extends ActionEvent
     protected ?string $postageTaxRuleTitle = null;
     protected ?string $ref = null;
     protected ?int $status = null;
+    protected ?int $previousStatusId = null;
+    protected bool $statusTransitionForced = false;
     protected ?string $deliveryRef = null;
     protected ?int $cartItemId = null;
     protected ?string $transactionRef = null;
@@ -244,6 +246,40 @@ class OrderEvent extends ActionEvent
     public function getStatus(): ?int
     {
         return $this->status;
+    }
+
+    /**
+     * The status the order held before ORDER_UPDATE_STATUS was applied. Set by the
+     * core listener that persists the new status, so that the listeners running
+     * after it can tell which transition just happened.
+     */
+    public function setPreviousStatusId(int $previousStatusId): self
+    {
+        $this->previousStatusId = $previousStatusId;
+
+        return $this;
+    }
+
+    public function getPreviousStatusId(): ?int
+    {
+        return $this->previousStatusId;
+    }
+
+    /**
+     * Asks the core to apply the status even when the transition graph does not
+     * allow it. Reserved to an entitled administrator; the caller is responsible
+     * for leaving a trace of the override.
+     */
+    public function forceStatusTransition(): self
+    {
+        $this->statusTransitionForced = true;
+
+        return $this;
+    }
+
+    public function isStatusTransitionForced(): bool
+    {
+        return $this->statusTransitionForced;
     }
 
     /**
