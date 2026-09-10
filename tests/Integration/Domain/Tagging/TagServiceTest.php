@@ -44,6 +44,38 @@ final class TagServiceTest extends IntegrationTestCase
         self::assertSame('VIP', $tag->getLabel());
     }
 
+    public function testCreateAddsTheTagToTheVocabulary(): void
+    {
+        $tag = $this->tagService->create('Wholesaler', '#1A2B3C');
+
+        self::assertNotNull($tag->getId());
+        self::assertSame('Wholesaler', $tag->getLabel());
+        self::assertSame('#1A2B3C', $tag->getColorCode());
+    }
+
+    /**
+     * Unlike findOrCreate(), which hands back the tag already carrying the
+     * label: an administrator who asked to create one is owed the refusal, and
+     * a message naming the tag standing in the way. Under utf8mb4_general_ci
+     * that tag is spelled differently from what was typed.
+     */
+    public function testCreateRefusesALabelAnotherTagAlreadyCarries(): void
+    {
+        $this->tagService->create('Salon 2026');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Salon 2026/');
+
+        $this->tagService->create('salón 2026');
+    }
+
+    public function testCreateRefusesALabelOfOnlyWhitespace(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->tagService->create('   ');
+    }
+
     public function testTheSameLabelResolvesToTheSameTag(): void
     {
         $first = $this->tagService->findOrCreate('Salon 2026');

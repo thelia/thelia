@@ -77,6 +77,37 @@ final readonly class TagService
     }
 
     /**
+     * Adds a tag to the vocabulary, refusing a label another tag already carries.
+     *
+     * Not findOrCreate(): that one hands back the existing tag, which is right
+     * when a screen is attaching a label to an object and wrong when an
+     * administrator asked to create one. Here the collision is the answer, and
+     * the message names the tag standing in the way — under utf8mb4_general_ci
+     * it lands on a spelling that does not look like what was typed.
+     *
+     * @throws \InvalidArgumentException when the label is empty or already taken
+     */
+    public function create(string $label, ?string $colorCode = null, ?ConnectionInterface $connection = null): Tag
+    {
+        $normalizedLabel = Tag::normalizeLabel($label);
+
+        if ($normalizedLabel === '') {
+            throw new \InvalidArgumentException('A tag label cannot be empty.');
+        }
+
+        $conflicting = TagQuery::create()->findOneByLabel($normalizedLabel, $connection);
+
+        if ($conflicting instanceof Tag) {
+            throw new \InvalidArgumentException(\sprintf('The label "%s" is already carried by the tag "%s".', $normalizedLabel, (string) $conflicting->getLabel()));
+        }
+
+        $tag = (new Tag())->setLabel($normalizedLabel)->setColorCode($colorCode);
+        $tag->save($connection);
+
+        return $tag;
+    }
+
+    /**
      * Renames a tag, and recolours it.
      *
      * The collision is looked up rather than left to the unique index, for one
