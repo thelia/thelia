@@ -2094,7 +2094,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (51, 'admin.configuration.consent', NOW(), NOW()),
 (52, 'admin.order-return', NOW(), NOW()),
 (53, 'admin.configuration.order-return-reason', NOW(), NOW()),
-(54, 'admin.configuration.checkout-step', NOW(), NOW())
+(54, 'admin.configuration.checkout-step', NOW(), NOW()),
+(55, 'admin.configuration.tag', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3784,7 +3785,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
     (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
     (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL),
-    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL),
+    (55, '{{ locale }}', {{ intl('Configuration / Tag', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
