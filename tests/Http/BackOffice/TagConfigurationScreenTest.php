@@ -18,7 +18,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Admin;
+use Thelia\Model\Tag;
 use Thelia\Model\TagElement;
+use Thelia\Model\TagQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
@@ -120,6 +122,138 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
             $this->client->getResponse()->getStatusCode(),
             'Being allowed on customers must not open the tag vocabulary.',
         );
+    }
+
+    public function testRenamingATagChangesItsLabelAndColour(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Rename me', 'colorCode' => '#111111']);
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($tag, ['label' => 'Renamed', 'colorCode' => '#22ccff']);
+
+        $reloaded = TagQuery::create()->findPk($tag->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('Renamed', $reloaded->getLabel());
+        self::assertSame('#22ccff', $reloaded->getColorCode());
+    }
+
+    /**
+     * The refusal has to name the tag standing in the way: under
+     * utf8mb4_general_ci the collision lands on a spelling that does not look
+     * like the target, so a bare "already exists" leaves nothing to act on.
+     */
+    public function testRenamingOntoAnExistingLabelIsRefusedAndNamesTheOtherTag(): void
+    {
+        $factory = $this->factory();
+        $existing = $factory->tag(['label' => 'Salon']);
+        $renamed = $factory->tag(['label' => 'Prospect']);
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($renamed, ['label' => 'Salón']);
+
+        self::assertSame(400, $this->client->getResponse()->getStatusCode());
+        self::assertSame('Prospect', TagQuery::create()->findPk($renamed->getId())?->getLabel(), 'The tag is untouched.');
+        self::assertSame('Salon', TagQuery::create()->findPk($existing->getId())?->getLabel());
+    }
+
+    public function testALabelOfOnlyWhitespaceIsRefusedByTheForm(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Keep me']);
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($tag, ['label' => '   ']);
+
+        self::assertSame(400, $this->client->getResponse()->getStatusCode());
+        self::assertSame('Keep me', TagQuery::create()->findPk($tag->getId())?->getLabel());
+    }
+
+    public function testAnAdminWithoutTheTagResourceCannotOpenTheEditScreen(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag();
+        $this->loginAs($factory->restrictedAdmin([
+            AdminResources::CUSTOMER => [AccessManager::VIEW, AccessManager::UPDATE],
+        ]));
+
+        $this->client->request('GET', self::URL.'/update?tag_id='.$tag->getId());
+
+        self::assertNotSame(200, $this->client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * A native colour input has no empty state and posts black by default, so a
+     * tag with no colour would turn black on its first save. The checkbox is
+     * what keeps "no colour" expressible.
+     */
+    public function testATagWithoutAColourKeepsNoneWhenSavedUntouched(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Colourless', 'colorCode' => null]);
+        $this->loginAs($factory->admin());
+
+        // Black is posted on purpose: a real browser sends #000000 for a colour
+        // input left alone, while BrowserKit would send the empty rendered value.
+        // Without it this test would pass on a submission no browser ever makes,
+        // and would miss exactly the regression it exists for.
+        $this->submitEditForm($tag, ['label' => 'Colourless renamed', 'colorCode' => '#000000', 'noColor' => '1']);
+
+        $reloaded = TagQuery::create()->findPk($tag->getId());
+        self::assertSame('Colourless renamed', $reloaded?->getLabel());
+        self::assertNull($reloaded?->getColorCode(), 'Saving must not invent a black colour.');
+    }
+
+    public function testAColourCanBeTakenBackOff(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Was coloured', 'colorCode' => '#1A2B3C']);
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($tag, ['noColor' => '1']);
+
+        self::assertNull(TagQuery::create()->findPk($tag->getId())?->getColorCode());
+    }
+
+    public function testTickingNoColourWinsOverThePickedValue(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Ambiguous', 'colorCode' => '#1A2B3C']);
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($tag, ['colorCode' => '#ff0000', 'noColor' => '1']);
+
+        self::assertNull(TagQuery::create()->findPk($tag->getId())?->getColorCode(), 'The checkbox is the explicit intent.');
+    }
+
+    /**
+     * Goes through the rendered form rather than posting fields by hand, so the
+     * CSRF token travels with the submission the way a browser sends it.
+     *
+     * @param array<string, string> $values
+     */
+    private function submitEditForm(Tag $tag, array $values): void
+    {
+        // assertPageRenders rather than a blanket "skip unless 200": that helper
+        // skips only when the theme assets are missing, and asserts otherwise. A
+        // bare status check turns any server error into a skip, which is how a
+        // broken screen can masquerade as a passing suite.
+        $this->assertPageRenders(self::URL.'/update?tag_id='.$tag->getId());
+
+        $form = $this->client->getCrawler()->filter('form[action$="/tags/save"]')->form();
+
+        foreach ($values as $field => $value) {
+            $form['thelia_tag_update['.$field.']'] = $value;
+        }
+
+        // The fixture factory gives every tag a colour, so a form rendered for a
+        // colourless tag arrives with the checkbox ticked: untick it whenever the
+        // case under test posts a colour.
+        if (isset($values['colorCode']) && !isset($values['noColor'])) {
+            $form['thelia_tag_update[noColor]'] = false;
+        }
+
+        $this->client->submit($form);
     }
 
     private function factory(): FixtureFactory
