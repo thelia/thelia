@@ -44,7 +44,9 @@ final readonly class LoopExecutor
     private array $loopDefinition;
 
     /**
-     * @param iterable<LoopInterface> $theliaLoops the services tagged "thelia.loop"
+     * @param iterable<LoopInterface>     $theliaLoops       the services tagged "thelia.loop"
+     * @param array<string, class-string> $theliaParserLoops loop name => class, as collected
+     *                                                       from the module config.xml files
      */
     public function __construct(
         private ContainerInterface $container,
@@ -55,8 +57,9 @@ final readonly class LoopExecutor
         #[AutowireIterator('thelia.loop')]
         iterable $theliaLoops,
         private string $kernelEnvironment,
+        array $theliaParserLoops = [],
     ) {
-        $this->loopDefinition = $this->buildLoopDefinition($theliaLoops);
+        $this->loopDefinition = $this->buildLoopDefinition($theliaLoops, $theliaParserLoops);
     }
 
     /**
@@ -140,11 +143,12 @@ final readonly class LoopExecutor
      * Build the "loop name => class" registry from the tagged loop services, using the
      * exact same normalization as TheliaLoop::setLoopList() (kebab-case, collision suffix).
      *
-     * @param iterable<LoopInterface> $theliaLoops
+     * @param iterable<LoopInterface>     $theliaLoops
+     * @param array<string, class-string> $theliaParserLoops
      *
      * @return array<string, class-string<LoopInterface>>
      */
-    private function buildLoopDefinition(iterable $theliaLoops): array
+    private function buildLoopDefinition(iterable $theliaLoops, array $theliaParserLoops): array
     {
         $definition = [];
 
