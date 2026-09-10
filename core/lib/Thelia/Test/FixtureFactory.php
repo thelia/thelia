@@ -712,13 +712,15 @@ final class FixtureFactory
      * asserting on it fails on whichever engine it was not written against. Cut
      * every date this factory stores to the second.
      */
-    private static function wholeSeconds(?\DateTimeInterface $date): ?\DateTimeInterface
+    private static function wholeSeconds(?\DateTimeInterface $date): ?\DateTime
     {
         if (null === $date) {
             return null;
         }
 
-        return \DateTimeImmutable::createFromInterface($date)->setTime(
+        // A copy, and a mutable one: the API resources type their date setters
+        // ?DateTime, and the caller's own object must not be touched.
+        return \DateTime::createFromInterface($date)->setTime(
             (int) $date->format('H'),
             (int) $date->format('i'),
             (int) $date->format('s'),
