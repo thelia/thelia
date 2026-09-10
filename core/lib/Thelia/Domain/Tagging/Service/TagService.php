@@ -149,6 +149,29 @@ final readonly class TagService
     }
 
     /**
+     * The tags an object carries, in label order.
+     *
+     * Reading is a separate concern from setLabelsFor(): the screen that edits a
+     * customer needs the current tags before it can offer them, and going through
+     * TagElementQuery in the caller would spread the element-key convention out of
+     * this service.
+     *
+     * @return list<Tag>
+     */
+    public function findTagsFor(string $elementKey, int $elementId, ?ConnectionInterface $connection = null): array
+    {
+        $tags = TagQuery::create()
+            ->useTagElementQuery()
+                ->filterByElementKey($elementKey)
+                ->filterByElementId($elementId)
+            ->endUse()
+            ->orderByLabel(Criteria::ASC)
+            ->find($connection);
+
+        return array_values($tags->getData());
+    }
+
+    /**
      * Makes the tags of an object exactly the given labels, creating those that
      * do not exist yet and detaching those no longer listed.
      *
