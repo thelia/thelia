@@ -809,6 +809,66 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
+  <table name="order_status_transition" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="from_status_id" required="true" type="INTEGER" />
+    <column name="to_status_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="order_status" name="fk_order_status_transition_from_status_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="FromStatus" refPhpName="OutgoingTransition">
+      <reference foreign="id" local="from_status_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_status" name="fk_order_status_transition_to_status_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="ToStatus" refPhpName="IncomingTransition">
+      <reference foreign="id" local="to_status_id" />
+    </foreign-key>
+    <unique name="order_status_transition_from_to_UNIQUE">
+      <unique-column name="from_status_id" />
+      <unique-column name="to_status_id" />
+    </unique>
+    <index name="idx_order_status_transition_to_status_id">
+      <index-column name="to_status_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="order_status_action" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="trigger_type" required="true" size="20" type="VARCHAR" />
+    <column name="from_status_id" type="INTEGER" />
+    <column name="to_status_id" required="true" type="INTEGER" />
+    <column name="action_type" required="true" size="100" type="VARCHAR" />
+    <column name="payload" type="LONGVARCHAR" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column defaultValue="1" name="active" required="true" type="BOOLEAN" />
+    <foreign-key foreignTable="order_status" name="fk_order_status_action_from_status_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="FromStatus" refPhpName="OutgoingAction">
+      <reference foreign="id" local="from_status_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_status" name="fk_order_status_action_to_status_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="ToStatus" refPhpName="IncomingAction">
+      <reference foreign="id" local="to_status_id" />
+    </foreign-key>
+    <index name="idx_order_status_action_to_status_id">
+      <index-column name="to_status_id" />
+    </index>
+    <index name="idx_order_status_action_from_status_id">
+      <index-column name="from_status_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="order_status_action_failure" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="action_id" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column name="message" required="true" type="LONGVARCHAR" />
+    <foreign-key foreignTable="order_status_action" name="fk_order_status_action_failure_action_id" onDelete="CASCADE" onUpdate="RESTRICT" phpName="Action" refPhpName="Failure">
+      <reference foreign="id" local="action_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order" name="fk_order_status_action_failure_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <index name="idx_order_status_action_failure_order_id">
+      <index-column name="order_id" />
+    </index>
+    <behavior name="timestampable">
+      <parameter name="disable_updated_at" value="true" />
+    </behavior>
+  </table>
   <table name="order_sequence" namespace="Thelia\Model">
     <column name="name" primaryKey="true" required="true" size="64" type="VARCHAR" />
     <column defaultValue="0" name="current_value" required="true" type="BIGINT" />

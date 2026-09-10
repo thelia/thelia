@@ -2018,6 +2018,16 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 (5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
+-- The automatisms the core runs through its listeners (invoice numbering on
+-- payment, coupon release when an order stops being paid) are offered as
+-- actions too, switched off so that nothing runs twice. No transition is
+-- seeded: every status stays free, as before.
+INSERT INTO `order_status_action`(`id`, `trigger_type`, `from_status_id`, `to_status_id`, `action_type`, `payload`, `position`, `active`, `created_at`, `updated_at`) VALUES
+(1, 'enter', NULL, 2, 'allocate_invoice_ref', NULL, 1, 0, NOW(), NOW()),
+(2, 'enter', NULL, 1, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(3, 'enter', NULL, 5, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(4, 'enter', NULL, 6, 'release_coupons', NULL, 1, 0, NOW(), NOW());
+
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
 */
