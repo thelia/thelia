@@ -273,79 +273,123 @@ class TheliaKernel extends Kernel
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
-        if (!file_exists($this->getCacheDir().DS.'check_mysql_configurations.php')) {
-            $serverSqlMode = [];
-            $canUpdate = false;
-            $logs = [];
-            // The verdict is cached across requests, so it must describe the
-            // server-configured sql_mode (@@GLOBAL, what every fresh connection
-            // inherits), never the current session: bin/install boots several
-            // kernels over one shared connection, and a session corrected by a
-            // previous kernel would cache a "nothing to do" verdict that every
-            // later web request would then run with.
-            /** @var PDODataFetcher $result */
-            $result = $con->query('SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode');
+        $verdict = $this->readMySQLConfigurationsVerdict();
 
-            if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-                $serverSqlMode = explode(',', (string) $data['global_sql_mode']);
+        if (null === $verdict) {
+            $verdict = $this->probeMySQLConfigurations($con);
 
-                if (empty($serverSqlMode[0])) {
-                    unset($serverSqlMode[0]);
-                }
-
-                // MariaDB is not impacted by this problem
-                if (!str_contains((string) $data['version'], 'MariaDB')) {
-                    // MySQL 5.6+ compatibility
-                    if (version_compare($data['version'], '5.6.0', '>=')) {
-                        // add NO_ENGINE_SUBSTITUTION
-                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
-                            $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                            $canUpdate = true;
-                            $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
-                        }
-
-                        // remove ONLY_FULL_GROUP_BY
-                        if (($key = array_search('ONLY_FULL_GROUP_BY', $serverSqlMode, true)) !== false) {
-                            unset($serverSqlMode[$key]);
-                            $canUpdate = true;
-                            $logs[] = 'Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.';
-                        }
-                    }
-                } else {
-                    // MariaDB 10.1.7+ compatibility
-                    if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
-                        $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                        $canUpdate = true;
-                        $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
-                    }
-                }
-            } else {
-                $logs[] = 'Failed to get MySQL version and sql_mode';
-            }
-
-            foreach ($logs as $log) {
+            foreach ($verdict['logs'] as $log) {
                 Tlog::getInstance()->addWarning($log);
             }
 
             (new Filesystem())->dumpFile(
-                $this->getCacheDir().DS.'check_mysql_configurations.php',
-                '<?php return '.VarExporter::export([
-                    'modes' => array_values($serverSqlMode),
-                    'canUpdate' => $canUpdate,
-                    'logs' => $logs,
-                ]).';',
+                $this->getMySQLConfigurationsVerdictFile(),
+                '<?php return '.VarExporter::export($verdict).';',
             );
         }
 
-        $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
-
-        if (empty($cache['canUpdate'])) {
+        if (empty($verdict['canUpdate'])) {
             return;
         }
 
-        if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
+        if (null === $con->query("SET SESSION sql_mode='".implode(',', $verdict['modes'])."';")) {
             throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
         }
+    }
+
+    private function getMySQLConfigurationsVerdictFile(): string
+    {
+        return $this->getCacheDir().DS.'check_mysql_configurations.php';
+    }
+
+    /**
+     * Reading and writing are kept apart, and the file is never read back right
+     * after being written: emptying the cache directory leaves workers whose
+     * realpath cache still answers that the file is there, and reading it then
+     * raised a warning the error handler turned into a fatal - every back-office
+     * action that clears the cache (the button, activating a module) answered 500
+     * on the requests that followed until a worker recycled.
+     *
+     * @return array{modes: list<string>, canUpdate: bool, logs: list<string>}|null
+     */
+    private function readMySQLConfigurationsVerdict(): ?array
+    {
+        $file = $this->getMySQLConfigurationsVerdictFile();
+
+        clearstatcache(true, $file);
+
+        if (!is_file($file)) {
+            return null;
+        }
+
+        $verdict = @include $file;
+
+        if (!\is_array($verdict) || !isset($verdict['modes'], $verdict['canUpdate'], $verdict['logs'])) {
+            return null;
+        }
+
+        return $verdict;
+    }
+
+    /**
+     * @return array{modes: list<string>, canUpdate: bool, logs: list<string>}
+     */
+    private function probeMySQLConfigurations(ConnectionInterface $con): array
+    {
+        $serverSqlMode = [];
+        $canUpdate = false;
+        $logs = [];
+        // The verdict is cached across requests, so it must describe the
+        // server-configured sql_mode (@@GLOBAL, what every fresh connection
+        // inherits), never the current session: bin/install boots several
+        // kernels over one shared connection, and a session corrected by a
+        // previous kernel would cache a "nothing to do" verdict that every
+        // later web request would then run with.
+        /** @var PDODataFetcher $result */
+        $result = $con->query('SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode');
+
+        if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
+            $serverSqlMode = explode(',', (string) $data['global_sql_mode']);
+
+            if (empty($serverSqlMode[0])) {
+                unset($serverSqlMode[0]);
+            }
+
+            // MariaDB is not impacted by this problem
+            if (!str_contains((string) $data['version'], 'MariaDB')) {
+                // MySQL 5.6+ compatibility
+                if (version_compare($data['version'], '5.6.0', '>=')) {
+                    // add NO_ENGINE_SUBSTITUTION
+                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
+                        $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                        $canUpdate = true;
+                        $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
+                    }
+
+                    // remove ONLY_FULL_GROUP_BY
+                    if (($key = array_search('ONLY_FULL_GROUP_BY', $serverSqlMode, true)) !== false) {
+                        unset($serverSqlMode[$key]);
+                        $canUpdate = true;
+                        $logs[] = 'Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.';
+                    }
+                }
+            } else {
+                // MariaDB 10.1.7+ compatibility
+                if (version_compare($data['version'], '10.1.7', '>=') && !\in_array('NO_ENGINE_SUBSTITUTION', $serverSqlMode, true)) {
+                    $serverSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                    $canUpdate = true;
+                    $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
+                }
+            }
+        } else {
+            $logs[] = 'Failed to get MySQL version and sql_mode';
+        }
+
+        return [
+            'modes' => array_values($serverSqlMode),
+            'canUpdate' => $canUpdate,
+            'logs' => $logs,
+        ];
     }
 
     protected function getContainerBaseClass(): string
