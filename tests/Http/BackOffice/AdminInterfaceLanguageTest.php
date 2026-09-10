@@ -180,8 +180,10 @@ final class AdminInterfaceLanguageTest extends WebIntegrationTestCase
      */
     private function logInAs(Admin $admin): void
     {
-        $crawler = $this->client->request('GET', '/admin/login');
-        $token = $crawler->filter('input[name="thelia_admin_login[_token]"]');
+        // Rendered through assertPageRenders: a theme installed by Composer ships
+        // no built assets, and the suite-wide convention is to skip, not to fail.
+        $this->assertPageRenders('/admin/login');
+        $token = $this->client->getCrawler()->filter('input[name="thelia_admin_login[_token]"]');
 
         self::assertGreaterThan(0, $token->count(), 'The login form must carry a CSRF token');
 
