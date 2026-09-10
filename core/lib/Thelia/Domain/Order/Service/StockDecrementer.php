@@ -62,4 +62,20 @@ readonly class StockDecrementer
             throw new TheliaProcessException('Not enough stock');
         }
     }
+
+    /**
+     * Puts a quantity back in stock with the same single UPDATE, so that every stock
+     * mutation of the core goes through this class.
+     */
+    public function increment(int $productSaleElementsId, float $quantity, ConnectionInterface $connection): void
+    {
+        if ($quantity <= 0) {
+            return;
+        }
+
+        $statement = $connection->prepare('UPDATE `product_sale_elements` SET `quantity` = `quantity` + :quantity WHERE `id` = :id');
+        $statement->bindValue(':quantity', $quantity);
+        $statement->bindValue(':id', $productSaleElementsId, \PDO::PARAM_INT);
+        $statement->execute();
+    }
 }

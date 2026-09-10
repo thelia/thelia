@@ -75,7 +75,15 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
         $checkAvailableStock = ConfigQuery::checkAvailableStock();
 
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
+
+        // The order is adjusted as a whole or not at all. Inside a caller's transaction
+        // a nested rollback would poison that caller's commit, so the caller's
+        // transaction is the unit then, and a failure only surfaces to the runner.
+        $ownTransaction = !$connection->inTransaction();
+
+        if ($ownTransaction) {
+            $connection->beginTransaction();
+        }
 
         try {
             foreach ($context->order->getOrderProducts() as $orderProduct) {
@@ -87,10 +95,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
                 }
 
                 if ($increase) {
-                    $statement = $connection->prepare('UPDATE `product_sale_elements` SET `quantity` = `quantity` + :quantity WHERE `id` = :id');
-                    $statement->bindValue(':quantity', $quantity);
-                    $statement->bindValue(':id', $productSaleElementsId, \PDO::PARAM_INT);
-                    $statement->execute();
+                    $this->stockDecrementer->increment($productSaleElementsId, $quantity, $connection);
 
                     continue;
                 }
@@ -104,9 +109,13 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
                 );
             }
 
-            $connection->commit();
+            if ($ownTransaction) {
+                $connection->commit();
+            }
         } catch (\Throwable $throwable) {
-            $connection->rollBack();
+            if ($ownTransaction) {
+                $connection->rollBack();
+            }
 
             throw $throwable;
         }

@@ -16,6 +16,7 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
@@ -25,6 +26,7 @@ use Thelia\Api\Resource\OrderStatus as OrderStatusResource;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -56,16 +58,29 @@ final readonly class OrderProcessor implements ProcessorInterface
         }
 
         // Persist everything but the status, then move the status through the event.
+        // One transaction around both: a refused transition must not leave the other
+        // fields of the request written while the client is told the write failed.
         $data->setOrderStatus((new OrderStatusResource())->setId($order->getStatusId()));
-        $this->persistProcessor->process($data, $operation, $uriVariables, $context);
 
-        $order->reload();
-        $event = (new OrderEvent($order))->setStatus($requestedStatusId);
+        $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
 
         try {
+            $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+
+            $order->reload();
+            $event = (new OrderEvent($order))->setStatus($requestedStatusId);
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+
+            $connection->commit();
         } catch (OrderStatusTransitionRefusedException $exception) {
+            $connection->rollBack();
+
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
         }
 
         return $this->transformer->modelToResource(

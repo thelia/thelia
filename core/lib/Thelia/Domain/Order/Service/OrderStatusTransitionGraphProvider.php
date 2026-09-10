@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Service;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\OrderStatusTransitionQuery;
 
 /**
@@ -49,6 +51,14 @@ final class OrderStatusTransitionGraphProvider
         return $this->graph = new OrderStatusTransitionGraph($targetsByFrom, $equivalentIds);
     }
 
+    /**
+     * Priority -127: runs right before the catalog forgets its statuses (-128), so a
+     * changed equivalence rebuilds both the statuses and the graph that depends on them.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_CREATE, priority: -127)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_UPDATE, priority: -127)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_DELETE, priority: -127)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_UPDATE_POSITION, priority: -127)]
     public function reset(): void
     {
         $this->graph = null;

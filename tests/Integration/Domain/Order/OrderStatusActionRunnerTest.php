@@ -211,6 +211,26 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         self::assertSame($order->getCustomerId(), $mailer->customerMessages[0]['customer']->getId());
     }
 
+    public function testAnUnexpectedExceptionIsRecordedWithoutItsRawMessage(): void
+    {
+        $runner = new OrderStatusActionRunner(
+            new OrderStatusActionRegistry([new ExplodingAction()]),
+            $this->getService(OrderStatusCatalog::class),
+        );
+        $action = $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, ExplodingAction::getType());
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+
+        $event = new OrderEvent($order);
+        $event->setPreviousStatusId($this->orderStatus(OrderStatus::CODE_PROCESSING)->getId());
+        $event->setStatus($this->orderStatus(OrderStatus::CODE_SENT)->getId());
+        $runner->onOrderStatusUpdate($event);
+
+        $failure = OrderStatusActionFailureQuery::create()->filterByActionId($action->getId())->findOne();
+        self::assertNotNull($failure);
+        self::assertStringNotContainsString('smtp://user:secret@mail', $failure->getMessage());
+        self::assertStringContainsString(\RuntimeException::class, $failure->getMessage());
+    }
+
     public function testTheCustomerEmailActionRefusesAMessageCodeThatDoesNotExist(): void
     {
         $action = $this->getService(SendCustomerEmailAction::class);
@@ -316,5 +336,31 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         self::assertNotNull($reloaded);
 
         return $reloaded;
+    }
+}
+
+/**
+ * An action a module could ship, failing the way a transport does: with a secret in the message.
+ */
+final class ExplodingAction implements \Thelia\Domain\Order\StatusAction\OrderStatusActionInterface
+{
+    public static function getType(): string
+    {
+        return 'exploding_test_action';
+    }
+
+    public function describePayload(): array
+    {
+        return [];
+    }
+
+    public function normalizePayload(array $payload): array
+    {
+        return [];
+    }
+
+    public function execute(\Thelia\Domain\Order\StatusAction\OrderStatusActionContext $context): void
+    {
+        throw new \RuntimeException('Connection to smtp://user:secret@mail failed');
     }
 }
