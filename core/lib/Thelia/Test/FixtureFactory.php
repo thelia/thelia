@@ -570,15 +570,25 @@ final class FixtureFactory
         return $cartAddress;
     }
 
+    /**
+     * A coupon row. `triggerMode` says how it applies: with a code the customer
+     * types (the default) or on its own — an automatic promotion carries no
+     * code, so pass `['triggerMode' => Coupon::TRIGGER_MODE_AUTOMATIC, 'code' => null]`.
+     *
+     * `type` and `effects` are free: any registered coupon type with the fields
+     * it reads, so a test can build a BuyXGetY offer as easily as a flat amount.
+     */
     public function coupon(array $overrides = []): Coupon
     {
         $n = $this->next();
 
         $coupon = new Coupon();
-        $coupon->setCode($overrides['code'] ?? 'COUPON-'.$n);
+        $coupon->setCode(\array_key_exists('code', $overrides) ? $overrides['code'] : 'COUPON-'.$n);
+        $coupon->setTriggerMode($overrides['triggerMode'] ?? Coupon::TRIGGER_MODE_CODE);
         $coupon->setType($overrides['type'] ?? 'thelia.coupon.type.remove_x_amount');
         $coupon->setSerializedEffects(json_encode($overrides['effects'] ?? ['amount' => 5.0], \JSON_THROW_ON_ERROR));
         $coupon->setIsEnabled($overrides['isEnabled'] ?? true);
+        $coupon->setStartDate(self::wholeSeconds($overrides['startDate'] ?? null));
         $coupon->setExpirationDate(self::wholeSeconds($overrides['expirationDate'] ?? new \DateTime('+1 month')));
         $coupon->setMaxUsage($overrides['maxUsage'] ?? Coupon::UNLIMITED_COUPON_USE);
         $coupon->setIsCumulative($overrides['isCumulative'] ?? false);
@@ -673,6 +683,9 @@ final class FixtureFactory
     /**
      * Creates a CartItem in the given cart. The product's default
      * ProductSaleElements is used unless another one is passed.
+     *
+     * `isOffered` plus `offeredByCouponId` build the line a promotion offers,
+     * the one the customer may neither change nor remove.
      */
     public function cartItem(
         Cart $cart,
@@ -691,6 +704,8 @@ final class FixtureFactory
         $cartItem->setPrice($overrides['price'] ?? '10.000000');
         $cartItem->setPromoPrice($overrides['promoPrice'] ?? '10.000000');
         $cartItem->setPromo($overrides['promo'] ?? 0);
+        $cartItem->setIsOffered($overrides['isOffered'] ?? 0);
+        $cartItem->setOfferedByCouponId($overrides['offeredByCouponId'] ?? null);
         $cartItem->save($this->connection);
 
         return $cartItem;
