@@ -325,6 +325,104 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         $this->client->submit($form);
     }
 
+    /**
+     * Three customers on purpose: one carrying only the absorbed tag, one only
+     * the surviving one, one carrying both. The customer carrying both must come
+     * out with a single attachment, and the announced count must be three, not
+     * the four the two counts add up to.
+     */
+    public function testMergingMovesTheAttachmentsAndDropsTheAbsorbedTag(): void
+    {
+        $factory = $this->factory();
+        $absorbed = $factory->tag(['label' => 'Absorbed']);
+        $surviving = $factory->tag(['label' => 'Surviving']);
+        $onlyAbsorbed = $factory->customer($factory->customerTitle());
+        $onlySurviving = $factory->customer($factory->customerTitle());
+        $both = $factory->customer($factory->customerTitle());
+        $factory->tagElement($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $onlyAbsorbed->getId());
+        $factory->tagElement($surviving, TagElement::ELEMENT_KEY_CUSTOMER, $onlySurviving->getId());
+        $factory->tagElement($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $factory->tagElement($surviving, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $absorbedId = (int) $absorbed->getId();
+        $survivingId = (int) $surviving->getId();
+        $this->loginAs($factory->admin());
+
+        $this->confirmMerge($absorbedId, $survivingId);
+
+        self::assertNull(TagQuery::create()->findPk($absorbedId), 'The absorbed tag is gone.');
+        self::assertSame(3, TagElementQuery::create()->filterByTagId($survivingId)->count(), 'Three customers, and the one carrying both is not duplicated.');
+    }
+
+    public function testTheConfirmationAnnouncesTheResultingCountAndNotTheSum(): void
+    {
+        $factory = $this->factory();
+        $absorbed = $factory->tag(['label' => 'Absorbed']);
+        $surviving = $factory->tag(['label' => 'Surviving']);
+        $both = $factory->customer($factory->customerTitle());
+        $onlyAbsorbed = $factory->customer($factory->customerTitle());
+        $factory->tagElement($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $factory->tagElement($surviving, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $factory->tagElement($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $onlyAbsorbed->getId());
+        $this->loginAs($factory->admin());
+
+        $this->assertPageRenders(self::URL.'/merge?tag_id='.$absorbed->getId().'&into='.$surviving->getId());
+        $html = (string) $this->client->getResponse()->getContent();
+
+        self::assertStringContainsString('afterwards: 2', $html, 'Two customers, not the three the counts add up to.');
+    }
+
+    public function testMergingWithoutTheTokenIsRefused(): void
+    {
+        $factory = $this->factory();
+        $absorbed = $factory->tag(['label' => 'Absorbed']);
+        $surviving = $factory->tag(['label' => 'Surviving']);
+        $absorbedId = (int) $absorbed->getId();
+        $this->loginAs($factory->admin());
+
+        $this->client->request('POST', self::URL.'/merge', ['tag_id' => $absorbedId, 'into' => $surviving->getId()]);
+
+        self::assertNotNull(TagQuery::create()->findPk($absorbedId), 'An unconfirmed merge must not touch anything.');
+    }
+
+    public function testTheScreenNeverOffersATagAsItsOwnMergeTarget(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Alone with others']);
+        $other = $factory->tag(['label' => 'Another one']);
+        $this->loginAs($factory->admin());
+
+        $this->assertPageRenders(self::URL.'/update?tag_id='.$tag->getId());
+
+        $options = $this->client->getCrawler()->filter('select[name="into"] option')->extract(['value']);
+        self::assertNotContains((string) $tag->getId(), $options, 'A tag cannot absorb itself, so it must not be offered.');
+        self::assertContains((string) $other->getId(), $options, 'Every other tag is a legitimate target.');
+    }
+
+    public function testMergingATagIntoItselfLeadsNowhere(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Itself']);
+        $tagId = (int) $tag->getId();
+        $this->loginAs($factory->admin());
+
+        $this->client->request('GET', self::URL.'/merge?tag_id='.$tagId.'&into='.$tagId);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+        self::assertNotNull(TagQuery::create()->findPk($tagId));
+    }
+
+    /**
+     * Walks the confirmation page and submits its form, so the token travels the
+     * way it does for an administrator who clicked through.
+     */
+    private function confirmMerge(int $absorbedId, int $survivingId): void
+    {
+        $this->assertPageRenders(self::URL.'/merge?tag_id='.$absorbedId.'&into='.$survivingId);
+
+        $form = $this->client->getCrawler()->filter('form[data-testid="tag-merge-form"]')->form();
+        $this->client->submit($form);
+    }
+
     private function factory(): FixtureFactory
     {
         // Deliberately not createFixtureFactory(): that helper pushes a synthetic

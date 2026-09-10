@@ -228,6 +228,67 @@ final class TagServiceTest extends IntegrationTestCase
         self::assertSame(1, $this->countAttachments($carryingBoth));
     }
 
+    /**
+     * The number the confirmation screen must show. A customer carrying both is
+     * one customer, so the answer is smaller than the sum of the two counts.
+     */
+    public function testCountCustomersCarryingEitherDoesNotDoubleCountTheOverlap(): void
+    {
+        $onlyFirst = $this->createCustomer();
+        $onlySecond = $this->createCustomer();
+        $both = $this->createCustomer();
+
+        $first = $this->tagService->findOrCreate('First');
+        $second = $this->tagService->findOrCreate('Second');
+
+        $this->tagService->attach($first, TagElement::ELEMENT_KEY_CUSTOMER, $onlyFirst->getId());
+        $this->tagService->attach($second, TagElement::ELEMENT_KEY_CUSTOMER, $onlySecond->getId());
+        $this->tagService->attach($first, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $this->tagService->attach($second, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+
+        $counts = $this->tagService->countCustomersByTag();
+        self::assertSame(2, $counts[$first->getId()]);
+        self::assertSame(2, $counts[$second->getId()]);
+
+        self::assertSame(3, $this->tagService->countCustomersCarryingEither($first, $second), 'Three customers, not four.');
+    }
+
+    public function testTheAnnouncedCountIsWhatTheMergeActuallyProduces(): void
+    {
+        $onlyFirst = $this->createCustomer();
+        $both = $this->createCustomer();
+
+        $absorbed = $this->tagService->findOrCreate('Absorbed');
+        $surviving = $this->tagService->findOrCreate('Surviving');
+
+        $this->tagService->attach($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $onlyFirst->getId());
+        $this->tagService->attach($absorbed, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+        $this->tagService->attach($surviving, TagElement::ELEMENT_KEY_CUSTOMER, $both->getId());
+
+        $announced = $this->tagService->countCustomersCarryingEither($absorbed, $surviving);
+
+        $this->tagService->merge($absorbed, $surviving);
+
+        self::assertSame(
+            $announced,
+            $this->tagService->countCustomersByTag()[$surviving->getId()],
+            'What the confirmation announces must be what the merge leaves behind.',
+        );
+    }
+
+    public function testCountCustomersCarryingEitherIgnoresOrphanedAttachments(): void
+    {
+        $customer = $this->createCustomer();
+        $first = $this->tagService->findOrCreate('First');
+        $second = $this->tagService->findOrCreate('Second');
+        $this->tagService->attach($first, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+        $this->tagService->attach($second, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+
+        $this->deleteCustomerInBulk($customer);
+
+        self::assertSame(0, $this->tagService->countCustomersCarryingEither($first, $second));
+    }
+
     public function testMergingATagIntoItselfIsRefused(): void
     {
         $tag = $this->tagService->findOrCreate('VIP');
