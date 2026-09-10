@@ -53,10 +53,14 @@ jobs:
         run: composer update --no-progress --prefer-dist --optimize-autoloader
 
       - name: Check that the analysed theme is the branch tip
+        # A development version, not `dev-main`: a package that declares a
+        # branch-alias reports its alias instead.
         run: |
-          version=$(composer show thelia/backoffice-default-twig-template --format=json | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')
-          echo "thelia/backoffice-default-twig-template -> $version"
-          case "$version" in dev-main*) ;; *) echo "::error::the theme resolved to $version, expected dev-main"; exit 1 ;; esac
+          info=$(composer show thelia/backoffice-default-twig-template --format=json)
+          version=$(php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];' <<< "$info")
+          reference=$(php -r '$p = json_decode(stream_get_contents(STDIN), true); echo $p["source"]["reference"] ?? $p["dist"]["reference"] ?? "unknown";' <<< "$info")
+          echo "thelia/backoffice-default-twig-template -> $version ($reference)"
+          case "$version" in dev-*|*-dev) ;; *) echo "::error::the theme resolved to $version, expected a development version"; exit 1 ;; esac
 
       - name: Prepare test env (builds the Propel models via App\Kernel)
         run: |
