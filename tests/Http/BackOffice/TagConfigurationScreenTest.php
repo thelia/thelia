@@ -423,6 +423,163 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         $this->client->submit($form);
     }
 
+    public function testATagIsCreatedFromTheConfigurationScreen(): void
+    {
+        $factory = $this->factory();
+        $this->loginAs($factory->admin());
+
+        $this->submitCreateForm(['label' => 'Created here', 'colorCode' => '#0055AA']);
+
+        $created = TagQuery::create()->findOneByLabel('Created here');
+        self::assertNotNull($created, 'The tag reaches the vocabulary.');
+        self::assertSame('#0055AA', $created->getColorCode());
+    }
+
+    /**
+     * A native colour input has no empty state and posts black by default, so
+     * the checkbox is what keeps "no colour" expressible at creation too.
+     */
+    public function testATagIsCreatedWithoutAColourWhenTheBoxIsTicked(): void
+    {
+        $factory = $this->factory();
+        $this->loginAs($factory->admin());
+
+        // Black is posted on purpose: a real browser sends #000000 for a colour
+        // input left alone, while BrowserKit would send the empty rendered value.
+        $this->submitCreateForm(['label' => 'Created colourless', 'colorCode' => '#000000', 'noColor' => '1']);
+
+        // Asserted to exist first: a null-safe read on a tag that was never
+        // created answers null too, and the assertion below would pass on a
+        // screen that creates nothing at all.
+        $created = TagQuery::create()->findOneByLabel('Created colourless');
+        self::assertNotNull($created);
+        self::assertNull($created->getColorCode(), 'Creating must not invent a black colour.');
+    }
+
+    /**
+     * Found by opening the screen, not by a test: a tag created without touching
+     * the colour picker came out black. The box is ticked by default at creation
+     * for the same reason the edit screen ticks it for a colourless tag.
+     */
+    public function testATagCreatedWithoutTouchingTheColourHasNone(): void
+    {
+        $factory = $this->factory();
+        $this->loginAs($factory->admin());
+
+        // Only the label is filled: the picker is left exactly as rendered, and
+        // black is posted the way a real browser posts it for an untouched
+        // colour input.
+        $this->submitCreateForm(['label' => 'Created untouched', 'colorCode' => '#000000']);
+
+        $created = TagQuery::create()->findOneByLabel('Created untouched');
+        self::assertNotNull($created);
+        self::assertNull($created->getColorCode(), 'An untouched colour picker must not invent black.');
+    }
+
+    public function testCreatingALabelAnotherTagAlreadyCarriesIsRefused(): void
+    {
+        $factory = $this->factory();
+        $existing = $factory->tag(['label' => 'Salon']);
+        $this->loginAs($factory->admin());
+
+        $this->submitCreateForm(['label' => 'Salón']);
+
+        self::assertSame(
+            1,
+            TagQuery::create()->filterByLabel('Salon')->count(),
+            'The collision leaves the vocabulary as it was.',
+        );
+        self::assertSame('Salon', TagQuery::create()->findPk($existing->getId())?->getLabel());
+    }
+
+    public function testAnAdminWithoutTheTagResourceCannotCreate(): void
+    {
+        $factory = $this->factory();
+        // CREATE is granted on customers on purpose: without it the refusal would
+        // prove nothing about the tag resource, since a profile holding no create
+        // right anywhere is refused whichever resource the screen checks.
+        $this->loginAs($factory->restrictedAdmin([
+            AdminResources::CUSTOMER => [AccessManager::VIEW, AccessManager::CREATE],
+        ]));
+
+        $this->client->request('POST', self::URL.'/create', ['thelia_tag_create' => ['label' => 'Sneaked in']]);
+
+        self::assertSame(403, $this->client->getResponse()->getStatusCode());
+        self::assertNull(TagQuery::create()->findOneByLabel('Sneaked in'));
+    }
+
+    public function testTheListLinksToTheCustomersCarryingATag(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Linked']);
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->tagElement($tag, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+
+        $this->loginAs($factory->admin());
+        $this->assertPageRenders(self::URL);
+
+        $link = $this->client->getCrawler()->filter('[data-testid="tag-customers-link"]')->first();
+        self::assertGreaterThan(0, $link->count(), 'The count is a link to the filtered customer list.');
+        self::assertStringContainsString('tag_ids', urldecode((string) $link->attr('href')));
+        self::assertStringContainsString((string) $tag->getId(), urldecode((string) $link->attr('href')));
+    }
+
+    /**
+     * A link that answers 403 is worse than no link: a profile that may manage
+     * the tag vocabulary is not necessarily allowed to open the customer list.
+     */
+    public function testTheCustomerLinkIsWithheldFromAnAdminWhoCannotSeeCustomers(): void
+    {
+        $factory = $this->factory();
+        $factory->tag(['label' => 'Withheld']);
+        $this->loginAs($factory->restrictedAdmin([
+            AdminResources::TAG => [AccessManager::VIEW, AccessManager::UPDATE],
+        ]));
+
+        $this->assertPageRenders(self::URL);
+
+        self::assertSame(
+            0,
+            $this->client->getCrawler()->filter('[data-testid="tag-customers-link"]')->count(),
+        );
+    }
+
+    public function testTheEditScreenLinksToTheCustomersCarryingTheTag(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Edit linked']);
+        $this->loginAs($factory->admin());
+
+        $this->assertPageRenders(self::URL.'/update?tag_id='.$tag->getId());
+
+        $link = $this->client->getCrawler()->filter('[data-testid="tag-edit-customers-link"]')->first();
+        self::assertGreaterThan(0, $link->count());
+        self::assertStringContainsString('tag_ids', urldecode((string) $link->attr('href')));
+    }
+
+    /**
+     * @param array<string, string> $values
+     */
+    private function submitCreateForm(array $values): void
+    {
+        $this->assertPageRenders(self::URL);
+
+        $form = $this->client->getCrawler()->filter('form[action$="/tags/create"]')->form();
+
+        foreach ($values as $field => $value) {
+            $form['thelia_tag_create['.$field.']'] = $value;
+        }
+
+        // Unticked only when the case under test means to pick a colour: the
+        // creation form arrives with the box ticked, and a test that always
+        // unticked it could never exercise the default.
+        if (isset($values['colorCode']) && !isset($values['noColor']) && $values['colorCode'] !== '#000000') {
+            $form['thelia_tag_create[noColor]'] = false;
+        }
+
+        $this->client->submit($form);
+    }
+
     private function factory(): FixtureFactory
     {
         // Deliberately not createFixtureFactory(): that helper pushes a synthetic
