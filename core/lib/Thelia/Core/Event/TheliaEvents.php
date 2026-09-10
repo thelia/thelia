@@ -471,6 +471,14 @@ final class TheliaEvents
     public const CONSENT_UPDATE_POSITION = 'action.updateConsentPosition';
     public const CONSENT_TOGGLE_ACTIVE = 'action.toggleConsentActive';
 
+    // -- Types of relation between products management ----------------------
+
+    public const PRODUCT_ASSOCIATION_TYPE_CREATE = 'action.createProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_UPDATE = 'action.updateProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_DELETE = 'action.deleteProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_UPDATE_POSITION = 'action.updateProductAssociationTypePosition';
+    public const PRODUCT_ASSOCIATION_TYPE_TOGGLE_VISIBLE = 'action.toggleProductAssociationTypeVisible';
+
     // -- Features management ---------------------------------------------
 
     public const FEATURE_CREATE = 'action.createFeature';
