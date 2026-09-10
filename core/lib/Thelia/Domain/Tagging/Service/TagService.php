@@ -242,6 +242,34 @@ final readonly class TagService
     }
 
     /**
+     * How many live customers would carry the surviving tag after a merge.
+     *
+     * Not the sum of the two counts: a customer carrying both is one customer,
+     * and the merge leaves it with one attachment. The screen that asks for the
+     * confirmation has to show this number and not the sum, or it announces a
+     * result that will not happen.
+     */
+    public function countCustomersCarryingEither(Tag $first, Tag $second, ?ConnectionInterface $connection = null): int
+    {
+        $connection ??= Propel::getConnection(TagTableMap::DATABASE_NAME);
+
+        $statement = $connection->prepare(
+            'SELECT COUNT(DISTINCT c.id)
+               FROM tag_element te
+               INNER JOIN customer c ON c.id = te.element_id
+              WHERE te.element_key = :element_key
+                AND te.tag_id IN (:first_tag, :second_tag)'
+        );
+        $statement->execute([
+            ':element_key' => TagElement::ELEMENT_KEY_CUSTOMER,
+            ':first_tag' => $first->getId(),
+            ':second_tag' => $second->getId(),
+        ]);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
      * Number of live customers carrying each tag, in one grouped query.
      *
      * Joined to `customer` on purpose: a bulk delete that bypassed
