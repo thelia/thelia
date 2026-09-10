@@ -20,6 +20,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Admin;
 use Thelia\Model\Tag;
 use Thelia\Model\TagElement;
+use Thelia\Model\TagElementQuery;
 use Thelia\Model\TagQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
@@ -117,8 +118,8 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
 
         $this->client->request('GET', self::URL);
 
-        self::assertNotSame(
-            200,
+        self::assertSame(
+            403,
             $this->client->getResponse()->getStatusCode(),
             'Being allowed on customers must not open the tag vocabulary.',
         );
@@ -179,7 +180,7 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
 
         $this->client->request('GET', self::URL.'/update?tag_id='.$tag->getId());
 
-        self::assertNotSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertSame(403, $this->client->getResponse()->getStatusCode());
     }
 
     /**
@@ -252,6 +253,74 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         if (isset($values['colorCode']) && !isset($values['noColor'])) {
             $form['thelia_tag_update[noColor]'] = false;
         }
+
+        $this->client->submit($form);
+    }
+
+    public function testDeletingATagTakesItOffEveryCustomer(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Delete me']);
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->tagElement($tag, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+        $tagId = (int) $tag->getId();
+        $this->loginAs($factory->admin());
+
+        $this->submitDeleteDialog($tagId);
+
+        self::assertNull(TagQuery::create()->findPk($tagId));
+        self::assertSame(0, TagElementQuery::create()->filterByTagId($tagId)->count(), 'The cascade takes the attachments with it.');
+    }
+
+    /**
+     * Deleting a tag strips it from every customer at once, so an unguarded GET
+     * would be a one-click forgery. The token is the guard.
+     */
+    public function testDeletingWithoutTheTokenIsRefused(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Survive']);
+        $tagId = (int) $tag->getId();
+        $this->loginAs($factory->admin());
+
+        $this->client->request('GET', self::URL.'/delete?tag_id='.$tagId);
+
+        self::assertNotNull(TagQuery::create()->findPk($tagId), 'A request with no token must not delete anything.');
+    }
+
+    public function testAnAdminWithoutTheTagResourceCannotDelete(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag();
+        $tagId = (int) $tag->getId();
+        // DELETE is granted on customers on purpose: without it the refusal would
+        // prove nothing about the tag resource, since a profile holding no delete
+        // right anywhere is refused whichever resource the screen checks.
+        $this->loginAs($factory->restrictedAdmin([
+            AdminResources::CUSTOMER => [AccessManager::VIEW, AccessManager::UPDATE, AccessManager::DELETE],
+        ]));
+
+        $this->client->request('GET', self::URL.'/delete?tag_id='.$tagId);
+
+        // 403 and not merely "the tag survived": a missing token also spares the
+        // tag, but answers a redirect. Asserting the status is what tells the two
+        // guards apart, and so what proves this screen checks the tag resource
+        // rather than the customer one.
+        self::assertSame(403, $this->client->getResponse()->getStatusCode());
+        self::assertNotNull(TagQuery::create()->findPk($tagId));
+    }
+
+    /**
+     * Submits the confirmation dialog of the list rather than crafting the
+     * request: the token the dialog carries in its action URL travels with it,
+     * the way it does for an administrator clicking Delete.
+     */
+    private function submitDeleteDialog(int $tagId): void
+    {
+        $this->assertPageRenders(self::URL);
+
+        $form = $this->client->getCrawler()->filter('form[action*="/tags/delete"]')->form();
+        $form['tag_id'] = (string) $tagId;
 
         $this->client->submit($form);
     }
