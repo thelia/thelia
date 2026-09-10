@@ -215,7 +215,7 @@ final class FixtureFactory
         // Timestampable only fills created_at when it is untouched, so setting it
         // here survives the insert.
         if (isset($overrides['createdAt'])) {
-            $product->setCreatedAt($overrides['createdAt']);
+            $product->setCreatedAt(self::wholeSeconds($overrides['createdAt']));
         }
 
         // A product has no product_i18n row unless a title is asked for, which is
@@ -240,7 +240,7 @@ final class FixtureFactory
         // Product::create() saves the product several times, so updated_at can only
         // be forced once the creation is over.
         if (isset($overrides['updatedAt'])) {
-            $product->setUpdatedAt($overrides['updatedAt'])->save($this->connection);
+            $product->setUpdatedAt(self::wholeSeconds($overrides['updatedAt']))->save($this->connection);
         }
 
         return $product;
@@ -579,7 +579,7 @@ final class FixtureFactory
         $coupon->setType($overrides['type'] ?? 'thelia.coupon.type.remove_x_amount');
         $coupon->setSerializedEffects(json_encode($overrides['effects'] ?? ['amount' => 5.0], \JSON_THROW_ON_ERROR));
         $coupon->setIsEnabled($overrides['isEnabled'] ?? true);
-        $coupon->setExpirationDate($overrides['expirationDate'] ?? new \DateTime('+1 month'));
+        $coupon->setExpirationDate(self::wholeSeconds($overrides['expirationDate'] ?? new \DateTime('+1 month')));
         $coupon->setMaxUsage($overrides['maxUsage'] ?? Coupon::UNLIMITED_COUPON_USE);
         $coupon->setIsCumulative($overrides['isCumulative'] ?? false);
         $coupon->setIsRemovingPostage($overrides['isRemovingPostage'] ?? false);
@@ -704,14 +704,35 @@ final class FixtureFactory
      * The operation discounts nothing on its own — link the products with
      * saleProduct() and give it an offset per currency with saleOffsetCurrency().
      */
+    /**
+     * A DATETIME column holds whole seconds, and the engines disagree on how a
+     * fractional one gets there: MySQL rounds it up, MariaDB truncates it. A date
+     * built from `new \DateTime('+2 hours')` carries microseconds, so it reads back
+     * one second later on one engine and unchanged on the other, and a test
+     * asserting on it fails on whichever engine it was not written against. Cut
+     * every date this factory stores to the second.
+     */
+    private static function wholeSeconds(?\DateTimeInterface $date): ?\DateTimeInterface
+    {
+        if (null === $date) {
+            return null;
+        }
+
+        return \DateTimeImmutable::createFromInterface($date)->setTime(
+            (int) $date->format('H'),
+            (int) $date->format('i'),
+            (int) $date->format('s'),
+        );
+    }
+
     public function sale(array $overrides = []): Sale
     {
         $n = $this->next();
 
         $sale = new Sale();
         $sale->setActive($overrides['active'] ?? false);
-        $sale->setStartDate($overrides['startDate'] ?? null);
-        $sale->setEndDate($overrides['endDate'] ?? null);
+        $sale->setStartDate(self::wholeSeconds($overrides['startDate'] ?? null));
+        $sale->setEndDate(self::wholeSeconds($overrides['endDate'] ?? null));
         $sale->setPriceOffsetType($overrides['priceOffsetType'] ?? Sale::OFFSET_TYPE_PERCENTAGE);
         $sale->setDisplayInitialPrice($overrides['displayInitialPrice'] ?? true);
         $sale->setAudienceMode($overrides['audienceMode'] ?? Sale::AUDIENCE_MODE_PUBLIC);
