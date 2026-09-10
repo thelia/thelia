@@ -112,6 +112,10 @@ class BaseFacade implements FacadeInterface
     /**
      * Return Products total price.
      *
+     * The lines a promotion offered are left out: what these totals feed are the
+     * coupon conditions and effects, and a gift must never sustain the very
+     * condition that grants it.
+     *
      * @param bool $withItemsInPromo if true, the discounted items are included in the total
      */
     public function getCartTotalPrice(bool $withItemsInPromo = true): float
@@ -121,6 +125,10 @@ class BaseFacade implements FacadeInterface
         $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
 
         foreach ($cartItems as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
             if ($withItemsInPromo || !$cartItem->getPromo()) {
                 $total += $cartItem->getTotalRealPrice();
             }
@@ -130,6 +138,8 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
+     * The offered lines are left out, for the same reason as getCartTotalPrice().
+     *
      * @throws PropelException
      */
     public function getCartTotalTaxPrice(bool $withItemsInPromo = true): float
@@ -140,6 +150,10 @@ class BaseFacade implements FacadeInterface
         $total = 0;
 
         foreach ($cartItems as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
             if ($withItemsInPromo || !$cartItem->getPromo()) {
                 $total += $cartItem->getTotalRealTaxedPrice($taxCountry);
             }
@@ -166,10 +180,22 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the number of Products in the Cart.
+     *
+     * The offered lines are left out, for the same reason as getCartTotalPrice():
+     * a gift line counting as an article would sustain the very condition
+     * (MatchForXArticles) that grants it.
      */
     public function getNbArticlesInCart(): int
     {
-        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? []);
+        $count = 0;
+
+        foreach ($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [] as $cartItem) {
+            if (1 !== (int) $cartItem->getIsOffered()) {
+                ++$count;
+            }
+        }
+
+        return $count;
     }
 
     public function getNbArticlesInCartIncludeQuantity(): int
@@ -178,6 +204,10 @@ class BaseFacade implements FacadeInterface
         $quantity = 0;
 
         foreach ($cartItems as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
             $quantity += $cartItem->getQuantity();
         }
 

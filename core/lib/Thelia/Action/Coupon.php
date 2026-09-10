@@ -31,6 +31,10 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
+use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
+use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Log\Tlog;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
@@ -58,6 +62,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected MatchForEveryone $noConditionRule,
         protected ConditionFactory $conditionFactory,
         protected EventDispatcherInterface $dispatcher,
+        protected OfferedCartLineService $offeredCartLineService,
     ) {
     }
 
@@ -159,13 +164,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             return;
         }
 
+        // The cart just changed: the coupons memoised for this request are stale.
+        $this->couponManager->invalidateCurrentCoupons();
+
+        $cart = $session->getSessionCart($dispatcher);
+
+        if (null !== $cart) {
+            // Put the offered lines in line with what the kept promotions ask for,
+            // BEFORE pricing the discount on what the cart now holds.
+            $this->offeredCartLineService->reconcile($this->couponManager->getCouponsKept(), $cart);
+        }
+
         $discount = $this->couponManager->getDiscount();
 
-        $this->getSession()?->getSessionCart($dispatcher)
+        $session->getSessionCart($dispatcher)
             ->setDiscount((string) $discount)
             ->save();
 
-        $this->getSession()?->getOrder()
+        $session->getOrder()
             ->setDiscount((string) $discount);
     }
 
@@ -189,8 +205,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $couponRuleCollection,
         );
 
+        // An automatic promotion applies on its own: it carries no code.
+        $isAutomatic = CouponModel::TRIGGER_MODE_AUTOMATIC === $event->getTriggerMode();
+
         $coupon->createOrUpdate(
-            $event->getCode(),
+            $isAutomatic ? null : $event->getCode(),
             $event->getTitle(),
             $event->getEffects(),
             $event->getServiceId(),
@@ -208,6 +227,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getFreeShippingForMethods(),
             $event->getPerCustomerUsageCount(),
             $event->getStartDate(),
+            $event->getTriggerMode(),
         );
 
         $event->setCouponModel($coupon);
@@ -278,18 +298,27 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            foreach ($consumedCoupons as $couponCode) {
-                $couponQuery = CouponQuery::create();
-                $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
+            foreach ($consumedCoupons as $consumedCoupon) {
+                $couponModel = $this->resolveCouponModel($consumedCoupon);
+
+                if (null === $couponModel) {
+                    Tlog::getInstance()->warning(
+                        \sprintf('Coupon "%s" could not be resolved when recording the order coupons', $consumedCoupon->getCode()),
+                    );
+
+                    continue;
+                }
+
                 $couponModel->setLocale($this->getSession()?->getLang()?->getLocale());
 
                 /* memorize coupon. Its usage is not counted yet: this is done when the order is paid. */
                 $orderCoupon = new OrderCoupon();
                 $orderCoupon->setOrder($event->getOrder())
                     ->setUsageCanceled(1)
+                    ->setCouponId($couponModel->getId())
                     ->setCode($couponModel->getCode())
                     ->setType($couponModel->getType())
-                    ->setAmount((string) $couponCode->exec())
+                    ->setAmount((string) round($consumedCoupon->exec(), 2))
                     ->setTitle($couponModel->getTitle())
                     ->setShortDescription($couponModel->getShortDescription())
                     ->setDescription($couponModel->getDescription())
@@ -299,6 +328,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
                     ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
                     ->setSerializedConditions($couponModel->getSerializedConditions())
+                    ->setSerializedEffects($couponModel->getSerializedEffects())
                     ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount());
                 $orderCoupon->save();
 
@@ -363,7 +393,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             /** @var OrderCoupon $usedCoupon */
             foreach ($usedCoupons as $usedCoupon) {
-                if (null !== $couponModel = CouponQuery::create()->findOneByCode($usedCoupon->getCode())) {
+                if (null !== $couponModel = $this->resolveOrderCouponModel($usedCoupon)) {
                     // If the coupon still exists, restore one usage to the usage count.
                     $this->couponManager->incrementQuantity($couponModel, $customerId);
                 }
@@ -381,7 +411,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             /** @var OrderCoupon $usedCoupon */
             foreach ($usedCoupons as $usedCoupon) {
-                if (null !== $couponModel = CouponQuery::create()->findOneByCode($usedCoupon->getCode())) {
+                if (null !== $couponModel = $this->resolveOrderCouponModel($usedCoupon)) {
                     // If the coupon still exists, mark the coupon as used
                     $this->couponManager->decrementQuantity($couponModel, $customerId);
                 }
@@ -390,6 +420,44 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $usedCoupon->setUsageCanceled(0)->save();
             }
         }
+    }
+
+    /**
+     * The coupon row a coupon built for the checkout came from: by id when the
+     * instance carries one, by code otherwise. An automatic promotion has no code,
+     * so the id is the only reliable link.
+     */
+    protected function resolveCouponModel(CouponInterface $coupon): ?CouponModel
+    {
+        if ($coupon instanceof CouponAbstract && null !== $coupon->getCouponModelId()) {
+            return CouponQuery::create()->findPk($coupon->getCouponModelId());
+        }
+
+        if ('' !== $coupon->getCode()) {
+            return CouponQuery::create()->findOneByCode($coupon->getCode());
+        }
+
+        return null;
+    }
+
+    /**
+     * The coupon row an order coupon was recorded from: by id first, falling back
+     * to the code for order coupons recorded before coupon_id existed.
+     */
+    protected function resolveOrderCouponModel(OrderCoupon $orderCoupon): ?CouponModel
+    {
+        if (null !== $orderCoupon->getCouponId()
+            && null !== $couponModel = CouponQuery::create()->findPk($orderCoupon->getCouponId())) {
+            return $couponModel;
+        }
+
+        $code = $orderCoupon->getCode();
+
+        if (null !== $code && '' !== $code) {
+            return CouponQuery::create()->findOneByCode($code);
+        }
+
+        return null;
     }
 
     public static function getSubscribedEvents(): array
@@ -410,6 +478,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CUSTOMER_LOGIN => ['updateOrderDiscount', 10],
             AddressEvent::POST_UPDATE => ['updateOrderDiscount', 10],
+            // The promotions conditioned on the shipping choice (MatchDeliveryModules,
+            // delivery country) must follow the checkout selections. Priority 10 runs
+            // after Action\Cart (128) has written the selection on the cart.
+            TheliaEvents::CART_SET_DELIVERY_MODULE => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL => ['updateOrderDiscount', 10],
         ];
     }
 
