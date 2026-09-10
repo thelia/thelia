@@ -172,6 +172,37 @@ final readonly class TagService
     }
 
     /**
+     * The tags carried by each of several objects, in one query.
+     *
+     * A list screen asking findTagsFor() per row is one query per row; this asks
+     * once and returns rows keyed by element id, with the ids carrying nothing
+     * absent rather than mapped to an empty list.
+     *
+     * @param list<int> $elementIds
+     *
+     * @return array<int, list<Tag>> element id => tags, in label order
+     */
+    public function findTagsForMany(string $elementKey, array $elementIds, ?ConnectionInterface $connection = null): array
+    {
+        $links = TagElementQuery::create()
+            ->filterByElementKey($elementKey)
+            ->filterByElementId($elementIds, Criteria::IN)
+            ->useTagQuery()
+                ->orderByLabel(Criteria::ASC)
+            ->endUse()
+            ->joinWithTag()
+            ->find($connection);
+
+        $tagsByElement = [];
+
+        foreach ($links as $link) {
+            $tagsByElement[(int) $link->getElementId()][] = $link->getTag();
+        }
+
+        return $tagsByElement;
+    }
+
+    /**
      * Makes the tags of an object exactly the given labels, creating those that
      * do not exist yet and detaching those no longer listed.
      *

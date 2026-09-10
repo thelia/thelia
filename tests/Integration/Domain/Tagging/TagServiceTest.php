@@ -213,6 +213,48 @@ final class TagServiceTest extends IntegrationTestCase
         self::assertCount(1, $this->tagService->findTagsFor('order', $customer->getId()));
     }
 
+    public function testFindTagsForManyGroupsTheTagsByElement(): void
+    {
+        $first = $this->createCustomer();
+        $second = $this->createCustomer();
+        $untagged = $this->createCustomer();
+
+        $this->tagService->setLabelsFor(TagElement::ELEMENT_KEY_CUSTOMER, $first->getId(), ['VIP', 'Grossiste']);
+        $this->tagService->setLabelsFor(TagElement::ELEMENT_KEY_CUSTOMER, $second->getId(), ['Prospect']);
+
+        $byCustomer = $this->tagService->findTagsForMany(
+            TagElement::ELEMENT_KEY_CUSTOMER,
+            [(int) $first->getId(), (int) $second->getId(), (int) $untagged->getId()],
+        );
+
+        self::assertSame(
+            ['Grossiste', 'VIP'],
+            array_map(static fn (Tag $tag): string => $tag->getLabel(), $byCustomer[(int) $first->getId()]),
+        );
+        self::assertSame(
+            ['Prospect'],
+            array_map(static fn (Tag $tag): string => $tag->getLabel(), $byCustomer[(int) $second->getId()]),
+        );
+        self::assertArrayNotHasKey((int) $untagged->getId(), $byCustomer, 'An element carrying nothing is absent, not empty.');
+    }
+
+    public function testFindTagsForManyIgnoresAnotherElementKey(): void
+    {
+        $customer = $this->createCustomer();
+        $orderTag = $this->tagService->findOrCreate('Litige');
+        $this->tagService->attach($orderTag, 'order', $customer->getId());
+
+        self::assertSame(
+            [],
+            $this->tagService->findTagsForMany(TagElement::ELEMENT_KEY_CUSTOMER, [(int) $customer->getId()]),
+        );
+    }
+
+    public function testFindTagsForManyReturnsNothingForAnEmptyList(): void
+    {
+        self::assertSame([], $this->tagService->findTagsForMany(TagElement::ELEMENT_KEY_CUSTOMER, []));
+    }
+
     public function testSetLabelsForReplacesTheWholeSet(): void
     {
         $customer = $this->createCustomer();
