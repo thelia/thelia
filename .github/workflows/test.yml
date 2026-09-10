@@ -2,9 +2,9 @@ name: test
 
 on:
   push:
-    branches: [ twig, main ]
+    branches: [ main ]
   pull_request:
-    branches: [ twig, main ]
+    branches: [ main ]
 
 jobs:
   ci:
@@ -20,6 +20,10 @@ jobs:
     timeout-minutes: 30
     env:
       PHP_CS_FIXER_IGNORE_ENV: 1
+      # Without a token, Flex silently skips the thelia/thelia-recipes endpoint
+      # and the GitHub archives the theme branches are downloaded from are rate
+      # limited per runner IP.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,53 +40,64 @@ jobs:
           ini-values: post_max_size=20M
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
-      - name: Install Composer dependencies
-        run: |
-          composer install --no-progress --prefer-dist --optimize-autoloader
-          composer update --no-interaction --prefer-dist
-
-      - name: Restore the project schema the config package overwrote
-        # The thelia/config package installs into local/ and replaces the
-        # version-controlled local/config/schema.xml with its own copy. Until the
-        # package ships the guest checkout columns (release follow-up), the file
-        # committed in this repository is the source of truth for the CI build.
-        #
-        # The grep is the point of the step: a restore that silently did nothing would
-        # build models without the guest columns, and every guest test would fail far
-        # from here with an unrelated message.
-        run: |
-          git checkout -- local/config/schema.xml
-          grep -q is_guest local/config/schema.xml \
-            || { echo "::error::local/config/schema.xml has no is_guest column after the restore"; exit 1; }
-          grep -q audience_mode local/config/schema.xml \
-            || { echo "::error::local/config/schema.xml has no audience_mode column after the restore"; exit 1; }
-
       - name: Prepare the test database credentials
-        # bin/test-prepare (run by `composer test`) reads these to create the test
-        # database, build the Propel models and generate the JWT keys.
+        # bin/test-prepare (run below and by `composer test`) reads these to create
+        # the test database, build the Propel models and generate the JWT keys.
         run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
 
-      - name: Install the front theme importmap vendors
-        # The Flexy theme renders its JavaScript through AssetMapper and its Composer
-        # package ships no assets/vendor/: without them the front pages cannot render
-        # and their smoke tests skip instead of asserting a 200. The vendor directory
-        # follows the active front template, which the kernel reads from the database,
-        # so the test database has to exist first — `composer ci` builds it again,
-        # idempotently. A failed download only brings the skips back, never a red job.
-        continue-on-error: true
+      - name: Resolve the themes from their development branch
+        # This repository is the development monorepo, not what a shop installs
+        # (that is thelia/thelia-project). It has one contract to prove: the tip of
+        # the core works with the tip of the themes. Resolving the *released* themes
+        # instead proved a combination nobody ever runs — a core ahead of its release
+        # against themes behind theirs — and every feature that spans both had to be
+        # switched off with a skip guard to keep the suite green.
+        #
+        # phpstan-botwig.yml already analyses the back-office theme from its branch
+        # for the same reason; this aligns the test job with it.
+        #
+        # The `as` alias keeps the released constraint satisfiable for any package
+        # that requires a theme by version.
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Install Composer dependencies
+        # No composer.lock is committed, so `install` resolves exactly like `update`;
+        # running both did the resolution twice.
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Check that the themes under test are the branch tips
+        # A theme silently resolved to its released tag would bring the skip guards
+        # back and the job would stay green while proving nothing.
+        run: |
+          for package in flexy backoffice-default-twig-template email-default-template pdf-default-template; do
+            version=$(composer show "thelia/$package" --format=json | php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];')
+            echo "thelia/$package -> $version"
+            case "$version" in dev-main*) ;; *) echo "::error::thelia/$package resolved to $version, expected dev-main"; exit 1 ;; esac
+          done
+
+      - name: Build the test database and the theme assets
+        # Every HTTP test renders a page, and a page whose theme assets are missing
+        # raises an exception that WebIntegrationTestCase::assertPageRenders() turns
+        # into a *skipped* test. Without this step the two HTTP suites reported 116
+        # skips out of 147: the suites that prove pages render were switched off.
+        # The asset commands read the active templates from the database, so
+        # bin/test-prepare comes first.
         run: |
           php bin/test-prepare
           php bin/console importmap:install --env=test
+          php bin/console tailwind:build --env=test
+          php bin/console sass:build --env=test
 
       - name: Lint the YAML config and the Twig themes
-        # Runs in the test environment: booting the kernel needs the generated Propel
-        # model classes, which bin/test-prepare builds (rerun here, it is idempotent,
-        # in case the best-effort step above did not reach it). The back-office
-        # default-twig theme is left out on purpose: its `safe_hook` Twig function is
-        # unknown to the bare console environment, so a plain lint reports false errors
-        # on it; that theme is covered by the phpstan-botwig job instead.
+        # The back-office default-twig theme is left out on purpose: its `safe_hook`
+        # Twig function is unknown to the bare console environment, so a plain lint
+        # reports false errors on it; that theme is covered by the phpstan-botwig job.
         run: |
-          php bin/test-prepare
           php bin/console lint:yaml config/ --env=test
           php bin/console lint:twig templates/frontOffice templates/email templates/pdf core/lib/Thelia/Resources/views --env=test
 
