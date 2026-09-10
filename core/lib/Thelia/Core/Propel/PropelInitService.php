@@ -243,11 +243,14 @@ class PropelInitService
             // installed, so the question is put to the connection the request
             // works on anyway. The other way round it cost a second
             // connection, its handshake and a query, on every single request.
-            if (!$this->loadPropelRuntime()) {
-                return false;
-            }
+            $loaded = $this->loadPropelRuntime();
 
-            return TheliaKernel::isInstalled();
+            // null means the init file went away between the check above and the
+            // load - a cache clear running on another worker - so the build path
+            // below takes over rather than the request dying on a fatal.
+            if (null !== $loaded) {
+                return $loaded && TheliaKernel::isInstalled();
+            }
         }
 
         if (!$force && !TheliaKernel::isInstalled()) {
@@ -268,8 +271,8 @@ class PropelInitService
                 return false;
             }
 
-            if (!$force && $this->isCacheComplete()) {
-                return $this->loadPropelRuntime() && TheliaKernel::isInstalled();
+            if (!$force && $this->isCacheComplete() && ($loaded = $this->loadPropelRuntime()) !== null) {
+                return $loaded && TheliaKernel::isInstalled();
             }
 
             (new Filesystem())->mkdir(\dirname($buildingFlag));
@@ -334,6 +337,13 @@ class PropelInitService
         $hashFile = $this->getPropelCacheDir().'hash';
         $modelHashFile = $this->getPropelModelDir().'hash';
 
+        // A worker that answered a request before the cache was emptied still
+        // holds those paths in its stat cache, and would call a wiped cache
+        // complete - then die on the require that follows.
+        foreach ([$this->getPropelInitFile(), $hashFile, $modelHashFile] as $file) {
+            clearstatcache(true, $file);
+        }
+
         return file_exists($this->getPropelInitFile())
             && is_dir($this->getPropelSchemaDir())
             && file_exists($hashFile)
@@ -345,9 +355,28 @@ class PropelInitService
      * @return bool false when no database answers behind the configured
      *              credentials, which is the shop the installer is there for
      */
-    private function loadPropelRuntime(): bool
+    /**
+     * @return bool|null true once the runtime is up, false when the database
+     *                   refuses the connection, null when the init file is not
+     *                   there any more and the cache has to be rebuilt
+     */
+    private function loadPropelRuntime(): ?bool
     {
-        require_once $this->getPropelInitFile();
+        $initFile = $this->getPropelInitFile();
+
+        clearstatcache(true, $initFile);
+
+        if (!is_file($initFile)) {
+            return null;
+        }
+
+        try {
+            require_once $initFile;
+        } catch (\Throwable) {
+            // The file can still go away between the check and the read, and a
+            // half-written one is no better: either way the cache is rebuilt.
+            return null;
+        }
 
         try {
             $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
