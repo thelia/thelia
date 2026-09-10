@@ -117,7 +117,9 @@ final class SaleApiTest extends ApiTestCase
     {
         $sale = $this->runningSale([
             'countdownMode' => Sale::COUNTDOWN_MODE_FROM_OPENING,
-            'endDate' => new \DateTime('+2 hours'),
+            // Truncated to the second: MariaDB rounds a fractional DATETIME up,
+            // which would leave 7201 seconds on the countdown on an unlucky run.
+            'endDate' => new \DateTime((new \DateTime('+2 hours'))->format('Y-m-d H:i:s')),
         ]);
 
         $member = $this->memberOrNull($this->readJson('/api/front/sales'), $sale->getId());
