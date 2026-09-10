@@ -836,7 +836,9 @@ final class FixtureFactory
         // The unique index folds case and Latin accents, so a fixed label would
         // collide across tests: the counter keeps each fixture its own tag.
         $tag->setLabel($overrides['label'] ?? 'Tag '.$n);
-        $tag->setColorCode($overrides['colorCode'] ?? '#1A2B3C');
+        // array_key_exists, not ??: a caller passing an explicit null wants a tag
+        // with no colour, and ?? would hand it the default instead.
+        $tag->setColorCode(\array_key_exists('colorCode', $overrides) ? $overrides['colorCode'] : '#1A2B3C');
         $tag->save($this->connection);
 
         return $tag;

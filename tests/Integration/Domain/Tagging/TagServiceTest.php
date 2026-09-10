@@ -98,6 +98,58 @@ final class TagServiceTest extends IntegrationTestCase
         $this->tagService->findOrCreate('   ');
     }
 
+    public function testRenameChangesTheLabelAndTheColour(): void
+    {
+        $tag = $this->tagService->findOrCreate('Prospect', '#111111');
+
+        $this->tagService->rename($tag, '  Qualified   prospect ', '#222222');
+
+        $reloaded = TagQuery::create()->findPk($tag->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('Qualified prospect', $reloaded->getLabel(), 'The label is normalized on the way in.');
+        self::assertSame('#222222', $reloaded->getColorCode());
+    }
+
+    public function testRenamingATagOntoItsOwnLabelIsAllowed(): void
+    {
+        $tag = $this->tagService->findOrCreate('VIP', '#111111');
+
+        $this->tagService->rename($tag, 'VIP', '#333333');
+
+        self::assertSame('#333333', TagQuery::create()->findPk($tag->getId())?->getColorCode());
+    }
+
+    /**
+     * The refusal has to name the tag standing in the way. Under
+     * utf8mb4_general_ci the collision happens on a spelling that does not look
+     * like the target, so "this label already exists" would leave the
+     * administrator with no way to find the culprit.
+     */
+    public function testRenamingOntoAnotherTagLabelIsRefusedAndNamesIt(): void
+    {
+        $target = $this->tagService->findOrCreate('Salon');
+        $renamed = $this->tagService->findOrCreate('Prospect');
+
+        try {
+            $this->tagService->rename($renamed, 'Salón');
+            self::fail('Renaming onto an existing label must be refused.');
+        } catch (\InvalidArgumentException $refusal) {
+            self::assertStringContainsString('Salon', $refusal->getMessage(), 'The message names the tag in the way.');
+        }
+
+        self::assertSame('Prospect', TagQuery::create()->findPk($renamed->getId())?->getLabel());
+        self::assertSame('Salon', TagQuery::create()->findPk($target->getId())?->getLabel());
+    }
+
+    public function testRenamingToAnEmptyLabelIsRefused(): void
+    {
+        $tag = $this->tagService->findOrCreate('VIP');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->tagService->rename($tag, "  \t ");
+    }
+
     public function testAttachIsIdempotent(): void
     {
         $customer = $this->createCustomer();

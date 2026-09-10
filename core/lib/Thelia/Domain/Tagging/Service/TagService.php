@@ -77,6 +77,37 @@ final readonly class TagService
     }
 
     /**
+     * Renames a tag, and recolours it.
+     *
+     * The collision is looked up rather than left to the unique index, for one
+     * reason: the index answers "taken", not "taken by which one". Under
+     * utf8mb4_general_ci a rename collides on a spelling that does not look like
+     * the target — renaming "Salón" to "Salon" is a duplicate, and so is any
+     * change of case — so the caller has to be able to name the tag standing in
+     * the way, or the administrator cannot understand the refusal.
+     *
+     * @throws \InvalidArgumentException when the label is empty or already taken
+     */
+    public function rename(Tag $tag, string $label, ?string $colorCode = null, ?ConnectionInterface $connection = null): Tag
+    {
+        $normalizedLabel = Tag::normalizeLabel($label);
+
+        if ($normalizedLabel === '') {
+            throw new \InvalidArgumentException('A tag label cannot be empty.');
+        }
+
+        $conflicting = TagQuery::create()->findOneByLabel($normalizedLabel, $connection);
+
+        if ($conflicting instanceof Tag && $conflicting->getId() !== $tag->getId()) {
+            throw new \InvalidArgumentException(\sprintf('The label "%s" is already carried by the tag "%s". Merge them instead of renaming.', $normalizedLabel, (string) $conflicting->getLabel()));
+        }
+
+        $tag->setLabel($normalizedLabel)->setColorCode($colorCode)->save($connection);
+
+        return $tag;
+    }
+
+    /**
      * Attaches a tag to an object, doing nothing when it is already attached.
      *
      * The connection is a parameter rather than something this method fetches for
