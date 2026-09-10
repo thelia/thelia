@@ -46,6 +46,18 @@ final class SaleTypeTest extends TestCase
         'countdown_mode' => '0',
     ];
 
+    protected function setUp(): void
+    {
+        // The bundle under test ships in its own package (thelia-templates/default-twig),
+        // and the core CI installs the published version, not its main branch. A screen
+        // this suite already covers can therefore be absent from the release the runner
+        // resolves: skip, the way assertPageRenders() does for the back-office HTTP
+        // tests, instead of turning the core red over a dependency it does not control.
+        if (!class_exists(SaleCustomerIdsReader::class)) {
+            self::markTestSkipped('SaleCustomerIdsReader is not in the published default-twig version yet.');
+        }
+    }
+
     public function testTargetingAndCountdownFieldsArePresentByDefault(): void
     {
         $form = $this->createForm();
