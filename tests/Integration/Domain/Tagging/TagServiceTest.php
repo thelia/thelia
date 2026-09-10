@@ -175,6 +175,44 @@ final class TagServiceTest extends IntegrationTestCase
         self::assertSame([$keptTag->getId()], $this->attachedTagIds($customer));
     }
 
+    public function testFindTagsForReturnsOnlyTheTagsOfThatElementInLabelOrder(): void
+    {
+        $customer = $this->createCustomer();
+        $otherCustomer = $this->createCustomer();
+
+        $this->tagService->setLabelsFor(TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId(), ['VIP', 'Grossiste']);
+        $this->tagService->setLabelsFor(TagElement::ELEMENT_KEY_CUSTOMER, $otherCustomer->getId(), ['Prospect']);
+
+        $labels = array_map(
+            static fn (Tag $tag): string => $tag->getLabel(),
+            $this->tagService->findTagsFor(TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId()),
+        );
+
+        self::assertSame(['Grossiste', 'VIP'], $labels);
+    }
+
+    public function testFindTagsForReturnsNothingForAnElementCarryingNone(): void
+    {
+        $customer = $this->createCustomer();
+        $this->tagService->findOrCreate('VIP');
+
+        self::assertSame([], $this->tagService->findTagsFor(TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId()));
+    }
+
+    /**
+     * The element key is part of the identity of an attachment, not decoration:
+     * a tag put on order 12 must not surface on customer 12.
+     */
+    public function testFindTagsForSeparatesTwoElementKeysSharingAnIdentifier(): void
+    {
+        $customer = $this->createCustomer();
+        $orderTag = $this->tagService->findOrCreate('Litige');
+        $this->tagService->attach($orderTag, 'order', $customer->getId());
+
+        self::assertSame([], $this->tagService->findTagsFor(TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId()));
+        self::assertCount(1, $this->tagService->findTagsFor('order', $customer->getId()));
+    }
+
     public function testSetLabelsForReplacesTheWholeSet(): void
     {
         $customer = $this->createCustomer();
