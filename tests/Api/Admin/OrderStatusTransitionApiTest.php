@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
@@ -52,6 +53,30 @@ final class OrderStatusTransitionApiTest extends ApiTestCase
 
         self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
         self::assertSame(OrderStatus::CODE_REFUNDED, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
+    public function testARefusedStatusRollsTheWholeRequestBack(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->sentOrderWithOneLine();
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+
+        $body = $this->bodyWithStatus($token, $order->getId(), OrderStatus::CODE_NOT_PAID);
+        $body['deliveryRef'] = 'PARCEL-REFUSED-WITH-STATUS';
+
+        $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $body, $token);
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        // The test itself wraps every request in a transaction, so the processor's
+        // rollback is nested: Propel cannot undo the rows here and marks the outer
+        // transaction as no longer committable instead. That mark is the proof that
+        // the processor asked for the rollback of everything it wrote.
+        $connection = $this->getPropelConnection();
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        self::assertTrue(
+            (new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection),
+            'A refused status must roll back the other fields written by the same request.',
+        );
     }
 
     /**

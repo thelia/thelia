@@ -19,7 +19,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 /**
  * E-mails the customer, in their language, with the chosen message template.
  */
-final class SendCustomerEmailAction extends AbstractEmailAction
+final readonly class SendCustomerEmailAction extends AbstractEmailAction
 {
     public static function getType(): string
     {

@@ -308,6 +308,10 @@ class Order extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
 
+        if (null === $newStatus) {
+            throw new \LogicException('ORDER_UPDATE_STATUS was dispatched without a target status.');
+        }
+
         // Every entry point (back office, API, payment modules, commands) lands here,
         // so this is where the transition graph is enforced.
         $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());

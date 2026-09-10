@@ -18,7 +18,9 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
+use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatusAction;
@@ -38,6 +40,9 @@ final class OrderStatusActionRunner
 {
     /** @var array<string, list<OrderStatusAction>> */
     private array $actionsByTransition = [];
+
+    /** @var array<int, array<string, mixed>> normalized payload by action id */
+    private array $normalizedPayloadByAction = [];
 
     public function __construct(
         private readonly OrderStatusActionRegistry $registry,
@@ -89,6 +94,9 @@ final class OrderStatusActionRunner
         $fromIds = $this->catalog->equivalentIds($previousStatusId);
         $toIds = $this->catalog->equivalentIds($newStatusId);
 
+        // WHERE active = 1 AND to_status_id IN (:toIds)
+        //   AND (trigger_type = 'enter' OR (trigger_type = 'transition' AND from_status_id IN (:fromIds)))
+        // ORDER BY position, id
         $actions = OrderStatusActionQuery::create()
             ->filterByActive(true)
             ->filterByToStatusId($toIds, \Propel\Runtime\ActiveQuery\Criteria::IN)
@@ -105,9 +113,19 @@ final class OrderStatusActionRunner
         return $this->actionsByTransition[$key] = array_values($actions);
     }
 
+    /**
+     * Forgets the actions read so far. The statuses events cover an equivalence or a
+     * status that changes; whoever writes order_status_action rows in the same process
+     * (a back-office save, a command) calls this too, there is no event for those yet.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_CREATE, priority: -128)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_UPDATE, priority: -128)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_DELETE, priority: -128)]
+    #[AsEventListener(event: TheliaEvents::ORDER_STATUS_UPDATE_POSITION, priority: -128)]
     public function reset(): void
     {
         $this->actionsByTransition = [];
+        $this->normalizedPayloadByAction = [];
     }
 
     /**
@@ -124,10 +142,30 @@ final class OrderStatusActionRunner
         }
 
         try {
-            $service->execute($contextFor($service->normalizePayload($action->getDecodedPayload())));
+            $payload = $this->normalizedPayloadByAction[$action->getId()]
+                ??= $service->normalizePayload($action->getDecodedPayload());
+
+            $service->execute($contextFor($payload));
         } catch (\Throwable $throwable) {
-            $this->recordFailure($action, $order, $throwable->getMessage());
+            $this->recordFailure($action, $order, $this->failureMessage($throwable));
         }
+    }
+
+    /**
+     * What the back office may show about a failure. The message of an exception the
+     * domain raised on purpose is meant to be read; anything else (a driver, a mail
+     * transport, a module) may carry a DSN or an address, so only its class is kept
+     * and the full text stays in the server log.
+     */
+    private function failureMessage(\Throwable $throwable): string
+    {
+        if ($throwable instanceof InvalidOrderStatusActionPayloadException || $throwable instanceof TheliaProcessException) {
+            return $throwable->getMessage();
+        }
+
+        Tlog::getInstance()->addError('Order status action failure detail: '.$throwable->getMessage());
+
+        return \sprintf('The action failed (%s). See the server log for details.', $throwable::class);
     }
 
     private function recordFailure(OrderStatusAction $action, Order $order, string $message): void

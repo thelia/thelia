@@ -27,7 +27,7 @@ use Thelia\Model\MessageQuery;
  * Only an existing message code is accepted, never a free body: the action must
  * not turn the shop into a mail relay.
  */
-abstract class AbstractEmailAction implements OrderStatusActionInterface
+abstract readonly class AbstractEmailAction implements OrderStatusActionInterface
 {
     public const FIELD_MESSAGE_CODE = 'message_code';
 

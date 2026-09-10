@@ -19,7 +19,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 /**
  * E-mails the shop managers with the chosen message template.
  */
-final class SendShopManagersEmailAction extends AbstractEmailAction
+final readonly class SendShopManagersEmailAction extends AbstractEmailAction
 {
     public static function getType(): string
     {

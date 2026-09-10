@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Order;
 
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
+use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -155,6 +156,19 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
 
         self::assertContains('orphan_status', $unreachable);
         self::assertNotContains(OrderStatus::CODE_CANCELED, $unreachable);
+    }
+
+    public function testChangingAnEquivalenceThroughTheStatusEventRefreshesTheGraph(): void
+    {
+        $custom = $this->factory->orderStatus(['code' => 'custom_free', 'title' => 'Custom']);
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        self::assertTrue($this->guard->isAllowed($custom->getId(), $this->orderStatus(OrderStatus::CODE_NOT_PAID)->getId()), 'A custom status without equivalence is free.');
+
+        $event = new OrderStatusUpdateEvent($custom->getId());
+        $event->setCode('custom_free')->setEquivalentCode(OrderStatus::CODE_SENT)->setColor('#000000')->setLocale('en_US')->setTitle('Custom');
+        $this->dispatch($event, TheliaEvents::ORDER_STATUS_UPDATE);
+
+        self::assertFalse($this->guard->isAllowed($custom->getId(), $this->orderStatus(OrderStatus::CODE_NOT_PAID)->getId()), 'Once equivalent to sent, the status follows the graph of sent in the same process.');
     }
 
     public function testDeletingAStatusTakesItsTransitionsAway(): void
