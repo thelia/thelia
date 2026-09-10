@@ -108,7 +108,10 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
         $currency = $this->factory->currency();
         $product = $this->catalogProduct($currency);
         $customer = $this->newCustomer();
-        $endDate = new \DateTime('+3 days');
+        // Seconds only: MySQL rounds a fractional second up when it writes a
+        // DATETIME column and MariaDB truncates it, so a date carrying microseconds
+        // reads back one second later on one engine and unchanged on the other.
+        $endDate = new \DateTime((new \DateTime('+3 days'))->format('Y-m-d H:i:s'));
 
         $sale = $this->runningReservedSale($currency, '10', Sale::OFFSET_TYPE_PERCENTAGE, ['endDate' => $endDate]);
         $this->factory->saleProduct($sale, $product);
