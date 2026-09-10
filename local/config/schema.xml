@@ -1024,7 +1024,8 @@
   </table>
   <table name="coupon" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" required="true" size="45" type="VARCHAR" />
+    <column description="the code the customer types, empty on a promotion that applies on its own" name="code" size="45" type="VARCHAR" />
+    <column defaultValue="code" description="what makes the promotion apply: code, the customer types it, or automatic, the cart matching the conditions is enough" name="trigger_mode" required="true" size="20" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
     <column name="serialized_effects" required="true" type="CLOB" />
     <column name="title" required="true" size="255" type="VARCHAR" />
@@ -1069,6 +1070,9 @@
     </index>
     <index name="idx_start_date">
       <index-column name="start_date" />
+    </index>
+    <index name="idx_trigger_mode">
+      <index-column name="trigger_mode" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -1221,6 +1225,8 @@
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column name="promo" type="INTEGER" />
+    <column defaultValue="0" description="the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it" name="is_offered" required="true" type="TINYINT" />
+    <column description="the coupon that offers the line, read to take the line back when the promotion no longer applies" name="offered_by_coupon_id" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -1238,6 +1244,9 @@
     </index>
     <index name="idx_cart_item_product_sale_elements_id">
       <index-column name="product_sale_elements_id" />
+    </index>
+    <index name="idx_cart_item_offered_by_coupon_id">
+      <index-column name="offered_by_coupon_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -1594,8 +1603,10 @@
   <table name="order_coupon" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_id" required="true" type="INTEGER" />
-    <column name="code" required="true" size="45" type="VARCHAR" />
+    <column description="the coupon the order was placed with, kept to find it again when the code is empty or was changed since" name="coupon_id" type="INTEGER" />
+    <column description="the code the customer typed, empty on a promotion that applied on its own" name="code" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
+    <column description="the effects the coupon carried when the order was placed, copied from the coupon so a later change never rewrites the order" name="serialized_effects" type="CLOB" />
     <column defaultValue="0.000000" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
@@ -1613,6 +1624,9 @@
     </foreign-key>
     <index name="idx_order_coupon_order_id">
       <index-column name="order_id" />
+    </index>
+    <index name="idx_order_coupon_coupon_id">
+      <index-column name="coupon_id" />
     </index>
     <behavior name="timestampable" />
   </table>
