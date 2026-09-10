@@ -32,6 +32,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
+use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
@@ -71,6 +72,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         protected OrderFacade $orderFacade,
         protected GuestOrderAccessService $guestOrderAccessService,
         protected URL $urlManager,
+        protected OrderStatusTransitionGuard $transitionGuard,
     ) {
     }
 
@@ -305,6 +307,12 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
+
+        // Every entry point (back office, API, payment modules, commands) lands here,
+        // so this is where the transition graph is enforced.
+        $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+
+        $event->setPreviousStatusId($order->getStatusId());
 
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
