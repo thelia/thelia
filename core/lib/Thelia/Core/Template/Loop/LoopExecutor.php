@@ -141,7 +141,8 @@ final readonly class LoopExecutor
 
     /**
      * Build the "loop name => class" registry from the tagged loop services, using the
-     * exact same normalization as TheliaLoop::setLoopList() (kebab-case, collision suffix).
+     * exact same normalization as TheliaLoop::setLoopList() (kebab-case, collision suffix),
+     * then add the names the modules declared themselves in their config.xml.
      *
      * @param iterable<LoopInterface>     $theliaLoops
      * @param array<string, class-string> $theliaParserLoops
@@ -151,6 +152,7 @@ final readonly class LoopExecutor
     private function buildLoopDefinition(iterable $theliaLoops, array $theliaParserLoops): array
     {
         $definition = [];
+        $taggedClasses = [];
 
         foreach ($theliaLoops as $key => $loop) {
             $className = substr(strrchr($loop::class, '\\'), 1);
@@ -162,6 +164,26 @@ final readonly class LoopExecutor
             }
 
             $definition[$name] = $loop::class;
+            $taggedClasses[$loop::class] = true;
+        }
+
+        // A module may name its loops in config.xml (<loop name="paypal-order"
+        // class="PayPal\Loop\PayPalOrderLoop" />), and its templates then ask for that
+        // name, not for the one derived from the class. LoopCompilerPass hands those
+        // aliases to the Smarty plugin only; without them here, {loop type="paypal-order"}
+        // resolves under Smarty and not under any other engine. Aliases are kept only for
+        // classes that are actually registered loop services, so a module whose loop is
+        // gone does not come back through its declaration.
+        foreach ($theliaParserLoops as $alias => $className) {
+            if (!\is_string($alias) || !\is_string($className) || !isset($taggedClasses[$className])) {
+                continue;
+            }
+
+            $alias = str_replace('_', '-', strtolower($alias));
+
+            if (!isset($definition[$alias])) {
+                $definition[$alias] = $className;
+            }
         }
 
         return $definition;
