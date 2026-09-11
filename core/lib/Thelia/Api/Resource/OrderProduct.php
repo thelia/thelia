@@ -109,6 +109,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_READ,
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
@@ -127,6 +131,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productRef;
@@ -138,6 +146,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productSaleElementsRef;
@@ -158,6 +170,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     public ?string $title = null;
 
@@ -185,6 +201,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     // order_product.quantity is a FLOAT: a line of goods sold by weight carries
@@ -198,6 +218,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $price;

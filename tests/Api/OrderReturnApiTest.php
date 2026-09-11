@@ -464,6 +464,60 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * A return line without its article is unusable: a decoupled front reads
+     * the return and has nothing to show the customer but a quantity. The line
+     * carries the order product as a nested object, and nothing on
+     * `OrderProduct` used to declare the return read groups - so it normalised
+     * to an empty object on both surfaces.
+     */
+    public function testAReturnLineNamesTheArticleItIsAbout(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+        $token = $this->authenticateAsCustomer($customer);
+
+        self::assertSame(201, $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $token,
+        )->getStatusCode());
+
+        $created = OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->findOne($this->getPropelConnection());
+        self::assertNotNull($created);
+
+        foreach ([
+            'front' => ['/api/front/account/order_returns/'.$created->getId(), $token],
+            'admin' => ['/api/admin/order_returns/'.$created->getId(), $this->authenticateAsAdmin()],
+        ] as $surface => [$uri, $surfaceToken]) {
+            $response = $this->jsonRequest('GET', $uri, token: $surfaceToken);
+            self::assertJsonResponseSuccessful($response);
+
+            $decoded = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+            $line = $decoded['orderReturnLines'][0] ?? null;
+
+            self::assertIsArray($line, \sprintf('The %s return carries no line at all.', $surface));
+            self::assertIsArray($line['orderProduct'] ?? null, \sprintf('The %s return line carries no order product.', $surface));
+
+            self::assertSame(
+                $orderProduct->getTitle(),
+                $line['orderProduct']['title'] ?? null,
+                \sprintf('The %s return line does not say which article it is about.', $surface),
+            );
+            self::assertSame(
+                $orderProduct->getProductRef(),
+                $line['orderProduct']['productRef'] ?? null,
+                \sprintf('The %s return line carries no product reference.', $surface),
+            );
+        }
+    }
+
+    /**
      * `quantityReceived` is what the reception restocks and what the refund is
      * recomputed on. The admin patch exposed both it and `quantity` with no
      * check at all, so a merchant typing 20 instead of 2 inflated the stock and
