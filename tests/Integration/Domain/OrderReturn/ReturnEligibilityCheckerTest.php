@@ -20,6 +20,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnLine;
 use Thelia\Model\OrderReturnStatus;
@@ -151,6 +152,42 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
     }
 
     /**
+     * A quantity is a FLOAT - Thelia sells by weight and by length as well as
+     * by the piece - so the remaining quantity is a subtraction of floats:
+     * 0.7 ordered minus 0.3 already asked for is 0.39999999999999997, and the
+     * customer asking for the 0.4 the shop displays used to be refused.
+     */
+    public function testTheRemainderOfAFloatQuantityIsStillReturnable(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->storedOrderProduct($this->orderProduct($order, quantity: 0.7));
+
+        $this->openReturn($order, $customer, $line, 0.3, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertSame(0.4, $this->checker->remainingReturnableQuantity($line));
+
+        $this->checker->assertReturnable($order, $customer, $line, 0.4);
+    }
+
+    /**
+     * The tolerance the float subtraction needs must not become an extra unit
+     * handed out on a line that is already entirely returned.
+     */
+    public function testAFullyReturnedFloatLineHasNothingLeft(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->storedOrderProduct($this->orderProduct($order, quantity: 0.7));
+
+        $this->openReturn($order, $customer, $line, 0.3, OrderReturnStatus::CODE_REQUESTED);
+        $this->openReturn($order, $customer, $line, 0.4, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertSame(0.0, $this->checker->remainingReturnableQuantity($line));
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->checker->assertReturnable($order, $customer, $line, 0.1);
+    }
+
+    /**
      * @return array{Order, Customer}
      */
     private function paidOrderWithProduct(
@@ -185,6 +222,20 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         $orderProduct->save($this->getPropelConnection());
 
         return $orderProduct;
+    }
+
+    /**
+     * The same line read back from the database, so that the quantity carries
+     * the precision the FLOAT column actually stores and not the double the
+     * fixture set.
+     */
+    private function storedOrderProduct(OrderProductModel $orderProduct): OrderProductModel
+    {
+        $stored = OrderProductQuery::create()->findPk($orderProduct->getId(), $this->getPropelConnection());
+
+        self::assertNotNull($stored);
+
+        return $stored;
     }
 
     private function openReturn(

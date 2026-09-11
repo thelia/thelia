@@ -48,6 +48,17 @@ final class ReturnEligibilityChecker
     public const DEFAULT_WINDOW_DAYS = 14;
 
     /**
+     * Quantities are floats - Thelia sells by weight and by length as much as
+     * by the piece - so the remaining quantity is a subtraction of floats and
+     * carries its representation error: 0.7 - 0.3 is 0.39999999999999997, and
+     * a strict comparison refuses the 0.4 the shop displays. Six decimals is
+     * finer than any quantity a shop sells in and coarser than the error, so
+     * it separates the two without ever granting a unit that is not there.
+     */
+    public const QUANTITY_PRECISION = 6;
+    public const QUANTITY_TOLERANCE = 1e-6;
+
+    /**
      * Whether the returns feature is enabled on the shop.
      */
     public function isFeatureEnabled(): bool
@@ -207,7 +218,7 @@ final class ReturnEligibilityChecker
             $alreadyRequested += (float) $line->getQuantity();
         }
 
-        $remaining = (float) $orderProduct->getQuantity() - $alreadyRequested;
+        $remaining = round((float) $orderProduct->getQuantity() - $alreadyRequested, self::QUANTITY_PRECISION);
 
         return $remaining > 0 ? $remaining : 0.0;
     }
@@ -240,7 +251,7 @@ final class ReturnEligibilityChecker
             throw new ReturnNotAllowedException('The returned quantity must be positive.');
         }
 
-        if ($quantity > $this->remainingReturnableQuantity($orderProduct, $excludeReturnId)) {
+        if ($quantity > $this->remainingReturnableQuantity($orderProduct, $excludeReturnId) + self::QUANTITY_TOLERANCE) {
             throw new ReturnNotAllowedException('The returned quantity exceeds the returnable quantity of this line.');
         }
     }
