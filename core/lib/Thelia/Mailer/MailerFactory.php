@@ -219,14 +219,27 @@ class MailerFactory
 
             $this->send($instance);
         } catch (\Exception $ex) {
-            // The raw reason names the recipient and carries the transport credentials:
-            // the server log is the only place for it.
+            // The raw reason names the recipient: the server log is the only place
+            // for it. The credentials of the transport are not even wanted there.
             Tlog::getInstance()->addError(
-                \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
+                \sprintf('Error while sending email message %s: ', $messageCode).self::withoutTransportCredentials($ex->getMessage()),
             );
 
             throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
+    }
+
+    /**
+     * Hides the credentials a transport puts in the reason it refuses a message.
+     *
+     * A mailer names the DSN it was configured with when it fails, password
+     * included: `smtp://user:s3cr3t@mail.example.com`. The log of a shop is read,
+     * shipped and archived far more widely than its configuration, so the
+     * userinfo part of any URL is replaced before the reason is written.
+     */
+    private static function withoutTransportCredentials(string $message): string
+    {
+        return preg_replace('#://[^@/\s]+@#', '://***@', $message) ?? $message;
     }
 
     /**
