@@ -28,6 +28,14 @@ class OrderReturnEvent extends ActionEvent
 
     protected ?string $refusalReason = null;
 
+    /**
+     * What the merchant says came back, per return line id. Read by the
+     * ORDER_RETURN_RECEIVE listener, ignored everywhere else.
+     *
+     * @var array<int, array{quantity: float, condition?: ?string, resellable?: bool}>
+     */
+    protected array $receivedLines = [];
+
     public function __construct(OrderReturn $orderReturn)
     {
         $this->orderReturn = $orderReturn;
@@ -59,6 +67,26 @@ class OrderReturnEvent extends ActionEvent
     public function setTargetStatusId(?int $targetStatusId): self
     {
         $this->targetStatusId = $targetStatusId;
+
+        return $this;
+    }
+
+    /**
+     * @return array<int, array{quantity: float, condition?: ?string, resellable?: bool}>
+     */
+    public function getReceivedLines(): array
+    {
+        return $this->receivedLines;
+    }
+
+    /**
+     * @param array<int, array{quantity: float, condition?: ?string, resellable?: bool}> $receivedLines
+     *
+     * @return $this
+     */
+    public function setReceivedLines(array $receivedLines): self
+    {
+        $this->receivedLines = $receivedLines;
 
         return $this;
     }

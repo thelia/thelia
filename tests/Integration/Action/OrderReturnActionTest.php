@@ -24,7 +24,9 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
+use Thelia\Domain\OrderReturn\Service\OrderReturnComposer;
 use Thelia\Domain\OrderReturn\Service\RefundAmountCalculator;
+use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Domain\OrderReturn\Service\StockIncrementer;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -226,6 +228,8 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
             $this->getService(OrderReturnStateMachine::class),
             $this->getService(StockIncrementer::class),
             $this->getService(RefundAmountCalculator::class),
+            $this->getService(ReturnEligibilityChecker::class),
+            $this->getService(OrderReturnComposer::class),
         ));
 
         return $dispatcher;
