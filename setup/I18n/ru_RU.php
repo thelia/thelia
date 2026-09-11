@@ -27,6 +27,8 @@ return [
     'Other' => 'Другое',
     'Return status update sent to the customer' => 'Обновление статуса возврата отправлено клиенту',
     'Update on your return {{ return_ref }}' => 'Обновление по вашему возврату {{ return_ref }}',
+    'Product returns' => 'Возвраты товаров',
+    'Return reasons' => 'Причины возврата',
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Время жизни cookie "Запомнить меня" в секундах, для админов',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Время жизни cookie "Запомнить меня" в секундах, для клиентов',
     '"Remember me" cookie name for administration users' => 'Имя cookie "Запомнить меня" для админов',

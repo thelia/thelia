@@ -15,6 +15,8 @@ declare(strict_types=1);
 return [
     'Return status update sent to the customer' => 'Mise à jour du statut de retour envoyée au client',
     'Update on your return {{ return_ref }}' => 'Mise à jour de votre retour {{ return_ref }}',
+    'Product returns' => 'Retours produits',
+    'Return reasons' => 'Motifs de retour',
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les utilisateurs d\'administration',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les clients',
     '"Remember me" cookie name for administration users' => 'Nom du cookie "Remember me" pour les utilisateurs d\'administration',

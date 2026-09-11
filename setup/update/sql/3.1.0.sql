@@ -383,11 +383,27 @@ EXECUTE add_index_statement;
 DEALLOCATE PREPARE add_index_statement;
 
 -- ---------------------------------------------------------------------
--- Product returns (RMA) feature: tables, reference data and settings.
--- Brings an existing shop to the same state as a fresh install, with
--- the feature disabled by default.
+-- Product returns (RMA)
+--
+-- A return is a request a customer opens on an order they were delivered:
+-- which lines, how many of each, why, and what they expect in exchange. It
+-- carries its own reference and its own lifecycle, `order_return_status`
+-- holding the states the merchant moves it through and `order_return_reason`
+-- the motives the merchant offers to pick from.
+--
+-- `order_return.reason_id` releases to NULL when the merchant deletes a
+-- reason, `reason_title` keeping the label as it was displayed, so a request
+-- already filed never loses what it was filed for. `refund_amount` is the
+-- amount computed from the prices actually paid on the returned lines.
+--
+-- `order_return` is versionable, which is also why the version tables of its
+-- versionable relations gain a referrer snapshot below: without those columns
+-- Propel selects a column that does not exist.
+--
+-- The feature arrives disabled, exactly as on a fresh install: a shop that
+-- updates its core displays nothing about returns until the merchant turns
+-- `order_return_enabled` on.
 -- ---------------------------------------------------------------------
-
 CREATE TABLE IF NOT EXISTS `order_return_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(45) NOT NULL,
@@ -501,74 +517,210 @@ CREATE TABLE IF NOT EXISTS `order_return_version` (
   CONSTRAINT `order_return_version_fk_6cd0c8` FOREIGN KEY (`id`) REFERENCES `order_return` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
--- The versionable behaviour of order_return adds a referrer snapshot to the
--- version tables of its versionable relations (order and customer). Without
--- these columns Propel selects a column that does not exist.
-ALTER TABLE `customer_version`
-  ADD COLUMN IF NOT EXISTS `order_return_ids` TEXT DEFAULT NULL,
-  ADD COLUMN IF NOT EXISTS `order_return_versions` TEXT DEFAULT NULL;
-ALTER TABLE `order_version`
-  ADD COLUMN IF NOT EXISTS `order_return_ids` TEXT DEFAULT NULL,
-  ADD COLUMN IF NOT EXISTS `order_return_versions` TEXT DEFAULT NULL;
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_version' AND `COLUMN_NAME` = 'order_return_ids');
+SET @statement := IF(@add_column, 'ALTER TABLE `customer_version` ADD `order_return_ids` TEXT DEFAULT NULL', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_version' AND `COLUMN_NAME` = 'order_return_versions');
+SET @statement := IF(@add_column, 'ALTER TABLE `customer_version` ADD `order_return_versions` TEXT DEFAULT NULL', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'order_return_ids');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `order_return_ids` TEXT DEFAULT NULL', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'order_return_versions');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `order_return_versions` TEXT DEFAULT NULL', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
 
 -- ---------------------------------------------------------------------
 -- Reference data for the product returns feature.
--- The tables are new, so the status and reason ids are fixed; config,
--- message and resource rows are auto-incremented to avoid colliding with
--- rows an existing shop already owns.
+--
+-- The status and reason ids are fixed, the tables being new; the config,
+-- message and resource rows are auto-incremented so they never collide with
+-- rows an existing shop already owns, and are found again by the unique key
+-- they carry.
+--
+-- Every statement is INSERT IGNORE: a run that stops halfway - a disconnect,
+-- a statement the shop refuses - can be replayed from the top without the
+-- unique keys turning the second attempt into a failure.
+--
+-- The i18n rows cover the eight locales a fresh install seeds (see
+-- setup/insert.sql), not just two: a locale left without a row makes an
+-- updated shop display a status or a reason with no label at all, exactly
+-- where the customer is being asked to pick one.
 -- ---------------------------------------------------------------------
 
-INSERT INTO `order_return_status` (`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
-(1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
-(2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
-(3, 'accepted', '#5cb85c', 3, 1, NOW(), NOW()),
-(4, 'refused', '#dc3545', 4, 1, NOW(), NOW()),
-(5, 'received', '#986dff', 5, 1, NOW(), NOW()),
-(6, 'settled', '#20c997', 6, 1, NOW(), NOW()),
-(7, 'expired', '#6c757d', 7, 1, NOW(), NOW());
+INSERT IGNORE INTO `order_return_status` (`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+    (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
+    (2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
+    (3, 'accepted', '#5cb85c', 3, 1, NOW(), NOW()),
+    (4, 'refused', '#dc3545', 4, 1, NOW(), NOW()),
+    (5, 'received', '#986dff', 5, 1, NOW(), NOW()),
+    (6, 'settled', '#20c997', 6, 1, NOW(), NOW()),
+    (7, 'expired', '#6c757d', 7, 1, NOW(), NOW());
 
-INSERT INTO `order_return_status_i18n` (`id`, `locale`, `title`) VALUES
-(1, 'en_US', 'Requested'), (1, 'fr_FR', 'Demandé'),
-(2, 'en_US', 'Information awaited'), (2, 'fr_FR', 'Information attendue'),
-(3, 'en_US', 'Accepted'), (3, 'fr_FR', 'Accepté'),
-(4, 'en_US', 'Refused'), (4, 'fr_FR', 'Refusé'),
-(5, 'en_US', 'Received'), (5, 'fr_FR', 'Reçu'),
-(6, 'en_US', 'Settled'), (6, 'fr_FR', 'Soldé'),
-(7, 'en_US', 'Expired'), (7, 'fr_FR', 'Expiré');
+INSERT IGNORE INTO `order_return_status_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'cs_CZ', NULL),
+    (2, 'cs_CZ', NULL),
+    (3, 'cs_CZ', NULL),
+    (4, 'cs_CZ', NULL),
+    (5, 'cs_CZ', NULL),
+    (6, 'cs_CZ', NULL),
+    (7, 'cs_CZ', NULL),
+    (1, 'de_DE', 'Angefragt'),
+    (2, 'de_DE', 'Warten auf Informationen'),
+    (3, 'de_DE', 'Akzeptiert'),
+    (4, 'de_DE', 'Abgelehnt'),
+    (5, 'de_DE', 'Erhalten'),
+    (6, 'de_DE', 'Abgeschlossen'),
+    (7, 'de_DE', 'Abgelaufen'),
+    (1, 'en_US', 'Requested'),
+    (2, 'en_US', 'Information awaited'),
+    (3, 'en_US', 'Accepted'),
+    (4, 'en_US', 'Refused'),
+    (5, 'en_US', 'Received'),
+    (6, 'en_US', 'Settled'),
+    (7, 'en_US', 'Expired'),
+    (1, 'es_ES', 'Solicitada'),
+    (2, 'es_ES', 'A la espera de información'),
+    (3, 'es_ES', 'Aceptada'),
+    (4, 'es_ES', 'Rechazada'),
+    (5, 'es_ES', 'Recibida'),
+    (6, 'es_ES', 'Resuelta'),
+    (7, 'es_ES', 'Caducada'),
+    (1, 'fr_FR', 'Demandé'),
+    (2, 'fr_FR', 'En attente d\'informations'),
+    (3, 'fr_FR', 'Accepté'),
+    (4, 'fr_FR', 'Refusé'),
+    (5, 'fr_FR', 'Reçu'),
+    (6, 'fr_FR', 'Réglé'),
+    (7, 'fr_FR', 'Expiré'),
+    (1, 'it_IT', NULL),
+    (2, 'it_IT', NULL),
+    (3, 'it_IT', NULL),
+    (4, 'it_IT', NULL),
+    (5, 'it_IT', NULL),
+    (6, 'it_IT', NULL),
+    (7, 'it_IT', NULL),
+    (1, 'nl_NL', 'Aangevraagd'),
+    (2, 'nl_NL', 'Wachten op informatie'),
+    (3, 'nl_NL', 'Geaccepteerd'),
+    (4, 'nl_NL', 'Geweigerd'),
+    (5, 'nl_NL', 'Ontvangen'),
+    (6, 'nl_NL', 'Afgehandeld'),
+    (7, 'nl_NL', 'Verlopen'),
+    (1, 'ru_RU', 'Запрошен'),
+    (2, 'ru_RU', 'Ожидается информация'),
+    (3, 'ru_RU', 'Принят'),
+    (4, 'ru_RU', 'Отклонён'),
+    (5, 'ru_RU', 'Получен'),
+    (6, 'ru_RU', 'Урегулирован'),
+    (7, 'ru_RU', 'Истёк');
 
-INSERT INTO `order_return_reason` (`id`, `code`, `position`, `visible`, `created_at`, `updated_at`) VALUES
-(1, 'not_conform', 1, 1, NOW(), NOW()),
-(2, 'defective', 2, 1, NOW(), NOW()),
-(3, 'wrong_item', 3, 1, NOW(), NOW()),
-(4, 'no_longer_needed', 4, 1, NOW(), NOW()),
-(5, 'other', 5, 1, NOW(), NOW());
+INSERT IGNORE INTO `order_return_reason` (`id`, `code`, `position`, `visible`, `created_at`, `updated_at`) VALUES
+    (1, 'not_conform', 1, 1, NOW(), NOW()),
+    (2, 'defective', 2, 1, NOW(), NOW()),
+    (3, 'wrong_item', 3, 1, NOW(), NOW()),
+    (4, 'no_longer_needed', 4, 1, NOW(), NOW()),
+    (5, 'other', 5, 1, NOW(), NOW());
 
-INSERT INTO `order_return_reason_i18n` (`id`, `locale`, `title`) VALUES
-(1, 'en_US', 'Product not as described'), (1, 'fr_FR', 'Produit non conforme'),
-(2, 'en_US', 'Defective product'), (2, 'fr_FR', 'Produit défectueux'),
-(3, 'en_US', 'Wrong item received'), (3, 'fr_FR', 'Article erroné reçu'),
-(4, 'en_US', 'No longer needed'), (4, 'fr_FR', 'Plus nécessaire'),
-(5, 'en_US', 'Other'), (5, 'fr_FR', 'Autre');
+INSERT IGNORE INTO `order_return_reason_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'cs_CZ', NULL),
+    (2, 'cs_CZ', NULL),
+    (3, 'cs_CZ', NULL),
+    (4, 'cs_CZ', NULL),
+    (5, 'cs_CZ', NULL),
+    (1, 'de_DE', 'Produkt entspricht nicht der Beschreibung'),
+    (2, 'de_DE', 'Defektes Produkt'),
+    (3, 'de_DE', 'Falscher Artikel erhalten'),
+    (4, 'de_DE', 'Nicht mehr benötigt'),
+    (5, 'de_DE', 'Sonstiges'),
+    (1, 'en_US', 'Product not as described'),
+    (2, 'en_US', 'Defective product'),
+    (3, 'en_US', 'Wrong item received'),
+    (4, 'en_US', 'No longer needed'),
+    (5, 'en_US', 'Other'),
+    (1, 'es_ES', 'Producto no coincide con la descripción'),
+    (2, 'es_ES', 'Producto defectuoso'),
+    (3, 'es_ES', 'Artículo equivocado recibido'),
+    (4, 'es_ES', 'Ya no se necesita'),
+    (5, 'es_ES', 'Otro'),
+    (1, 'fr_FR', 'Produit non conforme'),
+    (2, 'fr_FR', 'Produit défectueux'),
+    (3, 'fr_FR', 'Mauvais article reçu'),
+    (4, 'fr_FR', 'Plus nécessaire'),
+    (5, 'fr_FR', 'Autre'),
+    (1, 'it_IT', NULL),
+    (2, 'it_IT', NULL),
+    (3, 'it_IT', NULL),
+    (4, 'it_IT', NULL),
+    (5, 'it_IT', NULL),
+    (1, 'nl_NL', 'Product niet zoals beschreven'),
+    (2, 'nl_NL', 'Defect product'),
+    (3, 'nl_NL', 'Verkeerd artikel ontvangen'),
+    (4, 'nl_NL', 'Niet langer nodig'),
+    (5, 'nl_NL', 'Overig'),
+    (1, 'ru_RU', 'Товар не соответствует описанию'),
+    (2, 'ru_RU', 'Бракованный товар'),
+    (3, 'ru_RU', 'Получен неверный товар'),
+    (4, 'ru_RU', 'Больше не нужен'),
+    (5, 'ru_RU', 'Другое');
 
--- The feature ships disabled on an updated shop, exactly like on a new one.
-INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('order_return_enabled', '0', 0, 0, NOW(), NOW()),
-('order_return_window_days', '14', 0, 0, NOW(), NOW()),
-('order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW());
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('order_return_enabled', '0', 0, 0, NOW(), NOW()),
+    ('order_return_window_days', '14', 0, 0, NOW(), NOW()),
+    ('order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW());
 
-INSERT INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`)
-VALUES ('order_return_status_changed', NULL, 'order_return_status_changed.txt', 'order_return_status_changed.html', NOW(), NOW());
-SET @order_return_message_id = LAST_INSERT_ID();
-INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
-(@order_return_message_id, 'en_US', 'Return status update sent to the customer', 'Update on your return {{ return_ref }}'),
-(@order_return_message_id, 'fr_FR', 'Notification de changement de statut de retour envoyée au client', 'Suivi de votre retour {{ return_ref }}');
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('order_return_status_changed', NULL, 'order_return_status_changed.txt', 'order_return_status_changed.html', NOW(), NOW());
 
-INSERT INTO resource (`code`, `created_at`, `updated_at`) VALUES
-('admin.order-return', NOW(), NOW()),
-('admin.configuration.order-return-reason', NOW(), NOW());
-INSERT INTO `resource_i18n` (`id`, `locale`, `title`)
-SELECT id, 'en_US', 'Product returns' FROM resource WHERE code = 'admin.order-return'
-UNION ALL SELECT id, 'fr_FR', 'Retours produits' FROM resource WHERE code = 'admin.order-return'
-UNION ALL SELECT id, 'en_US', 'Return reasons' FROM resource WHERE code = 'admin.configuration.order-return-reason'
-UNION ALL SELECT id, 'fr_FR', 'Motifs de retour' FROM resource WHERE code = 'admin.configuration.order-return-reason';
+-- Read back by name rather than from LAST_INSERT_ID(): on a replay the insert
+-- above is ignored and hands back no id at all.
+SET @order_return_message_id := (SELECT `id` FROM `message` WHERE `name` = 'order_return_status_changed');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@order_return_message_id, 'cs_CZ', NULL, NULL),
+    (@order_return_message_id, 'de_DE', 'Aktualisierung des Rückgabestatus an den Kunden gesendet', 'Aktualisierung zu Ihrer Rückgabe {{ return_ref }}'),
+    (@order_return_message_id, 'en_US', 'Return status update sent to the customer', 'Update on your return {{ return_ref }}'),
+    (@order_return_message_id, 'es_ES', 'Actualización del estado de la devolución enviada al cliente', 'Actualización de tu devolución {{ return_ref }}'),
+    (@order_return_message_id, 'fr_FR', 'Mise à jour du statut de retour envoyée au client', 'Mise à jour de votre retour {{ return_ref }}'),
+    (@order_return_message_id, 'it_IT', NULL, NULL),
+    (@order_return_message_id, 'nl_NL', 'Update van de retourstatus naar de klant verzonden', 'Update over je retour {{ return_ref }}'),
+    (@order_return_message_id, 'ru_RU', 'Обновление статуса возврата отправлено клиенту', 'Обновление по вашему возврату {{ return_ref }}');
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order-return', NOW(), NOW()),
+    ('admin.configuration.order-return-reason', NOW(), NOW());
+
+SET @order_return_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order-return');
+SET @order_return_reason_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.order-return-reason');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@order_return_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@order_return_resource_id, 'de_DE', 'Produktrückgaben', NULL, NULL, NULL),
+    (@order_return_resource_id, 'en_US', 'Product returns', NULL, NULL, NULL),
+    (@order_return_resource_id, 'es_ES', 'Devoluciones de productos', NULL, NULL, NULL),
+    (@order_return_resource_id, 'fr_FR', 'Retours produits', NULL, NULL, NULL),
+    (@order_return_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@order_return_resource_id, 'nl_NL', 'Productretouren', NULL, NULL, NULL),
+    (@order_return_resource_id, 'ru_RU', 'Возвраты товаров', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'de_DE', 'Rückgabegründe', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'en_US', 'Return reasons', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'es_ES', 'Motivos de devolución', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'fr_FR', 'Motifs de retour', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'nl_NL', 'Retourredenen', NULL, NULL, NULL),
+    (@order_return_reason_resource_id, 'ru_RU', 'Причины возврата', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
