@@ -35,6 +35,8 @@ use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
@@ -186,6 +188,59 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Last chance to price the promotions before the order is written.
+     *
+     * The buyer can sit on the payment page long after the last cart change, and
+     * a promotion can stop applying in the meantime: disabled by the merchant,
+     * expired, out of stock for the product it offers, or used up by someone else.
+     * Without this pass the order is billed with a discount nothing explains, and
+     * no order_coupon row is written for it.
+     *
+     * Only carts the coupon machinery has a say in are touched: a discount put on
+     * a cart by something else is left where it is.
+     */
+    public function reconcileBeforeOrder(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $session = $this->requestStack->getMainRequest()?->getSession();
+
+        if (!$session instanceof Session || !$session->isStarted()) {
+            return;
+        }
+
+        if (!$this->couponsCanExplainTheDiscount($session->getSessionCart($dispatcher))) {
+            return;
+        }
+
+        $this->updateOrderDiscount($event, $eventName, $dispatcher);
+    }
+
+    /**
+     * Whether the discount carried by this cart can be the work of a coupon: a code
+     * the buyer typed, a line a promotion offered, or an automatic promotion the shop
+     * declares — disabled ones included, since a promotion withdrawn since the last
+     * cart change is exactly the case to catch.
+     */
+    private function couponsCanExplainTheDiscount(?Cart $cart): bool
+    {
+        if ([] !== ($this->getSession()?->getConsumedCoupons() ?? [])) {
+            return true;
+        }
+
+        if (null !== $cart
+            && null !== CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterByIsOffered(1)
+                ->findOne()
+        ) {
+            return true;
+        }
+
+        return CouponQuery::create()
+            ->filterByTriggerMode(CouponModel::TRIGGER_MODE_AUTOMATIC)
+            ->count() > 0;
+    }
+
+    /**
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model.
      *
@@ -256,7 +311,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function checkFreePostage(OrderEvent $event): void
     {
-        /** @var \Thelia\Model\Cart $cart */
+        /** @var Cart $cart */
         $cart = $this->requestStack->getMainRequest()?->getSession()->getSessionCart($this->dispatcher);
 
         if ($this->couponManager->isCouponRemovingPostage($cart)) {
@@ -271,7 +326,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function forceFreePostage(mixed $event): void
     {
-        /** @var \Thelia\Model\Cart $cart */
+        /** @var Cart $cart */
         $cart = $this->requestStack->getMainRequest()?->getSession()->getSessionCart($this->dispatcher);
 
         if ($this->couponManager->isCouponRemovingPostage($cart)) {
@@ -484,6 +539,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_SET_DELIVERY_MODULE => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL => ['updateOrderDiscount', 10],
+            // The buyer can sit on the payment page long after the last cart change,
+            // and an automatic promotion can stop applying in the meantime: disabled
+            // by the merchant, expired, or out of stock for its offered product.
+            // 200 runs before Action\Order::create (128), so the order is built from a
+            // cart whose discount and offered lines are the ones that still hold.
+            TheliaEvents::ORDER_PAY => ['reconcileBeforeOrder', 200],
         ];
     }
 

@@ -122,6 +122,66 @@ final class AutomaticPromotionOrderTest extends ActionIntegrationPromotionTestCa
     /**
      * @return array{0: Coupon, 1: Product, 2: Product, 3: Order, 4: float}
      */
+    public function testAPromotionWithdrawnBeforeTheOrderIsNotBilledOnIt(): void
+    {
+        $customer = $this->signedInCustomer();
+        $coupon = $this->automaticPromotion(conditions: $this->atLeastLines(1));
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        // Action\Order::create() copies the order addresses off the cart, the way the
+        // checkout does once the buyer has chosen them.
+        $cartAddress = $this->factory->cartAddress($this->factory->address($customer));
+        $cart
+            ->setAddressDeliveryId($cartAddress->getId())
+            ->setAddressInvoiceId($cartAddress->getId())
+            ->save();
+        $cart->reload();
+
+        self::assertSame(5.0, (float) $cart->getDiscount(), 'The promotion applies while the buyer fills the cart.');
+
+        // The merchant ends the promotion while the buyer sits on the payment page.
+        // Nothing touches the cart after that, so nothing recomputes its discount.
+        $coupon->setIsEnabled(false)->save();
+
+        $order = $this->payOrder($customer, $cart);
+
+        self::assertSame(
+            0.0,
+            (float) $order->getDiscount(),
+            'A promotion that no longer applies must not be billed on the order.',
+        );
+        self::assertCount(
+            0,
+            OrderCouponQuery::create()->filterByOrderId($order->getId())->find(),
+            'And the order must not carry a discount no coupon row explains.',
+        );
+    }
+
+    /**
+     * The checkout path a buyer takes: ORDER_PAY, which is what gives the
+     * promotions a last chance to be priced before the order is built.
+     */
+    private function payOrder(Customer $customer, Cart $cart): Order
+    {
+        $sessionOrder = $this->session()->getOrder();
+        $sessionOrder
+            ->setDeliveryOrderAddressId($this->factory->orderAddress()->getId())
+            ->setInvoiceOrderAddressId($this->factory->orderAddress()->getId())
+            ->setStatusId(OrderStatusQuery::getNotPaidStatus()?->getId())
+            ->setDeliveryModuleId(ModuleQuery::create()->findOneByCode('CustomDelivery')?->getId())
+            ->setPaymentModuleId(ModuleQuery::create()->findOneByCode('Cheque')?->getId())
+            ->setCustomerId($customer->getId())
+            ->setCartId($cart->getId())
+            ->setPostage('0')
+            ->setPostageTax('0');
+
+        $event = new OrderEvent($sessionOrder);
+        $this->dispatch($event, TheliaEvents::ORDER_PAY);
+
+        return $event->getPlacedOrder();
+    }
+
     private function placeOrderWithAnOfferedGift(int $maxUsage = Coupon::UNLIMITED_COUPON_USE): array
     {
         $customer = $this->signedInCustomer();
