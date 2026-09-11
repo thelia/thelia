@@ -511,12 +511,34 @@ WHERE NOT EXISTS (SELECT 1 FROM `order_status_action`);
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.order.status-force', NOW(), NOW());
 
+-- Every language the shop has, with the wording setup/I18n ships for it, English for
+-- a locale nobody translated: the profile screen lists the right in the language of
+-- the administrator, and a locale left without a row would show it blank.
 INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'en_US', 'Order status transition override', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
-
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
+    SELECT `resource`.`id`, `lang`.`locale`,
+           CASE `lang`.`locale`
+                WHEN 'ar_SA' THEN 'تجاوز انتقالات حالة الطلب'
+                WHEN 'cs_CZ' THEN 'Vynucení přechodu stavu objednávky'
+                WHEN 'de_DE' THEN 'Erzwingen von Bestellstatus-Übergängen'
+                WHEN 'el_GR' THEN 'Παράκαμψη μεταβάσεων κατάστασης παραγγελίας'
+                WHEN 'es_ES' THEN 'Forzar transiciones de estado de pedido'
+                WHEN 'fa_IR' THEN 'نادیده گرفتن انتقال وضعیت سفارش'
+                WHEN 'fr_FR' THEN 'Forçage des transitions de statut de commande'
+                WHEN 'hu_HU' THEN 'Rendelési állapotváltás felülbírálása'
+                WHEN 'id_ID' THEN 'Pengesampingan transisi status pesanan'
+                WHEN 'it_IT' THEN 'Forzatura delle transizioni di stato dell\'ordine'
+                WHEN 'nl_NL' THEN 'Overschrijven van orderstatusovergangen'
+                WHEN 'pl_PL' THEN 'Wymuszanie zmiany statusu zamówienia'
+                WHEN 'pt_BR' THEN 'Forçar transições de status do pedido'
+                WHEN 'pt_PT' THEN 'Forçar transições de estado da encomenda'
+                WHEN 'ru_RU' THEN 'Принудительное изменение статуса заказа'
+                WHEN 'sk_SK' THEN 'Vynútenie prechodu stavu objednávky'
+                WHEN 'tr_TR' THEN 'Sipariş durumu geçişini zorlama'
+                WHEN 'uk_UA' THEN 'Примусова зміна статусу замовлення'
+                ELSE 'Order status transition override'
+           END,
+           NULL, NULL, NULL
+    FROM `resource` CROSS JOIN `lang`
+    WHERE `resource`.`code` = 'admin.order.status-force';
 
 SET FOREIGN_KEY_CHECKS = 1;
