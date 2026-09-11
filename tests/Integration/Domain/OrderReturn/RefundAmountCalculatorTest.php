@@ -89,7 +89,7 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
     {
         $order = $this->discountedOrder();
         $paid = $this->orderProduct($order, price: '30.000000', quantity: 2.0, unitTax: '6.000000');
-        $offered = $this->orderProduct($order, price: '0.000000', quantity: 1.0, unitTax: '0.000000');
+        $offered = $this->orderProduct($order, price: '0.000000', quantity: 1.0, unitTax: '0.000000', offered: true);
         $this->orderProduct($order, price: '10.000000', quantity: 1.0, unitTax: '2.000000');
 
         self::assertSame(0.0, $this->calculator->lineRefundForProduct($offered, 1.0));
@@ -131,7 +131,7 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
         return $order;
     }
 
-    private function orderProduct(Order $order, string $price, float $quantity, string $unitTax): OrderProductModel
+    private function orderProduct(Order $order, string $price, float $quantity, string $unitTax, bool $offered = false): OrderProductModel
     {
         $orderProduct = (new OrderProductModel())
             ->setOrderId((int) $order->getId())
@@ -144,7 +144,8 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
             ->setPromoPrice($price)
             ->setWasNew(1)
             ->setWasInPromo(0)
-            ->setVirtual(0);
+            ->setVirtual(0)
+            ->setIsOffered($offered ? 1 : 0);
         $orderProduct->save($this->getPropelConnection());
 
         if ('0.000000' !== $unitTax) {
