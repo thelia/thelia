@@ -15,26 +15,48 @@ declare(strict_types=1);
 namespace Thelia\Test;
 
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\Customer;
 
 /**
  * A mailer factory that keeps what it was asked to send instead of sending it.
  *
- * Lets a test assert on the message code and on the parameters the calling code chose,
- * which is what that code is responsible for — the wording around them belongs to the
- * email template, and a shop is free to replace it.
+ * It stands in for the transport only: everything the factory decides before
+ * handing a message over — the recipients of a shop notification, the locale a
+ * customer message is rendered in, the parameters the calling code chose — is
+ * resolved by the real code and recorded here. A test can therefore assert on
+ * what the caller is responsible for, the wording around it belonging to the
+ * email template, which a shop is free to replace.
  */
 class RecordingMailerFactory extends MailerFactory
 {
-    /** @var list<array{code: string, customer: Customer, parameters: array<string, mixed>}> */
-    public array $customerMessages = [];
+    /**
+     * @var list<array{
+     *     code: string,
+     *     from: array<string, string>,
+     *     to: array<string, string>,
+     *     parameters: array<string, mixed>,
+     *     locale: string|null,
+     *     replyTo: array<string, string>,
+     * }>
+     */
+    public array $messages = [];
 
-    public function sendEmailToCustomer(string $messageCode, Customer $customer, array $messageParameters = []): void
-    {
-        $this->customerMessages[] = [
+    public function sendEmailMessageOrFail(
+        string $messageCode,
+        array $from,
+        array $to,
+        array $messageParameters = [],
+        ?string $locale = null,
+        array $cc = [],
+        array $bcc = [],
+        array $replyTo = [],
+    ): void {
+        $this->messages[] = [
             'code' => $messageCode,
-            'customer' => $customer,
+            'from' => $from,
+            'to' => $to,
             'parameters' => $messageParameters,
+            'locale' => $locale,
+            'replyTo' => $replyTo,
         ];
     }
 
@@ -47,7 +69,7 @@ class RecordingMailerFactory extends MailerFactory
             array_map(
                 static fn (array $message): array => $message['parameters'],
                 array_filter(
-                    $this->customerMessages,
+                    $this->messages,
                     static fn (array $message): bool => $message['code'] === $messageCode,
                 ),
             ),

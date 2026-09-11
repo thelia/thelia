@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -26,11 +28,17 @@ use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Order\StatusAction\Effect\AllocateInvoiceRefAction;
 use Thelia\Domain\Order\StatusAction\Effect\ReleaseCouponsAction;
 use Thelia\Domain\Order\StatusAction\Effect\SendCustomerEmailAction;
+use Thelia\Domain\Order\StatusAction\Effect\SendShopManagersEmailAction;
+use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRegistry;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Customer;
+use Thelia\Model\LangQuery;
+use Thelia\Model\Message;
 use Thelia\Model\Order;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponQuery;
@@ -96,6 +104,46 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_PROCESSING);
 
         self::assertSame(13.0, $this->stockOf($productSaleElements));
+    }
+
+    public function testAStockActionOnATransitionTakesTheOrderedQuantityOutOfStock(): void
+    {
+        $this->action(
+            OrderStatusActionTrigger::TRANSITION,
+            OrderStatus::CODE_PROCESSING,
+            OrderStatus::CODE_SENT,
+            AdjustStockAction::getType(),
+            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
+        );
+        $productSaleElements = $this->createProductSaleElements(10);
+        // Neither status is a paid one, so the core listener leaves the stock alone:
+        // what the quantity ends up being is the work of the action and of it alone.
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+        $this->addOrderProduct($order, $productSaleElements, 4);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+
+        self::assertSame(6.0, $this->stockOf($productSaleElements));
+        self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->count());
+    }
+
+    /**
+     * The effects are found by their tag, never by a switch: a shop that installs a
+     * module gets its action type without anyone editing the core.
+     */
+    public function testTheInstalledActionTypesAreDiscoveredByTheirTag(): void
+    {
+        $registry = $this->getService(OrderStatusActionRegistry::class);
+
+        foreach ([
+            SendCustomerEmailAction::class,
+            SendShopManagersEmailAction::class,
+            AdjustStockAction::class,
+            AllocateInvoiceRefAction::class,
+            ReleaseCouponsAction::class,
+        ] as $effect) {
+            self::assertInstanceOf($effect, $registry->get($effect::getType()), \sprintf('%s must be discovered through its tag.', $effect));
+        }
     }
 
     public function testAFailingActionLeavesTheStatusChangedIsRecordedAndDoesNotStopTheNextOnes(): void
@@ -186,44 +234,113 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 
     public function testTheCustomerEmailActionSendsTheChosenMessageWithTheOrderParameters(): void
     {
-        $mailer = new RecordingMailerFactory(
-            $this->getService(TemplateHelperInterface::class),
-            $this->getService(ParserResolver::class),
-            $this->getService(MailerInterface::class),
-        );
-        $runner = new OrderStatusActionRunner(
-            new OrderStatusActionRegistry([new SendCustomerEmailAction($mailer)]),
-            $this->getService(OrderStatusCatalog::class),
-        );
+        $mailer = $this->recordingMailer();
         $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'order_confirmation']);
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
 
-        $event = new OrderEvent($order);
-        $event->setPreviousStatusId($this->orderStatus(OrderStatus::CODE_PROCESSING)->getId());
-        $event->setStatus($this->orderStatus(OrderStatus::CODE_SENT)->getId());
-        $runner->onOrderStatusUpdate($event);
+        $this->runnerWith(new SendCustomerEmailAction($mailer))
+            ->onOrderStatusUpdate($this->statusChange($order, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
 
         $sent = $mailer->parametersOfMessagesSent('order_confirmation');
         self::assertCount(1, $sent);
         self::assertSame($order->getRef(), $sent[0]['order_ref']);
         self::assertSame(OrderStatus::CODE_SENT, $sent[0]['order_status_code']);
         self::assertSame(OrderStatus::CODE_PROCESSING, $sent[0]['previous_order_status_code']);
-        self::assertSame($order->getCustomerId(), $mailer->customerMessages[0]['customer']->getId());
+        self::assertSame($order->getCustomerId(), $sent[0]['customer_id']);
+    }
+
+    /**
+     * Recipe 3 of #160: the customer reads the message in their own language, whatever
+     * the language of the shop or of the administrator who moved the order.
+     */
+    public function testTheCustomerEmailIsSentInTheLanguageOfTheCustomer(): void
+    {
+        $mailer = $this->recordingMailer();
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'order_confirmation']);
+        $french = $this->factory->order($this->customerSpeaking('fr_FR'), ['statusCode' => OrderStatus::CODE_PROCESSING]);
+        $english = $this->factory->order($this->customerSpeaking('en_US'), ['statusCode' => OrderStatus::CODE_PROCESSING]);
+
+        $runner = $this->runnerWith(new SendCustomerEmailAction($mailer));
+        $runner->onOrderStatusUpdate($this->statusChange($french, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
+        $runner->onOrderStatusUpdate($this->statusChange($english, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
+
+        self::assertSame(['fr_FR', 'en_US'], array_column($mailer->messages, 'locale'));
+    }
+
+    public function testTheShopManagersEmailActionSendsTheChosenMessageToTheConfiguredRecipients(): void
+    {
+        ConfigQuery::write('store_notification_emails', 'manager@example.com,second-manager@example.com');
+        $mailer = $this->recordingMailer();
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, SendShopManagersEmailAction::getType(), [SendShopManagersEmailAction::FIELD_MESSAGE_CODE => 'order_confirmation']);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+
+        $this->runnerWith(new SendShopManagersEmailAction($mailer))
+            ->onOrderStatusUpdate($this->statusChange($order, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
+
+        self::assertCount(1, $mailer->messages);
+        self::assertSame(
+            ['manager@example.com', 'second-manager@example.com'],
+            array_keys($mailer->messages[0]['to']),
+            'The managers of the shop are the recipients the configuration names.',
+        );
+        $sent = $mailer->parametersOfMessagesSent('order_confirmation');
+        self::assertSame($order->getRef(), $sent[0]['order_ref']);
+        self::assertSame(OrderStatus::CODE_SENT, $sent[0]['order_status_code']);
+    }
+
+    /**
+     * An e-mail that never leaves is exactly the case #160 asks to journal: the
+     * merchant has to learn that the customer was not told, while the order keeps
+     * moving and the rest of the configuration still runs.
+     */
+    public function testAnEmailThatCannotBeSentLeavesTheStatusChangedIsRecordedAndDoesNotStopTheNextAction(): void
+    {
+        ConfigQuery::write('store_email', 'shop@example.com');
+        $messageCode = $this->messageWithoutABody();
+        $emailAction = $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => $messageCode], 1);
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, AllocateInvoiceRefAction::getType(), [], 2);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PROCESSING);
+
+        $reloaded = $this->reload($order);
+        self::assertSame(OrderStatus::CODE_PROCESSING, $reloaded->getOrderStatus()->getCode(), 'A mail that could not be sent must not undo the status change.');
+        self::assertNotEmpty($reloaded->getInvoiceRef(), 'The action after the failing e-mail still ran.');
+
+        $failure = OrderStatusActionFailureQuery::create()->filterByActionId($emailAction->getId())->findOne();
+        self::assertNotNull($failure, 'An e-mail that never left must be journalled.');
+        self::assertStringContainsString($messageCode, $failure->getMessage());
+        self::assertStringNotContainsString((string) $order->getCustomer()->getEmail(), $failure->getMessage());
+    }
+
+    /**
+     * A mail transport names the recipient and carries its own credentials when it
+     * fails. Neither belongs in a journal an administrator reads (#161, security).
+     */
+    public function testAFailedEmailIsJournalledWithoutTheCustomerAddressNorTheTransportDetail(): void
+    {
+        ConfigQuery::write('store_email', 'shop@example.com');
+        $messageCode = $this->renderableMessage();
+        $action = $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => $messageCode]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+        $customerEmail = (string) $order->getCustomer()->getEmail();
+
+        $this->runnerWith(new SendCustomerEmailAction($this->leakingMailer()))
+            ->onOrderStatusUpdate($this->statusChange($order, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
+
+        $failure = OrderStatusActionFailureQuery::create()->filterByActionId($action->getId())->findOne();
+        self::assertNotNull($failure, 'A transport failure must be journalled.');
+        self::assertStringNotContainsString($customerEmail, $failure->getMessage());
+        self::assertStringNotContainsString('s3cr3t', $failure->getMessage());
     }
 
     public function testAnUnexpectedExceptionIsRecordedWithoutItsRawMessage(): void
     {
-        $runner = new OrderStatusActionRunner(
-            new OrderStatusActionRegistry([new ExplodingAction()]),
-            $this->getService(OrderStatusCatalog::class),
-        );
         $action = $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, ExplodingAction::getType());
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
 
-        $event = new OrderEvent($order);
-        $event->setPreviousStatusId($this->orderStatus(OrderStatus::CODE_PROCESSING)->getId());
-        $event->setStatus($this->orderStatus(OrderStatus::CODE_SENT)->getId());
-        $runner->onOrderStatusUpdate($event);
+        $this->runnerWith(new ExplodingAction())
+            ->onOrderStatusUpdate($this->statusChange($order, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
 
         $failure = OrderStatusActionFailureQuery::create()->filterByActionId($action->getId())->findOne();
         self::assertNotNull($failure);
@@ -262,6 +379,83 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         $action->save();
 
         return $action;
+    }
+
+    /**
+     * A runner wired to the given actions only, for the cases a test has to drive
+     * the effect itself instead of letting the container's services run.
+     */
+    private function runnerWith(OrderStatusActionInterface ...$actions): OrderStatusActionRunner
+    {
+        return new OrderStatusActionRunner(
+            new OrderStatusActionRegistry($actions),
+            $this->getService(OrderStatusCatalog::class),
+        );
+    }
+
+    private function statusChange(Order $order, string $fromCode, string $toCode): OrderEvent
+    {
+        $event = new OrderEvent($order);
+        $event->setPreviousStatusId($this->orderStatus($fromCode)->getId());
+        $event->setStatus($this->orderStatus($toCode)->getId());
+
+        return $event;
+    }
+
+    private function customerSpeaking(string $locale): Customer
+    {
+        $lang = LangQuery::create()->findOneByLocale($locale);
+        self::assertNotNull($lang, "Seeded language '$locale' is missing.");
+
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $customer->setLangId($lang->getId())->save();
+
+        return $customer;
+    }
+
+    private function recordingMailer(): RecordingMailerFactory
+    {
+        return new RecordingMailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->getService(ParserResolver::class),
+            $this->getService(MailerInterface::class),
+        );
+    }
+
+    private function leakingMailer(): LeakingMailerFactory
+    {
+        return new LeakingMailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->getService(ParserResolver::class),
+            $this->getService(MailerInterface::class),
+        );
+    }
+
+    /**
+     * A message the mailer cannot build: no body at all, which is how a shop breaks
+     * a template in practice.
+     */
+    private function messageWithoutABody(): string
+    {
+        $message = new Message();
+        $message->setName('order_status_action_unsendable_'.uniqid());
+        $message->setLocale('en_US');
+        $message->setSubject('Subject');
+        $message->save();
+
+        return (string) $message->getName();
+    }
+
+    private function renderableMessage(): string
+    {
+        $message = new Message();
+        $message->setName('order_status_action_renderable_'.uniqid());
+        $message->setLocale('en_US');
+        $message->setSubject('Subject');
+        $message->setTextMessage('Your order changed status.');
+        $message->save();
+
+        return (string) $message->getName();
     }
 
     private function createProductSaleElements(int $quantity): ProductSaleElements
@@ -340,9 +534,21 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 }
 
 /**
+ * A mailer whose transport refuses the message the way a real one does: the reason
+ * names the recipient and carries the credentials of the transport.
+ */
+final class LeakingMailerFactory extends MailerFactory
+{
+    public function send(Email $message): void
+    {
+        throw new TransportException('Connection to smtp://postmaster:s3cr3t@mail.example.com refused while writing to '.$message->getTo()[0]->getAddress());
+    }
+}
+
+/**
  * An action a module could ship, failing the way a transport does: with a secret in the message.
  */
-final class ExplodingAction implements \Thelia\Domain\Order\StatusAction\OrderStatusActionInterface
+final class ExplodingAction implements OrderStatusActionInterface
 {
     public static function getType(): string
     {

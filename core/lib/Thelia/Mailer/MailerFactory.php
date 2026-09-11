@@ -23,6 +23,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
@@ -52,14 +53,34 @@ class MailerFactory
     /**
      * Send a message to the customer.
      *
+     * A message that cannot be sent is logged and swallowed: a mail is never worth
+     * breaking the process that asked for it. A caller that has to know uses
+     * {@see self::sendEmailToCustomerOrFail()}.
+     *
      * @param array $messageParameters an array of (name => value) parameters that will be available in the message
      */
     public function sendEmailToCustomer(string $messageCode, Customer $customer, array $messageParameters = []): void
     {
+        try {
+            $this->sendEmailToCustomerOrFail($messageCode, $customer, $messageParameters);
+        } catch (EmailNotSentException) {
+            // Already logged where it was raised.
+        }
+    }
+
+    /**
+     * Send a message to the customer, and tell the caller when it did not leave.
+     *
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
+     *
+     * @throws EmailNotSentException
+     */
+    public function sendEmailToCustomerOrFail(string $messageCode, Customer $customer, array $messageParameters = []): void
+    {
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
 
-        $this->sendEmailMessage(
+        $this->sendEmailMessageOrFail(
             $messageCode,
             [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
             [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
@@ -76,6 +97,23 @@ class MailerFactory
      */
     public function sendEmailToShopManagers(string $messageCode, array $messageParameters = [], array $replyTo = []): void
     {
+        try {
+            $this->sendEmailToShopManagersOrFail($messageCode, $messageParameters, $replyTo);
+        } catch (EmailNotSentException) {
+            // Already logged where it was raised.
+        }
+    }
+
+    /**
+     * Send a message to the shop managers, and tell the caller when it did not leave.
+     *
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param array $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     *
+     * @throws EmailNotSentException
+     */
+    public function sendEmailToShopManagersOrFail(string $messageCode, array $messageParameters = [], array $replyTo = []): void
+    {
         $storeName = ConfigQuery::getStoreName();
 
         // Build the list of email recipients
@@ -88,12 +126,13 @@ class MailerFactory
         }
 
         if ([] === $to) {
-            Tlog::getInstance()->addError(\sprintf('Message %s not sent: no shop notification recipient is configured (store_notification_emails, Configuration > Store information).', $messageCode));
+            $exception = EmailNotSentException::noShopNotificationRecipient($messageCode);
+            Tlog::getInstance()->addError($exception->getMessage());
 
-            return;
+            throw $exception;
         }
 
-        $this->sendEmailMessage(
+        $this->sendEmailMessageOrFail(
             $messageCode,
             [ConfigQuery::getStoreEmail() => $storeName],
             $to,
@@ -126,17 +165,53 @@ class MailerFactory
         array $bcc = [],
         array $replyTo = [],
     ): void {
+        try {
+            $this->sendEmailMessageOrFail($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
+        } catch (EmailNotSentException) {
+            // Already logged where it was raised.
+        }
+    }
+
+    /**
+     * Send a message built from a message code, and tell the caller when it did not leave.
+     *
+     * The single place a message is actually handed to the transport. What went wrong
+     * is logged here, with everything the server may need; what the exception carries
+     * is what a caller may show, and names neither a recipient nor a transport.
+     *
+     * @param array       $from              From addresses. An array of (email-address => name)
+     * @param array       $to                To addresses. An array of (email-address => name)
+     * @param array       $messageParameters an array of (name => value) parameters that will be available in the message
+     * @param string|null $locale            if null, the default store locale is used
+     * @param array       $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param array       $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param array       $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     *
+     * @throws EmailNotSentException
+     */
+    public function sendEmailMessageOrFail(
+        string $messageCode,
+        array $from,
+        array $to,
+        array $messageParameters = [],
+        ?string $locale = null,
+        array $cc = [],
+        array $bcc = [],
+        array $replyTo = [],
+    ): void {
         $storeEmail = ConfigQuery::getStoreEmail();
 
         if (empty($storeEmail)) {
-            Tlog::getInstance()->addError(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
+            $exception = EmailNotSentException::storeEmailMissing($messageCode);
+            Tlog::getInstance()->addError($exception->getMessage());
 
-            return;
+            throw $exception;
         }
         if ([] === $to) {
-            Tlog::getInstance()->addWarning(\sprintf('Message %s not sent: recipient list is empty.', $messageCode));
+            $exception = EmailNotSentException::emptyRecipientList($messageCode);
+            Tlog::getInstance()->addWarning($exception->getMessage());
 
-            return;
+            throw $exception;
         }
 
         try {
@@ -144,9 +219,13 @@ class MailerFactory
 
             $this->send($instance);
         } catch (\Exception $ex) {
+            // The raw reason names the recipient and carries the transport credentials:
+            // the server log is the only place for it.
             Tlog::getInstance()->addError(
                 \sprintf('Error while sending email message %s: ', $messageCode).$ex->getMessage(),
             );
+
+            throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
     }
 
