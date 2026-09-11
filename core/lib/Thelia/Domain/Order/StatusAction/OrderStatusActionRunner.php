@@ -22,6 +22,7 @@ use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\OrderStatusActionFailure;
@@ -159,7 +160,9 @@ final class OrderStatusActionRunner
      */
     private function failureMessage(\Throwable $throwable): string
     {
-        if ($throwable instanceof InvalidOrderStatusActionPayloadException || $throwable instanceof TheliaProcessException) {
+        if ($throwable instanceof InvalidOrderStatusActionPayloadException
+            || $throwable instanceof EmailNotSentException
+            || $throwable instanceof TheliaProcessException) {
             return $throwable->getMessage();
         }
 

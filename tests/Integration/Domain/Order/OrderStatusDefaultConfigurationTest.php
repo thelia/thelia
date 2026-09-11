@@ -20,6 +20,11 @@ use Thelia\Domain\Invoice\InvoiceRefAllocator;
 use Thelia\Domain\Order\StatusAction\Effect\AllocateInvoiceRefAction;
 use Thelia\Domain\Order\StatusAction\Effect\ReleaseCouponsAction;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Coupon;
+use Thelia\Model\CouponQuery;
+use Thelia\Model\Order;
+use Thelia\Model\OrderCoupon;
+use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
@@ -89,10 +94,16 @@ final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCas
             ->setWasInPromo(0)
             ->save();
 
-        foreach ([OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT] as $code) {
-            $event = new OrderEvent($order);
-            $event->setStatus($this->orderStatus($code)->getId());
-            $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        $coupon = $this->factory->coupon(['code' => 'LIFECYCLE', 'maxUsage' => 1]);
+        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage(), 'Paying the order still consumes the usage of its coupons, through the core listener.');
+        self::assertFalse((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+
+        foreach ([OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT] as $code) {
+            $this->moveOrderTo($order, $code);
         }
 
         $reloaded = OrderQuery::create()->findPk($order->getId());
@@ -101,15 +112,65 @@ final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCas
         // Paying an order whose stock was not taken at creation takes the ordered
         // quantities out of stock, through the core listener, exactly as before.
         self::assertSame(8.0, (float) ProductSaleElementsQuery::create()->findPk($productSaleElements->getId())->getQuantity());
+        self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage(), 'Processing and shipping leave the coupon usage alone.');
         self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->count());
 
         // Going back, the way the graph would forbid once configured, is still allowed.
-        $event = new OrderEvent($order);
-        $event->setStatus($this->orderStatus(OrderStatus::CODE_NOT_PAID)->getId());
-        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
 
         self::assertSame(OrderStatus::CODE_NOT_PAID, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame(10.0, (float) ProductSaleElementsQuery::create()->findPk($productSaleElements->getId())->getQuantity(), 'Leaving a paid status puts the quantities back, as before.');
+        self::assertSame(1, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage(), 'An order that is no longer paid gives its coupon usage back, as before.');
+        self::assertTrue((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+    }
+
+    public function testCancellingAPaidOrderStillGivesItsCouponUsageBack(): void
+    {
+        $order = $this->factory->order();
+        $coupon = $this->factory->coupon(['code' => 'CANCEL-ME', 'maxUsage' => 1]);
+        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
+
+        $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(1, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
+        self::assertTrue((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
+    }
+
+    /**
+     * A coupon as the checkout leaves it on an order: remembered, and not counted yet.
+     */
+    private function rememberCouponOnOrder(Order $order, Coupon $coupon): OrderCoupon
+    {
+        $orderCoupon = (new OrderCoupon())
+            ->setOrder($order)
+            ->setUsageCanceled(1)
+            ->setCode($coupon->getCode())
+            ->setType($coupon->getType())
+            ->setAmount('5')
+            ->setTitle($coupon->getTitle())
+            ->setShortDescription($coupon->getShortDescription())
+            ->setDescription($coupon->getDescription())
+            ->setStartDate($coupon->getStartDate())
+            ->setExpirationDate($coupon->getExpirationDate())
+            ->setIsCumulative($coupon->getIsCumulative())
+            ->setIsRemovingPostage($coupon->getIsRemovingPostage())
+            ->setIsAvailableOnSpecialOffers($coupon->getIsAvailableOnSpecialOffers())
+            ->setSerializedConditions($coupon->getSerializedConditions())
+            ->setPerCustomerUsageCount($coupon->getPerCustomerUsageCount());
+        $orderCoupon->save();
+
+        return $orderCoupon;
+    }
+
+    private function moveOrderTo(Order $order, string $statusCode): void
+    {
+        $event = new OrderEvent($order);
+        $event->setStatus($this->orderStatus($statusCode)->getId());
+
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
     }
 
     private function orderStatus(string $code): OrderStatus

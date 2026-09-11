@@ -100,7 +100,7 @@ final class PasswordResetServiceTest extends IntegrationTestCase
     {
         $this->service->requestResetLink('unknown-'.bin2hex(random_bytes(8)).'@example.com');
 
-        self::assertSame([], $this->mailer->customerMessages);
+        self::assertSame([], $this->mailer->messages);
     }
 
     public function testTheCapStopsTheMailWithoutSayingSo(): void
@@ -118,7 +118,7 @@ final class PasswordResetServiceTest extends IntegrationTestCase
 
         $this->service->requestResetLink($email);
 
-        self::assertSame([], $this->mailer->customerMessages);
+        self::assertSame([], $this->mailer->messages);
     }
 
     public function testTheTokenFromTheMailSetsTheChosenPassword(): void

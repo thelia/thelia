@@ -28,7 +28,9 @@ final readonly class SendShopManagersEmailAction extends AbstractEmailAction
 
     public function execute(OrderStatusActionContext $context): void
     {
-        $this->mailer->sendEmailToShopManagers(
+        // OrFail: a message that does not leave is the failure the merchant has to
+        // see in the back office, so it must reach the runner instead of a log line.
+        $this->mailer->sendEmailToShopManagersOrFail(
             $context->payload[self::FIELD_MESSAGE_CODE],
             $this->messageParameters($context),
         );
