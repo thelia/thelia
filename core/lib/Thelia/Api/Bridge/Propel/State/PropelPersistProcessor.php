@@ -182,7 +182,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         PropelResourceInterface $data,
     ): array {
         $resourceAddons = [];
-        $jsonData = json_decode((string) $this->requestStack->getMainRequest()?->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $jsonData = $this->requestPayload();
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
 
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
@@ -199,5 +199,34 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         }
 
         return $resourceAddons;
+    }
+
+    /**
+     * The JSON body of the API request being processed, or nothing.
+     *
+     * Addons are declared in that body, and this processor is not only reached
+     * from an API request: a theme controller, a console command or a test
+     * writes a resource through it with no request at all, or with a
+     * form-encoded body. None of those carries addons, and none of them is an
+     * error - decoding what is not JSON used to throw a JsonException and force
+     * the caller to redo the Propel mapping by hand.
+     *
+     * @return array<string, mixed>
+     */
+    private function requestPayload(): array
+    {
+        $content = $this->requestStack->getMainRequest()?->getContent();
+
+        if (!\is_string($content) || '' === trim($content)) {
+            return [];
+        }
+
+        try {
+            $decoded = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return [];
+        }
+
+        return \is_array($decoded) ? $decoded : [];
     }
 }

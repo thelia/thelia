@@ -13,6 +13,10 @@ declare(strict_types=1);
  */
 
 return [
+    'Return status update sent to the customer' => 'Return status update sent to the customer',
+    'Update on your return {{ return_ref }}' => 'Update on your return {{ return_ref }}',
+    'Product returns' => 'Product returns',
+    'Return reasons' => 'Return reasons',
     '"Remember me" cookie expiration time, in seconds, for administration users' => '"Remember me" cookie expiration time, in seconds, for administration users',
     '"Remember me" cookie expiration time, in seconds, for customer users' => '"Remember me" cookie expiration time, in seconds, for customer users',
     '"Remember me" cookie name for administration users' => '"Remember me" cookie name for administration users',
@@ -1537,4 +1541,16 @@ return [
     'French 10% VAT (France only)' => 'French 10% VAT (France only)',
     'French 20% VAT  for all European countries (metropolitan only)' => 'French 20% VAT  for all European countries (metropolitan only)',
     'French 10% VAT (for metropolitan France only)' => 'French 10% VAT (for metropolitan France only)',
+    'Requested' => 'Requested',
+    'Information awaited' => 'Information awaited',
+    'Accepted' => 'Accepted',
+    'Refused' => 'Refused',
+    'Received' => 'Received',
+    'Settled' => 'Settled',
+    'Expired' => 'Expired',
+    'Product not as described' => 'Product not as described',
+    'Defective product' => 'Defective product',
+    'Wrong item received' => 'Wrong item received',
+    'No longer needed' => 'No longer needed',
+    'Other' => 'Other',
 ];

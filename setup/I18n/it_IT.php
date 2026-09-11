@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 return [
+    'Update on your return {{ return_ref }}' => 'Aggiornamento sul tuo reso {{ return_ref }}',
     'A {{ config("store_name") }} account has been created for you' => 'È stato creato un account {{ config("store_name") }} per te',
     'Address' => 'Indirizzo',
     'Advanced configuration' => 'Configurazione avanzata',

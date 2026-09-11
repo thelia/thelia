@@ -290,6 +290,18 @@ final class TheliaEvents
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';
     public const ORDER_PRODUCT_AFTER_CREATE = 'action.orderProduct.afterCreate';
 
+    /** Order return (RMA) linked events. */
+    public const ORDER_RETURN_CREATE = 'action.orderReturn.create';
+    public const ORDER_RETURN_UPDATE_STATUS = 'action.orderReturn.updateStatus';
+    public const ORDER_RETURN_RECEIVE = 'action.orderReturn.receive';
+    public const ORDER_RETURN_SEND_STATUS_EMAIL = 'action.orderReturn.sendStatusEmail';
+
+    /** Return reasons, the reference table the merchant configures. */
+    public const ORDER_RETURN_REASON_CREATE = 'action.createOrderReturnReason';
+    public const ORDER_RETURN_REASON_UPDATE = 'action.updateOrderReturnReason';
+    public const ORDER_RETURN_REASON_DELETE = 'action.deleteOrderReturnReason';
+    public const ORDER_RETURN_REASON_UPDATE_POSITION = 'action.updateOrderReturnReasonPosition';
+
     /** Sent on image processing. */
     public const IMAGE_PROCESS = 'action.processImage';
 

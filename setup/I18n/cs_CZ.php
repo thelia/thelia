@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 return [
+    'Update on your return {{ return_ref }}' => 'Aktualizace k vašemu vrácení {{ return_ref }}',
     'A {{ config("store_name") }} account has been created for you' => 'Pro Vás byl vytvořen účet v obchodě {{ config("store_name") }}',
     'Address' => 'Adresa',
     'Category' => 'Kategorie',
