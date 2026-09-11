@@ -296,6 +296,12 @@ final class TheliaEvents
     public const ORDER_RETURN_RECEIVE = 'action.orderReturn.receive';
     public const ORDER_RETURN_SEND_STATUS_EMAIL = 'action.orderReturn.sendStatusEmail';
 
+    /** Return reasons, the reference table the merchant configures. */
+    public const ORDER_RETURN_REASON_CREATE = 'action.createOrderReturnReason';
+    public const ORDER_RETURN_REASON_UPDATE = 'action.updateOrderReturnReason';
+    public const ORDER_RETURN_REASON_DELETE = 'action.deleteOrderReturnReason';
+    public const ORDER_RETURN_REASON_UPDATE_POSITION = 'action.updateOrderReturnReasonPosition';
+
     /** Sent on image processing. */
     public const IMAGE_PROCESS = 'action.processImage';
 
