@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Tagging;
 
+use Thelia\Domain\Tagging\Exception\TagLabelAlreadyUsedException;
 use Thelia\Domain\Tagging\Service\TagService;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -63,10 +64,35 @@ final class TagServiceTest extends IntegrationTestCase
     {
         $this->tagService->create('Salon 2026');
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Salon 2026/');
+        try {
+            $this->tagService->create('salón 2026');
+            self::fail('Creating a tag on a taken label must be refused.');
+        } catch (TagLabelAlreadyUsedException $exception) {
+            // Both labels are carried, not just a sentence: the screen has to be
+            // able to name the tag standing in the way, and it is spelled
+            // differently from what was typed.
+            self::assertSame('salón 2026', $exception->requestedLabel);
+            self::assertSame('Salon 2026', $exception->existingLabel);
+            self::assertFalse($exception->isSameSpelling());
+        }
+    }
 
-        $this->tagService->create('salón 2026');
+    /**
+     * The other half of the collision: the very same spelling. A screen that
+     * printed "the label X is taken by the tag X" would read as nonsense, so the
+     * two cases have to be distinguishable without comparing strings again.
+     */
+    public function testCreateReportsACollisionOnTheVerySameSpelling(): void
+    {
+        $this->tagService->create('Wholesaler');
+
+        try {
+            $this->tagService->create('Wholesaler');
+            self::fail('Creating a tag on a taken label must be refused.');
+        } catch (TagLabelAlreadyUsedException $exception) {
+            self::assertTrue($exception->isSameSpelling());
+            self::assertSame('Wholesaler', $exception->existingLabel);
+        }
     }
 
     public function testCreateRefusesALabelOfOnlyWhitespace(): void
@@ -165,8 +191,9 @@ final class TagServiceTest extends IntegrationTestCase
         try {
             $this->tagService->rename($renamed, 'Salón');
             self::fail('Renaming onto an existing label must be refused.');
-        } catch (\InvalidArgumentException $refusal) {
-            self::assertStringContainsString('Salon', $refusal->getMessage(), 'The message names the tag in the way.');
+        } catch (TagLabelAlreadyUsedException $refusal) {
+            self::assertSame('Salón', $refusal->requestedLabel);
+            self::assertSame('Salon', $refusal->existingLabel, 'The refusal names the tag in the way.');
         }
 
         self::assertSame('Prospect', TagQuery::create()->findPk($renamed->getId())?->getLabel());
