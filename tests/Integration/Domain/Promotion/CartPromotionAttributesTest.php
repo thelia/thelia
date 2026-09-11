@@ -74,10 +74,8 @@ final class CartPromotionAttributesTest extends ActionIntegrationPromotionTestCa
 
     /**
      * The list is exactly what the evaluation retained, no more. Two promotions
-     * both marked cumulative do NOT stack today: CouponFactory compares the
-     * BOOLEAN is_cumulative against the integer 1, so every coupon is built as
-     * non-cumulative and the last one evaluated wipes the previous. Stacking is
-     * a ticket of its own; the day it lands, this expectation changes with it.
+     * the merchant marked as combinable are both retained, each under its own
+     * label, and their amounts add up to the cart discount.
      */
     public function testTheListHoldsExactlyThePromotionsTheEvaluationRetained(): void
     {
@@ -89,7 +87,7 @@ final class CartPromotionAttributesTest extends ActionIntegrationPromotionTestCa
 
         $discounts = $this->attributeAccess->attributeCart('discounts');
 
-        self::assertSame(['Three off'], array_column($discounts, 'label'));
+        self::assertSame(['Five off', 'Three off'], array_column($discounts, 'label'));
         self::assertSame(
             $this->attributeAccess->attributeCart('taxed_discount'),
             array_sum(array_column($discounts, 'taxed_amount')),

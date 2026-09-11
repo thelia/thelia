@@ -105,8 +105,11 @@ class CouponFactory
      */
     public function buildCouponFromModel(Coupon $model): CouponInterface
     {
-        $isCumulative = 1 === $model->getIsCumulative();
-        $isRemovingPostage = 1 === $model->getIsRemovingPostage();
+        // The generated getters are typed ?bool: comparing them to the integer 1
+        // is never true, and every coupon read from the database came out
+        // non-cumulative and unable to offer the postage.
+        $isCumulative = (bool) $model->getIsCumulative();
+        $isRemovingPostage = (bool) $model->getIsRemovingPostage();
 
         if (!$this->container->has($model->getType())) {
             throw new \InvalidArgumentException(\sprintf('Coupon type "%s" is not registered.', $model->getType()));

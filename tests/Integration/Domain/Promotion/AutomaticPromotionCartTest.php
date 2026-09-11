@@ -322,6 +322,55 @@ final class AutomaticPromotionCartTest extends ActionIntegrationPromotionTestCas
         self::assertSame(5.0, $this->cartDiscount($cart));
     }
 
+    public function testTwoCumulativeAutomaticPromotionsBothApply(): void
+    {
+        $this->automaticPromotion(
+            effects: ['amount' => 5.0],
+            conditions: $this->atLeastLines(1),
+            title: 'Five off',
+        );
+        $this->automaticPromotion(
+            effects: ['amount' => 7.0],
+            conditions: $this->atLeastLines(1),
+            title: 'Seven off',
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+
+        self::assertSame(
+            12.0,
+            $this->cartDiscount($cart),
+            'Two promotions the merchant marked as combinable must both be taken into account.',
+        );
+    }
+
+    public function testACumulativeAutomaticPromotionKeepsTheCodeTheBuyerTyped(): void
+    {
+        $this->automaticPromotion(
+            effects: ['amount' => 5.0],
+            conditions: $this->atLeastLines(1),
+            title: 'Five off',
+        );
+        $typed = $this->factory->coupon([
+            'code' => 'KEEP-'.uniqid(),
+            'conditions' => $this->atLeastLines(1),
+            'isCumulative' => true,
+        ]);
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+
+        $this->session()->setConsumedCoupons([$typed->getCode()]);
+        $this->recomputeDiscount();
+
+        self::assertSame(
+            10.0,
+            $this->cartDiscount($cart),
+            'An automatic promotion must not swallow the code the buyer typed when both are combinable.',
+        );
+    }
+
     /**
      * Signing in duplicates the cart. The offered line belongs to the promotion,
      * not to the customer: copied as a regular line it would be PAID, and the
