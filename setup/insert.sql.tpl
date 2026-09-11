@@ -2102,7 +2102,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (50, 'admin.configuration.order-status', NOW(), NOW()),
 (51, 'admin.configuration.consent', NOW(), NOW()),
 (52, 'admin.order-return', NOW(), NOW()),
-(53, 'admin.configuration.order-return-reason', NOW(), NOW())
+(53, 'admin.configuration.order-return-reason', NOW(), NOW()),
+(54, 'admin.order.status-force', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3791,7 +3792,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL),
     (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
     (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
-    (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL),
+    (54, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

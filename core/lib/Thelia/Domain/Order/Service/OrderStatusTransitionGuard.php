@@ -41,6 +41,14 @@ final readonly class OrderStatusTransitionGuard
     }
 
     /**
+     * A free status declares no transition and lets an order go anywhere.
+     */
+    public function isFree(int $fromStatusId): bool
+    {
+        return $this->graphProvider->get()->isFree($fromStatusId);
+    }
+
+    /**
      * @throws OrderStatusTransitionRefusedException
      */
     public function assertAllowed(Order $order, int $toStatusId, bool $forced = false): void
