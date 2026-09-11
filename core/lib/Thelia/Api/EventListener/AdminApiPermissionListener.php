@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\EventListener;
 
+use ApiPlatform\Metadata\Operation;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
@@ -92,7 +93,9 @@ final readonly class AdminApiPermissionListener
             return;
         }
 
-        $access = self::METHOD_ACCESSES[$request->getMethod()] ?? null;
+        $operation = $request->attributes->get('_api_operation');
+        $access = ($operation instanceof Operation ? ($operation->getExtraProperties()['admin_access'] ?? null) : null)
+            ?? self::METHOD_ACCESSES[$request->getMethod()] ?? null;
         $resourceClass = $request->attributes->get('_api_resource_class');
         $resource = \is_string($resourceClass) ? $this->permissions->resolve($resourceClass) : null;
 

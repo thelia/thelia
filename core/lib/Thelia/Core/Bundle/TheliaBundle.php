@@ -36,6 +36,8 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterTemplateTranslationsPass;
 use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
+use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
+use Thelia\Model\OrderReturn;
 
 /**
  * First Bundle use in Thelia
@@ -85,5 +87,11 @@ class TheliaBundle extends Bundle
         $configCacheService = $this->container->get(ConfigCacheService::class);
 
         $configCacheService->initCacheConfigs();
+
+        // A Propel model cannot be injected into, and the return reference is
+        // allocated where the row is written. The shop's generator is handed
+        // over here so a project aliasing the interface takes the numbering
+        // over wherever a return is saved from.
+        OrderReturn::setRefGenerator($this->container->get(OrderReturnRefGeneratorInterface::class));
     }
 }

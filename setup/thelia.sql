@@ -3582,6 +3582,8 @@ CREATE TABLE `customer_version`
     `version_created_by` VARCHAR(100),
     `order_ids` TEXT,
     `order_versions` TEXT,
+    `order_return_ids` TEXT,
+    `order_return_versions` TEXT,
     PRIMARY KEY (`id`,`version`),
     CONSTRAINT `customer_version_FK_1`
         FOREIGN KEY (`id`)
@@ -3673,6 +3675,8 @@ CREATE TABLE `order_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     `customer_id_version` INTEGER DEFAULT 0,
+    `order_return_ids` TEXT,
+    `order_return_versions` TEXT,
     PRIMARY KEY (`id`,`version`),
     CONSTRAINT `order_version_FK_1`
         FOREIGN KEY (`id`)
@@ -3827,5 +3831,206 @@ CREATE TABLE `choice_filter_other_i18n`
             REFERENCES `choice_filter_other` (`id`)
             ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+-- ---------------------------------------------------------------------
+-- order_return_status
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_status`;
+
+CREATE TABLE `order_return_status`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(45) NOT NULL,
+    `equivalent_code` VARCHAR(45),
+    `color` CHAR(7),
+    `position` INTEGER,
+    `protected_status` TINYINT(1) DEFAULT 0,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_return_status_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return_reason
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_reason`;
+
+CREATE TABLE `order_return_reason`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(45),
+    `position` INTEGER,
+    `visible` TINYINT(1) DEFAULT 1,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_return_reason_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return`;
+
+CREATE TABLE `order_return`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(45),
+    `order_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `reason_id` INTEGER COMMENT 'the merchant-managed reason, NULL once that reason is deleted',
+    `reason_title` VARCHAR(255) COMMENT 'the reason label snapshot, kept when the reason is deleted',
+    `expected_resolution` VARCHAR(45) COMMENT 'what the customer expects: refund, credit or exchange',
+    `customer_comment` TEXT,
+    `refusal_reason` TEXT COMMENT 'the motive given by the merchant when the request is refused',
+    `refund_amount` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the amount to refund, computed on the paid prices of the returned lines',
+    `include_postage` TINYINT(1) DEFAULT 0 COMMENT 'whether the postage is included in the refundable amount',
+    `created_by_admin` TINYINT(1) DEFAULT 0 COMMENT 'true when the merchant opened the return without a customer request',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_return_ref_UNIQUE` (`ref`),
+    INDEX `idx_order_return_order_id` (`order_id`),
+    INDEX `idx_order_return_customer_id` (`customer_id`),
+    INDEX `idx_order_return_status_id` (`status_id`),
+    INDEX `idx_order_return_reason_id` (`reason_id`),
+    CONSTRAINT `fk_order_return_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_return_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_return_status_id`
+        FOREIGN KEY (`status_id`)
+        REFERENCES `order_return_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_return_reason_id`
+        FOREIGN KEY (`reason_id`)
+        REFERENCES `order_return_reason` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return_line
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_line`;
+
+CREATE TABLE `order_return_line`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_return_id` INTEGER NOT NULL,
+    `order_product_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER COMMENT 'the sale element to restock, snapshot from the order product',
+    `quantity` FLOAT NOT NULL COMMENT 'the quantity the customer asks to return',
+    `quantity_received` FLOAT DEFAULT 0 COMMENT 'the quantity actually received by the merchant',
+    `received_condition` VARCHAR(45) COMMENT 'the condition the returned goods were received in',
+    `resellable` TINYINT(1) DEFAULT 0 COMMENT 'whether the received goods can be sold again',
+    `refund_amount` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the paid taxed price for the returned quantity of this line',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_return_line_order_return_id` (`order_return_id`),
+    INDEX `idx_order_return_line_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_order_return_line_order_return_id`
+        FOREIGN KEY (`order_return_id`)
+        REFERENCES `order_return` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_return_line_order_product_id`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return_status_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_status_i18n`;
+
+CREATE TABLE `order_return_status_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `order_return_status_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `order_return_status` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return_reason_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_reason_i18n`;
+
+CREATE TABLE `order_return_reason_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `order_return_reason_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `order_return_reason` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_return_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_return_version`;
+
+CREATE TABLE `order_return_version`
+(
+    `id` INTEGER NOT NULL,
+    `ref` VARCHAR(45),
+    `order_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `reason_id` INTEGER COMMENT 'the merchant-managed reason, NULL once that reason is deleted',
+    `reason_title` VARCHAR(255) COMMENT 'the reason label snapshot, kept when the reason is deleted',
+    `expected_resolution` VARCHAR(45) COMMENT 'what the customer expects: refund, credit or exchange',
+    `customer_comment` TEXT,
+    `refusal_reason` TEXT COMMENT 'the motive given by the merchant when the request is refused',
+    `refund_amount` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the amount to refund, computed on the paid prices of the returned lines',
+    `include_postage` TINYINT(1) DEFAULT 0 COMMENT 'whether the postage is included in the refundable amount',
+    `created_by_admin` TINYINT(1) DEFAULT 0 COMMENT 'true when the merchant opened the return without a customer request',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    `order_id_version` INTEGER DEFAULT 0,
+    `customer_id_version` INTEGER DEFAULT 0,
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `order_return_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `order_return` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
