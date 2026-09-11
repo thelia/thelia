@@ -21,6 +21,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnQuery;
+use Thelia\Model\OrderReturnReason;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\OrderStatus;
@@ -40,6 +41,18 @@ final class OrderReturnApiTest extends ApiTestCase
     {
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
+
+        // The whole returns surface is off on a shop that did not turn the
+        // feature on, so every case but the one testing that has to turn it on.
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+    }
+
+    protected function tearDown(): void
+    {
+        // ConfigQuery keeps a static cache the transaction rollback cannot reach.
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
     }
 
     public function testACustomerOnlySeesTheirOwnReturns(): void
@@ -190,27 +203,52 @@ final class OrderReturnApiTest extends ApiTestCase
         self::assertTrue((bool) $created->getCreatedByAdmin());
     }
 
-    public function testACustomerCannotOpenAReturnWhenTheFeatureIsDisabled(): void
+    /**
+     * A shop that turns returns off after having collected some must stop
+     * serving them everywhere, not just stop accepting new ones: recette point
+     * 9 of the story asks for nothing to appear on either side.
+     */
+    public function testNothingOfTheReturnsSurfaceAnswersWhenTheFeatureIsDisabled(): void
     {
-        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '0');
-
         $customer = $this->customer();
         [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+        $return = $this->returnFor($customer, OrderReturnStatus::CODE_ACCEPTED);
+        $reason = $this->reason(visible: true);
 
-        $token = $this->authenticateAsCustomer($customer);
-        $response = $this->jsonRequest(
-            'POST',
-            '/api/front/account/order_returns',
-            [
+        $customerToken = $this->authenticateAsCustomer($customer);
+        $adminToken = $this->authenticateAsAdmin();
+
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '0');
+        ConfigQuery::resetCache();
+
+        $silenced = [
+            'front collection' => ['GET', '/api/front/account/order_returns', [], $customerToken],
+            'front item' => ['GET', '/api/front/account/order_returns/'.$return->getId(), [], $customerToken],
+            'front reasons' => ['GET', '/api/front/account/order_return_reasons', [], $customerToken],
+            'front reason' => ['GET', '/api/front/account/order_return_reasons/'.$reason->getId(), [], $customerToken],
+            'front statuses' => ['GET', '/api/front/account/order_return_statutes', [], $customerToken],
+            'front creation' => ['POST', '/api/front/account/order_returns', [
                 'order' => '/api/front/account/orders/'.$order->getId(),
                 'orderReturnLines' => [
                     ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
                 ],
-            ],
-            token: $token,
-        );
+            ], $customerToken],
+            'admin collection' => ['GET', '/api/admin/order_returns', [], $adminToken],
+            'admin item' => ['GET', '/api/admin/order_returns/'.$return->getId(), [], $adminToken],
+            'admin reasons' => ['GET', '/api/admin/order_return_reasons', [], $adminToken],
+            'admin transition' => ['POST', '/api/admin/order_returns/'.$return->getId().'/transition', [
+                'statusCode' => OrderReturnStatus::CODE_RECEIVED,
+            ], $adminToken],
+            'admin deletion' => ['DELETE', '/api/admin/order_returns/'.$return->getId(), [], $adminToken],
+        ];
 
-        self::assertSame(422, $response->getStatusCode());
+        foreach ($silenced as $label => [$method, $uri, $payload, $token]) {
+            self::assertSame(
+                404,
+                $this->jsonRequest($method, $uri, $payload, token: $token)->getStatusCode(),
+                \sprintf('The %s still answers on a shop where returns are disabled.', $label),
+            );
+        }
     }
 
     public function testACustomerCannotReturnMoreThanTheOrderedQuantity(): void
@@ -253,6 +291,18 @@ final class OrderReturnApiTest extends ApiTestCase
     private function customer(): Customer
     {
         return $this->factory->customer($this->factory->customerTitle());
+    }
+
+    private function reason(bool $visible): OrderReturnReason
+    {
+        $reason = (new OrderReturnReason())
+            ->setCode('reason-'.uniqid())
+            ->setVisible($visible)
+            ->setPosition(1);
+        $reason->setLocale('en_US')->setTitle('A reason');
+        $reason->save($this->getPropelConnection());
+
+        return $reason;
     }
 
     private function returnFor(Customer $customer, string $statusCode): OrderReturn
