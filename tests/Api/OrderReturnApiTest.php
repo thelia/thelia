@@ -251,6 +251,39 @@ final class OrderReturnApiTest extends ApiTestCase
         }
     }
 
+    /**
+     * The gate reads what other returns already hold from the database, where
+     * the lines of the request being checked are not written yet. One ordered
+     * unit split over several lines used to pass the gate once per line.
+     */
+    public function testSeveralLinesOnTheSameOrderProductCannotExceedTheOrderedQuantity(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $line = ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0];
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => array_fill(0, 10, $line),
+            ],
+            token: $token,
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('exceeds the returnable quantity', (string) $response->getContent());
+
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written for ten times the ordered quantity.',
+        );
+    }
+
     public function testACustomerCannotReturnMoreThanTheOrderedQuantity(): void
     {
         ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');

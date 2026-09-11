@@ -42,6 +42,10 @@ final readonly class OrderReturnHydrator
     }
 
     /**
+     * Meant to be called inside the transaction that writes the return: it
+     * locks every order product line it checks, and a lock outside a
+     * transaction is released as soon as it is taken.
+     *
      * @throws ReturnNotAllowedException
      */
     public function hydrate(OrderReturnResource $data, Customer $customer, bool $byAdmin): void
@@ -67,6 +71,14 @@ final readonly class OrderReturnHydrator
         }
 
         $total = 0.0;
+
+        // What the request itself has already claimed on each order product.
+        // The eligibility gate reads what other returns hold from the database,
+        // where the lines of this request are not written yet: without the
+        // running total, a request splitting one ordered unit over ten lines
+        // passes the gate ten times and returns ten.
+        $claimedByOrderProduct = [];
+
         foreach ($data->getOrderReturnLines() as $line) {
             $orderProduct = OrderProductQuery::create()->findPk($line->getOrderProduct()->getId());
 
@@ -74,7 +86,13 @@ final readonly class OrderReturnHydrator
                 throw new ReturnNotAllowedException('Unknown order product in a return line.');
             }
 
-            $this->eligibility->assertReturnable($order, $customer, $orderProduct, $line->getQuantity());
+            $orderProductId = (int) $orderProduct->getId();
+            $claimed = ($claimedByOrderProduct[$orderProductId] ?? 0.0) + $line->getQuantity();
+
+            $this->eligibility->lockLine($orderProduct);
+            $this->eligibility->assertReturnable($order, $customer, $orderProduct, $claimed);
+
+            $claimedByOrderProduct[$orderProductId] = $claimed;
 
             $line->setProductSaleElementsId($orderProduct->getProductSaleElementsId());
             $lineRefund = $this->refundCalculator->lineRefundForProduct($orderProduct, $line->getQuantity());
