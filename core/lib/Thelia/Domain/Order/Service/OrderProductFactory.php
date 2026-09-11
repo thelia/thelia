@@ -61,6 +61,11 @@ readonly class OrderProductFactory
             ->setTaxRuleTitle($taxRuleI18n->getTitle())
             ->setTaxRuleDescription($taxRuleI18n->getDescription())
             ->setEanCode($productSaleElements->getEanCode())
+            // A line a promotion offered is priced at zero by the cart discount, not by
+            // its own price: without this marker the order cannot tell the gift from a
+            // purchase once the cart is gone. The generated getter is ?int, so a strict
+            // comparison against a boolean would never be true.
+            ->setIsOffered((int) ($cartItem->getIsOffered() ?? 0))
             ->setCartItemId($cartItem->getId());
 
         $orderProduct->save($connection);

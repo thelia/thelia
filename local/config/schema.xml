@@ -781,6 +781,7 @@
     <column description="not managed yet" name="parent" type="INTEGER" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column name="virtual_document" size="255" type="VARCHAR" />
+    <column defaultValue="0" description="the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone" name="is_offered" required="true" type="TINYINT" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>

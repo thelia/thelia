@@ -896,6 +896,7 @@ CREATE TABLE `order_product`
     `parent` INTEGER COMMENT 'not managed yet',
     `virtual` TINYINT DEFAULT 0 NOT NULL,
     `virtual_document` VARCHAR(255),
+    `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT 'the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
