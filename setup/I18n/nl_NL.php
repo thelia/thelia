@@ -411,4 +411,5 @@ return [
     'Åland Islands' => 'Åland',
     'Đồng' => 'Dong',
     'Гривна' => 'Hryvnia',
+    'Order status transition override' => 'Overschrijven van orderstatusovergangen',
 ];

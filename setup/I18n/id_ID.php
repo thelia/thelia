@@ -58,4 +58,5 @@ return [
     'Hooks' => 'Kaitan',
     'Order' => 'Pesan',
     'Translations' => 'Alih Bahasa',
+    'Order status transition override' => 'Pengesampingan transisi status pesanan',
 ];
