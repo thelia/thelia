@@ -21,6 +21,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
+use Thelia\Model\OrderReturnLine;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnReason;
 use Thelia\Model\OrderReturnStatus;
@@ -387,6 +388,80 @@ final class OrderReturnApiTest extends ApiTestCase
         );
     }
 
+    /**
+     * `quantityReceived` is what the reception restocks and what the refund is
+     * recomputed on. The admin patch exposed both it and `quantity` with no
+     * check at all, so a merchant typing 20 instead of 2 inflated the stock and
+     * the refund by the difference.
+     */
+    public function testAnAdminCannotRecordMoreReceivedThanTheCustomerAskedFor(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+
+        $token = $this->authenticateAsAdmin();
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantityReceived' => 20.0],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('received quantity', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(0.0, (float) $line->getQuantityReceived(), 'The excessive received quantity was written anyway.');
+    }
+
+    public function testAnAdminCanRecordUpToTheRequestedQuantity(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantityReceived' => 2.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertJsonResponseSuccessful($response);
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(2.0, (float) $line->getQuantityReceived());
+    }
+
+    /**
+     * Raising `quantity` on an existing line is opening a bigger return, and it
+     * has to pass the same gate the creation does - the ordered quantity of the
+     * line included.
+     */
+    public function testAnAdminCannotRaiseALineAboveTheOrderedQuantity(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantity' => 9.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString('exceeds the returnable quantity', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(1.0, (float) $line->getQuantity());
+    }
+
     private function customer(): Customer
     {
         return $this->factory->customer($this->factory->customerTitle());
@@ -416,6 +491,36 @@ final class OrderReturnApiTest extends ApiTestCase
         return $decoded['member'] ?? $decoded['hydra:member'] ?? [];
     }
 
+    /**
+     * A return that already holds one line, as the administration screens see
+     * it: the line is what the merchant patches on reception.
+     */
+    private function returnWithLine(Customer $customer, string $statusCode, float $quantity = 1.0): OrderReturn
+    {
+        $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProductFor($order, $quantity);
+
+        $status = OrderReturnStatusQuery::create()->findOneByCode($statusCode);
+
+        $return = (new OrderReturn())
+            ->setOrder($order)
+            ->setCustomer($customer)
+            ->setOrderReturnStatus($status);
+        $return->save($this->getPropelConnection());
+
+        $line = (new OrderReturnLine())
+            ->setOrderReturn($return)
+            ->setOrderProduct($orderProduct)
+            ->setProductSaleElementsId($orderProduct->getProductSaleElementsId())
+            ->setQuantity($quantity)
+            ->setQuantityReceived(0.0);
+        $line->save($this->getPropelConnection());
+
+        $return->clearOrderReturnLines();
+
+        return $return;
+    }
+
     private function returnFor(Customer $customer, string $statusCode): OrderReturn
     {
         $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
@@ -442,7 +547,7 @@ final class OrderReturnApiTest extends ApiTestCase
         return [$order, $this->orderProductFor($order)];
     }
 
-    private function orderProductFor(Order $order): OrderProductModel
+    private function orderProductFor(Order $order, float $quantity = 1.0): OrderProductModel
     {
         $orderProduct = (new OrderProductModel())
             ->setOrderId((int) $order->getId())
@@ -450,7 +555,7 @@ final class OrderReturnApiTest extends ApiTestCase
             ->setProductSaleElementsRef('PSE-'.uniqid())
             ->setProductSaleElementsId(1)
             ->setTitle('A returnable product')
-            ->setQuantity(1.0)
+            ->setQuantity($quantity)
             ->setPrice('10.000000')
             ->setPromoPrice('10.000000')
             ->setWasNew(1)

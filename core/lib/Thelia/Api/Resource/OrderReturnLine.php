@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\State\Processor\OrderReturnLineAdminPatchProcessor;
 use Thelia\Model\Map\OrderReturnLineTableMap;
 
 #[ApiResource(
@@ -36,6 +37,7 @@ use Thelia\Model\Map\OrderReturnLineTableMap;
         ),
         new Patch(
             uriTemplate: '/admin/order_return_lines/{id}',
+            processor: OrderReturnLineAdminPatchProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
