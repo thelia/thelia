@@ -156,6 +156,16 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         self::assertSame(400, $this->client->getResponse()->getStatusCode());
         self::assertSame('Prospect', TagQuery::create()->findPk($renamed->getId())?->getLabel(), 'The tag is untouched.');
         self::assertSame('Salon', TagQuery::create()->findPk($existing->getId())?->getLabel());
+
+        $banner = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Salon', $banner, 'The refusal names the tag standing in the way.');
+        // This sentence exists only in the catalogue, never in the exception:
+        // it is what tells a translated message apart from the raw one.
+        self::assertStringContainsString(
+            'Merge the two tags instead of renaming this one.',
+            $banner,
+            'The refusal goes through the translator, and offers the way out.',
+        );
     }
 
     public function testALabelOfOnlyWhitespaceIsRefusedByTheForm(): void
@@ -490,6 +500,37 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
             'The collision leaves the vocabulary as it was.',
         );
         self::assertSame('Salon', TagQuery::create()->findPk($existing->getId())?->getLabel());
+
+        // The refusal reaches the administrator through the translator, not as
+        // the raw exception message: this sentence is a catalogue key.
+        self::assertStringContainsString(
+            'is already carried by the tag',
+            $this->flashMessages(),
+            'The refusal names the tag standing in the way.',
+        );
+        self::assertStringContainsString('Salon', $this->flashMessages());
+    }
+
+    /**
+     * The collision is often on the very same spelling, where naming the other
+     * tag would print the label twice — "the label Test is carried by the tag
+     * Test" — and read as nonsense.
+     */
+    public function testACollisionOnTheSameSpellingDoesNotNameTheLabelTwice(): void
+    {
+        $factory = $this->factory();
+        $factory->tag(['label' => 'Twice']);
+        $this->loginAs($factory->admin());
+
+        $this->submitCreateForm(['label' => 'Twice']);
+
+        $flash = $this->flashMessages();
+        self::assertStringContainsString('already exists', $flash);
+        self::assertSame(
+            1,
+            substr_count($flash, 'Twice'),
+            'The label is named once, not on both sides of the sentence.',
+        );
     }
 
     public function testAnAdminWithoutTheTagResourceCannotCreate(): void
@@ -578,6 +619,25 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         }
 
         $this->client->submit($form);
+    }
+
+    /**
+     * The danger banner the administrator lands on after a refused write.
+     *
+     * Read from the rendered banner rather than from the flash bag: a refusal
+     * answers a redirect, and the session of the request that followed it is not
+     * the one that held the message. Scoped to the banner and not to the whole
+     * page, because the page also lists the tag the message talks about.
+     */
+    private function flashMessages(): string
+    {
+        if ($this->client->getResponse()->isRedirect()) {
+            $this->client->followRedirect();
+        }
+
+        return implode(' ', $this->client->getCrawler()->filter('[data-testid="bo-flash-danger"]')->each(
+            static fn ($node): string => trim($node->text()),
+        ));
     }
 
     private function factory(): FixtureFactory

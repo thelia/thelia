@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Tagging\Exception\TagLabelAlreadyUsedException;
 use Thelia\Model\Map\TagTableMap;
 use Thelia\Model\Tag;
 use Thelia\Model\TagElement;
@@ -85,7 +86,8 @@ final readonly class TagService
      * the message names the tag standing in the way — under utf8mb4_general_ci
      * it lands on a spelling that does not look like what was typed.
      *
-     * @throws \InvalidArgumentException when the label is empty or already taken
+     * @throws \InvalidArgumentException    when the label is empty
+     * @throws TagLabelAlreadyUsedException when another tag already carries it
      */
     public function create(string $label, ?string $colorCode = null, ?ConnectionInterface $connection = null): Tag
     {
@@ -98,7 +100,7 @@ final readonly class TagService
         $conflicting = TagQuery::create()->findOneByLabel($normalizedLabel, $connection);
 
         if ($conflicting instanceof Tag) {
-            throw new \InvalidArgumentException(\sprintf('The label "%s" is already carried by the tag "%s".', $normalizedLabel, (string) $conflicting->getLabel()));
+            throw new TagLabelAlreadyUsedException($normalizedLabel, (string) $conflicting->getLabel());
         }
 
         $tag = (new Tag())->setLabel($normalizedLabel)->setColorCode($colorCode);
@@ -117,7 +119,8 @@ final readonly class TagService
      * change of case — so the caller has to be able to name the tag standing in
      * the way, or the administrator cannot understand the refusal.
      *
-     * @throws \InvalidArgumentException when the label is empty or already taken
+     * @throws \InvalidArgumentException    when the label is empty
+     * @throws TagLabelAlreadyUsedException when another tag already carries it
      */
     public function rename(Tag $tag, string $label, ?string $colorCode = null, ?ConnectionInterface $connection = null): Tag
     {
@@ -130,7 +133,7 @@ final readonly class TagService
         $conflicting = TagQuery::create()->findOneByLabel($normalizedLabel, $connection);
 
         if ($conflicting instanceof Tag && $conflicting->getId() !== $tag->getId()) {
-            throw new \InvalidArgumentException(\sprintf('The label "%s" is already carried by the tag "%s". Merge them instead of renaming.', $normalizedLabel, (string) $conflicting->getLabel()));
+            throw new TagLabelAlreadyUsedException($normalizedLabel, (string) $conflicting->getLabel());
         }
 
         $tag->setLabel($normalizedLabel)->setColorCode($colorCode)->save($connection);
