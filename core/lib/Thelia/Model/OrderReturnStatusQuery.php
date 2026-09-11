@@ -27,6 +27,20 @@ class OrderReturnStatusQuery extends BaseOrderReturnStatusQuery
     protected static array $statusByCodeCache = [];
 
     /**
+     * Drop the memoized lookups.
+     *
+     * The cache lives as long as the PHP process, which is a request for the
+     * web front and days for a Messenger worker: without this, a status the
+     * merchant renames stays answered under its old code until the worker is
+     * restarted. Under test it also outlives the transaction rollback, and
+     * hands the next test a row that no longer exists.
+     */
+    public static function resetCache(): void
+    {
+        self::$statusByCodeCache = [];
+    }
+
+    /**
      * Return the status bearing the given code, or null when none exists.
      */
     public function findOneByCodeCached(string $code): ?OrderReturnStatus

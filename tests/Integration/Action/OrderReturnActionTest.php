@@ -41,6 +41,7 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
     protected function tearDown(): void
     {
         ConfigQuery::resetCache();
+        OrderReturnStatusQuery::resetCache();
 
         parent::tearDown();
     }

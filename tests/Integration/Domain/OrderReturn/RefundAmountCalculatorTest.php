@@ -50,6 +50,7 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
     {
         // ConfigQuery keeps a static cache the transaction rollback cannot reach.
         ConfigQuery::resetCache();
+        OrderReturnStatusQuery::resetCache();
 
         parent::tearDown();
     }
