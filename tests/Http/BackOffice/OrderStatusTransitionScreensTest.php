@@ -194,6 +194,34 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertStringContainsString('Forced order '.$order->getRef(), (string) $log->getMessage());
     }
 
+    public function testTheOrderSheetShowsTheForcedChangesItHasReceived(): void
+    {
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $notPaid = $this->orderStatus(OrderStatus::CODE_NOT_PAID);
+
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_STATUS_FORCE => [AccessManager::UPDATE],
+        ], ['firstname' => 'Norma', 'lastname' => 'Jennings']));
+
+        $crawler = $this->client->request('GET', '/admin/order/update/'.$order->getId());
+        self::assertCount(0, $crawler->filter('[data-testid="order-forced-status-changes"]'), 'An order nobody forced shows no override.');
+
+        $form = $crawler->filter('[data-testid="order-status-force-submit"]')->form();
+        $form['status_id'] = (string) $notPaid->getId();
+        $this->client->submit($form);
+        $crawler = $this->client->followRedirect();
+
+        $overrides = $crawler->filter('[data-testid="order-forced-status-changes"]');
+        self::assertCount(1, $overrides, 'The order sheet shows the override it just received.');
+
+        $text = $overrides->text();
+        self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_SENT), $text, 'The status it was forced out of.');
+        self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_NOT_PAID), $text, 'The status it was forced into.');
+        self::assertStringContainsString('Norma Jennings', $text, 'The administrator who forced it.');
+    }
+
     public function testARefusedChangeFromTheOrderSheetIsExplainedAndLeavesTheOrderUntouched(): void
     {
         $this->loginAs($this->factory->admin());
@@ -236,6 +264,34 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_SENT, OrderQuery::create()->findPk($sentOrder->getId())->getOrderStatus()->getCode());
         self::assertStringContainsString($sentOrder->getRef(), $crawler->filter('[data-testid="bo-flash-warning"]')->text(), 'The skipped order is named.');
         self::assertStringContainsString('1 order(s)', $crawler->filter('[data-testid="bo-flash-success"]')->text());
+    }
+
+    public function testTheBulkSelectorCarriesTheStatusesEachTargetIsWithinReachOf(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $sentOrder = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $sent = $this->orderStatus(OrderStatus::CODE_SENT);
+
+        $crawler = $this->client->request('GET', '/admin/orders');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        self::assertSame(
+            (string) $sent->getId(),
+            $crawler->filter('[data-testid="datatable-select-'.$sentOrder->getId().'"]')->attr('data-bulk-state'),
+            'Each row states the status it is in.',
+        );
+
+        $reachableFrom = function (string $code) use ($crawler): array {
+            $option = $crawler->filter('[data-testid="order-bulk-status-select"] option[value="'.$this->orderStatus($code)->getId().'"]');
+            self::assertCount(1, $option);
+
+            return array_filter(explode(',', (string) $option->attr('data-bulk-from')));
+        };
+
+        self::assertContains((string) $sent->getId(), $reachableFrom(OrderStatus::CODE_REFUNDED), 'The one transition declared from sent.');
+        self::assertNotContains((string) $sent->getId(), $reachableFrom(OrderStatus::CODE_NOT_PAID), 'Sent no longer reaches anything else.');
+        self::assertContains((string) $this->orderStatus(OrderStatus::CODE_PAID)->getId(), $reachableFrom(OrderStatus::CODE_NOT_PAID), 'A free status still reaches everything.');
     }
 
     public function testARefusedChangeIsNotEvenExplainedToAnAdministratorWithoutTheUpdateRight(): void
@@ -328,6 +384,11 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
             $this->orderStatus($fromCode)->getId(),
             array_map(fn (string $code): int => $this->orderStatus($code)->getId(), $toCodes),
         );
+    }
+
+    private function statusTitle(string $code): string
+    {
+        return (string) $this->orderStatus($code)->setLocale('en_US')->getTitle();
     }
 
     private function orderStatus(string $code): OrderStatus
