@@ -22,5 +22,6 @@ return [
     'Folder' => 'مجلّد',
     'Hooks' => 'روابط',
     'New York' => 'نيويورك',
+    'Order status transition override' => 'تجاوز انتقالات حالة الطلب',
     'Search' => 'بحث',
 ];

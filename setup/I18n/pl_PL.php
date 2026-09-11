@@ -416,6 +416,7 @@ return [
     'Nouvelle-Calédonie' => 'Nowa Kaledonia',
     'Oman' => 'Oman',
     'Order' => 'Zamówienie',
+    'Order status transition override' => 'Wymuszanie zmiany statusu zamówienia',
     'Page 404 - CSS stylesheet' => 'Strona 404 - style CSS',
     'Page 404 - content area' => 'Strona 404 - treść',
     'Paid' => 'Zapłacone',

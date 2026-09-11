@@ -1035,6 +1035,7 @@ return [
     'Order failed - after javascript initialisation' => 'Echec de la commande - après l\'initialisation du JavaScript',
     'Order failed - at the bottom' => 'Échec de la commande - en bas',
     'Order failed - at the top' => 'Échec de la commande - en haut',
+    'Order status transition override' => 'Forçage des transitions de statut de commande',
     'Orders - JavaScript' => 'Commandes - JavaScript',
     'Orders - at the top' => 'Commandes - en haut',
     'Orders - bottom' => 'Commandes - en bas',

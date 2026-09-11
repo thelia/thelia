@@ -770,6 +770,7 @@ return [
     'Order failed - after javascript initialisation' => 'Fehlschlag der Bestellung - nach der Initialisierung von Javascript',
     'Order failed - at the bottom' => 'Fehlschlag der Bestellung - unten',
     'Order failed - at the top' => 'Fehlschlag der Bestellung - oben',
+    'Order status transition override' => 'Erzwingen von Bestellstatus-Übergängen',
     'Orders - JavaScript' => 'Bestellungen - JavaScript',
     'Orders - at the top' => 'Bestellungen - oben',
     'Orders - bottom' => 'Bestellungen - unten',

@@ -1029,6 +1029,7 @@ return [
     'Order failed - after javascript initialisation' => 'Ошибка заказа - после инициализации javascript',
     'Order failed - at the bottom' => 'Ошибка заказа - внизу',
     'Order failed - at the top' => 'Ошибка заказа - вверху',
+    'Order status transition override' => 'Принудительное изменение статуса заказа',
     'Orders - JavaScript' => 'Заказы - JavaScript',
     'Orders - at the top' => 'Заказы - вверху',
     'Orders - bottom' => 'Заказы - внизу',

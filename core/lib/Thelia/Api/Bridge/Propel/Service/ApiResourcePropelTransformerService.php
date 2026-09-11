@@ -462,6 +462,12 @@ readonly class ApiResourcePropelTransformerService
             'is'.ucfirst($property->getName()),
         ];
 
+        // A boolean named after its question ($isOffered, $hasStates) is read
+        // by a getter of the same name: isOffered(), not getIsOffered().
+        if (1 === preg_match('/^(is|has)[A-Z]/', $property->getName())) {
+            $possibleGetters[] = $property->getName();
+        }
+
         $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
 
         $value = null;

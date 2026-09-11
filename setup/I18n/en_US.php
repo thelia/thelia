@@ -1056,6 +1056,7 @@ return [
     'Order status - table header' => 'Order status - table header',
     'Order status - table row' => 'Order status - table row',
     'Order status - top' => 'Order status - top',
+    'Order status transition override' => 'Order status transition override',
     'Orders - JavaScript' => 'Orders - JavaScript',
     'Orders - at the top' => 'Orders - at the top',
     'Orders - bottom' => 'Orders - bottom',
