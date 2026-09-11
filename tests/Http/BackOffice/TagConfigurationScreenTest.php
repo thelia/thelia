@@ -168,6 +168,28 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         );
     }
 
+    /**
+     * The refusal re-renders the edit screen, and it has to be the screen of the
+     * tag being edited. An empty stub would announce "#0, 0 customers" and read
+     * as if the tag had just been emptied, when nothing was written at all.
+     */
+    public function testARefusedRenameComesBackOnTheScreenOfTheSameTag(): void
+    {
+        $factory = $this->factory();
+        $factory->tag(['label' => 'Occupied']);
+        $edited = $factory->tag(['label' => 'Still mine']);
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->tagElement($edited, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+        $this->loginAs($factory->admin());
+
+        $this->submitEditForm($edited, ['label' => 'Occupied']);
+
+        $html = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('#'.$edited->getId(), $html, 'The screen still names the tag being edited.');
+        self::assertStringNotContainsString('#0', $html, 'Never the empty stub.');
+        self::assertStringContainsString('Still mine', $html, 'The label is the stored one, the refused change is not applied.');
+    }
+
     public function testALabelOfOnlyWhitespaceIsRefusedByTheForm(): void
     {
         $factory = $this->factory();
