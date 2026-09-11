@@ -21,8 +21,12 @@ use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Service\RefundAmountCalculator;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Customer;
+use Thelia\Model\Lang;
+use Thelia\Model\Order;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturnReason;
+use Thelia\Model\OrderReturnReasonI18nQuery;
 use Thelia\Model\OrderReturnReasonQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
@@ -103,11 +107,7 @@ final readonly class OrderReturnHydrator
         if (null !== $data->getOrderReturnReason()) {
             $reason = OrderReturnReasonQuery::create()->findPk($data->getOrderReturnReason()->getId());
             if (null !== $reason) {
-                $locale = $order->getLang()?->getLocale();
-                if (null !== $locale) {
-                    $reason->setLocale($locale);
-                }
-                $data->setReasonTitle($reason->getTitle());
+                $data->setReasonTitle($this->reasonTitleFor($reason, $order));
             }
         }
 
@@ -117,5 +117,46 @@ final readonly class OrderReturnHydrator
         }
 
         $data->setRefundAmount(round($total, 2));
+    }
+
+    /**
+     * The wording of the reason as it is kept on the return.
+     *
+     * `reason_id` is set to NULL when the merchant deletes the reason, so this
+     * snapshot is the only place the customer's answer survives: an empty one
+     * loses it for good. A merchant who adds a reason without translating it
+     * into every language of the shop must not produce returns with no reason,
+     * so the wording is looked up in the language of the order, then in the
+     * default language of the shop, then in whichever language the reason does
+     * have - anything rather than nothing.
+     */
+    private function reasonTitleFor(OrderReturnReason $reason, Order $order): ?string
+    {
+        $locales = [$order->getLang()?->getLocale()];
+
+        try {
+            $locales[] = Lang::getDefaultLanguage()->getLocale();
+        } catch (\RuntimeException) {
+            // A shop with no default language is a broken install, not a reason
+            // to lose the wording: the last fallback below still answers.
+        }
+
+        foreach (array_filter($locales) as $locale) {
+            $title = $reason->setLocale($locale)->getTitle();
+
+            if (null !== $title && '' !== trim($title)) {
+                return $title;
+            }
+        }
+
+        foreach (OrderReturnReasonI18nQuery::create()->filterById($reason->getId())->orderByLocale()->find() as $translation) {
+            $title = $translation->getTitle();
+
+            if (null !== $title && '' !== trim($title)) {
+                return $title;
+            }
+        }
+
+        return null;
     }
 }

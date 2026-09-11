@@ -608,6 +608,47 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * The snapshot is the only place the reason survives the merchant deleting
+     * it, so it must never be empty. A reason the merchant added without
+     * translating it into every language of the shop used to snapshot nothing
+     * at all on an order placed in one of the others.
+     */
+    public function testTheReasonSnapshotFallsBackWhenTheOrderLanguageHasNoTranslation(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+        $reason = $this->reasonTranslatedIn(['en_US' => 'Damaged on arrival']);
+
+        self::assertNotSame(
+            'en_US',
+            $order->getLang()?->getLocale(),
+            'The order is expected to be in a language the reason has no title in: this test has lost its subject.',
+        );
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnReason' => '/api/front/account/order_return_reasons/'.$reason->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()
+            ->filterByCustomerId((int) $customer->getId())
+            ->findOne($this->getPropelConnection());
+
+        self::assertNotNull($created);
+        self::assertSame('Damaged on arrival', $created->getReasonTitle());
+    }
+
+    /**
      * A merchant retiring a reason must not take the returns that named it down
      * with them: the reason is nulled and the wording stays on the return as the
      * snapshot taken when it was opened.
@@ -680,12 +721,23 @@ final class OrderReturnApiTest extends ApiTestCase
      */
     private function reason(bool $visible): OrderReturnReason
     {
+        return $this->reasonTranslatedIn(['en_US' => 'A reason', 'fr_FR' => 'Un motif'], $visible);
+    }
+
+    /**
+     * @param array<string, string> $titles title per locale
+     */
+    private function reasonTranslatedIn(array $titles, bool $visible = true): OrderReturnReason
+    {
         $reason = (new OrderReturnReason())
             ->setCode('reason-'.uniqid())
             ->setVisible($visible)
             ->setPosition(1);
-        $reason->setLocale('en_US')->setTitle('A reason');
-        $reason->setLocale('fr_FR')->setTitle('Un motif');
+
+        foreach ($titles as $locale => $title) {
+            $reason->setLocale($locale)->setTitle($title);
+        }
+
         $reason->save($this->getPropelConnection());
 
         return $reason;
