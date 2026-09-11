@@ -16,9 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Order;
 
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
@@ -32,35 +30,46 @@ use Thelia\Domain\Order\StatusAction\Effect\SendShopManagersEmailAction;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRegistry;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
-use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
 use Thelia\Model\Order;
-use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\OrderStatusActionFailureQuery;
-use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\RecordingMailerFactory;
+use Thelia\Tests\Support\Order\ExplodingAction;
+use Thelia\Tests\Support\Order\LeakingMailerFactory;
+use Thelia\Tests\Support\Order\MovesOrders;
 
 final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 {
+    use MovesOrders;
+
     protected function setUp(): void
     {
         parent::setUp();
         // The automatic numbering listener stays out of the way: what is asserted
         // here is what the configured actions do by themselves.
         ConfigQuery::write(InvoiceRefAllocator::CONFIG_ENABLED, '0');
+    }
+
+    protected function tearDown(): void
+    {
+        // The transaction rollback puts the config rows back, never the static cache
+        // ConfigQuery::write() fills: without this, the values written here are read
+        // by every later test of the process.
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
     }
 
     public function testAnActionOnEnteringAStatusRunsAfterTheStatusIsPersisted(): void
@@ -221,7 +230,7 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, ReleaseCouponsAction::getType());
         $coupon = $this->factory->coupon(['code' => 'RELEASE-ME', 'maxUsage' => 1]);
         $order = $this->factory->order();
-        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+        $orderCoupon = $this->factory->orderCoupon($order, $coupon);
 
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
         self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage(), 'Paying the order consumed the usage.');
@@ -331,7 +340,11 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         $failure = OrderStatusActionFailureQuery::create()->filterByActionId($action->getId())->findOne();
         self::assertNotNull($failure, 'A transport failure must be journalled.');
         self::assertStringNotContainsString($customerEmail, $failure->getMessage());
-        self::assertStringNotContainsString('s3cr3t', $failure->getMessage());
+        self::assertStringNotContainsString(LeakingMailerFactory::LEAKED_SECRET, $failure->getMessage());
+        // What is left has to be enough for an administrator to act on: which message
+        // did not leave, and what refused it.
+        self::assertStringContainsString($messageCode, $failure->getMessage());
+        self::assertStringContainsString(TransportException::class, $failure->getMessage());
     }
 
     public function testAnUnexpectedExceptionIsRecordedWithoutItsRawMessage(): void
@@ -344,7 +357,7 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 
         $failure = OrderStatusActionFailureQuery::create()->filterByActionId($action->getId())->findOne();
         self::assertNotNull($failure);
-        self::assertStringNotContainsString('smtp://user:secret@mail', $failure->getMessage());
+        self::assertStringNotContainsString(ExplodingAction::LEAKED_DSN, $failure->getMessage());
         self::assertStringContainsString(\RuntimeException::class, $failure->getMessage());
     }
 
@@ -485,88 +498,11 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         return (float) ProductSaleElementsQuery::create()->findPk($productSaleElements->getId())->getQuantity();
     }
 
-    private function rememberCouponOnOrder(Order $order, Coupon $coupon): OrderCoupon
-    {
-        $orderCoupon = (new OrderCoupon())
-            ->setOrder($order)
-            ->setUsageCanceled(1)
-            ->setCode($coupon->getCode())
-            ->setType($coupon->getType())
-            ->setAmount('5')
-            ->setTitle($coupon->getTitle())
-            ->setShortDescription($coupon->getShortDescription())
-            ->setDescription($coupon->getDescription())
-            ->setStartDate($coupon->getStartDate())
-            ->setExpirationDate($coupon->getExpirationDate())
-            ->setIsCumulative($coupon->getIsCumulative())
-            ->setIsRemovingPostage($coupon->getIsRemovingPostage())
-            ->setIsAvailableOnSpecialOffers($coupon->getIsAvailableOnSpecialOffers())
-            ->setSerializedConditions($coupon->getSerializedConditions())
-            ->setPerCustomerUsageCount($coupon->getPerCustomerUsageCount());
-        $orderCoupon->save();
-
-        return $orderCoupon;
-    }
-
-    private function moveOrderTo(Order $order, string $statusCode): void
-    {
-        $event = new OrderEvent($order);
-        $event->setStatus($this->orderStatus($statusCode)->getId());
-
-        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-    }
-
-    private function orderStatus(string $code): OrderStatus
-    {
-        $status = OrderStatusQuery::create()->findOneByCode($code);
-        self::assertNotNull($status, "Order status '$code' is missing.");
-
-        return $status;
-    }
-
     private function reload(Order $order): Order
     {
         $reloaded = OrderQuery::create()->findPk($order->getId());
         self::assertNotNull($reloaded);
 
         return $reloaded;
-    }
-}
-
-/**
- * A mailer whose transport refuses the message the way a real one does: the reason
- * names the recipient and carries the credentials of the transport.
- */
-final class LeakingMailerFactory extends MailerFactory
-{
-    public function send(Email $message): void
-    {
-        throw new TransportException('Connection to smtp://postmaster:s3cr3t@mail.example.com refused while writing to '.$message->getTo()[0]->getAddress());
-    }
-}
-
-/**
- * An action a module could ship, failing the way a transport does: with a secret in the message.
- */
-final class ExplodingAction implements OrderStatusActionInterface
-{
-    public static function getType(): string
-    {
-        return 'exploding_test_action';
-    }
-
-    public function describePayload(): array
-    {
-        return [];
-    }
-
-    public function normalizePayload(array $payload): array
-    {
-        return [];
-    }
-
-    public function execute(\Thelia\Domain\Order\StatusAction\OrderStatusActionContext $context): void
-    {
-        throw new \RuntimeException('Connection to smtp://user:secret@mail failed');
     }
 }

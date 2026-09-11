@@ -44,6 +44,7 @@ use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
@@ -604,6 +605,36 @@ final class FixtureFactory
         $coupon->save($this->connection);
 
         return $coupon;
+    }
+
+    /**
+     * The copy of a coupon an order keeps, as the checkout leaves it: remembered on
+     * the order, and not counted against the coupon yet — `usageCanceled` is on
+     * until the order is paid.
+     */
+    public function orderCoupon(Order $order, Coupon $coupon, array $overrides = []): OrderCoupon
+    {
+        $orderCoupon = new OrderCoupon();
+        $orderCoupon->setOrder($order);
+        $orderCoupon->setCouponId($overrides['couponId'] ?? $coupon->getId());
+        $orderCoupon->setUsageCanceled($overrides['usageCanceled'] ?? 1);
+        $orderCoupon->setCode($coupon->getCode());
+        $orderCoupon->setType($coupon->getType());
+        $orderCoupon->setAmount((string) ($overrides['amount'] ?? '5'));
+        $orderCoupon->setTitle($coupon->getTitle());
+        $orderCoupon->setShortDescription($coupon->getShortDescription());
+        $orderCoupon->setDescription($coupon->getDescription());
+        $orderCoupon->setStartDate($coupon->getStartDate());
+        $orderCoupon->setExpirationDate($coupon->getExpirationDate());
+        $orderCoupon->setIsCumulative($coupon->getIsCumulative());
+        $orderCoupon->setIsRemovingPostage($coupon->getIsRemovingPostage());
+        $orderCoupon->setIsAvailableOnSpecialOffers($coupon->getIsAvailableOnSpecialOffers());
+        $orderCoupon->setSerializedConditions($coupon->getSerializedConditions());
+        $orderCoupon->setSerializedEffects($coupon->getSerializedEffects());
+        $orderCoupon->setPerCustomerUsageCount($coupon->getPerCustomerUsageCount());
+        $orderCoupon->save($this->connection);
+
+        return $orderCoupon;
     }
 
     public function profile(array $overrides = []): Profile
