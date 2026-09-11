@@ -22,6 +22,7 @@ use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNotReleaseException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
+use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\Customer;
@@ -86,10 +87,9 @@ class CouponFactory
             }
         }
 
-        /** @var CouponInterface $couponInterface */
         $couponInterface = $this->buildCouponFromModel($couponModel);
 
-        if ($couponInterface && 0 === $couponInterface->getConditions()->count()) {
+        if (0 === $couponInterface->getConditions()->count()) {
             throw new InvalidConditionException($couponInterface::class);
         }
 
@@ -105,8 +105,11 @@ class CouponFactory
      */
     public function buildCouponFromModel(Coupon $model): CouponInterface
     {
-        $isCumulative = 1 === $model->getIsCumulative();
-        $isRemovingPostage = 1 === $model->getIsRemovingPostage();
+        // The generated getters are typed ?bool: comparing them to the integer 1
+        // is never true, and every coupon read from the database came out
+        // non-cumulative and unable to offer the postage.
+        $isCumulative = (bool) $model->getIsCumulative();
+        $isRemovingPostage = (bool) $model->getIsRemovingPostage();
 
         if (!$this->container->has($model->getType())) {
             throw new \InvalidArgumentException(\sprintf('Coupon type "%s" is not registered.', $model->getType()));
@@ -116,7 +119,8 @@ class CouponFactory
         $couponManager = $this->container->get($model->getType());
         $couponManager->set(
             $this->facade,
-            $model->getCode(),
+            // An automatic promotion has no code: the shared coupon contract still expects a string.
+            $model->getCode() ?? '',
             $model->getTitle(),
             $model->getShortDescription(),
             $model->getDescription(),
@@ -131,6 +135,10 @@ class CouponFactory
             $model->getFreeShippingForModules(),
             $model->getPerCustomerUsageCount(),
         );
+
+        if ($couponManager instanceof CouponAbstract) {
+            $couponManager->setCouponModelId($model->getId());
+        }
 
         $conditions = $this->conditionFactory->unserializeConditionCollection(
             $model->getSerializedConditions(),

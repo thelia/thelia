@@ -175,7 +175,9 @@ class FreeProduct extends AbstractRemoveOnProducts
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
             if (\in_array($cartItem->getProduct()->getId(), $this->product_list, true) && (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers())) {
-                $eligibleProduct = $cartItem;
+                // The product, not the cart line: getRelatedCartItem() and
+                // setRelatedCartItem() key the session marker on the product id.
+                $eligibleProduct = $cartItem->getProduct();
                 break;
             }
         }

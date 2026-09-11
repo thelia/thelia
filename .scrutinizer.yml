@@ -25,6 +25,7 @@ build:
                     # local/config/schema.xml on install; the committed file is the source
                     # of truth, and models built without it turn into phantom issues.
                     - git checkout -- local/config/schema.xml
+                    - grep -q audience_mode local/config/schema.xml
                     - php bin/test-prepare || true
                     - php-scrutinizer-run
                     - command: composer phpstan

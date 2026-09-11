@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Service\DataAccess;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -26,6 +27,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Service\DiscountProration;
+use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
+use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
+use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Base\BrandQuery;
@@ -35,6 +40,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CouponQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ProductQuery;
@@ -59,6 +65,7 @@ class AttributeAccessService
         private readonly TaxEngine $taxEngine,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly CouponManager $couponManager, private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly OfferedCartLineService $offeredCartLineService,
     ) {
     }
 
@@ -319,9 +326,234 @@ class AttributeAccessService
             case 'payment_module_id':
                 $result = $cart->getPaymentModuleId();
                 break;
+            case 'discounts':
+                $result = $this->cartDiscounts($cart, $taxCountry, $taxState);
+                break;
+            case 'cart_items':
+                $result = $this->cartItems($cart, $taxCountry, $taxState);
+                break;
+            case 'unavailable_promotions':
+                $result = $this->offeredCartLineService->getUnavailablePromotions();
+                break;
         }
 
         return $result;
+    }
+
+    /**
+     * What each kept promotion takes off the cart, so the front can name the
+     * promotions instead of showing one anonymous total.
+     *
+     * The stored `cart.discount` is the authoritative figure — it was capped and
+     * rounded when the evaluation wrote it — so what the promotions price now is
+     * prorated onto it: the listed taxed_amount add up EXACTLY to
+     * attr('cart', 'taxed_discount'), the rounding remainder on the last line,
+     * and the amounts to attr('cart', 'discount') the same way. A stored
+     * discount of zero has nothing to distribute: the list is empty.
+     *
+     * The amounts come from the coupons the evaluation retained, which
+     * CouponManager memoises for the request: reading this attribute never
+     * rebuilds them. A promotion discounting nothing — free shipping, an offer
+     * whose gift is out of stock — is left out: it has no line to show.
+     *
+     * @return list<array{label: string, amount: float, taxed_amount: float}>
+     */
+    private function cartDiscounts(Cart $cart, Country $taxCountry, ?State $taxState): array
+    {
+        $storedTaxedDiscount = round($cart->getCalculatedDiscount(true, $taxCountry, $taxState), 2);
+
+        if ($storedTaxedDiscount <= 0.0) {
+            return [];
+        }
+
+        $couponsKept = $this->couponManager->getCouponsKept();
+
+        if ([] === $couponsKept) {
+            return [];
+        }
+
+        $titles = $this->couponTitles($couponsKept);
+
+        $labels = [];
+        $rawAmounts = [];
+
+        /** @var CouponInterface $coupon */
+        foreach ($couponsKept as $coupon) {
+            $rawAmount = round($coupon->exec(), 2);
+
+            if ($rawAmount <= 0.0) {
+                continue;
+            }
+
+            $modelId = $coupon instanceof CouponAbstract ? $coupon->getCouponModelId() : null;
+
+            $labels[] = $titles[$modelId] ?? ('' !== $coupon->getTitle() ? $coupon->getTitle() : $coupon->getCode());
+            $rawAmounts[] = $rawAmount;
+        }
+
+        $taxedAmounts = DiscountProration::prorate($rawAmounts, $storedTaxedDiscount);
+
+        if ([] === $taxedAmounts) {
+            return [];
+        }
+
+        // The pair the cart exposes gives the factor to untax a share of the
+        // discount; the last line takes the untaxed rounding remainder too.
+        $untaxedDiscount = round($cart->getCalculatedDiscount(false, $taxCountry, $taxState), 2);
+        $untaxFactor = $untaxedDiscount / $storedTaxedDiscount;
+
+        $discounts = [];
+        $allocatedUntaxed = 0.0;
+        $lastIndex = array_key_last($taxedAmounts);
+
+        foreach ($taxedAmounts as $index => $taxedAmount) {
+            $amount = $index === $lastIndex
+                ? round($untaxedDiscount - $allocatedUntaxed, 2)
+                : round($taxedAmount * $untaxFactor, 2);
+
+            $allocatedUntaxed = round($allocatedUntaxed + $amount, 2);
+
+            $discounts[] = [
+                'label' => $labels[$index],
+                'amount' => $amount,
+                'taxed_amount' => $taxedAmount,
+            ];
+        }
+
+        return $discounts;
+    }
+
+    /**
+     * The cart lines with what no column carries: `offered_taxed_discount`, the
+     * taxed discount THIS line carries when a promotion offered it, 0.0 for any
+     * other line. It is what lets a cart page strike the gift's own price
+     * instead of showing one anonymous total.
+     *
+     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float}>
+     */
+    private function cartItems(Cart $cart, Country $taxCountry, ?State $taxState): array
+    {
+        $offeredDiscounts = $this->offeredTaxedDiscounts($cart, $taxCountry, $taxState);
+
+        $items = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            $items[] = [
+                'id' => (int) $cartItem->getId(),
+                'product_id' => (int) $cartItem->getProductId(),
+                'is_offered' => (int) $cartItem->getIsOffered(),
+                'offered_taxed_discount' => $offeredDiscounts[(int) $cartItem->getId()] ?? 0.0,
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * The taxed discount each OFFERED cart line carries, keyed by cart item id,
+     * prorated by the same factor as the 'discounts' attribute: what the owning
+     * promotion grants on that very line, scaled onto the stored cart discount.
+     * A cart item missing from the map carries no offered discount (0.0) — a
+     * regular line, or an offered line whose promotion prices nothing.
+     *
+     * @return array<int, float>
+     */
+    private function offeredTaxedDiscounts(Cart $cart, Country $taxCountry, ?State $taxState): array
+    {
+        $storedTaxedDiscount = round($cart->getCalculatedDiscount(true, $taxCountry, $taxState), 2);
+
+        if ($storedTaxedDiscount <= 0.0) {
+            return [];
+        }
+
+        $couponsKept = $this->couponManager->getCouponsKept();
+
+        if ([] === $couponsKept) {
+            return [];
+        }
+
+        $rawAmounts = [];
+
+        /** @var CouponInterface $coupon */
+        foreach ($couponsKept as $coupon) {
+            $rawAmounts[] = round($coupon->exec(), 2);
+        }
+
+        $factor = DiscountProration::factor($rawAmounts, $storedTaxedDiscount);
+
+        if (0.0 === $factor) {
+            return [];
+        }
+
+        $map = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (1 !== (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
+            $rawLineDiscount = 0.0;
+
+            foreach ($couponsKept as $coupon) {
+                if ($coupon instanceof BuyXGetY) {
+                    $rawLineDiscount += $coupon->taxedDiscountOnOfferedLine($cartItem);
+                }
+            }
+
+            if ($rawLineDiscount > 0.0) {
+                $map[(int) $cartItem->getId()] = round($rawLineDiscount * $factor, 2);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * The public title of each coupon, in the language the visitor is browsing.
+     * A coupon built for the checkout carries the title of the default locale,
+     * which is not the one the cart page is written in.
+     *
+     * @param CouponInterface[] $coupons
+     *
+     * @return array<int, string>
+     */
+    private function couponTitles(array $coupons): array
+    {
+        $modelIds = array_values(array_filter(array_map(
+            static fn (CouponInterface $coupon): ?int => $coupon instanceof CouponAbstract ? $coupon->getCouponModelId() : null,
+            $coupons,
+        )));
+
+        if ([] === $modelIds) {
+            return [];
+        }
+
+        $locale = $this->getSession()->getLang()?->getLocale();
+
+        // A page reads several cart attributes going through here — 'discounts',
+        // the per-line offered discounts — and each would replay the query: the
+        // titles are kept for the request, like every other attr() resolution.
+        $cacheKey = \sprintf('couponTitles_%s_%s', $locale ?? '-', implode('-', $modelIds));
+
+        if (\array_key_exists($cacheKey, self::$dataAccessCache)) {
+            return self::$dataAccessCache[$cacheKey];
+        }
+
+        $titles = [];
+
+        foreach (CouponQuery::create()->filterById($modelIds, Criteria::IN)->find() as $model) {
+            if (null !== $locale) {
+                $model->setLocale($locale);
+            }
+
+            $title = (string) $model->getTitle();
+
+            if ('' !== $title) {
+                $titles[(int) $model->getId()] = $title;
+            }
+        }
+
+        return self::$dataAccessCache[$cacheKey] = $titles;
     }
 
     public function attributeCoupon(string $attributeName): mixed
@@ -331,21 +563,39 @@ class AttributeAccessService
 
         switch ($attributeName) {
             case 'has_coupons':
-                return \count($this->couponManager->getCouponsKept()) > 0;
+                return [] !== $this->keptCouponCodes();
             case 'coupon_count':
-                return \count($this->couponManager->getCouponsKept());
+                return \count($this->keptCouponCodes());
             case 'coupon_list':
-                $orderCoupons = [];
-                /** @var CouponInterface $coupon */
-                foreach ($this->couponManager->getCouponsKept() as $coupon) {
-                    $orderCoupons[] = $coupon->getCode();
-                }
-
-                return $orderCoupons;
+                return $this->keptCouponCodes();
             case 'is_delivery_free':
                 return $this->couponManager->isCouponRemovingPostage($cart);
         }
         throw new \InvalidArgumentException(\sprintf("%s has no '%s' attribute", 'Order', $attributeName));
+    }
+
+    /**
+     * The codes of the coupons the evaluation retained. These attributes drive
+     * the "your coupon" block of the cart page — a code typed in, shown, removable.
+     * An automatic promotion carries no code: it has nothing to show or remove
+     * there, and belongs to the 'discounts' attribute instead.
+     *
+     * @return list<string>
+     */
+    private function keptCouponCodes(): array
+    {
+        $codes = [];
+
+        /** @var CouponInterface $coupon */
+        foreach ($this->couponManager->getCouponsKept() as $coupon) {
+            $code = $coupon->getCode();
+
+            if ('' !== $code) {
+                $codes[] = $code;
+            }
+        }
+
+        return $codes;
     }
 
     public function orderDataAccess(string $attributeName): mixed

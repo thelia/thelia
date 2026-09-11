@@ -23,12 +23,15 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Domain\Sale\ReservedSalePriceCatalog;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 
 class ProductSaleElementsAccessService
@@ -41,6 +44,8 @@ class ProductSaleElementsAccessService
         private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LangService $langService,
+        private readonly ReservedSaleVisibility $reservedSaleVisibility,
+        private readonly ReservedSalePriceCatalog $reservedSalePriceCatalog,
     ) {
         $this->request = $requestStack->getMainRequest();
     }
@@ -61,8 +66,24 @@ class ProductSaleElementsAccessService
             $discount = $this->securityContext->getCustomerUser()->getDiscount();
         }
 
-        foreach (ProductSaleElementsQuery::create()->filterByVisible(true)->orderByPosition()->findByProductId($productId) as $pse) {
+        // Reached by a product id, so the private drop rule has to be enforced here
+        // too: the page of such a product is out of reach for this visitor, and its
+        // prices must not be readable behind it.
+        $query = ProductSaleElementsQuery::create()
+            ->filterByVisible(true)
+            ->filterByProductId($productId)
+            ->orderByPosition();
+
+        $this->reservedSaleVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
+
+        $reservedPrices = $this->reservedSalePriceCatalog->prices(
+            $currency,
+            $this->reservedSaleVisibility->currentCustomer(),
+        );
+
+        foreach ($query->find() as $pse) {
             $attributes = [];
+            $isPromo = (bool) $pse->getPromo();
 
             // Reading the first price row priced the sale element in whichever
             // currency the database answered first. The model knows the rule:
@@ -73,6 +94,20 @@ class ProductSaleElementsAccessService
             $pse->setVirtualColumn('price_PRICE', $prices->getPrice());
             $pse->setVirtualColumn('price_PROMO_PRICE', $prices->getPromoPrice());
 
+            // A reserved operation writes nothing in the catalog, so its price is
+            // substituted in the virtual column the getters below read: the customer
+            // discount and the tax are then applied to it exactly the way they are
+            // applied to a public promo price.
+            $reservedPrice = $reservedPrices[$pse->getId()] ?? null;
+
+            if (null !== $reservedPrice) {
+                $pse->setVirtualColumn(
+                    'price_PROMO_PRICE',
+                    $reservedPrice->untaxedPromoPrice * (1 - ((float) $discount / 100)),
+                );
+                $isPromo = true;
+            }
+
             foreach ($pse->getAttributeCombinations() as $attribute) {
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
             }
@@ -82,7 +117,7 @@ class ProductSaleElementsAccessService
             $result[] = [
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
-                'isPromo' => $pse->getPromo() ? true : false,
+                'isPromo' => $isPromo,
                 'isNew' => $pse->getNewness() ? true : false,
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),

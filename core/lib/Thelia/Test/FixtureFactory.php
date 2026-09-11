@@ -47,11 +47,16 @@ use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Profile;
 use Thelia\Model\ProfileResource;
 use Thelia\Model\Resource;
 use Thelia\Model\ResourceQuery;
+use Thelia\Model\Sale;
+use Thelia\Model\SaleCustomer;
+use Thelia\Model\SaleOffsetCurrency;
+use Thelia\Model\SaleProduct;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
@@ -210,7 +215,7 @@ final class FixtureFactory
         // Timestampable only fills created_at when it is untouched, so setting it
         // here survives the insert.
         if (isset($overrides['createdAt'])) {
-            $product->setCreatedAt($overrides['createdAt']);
+            $product->setCreatedAt(self::wholeSeconds($overrides['createdAt']));
         }
 
         // A product has no product_i18n row unless a title is asked for, which is
@@ -235,7 +240,7 @@ final class FixtureFactory
         // Product::create() saves the product several times, so updated_at can only
         // be forced once the creation is over.
         if (isset($overrides['updatedAt'])) {
-            $product->setUpdatedAt($overrides['updatedAt'])->save($this->connection);
+            $product->setUpdatedAt(self::wholeSeconds($overrides['updatedAt']))->save($this->connection);
         }
 
         return $product;
@@ -565,16 +570,26 @@ final class FixtureFactory
         return $cartAddress;
     }
 
+    /**
+     * A coupon row. `triggerMode` says how it applies: with a code the customer
+     * types (the default) or on its own — an automatic promotion carries no
+     * code, so pass `['triggerMode' => Coupon::TRIGGER_MODE_AUTOMATIC, 'code' => null]`.
+     *
+     * `type` and `effects` are free: any registered coupon type with the fields
+     * it reads, so a test can build a BuyXGetY offer as easily as a flat amount.
+     */
     public function coupon(array $overrides = []): Coupon
     {
         $n = $this->next();
 
         $coupon = new Coupon();
-        $coupon->setCode($overrides['code'] ?? 'COUPON-'.$n);
+        $coupon->setCode(\array_key_exists('code', $overrides) ? $overrides['code'] : 'COUPON-'.$n);
+        $coupon->setTriggerMode($overrides['triggerMode'] ?? Coupon::TRIGGER_MODE_CODE);
         $coupon->setType($overrides['type'] ?? 'thelia.coupon.type.remove_x_amount');
         $coupon->setSerializedEffects(json_encode($overrides['effects'] ?? ['amount' => 5.0], \JSON_THROW_ON_ERROR));
         $coupon->setIsEnabled($overrides['isEnabled'] ?? true);
-        $coupon->setExpirationDate($overrides['expirationDate'] ?? new \DateTime('+1 month'));
+        $coupon->setStartDate(self::wholeSeconds($overrides['startDate'] ?? null));
+        $coupon->setExpirationDate(self::wholeSeconds($overrides['expirationDate'] ?? new \DateTime('+1 month')));
         $coupon->setMaxUsage($overrides['maxUsage'] ?? Coupon::UNLIMITED_COUPON_USE);
         $coupon->setIsCumulative($overrides['isCumulative'] ?? false);
         $coupon->setIsRemovingPostage($overrides['isRemovingPostage'] ?? false);
@@ -625,6 +640,31 @@ final class FixtureFactory
     }
 
     /**
+     * Gives a sale element a price in a currency. Product::create() already writes
+     * one for the product's default sale element in the currency it was created
+     * with — call this for an additional sale element, or an additional currency.
+     *
+     * `fromDefaultCurrency` says the row is a conversion rather than a price the
+     * shopkeeper typed, which is what makes the reader convert it again from the
+     * default currency instead of using it as is.
+     */
+    public function productPrice(
+        ProductSaleElements $productSaleElements,
+        Currency $currency,
+        array $overrides = [],
+    ): ProductPrice {
+        $price = new ProductPrice();
+        $price->setProductSaleElementsId($productSaleElements->getId());
+        $price->setCurrencyId($currency->getId());
+        $price->setPrice($overrides['price'] ?? '10.000000');
+        $price->setPromoPrice($overrides['promoPrice'] ?? '10.000000');
+        $price->setFromDefaultCurrency($overrides['fromDefaultCurrency'] ?? false);
+        $price->save($this->connection);
+
+        return $price;
+    }
+
+    /**
      * Creates a Cart. Mostly used as a structural dependency for Order.
      */
     public function cart(?Customer $customer = null, array $overrides = []): Cart
@@ -643,6 +683,9 @@ final class FixtureFactory
     /**
      * Creates a CartItem in the given cart. The product's default
      * ProductSaleElements is used unless another one is passed.
+     *
+     * `isOffered` plus `offeredByCouponId` build the line a promotion offers,
+     * the one the customer may neither change nor remove.
      */
     public function cartItem(
         Cart $cart,
@@ -661,9 +704,115 @@ final class FixtureFactory
         $cartItem->setPrice($overrides['price'] ?? '10.000000');
         $cartItem->setPromoPrice($overrides['promoPrice'] ?? '10.000000');
         $cartItem->setPromo($overrides['promo'] ?? 0);
+        $cartItem->setIsOffered($overrides['isOffered'] ?? 0);
+        $cartItem->setOfferedByCouponId($overrides['offeredByCouponId'] ?? null);
         $cartItem->save($this->connection);
 
         return $cartItem;
+    }
+
+    /**
+     * Creates a sale operation. It is INACTIVE and open to everyone by default:
+     * a test that wants a running operation says so, and one that wants a reserved
+     * one passes `audienceMode` plus the customers through saleCustomer().
+     *
+     * The operation discounts nothing on its own — link the products with
+     * saleProduct() and give it an offset per currency with saleOffsetCurrency().
+     */
+    /**
+     * A DATETIME column holds whole seconds, and the engines disagree on how a
+     * fractional one gets there: MySQL rounds it up, MariaDB truncates it. A date
+     * built from `new \DateTime('+2 hours')` carries microseconds, so it reads back
+     * one second later on one engine and unchanged on the other, and a test
+     * asserting on it fails on whichever engine it was not written against. Cut
+     * every date this factory stores to the second.
+     */
+    private static function wholeSeconds(?\DateTimeInterface $date): ?\DateTime
+    {
+        if (null === $date) {
+            return null;
+        }
+
+        // A copy, and a mutable one: the API resources type their date setters
+        // ?DateTime, and the caller's own object must not be touched.
+        return \DateTime::createFromInterface($date)->setTime(
+            (int) $date->format('H'),
+            (int) $date->format('i'),
+            (int) $date->format('s'),
+        );
+    }
+
+    public function sale(array $overrides = []): Sale
+    {
+        $n = $this->next();
+
+        $sale = new Sale();
+        $sale->setActive($overrides['active'] ?? false);
+        $sale->setStartDate(self::wholeSeconds($overrides['startDate'] ?? null));
+        $sale->setEndDate(self::wholeSeconds($overrides['endDate'] ?? null));
+        $sale->setPriceOffsetType($overrides['priceOffsetType'] ?? Sale::OFFSET_TYPE_PERCENTAGE);
+        $sale->setDisplayInitialPrice($overrides['displayInitialPrice'] ?? true);
+        $sale->setAudienceMode($overrides['audienceMode'] ?? Sale::AUDIENCE_MODE_PUBLIC);
+        $sale->setHideProducts($overrides['hideProducts'] ?? false);
+        $sale->setCountdownMode($overrides['countdownMode'] ?? Sale::COUNTDOWN_MODE_NONE);
+        $sale->setCountdownLeadHours($overrides['countdownLeadHours'] ?? null);
+        $sale->setLocale($overrides['locale'] ?? 'en_US');
+        $sale->setTitle($overrides['title'] ?? 'Sale '.$n);
+        $sale->setSaleLabel($overrides['saleLabel'] ?? 'SALE-'.$n);
+        $sale->save($this->connection);
+
+        return $sale;
+    }
+
+    /**
+     * Puts a product in a sale operation. Pass an attribute value to discount only
+     * the sale elements carrying it, the way the back office selection does; without
+     * one, every sale element of the product is included.
+     */
+    public function saleProduct(
+        Sale $sale,
+        Product $product,
+        ?AttributeAv $attributeAv = null,
+    ): SaleProduct {
+        $saleProduct = new SaleProduct();
+        $saleProduct->setSaleId($sale->getId());
+        $saleProduct->setProductId($product->getId());
+        $saleProduct->setAttributeAvId($attributeAv?->getId());
+        $saleProduct->save($this->connection);
+
+        return $saleProduct;
+    }
+
+    /**
+     * Names a customer a reserved operation is open to. Only read when the
+     * operation's audience mode is Sale::AUDIENCE_MODE_CUSTOMERS.
+     */
+    public function saleCustomer(Sale $sale, Customer $customer): SaleCustomer
+    {
+        $saleCustomer = new SaleCustomer();
+        $saleCustomer->setSaleId($sale->getId());
+        $saleCustomer->setCustomerId($customer->getId());
+        $saleCustomer->save($this->connection);
+
+        return $saleCustomer;
+    }
+
+    /**
+     * The discount the operation gives in one currency: an amount or a percentage,
+     * depending on the operation's own price offset type.
+     */
+    public function saleOffsetCurrency(
+        Sale $sale,
+        Currency $currency,
+        float $priceOffsetValue,
+    ): SaleOffsetCurrency {
+        $offset = new SaleOffsetCurrency();
+        $offset->setSaleId($sale->getId());
+        $offset->setCurrencyId($currency->getId());
+        $offset->setPriceOffsetValue($priceOffsetValue);
+        $offset->save($this->connection);
+
+        return $offset;
     }
 
     /**

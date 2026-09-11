@@ -334,7 +334,13 @@ class SessionController extends BaseAdminController
     }
 
     /**
-     * Save user locale preference in session.
+     * Give the session the interface language of the administrator who just signed in.
+     *
+     * The admin language and the shop language are two different session keys, and this
+     * used to write the shop one: an administrator whose locale is French was served an
+     * English back-office — the back-office reads the admin key, which the anonymous
+     * login page had already pinned to the default language — while the storefront they
+     * browsed in the same browser was switched to French behind their back.
      */
     protected function applyUserLocale(UserInterface $user): void
     {
@@ -345,7 +351,7 @@ class SessionController extends BaseAdminController
             $lang = Lang::getDefaultLanguage();
         }
 
-        $this->langService->setLang($lang);
+        $this->langService->setAdminLang($lang);
     }
 
     protected function getRememberMeCookieName()

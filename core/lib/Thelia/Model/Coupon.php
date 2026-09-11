@@ -31,31 +31,45 @@ class Coupon extends BaseCoupon
     // Define the value of an unlimited coupon usage.
     public const UNLIMITED_COUPON_USE = -1;
 
+    // The customer types the code for the promotion to apply.
+    public const TRIGGER_MODE_CODE = 'code';
+
+    // The promotion applies on its own, as soon as the cart matches its conditions.
+    public const TRIGGER_MODE_AUTOMATIC = 'automatic';
+
+    /**
+     * Whether the promotion applies on its own, with no code to type.
+     */
+    public function isAutomatic(): bool
+    {
+        return self::TRIGGER_MODE_AUTOMATIC === $this->getTriggerMode();
+    }
+
     /**
      * Create or Update this Coupon.
      *
-     * @param string    $code                       Coupon Code
-     * @param string    $title                      Coupon title
-     * @param array     $effects                    Ready to be serialized in JSON effect params
-     * @param string    $type                       Coupon type
-     * @param bool      $isRemovingPostage          Is removing Postage
-     * @param string    $shortDescription           Coupon short description
-     * @param string    $description                Coupon description
-     * @param bool      $isEnabled                  Enable/Disable
-     * @param \DateTime $expirationDate             Coupon expiration date
-     * @param bool      $isAvailableOnSpecialOffers Is available on special offers
-     * @param bool      $isCumulative               Is cumulative
-     * @param int       $maxUsage                   Coupon quantity
-     * @param string    $defaultSerializedRule      Serialized default rule added if none found
-     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
+     * @param string|null $code                       Coupon Code, null for an automatic promotion
+     * @param string      $title                      Coupon title
+     * @param array       $effects                    Ready to be serialized in JSON effect params
+     * @param string      $type                       Coupon type
+     * @param bool        $isRemovingPostage          Is removing Postage
+     * @param string      $shortDescription           Coupon short description
+     * @param string      $description                Coupon description
+     * @param bool        $isEnabled                  Enable/Disable
+     * @param \DateTime   $expirationDate             Coupon expiration date
+     * @param bool        $isAvailableOnSpecialOffers Is available on special offers
+     * @param bool        $isCumulative               Is cumulative
+     * @param int         $maxUsage                   Coupon quantity
+     * @param string      $defaultSerializedRule      Serialized default rule added if none found
+     * @param string      $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array       $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array       $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool        $perCustomerUsageCount      True if usage coiunt is per customer
      *
      * @throws \Exception
      */
     public function createOrUpdate(
-        string $code,
+        ?string $code,
         string $title,
         array $effects,
         string $type,
@@ -73,6 +87,7 @@ class Coupon extends BaseCoupon
         array $freeShippingForMethods,
         bool $perCustomerUsageCount,
         $startDate = null,
+        string $triggerMode = self::TRIGGER_MODE_CODE,
     ): void {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
@@ -81,6 +96,7 @@ class Coupon extends BaseCoupon
         try {
             $this
                 ->setCode($code)
+                ->setTriggerMode($triggerMode)
                 ->setType($type)
                 ->setEffects($effects)
                 ->setIsRemovingPostage($isRemovingPostage)

@@ -46,6 +46,16 @@ class ImageEvent extends CachedFileEvent
     protected ?int $quality = null;
 
     protected ?ImageInterface $imageObject = null;
+
+    /**
+     * Set once the cache file exists, {@see getImageObject()} decodes it, and a caller
+     * asking only for the url or the path (uploading a file, transforming an API
+     * resource) never pays for it.
+     *
+     * @var (\Closure(): ?ImageInterface)|null
+     */
+    private ?\Closure $imageObjectSupplier = null;
+
     protected bool $allowZoom = false;
     protected ?string $format = null;
 
@@ -196,12 +206,32 @@ class ImageEvent extends CachedFileEvent
     public function setImageObject(?ImageInterface $imageObject): self
     {
         $this->imageObject = $imageObject;
+        $this->imageObjectSupplier = null;
+
+        return $this;
+    }
+
+    /**
+     * Hands the image over without decoding it: {@see getImageObject()} does that,
+     * once, the first time it is actually asked for one.
+     *
+     * @param \Closure(): ?ImageInterface $supplier
+     */
+    public function setImageObjectSupplier(\Closure $supplier): self
+    {
+        $this->imageObject = null;
+        $this->imageObjectSupplier = $supplier;
 
         return $this;
     }
 
     public function getImageObject(): ?ImageInterface
     {
+        if (null === $this->imageObject && null !== $this->imageObjectSupplier) {
+            $this->imageObject = ($this->imageObjectSupplier)();
+            $this->imageObjectSupplier = null;
+        }
+
         return $this->imageObject;
     }
 

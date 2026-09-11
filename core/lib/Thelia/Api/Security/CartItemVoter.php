@@ -32,6 +32,15 @@ final class CartItemVoter extends Voter
 {
     public const OWNER = 'THELIA_CART_ITEM_OWNER';
 
+    /**
+     * Owning the line is not enough to change it: a line a promotion offered
+     * belongs to that promotion, which puts it there and takes it back on its
+     * own. This is the API side of the lock Action\Cart holds on the event
+     * side — the front PUT and DELETE go through PropelPersistProcessor and
+     * PropelRemoveProcessor, which dispatch no cart event at all.
+     */
+    public const MUTABLE = 'THELIA_CART_ITEM_MUTABLE';
+
     public function __construct(
         private readonly CartOwnership $cartOwnership,
     ) {
@@ -39,7 +48,7 @@ final class CartItemVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return self::OWNER === $attribute && $subject instanceof CartItem;
+        return \in_array($attribute, [self::OWNER, self::MUTABLE], true) && $subject instanceof CartItem;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -56,6 +65,10 @@ final class CartItemVoter extends Voter
             return false;
         }
 
-        return $this->cartOwnership->ownsCart($cart->getCustomerId(), $cart->getId());
+        if (!$this->cartOwnership->ownsCart($cart->getCustomerId(), $cart->getId())) {
+            return false;
+        }
+
+        return self::MUTABLE !== $attribute || 1 !== (int) $model->getIsOffered();
     }
 }

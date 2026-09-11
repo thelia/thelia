@@ -67,6 +67,28 @@ final class TheliaKernelSqlModeTest extends TestCase
     }
 
     /**
+     * Emptying the cache directory leaves workers that still believe the verdict
+     * file is there, and reading it then killed the boot: every back-office action
+     * clearing the cache answered 500 until the worker recycled. An unreadable file
+     * puts the kernel in that same position, without a worker to recycle.
+     */
+    public function testAnUnreadableVerdictIsRebuiltInsteadOfBreakingTheBoot(): void
+    {
+        $verdictFile = $this->cacheDir.'/check_mysql_configurations.php';
+        file_put_contents($verdictFile, '<?php return '.var_export(['modes' => [], 'canUpdate' => false, 'logs' => []], true).';');
+        chmod($verdictFile, 0o000);
+
+        if (is_readable($verdictFile)) {
+            self::markTestSkipped('The test user reads the file whatever its mode.');
+        }
+
+        $modes = $this->resolveSessionSqlMode('8.0.40', ['ONLY_FULL_GROUP_BY', 'STRICT_TRANS_TABLES']);
+
+        self::assertNotContains('ONLY_FULL_GROUP_BY', $modes);
+        self::assertContains('STRICT_TRANS_TABLES', $modes);
+    }
+
+    /**
      * @param string[] $serverModes
      *
      * @return string[] the sql_mode the kernel settles on for the session

@@ -22,7 +22,6 @@ use Thelia\Test\ApiTestCase;
  * with valid Hydra structure without authentication.
  *
  * Excluded endpoints:
- * - /api/front/currencies: 500 (StateProvider issue, pre-existing)
  * - /api/front/countries: 404 (identifier config issue, pre-existing)
  * - Authenticated endpoints: CustomerFamily vendor module crashes on
  *   customer save via OpenApiListener::getContent() on null (same
@@ -36,6 +35,7 @@ final class FrontCollectionContractTest extends ApiTestCase
         yield 'categories' => ['/api/front/categories'];
         yield 'brands' => ['/api/front/brands'];
         yield 'languages' => ['/api/front/languages'];
+        yield 'currencies' => ['/api/front/currencies'];
         yield 'contents' => ['/api/front/contents'];
         yield 'folders' => ['/api/front/folders'];
         yield 'attributes' => ['/api/front/attributes'];

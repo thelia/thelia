@@ -44,6 +44,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeTemplateQuery;
@@ -77,8 +78,10 @@ use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher,
+        private readonly ReservedSaleVisibility $reservedSaleVisibility,
+    ) {
     }
 
     public function create(ProductCreateEvent $event): void
@@ -866,12 +869,15 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ('product' === $event->getView()) {
-            $product = ProductQuery::create()
+            $query = ProductQuery::create()
                 ->filterById($event->getViewId())
-                ->filterByVisible(1)
-                ->count();
+                ->filterByVisible(1);
 
-            if (0 === $product) {
+            // A product hidden by a reserved operation answers the same 404 as an
+            // invisible one: the page template renders a null product otherwise.
+            $this->reservedSaleVisibility->applyTo($query, ProductTableMap::COL_ID);
+
+            if (0 === $query->count()) {
                 $dispatcher->dispatch($event, TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE);
             }
         }

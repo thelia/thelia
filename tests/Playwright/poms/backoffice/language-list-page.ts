@@ -33,4 +33,17 @@ export class LanguageListPage extends BaseAdminPage {
   get urlForm(): Locator {
     return this.page.getByTestId('lang-url-form');
   }
+
+  get defaultRadios(): Locator {
+    return this.page.locator('input[name="lang_default"]');
+  }
+
+  defaultRadioFor(langId: number): Locator {
+    return this.page.locator(`input[name="lang_default"][value="${langId}"]`);
+  }
+
+  /** Value of the radio the server rendered as checked, i.e. the language currently by default. */
+  async checkedDefaultValue(): Promise<string | null> {
+    return this.page.locator('input[name="lang_default"]:checked').first().getAttribute('value');
+  }
 }

@@ -12,14 +12,18 @@ name: phpstan-botwig
 # were found"). A .env.test.local points it at the runner's MySQL.
 on:
   push:
-    branches: [ twig, main ]
+    branches: [ main ]
   pull_request:
-    branches: [ twig, main ]
+    branches: [ main ]
 
 jobs:
   phpstan-botwig:
     name: PHPStan level 5 (BO Twig bundle)
     runs-on: ubuntu-latest
+    env:
+      # Without a token, Flex silently skips the thelia/thelia-recipes endpoint
+      # and the GitHub archive the theme branch is downloaded from is rate limited.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,36 +40,32 @@ jobs:
           ini-values: post_max_size=20M
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
-      - name: Install Composer dependencies
+      - name: Resolve the back-office theme from its development branch
+        # The analysed code has to be the branch phpstan-baseline-botwig.neon was
+        # written against. This used to be a `git clone` over the installed package,
+        # which kept the released tag's dependencies while analysing the branch's
+        # code; resolving the branch through Composer keeps the two in step.
         run: |
-          composer install --no-progress --prefer-dist --optimize-autoloader
-          composer update --no-interaction --prefer-dist
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0"
 
-      - name: Restore the project schema the config package overwrote
-        # Same step, and same reason, as the CI workflow: the thelia/config package
-        # installs into local/ and replaces the version-controlled
-        # local/config/schema.xml with its own copy. Without the restore, the models
-        # this job builds have no guest checkout columns and PHPStan reports their
-        # accessors as undefined methods, on every pull request at once.
-        #
-        # The grep is the point of the step: a restore that silently did nothing would
-        # bring those errors straight back.
+      - name: Install Composer dependencies
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Check that the analysed theme is the branch tip
+        # A development version, not `dev-main`: a package that declares a
+        # branch-alias reports its alias instead.
         run: |
-          git checkout -- local/config/schema.xml
-          grep -q is_guest local/config/schema.xml \
-            || { echo "::error::local/config/schema.xml has no is_guest column after the restore"; exit 1; }
+          info=$(composer show thelia/backoffice-default-twig-template --format=json)
+          version=$(php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];' <<< "$info")
+          reference=$(php -r '$p = json_decode(stream_get_contents(STDIN), true); echo $p["source"]["reference"] ?? $p["dist"]["reference"] ?? "unknown";' <<< "$info")
+          echo "thelia/backoffice-default-twig-template -> $version ($reference)"
+          case "$version" in dev-*|*-dev) ;; *) echo "::error::the theme resolved to $version, expected a development version"; exit 1 ;; esac
 
       - name: Prepare test env (builds the Propel models via App\Kernel)
         run: |
           printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
           php bin/test-prepare
-
-      - name: Sync the bundle to its working branch
-        # composer installs the published tag; replace the source with the live
-        # branch so the analysed code matches phpstan-baseline-botwig.neon.
-        run: |
-          rm -rf templates/backOffice/default-twig
-          git clone --depth 1 --branch main https://github.com/thelia-templates/default-twig.git templates/backOffice/default-twig
 
       - name: PHPStan (level and paths come from phpstan-botwig.neon)
         run: ./vendor/bin/phpstan analyse -c phpstan-botwig.neon --no-progress --error-format=github

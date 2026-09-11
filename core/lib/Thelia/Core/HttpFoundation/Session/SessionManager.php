@@ -133,6 +133,13 @@ class SessionManager
         }
     }
 
+    /**
+     * Give the session the interface language of the administrator a remember-me
+     * cookie just signed in. Only ever called for an administrator, so it writes the
+     * admin language: writing the shop one, as it used to, left the back-office in
+     * whatever language the anonymous request had settled on and switched the
+     * storefront of the same browser instead.
+     */
     protected function applyUserLocale(UserInterface $user, Session $session): void
     {
         // Set the current language according to locale preference
@@ -145,6 +152,6 @@ class SessionManager
             $lang = Lang::getDefaultLanguage();
         }
 
-        $session->setLang($lang);
+        $session->setAdminLang($lang);
     }
 }

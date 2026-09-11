@@ -14,11 +14,18 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Imagine\Gd\Imagine as GdImagine;
+use Imagine\Gmagick\Imagine as GmagickImagine;
+use Imagine\Image\ImageInterface;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Action\Image as ImageAction;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\FileManager;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -202,5 +209,56 @@ final class ImageActionTest extends ActionIntegrationTestCase
         $this->trackFileForCleanup($event->getCacheOriginalFilepath());
 
         self::assertNotNull($event->getImageObject());
+    }
+
+    /**
+     * Uploading a file and transforming an API resource both process an image
+     * and read only its url or its path afterwards: neither must decode it.
+     */
+    public function testProcessImageDoesNotDecodeTheCacheFileWithoutADemand(): void
+    {
+        $sourceFile = $this->createTestPng();
+        $this->trackFileForCleanup($sourceFile);
+
+        $countingImagine = new class extends GdImagine {
+            public int $opens = 0;
+
+            public function open($path): ImageInterface
+            {
+                ++$this->opens;
+
+                return parent::open($path);
+            }
+        };
+
+        $action = new class(new FileManager([]), $countingImagine) extends ImageAction {
+            public function __construct(FileManager $fileManager, private readonly GdImagine $countingImagine)
+            {
+                parent::__construct($fileManager);
+            }
+
+            protected function createImagineInstance(): ImagickImagine|GmagickImagine|GdImagine
+            {
+                return $this->countingImagine;
+            }
+        };
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        $action->processImage($event, TheliaEvents::IMAGE_PROCESS, new EventDispatcher());
+
+        $this->trackFileForCleanup((string) $event->getCacheFilepath());
+        $this->trackFileForCleanup($event->getCacheOriginalFilepath());
+
+        self::assertNotEmpty($event->getFileUrl(), 'sanity: the url must be there without ever decoding the image.');
+        self::assertSame(0, $countingImagine->opens, 'The cache file must not be decoded until something asks for the image object.');
+
+        self::assertNotNull($event->getImageObject());
+        self::assertSame(1, $countingImagine->opens, 'Asking for the image object must decode it.');
+
+        $event->getImageObject();
+        self::assertSame(1, $countingImagine->opens, 'A second demand must reuse the decoded image, not decode it again.');
     }
 }
