@@ -269,6 +269,7 @@ return [
     'Oman' => 'Oman',
     'Order' => 'Bestelling',
     'Order confirmation sent to the customer' => 'Bevestiging van de bestelling verzonden naar de klant',
+    'Order status transition override' => 'Overschrijven van orderstatusovergangen',
     'Paid' => 'Betaald',
     'Pakistan' => 'Pakistan',
     'Palau' => 'Palau',
@@ -395,5 +396,4 @@ return [
     'Åland Islands' => 'Åland',
     'Đồng' => 'Dong',
     'Гривна' => 'Hryvnia',
-    'Order status transition override' => 'Overschrijven van orderstatusovergangen',
 ];

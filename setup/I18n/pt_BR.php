@@ -80,6 +80,6 @@ return [
     'Hooks' => 'Ganchos',
     'Modules maagement' => 'Módulos',
     'New York' => 'Cidade',
-    'Search' => 'Procurar',
     'Order status transition override' => 'Forçar transições de status do pedido',
+    'Search' => 'Procurar',
 ];

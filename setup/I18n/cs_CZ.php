@@ -17,6 +17,6 @@ return [
     'Category' => 'Kategorie',
     'Content' => 'Obsah',
     'New York' => 'New York',
-    'Search' => 'Vyhledávání',
     'Order status transition override' => 'Vynucení přechodu stavu objednávky',
+    'Search' => 'Vyhledávání',
 ];
