@@ -23,4 +23,5 @@ return [
     'Hooks' => 'روابط',
     'New York' => 'نيويورك',
     'Search' => 'بحث',
+    'Order status transition override' => 'تجاوز انتقالات حالة الطلب',
 ];

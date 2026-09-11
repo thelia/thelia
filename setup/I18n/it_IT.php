@@ -419,4 +419,5 @@ return [
     'Zaire' => 'RD del Congo',
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabwe',
+    'Order status transition override' => 'Forzatura delle transizioni di stato dell\'ordine',
 ];

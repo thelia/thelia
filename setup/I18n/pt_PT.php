@@ -14,4 +14,5 @@ declare(strict_types=1);
 
 return [
     'Address' => 'Endereço',
+    'Order status transition override' => 'Forçar transições de estado da encomenda',
 ];

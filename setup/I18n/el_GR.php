@@ -16,4 +16,5 @@ return [
     'Address' => 'Διεύθυνση',
     'New York' => 'Νέα Υόρκη',
     'Search' => 'Αναζήτηση',
+    'Order status transition override' => 'Παράκαμψη μεταβάσεων κατάστασης παραγγελίας',
 ];

@@ -724,6 +724,7 @@ return [
     'Order failed - after javascript initialisation' => 'Başarısız - sipariş sonra javascript başlatma',
     'Order failed - at the bottom' => 'Başarısız - sipariş alt',
     'Order failed - at the top' => 'Sipariş başarısız - üst',
+    'Order status transition override' => 'Sipariş durumu geçişini zorlama',
     'Orders - JavaScript' => 'Siparişler - JavaScript',
     'Orders - at the top' => 'Siparişler - üst',
     'Orders - bottom' => 'Siparişler - Alt',

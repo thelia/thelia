@@ -320,4 +320,5 @@ return [
     'Zaire' => 'زئیر',
     'Zambia' => 'زامبیا',
     'Zimbabwe' => 'زیمباوه',
+    'Order status transition override' => 'نادیده گرفتن انتقال وضعیت سفارش',
 ];

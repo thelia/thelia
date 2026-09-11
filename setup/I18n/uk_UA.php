@@ -17,4 +17,5 @@ return [
     'Content' => 'Контент',
     'Folder' => 'Каталог',
     'Hooks' => 'Хуки',
+    'Order status transition override' => 'Примусова зміна статусу замовлення',
 ];

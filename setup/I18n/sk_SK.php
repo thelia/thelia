@@ -537,4 +537,5 @@ return [
     'states - table row' => 'štáty - riadok tabuľky',
     'Đồng' => 'Đồng',
     'Гривна' => 'ГРИВНА',
+    'Order status transition override' => 'Vynútenie prechodu stavu objednávky',
 ];

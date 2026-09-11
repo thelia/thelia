@@ -488,4 +488,5 @@ return [
     'Zaire' => 'Zair',
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabwe',
+    'Order status transition override' => 'Wymuszanie zmiany statusu zamówienia',
 ];

@@ -26,4 +26,5 @@ return [
     'Search' => 'Keresés',
     'Shipping configuration' => 'Szállítási beállítások',
     'Translations' => 'Fordítások',
+    'Order status transition override' => 'Rendelési állapotváltás felülbírálása',
 ];
