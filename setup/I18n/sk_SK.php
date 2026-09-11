@@ -372,6 +372,7 @@ return [
     'Order - cart top' => 'Objednávka - košík top',
     'Order details - after delivery address' => 'Podrobnosti objednávky - po adresu doručenia',
     'Order details - after invoice address' => 'Podrobnosti objednávky - po fakturačnej adrese',
+    'Order status transition override' => 'Vynútenie prechodu stavu objednávky',
     'Oregon' => 'Oregon',
     'Oristano' => 'Oristano',
     'Osaka' => 'Osaka',
@@ -537,5 +538,4 @@ return [
     'states - table row' => 'štáty - riadok tabuľky',
     'Đồng' => 'Đồng',
     'Гривна' => 'ГРИВНА',
-    'Order status transition override' => 'Vynútenie prechodu stavu objednávky',
 ];

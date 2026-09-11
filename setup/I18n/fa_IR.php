@@ -220,6 +220,7 @@ return [
     'Not paid' => 'پرداخت نشده',
     'Oman' => 'عمان',
     'Order' => 'سفارش',
+    'Order status transition override' => 'نادیده گرفتن انتقال وضعیت سفارش',
     'Paid' => 'پرداخت شده',
     'Pakistan' => 'پاکستان',
     'Panama' => 'پاناما',
@@ -320,5 +321,4 @@ return [
     'Zaire' => 'زئیر',
     'Zambia' => 'زامبیا',
     'Zimbabwe' => 'زیمباوه',
-    'Order status transition override' => 'نادیده گرفتن انتقال وضعیت سفارش',
 ];

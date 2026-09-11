@@ -57,6 +57,6 @@ return [
     'Folder' => 'Folder',
     'Hooks' => 'Kaitan',
     'Order' => 'Pesan',
-    'Translations' => 'Alih Bahasa',
     'Order status transition override' => 'Pengesampingan transisi status pesanan',
+    'Translations' => 'Alih Bahasa',
 ];

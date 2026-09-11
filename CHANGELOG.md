@@ -22,6 +22,7 @@ Two coordinated advisories are fixed and published with this release. Shops runn
 - A shop configuration value has the last word over the core defaults again. A project that overrode `title`, `version` or `stateless` in its own `config/packages/api_platform.yaml` to compensate should remove those keys. #3860
 - Updating a Thelia 2 database in place is refused with an explicit message instead of silently replaying the 2.5 scripts; migrating from Thelia 2 is a separate, documented path. `UPDATE.md` now describes Thelia 3 in-place updates.
 - The `VirtualProductControl` module left the default install: it only ever shipped a Thelia 2 Smarty back-office hook. The update script deactivates it; the module row comes back if it is ever reinstalled on purpose.
+- A message reaches the transport in one place only, `MailerFactory::sendEmailMessageOrFail()`. `sendEmailMessage()`, `sendEmailToCustomer()` and `sendEmailToShopManagers()` delegate to their `OrFail` variant and swallow the `Thelia\Mailer\Exception\EmailNotSentException` it raises, so their callers are unaffected. A module that overrode `sendEmailMessage()` must override `sendEmailMessageOrFail()` instead, or its code no longer runs.
 
 ## Front office
 
