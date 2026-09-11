@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\OrderReturn\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderReturnLineQuery;
@@ -146,6 +148,37 @@ final class ReturnEligibilityChecker
     public function isProductReturnable(OrderProduct $orderProduct): bool
     {
         return 1 !== (int) $orderProduct->getVirtual();
+    }
+
+    /**
+     * Holds the order product row until the end of the transaction in progress,
+     * so that the quantity still returnable on it cannot be read by two
+     * requests at once.
+     *
+     * Reading the remaining quantity and writing the return that consumes it
+     * are two steps: between them, a second request asking for the same line
+     * reads the same remaining quantity and is allowed the same units, and one
+     * ordered unit comes back twice. The window is small and the rate limiter
+     * does not close it - twenty requests an hour are twenty chances, and two
+     * requests a millisecond apart are within the quota.
+     *
+     * The lock is only worth taking inside the transaction that writes the
+     * return: a `FOR UPDATE` outside one is released as soon as it is taken.
+     * The caller opens it - OrderReturnFrontCreateProcessor and
+     * OrderReturnAdminCreateProcessor both do - which is also what makes the
+     * read and the insert one atomic step.
+     */
+    public function lockLine(OrderProduct $orderProduct): void
+    {
+        $connection = Propel::getWriteConnection(OrderProductTableMap::DATABASE_NAME);
+
+        $statement = $connection->prepare(
+            'SELECT '.OrderProductTableMap::COL_ID
+            .' FROM '.OrderProductTableMap::TABLE_NAME
+            .' WHERE '.OrderProductTableMap::COL_ID.' = :id FOR UPDATE'
+        );
+        $statement->execute([':id' => (int) $orderProduct->getId()]);
+        $statement->closeCursor();
     }
 
     /**
