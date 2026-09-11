@@ -14,26 +14,21 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
-use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
 use Thelia\Domain\Order\StatusAction\Effect\AllocateInvoiceRefAction;
 use Thelia\Domain\Order\StatusAction\Effect\ReleaseCouponsAction;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Model\Order;
-use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusActionFailureQuery;
 use Thelia\Model\OrderStatusActionQuery;
-use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\OrderStatusTransitionQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Tests\Support\Order\MovesOrders;
 
 /**
  * A shop that never touched the transition screen must behave exactly as it did
@@ -42,9 +37,15 @@ use Thelia\Test\ActionIntegrationTestCase;
  */
 final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCase
 {
+    use MovesOrders;
+
     protected function tearDown(): void
     {
         ConfigQuery::write(InvoiceRefAllocator::CONFIG_ENABLED, '0');
+        // The transaction rollback puts the config rows back, never the static cache
+        // ConfigQuery::write() fills: without this, the values written here are read
+        // by every later test of the process.
+        ConfigQuery::resetCache();
 
         parent::tearDown();
     }
@@ -95,7 +96,7 @@ final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCas
             ->save();
 
         $coupon = $this->factory->coupon(['code' => 'LIFECYCLE', 'maxUsage' => 1]);
-        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+        $orderCoupon = $this->factory->orderCoupon($order, $coupon);
 
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 
@@ -128,7 +129,7 @@ final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCas
     {
         $order = $this->factory->order();
         $coupon = $this->factory->coupon(['code' => 'CANCEL-ME', 'maxUsage' => 1]);
-        $orderCoupon = $this->rememberCouponOnOrder($order, $coupon);
+        $orderCoupon = $this->factory->orderCoupon($order, $coupon);
 
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
         self::assertSame(0, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
@@ -137,47 +138,5 @@ final class OrderStatusDefaultConfigurationTest extends ActionIntegrationTestCas
 
         self::assertSame(1, CouponQuery::create()->findPk($coupon->getId())->getMaxUsage());
         self::assertTrue((bool) OrderCouponQuery::create()->findPk($orderCoupon->getId())->getUsageCanceled());
-    }
-
-    /**
-     * A coupon as the checkout leaves it on an order: remembered, and not counted yet.
-     */
-    private function rememberCouponOnOrder(Order $order, Coupon $coupon): OrderCoupon
-    {
-        $orderCoupon = (new OrderCoupon())
-            ->setOrder($order)
-            ->setUsageCanceled(1)
-            ->setCode($coupon->getCode())
-            ->setType($coupon->getType())
-            ->setAmount('5')
-            ->setTitle($coupon->getTitle())
-            ->setShortDescription($coupon->getShortDescription())
-            ->setDescription($coupon->getDescription())
-            ->setStartDate($coupon->getStartDate())
-            ->setExpirationDate($coupon->getExpirationDate())
-            ->setIsCumulative($coupon->getIsCumulative())
-            ->setIsRemovingPostage($coupon->getIsRemovingPostage())
-            ->setIsAvailableOnSpecialOffers($coupon->getIsAvailableOnSpecialOffers())
-            ->setSerializedConditions($coupon->getSerializedConditions())
-            ->setPerCustomerUsageCount($coupon->getPerCustomerUsageCount());
-        $orderCoupon->save();
-
-        return $orderCoupon;
-    }
-
-    private function moveOrderTo(Order $order, string $statusCode): void
-    {
-        $event = new OrderEvent($order);
-        $event->setStatus($this->orderStatus($statusCode)->getId());
-
-        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-    }
-
-    private function orderStatus(string $code): OrderStatus
-    {
-        $status = OrderStatusQuery::create()->findOneByCode($code);
-        self::assertNotNull($status, "Seeded order status '$code' is missing.");
-
-        return $status;
     }
 }
