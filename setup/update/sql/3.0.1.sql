@@ -273,4 +273,113 @@ CREATE TABLE IF NOT EXISTS `sale_customer`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- Promotions that apply on their own, and the lines they offer
+--
+-- A coupon used to be reachable one way only: the customer typed its code.
+-- `trigger_mode` is what tells the two apart - `code`, the behaviour every
+-- coupon already on file keeps, or `automatic`, where a cart matching the
+-- conditions is enough and nothing is ever typed. An automatic promotion has
+-- no code to carry, so `code` becomes nullable; the `code_UNIQUE` index stays,
+-- MariaDB counting each NULL as distinct.
+--
+-- `coupon` is versionable, so both changes are mirrored in `coupon_version`.
+--
+-- A promotion may also put a line in the cart itself - the offered product of
+-- a buy X get Y rule. `cart_item.is_offered` marks that line so the customer
+-- can neither change its quantity nor remove it, and `offered_by_coupon_id`
+-- says which promotion put it there, so the line can be taken back when the
+-- cart stops matching. No foreign key on purpose: the line is reconciled on
+-- every evaluation, and a deleted coupon must leave the cart standing rather
+-- than take rows down with it. `cart_item` is not versionable.
+--
+-- On the order side, `order_coupon` recorded the code and looked the coupon up
+-- by it again - which an automatic promotion, having no code, cannot do.
+-- `coupon_id` is what resolves the coupon now, the code staying as the
+-- fallback for the orders already on file. `serialized_effects` freezes what
+-- the coupon did at the time of the order, so editing the promotion later
+-- never rewrites an order already placed. Both are nullable: nothing is
+-- backfilled, and the orders already on file keep resolving by code.
+--
+-- Existing rows take the defaults: every coupon already on file stays a code
+-- coupon, and no cart line is offered.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `COLUMN_NAME` = 'trigger_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon` ADD `trigger_mode` VARCHAR(20) DEFAULT \'code\' NOT NULL COMMENT \'what makes the promotion apply: code, the customer types it, or automatic, the cart matching the conditions is enough\' AFTER `code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon_version' AND `COLUMN_NAME` = 'trigger_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon_version` ADD `trigger_mode` VARCHAR(20) DEFAULT \'code\' NOT NULL COMMENT \'what makes the promotion apply: code, the customer types it, or automatic, the cart matching the conditions is enough\' AFTER `code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- Only relaxed where it is still NOT NULL, so the statement can be replayed.
+SET @relax_column := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `COLUMN_NAME` = 'code' AND `IS_NULLABLE` = 'NO');
+SET @statement := IF(@relax_column, 'ALTER TABLE `coupon` MODIFY `code` VARCHAR(45) NULL COMMENT \'the code the customer types, empty on a promotion that applies on its own\'', 'DO 0');
+PREPARE relax_column_statement FROM @statement;
+EXECUTE relax_column_statement;
+DEALLOCATE PREPARE relax_column_statement;
+
+SET @relax_column := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon_version' AND `COLUMN_NAME` = 'code' AND `IS_NULLABLE` = 'NO');
+SET @statement := IF(@relax_column, 'ALTER TABLE `coupon_version` MODIFY `code` VARCHAR(45) NULL COMMENT \'the code the customer types, empty on a promotion that applies on its own\'', 'DO 0');
+PREPARE relax_column_statement FROM @statement;
+EXECUTE relax_column_statement;
+DEALLOCATE PREPARE relax_column_statement;
+
+-- Every cart evaluation asks for the automatic promotions and nothing else, so
+-- the answer has to come from an index rather than a scan of every coupon.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `INDEX_NAME` = 'idx_trigger_mode');
+SET @statement := IF(@add_index, 'ALTER TABLE `coupon` ADD INDEX `idx_trigger_mode` (`trigger_mode`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'is_offered');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT \'the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it\' AFTER `promo`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'offered_by_coupon_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `offered_by_coupon_id` INTEGER NULL COMMENT \'the coupon that offers the line, read to take the line back when the promotion no longer applies\' AFTER `is_offered`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_offered_by_coupon_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_offered_by_coupon_id` (`offered_by_coupon_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_coupon' AND `COLUMN_NAME` = 'coupon_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_coupon` ADD `coupon_id` INTEGER NULL COMMENT \'the coupon the order was placed with, kept to find it again when the code is empty or was changed since\' AFTER `order_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_coupon' AND `COLUMN_NAME` = 'serialized_effects');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_coupon` ADD `serialized_effects` LONGTEXT NULL COMMENT \'the effects the coupon carried when the order was placed, copied from the coupon so a later change never rewrites the order\' AFTER `type`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @relax_column := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_coupon' AND `COLUMN_NAME` = 'code' AND `IS_NULLABLE` = 'NO');
+SET @statement := IF(@relax_column, 'ALTER TABLE `order_coupon` MODIFY `code` VARCHAR(45) NULL COMMENT \'the code the customer typed, empty on a promotion that applied on its own\'', 'DO 0');
+PREPARE relax_column_statement FROM @statement;
+EXECUTE relax_column_statement;
+DEALLOCATE PREPARE relax_column_statement;
+
+-- The order history resolves its coupons by id, and the usage counters walk
+-- back from a coupon to the orders that used it.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_coupon' AND `INDEX_NAME` = 'idx_order_coupon_coupon_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order_coupon` ADD INDEX `idx_order_coupon_coupon_id` (`coupon_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

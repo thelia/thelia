@@ -1223,7 +1223,8 @@ DROP TABLE IF EXISTS `coupon`;
 CREATE TABLE `coupon`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45) NOT NULL,
+    `code` VARCHAR(45) COMMENT 'the code the customer types, empty on a promotion that applies on its own',
+    `trigger_mode` VARCHAR(20) DEFAULT 'code' NOT NULL COMMENT 'what makes the promotion apply: code, the customer types it, or automatic, the cart matching the conditions is enough',
     `type` VARCHAR(255) NOT NULL,
     `serialized_effects` LONGTEXT NOT NULL,
     `is_enabled` TINYINT(1) NOT NULL,
@@ -1251,7 +1252,8 @@ CREATE TABLE `coupon`
     INDEX `idx_is_removing_postage` (`is_removing_postage`),
     INDEX `idx_max_usage` (`max_usage`),
     INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`),
-    INDEX `idx_start_date` (`start_date`)
+    INDEX `idx_start_date` (`start_date`),
+    INDEX `idx_trigger_mode` (`trigger_mode`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -1437,12 +1439,15 @@ CREATE TABLE `cart_item`
     `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
     `price_end_of_life` DATETIME,
     `promo` INTEGER,
+    `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT 'the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it',
+    `offered_by_coupon_id` INTEGER COMMENT 'the coupon that offers the line, read to take the line back when the promotion no longer applies',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_cart_item_cart_id` (`cart_id`),
     INDEX `idx_cart_item_product_id` (`product_id`),
     INDEX `idx_cart_item_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_cart_item_offered_by_coupon_id` (`offered_by_coupon_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
         REFERENCES `cart` (`id`)
@@ -1915,8 +1920,10 @@ CREATE TABLE `order_coupon`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
+    `coupon_id` INTEGER COMMENT 'the coupon the order was placed with, kept to find it again when the code is empty or was changed since',
+    `code` VARCHAR(45) COMMENT 'the code the customer typed, empty on a promotion that applied on its own',
     `type` VARCHAR(255) NOT NULL,
+    `serialized_effects` LONGTEXT COMMENT 'the effects the coupon carried when the order was placed, copied from the coupon so a later change never rewrites the order',
     `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
@@ -1933,6 +1940,7 @@ CREATE TABLE `order_coupon`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_order_coupon_order_id` (`order_id`),
+    INDEX `idx_order_coupon_coupon_id` (`coupon_id`),
     CONSTRAINT `fk_order_coupon_order_id`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
@@ -3707,7 +3715,8 @@ DROP TABLE IF EXISTS `coupon_version`;
 CREATE TABLE `coupon_version`
 (
     `id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
+    `code` VARCHAR(45) COMMENT 'the code the customer types, empty on a promotion that applies on its own',
+    `trigger_mode` VARCHAR(20) DEFAULT 'code' NOT NULL COMMENT 'what makes the promotion apply: code, the customer types it, or automatic, the cart matching the conditions is enough',
     `type` VARCHAR(255) NOT NULL,
     `serialized_effects` LONGTEXT NOT NULL,
     `is_enabled` TINYINT(1) NOT NULL,

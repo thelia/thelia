@@ -34,6 +34,12 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
     protected Coupon $couponModel;
 
+    /**
+     * How the promotion is triggered: typed code (the default, what every caller
+     * built before trigger modes existed) or automatic.
+     */
+    protected string $triggerMode = Coupon::TRIGGER_MODE_CODE;
+
     public function __construct(
         protected $code,
         protected $serviceId,
@@ -101,10 +107,22 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         return $this->freeShippingForMethods;
     }
 
+    public function setTriggerMode(string $triggerMode): static
+    {
+        $this->triggerMode = $triggerMode;
+
+        return $this;
+    }
+
+    public function getTriggerMode(): string
+    {
+        return $this->triggerMode;
+    }
+
     /**
-     * Return Coupon code (ex: XMAS).
+     * Return Coupon code (ex: XMAS). An automatic promotion has none.
      */
-    public function getCode(): string
+    public function getCode(): ?string
     {
         return $this->code;
     }
