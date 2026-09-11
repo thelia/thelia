@@ -45,6 +45,69 @@ final class BuyXGetYTest extends TestCase
         self::assertSame(10.0, $coupon->exec());
     }
 
+    /**
+     * The whole cart as the lot: it forms one, never several. Paired with a cart-total
+     * condition this is what « one gift from eighty euros » needs — the scope that
+     * divides would hand out one gift per article.
+     */
+    public function testTheWholeCartFormsASingleLotWhateverItHolds(): void
+    {
+        $cart = $this->cartWith([
+            ['productId' => 7, 'quantity' => 4, 'price' => 10.0],
+            ['productId' => 9, 'quantity' => 3, 'price' => 20.0],
+        ]);
+
+        $coupon = $this->coupon($cart, [
+            BuyXGetY::TRIGGER_SCOPE_FIELD => BuyXGetY::TRIGGER_SCOPE_CART,
+            BuyXGetY::TRIGGER_QUANTITY_FIELD => 2,
+            BuyXGetY::TARGET_MODE_FIELD => BuyXGetY::TARGET_MODE_CHEAPEST,
+            BuyXGetY::OFFERED_QUANTITY_FIELD => 1,
+        ]);
+
+        self::assertSame(
+            10.0,
+            $coupon->exec(),
+            'Seven articles form one lot, so exactly one unit is offered, the cheapest.',
+        );
+    }
+
+    public function testTheWholeCartOffersNothingBelowTheMinimumNumberOfArticles(): void
+    {
+        $cart = $this->cartWith([
+            ['productId' => 7, 'quantity' => 1, 'price' => 10.0],
+        ]);
+
+        $coupon = $this->coupon($cart, [
+            BuyXGetY::TRIGGER_SCOPE_FIELD => BuyXGetY::TRIGGER_SCOPE_CART,
+            BuyXGetY::TRIGGER_QUANTITY_FIELD => 2,
+            BuyXGetY::TARGET_MODE_FIELD => BuyXGetY::TARGET_MODE_CHEAPEST,
+            BuyXGetY::OFFERED_QUANTITY_FIELD => 1,
+        ]);
+
+        self::assertSame(0.0, $coupon->exec(), 'The triggering quantity is a floor, not a divisor.');
+    }
+
+    /**
+     * The cart scope names nothing, so the guard that refuses a rule without a
+     * selection must not refuse it.
+     */
+    public function testTheWholeCartNeedsNoProductOrCategoryNamed(): void
+    {
+        $cart = $this->cartWith([
+            ['productId' => 7, 'quantity' => 2, 'price' => 15.0],
+        ]);
+
+        $coupon = $this->coupon($cart, [
+            BuyXGetY::TRIGGER_SCOPE_FIELD => BuyXGetY::TRIGGER_SCOPE_CART,
+            BuyXGetY::TRIGGER_IDS_FIELD => [],
+            BuyXGetY::TRIGGER_QUANTITY_FIELD => 2,
+            BuyXGetY::TARGET_MODE_FIELD => BuyXGetY::TARGET_MODE_CHEAPEST,
+            BuyXGetY::OFFERED_QUANTITY_FIELD => 1,
+        ]);
+
+        self::assertSame(15.0, $coupon->exec());
+    }
+
     public function testACartShortOfAFullLotOffersNothing(): void
     {
         $cart = $this->cartWith([
