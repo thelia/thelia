@@ -39,6 +39,8 @@ final class ProductAccessoriesTest extends WebIntegrationTestCase
 
     private const STRIP_TITLE = 'Accessories';
 
+    private const TYPES_ENDPOINT = '/api/front/product_association_types';
+
     private const PRODUCT_URL = 'flexy-accessories-test.html';
 
     protected function setUp(): void
@@ -48,8 +50,12 @@ final class ProductAccessoriesTest extends WebIntegrationTestCase
         $frontTemplate = $this->getService(TemplateHelperInterface::class)->getActiveFrontTemplate();
         $productPage = $frontTemplate->getAbsolutePath().\DIRECTORY_SEPARATOR.self::PRODUCT_TEMPLATE;
 
-        if (!file_exists($productPage) || !str_contains((string) file_get_contents($productPage), self::STRIP_TITLE)) {
-            self::markTestSkipped('The installed front-office theme has no accessories strip.');
+        // The strip is no longer a hard-coded title in the page: it is one block per
+        // relation type, and the wording comes from the type itself. What the page
+        // has to carry is therefore the read of the types, not the word the
+        // accessory type happens to be called in English.
+        if (!file_exists($productPage) || !str_contains((string) file_get_contents($productPage), self::TYPES_ENDPOINT)) {
+            self::markTestSkipped('The installed front-office theme has no relation blocks.');
         }
     }
 

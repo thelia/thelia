@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\ProductAssociationType;
 
 /**
  * Accessory loop.
@@ -61,6 +62,11 @@ class Accessory extends Product
         $product = $this->getProduct();
 
         $search->filterByProductId($product, Criteria::IN);
+
+        $search
+            ->useProductAssociationTypeQuery()
+                ->filterByCode(ProductAssociationType::CODE_ACCESSORY)
+            ->endUse();
 
         $order = $this->getOrder();
         $orderByAccessory = array_search('accessory', $order, true);

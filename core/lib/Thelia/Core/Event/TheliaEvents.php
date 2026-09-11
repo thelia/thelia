@@ -188,6 +188,9 @@ final class TheliaEvents
     public const PRODUCT_ADD_ACCESSORY = 'action.productAddProductAccessory';
     public const PRODUCT_REMOVE_ACCESSORY = 'action.productRemoveProductAccessory';
     public const PRODUCT_UPDATE_ACCESSORY_POSITION = 'action.updateProductAccessoryPosition';
+    public const PRODUCT_ADD_ASSOCIATION = 'action.productAddProductAssociation';
+    public const PRODUCT_REMOVE_ASSOCIATION = 'action.productRemoveProductAssociation';
+    public const PRODUCT_UPDATE_ASSOCIATION_POSITION = 'action.updateProductAssociationPosition';
     public const PRODUCT_FEATURE_UPDATE_VALUE = 'action.updateProductFeatureValue';
     public const PRODUCT_FEATURE_DELETE_VALUE = 'action.deleteProductFeatureValue';
     public const PRODUCT_ADD_CATEGORY = 'action.addProductCategory';
@@ -467,6 +470,14 @@ final class TheliaEvents
     public const CONSENT_DELETE = 'action.deleteConsent';
     public const CONSENT_UPDATE_POSITION = 'action.updateConsentPosition';
     public const CONSENT_TOGGLE_ACTIVE = 'action.toggleConsentActive';
+
+    // -- Types of relation between products management ----------------------
+
+    public const PRODUCT_ASSOCIATION_TYPE_CREATE = 'action.createProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_UPDATE = 'action.updateProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_DELETE = 'action.deleteProductAssociationType';
+    public const PRODUCT_ASSOCIATION_TYPE_UPDATE_POSITION = 'action.updateProductAssociationTypePosition';
+    public const PRODUCT_ASSOCIATION_TYPE_TOGGLE_VISIBLE = 'action.toggleProductAssociationTypeVisible';
 
     // -- Features management ---------------------------------------------
 

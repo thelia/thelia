@@ -183,6 +183,8 @@ class Product extends AbstractTranslatableResource
             ProductImage::GROUP_ADMIN_READ_SINGLE,
             ProductDocument::GROUP_ADMIN_READ_SINGLE,
             CartItem::GROUP_FRONT_READ_SINGLE,
+            ProductAssociation::GROUP_ADMIN_READ,
+            ProductAssociation::GROUP_FRONT_READ,
         ],
     )]
     public ?int $id = null;
@@ -192,11 +194,11 @@ class Product extends AbstractTranslatableResource
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public TaxRule $taxRule;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, ProductAssociation::GROUP_ADMIN_READ, ProductAssociation::GROUP_FRONT_READ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public string $ref;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ, ProductAssociation::GROUP_ADMIN_READ, ProductAssociation::GROUP_FRONT_READ])]
     public bool $visible;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
@@ -236,6 +238,8 @@ class Product extends AbstractTranslatableResource
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_ADMIN_WRITE_UPDATE,
         self::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public array $productSaleElements = [];
 
@@ -253,6 +257,8 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
         CartItem::GROUP_FRONT_READ_SINGLE,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public I18nCollection $i18ns;
 
@@ -490,6 +496,8 @@ class Product extends AbstractTranslatableResource
         self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
         CartItem::GROUP_FRONT_READ_SINGLE,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public function getPublicUrl()
     {

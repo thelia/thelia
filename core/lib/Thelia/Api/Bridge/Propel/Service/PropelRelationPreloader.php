@@ -114,10 +114,13 @@ final readonly class PropelRelationPreloader
 
             $isCollectionRelation = 'array' === $property->getType()?->getName();
 
-            // The eager loading extension already joined the many-to-one ends of
-            // the rows the query returned, leaving out only the ones that would
-            // have duplicated them.
-            if (!$isCollectionRelation && $joinedByTheQuery) {
+            // The eager loading extension joins the many-to-one ends of the rows
+            // the query returned, but it only adds their columns: nothing reads
+            // those back, so the object is never hydrated and the transformer
+            // pays a query per row. The instance pool covers that while the rows
+            // point at the same target, which is why it goes unnoticed; a
+            // relation that says otherwise is read here for the whole page.
+            if (!$isCollectionRelation && $joinedByTheQuery && !$this->asksToBePreloaded($relationAttribute)) {
                 continue;
             }
 
@@ -154,6 +157,11 @@ final readonly class PropelRelationPreloader
                 $this->walk($related, $targetClass, $context, $visited, $depth + 1, joinedByTheQuery: false);
             }
         }
+    }
+
+    private function asksToBePreloaded(\ReflectionAttribute $relationAttribute): bool
+    {
+        return true === ($relationAttribute->getArguments()['preload'] ?? false);
     }
 
     /**

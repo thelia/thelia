@@ -23,10 +23,12 @@ class ProductI18n extends I18n
         Product::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_WRITE,
         CartItem::GROUP_FRONT_READ_SINGLE,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     protected ?string $title = null;
 
-    #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE, CartItem::GROUP_FRONT_READ_SINGLE, ProductAssociation::GROUP_ADMIN_READ, ProductAssociation::GROUP_FRONT_READ])]
     protected ?string $chapo = null;
 
     #[Groups([Product::GROUP_ADMIN_READ, Product::GROUP_FRONT_READ, Product::GROUP_ADMIN_WRITE])]

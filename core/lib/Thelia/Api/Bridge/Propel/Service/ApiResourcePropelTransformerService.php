@@ -72,6 +72,7 @@ readonly class ApiResourcePropelTransformerService
         bool $withRelation = true,
         ?ActiveRecordInterface $baseModel = null,
         bool $withAddon = true,
+        ?string $reachedThroughProperty = null,
     ): PropelResourceInterface {
         if (!$langs instanceof Collection) {
             $langs = Lang::getActiveLangs();
@@ -129,6 +130,7 @@ readonly class ApiResourcePropelTransformerService
                 reflector: $reflector,
                 context: $context,
                 langs: $langs,
+                reachedThroughProperty: $reachedThroughProperty,
             );
         }
 
@@ -616,6 +618,7 @@ readonly class ApiResourcePropelTransformerService
                     context: $context,
                     withAddon: $withAddon,
                     langs: $langs,
+                    propertyName: $property->getName(),
                 );
             }
 
@@ -661,6 +664,7 @@ readonly class ApiResourcePropelTransformerService
         array $context,
         bool $withAddon,
         Collection $langs,
+        ?string $propertyName = null,
     ): void {
         if ($value instanceof Collection) {
             $collection = new Collection();
@@ -676,6 +680,7 @@ readonly class ApiResourcePropelTransformerService
                         parentModel: $propelModel,
                         baseModel: $baseModel,
                         withAddon: $withAddon,
+                        reachedThroughProperty: $propertyName,
                     ),
                 );
             }
@@ -694,6 +699,7 @@ readonly class ApiResourcePropelTransformerService
             parentModel: $propelModel,
             baseModel: $baseModel,
             withAddon: $withAddon,
+            reachedThroughProperty: $propertyName,
         );
     }
 
@@ -706,8 +712,17 @@ readonly class ApiResourcePropelTransformerService
         \ReflectionClass $reflector,
         array $context,
         Collection $langs,
+        ?string $reachedThroughProperty = null,
     ): void {
         $staleVirtualColumns = (bool) ($context[self::STALE_I18N_VIRTUAL_COLUMNS] ?? false);
+
+        // {@see \Thelia\Api\Bridge\Propel\Extension\EagerLoadingExtension::joinI18ns()}
+        // names its join after the property the relation is read through, not
+        // after the resource behind it. Both agree as long as a resource is
+        // reached through a property bearing its own name; two relations towards
+        // the same translatable resource do not, and reading the resource name
+        // handed the second one the translations of the first.
+        $joinName = $reachedThroughProperty ?? $reflector->getShortName();
 
         foreach ($langs as $lang) {
             $i18nResource = new ($resourceClass::getI18nResourceClass());
@@ -729,7 +744,7 @@ readonly class ApiResourcePropelTransformerService
 
                 $fieldValue = null;
 
-                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
+                $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$joinName).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
 
                 if (!$staleVirtualColumns && $baseModel->hasVirtualColumn($virtualColumn)) {
                     // The query left-joined every active language, so an empty column

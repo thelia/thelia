@@ -14760,3 +14760,54 @@ INSERT INTO `consent_i18n` (`id`, `locale`, `title`, `description`) VALUES
     (1, 'nl_NL', 'I have read and accept the terms and conditions of sale', NULL),
     (1, 'ru_RU', 'I have read and accept the terms and conditions of sale', NULL)
 ;
+
+/**
+Types of relation between products
+
+Three types ship with a shop, and the accessory is the one the shop already had: every
+relation saved before this release is an accessory, and the code `accessory` is what the
+core itself asks for when the back office adds one. Deleting that row is refused for good
+— the relations already saved hang off it, and `addAccessory()` names it by code.
+
+`reciprocal` is set on the complementary products alone. Relating a mug to a coffee maker
+is worth stating both ways, where an accessory or a higher-end model reads in one
+direction only: a case is an accessory of the phone, the phone is not an accessory of the
+case.
+*/
+INSERT INTO `product_association_type` (`id`, `code`, `visible`, `reciprocal`, `position`, `created_at`, `updated_at`) VALUES
+(1, 'accessory', 1, 0, 1, NOW(), NOW()),
+(2, 'cross_selling', 1, 1, 2, NOW(), NOW()),
+(3, 'up_selling', 1, 0, 3, NOW(), NOW())
+;
+
+/**
+Every seeded locale gets a row, falling back to the English wording where the label is not
+translated yet: the back office titles a block of the product sheet with it, and an empty
+title would leave the merchant with an unnamed block.
+*/
+INSERT INTO `product_association_type_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (1, 'cs_CZ', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'cs_CZ', 'Complementary products', 'Products that go well with this one'),
+    (3, 'cs_CZ', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'de_DE', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'de_DE', 'Complementary products', 'Products that go well with this one'),
+    (3, 'de_DE', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'en_US', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'en_US', 'Complementary products', 'Products that go well with this one'),
+    (3, 'en_US', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'es_ES', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'es_ES', 'Complementary products', 'Products that go well with this one'),
+    (3, 'es_ES', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'fr_FR', 'Accessoires', 'Produits qui complètent celui-ci, comme une housse ou une pièce détachée'),
+    (2, 'fr_FR', 'Produits complémentaires', 'Produits qui vont bien avec celui-ci'),
+    (3, 'fr_FR', 'Modèles supérieurs', 'Produits de même nature, une gamme au-dessus de celui-ci'),
+    (1, 'it_IT', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'it_IT', 'Complementary products', 'Products that go well with this one'),
+    (3, 'it_IT', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'nl_NL', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'nl_NL', 'Complementary products', 'Products that go well with this one'),
+    (3, 'nl_NL', 'Higher-end models', 'Products of the same kind, a range above this one'),
+    (1, 'ru_RU', 'Accessories', 'Products that complete this one, such as a case or a spare part'),
+    (2, 'ru_RU', 'Complementary products', 'Products that go well with this one'),
+    (3, 'ru_RU', 'Higher-end models', 'Products of the same kind, a range above this one')
+;
