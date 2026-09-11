@@ -63,10 +63,6 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
             throw new AccessDeniedHttpException('A customer must be authenticated to open a return.');
         }
 
-        if (!$this->limiter->allows($customer)) {
-            throw new TooManyRequestsHttpException(message: 'Too many return requests, please try again later.');
-        }
-
         // Checking how much of a line is still returnable and writing the
         // return that consumes it belong to the same transaction, or two
         // requests arriving together are both allowed the same last unit. The
@@ -77,6 +73,15 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
 
         try {
             $this->hydrator->hydrate($data, $customer, false);
+
+            // The quota counts the returns a customer opens, not the mistakes
+            // they make filling the form in: consumed before the eligibility
+            // gate, twenty refusals closed the hour for the one valid request
+            // that followed them.
+            if (!$this->limiter->allows($customer)) {
+                throw new TooManyRequestsHttpException(message: 'Too many return requests, please try again later.');
+            }
+
             $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
             $connection->commit();
         } catch (ReturnNotAllowedException $exception) {

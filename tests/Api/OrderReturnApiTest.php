@@ -389,6 +389,76 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * The rate limiter is the shop's protection against a flood of requests,
+     * not a punishment for getting a form wrong: consuming a token before the
+     * eligibility check let twenty refused attempts close the hour for the
+     * customer's one valid return.
+     */
+    public function testRefusedRequestsDoNotEatTheQuotaOfAValidOne(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+        $token = $this->authenticateAsCustomer($customer);
+
+        $body = static fn (float $quantity): array => [
+            'order' => '/api/front/account/orders/'.$order->getId(),
+            'orderReturnLines' => [
+                ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => $quantity],
+            ],
+        ];
+
+        // The quota is twenty requests an hour: exactly enough refused attempts
+        // to use it up if a refusal counted.
+        for ($attempt = 1; $attempt <= 20; ++$attempt) {
+            self::assertSame(
+                422,
+                $this->jsonRequest('POST', '/api/front/account/order_returns', $body(9.0), token: $token)->getStatusCode(),
+                \sprintf('Attempt %d was expected to be refused on its quantity.', $attempt),
+            );
+        }
+
+        self::assertSame(
+            201,
+            $this->jsonRequest('POST', '/api/front/account/order_returns', $body(1.0), token: $token)->getStatusCode(),
+            'Twenty refused attempts closed the hour for a legitimate return.',
+        );
+    }
+
+    /**
+     * The counterpart of the case above: moving the quota behind the
+     * eligibility gate must not disarm it. Twenty returns opened for real do
+     * use the hour up.
+     */
+    public function testTheHourlyQuotaStillClosesAfterTwentyReturns(): void
+    {
+        $customer = $this->customer();
+        $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProductFor($order, 21.0);
+        $token = $this->authenticateAsCustomer($customer);
+
+        $payload = [
+            'order' => '/api/front/account/orders/'.$order->getId(),
+            'orderReturnLines' => [
+                ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+            ],
+        ];
+
+        for ($opened = 1; $opened <= 20; ++$opened) {
+            self::assertSame(
+                201,
+                $this->jsonRequest('POST', '/api/front/account/order_returns', $payload, token: $token)->getStatusCode(),
+                \sprintf('Return %d was expected to be accepted.', $opened),
+            );
+        }
+
+        self::assertSame(
+            429,
+            $this->jsonRequest('POST', '/api/front/account/order_returns', $payload, token: $token)->getStatusCode(),
+            'The twenty-first return of the hour was accepted: the quota is no longer enforced.',
+        );
+    }
+
+    /**
      * `quantityReceived` is what the reception restocks and what the refund is
      * recomputed on. The admin patch exposed both it and `quantity` with no
      * check at all, so a merchant typing 20 instead of 2 inflated the stock and
