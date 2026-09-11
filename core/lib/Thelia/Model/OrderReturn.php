@@ -16,6 +16,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
 use Thelia\Domain\OrderReturn\Service\SequenceOrderReturnRefGenerator;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Model\Base\OrderReturn as BaseOrderReturn;
@@ -39,6 +40,19 @@ class OrderReturn extends BaseOrderReturn
     protected bool $disableVersioning = false;
 
     protected bool $refGenerationDeferred = false;
+
+    /**
+     * What allocates the reference, so a shop bound to its own numbering series
+     * can take it over. TheliaBundle hands the container's implementation over
+     * at boot; outside a kernel - the standalone installer, a script - the
+     * default below applies.
+     */
+    private static ?OrderReturnRefGeneratorInterface $refGenerator = null;
+
+    public static function setRefGenerator(?OrderReturnRefGeneratorInterface $refGenerator): void
+    {
+        self::$refGenerator = $refGenerator;
+    }
 
     public function setDisableVersioning(bool $disableVersioning): static
     {
@@ -88,7 +102,7 @@ class OrderReturn extends BaseOrderReturn
     }
 
     /**
-     * Allocate the next reference from the gapless order_return_ref sequence.
+     * Allocate the next reference through the shop's reference generator.
      *
      * Each call consumes a number: only call this to assign a reference that
      * will be persisted.
@@ -97,9 +111,9 @@ class OrderReturn extends BaseOrderReturn
     {
         $con ??= Propel::getConnection(OrderReturnTableMap::DATABASE_NAME);
 
-        return SequenceOrderReturnRefGenerator::format(
-            (new GaplessSequenceGenerator())->next(SequenceOrderReturnRefGenerator::SEQUENCE_NAME, $con)
-        );
+        self::$refGenerator ??= new SequenceOrderReturnRefGenerator(new GaplessSequenceGenerator());
+
+        return self::$refGenerator->generate($con);
     }
 
     /**

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\OrderReturn\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 
 /**
@@ -22,7 +23,8 @@ use Thelia\Domain\Sequence\GaplessSequenceGenerator;
  * from a gapless transactional sequence, so two concurrent requests never share
  * a reference and the series has no hole.
  */
-final readonly class SequenceOrderReturnRefGenerator
+#[AsAlias(OrderReturnRefGeneratorInterface::class)]
+final readonly class SequenceOrderReturnRefGenerator implements OrderReturnRefGeneratorInterface
 {
     public const SEQUENCE_NAME = 'order_return_ref';
 

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Thelia\Core\Cache\ConfigCacheService;
+use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
+use Thelia\Domain\OrderReturn\Service\SequenceOrderReturnRefGenerator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\SessionFactory;
 use Thelia\Core\HttpFoundation\Session\SessionStorageFactory;
@@ -167,4 +169,9 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public()
         ->arg('$cache', service('thelia.cache.config.adapter'));
+
+    // TheliaBundle::boot() reads this one out of the container to hand it to the
+    // OrderReturn model, which nothing can inject into.
+    $serviceConfigurator->alias(OrderReturnRefGeneratorInterface::class, SequenceOrderReturnRefGenerator::class)
+        ->public();
 };
