@@ -2081,7 +2081,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (47, 'admin.search', NOW(), NOW()),
 (49, 'admin.customer.title', NOW(), NOW()),
 (50, 'admin.configuration.order-status', NOW(), NOW()),
-(51, 'admin.configuration.consent', NOW(), NOW())
+(51, 'admin.configuration.consent', NOW(), NOW()),
+(52, 'admin.order.status-force', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -14312,6 +14313,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'cs_CZ', NULL, NULL, NULL, NULL),
     (50, 'cs_CZ', NULL, NULL, NULL, NULL),
     (51, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (52, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -14362,6 +14364,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'de_DE', 'Kunde-Andere', NULL, NULL, NULL),
     (50, 'de_DE', NULL, NULL, NULL, NULL),
     (51, 'de_DE', NULL, NULL, NULL, NULL),
+    (52, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -14412,6 +14415,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'en_US', 'Customer title', NULL, NULL, NULL),
     (50, 'en_US', 'Configuration order status', NULL, NULL, NULL),
     (51, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL),
+    (52, 'en_US', 'Order status transition override', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -14462,6 +14466,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'es_ES', 'Estado civil cliente', NULL, NULL, NULL),
     (50, 'es_ES', NULL, NULL, NULL, NULL),
     (51, 'es_ES', NULL, NULL, NULL, NULL),
+    (52, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -14512,6 +14517,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'fr_FR', 'civilité client', NULL, NULL, NULL),
     (50, 'fr_FR', NULL, NULL, NULL, NULL),
     (51, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL),
+    (52, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -14562,6 +14568,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'it_IT', NULL, NULL, NULL, NULL),
     (50, 'it_IT', NULL, NULL, NULL, NULL),
     (51, 'it_IT', NULL, NULL, NULL, NULL),
+    (52, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -14612,6 +14619,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (49, 'nl_NL', 'Aanhef', NULL, NULL, NULL),
     (50, 'nl_NL', 'Configuratie van de bestelstatussen', NULL, NULL, NULL),
     (51, 'nl_NL', NULL, NULL, NULL, NULL),
+    (52, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -14661,7 +14669,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'ru_RU', 'Поиск по админке', NULL, NULL, NULL),
     (49, 'ru_RU', 'Заголовок клиента', NULL, NULL, NULL),
     (50, 'ru_RU', NULL, NULL, NULL, NULL),
-    (51, 'ru_RU', NULL, NULL, NULL, NULL)
+    (51, 'ru_RU', NULL, NULL, NULL, NULL),
+    (52, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 

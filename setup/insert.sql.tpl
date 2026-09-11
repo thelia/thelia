@@ -2081,7 +2081,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (47, 'admin.search', NOW(), NOW()),
 (49, 'admin.customer.title', NOW(), NOW()),
 (50, 'admin.configuration.order-status', NOW(), NOW()),
-(51, 'admin.configuration.consent', NOW(), NOW())
+(51, 'admin.configuration.consent', NOW(), NOW()),
+(52, 'admin.order.status-force', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3743,7 +3744,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, '{{ locale }}', {{ intl('Back-office search function', locale) }}, NULL, NULL, NULL),
     (49, '{{ locale }}', {{ intl('Customer title', locale) }}, NULL, NULL, NULL),
     (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL),
-    (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
+    (52, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

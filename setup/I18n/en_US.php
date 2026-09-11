@@ -315,6 +315,7 @@ return [
     'Configuration / Tax' => 'Configuration / Tax',
     'Configuration / Template' => 'Configuration / Template',
     'Configuration checkout consents' => 'Configuration checkout consents',
+    'Order status transition override' => 'Order status transition override',
     'Configuration order status' => 'Configuration order status',
     'Configuration variables' => 'Configuration variables',
     'Confirm your %store account' => 'Confirm your {{ config("store_name") }} account',

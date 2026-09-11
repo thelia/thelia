@@ -506,4 +506,17 @@ FROM (
 INNER JOIN `order_status` ON `order_status`.`code` = `seed`.`status_code`
 WHERE NOT EXISTS (SELECT 1 FROM `order_status_action`);
 
+-- Forcing an order into a status its transition graph refuses is a right of its
+-- own, granted profile by profile, distinct from editing orders.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.status-force', NOW(), NOW());
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+    SELECT `resource`.`id`, 'en_US', 'Order status transition override', NULL, NULL, NULL
+    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+    SELECT `resource`.`id`, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL
+    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
+
 SET FOREIGN_KEY_CHECKS = 1;
