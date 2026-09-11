@@ -716,8 +716,53 @@ final class AutomaticPromotionCartTest extends ActionIntegrationPromotionTestCas
     }
 
     /**
-     * @param list<int> $triggerIds
+     * « One gift from eighty euros » — the scenario the category and product scopes
+     * cannot express, because they hand out one gift per complete lot found in the
+     * cart. The cart scope forms a single lot, so a seven-article cart gets one gift.
      */
+    public function testTheWholeCartScopeOffersOneGiftWhateverTheNumberOfArticles(): void
+    {
+        $gift = $this->product();
+        $this->offerPromotion(
+            BuyXGetY::TRIGGER_SCOPE_CART,
+            [],
+            $gift,
+            triggerQuantity: 1,
+            title: 'One gift for the whole cart',
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product(), quantity: 4);
+        $this->addItem($cart, $this->product(), quantity: 3);
+
+        $offered = $this->offeredLines($cart);
+
+        self::assertCount(1, $offered, 'The whole cart is one lot, so one line is offered.');
+        self::assertSame($gift->getId(), $offered[0]->getProductId());
+        self::assertSame(1.0, (float) $offered[0]->getQuantity(), 'One gift, not one per article.');
+    }
+
+    public function testTheWholeCartScopeTakesTheGiftBackWhenTheCartEmpties(): void
+    {
+        $gift = $this->product();
+        $this->offerPromotion(
+            BuyXGetY::TRIGGER_SCOPE_CART,
+            [],
+            $gift,
+            triggerQuantity: 2,
+            title: 'One gift from two articles',
+        );
+
+        $cart = $this->newEmptyCart();
+        $line = $this->addItem($cart, $this->product(), quantity: 2);
+
+        self::assertCount(1, $this->offeredLines($cart));
+
+        $this->changeItemQuantity($cart, $line, 1.0);
+
+        self::assertCount(0, $this->offeredLines($cart), 'Below the floor, the gift goes away.');
+    }
+
     private function offerPromotion(
         string $scope,
         array $triggerIds,

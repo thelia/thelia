@@ -292,6 +292,13 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?string $virtualDocument = null;
 
+    /**
+     * Whether a promotion offered this line. Read only: the order says what the cart
+     * said when it was placed, and no caller gets to turn a paid line into a gift.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public bool $isOffered = false;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt = null;
 
@@ -609,6 +616,18 @@ class OrderProduct implements PropelResourceInterface
     public function getVirtualDocument(): ?string
     {
         return $this->virtualDocument;
+    }
+
+    public function isOffered(): bool
+    {
+        return $this->isOffered;
+    }
+
+    public function setIsOffered(bool $isOffered): self
+    {
+        $this->isOffered = $isOffered;
+
+        return $this;
     }
 
     public function setVirtualDocument(?string $virtualDocument): self

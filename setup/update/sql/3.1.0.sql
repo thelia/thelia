@@ -350,6 +350,23 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- ---------------------------------------------------------------------
+-- The offered line, once the cart is gone
+--
+-- A line a promotion offered is priced at zero by the cart discount, not by its
+-- own price: on the order it therefore reads exactly like a line the customer
+-- paid for. `order_product.is_offered` copies the cart marker at the moment the
+-- order is written, the way the title, the price and the tax rule are already
+-- copied, so the back office, the invoice and a later return can still tell the
+-- gift from a purchase long after the cart it came from has been purged.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'is_offered');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT \'the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone\' AFTER `virtual_document`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_offered_by_coupon_id');
 SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_offered_by_coupon_id` (`offered_by_coupon_id`)', 'DO 0');
 PREPARE add_index_statement FROM @statement;

@@ -49,6 +49,14 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
     public const TRIGGER_SCOPE_CATEGORY = 'category';
     public const TRIGGER_SCOPE_SELECTION = 'selection';
 
+    /**
+     * The whole cart is the lot. It forms at most one, whatever the cart holds, which
+     * is what « one gift from eighty euros » needs: paired with a cart-total condition,
+     * the merchant offers one thing per cart instead of one per article. The triggering
+     * quantity then reads as a minimum number of articles, not as a divisor.
+     */
+    public const TRIGGER_SCOPE_CART = 'cart';
+
     public const TARGET_MODE_SAME = 'same';
     public const TARGET_MODE_PRODUCT = 'product';
     public const TARGET_MODE_CHEAPEST = 'cheapest';
@@ -163,12 +171,12 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
     {
         $cart = $this->facade->getCart();
 
-        if (null === $cart || [] === $this->triggerIds) {
+        if (null === $cart || !$this->hasTriggerSelection()) {
             return 0.0;
         }
 
         $unitPrices = $this->eligibleUnitPrices($cart);
-        $lots = intdiv(\count($unitPrices), $this->triggerQuantity);
+        $lots = $this->lotsFor($unitPrices);
 
         if (0 === $lots) {
             return 0.0;
@@ -192,7 +200,7 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
         if (self::TARGET_MODE_PRODUCT !== $this->targetMode
             || null === $this->targetProductId
             || null === $this->getCouponModelId()
-            || [] === $this->triggerIds) {
+            || !$this->hasTriggerSelection()) {
             return [];
         }
 
@@ -202,7 +210,7 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
             return [];
         }
 
-        $lots = intdiv(\count($this->eligibleUnitPrices($cart)), $this->triggerQuantity);
+        $lots = $this->lotsFor($this->eligibleUnitPrices($cart));
 
         if (0 === $lots) {
             return [];
@@ -226,6 +234,7 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
     private function eligibleUnitPrices(Cart $cart): array
     {
         $country = $this->facade->getDeliveryCountry();
+        $wholeCartIsTheLot = self::TRIGGER_SCOPE_CART === $this->triggerScope;
         $categoryProductIds = self::TRIGGER_SCOPE_CATEGORY === $this->triggerScope
             ? $this->triggerProductIdsInCart($cart)
             : null;
@@ -244,9 +253,13 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
 
             $productId = (int) $cartItem->getProductId();
 
-            $isTrigger = null !== $categoryProductIds
-                ? \in_array($productId, $categoryProductIds, true)
-                : \in_array($productId, $this->triggerIds, true);
+            $isTrigger = match (true) {
+                // Every paid line of the cart forms the lot: nothing is named, so
+                // nothing has to match.
+                $wholeCartIsTheLot => true,
+                null !== $categoryProductIds => \in_array($productId, $categoryProductIds, true),
+                default => \in_array($productId, $this->triggerIds, true),
+            };
 
             if (!$isTrigger) {
                 continue;
@@ -333,11 +346,11 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
 
         $cart = $this->facade->getCart();
 
-        if (null === $cart || [] === $this->triggerIds) {
+        if (null === $cart || !$this->hasTriggerSelection()) {
             return 0.0;
         }
 
-        $lots = intdiv(\count($this->eligibleUnitPrices($cart)), $this->triggerQuantity);
+        $lots = $this->lotsFor($this->eligibleUnitPrices($cart));
 
         if (0 === $lots) {
             return 0.0;
@@ -390,9 +403,13 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
             throw new \InvalidArgumentException($this->translator->trans('Please select what triggers the offer: a product, a category or a selection'));
         }
 
-        $triggerIds = $this->normalizeIdList($raw[self::TRIGGER_IDS_FIELD] ?? []);
+        // The whole cart names nothing, so a stored selection would only mislead the
+        // next reader of these effects.
+        $triggerIds = self::TRIGGER_SCOPE_CART === $scope
+            ? []
+            : $this->normalizeIdList($raw[self::TRIGGER_IDS_FIELD] ?? []);
 
-        if ([] === $triggerIds) {
+        if (self::TRIGGER_SCOPE_CART !== $scope && [] === $triggerIds) {
             throw new \InvalidArgumentException($this->translator->trans('Please select at least one triggering product or category'));
         }
 
@@ -535,7 +552,41 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
      */
     private function triggerScopes(): array
     {
-        return [self::TRIGGER_SCOPE_PRODUCT, self::TRIGGER_SCOPE_CATEGORY, self::TRIGGER_SCOPE_SELECTION];
+        return [
+            self::TRIGGER_SCOPE_PRODUCT,
+            self::TRIGGER_SCOPE_CATEGORY,
+            self::TRIGGER_SCOPE_SELECTION,
+            self::TRIGGER_SCOPE_CART,
+        ];
+    }
+
+    /**
+     * Whether the rule knows what triggers it. Every scope but the cart one names
+     * products or categories; the cart scope needs nothing named.
+     */
+    private function hasTriggerSelection(): bool
+    {
+        return self::TRIGGER_SCOPE_CART === $this->triggerScope || [] !== $this->triggerIds;
+    }
+
+    /**
+     * How many complete lots the cart forms.
+     *
+     * Every scope but the cart one divides: six articles of a three-for-two rule are
+     * two lots, hence two offers. The cart itself is a single lot, so the offer lands
+     * once and the triggering quantity is read as a floor.
+     *
+     * @param float[] $unitPrices
+     */
+    private function lotsFor(array $unitPrices): int
+    {
+        $units = \count($unitPrices);
+
+        if (self::TRIGGER_SCOPE_CART === $this->triggerScope) {
+            return $units >= $this->triggerQuantity ? 1 : 0;
+        }
+
+        return intdiv($units, $this->triggerQuantity);
     }
 
     /**
