@@ -963,12 +963,19 @@ WHERE NOT EXISTS (SELECT 1 FROM `order_status_action`);
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.order.status-force', NOW(), NOW());
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'en_US', 'Order status transition override', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
+-- Its title in the eight languages the fresh install seeds, the way setup/insert.sql
+-- does: a locale left without a row would show the right with no name on the
+-- profile screen. A language added later gets its row from setup/I18n.
+SET @status_force_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.status-force');
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.order.status-force';
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@status_force_resource_id, 'cs_CZ', 'Vynucení přechodu stavu objednávky', NULL, NULL, NULL),
+    (@status_force_resource_id, 'de_DE', 'Erzwingen von Bestellstatus-Übergängen', NULL, NULL, NULL),
+    (@status_force_resource_id, 'en_US', 'Order status transition override', NULL, NULL, NULL),
+    (@status_force_resource_id, 'es_ES', 'Forzar transiciones de estado de pedido', NULL, NULL, NULL),
+    (@status_force_resource_id, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL),
+    (@status_force_resource_id, 'it_IT', 'Forzatura delle transizioni di stato dell\'ordine', NULL, NULL, NULL),
+    (@status_force_resource_id, 'nl_NL', 'Overschrijven van orderstatusovergangen', NULL, NULL, NULL),
+    (@status_force_resource_id, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

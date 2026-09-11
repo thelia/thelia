@@ -14439,7 +14439,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'cs_CZ', NULL, NULL, NULL, NULL),
     (52, 'cs_CZ', NULL, NULL, NULL, NULL),
     (53, 'cs_CZ', NULL, NULL, NULL, NULL),
-    (54, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (54, 'cs_CZ', 'Vynucení přechodu stavu objednávky', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -14492,7 +14492,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'de_DE', NULL, NULL, NULL, NULL),
     (52, 'de_DE', 'Produktrückgaben', NULL, NULL, NULL),
     (53, 'de_DE', 'Rückgabegründe', NULL, NULL, NULL),
-    (54, 'de_DE', NULL, NULL, NULL, NULL),
+    (54, 'de_DE', 'Erzwingen von Bestellstatus-Übergängen', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -14598,7 +14598,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'es_ES', NULL, NULL, NULL, NULL),
     (52, 'es_ES', 'Devoluciones de productos', NULL, NULL, NULL),
     (53, 'es_ES', 'Motivos de devolución', NULL, NULL, NULL),
-    (54, 'es_ES', NULL, NULL, NULL, NULL),
+    (54, 'es_ES', 'Forzar transiciones de estado de pedido', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -14704,7 +14704,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'it_IT', NULL, NULL, NULL, NULL),
     (52, 'it_IT', NULL, NULL, NULL, NULL),
     (53, 'it_IT', NULL, NULL, NULL, NULL),
-    (54, 'it_IT', NULL, NULL, NULL, NULL),
+    (54, 'it_IT', 'Forzatura delle transizioni di stato dell\'ordine', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -14757,7 +14757,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'nl_NL', NULL, NULL, NULL, NULL),
     (52, 'nl_NL', 'Productretouren', NULL, NULL, NULL),
     (53, 'nl_NL', 'Retourredenen', NULL, NULL, NULL),
-    (54, 'nl_NL', NULL, NULL, NULL, NULL),
+    (54, 'nl_NL', 'Overschrijven van orderstatusovergangen', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -14810,7 +14810,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'ru_RU', NULL, NULL, NULL, NULL),
     (52, 'ru_RU', 'Возвраты товаров', NULL, NULL, NULL),
     (53, 'ru_RU', 'Причины возврата', NULL, NULL, NULL),
-    (54, 'ru_RU', NULL, NULL, NULL, NULL)
+    (54, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL)
 ;
 
 
