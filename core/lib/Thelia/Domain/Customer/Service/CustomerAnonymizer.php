@@ -142,9 +142,13 @@ final readonly class CustomerAnonymizer
 
     /**
      * A return stays attached to its order for the accounting record, but the
-     * free text the customer wrote when opening it is personal data: it is
-     * cleared in place. The versionable history keeps a full copy of every past
-     * revision, comment included, so those rows are dropped as well.
+     * free text written on it is personal data and is cleared in place: the
+     * comment the customer typed when opening the return, and the reason the
+     * merchant typed when refusing it - which names the customer as often as
+     * not. The versionable history keeps a full copy of every past revision,
+     * both texts included, so those rows are dropped as well, and the version
+     * number goes back to zero rather than pointing at a revision that is no
+     * longer there.
      */
     private function anonymizeOrderReturns(Customer $customer, ConnectionInterface $connection): void
     {
@@ -153,7 +157,12 @@ final readonly class CustomerAnonymizer
             ->find($connection);
 
         foreach ($returns as $return) {
-            $return->setCustomerComment(null)->save($connection);
+            $return
+                ->setCustomerComment(null)
+                ->setRefusalReason(null)
+                ->setVersion(0)
+                ->setDisableVersioning(true)
+                ->save($connection);
 
             OrderReturnVersionQuery::create()
                 ->filterById($return->getId())

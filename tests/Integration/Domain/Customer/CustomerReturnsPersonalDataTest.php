@@ -35,12 +35,21 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
 {
     private const COMMENT = 'The parcel arrived open.';
 
+    private const REFUSAL_REASON = 'Refused: Mrs Martin sent back a different item.';
+
     private FixtureFactory $factory;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
+    }
+
+    protected function tearDown(): void
+    {
+        OrderReturnStatusQuery::resetCache();
+
+        parent::tearDown();
     }
 
     public function testTheExportListsTheCustomerReturns(): void
@@ -61,6 +70,14 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
         $customer = $this->factory->customer($this->factory->customerTitle());
         $return = $this->returnWithComment($customer);
 
+        // Without this, a behavior that stopped writing versions would make the
+        // assertion below pass while the purge did nothing at all.
+        self::assertGreaterThan(
+            0,
+            OrderReturnVersionQuery::create()->filterById($return->getId())->count($this->getPropelConnection()),
+            'The versionable history is expected to hold the comment before the account is anonymized.',
+        );
+
         $this->getService(CustomerAnonymizer::class)->anonymize($customer);
 
         $reloaded = OrderReturnQuery::create()->findPk($return->getId(), $this->getPropelConnection());
@@ -74,7 +91,41 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
         );
     }
 
-    private function returnWithComment(Customer $customer): OrderReturn
+    /**
+     * The merchant types the refusal reason by hand, and names the customer in
+     * it as often as not ("returned by Mrs Martin, parcel opened"). It is the
+     * same kind of free text as the customer comment, and it goes the same way.
+     */
+    public function testAnonymizationClearsTheMerchantRefusalReason(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $return = $this->returnWithComment($customer, self::REFUSAL_REASON);
+
+        $this->getService(CustomerAnonymizer::class)->anonymize($customer);
+
+        $reloaded = OrderReturnQuery::create()->findPk($return->getId(), $this->getPropelConnection());
+        self::assertNotNull($reloaded);
+        self::assertNull($reloaded->getRefusalReason(), 'the merchant free text can name the customer too');
+    }
+
+    /**
+     * Dropping every version row leaves the return pointing at a revision that
+     * no longer exists, which is what the versionable behavior reads to build
+     * the next one.
+     */
+    public function testAnonymizationLeavesNoDanglingVersionNumber(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $return = $this->returnWithComment($customer);
+
+        $this->getService(CustomerAnonymizer::class)->anonymize($customer);
+
+        $reloaded = OrderReturnQuery::create()->findPk($return->getId(), $this->getPropelConnection());
+        self::assertNotNull($reloaded);
+        self::assertSame(0, $reloaded->getVersion(), 'no version row is left for the number to point at');
+    }
+
+    private function returnWithComment(Customer $customer, ?string $refusalReason = null): OrderReturn
     {
         $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
         $status = OrderReturnStatusQuery::create()->findOneByCode(OrderReturnStatus::CODE_REQUESTED);
@@ -83,7 +134,8 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
             ->setOrder($order)
             ->setCustomer($customer)
             ->setOrderReturnStatus($status)
-            ->setCustomerComment(self::COMMENT);
+            ->setCustomerComment(self::COMMENT)
+            ->setRefusalReason($refusalReason);
         $return->save($this->getPropelConnection());
 
         return $return;
