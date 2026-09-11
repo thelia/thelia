@@ -203,6 +203,9 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         $this->loginAs($this->factory->restrictedAdmin([
             AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
             AdminResources::ORDER_STATUS_FORCE => [AccessManager::UPDATE],
+            // Who forced a change is read from the administration log, and named
+            // only to an administrator allowed to read it.
+            AdminResources::ADMIN_LOG => [AccessManager::VIEW],
         ], ['firstname' => 'Norma', 'lastname' => 'Jennings']));
 
         $crawler = $this->client->request('GET', '/admin/order/update/'.$order->getId());
@@ -220,6 +223,59 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_SENT), $text, 'The status it was forced out of.');
         self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_NOT_PAID), $text, 'The status it was forced into.');
         self::assertStringContainsString('Norma Jennings', $text, 'The administrator who forced it.');
+    }
+
+    public function testTheForcedChangesAreShownToEveryReaderButNameTheirAuthorToNoOneElse(): void
+    {
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $notPaid = $this->orderStatus(OrderStatus::CODE_NOT_PAID);
+
+        // Entitled to force, not entitled to read the administration log.
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_STATUS_FORCE => [AccessManager::UPDATE],
+        ], ['firstname' => 'Dale', 'lastname' => 'Cooper']));
+
+        $crawler = $this->client->request('GET', '/admin/order/update/'.$order->getId());
+        $form = $crawler->filter('[data-testid="order-status-force-submit"]')->form();
+        $form['status_id'] = (string) $notPaid->getId();
+        $this->client->submit($form);
+        $crawler = $this->client->followRedirect();
+
+        $overrides = $crawler->filter('[data-testid="order-forced-status-changes"]');
+        self::assertCount(1, $overrides, 'That the order was forced belongs to whoever reads the order.');
+
+        $text = $overrides->text();
+        self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_SENT), $text);
+        self::assertStringContainsString($this->statusTitle(OrderStatus::CODE_NOT_PAID), $text);
+
+        self::assertCount(0, $crawler->filter('[data-testid="order-forced-status-change-admin"]'), 'Who forced it is not shown without the right to read the log.');
+        self::assertStringNotContainsString('Dale Cooper', $text);
+    }
+
+    public function testAForcedChangeWithoutAStatusIsRefusedWithAMessageAndWritesNothing(): void
+    {
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_STATUS_FORCE => [AccessManager::UPDATE],
+        ]));
+
+        $crawler = $this->client->request('GET', '/admin/order/update/'.$order->getId());
+        $form = $crawler->filter('[data-testid="order-status-force-submit"]')->form();
+        // The empty option the selector opens on, submitted as it stands.
+        $form['status_id'] = '';
+        $this->client->submit($form);
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+
+        $crawler = $this->client->followRedirect();
+        self::assertCount(1, $crawler->filter('[data-testid="bo-flash-warning"]'), 'The administrator is told nothing was picked.');
+        self::assertSame(OrderStatus::CODE_SENT, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+        self::assertSame(0, AdminLogQuery::create()->filterByResourceId($order->getId())->count(), 'Nothing was written, the administration log included.');
+        self::assertCount(0, $crawler->filter('[data-testid="order-forced-status-changes"]'));
     }
 
     public function testARefusedChangeFromTheOrderSheetIsExplainedAndLeavesTheOrderUntouched(): void
@@ -264,6 +320,28 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_SENT, OrderQuery::create()->findPk($sentOrder->getId())->getOrderStatus()->getCode());
         self::assertStringContainsString($sentOrder->getRef(), $crawler->filter('[data-testid="bo-flash-warning"]')->text(), 'The skipped order is named.');
         self::assertStringContainsString('1 order(s)', $crawler->filter('[data-testid="bo-flash-success"]')->text());
+    }
+
+    public function testTheBulkChangeOwnsUpToTheOrdersThatNoLongerExist(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $paidOrder = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $canceled = $this->orderStatus(OrderStatus::CODE_CANCELED);
+        // Deleted between the page the administrator ticked and the submit.
+        $goneId = (int) $paidOrder->getId() + 1000000;
+
+        $crawler = $this->client->request('GET', '/admin/orders');
+        $form = $crawler->filter('[data-testid="order-bulk-status-submit"]')->form();
+
+        $this->client->request('POST', '/admin/order/update/status', [
+            '_token' => $form->get('_token')->getValue(),
+            'status_id' => $canceled->getId(),
+            'order_ids' => [$paidOrder->getId(), $goneId],
+        ]);
+        $crawler = $this->client->followRedirect();
+
+        self::assertSame(OrderStatus::CODE_CANCELED, OrderQuery::create()->findPk($paidOrder->getId())->getOrderStatus()->getCode());
+        self::assertStringContainsString('1 order(s) no longer exist', $crawler->filter('[data-testid="bo-flash-warning"]')->text(), 'A selected order that is gone is counted, not dropped in silence.');
     }
 
     public function testTheBulkSelectorCarriesTheStatusesEachTargetIsWithinReachOf(): void
