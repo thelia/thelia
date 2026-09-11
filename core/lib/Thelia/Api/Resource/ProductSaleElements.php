@@ -113,6 +113,8 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_ADMIN_WRITE_UPDATE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_WRITE_UPDATE,
     ])]
     public ?int $id = null;
@@ -131,6 +133,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public string $ref;
 
@@ -144,6 +148,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public int $quantity;
 
@@ -157,6 +163,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public ?bool $visible = null;
 
@@ -173,6 +181,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public ?bool $promo = null;
 
@@ -186,6 +196,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public ?bool $newness = null;
 
@@ -199,6 +211,8 @@ class ProductSaleElements implements PropelResourceInterface
         CartItem::GROUP_ADMIN_READ,
         CartItem::GROUP_FRONT_READ,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public ?float $weight = null;
 
@@ -210,6 +224,8 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public ?bool $isDefault = null;
 
@@ -232,6 +248,8 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public array $productPrices = [];
 

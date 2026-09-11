@@ -22,6 +22,13 @@ class Relation
      *                                 current context serializes it. Only a resource
      *                                 computing another of its fields from that
      *                                 relation needs it, and it costs a query per row.
+     * @param bool $preload            reads this many-to-one end for the whole page at
+     *                                 once. The eager loading extension joins it but
+     *                                 never hydrates it, so the transformer asks the
+     *                                 getter and pays a query per row; the instance
+     *                                 pool hides that only while the rows point at the
+     *                                 same target. A relation whose target changes from
+     *                                 one row to the next asks for it here.
      */
     public function __construct(
         private readonly string $targetResource,
@@ -30,6 +37,7 @@ class Relation
         private readonly ?bool $forceJoin = null,
         private readonly ?array $excludedGroups = [],
         private readonly bool $hydrateOutOfGroups = false,
+        private readonly bool $preload = false,
     ) {
     }
 }
