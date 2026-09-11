@@ -269,6 +269,62 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('Stored body', $email->getTextBody());
     }
 
+    public function testAMessageWithoutASubjectInTheRequestedLocaleFallsBackToTheDefaultLanguage(): void
+    {
+        $defaultLocale = LangQuery::create()->findOneByByDefault(1)?->getLocale();
+        self::assertIsString($defaultLocale);
+        self::assertNotSame('it_IT', $defaultLocale);
+
+        // The shape of the gap the 3.0 seed shipped: the body is translated, the subject
+        // of that same locale never was.
+        $message = new Message();
+        $message->setName('test_message_without_italian_subject');
+        $message->setLocale($defaultLocale);
+        $message->setSubject('Default subject');
+        $message->setHtmlMessage('<p>Default body</p>');
+        $message->setTextMessage('Default body');
+        $message->setLocale('it_IT');
+        $message->setHtmlMessage('<p>Corpo</p>');
+        $message->setTextMessage('Corpo');
+        $message->save();
+
+        $email = $this->createStoredBodyMailerFactory()->createEmailMessage(
+            'test_message_without_italian_subject',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            [],
+            'it_IT',
+        );
+
+        self::assertSame('Default subject', $email->getSubject());
+        // The fallback is the subject alone: the body of the requested locale is untouched.
+        self::assertSame('<p>Corpo</p>', $email->getHtmlBody());
+    }
+
+    public function testAMessageWithoutASubjectInAnyLocaleIsStillSent(): void
+    {
+        // Defined behaviour, and the reason the model logs it: a mail carrying an order
+        // confirmation or an activation link is worth more delivered without a subject
+        // line than not delivered at all.
+        $message = new Message();
+        $message->setName('test_message_without_any_subject');
+        $message->setLocale('it_IT');
+        $message->setHtmlMessage('<p>Corpo</p>');
+        $message->setTextMessage('Corpo');
+        $message->save();
+
+        $email = $this->createStoredBodyMailerFactory()->createEmailMessage(
+            'test_message_without_any_subject',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            [],
+            'it_IT',
+        );
+
+        self::assertSame('', $email->getSubject());
+        self::assertSame('<p>Corpo</p>', $email->getHtmlBody());
+    }
+
     public function testSendDoesNotThrowWithNullTransport(): void
     {
         $email = $this->mailerFactory->createSimpleEmailMessage(
@@ -283,6 +339,24 @@ final class MailerFactoryTest extends IntegrationTestCase
         // should complete without error.
         $this->mailerFactory->send($email);
         self::assertTrue(true);
+    }
+
+    /**
+     * A factory whose parser renders what it is given, for messages that carry their body
+     * in the database rather than in a template file of the mail theme.
+     */
+    private function createStoredBodyMailerFactory(): MailerFactory
+    {
+        $parser = $this->createMock(ParserInterface::class);
+        $parser->method('getRequest')->willReturn($this->getService(RequestStack::class)->getMainRequest());
+        $parser->method('getTemplateHelper')->willReturn($this->getService(TemplateHelperInterface::class));
+        $parser->method('renderString')->willReturnArgument(0);
+
+        return new MailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->createParserResolverWhereNoParserClaimsAView($parser),
+            $this->getService(MailerInterface::class),
+        );
     }
 
     /**

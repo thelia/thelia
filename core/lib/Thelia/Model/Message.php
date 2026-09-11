@@ -93,6 +93,66 @@ class Message extends BaseMessage
     }
 
     /**
+     * The subject of the message in the locale it is set to, or the closest one a shop has.
+     *
+     * A message whose subject was never translated into the locale the mail is being sent in
+     * would otherwise leave the shop, silently, with no subject line at all: the seed of a
+     * Thelia 3.0 shop shipped that hole in five of its eight locales, and no seed can cover
+     * a language a merchant adds afterwards. The wording of another language is a degraded
+     * subject, an empty one is no subject.
+     *
+     * The default language of the shop comes first, being the one a merchant is the most
+     * likely to have written; any other translation, in locale order so the same shop always
+     * picks the same one, comes after. The body follows the same idea one level up, in
+     * getMessageBody(): a template file first, the stored body when there is none.
+     */
+    public function getSubjectWithFallback(): string
+    {
+        $subject = trim((string) $this->getSubject());
+
+        if ('' !== $subject) {
+            return $subject;
+        }
+
+        $translations = MessageI18nQuery::create()
+            ->filterById($this->getId())
+            ->orderByLocale()
+            ->find();
+
+        $subjects = [];
+
+        foreach ($translations as $translation) {
+            $translatedSubject = trim((string) $translation->getSubject());
+
+            if ('' !== $translatedSubject) {
+                $subjects[$translation->getLocale()] = $translatedSubject;
+            }
+        }
+
+        if ([] === $subjects) {
+            // Defined, not accidental: the mail is still worth sending without a subject —
+            // it carries the confirmation link a customer is waiting for — but nothing else
+            // in the shop would ever report that the wording is missing.
+            Tlog::getInstance()->addError(
+                \sprintf('Message %s has no subject in any locale: the mail is sent without a subject line.', $this->getName()),
+            );
+
+            return '';
+        }
+
+        $defaultLocale = LangQuery::create()->findOneByByDefault(1)?->getLocale();
+        $fallbackLocale = null !== $defaultLocale && isset($subjects[$defaultLocale])
+            ? $defaultLocale
+            : array_key_first($subjects);
+
+        Tlog::getInstance()->addWarning(
+            \sprintf('Message %s has no subject in %s: the %s one is used instead.', $this->getName(), $this->getLocale(), $fallbackLocale),
+        );
+
+        return $subjects[$fallbackLocale];
+    }
+
+    /**
      * Add a subject and a body (TEXT, HTML or both, depending on the message
      * configuration.
      *
@@ -113,7 +173,7 @@ class Message extends BaseMessage
         );
 
         try {
-            $subject = $parser->renderString($this->getSubject());
+            $subject = $parser->renderString($this->getSubjectWithFallback());
             $htmlMessage = $this->getHtmlMessageBody($parser);
             $textMessage = $this->getTextMessageBody($parser);
 
