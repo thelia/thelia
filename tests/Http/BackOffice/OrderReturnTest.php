@@ -62,6 +62,16 @@ final class OrderReturnTest extends WebIntegrationTestCase
             );
         }
 
+        // The active theme may predate the return screens: the core merges before the themes
+        // do, so a shop running the published back-office has the feature without its pages.
+        // Read from disk rather than from the router: the kernel must not boot before
+        // createClient() does it.
+        if (!file_exists(THELIA_TEMPLATE_DIR.'backOffice'.\DIRECTORY_SEPARATOR.'default-twig'
+            .\DIRECTORY_SEPARATOR.'src'.\DIRECTORY_SEPARATOR.'Controller'.\DIRECTORY_SEPARATOR
+            .'Order'.\DIRECTORY_SEPARATOR.'OrderReturnController.php')) {
+            self::markTestSkipped('The installed back-office theme has no order return screens.');
+        }
+
         $this->injector = new AdminSessionInjector();
         $this->getService(EventDispatcherInterface::class)->addSubscriber($this->injector);
 
@@ -76,7 +86,11 @@ final class OrderReturnTest extends WebIntegrationTestCase
 
     protected function tearDown(): void
     {
-        $this->injector->clear();
+        // setUp() can skip before the injector exists: PHPUnit still runs tearDown().
+        if (isset($this->injector)) {
+            $this->injector->clear();
+        }
+
         ConfigQuery::resetCache();
 
         parent::tearDown();
