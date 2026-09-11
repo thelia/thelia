@@ -133,6 +133,30 @@ final class UpdateScriptTest extends TestCase
     }
 
     /**
+     * The wording has to reach `setup/insert.sql` too, not just the catalogs it
+     * is generated from: the generated file is committed, and it stayed on the
+     * revision where the two permissions had no name at all - so a fresh
+     * install listed two unnamed permissions while an updated shop had them
+     * translated.
+     */
+    #[DataProvider('backOfficeResourceWording')]
+    public function testTheFreshInstallSeedCarriesTheWordingOfTheNewPermissions(string $key): void
+    {
+        $resourceI18n = array_values(array_filter(
+            $this->statementsOf($this->freshInstallSeed()),
+            static fn (string $statement): bool => 1 === preg_match('/^INSERT\s+INTO\s+`resource_i18n`/i', $statement),
+        ));
+
+        self::assertNotEmpty($resourceI18n, 'The fresh install seed no longer seeds resource_i18n.');
+
+        self::assertStringContainsString(
+            "'".$key."'",
+            implode("\n", $resourceI18n),
+            \sprintf('setup/insert.sql seeds the "%s" permission without a title: the profile screen shows a raw key.', $key),
+        );
+    }
+
+    /**
      * A forced AUTO_INCREMENT on a table the script seeds nothing into is a
      * dump artefact: it comes from the developer database the DDL was exported
      * from, and it makes the first row of an updated shop take an id the fresh
