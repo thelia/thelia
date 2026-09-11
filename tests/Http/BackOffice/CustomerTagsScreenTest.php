@@ -158,6 +158,31 @@ final class CustomerTagsScreenTest extends WebIntegrationTestCase
     }
 
     /**
+     * Anonymising takes the tags off the customer, and the confirmation has to
+     * say so before the administrator commits to something irreversible. The
+     * behaviour itself is covered by CustomerAnonymizerTest; this is about the
+     * warning telling the truth about it.
+     */
+    public function testTheAnonymiseConfirmationAnnouncesThatTheTagsAreTakenOff(): void
+    {
+        $factory = $this->factory();
+        $tag = $factory->tag(['label' => 'Sheet anonymised']);
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->tagElement($tag, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+
+        $this->loginAs($factory->admin());
+        $this->assertPageRenders(self::EDIT_URL.$customer->getId());
+
+        $dialog = $this->client->getCrawler()->filter('[data-testid="customer-anonymize-modal"], #customer-anonymize-modal');
+        self::assertGreaterThan(0, $dialog->count(), 'The anonymise confirmation is on the screen.');
+        self::assertStringContainsString(
+            'tags they carry are taken off them',
+            $dialog->text(),
+            'The confirmation names the tags among what anonymising removes.',
+        );
+    }
+
+    /**
      * The realistic regression: an operator edits a phone number and saves. The
      * screen posts whatever it rendered, so a form that failed to pre-tick the
      * carried tags silently strips them.

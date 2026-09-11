@@ -101,6 +101,26 @@ final class CustomerListTagsTest extends WebIntegrationTestCase
         self::assertStringNotContainsString('#GGGGGG', $cell, 'A value that is not a colour never reaches the style attribute.');
     }
 
+    /**
+     * The cell cuts a long label to one line, so the whole of it has to be
+     * reachable another way: the title attribute is what a truncated tag owes
+     * its reader.
+     */
+    public function testALongLabelIsCarriedWholeByTheTitleAttribute(): void
+    {
+        $factory = $this->factory();
+        $label = 'Relance impayé deuxième niveau avant mise en demeure';
+        $tag = $factory->tag(['label' => $label]);
+        $customer = $this->taggedCustomer($factory, $tag, 'LongLabel');
+
+        $this->loginAs($factory->admin());
+        $this->assertPageRenders(self::URL.'?q='.urlencode((string) $customer->getRef()));
+
+        $badge = $this->client->getCrawler()->filter('[data-testid="bo-customer-tags"] .bo-tag-badge')->first();
+        self::assertGreaterThan(0, $badge->count());
+        self::assertSame($label, $badge->attr('title'), 'The whole label is one hover away.');
+    }
+
     public function testTheFilterKeepsOnlyTheCustomersCarryingTheTag(): void
     {
         $factory = $this->factory();
@@ -127,6 +147,7 @@ final class CustomerListTagsTest extends WebIntegrationTestCase
         $second = $factory->tag(['label' => 'List second']);
         $onlyFirst = $this->taggedCustomer($factory, $first, 'OnlyFirst');
         $onlySecond = $this->taggedCustomer($factory, $second, 'OnlySecond');
+        $neither = $factory->customer($factory->customerTitle(), ['lastname' => 'ListNeither']);
 
         $this->loginAs($factory->admin());
         $this->assertPageRenders(self::URL.'?tag_ids[]='.$first->getId().'&tag_ids[]='.$second->getId());
@@ -134,6 +155,13 @@ final class CustomerListTagsTest extends WebIntegrationTestCase
         $html = (string) $this->client->getResponse()->getContent();
         self::assertStringContainsString((string) $onlyFirst->getRef(), $html);
         self::assertStringContainsString((string) $onlySecond->getRef(), $html, 'Ticking a second tag must not require both.');
+        // The third customer is what makes this an OR and not "everyone": without
+        // it, a filter that stopped filtering altogether would pass this test.
+        self::assertStringNotContainsString(
+            (string) $neither->getRef(),
+            $html,
+            'Carrying neither of the two tags keeps a customer out.',
+        );
     }
 
     /**
