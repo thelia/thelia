@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Thelia\Core\Cache\ConfigCacheService;
-use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
-use Thelia\Model\OrderReturn;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\LoopCompilerPass;
@@ -38,6 +36,8 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterTemplateTranslationsPass;
 use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
+use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
+use Thelia\Model\OrderReturn;
 
 /**
  * First Bundle use in Thelia

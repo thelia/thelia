@@ -73,11 +73,7 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
         }
 
         if ($received > $quantity + ReturnEligibilityChecker::QUANTITY_TOLERANCE) {
-            throw new UnprocessableEntityHttpException(\sprintf(
-                'The received quantity (%s) cannot exceed the returned quantity (%s) of this line.',
-                $received,
-                $quantity,
-            ));
+            throw new UnprocessableEntityHttpException(\sprintf('The received quantity (%s) cannot exceed the returned quantity (%s) of this line.', $received, $quantity));
         }
 
         if (abs($quantity - (float) $stored->getQuantity()) <= ReturnEligibilityChecker::QUANTITY_TOLERANCE) {
