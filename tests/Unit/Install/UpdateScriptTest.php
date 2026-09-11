@@ -133,6 +133,57 @@ final class UpdateScriptTest extends TestCase
     }
 
     /**
+     * A forced AUTO_INCREMENT on a table the script seeds nothing into is a
+     * dump artefact: it comes from the developer database the DDL was exported
+     * from, and it makes the first row of an updated shop take an id the fresh
+     * install gives to the seventh.
+     */
+    public function testThePendingUpdateScriptForcesNoAutoIncrementOnATableItDoesNotSeed(): void
+    {
+        $script = $this->pendingScript();
+        $seeded = $this->tablesInsertedInto($script);
+        $checked = 0;
+
+        foreach ($this->statementsOf($script) as $statement) {
+            if (1 !== preg_match('/^CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+`(\w+)`/i', $statement, $table)) {
+                continue;
+            }
+
+            if (1 !== preg_match('/AUTO_INCREMENT\s*=\s*(\d+)/i', $statement, $start)) {
+                continue;
+            }
+
+            ++$checked;
+
+            self::assertContains(
+                $table[1],
+                $seeded,
+                \sprintf('The script starts `%s` at AUTO_INCREMENT=%s without inserting a single row into it.', $table[1], $start[1]),
+            );
+        }
+
+        self::assertGreaterThan(0, $checked, 'No forced AUTO_INCREMENT left to judge: this test has lost its subject.');
+    }
+
+    /**
+     * The tables the given script writes rows into.
+     *
+     * @return list<string>
+     */
+    private function tablesInsertedInto(string $sql): array
+    {
+        $tables = [];
+
+        foreach ($this->statementsOf($sql) as $statement) {
+            if (1 === preg_match('/^INSERT\s+(?:IGNORE\s+)?INTO\s+`(\w+)`/i', $statement, $matches)) {
+                $tables[] = $matches[1];
+            }
+        }
+
+        return array_values(array_unique($tables));
+    }
+
+    /**
      * @return array<string, string>
      */
     private function updateScripts(): array

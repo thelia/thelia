@@ -472,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `order_return` (
   CONSTRAINT `fk_order_return_order_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`),
   CONSTRAINT `fk_order_return_reason_id` FOREIGN KEY (`reason_id`) REFERENCES `order_return_reason` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_order_return_status_id` FOREIGN KEY (`status_id`) REFERENCES `order_return_status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 CREATE TABLE IF NOT EXISTS `order_return_line` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `order_return_id` int(11) NOT NULL,
@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS `order_return_line` (
   KEY `idx_order_return_line_order_product_id` (`order_product_id`),
   CONSTRAINT `fk_order_return_line_order_product_id` FOREIGN KEY (`order_product_id`) REFERENCES `order_product` (`id`),
   CONSTRAINT `fk_order_return_line_order_return_id` FOREIGN KEY (`order_return_id`) REFERENCES `order_return` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 CREATE TABLE IF NOT EXISTS `order_return_status_i18n` (
   `id` int(11) NOT NULL,
   `locale` varchar(5) NOT NULL DEFAULT 'en_US',
