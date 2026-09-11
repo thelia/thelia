@@ -52,10 +52,10 @@ use Thelia\Model\Map\OrderReturnReasonTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/order_return_reasons',
+            uriTemplate: '/front/account/order_return_reasons',
         ),
         new Get(
-            uriTemplate: '/front/order_return_reasons/{id}',
+            uriTemplate: '/front/account/order_return_reasons/{id}',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],

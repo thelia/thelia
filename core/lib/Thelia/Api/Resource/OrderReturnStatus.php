@@ -47,14 +47,14 @@ use Thelia\Model\Map\OrderReturnStatusTableMap;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/front/order_return_statutes',
+            uriTemplate: '/front/account/order_return_statutes',
         ),
         new Get(
-            uriTemplate: '/front/order_return_statutes/{id}',
+            uriTemplate: '/front/account/order_return_statutes/{id}',
             uriVariables: ['id'],
         ),
         new Get(
-            uriTemplate: '/front/order_return_statutes/code/{code}',
+            uriTemplate: '/front/account/order_return_statutes/code/{code}',
             uriVariables: ['code'],
         ),
     ],

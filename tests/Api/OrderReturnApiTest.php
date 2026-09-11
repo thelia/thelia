@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -252,6 +253,70 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * The reasons and the statuses are what a customer picks from when opening
+     * a return, so they used to sit outside `^/api/front/account` - the pattern
+     * the kernel asks ROLE_CUSTOMER on - and were served to anyone at all.
+     */
+    public function testTheFrontReferenceEndpointsAreNotPublic(): void
+    {
+        $this->reason(visible: true);
+
+        // The paths outside the authenticated prefix must be gone, not merely
+        // duplicated: left in place they would keep serving the reference data
+        // to anyone.
+        foreach (['/api/front/order_return_reasons', '/api/front/order_return_statutes'] as $uri) {
+            self::assertSame(
+                404,
+                $this->jsonRequest('GET', $uri)->getStatusCode(),
+                \sprintf('%s is still served outside the authenticated prefix.', $uri),
+            );
+        }
+
+        foreach (['/api/front/account/order_return_reasons', '/api/front/account/order_return_statutes'] as $uri) {
+            self::assertSame(
+                401,
+                $this->jsonRequest('GET', $uri)->getStatusCode(),
+                \sprintf('%s answers without a token.', $uri),
+            );
+        }
+
+        $token = $this->authenticateAsCustomer($this->customer());
+
+        foreach (['/api/front/account/order_return_reasons', '/api/front/account/order_return_statutes'] as $uri) {
+            self::assertJsonResponseSuccessful($this->jsonRequest('GET', $uri, token: $token));
+        }
+    }
+
+    /**
+     * `visible` is the merchant's choice, not the caller's: a reason retired
+     * from the list must not come back by dropping the filter, by asking for
+     * the invisible ones, or by reading the reason by its id.
+     */
+    public function testAReasonTheMerchantHidesIsNeverServedOnTheFront(): void
+    {
+        $shown = $this->reason(visible: true);
+        $hidden = $this->reason(visible: false);
+
+        $token = $this->authenticateAsCustomer($this->customer());
+
+        foreach (['', '?visible=false', '?visible=0'] as $queryString) {
+            $response = $this->jsonRequest('GET', '/api/front/account/order_return_reasons'.$queryString, token: $token);
+            self::assertJsonResponseSuccessful($response);
+
+            $codes = array_column($this->decodeMembers($response), 'code');
+            self::assertNotContains((string) $hidden->getCode(), $codes, \sprintf('The hidden reason is served on "%s".', $queryString));
+        }
+
+        self::assertSame(
+            404,
+            $this->jsonRequest('GET', '/api/front/account/order_return_reasons/'.$hidden->getId(), token: $token)->getStatusCode(),
+        );
+        self::assertJsonResponseSuccessful(
+            $this->jsonRequest('GET', '/api/front/account/order_return_reasons/'.$shown->getId(), token: $token),
+        );
+    }
+
+    /**
      * The gate reads what other returns already hold from the database, where
      * the lines of the request being checked are not written yet. One ordered
      * unit split over several lines used to pass the gate once per line.
@@ -336,6 +401,18 @@ final class OrderReturnApiTest extends ApiTestCase
         $reason->save($this->getPropelConnection());
 
         return $reason;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function decodeMembers(Response $response): array
+    {
+        $decoded = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertIsArray($decoded);
+
+        return $decoded['member'] ?? $decoded['hydra:member'] ?? [];
     }
 
     private function returnFor(Customer $customer, string $statusCode): OrderReturn
