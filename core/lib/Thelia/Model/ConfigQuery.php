@@ -279,6 +279,18 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * How the theme is asked to lay the checkout out: one screen per step, or the whole
+     * tunnel on a single page.
+     *
+     * The raw stored value: {@see \Thelia\Domain\Checkout\Enum\CheckoutDisplayMode}
+     * turns it into one of the modes, and settles what an unknown value means.
+     */
+    public static function getCheckoutDisplayMode(): string
+    {
+        return (string) self::read('checkout_display_mode', 'steps');
+    }
+
+    /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList(): array

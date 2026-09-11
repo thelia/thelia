@@ -78,6 +78,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxTypeInterface;
@@ -563,6 +564,7 @@ class TheliaKernel extends Kernel
             ControllerInterface::class => 'controller.service_arguments',
             TaxTypeInterface::class => 'thelia.taxType',
             CustomerPersonalDataProviderInterface::class => 'thelia.customer.personal_data_provider',
+            CheckoutStepProviderInterface::class => 'thelia.checkout.step_provider',
 
             QueryCollectionExtensionInterface::class => 'thelia.api.propel.query_extension.collection',
             QueryItemExtensionInterface::class => 'thelia.api.propel.query_extension.item',

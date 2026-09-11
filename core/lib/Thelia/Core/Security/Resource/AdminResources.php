@@ -63,6 +63,7 @@ class AdminResources
     public const ATTRIBUTE = 'admin.configuration.attribute';
     public const BRAND = 'admin.brand';
     public const CATEGORY = 'admin.category';
+    public const CHECKOUT_STEP = 'admin.configuration.checkout-step';
     public const CONFIG = 'admin.configuration';
     public const CONSENT = 'admin.configuration.consent';
     public const CONTENT = 'admin.content';
