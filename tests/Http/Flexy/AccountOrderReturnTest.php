@@ -16,6 +16,7 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -196,6 +197,8 @@ final class AccountOrderReturnTest extends WebIntegrationTestCase
 
     public function testTheReturnDocumentIsServedOnlyToItsOwner(): void
     {
+        $this->skipUnlessThePdfTemplateShipsTheReturnDocument();
+
         [$customer, $order, $line] = $this->paidOrderWithOneLine(2.0, daysAgo: 1);
 
         $this->injector?->setCustomer($customer);
@@ -243,6 +246,20 @@ final class AccountOrderReturnTest extends WebIntegrationTestCase
         $crawler = $this->client->request('GET', $this->url('account_order', ['orderId' => $order->getId()]));
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
         self::assertStringNotContainsString('/return', $crawler->filter('body')->html());
+    }
+
+    /**
+     * The printable document is a file of the PDF template package, which ships on its own
+     * release cycle: without it the front route has nothing to render and answers 404, so
+     * this is reported as skipped rather than as a broken ownership guard.
+     */
+    private function skipUnlessThePdfTemplateShipsTheReturnDocument(): void
+    {
+        $pdfTemplate = $this->getService(TemplateHelperInterface::class)->getActivePdfTemplate();
+
+        if (!file_exists($pdfTemplate->getAbsolutePath().\DIRECTORY_SEPARATOR.'order_return.html.twig')) {
+            self::markTestSkipped('The active PDF template ships no return document.');
+        }
     }
 
     /**
