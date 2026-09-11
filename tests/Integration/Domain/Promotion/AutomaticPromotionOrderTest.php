@@ -81,6 +81,32 @@ final class AutomaticPromotionOrderTest extends ActionIntegrationPromotionTestCa
         self::assertSame(99.0, $this->stockOf($gift), 'The offered unit must leave the stock too.');
     }
 
+    /**
+     * The cart prices the gift at zero through the discount, not through the line
+     * itself: without a marker copied onto the order, the back office, the invoice
+     * and a later return read the gift as a line the customer paid for.
+     */
+    public function testTheOrderSaysWhichLineWasOffered(): void
+    {
+        [, $trigger, $gift, $order] = $this->placeOrderWithAnOfferedGift();
+
+        $offered = [];
+        $paid = [];
+
+        foreach ($order->getOrderProducts() as $orderProduct) {
+            if (1 === $orderProduct->getIsOffered()) {
+                $offered[] = $orderProduct->getProductRef();
+
+                continue;
+            }
+
+            $paid[] = $orderProduct->getProductRef();
+        }
+
+        self::assertSame([$gift->getRef()], $offered, 'The gift is the only line the order calls offered.');
+        self::assertSame([$trigger->getRef()], $paid, 'The triggering line stays a paid line.');
+    }
+
     public function testTheUsageOfAnAutomaticPromotionIsCountedWhenTheOrderIsPaidAndGivenBackOnCancellation(): void
     {
         [$coupon, , , $order] = $this->placeOrderWithAnOfferedGift(maxUsage: 1);
