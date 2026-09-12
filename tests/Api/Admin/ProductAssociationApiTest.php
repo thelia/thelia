@@ -24,8 +24,10 @@ use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Model\Admin;
 use Thelia\Model\Category;
 use Thelia\Model\Currency;
+use Thelia\Model\Map\ProductAssociationTypeI18nTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
+use Thelia\Model\ProductAssociationTypeI18nQuery;
 use Thelia\Model\ProductAssociationTypeQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Test\ApiTestCase;
@@ -221,6 +223,111 @@ final class ProductAssociationApiTest extends ApiTestCase
         self::assertSame(403, $response->getStatusCode());
     }
 
+    public function testWritingARelationWithoutATypeIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $product = $this->product();
+        $associated = $this->product();
+
+        try {
+            $response = $this->jsonRequest('POST', '/api/admin/product_associations', [
+                'product' => '/api/admin/products/'.$product->getId(),
+                'associatedProduct' => '/api/admin/products/'.$associated->getId(),
+            ], $token);
+        } catch (\Throwable $crash) {
+            self::fail(
+                'A relation payload with no type must be refused, not crash the write: '
+                .$crash::class.' — '.$crash->getMessage(),
+            );
+        }
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A relation payload with no type is refused as unprocessable, not answered by a 500: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+    }
+
+    public function testCreatingATypeWithACodeAlreadyTakenIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $this->client->catchExceptions(true);
+
+        $response = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => ProductAssociationType::CODE_ACCESSORY,
+            'visible' => true,
+            'reciprocal' => false,
+            'i18ns' => ['en_US' => ['title' => 'Accessories, again']],
+        ], $token);
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A code already taken is refused as unprocessable, not answered by a 500: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+    }
+
+    public function testCreatingATypeWithoutAnyWordingIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $this->client->catchExceptions(true);
+
+        $response = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => 'untitled_block',
+            'visible' => true,
+            'reciprocal' => false,
+        ], $token);
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A type with no title heads a front-office block with nothing: it is refused. Answer was: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+    }
+
+    public function testHidingATypeLeavesItsWordingAlone(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $created = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => 'goes_well_with',
+            'visible' => true,
+            'reciprocal' => false,
+            'i18ns' => [
+                'en_US' => ['title' => 'Goes well with'],
+                'fr_FR' => ['title' => 'Va bien avec'],
+            ],
+        ], $token);
+
+        self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
+
+        $id = (int) (json_decode((string) $created->getContent(), true)['id'] ?? 0);
+
+        self::assertSame('Goes well with', $this->wording($id, 'en_US'));
+
+        $patched = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_association_types/'.$id,
+            ['visible' => false],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(200, $patched->getStatusCode(), (string) $patched->getContent());
+
+        self::assertSame(
+            'Goes well with',
+            $this->wording($id, 'en_US'),
+            'A patch that carries no wording must leave the wording of every language where it was.',
+        );
+        self::assertSame('Va bien avec', $this->wording($id, 'fr_FR'));
+    }
+
     private function post(?string $token, Product $product, Product $associated, string $typeCode)
     {
         return $this->jsonRequest('POST', '/api/admin/product_associations', [
@@ -271,6 +378,17 @@ final class ProductAssociationApiTest extends ApiTestCase
     private function product(): Product
     {
         return $this->createFixtureFactory()->product($this->category, $this->taxRule, $this->currency);
+    }
+
+    private function wording(int $id, string $locale): ?string
+    {
+        ProductAssociationTypeI18nTableMap::clearInstancePool();
+
+        return ProductAssociationTypeI18nQuery::create()
+            ->filterById($id)
+            ->filterByLocale($locale)
+            ->findOne()
+            ?->getTitle();
     }
 
     private function facade(): ProductFacade

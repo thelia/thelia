@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Map\ProductAssociationTypeTableMap;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductAssociationTypeI18nQuery;
 use Thelia\Model\ProductAssociationTypeQuery;
@@ -209,6 +210,44 @@ final class ProductAssociationTypeActionTest extends IntegrationTestCase
         self::assertLessThan($firstAfter, $secondAfter);
     }
 
+    public function testRewordingAHiddenTypeLeavesItHidden(): void
+    {
+        // Visibility and reciprocity have their own event; rewording a type
+        // must not carry them back to the defaults of the update event.
+        $type = ProductAssociationTypeQuery::create()
+            ->findOneByCode(ProductAssociationType::CODE_CROSS_SELLING);
+
+        self::assertInstanceOf(ProductAssociationType::class, $type);
+        self::assertSame(1, $type->getReciprocal(), 'The install seeds cross_selling as a reciprocal type.');
+
+        $this->dispatcher->dispatch(
+            new ProductAssociationTypeToggleVisibleEvent($type->getId()),
+            TheliaEvents::PRODUCT_ASSOCIATION_TYPE_TOGGLE_VISIBLE,
+        );
+
+        self::assertSame(0, $this->reload($type->getId())->getVisible(), 'The toggle hid the type.');
+
+        $this->dispatcher->dispatch(
+            (new ProductAssociationTypeUpdateEvent($type->getId()))
+                ->setLocale('en_US')
+                ->setTitle('Reworded'),
+            TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE,
+        );
+
+        $reworded = $this->reload($type->getId());
+
+        self::assertSame(
+            0,
+            $reworded->getVisible(),
+            'Rewording a type must not put back on sheets a type the merchant hid with the toggle event.',
+        );
+        self::assertSame(
+            1,
+            $reworded->getReciprocal(),
+            'Rewording a type must not drop its reciprocity either.',
+        );
+    }
+
     private function freshType(string $code): ProductAssociationType
     {
         $event = new ProductAssociationTypeCreateEvent();
@@ -222,6 +261,17 @@ final class ProductAssociationTypeActionTest extends IntegrationTestCase
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_ASSOCIATION_TYPE_CREATE);
 
         return $event->getProductAssociationType();
+    }
+
+    private function reload(int $id): ProductAssociationType
+    {
+        ProductAssociationTypeTableMap::clearInstancePool();
+
+        $type = ProductAssociationTypeQuery::create()->findPk($id);
+
+        self::assertInstanceOf(ProductAssociationType::class, $type);
+
+        return $type;
     }
 
     private function shopLocale(): string

@@ -18,6 +18,7 @@ use Propel\Runtime\Propel;
 use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Model\Category;
 use Thelia\Model\Currency;
+use Thelia\Model\Customer;
 use Thelia\Model\Map\AccessoryTableMap;
 use Thelia\Model\Map\ProductAssociationTypeI18nTableMap;
 use Thelia\Model\Map\ProductAssociationTypeTableMap;
@@ -27,6 +28,7 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductAssociationTypeQuery;
+use Thelia\Model\Sale;
 use Thelia\Model\TaxRule;
 use Thelia\Test\ApiTestCase;
 
@@ -202,6 +204,51 @@ final class ProductAssociationApiTest extends ApiTestCase
         );
     }
 
+    public function testTheProductOfAPrivateDropIsNotHandedOutByTheRelationsOfAnOnlineProduct(): void
+    {
+        // A reserved operation with `hide_products` takes its products out of the
+        // catalog of everybody it is not open to. The relation endpoint has to
+        // apply the same rule: a relation pointing at such a product carries it
+        // whole, so serving the relation hands the product out.
+        $sheet = $this->catalogProduct();
+        $reserved = $this->catalogProduct();
+        $this->hiddenReservedSaleOn($reserved, $this->newCustomer());
+
+        $this->relate($sheet, $reserved, ProductAssociationType::CODE_ACCESSORY);
+
+        $payload = $this->readJson('/api/front/product_associations?product.id='.$sheet->getId());
+
+        $offered = array_map(
+            static fn (array $row): int => (int) ($row['associatedProduct']['id'] ?? 0),
+            $payload['hydra:member'] ?? [],
+        );
+
+        self::assertNotContains(
+            (int) $reserved->getId(),
+            $offered,
+            'A product hidden by a private drop is handed out by the relations of an online product: '
+            .'the front relation endpoint is not narrowed by the reserved operation rule.',
+        );
+    }
+
+    public function testTheRelationsOfAPrivateDropProductHandItOutFromTheOtherSideToo(): void
+    {
+        $reserved = $this->catalogProduct();
+        $online = $this->catalogProduct();
+        $this->hiddenReservedSaleOn($reserved, $this->newCustomer());
+
+        $this->relate($reserved, $online, ProductAssociationType::CODE_ACCESSORY);
+
+        $payload = $this->readJson('/api/front/product_associations?product.id='.$reserved->getId());
+
+        self::assertSame(
+            0,
+            $payload['hydra:totalItems'] ?? -1,
+            'The relations of a product hidden by a private drop are served to a visitor the drop is not open to, '
+            .'and each of them carries that product whole.',
+        );
+    }
+
     private function readJson(string $uri): array
     {
         $response = $this->jsonRequest('GET', $uri);
@@ -228,6 +275,40 @@ final class ProductAssociationApiTest extends ApiTestCase
     private function product(): Product
     {
         return $this->createFixtureFactory()->product($this->category, $this->taxRule, $this->currency);
+    }
+
+    private function catalogProduct(): Product
+    {
+        return $this->createFixtureFactory()->product(
+            $this->category,
+            $this->taxRule,
+            $this->currency,
+            ['baseQuantity' => 100, 'basePrice' => 100.0, 'title' => 'Private drop product'],
+        );
+    }
+
+    private function hiddenReservedSaleOn(Product $product, Customer $customer): Sale
+    {
+        $factory = $this->createFixtureFactory();
+        $sale = $factory->sale([
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS,
+            'hideProducts' => true,
+            'active' => true,
+            'startDate' => new \DateTime('-1 day'),
+            'endDate' => new \DateTime('+1 day'),
+        ]);
+        $factory->saleProduct($sale, $product);
+        $factory->saleCustomer($sale, $customer);
+        $factory->saleOffsetCurrency($sale, $this->currency, 10.0);
+
+        return $sale;
+    }
+
+    private function newCustomer(): Customer
+    {
+        $factory = $this->createFixtureFactory();
+
+        return $factory->customer($factory->customerTitle());
     }
 
     private function queriesSpentReadingABlockOf(int $relations): int
