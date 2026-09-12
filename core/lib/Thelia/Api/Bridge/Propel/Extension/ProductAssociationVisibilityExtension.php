@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Map\AccessoryTableMap;
 use Thelia\Model\Map\ProductAssociationTypeTableMap;
@@ -33,16 +34,24 @@ use Thelia\Model\ProductAssociationTypeQuery;
  * let anyone read the products a shop has taken offline by walking the relations
  * of a product that is still online.
  *
- * Two rules, because there are two ways for a block not to be offered: the
- * product it points at is offline, or the merchant has hidden the type. Both are
- * applied in the query, so the collection and the item read answer the same, and
- * a relation out of reach answers 404 rather than an empty-looking 200.
+ * Three rules, because there are three ways for a block not to be offered: the
+ * product it points at is offline, the merchant has hidden the type, or one of the
+ * two products belongs to a private drop the visitor is not part of — the same
+ * rule `/front/products` applies through ReservedSaleVisibility, on both ends of
+ * the relation since a relation carries both products whole. All are applied in
+ * the query, so the collection and the item read answer the same, and a relation
+ * out of reach answers 404 rather than an empty-looking 200.
  *
  * The admin endpoints are left alone: a back-office user reads every relation,
  * hidden types and offline products included — that is the point of the screen.
  */
 final readonly class ProductAssociationVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    public function __construct(
+        private ReservedSaleVisibility $reservedSaleVisibility,
+    ) {
+    }
+
     public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $this->scopeToWhatTheShopOffers($query, $resourceClass, $operation);
@@ -73,6 +82,9 @@ final readonly class ProductAssociationVisibilityExtension implements QueryColle
                 ProductAssociationTypeTableMap::TABLE_NAME,
                 ProductAssociationTypeTableMap::COL_VISIBLE,
             ));
+
+            $this->reservedSaleVisibility->applyTo($query, AccessoryTableMap::COL_PRODUCT_ID);
+            $this->reservedSaleVisibility->applyTo($query, AccessoryTableMap::COL_ACCESSORY);
 
             return;
         }
