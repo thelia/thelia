@@ -74,10 +74,17 @@ final readonly class ProductAssociationTypeProcessor implements ProcessorInterfa
         return null === $data->getId() ? $this->create($data, $context) : $this->update($data, $context);
     }
 
+    /**
+     * The creation event carries one language, and the action refuses a type created
+     * without a title: the language written first is the first one the payload titles,
+     * whatever order the client put its languages in.
+     */
     private function create(ProductAssociationType $data, array $context): ProductAssociationType
     {
         $wordings = $this->wordings($data, $context);
-        $firstLocale = array_key_first($wordings) ?? (string) Lang::getDefaultLanguage()->getLocale();
+        $firstLocale = $this->firstTitledLocale($wordings)
+            ?? array_key_first($wordings)
+            ?? (string) Lang::getDefaultLanguage()->getLocale();
 
         $event = new ProductAssociationTypeCreateEvent();
         $event
@@ -170,6 +177,20 @@ final readonly class ProductAssociationTypeProcessor implements ProcessorInterfa
         } catch (\LogicException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
         }
+    }
+
+    /**
+     * @param array<string, array{title?: string, description?: string|null}> $wordings
+     */
+    private function firstTitledLocale(array $wordings): ?string
+    {
+        foreach ($wordings as $locale => $wording) {
+            if ('' !== trim($wording['title'] ?? '')) {
+                return $locale;
+            }
+        }
+
+        return null;
     }
 
     /**

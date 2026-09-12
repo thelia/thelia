@@ -367,6 +367,38 @@ final class ProductAssociationApiTest extends ApiTestCase
         );
     }
 
+    public function testATypeTitledInAnotherLanguageThanTheFirstOneIsWritten(): void
+    {
+        // The order of the keys of a JSON object is not something the client chooses
+        // on purpose: the guard on the title reads the whole payload.
+        $token = $this->authenticateAsAdmin();
+
+        $this->client->catchExceptions(true);
+
+        $created = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => 'goes_well_with',
+            'visible' => true,
+            'reciprocal' => false,
+            'i18ns' => [
+                'en_US' => ['description' => 'Products our customers buy along with this one.'],
+                'fr_FR' => ['title' => 'Va bien avec'],
+            ],
+        ], $token);
+
+        self::assertSame(
+            201,
+            $created->getStatusCode(),
+            'The payload carries a title, in French, so the type is written. Answer was: '
+            .substr((string) $created->getContent(), 0, 300),
+        );
+
+        $id = (int) (json_decode((string) $created->getContent(), true)['id'] ?? 0);
+
+        self::assertSame('Va bien avec', $this->wording($id, 'fr_FR'));
+        self::assertSame('Va bien avec', $this->wording($id, 'en_US'), 'The shop language borrows the title it was not given.');
+        self::assertSame('Products our customers buy along with this one.', $this->description($id, 'en_US'));
+    }
+
     private function post(?string $token, Product $product, Product $associated, string $typeCode)
     {
         return $this->jsonRequest('POST', '/api/admin/product_associations', [
