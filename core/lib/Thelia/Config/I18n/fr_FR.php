@@ -564,6 +564,7 @@ return [
     'The consent "%code" is required by the shop and cannot be deleted. It can still be turned off, or made optional.' => 'Le consentement « %code » est requis par la boutique et ne peut pas être supprimé. Il reste possible de le désactiver ou de le rendre facultatif.',
     'The product relation type "%code" is required by the shop and cannot be deleted. It can still be hidden.' => 'Le type de relation « %code » est requis par la boutique et ne peut pas être supprimé. Il reste possible de le masquer.',
     'The product relation type "%code" still holds %count relations and cannot be deleted. Remove them first, or hide the type.' => "Le type de relation « %code » porte encore %count relations et ne peut pas être supprimé. Retirez-les d'abord, ou masquez le type.",
+    'A product relation type with the code "%code" already exists.' => 'Un type de relation portant le code « %code » existe déjà.',
     'The archiver :name is not available. Please install the php extension :extension first.' => "L'archiveur :name n'est pas disponible. Vous devez installer l'extension PHP :extension.",
     'The archiver identifier "%archiverId" doesn\’t exist' => 'L\'identifiant d\'archiveur «%archiverId » n"existe pas',
     'The brand name or title' => 'Le nom ou le titre de la marque',

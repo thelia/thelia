@@ -46,8 +46,15 @@ use Thelia\Model\ProductAssociationTypeQuery;
  */
 class ProductAssociationType extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @throws \LogicException when the code is already that of another type
+     */
     public function create(ProductAssociationTypeCreateEvent $event): void
     {
+        if (ProductAssociationTypeQuery::create()->filterByCode($event->getCode())->exists()) {
+            throw new \LogicException(Translator::getInstance()->trans('A product relation type with the code "%code" already exists.', ['%code' => $event->getCode()]));
+        }
+
         $type = new ProductAssociationTypeModel();
 
         $type
