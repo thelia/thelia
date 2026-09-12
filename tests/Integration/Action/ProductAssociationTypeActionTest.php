@@ -248,6 +248,35 @@ final class ProductAssociationTypeActionTest extends IntegrationTestCase
         );
     }
 
+    public function testUpdateCarryingATitleAloneLeavesTheDescriptionAlone(): void
+    {
+        $type = $this->freshType('house_selection');
+        $shopLocale = $this->shopLocale();
+
+        $this->dispatcher->dispatch(
+            (new ProductAssociationTypeUpdateEvent($type->getId()))
+                ->setLocale($shopLocale)
+                ->setDescription('Our own picks.'),
+            TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE,
+        );
+
+        $this->dispatcher->dispatch(
+            (new ProductAssociationTypeUpdateEvent($type->getId()))
+                ->setLocale($shopLocale)
+                ->setTitle('Our selection'),
+            TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE,
+        );
+
+        $reread = $this->reload($type->getId())->setLocale($shopLocale);
+
+        self::assertSame('Our selection', $reread->getTitle());
+        self::assertSame(
+            'Our own picks.',
+            $reread->getDescription(),
+            'An update carrying a title alone must leave the description of that language where it was.',
+        );
+    }
+
     private function freshType(string $code): ProductAssociationType
     {
         $event = new ProductAssociationTypeCreateEvent();

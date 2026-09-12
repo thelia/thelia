@@ -80,9 +80,10 @@ class ProductAssociationType extends BaseAction implements EventSubscriberInterf
 
     /**
      * Writes what the event carries and nothing else: rewording a type in one language
-     * leaves its visibility, its reciprocity and its other languages alone. The code is
-     * deliberately left out: it is the stable identifier the core and the themes hold
-     * this type by.
+     * leaves its visibility, its reciprocity and its other languages alone, and a title
+     * sent without a description leaves the description of that language alone. The
+     * code is deliberately left out: it is the stable identifier the core and the
+     * themes hold this type by.
      */
     public function update(ProductAssociationTypeUpdateEvent $event): void
     {
@@ -97,16 +98,21 @@ class ProductAssociationType extends BaseAction implements EventSubscriberInterf
         }
 
         if ($event->carriesWording()) {
-            $type
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription());
+            $type->setLocale($event->getLocale());
+        }
+
+        if ($event->carriesTitle()) {
+            $type->setTitle($event->getTitle());
+        }
+
+        if ($event->carriesDescription()) {
+            $type->setDescription($event->getDescription());
         }
 
         $type->save();
 
         if ($event->carriesWording()) {
-            $this->fillShopLanguage($type, $event->getLocale(), $event->getTitle(), $event->getDescription());
+            $this->fillShopLanguage($type, $event->getLocale(), $type->getTitle(), $type->getDescription());
         }
 
         $event->setProductAssociationType($type);

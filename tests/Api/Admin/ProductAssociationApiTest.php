@@ -328,6 +328,45 @@ final class ProductAssociationApiTest extends ApiTestCase
         self::assertSame('Va bien avec', $this->wording($id, 'fr_FR'));
     }
 
+    public function testRewordingATypeLeavesItsDescriptionAlone(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $created = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => 'goes_well_with',
+            'visible' => true,
+            'reciprocal' => false,
+            'i18ns' => [
+                'en_US' => [
+                    'title' => 'Goes well with',
+                    'description' => 'Products our customers buy along with this one.',
+                ],
+            ],
+        ], $token);
+
+        self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
+
+        $id = (int) (json_decode((string) $created->getContent(), true)['id'] ?? 0);
+
+        self::assertSame('Products our customers buy along with this one.', $this->description($id, 'en_US'));
+
+        $patched = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_association_types/'.$id,
+            ['i18ns' => ['en_US' => ['title' => 'Goes nicely with']]],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(200, $patched->getStatusCode(), (string) $patched->getContent());
+        self::assertSame('Goes nicely with', $this->wording($id, 'en_US'));
+        self::assertSame(
+            'Products our customers buy along with this one.',
+            $this->description($id, 'en_US'),
+            'A patch carrying only a title must leave the description of that language where it was.',
+        );
+    }
+
     private function post(?string $token, Product $product, Product $associated, string $typeCode)
     {
         return $this->jsonRequest('POST', '/api/admin/product_associations', [
@@ -389,6 +428,17 @@ final class ProductAssociationApiTest extends ApiTestCase
             ->filterByLocale($locale)
             ->findOne()
             ?->getTitle();
+    }
+
+    private function description(int $id, string $locale): ?string
+    {
+        ProductAssociationTypeI18nTableMap::clearInstancePool();
+
+        return ProductAssociationTypeI18nQuery::create()
+            ->filterById($id)
+            ->filterByLocale($locale)
+            ->findOne()
+            ?->getDescription();
     }
 
     private function facade(): ProductFacade

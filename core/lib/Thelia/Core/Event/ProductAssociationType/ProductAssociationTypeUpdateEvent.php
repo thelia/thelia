@@ -17,14 +17,17 @@ namespace Thelia\Core\Event\ProductAssociationType;
 /**
  * Unlike a creation, an update carries only what its caller set: the code is never
  * written back, and a wording sent in one language leaves the visibility, the
- * reciprocity and the other languages where they were. The action reads the
- * `carries*()` methods to know which part of the type the event is about.
+ * reciprocity and the other languages where they were. The title and the
+ * description are carried one by one too: correcting a heading says nothing about
+ * the paragraph printed under it. The action reads the `carries*()` methods to
+ * know which part of the type the event is about.
  */
 class ProductAssociationTypeUpdateEvent extends ProductAssociationTypeCreateEvent
 {
     protected int $productAssociationTypeId;
 
-    private bool $carriesWording = false;
+    private bool $carriesTitle = false;
+    private bool $carriesDescription = false;
     private bool $carriesVisible = false;
     private bool $carriesReciprocal = false;
 
@@ -37,21 +40,31 @@ class ProductAssociationTypeUpdateEvent extends ProductAssociationTypeCreateEven
 
     public function setTitle(string $title): static
     {
-        $this->carriesWording = true;
+        $this->carriesTitle = true;
 
         return parent::setTitle($title);
     }
 
+    public function carriesTitle(): bool
+    {
+        return $this->carriesTitle;
+    }
+
     public function setDescription(?string $description): static
     {
-        $this->carriesWording = true;
+        $this->carriesDescription = true;
 
         return parent::setDescription($description);
     }
 
+    public function carriesDescription(): bool
+    {
+        return $this->carriesDescription;
+    }
+
     public function carriesWording(): bool
     {
-        return $this->carriesWording;
+        return $this->carriesTitle || $this->carriesDescription;
     }
 
     public function setVisible(int $visible): static
