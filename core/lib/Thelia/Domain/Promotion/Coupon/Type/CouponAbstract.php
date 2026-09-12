@@ -72,6 +72,9 @@ abstract class CouponAbstract implements CouponInterface
 
     protected bool $perCustomerUsageCount;
 
+    /** The id of the coupon row this instance was built from, when it came from the database. */
+    protected ?int $couponModelId = null;
+
     /**
      * Constructor.
      *
@@ -139,6 +142,18 @@ abstract class CouponAbstract implements CouponInterface
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
         return $this;
+    }
+
+    public function setCouponModelId(?int $couponModelId): static
+    {
+        $this->couponModelId = $couponModelId;
+
+        return $this;
+    }
+
+    public function getCouponModelId(): ?int
+    {
+        return $this->couponModelId;
     }
 
     public function setPerCustomerUsageCount(bool $perCustomerUsageCount): static

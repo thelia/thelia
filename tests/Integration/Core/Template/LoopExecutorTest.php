@@ -14,9 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\Template;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\LoopExecutor;
+use Thelia\Core\Template\Loop\OrderProduct;
+use Thelia\Core\Template\Loop\Product;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\LangQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -79,6 +85,46 @@ final class LoopExecutorTest extends IntegrationTestCase
             'id' => $product->getId(),
             'lang' => $lang->getId(),
         ]));
+    }
+
+    public function testExecuteResolvesALoopNameDeclaredInAModuleConfigXml(): void
+    {
+        // A module declaring <loop name="order-comment" class="…\OrderCommentLoop" /> has
+        // templates asking for "order-comment", never for the name derived from the class.
+        // With order=0 the loop yields no row, but the declared name must still resolve.
+        $executor = $this->createLoopExecutor(['declared-in-config-xml' => OrderProduct::class]);
+
+        $result = $executor->execute('declared_in_config_xml', ['order' => 0]);
+
+        self::assertInstanceOf(LoopResult::class, $result);
+        self::assertSame(0, iterator_count($result));
+    }
+
+    public function testDeclaredNameIsIgnoredWhenItsLoopIsNotRegistered(): void
+    {
+        // The declaration of a module whose loop service is gone must not resurrect it.
+        $executor = $this->createLoopExecutor(['declared-but-absent' => Product::class]);
+
+        $this->expectException(ElementNotFoundException::class);
+
+        $executor->execute('declared-but-absent');
+    }
+
+    /**
+     * @param array<string, class-string> $theliaParserLoops
+     */
+    private function createLoopExecutor(array $theliaParserLoops): LoopExecutor
+    {
+        return new LoopExecutor(
+            static::getContainer(),
+            $this->getService(RequestStack::class),
+            $this->getService(EventDispatcherInterface::class),
+            $this->getService(SecurityContext::class),
+            $this->getService(Translator::class),
+            [new OrderProduct()],
+            'test',
+            $theliaParserLoops,
+        );
     }
 
     private function getLoopExecutor(): LoopExecutor

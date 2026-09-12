@@ -71,6 +71,13 @@ class Cart extends BaseCart
         $cart->save();
 
         foreach ($cartItems as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered()) {
+                // An offered line belongs to the promotion that placed it, not to the
+                // customer: copying it would sell the gift as a regular line. The next
+                // discount evaluation reconciles the offered lines on the new cart.
+                continue;
+            }
+
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
 

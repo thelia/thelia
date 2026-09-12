@@ -36,6 +36,7 @@ use Thelia\Domain\Sale\ReservedPrice;
 use Thelia\Domain\Sale\ReservedSalePriceResolver;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -291,10 +292,27 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $cartItemId = $event->getCartItemId()) {
             $cart = $event->getCart();
-            CartItemQuery::create()
+
+            $cartItem = CartItemQuery::create()
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
-                ->delete();
+                ->findOne();
+
+            if (null === $cartItem) {
+                return;
+            }
+
+            if (1 === (int) $cartItem->getIsOffered()) {
+                // An offered line belongs to the promotion that placed it: only the
+                // reconciliation removes it, through its own direct writes.
+                Tlog::getInstance()->warning(
+                    \sprintf('Refused to delete cart item %d: it is an offered line', $cartItem->getId()),
+                );
+
+                return;
+            }
+
+            $cartItem->delete();
 
             // Force an update of the Cart object to provide
             // to other listeners an updated CartItem collection.
@@ -330,6 +348,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->findOne();
 
             if ($cartItem) {
+                if (1 === (int) $cartItem->getIsOffered()) {
+                    // An offered line belongs to the promotion that placed it: only the
+                    // reconciliation changes its quantity, through its own direct writes.
+                    Tlog::getInstance()->warning(
+                        \sprintf('Refused to update cart item %d: it is an offered line', $cartItem->getId()),
+                    );
+
+                    return;
+                }
+
                 $event->setCartItem(
                     $this->updateQuantity($dispatcher, $cartItem, $quantity),
                 );
@@ -580,6 +608,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByCartId($cartId)
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
+            // A line a promotion offered is never the one a customer adds to: adding
+            // the same product by hand must open a regular, paid line of its own.
+            ->filterByIsOffered(0)
             ->findOne();
     }
 
@@ -597,6 +628,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProductId())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
+            // A line a promotion offered is never the one a customer adds to: adding
+            // the same product by hand must open a regular, paid line of its own.
+            ->filterByIsOffered(0)
             ->findOne()
         ) {
             $event->setCartItem($foundItem);

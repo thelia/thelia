@@ -56,7 +56,9 @@ use Thelia\Model\Map\CartItemTableMap;
 // The front operations are anonymous by design — a visitor builds a cart
 // before signing in — so the caller's own cart is the only boundary there is.
 // CartItemOwnershipExtension keeps foreign rows out of every query, and
-// CartItemVoter answers on the row that did come back.
+// CartItemVoter answers on the row that did come back. Owning the line is
+// enough to read it, not to write it: a line a promotion offered is only
+// ever written by the promotion itself.
 #[ApiResource(
     operations: [
         new Post(
@@ -72,11 +74,11 @@ use Thelia\Model\Map\CartItemTableMap;
         ),
         new Put(
             uriTemplate: '/front/cart_items/{id}',
-            security: 'is_granted("'.CartItemVoter::OWNER.'", object)',
+            security: 'is_granted("'.CartItemVoter::MUTABLE.'", object)',
         ),
         new Delete(
             uriTemplate: '/front/cart_items/{id}',
-            security: 'is_granted("'.CartItemVoter::OWNER.'", object)',
+            security: 'is_granted("'.CartItemVoter::MUTABLE.'", object)',
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -126,6 +128,17 @@ class CartItem implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $promo = null;
+
+    // Read only, in every context: a line is offered because a promotion put it
+    // there, never because a caller said so. It carries no write group, and the
+    // front write operations are refused outright on such a line.
+    //
+    // Left without a default on purpose: the Propel bridge writes back every
+    // initialized property, and a PUT that never mentions this one would then
+    // blank a NOT NULL column. Uninitialized, it is skipped on the way in and
+    // filled by the transformer on the way out.
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
+    public ?bool $isOffered;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
@@ -264,6 +277,18 @@ class CartItem implements PropelResourceInterface
     public function setPromo(?int $promo): self
     {
         $this->promo = $promo;
+
+        return $this;
+    }
+
+    public function getIsOffered(): ?bool
+    {
+        return $this->isOffered;
+    }
+
+    public function setIsOffered(?bool $isOffered): self
+    {
+        $this->isOffered = $isOffered;
 
         return $this;
     }

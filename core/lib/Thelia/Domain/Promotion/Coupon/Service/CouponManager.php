@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Promotion\Coupon\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
@@ -29,13 +33,16 @@ use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\CouponModule;
+use Thelia\Model\CouponQuery;
+use Thelia\Model\Customer;
+use Thelia\Model\Map\CouponTableMap;
 
 /**
  * Manage how Coupons could interact with a Checkout.
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class CouponManager
+class CouponManager implements ResetInterface
 {
     /** @var array Available Coupons (Services) */
     protected array $availableCoupons = [];
@@ -43,9 +50,13 @@ class CouponManager
     /** @var array Available Conditions (Services) */
     protected $availableConditions = [];
 
+    /** @var CouponInterface[]|null Coupons built for the current request, invalidated on every cart mutation */
+    private ?array $currentCoupons = null;
+
     public function __construct(
         protected FacadeInterface $facade,
         protected CouponFactory $couponFactory,
+        protected RequestStack $requestStack,
     ) {
     }
 
@@ -65,8 +76,10 @@ class CouponManager
 
             $discount = $this->getEffect($couponsKept);
 
-            // Just In Case test
-            $checkoutTotalPrice = $this->facade->getCartTotalTaxPrice();
+            // Just In Case test. The facade total leaves the offered lines out (they
+            // must not feed the conditions), but they ARE payable lines the discount
+            // offsets: the cap is the taxed total of everything the cart holds.
+            $checkoutTotalPrice = $this->facade->getCartTotalTaxPrice() + $this->offeredLinesTaxedTotal();
 
             if ($discount >= $checkoutTotalPrice) {
                 $discount = $checkoutTotalPrice;
@@ -77,13 +90,53 @@ class CouponManager
     }
 
     /**
-     * Return all Coupon given during the Checkout.
+     * Return all coupons applying to the checkout: the ones typed in during the
+     * session, plus the active automatic promotions, one instance per coupon row.
+     *
+     * The result is memoised for the request: getDiscount(), getCouponsKept() and
+     * isCouponRemovingPostage() all go through here several times per evaluation
+     * cycle. Any event mutating the cart must call invalidateCurrentCoupons() first.
      *
      * @return array Array of CouponInterface
      */
     public function getCurrentCoupons(): array
     {
-        $session = $this->facade->getRequest()->getSession();
+        if (null !== $this->currentCoupons) {
+            return $this->currentCoupons;
+        }
+
+        $sessionCoupons = $this->getSessionCoupons();
+
+        return $this->currentCoupons = array_merge(
+            $sessionCoupons,
+            $this->getAutomaticCoupons($sessionCoupons),
+        );
+    }
+
+    public function invalidateCurrentCoupons(): void
+    {
+        $this->currentCoupons = null;
+    }
+
+    public function reset(): void
+    {
+        $this->invalidateCurrentCoupons();
+    }
+
+    /**
+     * The coupons the customer typed in during the session.
+     *
+     * @return CouponInterface[]
+     */
+    private function getSessionCoupons(): array
+    {
+        $session = $this->getSession();
+
+        if (!$session instanceof Session) {
+            // No session on this request (CLI, cold error page): no code was typed in.
+            return [];
+        }
+
         $couponCodes = $session->getConsumedCoupons();
 
         if (null === $couponCodes) {
@@ -122,9 +175,119 @@ class CouponManager
         return $coupons;
     }
 
+    /**
+     * The enabled automatic promotions inside their date window, built one instance
+     * per coupon row: a promotion already applied through its code is not returned twice.
+     *
+     * A per-customer usage limit needs a customer to be counted against: with no
+     * customer signed in, such a promotion is silently ignored, never blocking.
+     *
+     * @param CouponInterface[] $sessionCoupons
+     *
+     * @return CouponInterface[]
+     */
+    private function getAutomaticCoupons(array $sessionCoupons): array
+    {
+        $sessionCodes = array_map(
+            static fn (CouponInterface $coupon): string => $coupon->getCode(),
+            $sessionCoupons,
+        );
+
+        $now = new \DateTime();
+
+        // The same rules buildCouponFromCode() applies: enabled, started (or no start
+        // date), not expired.
+        $models = CouponQuery::create()
+            ->filterByIsEnabled(true)
+            ->filterByTriggerMode(Coupon::TRIGGER_MODE_AUTOMATIC)
+            ->filterByExpirationDate($now, Criteria::GREATER_EQUAL)
+            ->condition('start_unset', CouponTableMap::COL_START_DATE.' IS NULL')
+            ->condition('start_reached', CouponTableMap::COL_START_DATE.' <= ?', $now)
+            ->where(['start_unset', 'start_reached'], Criteria::LOGICAL_OR)
+            ->find();
+
+        $coupons = [];
+
+        /** @var Coupon $model */
+        foreach ($models as $model) {
+            $code = $model->getCode();
+
+            if (null !== $code && '' !== $code && \in_array($code, $sessionCodes, true)) {
+                continue;
+            }
+
+            if (!$model->isUsageUnlimited()) {
+                if (!($customer = $this->facade->getCustomer()) instanceof Customer) {
+                    continue;
+                }
+
+                if ($model->getUsagesLeft($customer->getId()) <= 0) {
+                    continue;
+                }
+            }
+
+            try {
+                $coupon = $this->couponFactory->buildCouponFromModel($model);
+            } catch (\Exception $ex) {
+                Tlog::getInstance()->warning(
+                    \sprintf('Automatic promotion %d ignored, exception occurred: %s', $model->getId(), $ex->getMessage()),
+                );
+
+                continue;
+            }
+
+            if (0 === $coupon->getConditions()->count()) {
+                continue;
+            }
+
+            $coupons[] = $coupon;
+        }
+
+        return $coupons;
+    }
+
+    /**
+     * The taxed total of the offered lines of the cart, which the facade totals
+     * deliberately leave out.
+     */
+    private function offeredLinesTaxedTotal(): float
+    {
+        $cart = $this->facade->getCart();
+
+        if (null === $cart) {
+            return 0.0;
+        }
+
+        $country = $this->facade->getDeliveryCountry();
+        $total = 0.0;
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered()) {
+                $total += $cartItem->getTotalRealTaxedPrice($country);
+            }
+        }
+
+        return $total;
+    }
+
+    private function getSession(): ?Session
+    {
+        $request = $this->requestStack->getMainRequest();
+
+        if (null === $request || !$request->hasSession()) {
+            return null;
+        }
+
+        $session = $request->getSession();
+
+        return $session instanceof Session ? $session : null;
+    }
+
     public function pushCouponInSession($code): void
     {
         $this->facade->pushCouponInSession($code);
+
+        $this->invalidateCurrentCoupons();
     }
 
     /**
@@ -208,29 +371,48 @@ class CouponManager
      * Sort Coupon to keep
      * Coupon not cumulative cancels previous.
      *
+     * The coupons that do not apply to this cart are dropped FIRST: a coupon only
+     * takes part in the cumulative rule when it actually matches, otherwise a
+     * non-cumulative promotion whose conditions are not even met would evict the
+     * coupons the customer is entitled to. The cumulative rule between the
+     * matching coupons is then the historic one, unchanged (its overhaul is #158).
+     *
      * @param array $coupons CouponInterface to process
      *
      * @return array Array of CouponInterface sorted
      */
     protected function sortCoupons(array $coupons): array
     {
-        $couponsKept = [];
+        $matchingCoupons = [];
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            if ($coupon && !$coupon->isExpired()) {
-                if ($coupon->isCumulative()) {
-                    if (isset($couponsKept[0])) {
-                        /** @var CouponInterface $previousCoupon */
-                        $previousCoupon = $couponsKept[0];
+            if (!$coupon || $coupon->isExpired()) {
+                continue;
+            }
 
-                        if ($previousCoupon->isCumulative()) {
-                            // Add Coupon
-                            $couponsKept[] = $coupon;
-                        } else {
-                            // Reset Coupons, add last
-                            $couponsKept = [$coupon];
-                        }
+            try {
+                if ($coupon->isMatching()) {
+                    $matchingCoupons[] = $coupon;
+                }
+            } catch (UnmatchableConditionException) {
+                // ignore unmatchable coupon
+                continue;
+            }
+        }
+
+        $couponsKept = [];
+
+        /** @var CouponInterface $coupon */
+        foreach ($matchingCoupons as $coupon) {
+            if ($coupon->isCumulative()) {
+                if (isset($couponsKept[0])) {
+                    /** @var CouponInterface $previousCoupon */
+                    $previousCoupon = $couponsKept[0];
+
+                    if ($previousCoupon->isCumulative()) {
+                        // Add Coupon
+                        $couponsKept[] = $coupon;
                     } else {
                         // Reset Coupons, add last
                         $couponsKept = [$coupon];
@@ -239,21 +421,9 @@ class CouponManager
                     // Reset Coupons, add last
                     $couponsKept = [$coupon];
                 }
-            }
-        }
-
-        $coupons = $couponsKept;
-        $couponsKept = [];
-
-        /** @var CouponInterface $coupon */
-        foreach ($coupons as $coupon) {
-            try {
-                if ($coupon->isMatching()) {
-                    $couponsKept[] = $coupon;
-                }
-            } catch (UnmatchableConditionException) {
-                // ignore unmatchable coupon
-                continue;
+            } else {
+                // Reset Coupons, add last
+                $couponsKept = [$coupon];
             }
         }
 

@@ -116,6 +116,13 @@ class Coupon extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $code = null;
 
+    // What makes the promotion apply: the customer typing its code, or the cart
+    // matching its conditions. Read only — the trigger mode decides whether a
+    // code is required at all, so it is set through the coupon events, which
+    // enforce that pairing.
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $triggerMode = null;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $type = null;
 
@@ -194,6 +201,18 @@ class Coupon extends AbstractTranslatableResource
     public function setCode(?string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getTriggerMode(): ?string
+    {
+        return $this->triggerMode;
+    }
+
+    public function setTriggerMode(?string $triggerMode): self
+    {
+        $this->triggerMode = $triggerMode;
 
         return $this;
     }

@@ -21,6 +21,7 @@ use Thelia\Condition\Implementation\CartContainsProducts;
 use Thelia\Condition\Implementation\ForSomeCustomers;
 use Thelia\Condition\Implementation\MatchBillingCountries;
 use Thelia\Condition\Implementation\MatchDeliveryCountries;
+use Thelia\Condition\Implementation\MatchDeliveryModules;
 use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
@@ -29,6 +30,7 @@ use Thelia\Condition\Implementation\StartDate;
 use Thelia\Domain\Promotion\Coupon\BaseFacade;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
+use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
 use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Domain\Promotion\Coupon\Type\RemoveAmountOnAttributeValues;
 use Thelia\Domain\Promotion\Coupon\Type\RemoveAmountOnCategories;
@@ -58,6 +60,7 @@ return static function (ContainerConfigurator $configurator): void {
     $services->alias('thelia.coupon.type.remove_amount_on_attribute_av', RemoveAmountOnAttributeValues::class)->public();
     $services->alias('thelia.coupon.type.remove_percentage_on_attribute_av', RemovePercentageOnAttributeValues::class)->public();
     $services->alias('thelia.coupon.type.free_product', FreeProduct::class)->public();
+    $services->alias('thelia.coupon.type.buy_x_get_y', BuyXGetY::class)->public();
 
     $services->alias('thelia.condition.validator', ConditionEvaluator::class)->public();
     $services->alias('thelia.condition.match_for_everyone', MatchForEveryone::class)->public();
@@ -65,6 +68,7 @@ return static function (ContainerConfigurator $configurator): void {
     $services->alias('thelia.condition.match_for_x_articles', MatchForXArticles::class)->public();
     $services->alias('thelia.condition.match_for_x_articles_include_quantity', MatchForXArticlesIncludeQuantity::class)->public();
     $services->alias('thelia.condition.match_delivery_countries', MatchDeliveryCountries::class)->public();
+    $services->alias('thelia.condition.match_delivery_modules', MatchDeliveryModules::class)->public();
     $services->alias('thelia.condition.match_billing_countries', MatchBillingCountries::class)->public();
     $services->alias('thelia.condition.start_date', StartDate::class)->public();
     $services->alias('thelia.condition.cart_contains_categories', CartContainsCategories::class)->public();

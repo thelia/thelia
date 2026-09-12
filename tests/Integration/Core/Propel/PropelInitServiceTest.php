@@ -77,6 +77,20 @@ final class PropelInitServiceTest extends IntegrationTestCase
         self::assertSame(['ActiveModule'], $this->getActiveModuleCodes());
     }
 
+    /**
+     * A cache clear running on one worker takes the init file away while others
+     * are booting on a stat cache that still lists it: loading the runtime then
+     * killed the request. Answering "rebuild me" keeps the boot alive.
+     */
+    public function testLoadingTheRuntimeWithoutItsInitFileAsksForARebuild(): void
+    {
+        self::assertFileDoesNotExist($this->service->getPropelInitFile());
+
+        $method = new \ReflectionMethod($this->service, 'loadPropelRuntime');
+
+        self::assertNull($method->invoke($this->service));
+    }
+
     private function getActiveModuleCodes(): ?array
     {
         $method = new \ReflectionMethod($this->service, 'getActiveModuleCodes');

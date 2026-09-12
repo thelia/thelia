@@ -29,6 +29,8 @@ use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturnQuery;
+use Thelia\Model\OrderReturnVersionQuery;
 
 /**
  * Erases the identifying data of a customer while keeping the accounting
@@ -73,6 +75,7 @@ final readonly class CustomerAnonymizer
 
         try {
             $this->anonymizeOrderAddresses($customer, $connection);
+            $this->anonymizeOrderReturns($customer, $connection);
             $this->anonymizeOrderConsents($customer, $connection);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
@@ -134,6 +137,36 @@ final readonly class CustomerAnonymizer
                 ->setPhone(null)
                 ->setCellphone(null)
                 ->save($connection);
+        }
+    }
+
+    /**
+     * A return stays attached to its order for the accounting record, but the
+     * free text written on it is personal data and is cleared in place: the
+     * comment the customer typed when opening the return, and the reason the
+     * merchant typed when refusing it - which names the customer as often as
+     * not. The versionable history keeps a full copy of every past revision,
+     * both texts included, so those rows are dropped as well, and the version
+     * number goes back to zero rather than pointing at a revision that is no
+     * longer there.
+     */
+    private function anonymizeOrderReturns(Customer $customer, ConnectionInterface $connection): void
+    {
+        $returns = OrderReturnQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->find($connection);
+
+        foreach ($returns as $return) {
+            $return
+                ->setCustomerComment(null)
+                ->setRefusalReason(null)
+                ->setVersion(0)
+                ->setDisableVersioning(true)
+                ->save($connection);
+
+            OrderReturnVersionQuery::create()
+                ->filterById($return->getId())
+                ->delete($connection);
         }
     }
 

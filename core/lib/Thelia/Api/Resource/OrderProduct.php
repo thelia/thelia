@@ -109,6 +109,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_READ,
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
@@ -127,6 +131,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productRef;
@@ -138,6 +146,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ_SINGLE,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productSaleElementsRef;
@@ -158,6 +170,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_ADMIN_READ_SINGLE,
         Order::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_READ_SINGLE,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     public ?string $title = null;
 
@@ -185,6 +201,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     // order_product.quantity is a FLOAT: a line of goods sold by weight carries
@@ -198,6 +218,10 @@ class OrderProduct implements PropelResourceInterface
         Order::GROUP_FRONT_READ_SINGLE,
         Order::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
+        OrderReturn::GROUP_ADMIN_READ,
+        OrderReturn::GROUP_FRONT_READ,
+        OrderReturnLine::GROUP_ADMIN_READ,
+        OrderReturnLine::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $price;
@@ -291,6 +315,13 @@ class OrderProduct implements PropelResourceInterface
         self::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $virtualDocument = null;
+
+    /**
+     * Whether a promotion offered this line. Read only: the order says what the cart
+     * said when it was placed, and no caller gets to turn a paid line into a gift.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public bool $isOffered = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt = null;
@@ -609,6 +640,18 @@ class OrderProduct implements PropelResourceInterface
     public function getVirtualDocument(): ?string
     {
         return $this->virtualDocument;
+    }
+
+    public function isOffered(): bool
+    {
+        return $this->isOffered;
+    }
+
+    public function setIsOffered(bool $isOffered): self
+    {
+        $this->isOffered = $isOffered;
+
+        return $this;
     }
 
     public function setVirtualDocument(?string $virtualDocument): self
