@@ -47,12 +47,19 @@ use Thelia\Model\ProductAssociationTypeQuery;
 class ProductAssociationType extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @throws \LogicException when the code is already that of another type
+     * The title is what heads the block this type opens on every product sheet: a type
+     * written without one would title that block with nothing.
+     *
+     * @throws \LogicException when the code is already that of another type, or no title is given
      */
     public function create(ProductAssociationTypeCreateEvent $event): void
     {
         if (ProductAssociationTypeQuery::create()->filterByCode($event->getCode())->exists()) {
             throw new \LogicException(Translator::getInstance()->trans('A product relation type with the code "%code" already exists.', ['%code' => $event->getCode()]));
+        }
+
+        if ('' === trim($event->getTitle())) {
+            throw new \LogicException(Translator::getInstance()->trans('A product relation type needs a title: it heads the block it opens on the product sheets.'));
         }
 
         $type = new ProductAssociationTypeModel();
