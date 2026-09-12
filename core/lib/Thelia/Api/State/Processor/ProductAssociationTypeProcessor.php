@@ -99,12 +99,16 @@ final readonly class ProductAssociationTypeProcessor implements ProcessorInterfa
         return $data;
     }
 
+    /**
+     * A payload with no wording — a patch toggling the visibility, typically — writes
+     * the flags alone: the wording of every language stays where it was.
+     */
     private function update(ProductAssociationType $data): ProductAssociationType
     {
         $wordings = $this->wordings($data);
 
         if ([] === $wordings) {
-            $this->dispatchUpdate($data, (string) Lang::getDefaultLanguage()->getLocale(), null, null);
+            $this->dispatch($this->flagsUpdateEvent($data), TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE);
 
             return $data;
         }
@@ -123,17 +127,25 @@ final readonly class ProductAssociationTypeProcessor implements ProcessorInterfa
         }
     }
 
-    private function dispatchUpdate(ProductAssociationType $data, string $locale, ?string $title, ?string $description): void
+    private function dispatchUpdate(ProductAssociationType $data, string $locale, string $title, ?string $description): void
+    {
+        $event = $this->flagsUpdateEvent($data);
+        $event
+            ->setLocale($locale)
+            ->setTitle($title)
+            ->setDescription($description);
+
+        $this->dispatch($event, TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE);
+    }
+
+    private function flagsUpdateEvent(ProductAssociationType $data): ProductAssociationTypeUpdateEvent
     {
         $event = new ProductAssociationTypeUpdateEvent((int) $data->getId());
         $event
-            ->setLocale($locale)
-            ->setTitle($title ?? '')
-            ->setDescription($description)
             ->setVisible((int) $data->isVisible())
             ->setReciprocal((int) $data->isReciprocal());
 
-        $this->dispatch($event, TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE);
+        return $event;
     }
 
     private function delete(ProductAssociationType $data): void
