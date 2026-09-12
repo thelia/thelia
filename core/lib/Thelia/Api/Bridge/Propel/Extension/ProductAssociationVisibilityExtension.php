@@ -34,13 +34,15 @@ use Thelia\Model\ProductAssociationTypeQuery;
  * let anyone read the products a shop has taken offline by walking the relations
  * of a product that is still online.
  *
- * Three rules, because there are three ways for a block not to be offered: the
- * product it points at is offline, the merchant has hidden the type, or one of the
- * two products belongs to a private drop the visitor is not part of — the same
- * rule `/front/products` applies through ReservedSaleVisibility, on both ends of
- * the relation since a relation carries both products whole. All are applied in
- * the query, so the collection and the item read answer the same, and a relation
- * out of reach answers 404 rather than an empty-looking 200.
+ * Three rules, because there are three ways for a block not to be offered: one of
+ * the two products is offline, the merchant has hidden the type, or one of the two
+ * products belongs to a private drop the visitor is not part of — the same rule
+ * `/front/products` applies through ReservedSaleVisibility. The product rules hold
+ * on both ends of the relation, since a relation carries both products whole: the
+ * relations of a product taken offline would hand it out as surely as a relation
+ * pointing at it. All are applied in the query, so the collection and the item
+ * read answer the same, and a relation out of reach answers 404 rather than an
+ * empty-looking 200.
  *
  * The admin endpoints are left alone: a back-office user reads every relation,
  * hidden types and offline products included — that is the point of the screen.
@@ -69,12 +71,14 @@ final readonly class ProductAssociationVisibilityExtension implements QueryColle
         }
 
         if (ProductAssociation::class === $resourceClass && $query instanceof AccessoryQuery) {
-            $query->where($this->isOneOfClause(
-                AccessoryTableMap::COL_ACCESSORY,
-                ProductTableMap::COL_ID,
-                ProductTableMap::TABLE_NAME,
-                ProductTableMap::COL_VISIBLE,
-            ));
+            foreach ([AccessoryTableMap::COL_PRODUCT_ID, AccessoryTableMap::COL_ACCESSORY] as $productColumn) {
+                $query->where($this->isOneOfClause(
+                    $productColumn,
+                    ProductTableMap::COL_ID,
+                    ProductTableMap::TABLE_NAME,
+                    ProductTableMap::COL_VISIBLE,
+                ));
+            }
 
             $query->where($this->isOneOfClause(
                 AccessoryTableMap::COL_TYPE_ID,

@@ -249,6 +249,49 @@ final class ProductAssociationApiTest extends ApiTestCase
         );
     }
 
+    public function testTheRelationsOfAnOfflineProductAreNotServedEither(): void
+    {
+        // The source end of a relation is carried whole too: serving the relations
+        // of a product taken offline hands that product out, wording included.
+        $offline = $this->titledProduct('A product the shop has taken offline');
+        $online = $this->product();
+
+        $this->relate($offline, $online, ProductAssociationType::CODE_ACCESSORY);
+
+        $offline->setVisible(0)->save();
+
+        $payload = $this->readJson('/api/front/product_associations?product.id='.$offline->getId());
+
+        self::assertSame(
+            0,
+            $payload['hydra:totalItems'] ?? -1,
+            'The relations of a product taken offline are served to an anonymous visitor: '
+            .'the front query narrows the accessory end only, never the source end.',
+        );
+        self::assertNotContains(
+            'A product the shop has taken offline',
+            array_column($payload['hydra:member'][0]['product']['i18ns'] ?? [], 'title'),
+            'The wording of a product taken offline is handed out by the relation endpoint.',
+        );
+    }
+
+    public function testARelationWhoseSourceIsOfflineIsNotReachableByItsIdEither(): void
+    {
+        $offline = $this->product();
+        $online = $this->product();
+
+        $this->relate($offline, $online, ProductAssociationType::CODE_ACCESSORY);
+
+        $relations = $this->facade()->getAssociations((int) $offline->getId(), ProductAssociationType::CODE_ACCESSORY);
+        $relationId = (int) $relations[0]->getId();
+
+        $offline->setVisible(0)->save();
+
+        $response = $this->jsonRequest('GET', '/api/front/product_associations/'.$relationId);
+
+        self::assertSame(404, $response->getStatusCode(), 'A relation whose source product is offline stays readable one by one.');
+    }
+
     private function readJson(string $uri): array
     {
         $response = $this->jsonRequest('GET', $uri);
@@ -275,6 +318,11 @@ final class ProductAssociationApiTest extends ApiTestCase
     private function product(): Product
     {
         return $this->createFixtureFactory()->product($this->category, $this->taxRule, $this->currency);
+    }
+
+    private function titledProduct(string $title): Product
+    {
+        return $this->createFixtureFactory()->product($this->category, $this->taxRule, $this->currency, ['title' => $title]);
     }
 
     private function catalogProduct(): Product
