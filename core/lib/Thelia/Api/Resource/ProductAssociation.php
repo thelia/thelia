@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -125,14 +126,17 @@ class ProductAssociation implements PropelResourceInterface, CollectionPreloadab
 
     #[Relation(targetResource: Product::class, relationAlias: 'ProductRelatedByProductId', preload: true)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[NotNull]
     public Product $product;
 
     #[Relation(targetResource: Product::class, relationAlias: 'ProductRelatedByAccessory', preload: true)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[NotNull]
     public Product $associatedProduct;
 
     #[Relation(targetResource: ProductAssociationType::class, relationAlias: 'ProductAssociationType')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[NotNull]
     public ProductAssociationType $type;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
