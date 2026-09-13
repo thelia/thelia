@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -129,6 +130,7 @@ class ProductAssociationType extends AbstractTranslatableResource
         ProductAssociation::GROUP_ADMIN_READ,
         ProductAssociation::GROUP_FRONT_READ,
     ])]
+    #[NotBlank]
     public string $code;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]

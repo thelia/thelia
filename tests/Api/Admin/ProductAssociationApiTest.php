@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Admin;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Product\ProductAssociationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -304,6 +305,41 @@ final class ProductAssociationApiTest extends ApiTestCase
             422,
             $response->getStatusCode(),
             'A type with no title heads a front-office block with nothing: it is refused. Answer was: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+    }
+
+    public function testATypePostedWithoutItsCodeIsRefusedAsUnprocessable(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $this->client->catchExceptions(true);
+
+        $crash = null;
+        $response = null;
+
+        try {
+            $response = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+                'visible' => true,
+                'reciprocal' => false,
+                'i18ns' => ['en_US' => ['title' => 'A block with no code']],
+            ], $token);
+        } catch (\Throwable $thrown) {
+            $crash = $thrown;
+        }
+
+        self::assertNull(
+            $crash,
+            'A type posted without a code is answered, not crashed on: '
+            .(null === $crash ? '' : $crash::class.' — '.$crash->getMessage()),
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A type posted without a code is refused as unprocessable, the way a code already taken and a type with no wording already are: '
             .substr((string) $response->getContent(), 0, 300),
         );
     }
