@@ -132,10 +132,10 @@ class ProductAssociationType extends AbstractTranslatableResource
     public string $code;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public bool $visible;
+    public bool $visible = true;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
-    public bool $reciprocal;
+    public bool $reciprocal = false;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;

@@ -171,6 +171,24 @@ final class ProductAssociationApiTest extends ApiTestCase
         self::assertSame('Spare parts', $created->setLocale('en_US')->getTitle());
     }
 
+    public function testATypePostedWithoutItsFlagsIsCreatedVisibleAndNotReciprocal(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('POST', '/api/admin/product_association_types', [
+            'code' => 'spare_part_unflagged',
+            'i18ns' => ['en_US' => ['title' => 'Spare parts']],
+        ], $token);
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+
+        $created = ProductAssociationTypeQuery::create()->findOneByCode('spare_part_unflagged');
+
+        self::assertInstanceOf(ProductAssociationType::class, $created);
+        self::assertSame(1, $created->getVisible(), 'A flag the payload leaves out falls back on the default the schema carries.');
+        self::assertSame(0, $created->getReciprocal(), 'A flag the payload leaves out falls back on the default the schema carries.');
+    }
+
     public function testTheCodeOfATypeIsIgnoredOnUpdate(): void
     {
         $token = $this->authenticateAsAdmin();
