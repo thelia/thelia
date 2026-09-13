@@ -245,6 +245,44 @@ final class ProductAssociationActionTest extends IntegrationTestCase
         self::assertNotNull($this->relation($product, $accessory, ProductAssociationType::CODE_ACCESSORY));
     }
 
+    public function testRelatingTwiceAnnouncesTheAccessoryAdditionOnlyForTheRowItWrote(): void
+    {
+        $product = $this->product();
+        $accessory = $this->product();
+
+        $announced = 0;
+        $listener = static function () use (&$announced): void {
+            ++$announced;
+        };
+
+        $this->listenTo(TheliaEvents::PRODUCT_ADD_ACCESSORY, $listener, function () use ($product, $accessory): void {
+            $this->add($product, $accessory, ProductAssociationType::CODE_ACCESSORY);
+            $this->add($product, $accessory, ProductAssociationType::CODE_ACCESSORY);
+        });
+
+        self::assertSame(1, $announced, 'One row was written, so one addition is announced');
+    }
+
+    public function testRemovingARelationThatIsNotThereAnnouncesNoAccessoryRemoval(): void
+    {
+        $product = $this->product();
+        $unrelated = $this->product();
+
+        $announced = 0;
+        $listener = static function () use (&$announced): void {
+            ++$announced;
+        };
+
+        $this->listenTo(TheliaEvents::PRODUCT_REMOVE_ACCESSORY, $listener, function () use ($product, $unrelated): void {
+            $this->dispatcher->dispatch(
+                new ProductDeleteAssociationEvent($product, $unrelated->getId(), ProductAssociationType::CODE_ACCESSORY),
+                TheliaEvents::PRODUCT_REMOVE_ASSOCIATION,
+            );
+        });
+
+        self::assertSame(0, $announced, 'No relation was removed, so no removal is announced');
+    }
+
     public function testGetAssociationsFiltersByType(): void
     {
         $product = $this->product();

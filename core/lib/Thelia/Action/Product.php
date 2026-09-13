@@ -621,7 +621,9 @@ class Product extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            if (null === $this->findAssociation($productId, $associatedProductId, $type, $con)) {
+            $written = null === $this->findAssociation($productId, $associatedProductId, $type, $con);
+
+            if ($written) {
                 $association = new Accessory();
 
                 $association
@@ -644,7 +646,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 );
             }
 
-            if ($event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
+            // The accessory event tells its listeners what was written, not what was asked for.
+            if ($written && $event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
                 $dispatcher->dispatch(
                     new ProductAddAccessoryEvent($event->getProduct(), $associatedProductId),
                     TheliaEvents::PRODUCT_ADD_ACCESSORY,
@@ -671,8 +674,9 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         try {
             $association = $this->findAssociation($productId, $associatedProductId, $type, $con);
+            $removed = null !== $association;
 
-            if (null !== $association) {
+            if ($removed) {
                 $association->delete($con);
             }
 
@@ -693,7 +697,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
             }
 
-            if ($event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
+            if ($removed && $event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
                 $dispatcher->dispatch(
                     new ProductDeleteAccessoryEvent($event->getProduct(), $associatedProductId),
                     TheliaEvents::PRODUCT_REMOVE_ACCESSORY,
