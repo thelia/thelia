@@ -87,6 +87,22 @@ use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * The relation types resolved by code while an association operation runs.
+     *
+     * One operation resolves its type several times over: the write itself, the
+     * mirror relation of a reciprocal type, and the accessory event it announces,
+     * whose own listener resolves the accessory type again. A clone repeats that
+     * for every relation of the source product. The map lives as long as the
+     * outermost operation only, so a type deleted and created again between two
+     * operations is never served from it.
+     *
+     * @var array<string, ProductAssociationType>
+     */
+    private array $associationTypesOfTheOperation = [];
+
+    private int $associationOperationDepth = 0;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         private readonly ReservedSaleVisibility $reservedSaleVisibility,
@@ -304,20 +320,23 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     public function cloneAccessories(ProductCloneEvent $event): void
     {
-        // Get original product accessories
-        $originalProductAccessoryList = AccessoryQuery::create()
-            ->findByProductId($event->getOriginalProduct()->getId());
+        $this->resolvingAssociationTypesOnce(function () use ($event): void {
+            // Each relation comes with its type: the code handed to the association event costs no query of its own.
+            $originalProductAccessoryList = AccessoryQuery::create()
+                ->filterByProductId($event->getOriginalProduct()->getId())
+                ->joinWith('ProductAssociationType')
+                ->find();
 
-        // Set clone product accessories
-        /** @var Accessory $originalProductAccessory */
-        foreach ($originalProductAccessoryList as $originalProductAccessory) {
-            $clonedProductAddAssociationEvent = new ProductAddAssociationEvent(
-                $event->getClonedProduct(),
-                (int) $originalProductAccessory->getAccessory(),
-                $originalProductAccessory->getProductAssociationType()->getCode(),
-            );
-            $this->eventDispatcher->dispatch($clonedProductAddAssociationEvent, TheliaEvents::PRODUCT_ADD_ASSOCIATION);
-        }
+            /** @var Accessory $originalProductAccessory */
+            foreach ($originalProductAccessoryList as $originalProductAccessory) {
+                $clonedProductAddAssociationEvent = new ProductAddAssociationEvent(
+                    $event->getClonedProduct(),
+                    (int) $originalProductAccessory->getAccessory(),
+                    $originalProductAccessory->getProductAssociationType()->getCode(),
+                );
+                $this->eventDispatcher->dispatch($clonedProductAddAssociationEvent, TheliaEvents::PRODUCT_ADD_ASSOCIATION);
+            }
+        });
     }
 
     public function cloneAdditionalCategories(ProductCloneEvent $event): void
@@ -563,6 +582,26 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     public function addAccessory(ProductAddAccessoryEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
+        $this->resolvingAssociationTypesOnce(fn () => $this->writeAccessory($event, $dispatcher));
+    }
+
+    public function removeAccessory(ProductDeleteAccessoryEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->resolvingAssociationTypesOnce(fn () => $this->deleteAccessory($event, $dispatcher));
+    }
+
+    public function addAssociation(ProductAddAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->resolvingAssociationTypesOnce(fn () => $this->writeAssociation($event, $dispatcher));
+    }
+
+    public function removeAssociation(ProductDeleteAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->resolvingAssociationTypesOnce(fn () => $this->deleteAssociation($event, $dispatcher));
+    }
+
+    private function writeAccessory(ProductAddAccessoryEvent $event, EventDispatcherInterface $dispatcher): void
+    {
         $type = $this->getProductAssociationType(ProductAssociationType::CODE_ACCESSORY);
 
         if (null !== $this->findAssociation((int) $event->getProduct()->getId(), (int) $event->getAccessoryId(), $type)) {
@@ -580,7 +619,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function removeAccessory(ProductDeleteAccessoryEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    private function deleteAccessory(ProductDeleteAccessoryEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $type = $this->getProductAssociationType(ProductAssociationType::CODE_ACCESSORY);
 
@@ -599,7 +638,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function addAssociation(ProductAddAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    private function writeAssociation(ProductAddAssociationEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $productId = (int) $event->getProduct()->getId();
         $associatedProductId = $event->getAssociatedProductId();
@@ -662,7 +701,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeAssociation(ProductDeleteAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    private function deleteAssociation(ProductDeleteAssociationEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $productId = (int) $event->getProduct()->getId();
         $associatedProductId = $event->getAssociatedProductId();
@@ -712,14 +751,35 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    private function resolvingAssociationTypesOnce(callable $work): void
+    {
+        ++$this->associationOperationDepth;
+
+        try {
+            $work();
+        } finally {
+            if (0 === --$this->associationOperationDepth) {
+                $this->associationTypesOfTheOperation = [];
+            }
+        }
+    }
+
     private function getProductAssociationType(string $code): ProductAssociationType
     {
+        if (isset($this->associationTypesOfTheOperation[$code])) {
+            return $this->associationTypesOfTheOperation[$code];
+        }
+
         $type = ProductAssociationTypeQuery::create()
             ->filterByCode($code)
             ->findOne();
 
         if (null === $type) {
             throw ProductAssociationTypeNotFoundException::withCode($code);
+        }
+
+        if ($this->associationOperationDepth > 0) {
+            $this->associationTypesOfTheOperation[$code] = $type;
         }
 
         return $type;

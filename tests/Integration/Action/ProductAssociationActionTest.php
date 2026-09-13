@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDi
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddAssociationEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductDeleteAssociationEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -34,9 +35,12 @@ use Thelia\Model\ProductAssociationType;
 use Thelia\Model\TaxRule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 final class ProductAssociationActionTest extends IntegrationTestCase
 {
+    use RecordsSqlQueries;
+
     private EventDispatcherInterface $dispatcher;
     private FixtureFactory $factory;
     private Category $category;
@@ -281,6 +285,34 @@ final class ProductAssociationActionTest extends IntegrationTestCase
         });
 
         self::assertSame(0, $announced, 'No relation was removed, so no removal is announced');
+    }
+
+    public function testCloningAProductResolvesEachRelationTypeOnce(): void
+    {
+        $product = $this->product();
+        // cloneProduct() reads the source wording, which the fixture does not write.
+        $product->setLocale('en_US')->setTitle('Cloneable product')->save();
+
+        $this->factory->accessory($product, $this->product(), 1);
+        $this->factory->accessory($product, $this->product(), 2);
+        $this->factory->accessory($product, $this->product(), 3);
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+
+        $statements = $this->recordSqlQueries(function () use ($event): void {
+            $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+        });
+
+        self::assertSame(
+            3,
+            AccessoryQuery::create()->filterByProductId($event->getClonedProduct()->getId())->count(),
+            'The clone carries the three relations of its source',
+        );
+        self::assertLessThanOrEqual(
+            1,
+            self::countSqlQueriesSelectingFrom($statements, 'product_association_type'),
+            'Three relations under one type resolve that type once, not once per relation cloned',
+        );
     }
 
     public function testGetAssociationsFiltersByType(): void
