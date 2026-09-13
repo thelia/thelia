@@ -47,6 +47,8 @@ use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
+use Thelia\Model\ProductAssociationType;
+use Thelia\Model\ProductAssociationTypeQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Profile;
@@ -248,21 +250,54 @@ final class FixtureFactory
 
     /**
      * Ties an accessory to a product at the given position, the way the back-office does.
+     */
+    public function accessory(Product $product, Product $accessory, int $position): Accessory
+    {
+        return $this->association($product, $accessory, ProductAssociationType::CODE_ACCESSORY, $position);
+    }
+
+    /**
+     * Relates a product to another under the given type code, at the given position.
      *
      * The position is written after the insert: Accessory::preInsert() overwrites it with the
      * next free one, so a position asked for at creation time never survives.
      */
-    public function accessory(Product $product, Product $accessory, int $position): Accessory
-    {
+    public function association(
+        Product $product,
+        Product $associatedProduct,
+        string $typeCode,
+        int $position,
+    ): Accessory {
         $link = new Accessory();
         $link
             ->setProductId($product->getId())
-            ->setAccessory($accessory->getId())
+            ->setAccessory($associatedProduct->getId())
+            ->setTypeId($this->productAssociationType($typeCode)->getId())
             ->save($this->connection);
 
         $link->setPosition($position)->save($this->connection);
 
         return $link;
+    }
+
+    public function productAssociationType(string $code, array $overrides = []): ProductAssociationType
+    {
+        $existing = ProductAssociationTypeQuery::create()
+            ->filterByCode($code)
+            ->findOne($this->connection);
+
+        if (null !== $existing && [] === $overrides) {
+            return $existing;
+        }
+
+        $type = $existing ?? new ProductAssociationType();
+        $type
+            ->setCode($code)
+            ->setVisible($overrides['visible'] ?? 1)
+            ->setReciprocal($overrides['reciprocal'] ?? 0)
+            ->save($this->connection);
+
+        return $type;
     }
 
     public function customer(

@@ -17,12 +17,12 @@ namespace Thelia\Domain\Catalog\Product;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
-use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
+use Thelia\Core\Event\Product\ProductAddAssociationEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
-use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteAssociationEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
@@ -38,7 +38,11 @@ use Thelia\Domain\Catalog\Product\DTO\ProductSeoDTO;
 use Thelia\Domain\Catalog\Product\DTO\ProductUpdateDTO;
 use Thelia\Domain\Catalog\Product\DTO\ProductWithPSECreateDTO;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
+use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
+use Thelia\Model\Accessory;
+use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Product;
+use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -224,20 +228,23 @@ final readonly class ProductFacade
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_CONTENT);
     }
 
+    /**
+     * Kept for compatibility: relates a product under the accessory type.
+     */
     public function addAccessory(int $productId, int $accessoryProductId): void
     {
-        $product = $this->getById($productId);
-
-        if (null === $product) {
-            throw ProductNotFoundException::withId($productId);
-        }
-
-        $event = new ProductAddAccessoryEvent($product, $accessoryProductId);
-
-        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_ACCESSORY);
+        $this->addAssociation($productId, $accessoryProductId, ProductAssociationType::CODE_ACCESSORY);
     }
 
+    /**
+     * Kept for compatibility: unrelates a product under the accessory type.
+     */
     public function removeAccessory(int $productId, int $accessoryProductId): void
+    {
+        $this->removeAssociation($productId, $accessoryProductId, ProductAssociationType::CODE_ACCESSORY);
+    }
+
+    public function addAssociation(int $productId, int $associatedProductId, string $typeCode): void
     {
         $product = $this->getById($productId);
 
@@ -245,9 +252,48 @@ final readonly class ProductFacade
             throw ProductNotFoundException::withId($productId);
         }
 
-        $event = new ProductDeleteAccessoryEvent($product, $accessoryProductId);
+        if ($productId === $associatedProductId) {
+            throw SelfAssociationException::forProduct($productId);
+        }
 
-        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_ACCESSORY);
+        $event = new ProductAddAssociationEvent($product, $associatedProductId, $typeCode);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_ASSOCIATION);
+    }
+
+    public function removeAssociation(int $productId, int $associatedProductId, string $typeCode): void
+    {
+        $product = $this->getById($productId);
+
+        if (null === $product) {
+            throw ProductNotFoundException::withId($productId);
+        }
+
+        $event = new ProductDeleteAssociationEvent($product, $associatedProductId, $typeCode);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_ASSOCIATION);
+    }
+
+    /**
+     * @return Accessory[]
+     */
+    public function getAssociations(int $productId, ?string $typeCode = null): array
+    {
+        $query = AccessoryQuery::create()
+            ->filterByProductId($productId);
+
+        if (null !== $typeCode) {
+            $query
+                ->useProductAssociationTypeQuery()
+                    ->filterByCode($typeCode)
+                ->endUse();
+        }
+
+        return $query
+            ->orderByTypeId()
+            ->orderByPosition()
+            ->find()
+            ->getData();
     }
 
     public function setTemplate(int $productId, ?int $templateId, ?int $currencyId = null): Product

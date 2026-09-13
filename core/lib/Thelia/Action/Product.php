@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -26,11 +27,13 @@ use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
+use Thelia\Core\Event\Product\ProductAddAssociationEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteAssociationEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
@@ -44,6 +47,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundException;
+use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
+use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
@@ -55,6 +61,7 @@ use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\Map\AccessoryTableMap;
 use Thelia\Model\Map\AttributeTemplateTableMap;
 use Thelia\Model\Map\FeatureTemplateTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -62,6 +69,8 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductAssociationType;
+use Thelia\Model\ProductAssociationTypeQuery;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductDocument;
@@ -302,8 +311,12 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product accessories
         /** @var Accessory $originalProductAccessory */
         foreach ($originalProductAccessoryList as $originalProductAccessory) {
-            $clonedProductAddAccessoryEvent = new ProductAddAccessoryEvent($event->getClonedProduct(), $originalProductAccessory->getAccessory());
-            $this->eventDispatcher->dispatch($clonedProductAddAccessoryEvent, TheliaEvents::PRODUCT_ADD_ACCESSORY);
+            $clonedProductAddAssociationEvent = new ProductAddAssociationEvent(
+                $event->getClonedProduct(),
+                (int) $originalProductAccessory->getAccessory(),
+                $originalProductAccessory->getProductAssociationType()->getCode(),
+            );
+            $this->eventDispatcher->dispatch($clonedProductAddAssociationEvent, TheliaEvents::PRODUCT_ADD_ASSOCIATION);
         }
     }
 
@@ -548,30 +561,177 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addAccessory(ProductAddAccessoryEvent $event): void
+    public function addAccessory(ProductAddAccessoryEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        if (AccessoryQuery::create()
-            ->filterByAccessory($event->getAccessoryId())
-            ->filterByProductId($event->getProduct()->getId())->count() <= 0) {
-            $accessory = new Accessory();
+        $type = $this->getProductAssociationType(ProductAssociationType::CODE_ACCESSORY);
 
-            $accessory
-                ->setProductId((int) $event->getProduct()->getId())
-                ->setAccessory($event->getAccessoryId())
-                ->save();
+        if (null !== $this->findAssociation((int) $event->getProduct()->getId(), (int) $event->getAccessoryId(), $type)) {
+            return;
+        }
+
+        $dispatcher->dispatch(
+            new ProductAddAssociationEvent(
+                $event->getProduct(),
+                (int) $event->getAccessoryId(),
+                $type->getCode(),
+                announceAccessoryEvent: false,
+            ),
+            TheliaEvents::PRODUCT_ADD_ASSOCIATION,
+        );
+    }
+
+    public function removeAccessory(ProductDeleteAccessoryEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $type = $this->getProductAssociationType(ProductAssociationType::CODE_ACCESSORY);
+
+        if (null === $this->findAssociation((int) $event->getProduct()->getId(), (int) $event->getAccessoryId(), $type)) {
+            return;
+        }
+
+        $dispatcher->dispatch(
+            new ProductDeleteAssociationEvent(
+                $event->getProduct(),
+                (int) $event->getAccessoryId(),
+                $type->getCode(),
+                announceAccessoryEvent: false,
+            ),
+            TheliaEvents::PRODUCT_REMOVE_ASSOCIATION,
+        );
+    }
+
+    public function addAssociation(ProductAddAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $productId = (int) $event->getProduct()->getId();
+        $associatedProductId = $event->getAssociatedProductId();
+
+        if ($productId === $associatedProductId) {
+            throw SelfAssociationException::forProduct($productId);
+        }
+
+        $associatedProduct = ProductQuery::create()->findPk($associatedProductId);
+
+        if (null === $associatedProduct) {
+            throw ProductNotFoundException::withId($associatedProductId);
+        }
+
+        $type = $this->getProductAssociationType($event->getTypeCode());
+
+        $con = Propel::getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+            if (null === $this->findAssociation($productId, $associatedProductId, $type, $con)) {
+                $association = new Accessory();
+
+                $association
+                    ->setProductId($productId)
+                    ->setAccessory($associatedProductId)
+                    ->setTypeId($type->getId())
+                    ->save($con);
+            }
+
+            if ($event->appliesReciprocity() && $type->isReciprocal()) {
+                $dispatcher->dispatch(
+                    new ProductAddAssociationEvent(
+                        $associatedProduct,
+                        $productId,
+                        $type->getCode(),
+                        applyReciprocity: false,
+                        announceAccessoryEvent: $event->announcesAccessoryEvent(),
+                    ),
+                    TheliaEvents::PRODUCT_ADD_ASSOCIATION,
+                );
+            }
+
+            if ($event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
+                $dispatcher->dispatch(
+                    new ProductAddAccessoryEvent($event->getProduct(), $associatedProductId),
+                    TheliaEvents::PRODUCT_ADD_ACCESSORY,
+                );
+            }
+
+            $con->commit();
+        } catch (\Throwable $exception) {
+            $con->rollBack();
+
+            throw $exception;
         }
     }
 
-    public function removeAccessory(ProductDeleteAccessoryEvent $event): void
+    public function removeAssociation(ProductDeleteAssociationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        $accessory = AccessoryQuery::create()
-            ->filterByAccessory($event->getAccessoryId())
-            ->filterByProductId($event->getProduct()->getId())->findOne();
+        $productId = (int) $event->getProduct()->getId();
+        $associatedProductId = $event->getAssociatedProductId();
+        $type = $this->getProductAssociationType($event->getTypeCode());
 
-        if (null !== $accessory) {
-            $accessory
-                ->delete();
+        $con = Propel::getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+            $association = $this->findAssociation($productId, $associatedProductId, $type, $con);
+
+            if (null !== $association) {
+                $association->delete($con);
+            }
+
+            if ($event->appliesReciprocity() && $type->isReciprocal()) {
+                $associatedProduct = ProductQuery::create()->findPk($associatedProductId, $con);
+
+                if (null !== $associatedProduct) {
+                    $dispatcher->dispatch(
+                        new ProductDeleteAssociationEvent(
+                            $associatedProduct,
+                            $productId,
+                            $type->getCode(),
+                            applyReciprocity: false,
+                            announceAccessoryEvent: $event->announcesAccessoryEvent(),
+                        ),
+                        TheliaEvents::PRODUCT_REMOVE_ASSOCIATION,
+                    );
+                }
+            }
+
+            if ($event->announcesAccessoryEvent() && ProductAssociationType::CODE_ACCESSORY === $type->getCode()) {
+                $dispatcher->dispatch(
+                    new ProductDeleteAccessoryEvent($event->getProduct(), $associatedProductId),
+                    TheliaEvents::PRODUCT_REMOVE_ACCESSORY,
+                );
+            }
+
+            $con->commit();
+        } catch (\Throwable $exception) {
+            $con->rollBack();
+
+            throw $exception;
         }
+    }
+
+    private function getProductAssociationType(string $code): ProductAssociationType
+    {
+        $type = ProductAssociationTypeQuery::create()
+            ->filterByCode($code)
+            ->findOne();
+
+        if (null === $type) {
+            throw ProductAssociationTypeNotFoundException::withCode($code);
+        }
+
+        return $type;
+    }
+
+    private function findAssociation(
+        int $productId,
+        int $associatedProductId,
+        ProductAssociationType $type,
+        ?ConnectionInterface $con = null,
+    ): ?Accessory {
+        return AccessoryQuery::create()
+            ->filterByProductId($productId)
+            ->filterByAccessory($associatedProductId)
+            ->filterByTypeId($type->getId())
+            ->findOne($con);
     }
 
     public function setProductTemplate(ProductSetTemplateEvent $event): void
@@ -674,6 +834,11 @@ class Product extends BaseAction implements EventSubscriberInterface
      * Changes accessry position, selecting absolute ou relative change.
      */
     public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->genericUpdatePosition(AccessoryQuery::create(), $event, $dispatcher);
+    }
+
+    public function updateAssociationPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(AccessoryQuery::create(), $event, $dispatcher);
     }
@@ -910,6 +1075,10 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_ADD_ACCESSORY => ['addAccessory', 128],
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY => ['removeAccessory', 128],
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => ['updateAccessoryPosition', 128],
+
+            TheliaEvents::PRODUCT_ADD_ASSOCIATION => ['addAssociation', 128],
+            TheliaEvents::PRODUCT_REMOVE_ASSOCIATION => ['removeAssociation', 128],
+            TheliaEvents::PRODUCT_UPDATE_ASSOCIATION_POSITION => ['updateAssociationPosition', 128],
 
             TheliaEvents::PRODUCT_ADD_CATEGORY => ['addCategory', 128],
             TheliaEvents::PRODUCT_REMOVE_CATEGORY => ['removeCategory', 128],
