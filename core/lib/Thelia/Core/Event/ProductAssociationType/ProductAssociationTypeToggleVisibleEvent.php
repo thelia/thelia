@@ -16,24 +16,8 @@ namespace Thelia\Core\Event\ProductAssociationType;
 
 class ProductAssociationTypeToggleVisibleEvent extends ProductAssociationTypeEvent
 {
-    protected int $productAssociationTypeId;
-
     public function __construct(int $productAssociationTypeId)
     {
-        parent::__construct();
-
-        $this->productAssociationTypeId = $productAssociationTypeId;
-    }
-
-    public function getProductAssociationTypeId(): int
-    {
-        return $this->productAssociationTypeId;
-    }
-
-    public function setProductAssociationTypeId(int $productAssociationTypeId): static
-    {
-        $this->productAssociationTypeId = $productAssociationTypeId;
-
-        return $this;
+        parent::__construct(productAssociationTypeId: $productAssociationTypeId);
     }
 }

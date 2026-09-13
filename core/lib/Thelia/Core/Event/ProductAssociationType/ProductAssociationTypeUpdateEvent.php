@@ -24,8 +24,6 @@ namespace Thelia\Core\Event\ProductAssociationType;
  */
 class ProductAssociationTypeUpdateEvent extends ProductAssociationTypeCreateEvent
 {
-    protected int $productAssociationTypeId;
-
     private bool $carriesTitle = false;
     private bool $carriesDescription = false;
     private bool $carriesVisible = false;
@@ -33,9 +31,7 @@ class ProductAssociationTypeUpdateEvent extends ProductAssociationTypeCreateEven
 
     public function __construct(int $productAssociationTypeId)
     {
-        parent::__construct();
-
-        $this->productAssociationTypeId = $productAssociationTypeId;
+        parent::__construct(productAssociationTypeId: $productAssociationTypeId);
     }
 
     public function setTitle(string $title): static
@@ -89,17 +85,5 @@ class ProductAssociationTypeUpdateEvent extends ProductAssociationTypeCreateEven
     public function carriesReciprocal(): bool
     {
         return $this->carriesReciprocal;
-    }
-
-    public function getProductAssociationTypeId(): int
-    {
-        return $this->productAssociationTypeId;
-    }
-
-    public function setProductAssociationTypeId(int $productAssociationTypeId): static
-    {
-        $this->productAssociationTypeId = $productAssociationTypeId;
-
-        return $this;
     }
 }
