@@ -84,10 +84,20 @@ class ProductAssociationType extends BaseAction implements EventSubscriberInterf
      * sent without a description leaves the description of that language alone. The
      * code is deliberately left out: it is the stable identifier the core and the
      * themes hold this type by.
+     *
+     * The shop language is the one every other falls back on: emptying its title would
+     * leave the block this type opens on every product sheet with nothing to print, so
+     * that update is refused. Another language may drop its title and fall back.
+     *
+     * @throws \LogicException when the update empties the title of the shop language
      */
     public function update(ProductAssociationTypeUpdateEvent $event): void
     {
         $type = $this->getProductAssociationType($event->getProductAssociationTypeId());
+
+        if ($event->carriesTitle() && '' === trim($event->getTitle()) && $this->isShopLanguage($event->getLocale())) {
+            throw new \LogicException(Translator::getInstance()->trans('The product relation type "%code" cannot lose its title in the shop language: it heads the block it opens on the product sheets.', ['%code' => (string) $type->getCode()]));
+        }
 
         if ($event->carriesVisible()) {
             $type->setVisible($event->getVisible());
@@ -177,7 +187,7 @@ class ProductAssociationType extends BaseAction implements EventSubscriberInterf
      */
     private function fillShopLanguage(ProductAssociationTypeModel $type, string $writtenLocale, ?string $title, ?string $description): void
     {
-        $shopLocale = (string) Lang::getDefaultLanguage()->getLocale();
+        $shopLocale = $this->shopLocale();
 
         if ($shopLocale === $writtenLocale) {
             return;
@@ -200,6 +210,16 @@ class ProductAssociationType extends BaseAction implements EventSubscriberInterf
 
         // The caller reads the type back in the language it was written in.
         $type->setLocale($writtenLocale);
+    }
+
+    private function isShopLanguage(string $locale): bool
+    {
+        return $this->shopLocale() === $locale;
+    }
+
+    private function shopLocale(): string
+    {
+        return (string) Lang::getDefaultLanguage()->getLocale();
     }
 
     private function getProductAssociationType(int $productAssociationTypeId): ProductAssociationTypeModel

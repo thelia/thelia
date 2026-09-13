@@ -566,6 +566,7 @@ return [
     'The product relation type "%code" still holds %count relations and cannot be deleted. Remove them first, or hide the type.' => "Le type de relation « %code » porte encore %count relations et ne peut pas être supprimé. Retirez-les d'abord, ou masquez le type.",
     'A product relation type with the code "%code" already exists.' => 'Un type de relation portant le code « %code » existe déjà.',
     'A product relation type needs a title: it heads the block it opens on the product sheets.' => 'Un type de relation doit avoir un titre : c\'est lui qui coiffe le bloc qu\'il ouvre sur les fiches produit.',
+    'The product relation type "%code" cannot lose its title in the shop language: it heads the block it opens on the product sheets.' => 'Le type de relation « %code » ne peut pas perdre son titre dans la langue de la boutique : c\'est lui qui coiffe le bloc qu\'il ouvre sur les fiches produit.',
     'The archiver :name is not available. Please install the php extension :extension first.' => "L'archiveur :name n'est pas disponible. Vous devez installer l'extension PHP :extension.",
     'The archiver identifier "%archiverId" doesn\’t exist' => 'L\'identifiant d\'archiveur «%archiverId » n"existe pas',
     'The brand name or title' => 'Le nom ou le titre de la marque',

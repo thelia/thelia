@@ -277,6 +277,32 @@ final class ProductAssociationTypeActionTest extends IntegrationTestCase
         );
     }
 
+    public function testAnUpdateCannotLeaveTheShopLanguageWithoutATitle(): void
+    {
+        $type = $this->freshType('bundles');
+        $shopLocale = $this->shopLocale();
+
+        try {
+            $this->dispatcher->dispatch(
+                (new ProductAssociationTypeUpdateEvent($type->getId()))
+                    ->setLocale($shopLocale)
+                    ->setTitle(''),
+                TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE,
+            );
+
+            self::fail('Emptying the title of the shop language must be refused.');
+        } catch (\LogicException) {
+        }
+
+        $reread = $this->reload($type->getId())->setLocale($shopLocale);
+
+        self::assertSame(
+            'Bundles',
+            $reread->getTitle(),
+            'The title heads the block this type opens on every product sheet: the shop language keeps the one it had.',
+        );
+    }
+
     private function freshType(string $code): ProductAssociationType
     {
         $event = new ProductAssociationTypeCreateEvent();
