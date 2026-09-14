@@ -122,9 +122,7 @@ final class ProductAccessoriesTest extends WebIntegrationTestCase
      */
     public function testAProductWithoutAccessoriesCarriesNoStrip(): void
     {
-        $factory = $this->factory();
-        $product = $this->product($factory, $factory->category(), 'Product page under test');
-        $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
+        $this->productUnderTest($this->factory());
 
         $this->assertPageRenders('/'.self::PRODUCT_URL);
 
@@ -141,8 +139,7 @@ final class ProductAccessoriesTest extends WebIntegrationTestCase
     {
         $factory = $this->factory();
 
-        $product = $this->product($factory, $factory->category(), 'Product page under test');
-        $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
+        $product = $this->productUnderTest($factory);
 
         // The accessories live in their own category so the category strip of the page cannot
         // list them too, which would say nothing about the order of the accessories strip.
@@ -171,6 +168,23 @@ final class ProductAccessoriesTest extends WebIntegrationTestCase
     private function factory(): FixtureFactory
     {
         return new FixtureFactory($this->getPropelConnection());
+    }
+
+    /**
+     * The category holds one more product than the one under test: the category strip leaves the
+     * product being read out of its own suggestions, and a category with nothing else in it would
+     * carry no strip at all.
+     */
+    private function productUnderTest(FixtureFactory $factory): Product
+    {
+        $shelf = $factory->category();
+
+        $product = $this->product($factory, $shelf, 'Product page under test');
+        $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
+
+        $this->product($factory, $shelf, 'A neighbour on the same shelf');
+
+        return $product;
     }
 
     private function product(FixtureFactory $factory, Category $category, string $title): Product

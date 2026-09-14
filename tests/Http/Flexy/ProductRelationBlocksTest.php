@@ -122,10 +122,19 @@ final class ProductRelationBlocksTest extends WebIntegrationTestCase
         self::assertStringContainsString('A product still offered', $content);
     }
 
+    /**
+     * The category holds one more product than the one under test: the category strip leaves the
+     * product being read out of its own suggestions, and a category with nothing else in it would
+     * carry no strip at all.
+     */
     private function productUnderTest(): Product
     {
-        $product = $this->product($this->factory()->category(), 'Product page under test');
+        $shelf = $this->factory()->category();
+
+        $product = $this->product($shelf, 'Product page under test');
         $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
+
+        $this->product($shelf, 'A neighbour on the same shelf');
 
         return $product;
     }
