@@ -187,7 +187,9 @@ class Install extends ContainerAwareCommand
             '',
         ]);
 
-        $this->registerModules($output, $connectionInfo);
+        if (!$this->registerModules($output, $connectionInfo)) {
+            return Command::FAILURE;
+        }
 
         $this->handleThemesBundle($input, $output);
 
@@ -202,12 +204,13 @@ class Install extends ContainerAwareCommand
     }
 
     /**
-     * Register every module found on disk into the module table, active by default,
-     * and apply their SQL schemas. Without this step the module table stays empty
-     * after installation: PropelInitService would then fall back to a full
-     * filesystem scan on every boot, and the shop would run with no active module.
+     * Register every module found on disk into the module table, active unless the
+     * distribution lists it as disabled by default, and apply their SQL schemas.
+     * Without this step the module table stays empty after installation:
+     * PropelInitService would then fall back to a full filesystem scan on every boot,
+     * and the shop would run with no active module.
      */
-    private function registerModules(OutputInterface $output, array $connectionInfo): void
+    private function registerModules(OutputInterface $output, array $connectionInfo): bool
     {
         $output->writeln('<info>Registering modules...</info>');
 
@@ -220,19 +223,27 @@ class Install extends ContainerAwareCommand
         );
         $setup->connect();
 
-        $count = $setup->registerAndApplyModules();
+        try {
+            $count = $setup->registerAndApplyModules();
+        } catch (\InvalidArgumentException|\JsonException $e) {
+            $output->writeln(\sprintf('<error>composer.json — %s</error>', $e->getMessage()));
+
+            return false;
+        }
 
         $output->writeln(\sprintf('<info>%d module(s) registered</info>', $count));
 
         foreach ($setup->getWarnings() as $warning) {
             $output->writeln(\sprintf('<comment>WARN %s</comment>', $warning));
         }
+
+        return true;
     }
 
     /**
      * Run postActivation() for all active modules in a separate process, once
      * templates are applied and Propel models are generated. registerModules()
-     * inserts modules with activate=1 but never calls postActivation().
+     * registers modules but never calls postActivation().
      */
     private function runModulesPostActivation(OutputInterface $output, array $connectionInfo): void
     {

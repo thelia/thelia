@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Install;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\TheliaKernel;
 use Thelia\Install\Standalone\DatabaseSetup;
+use Thelia\Install\Standalone\DistributionModuleDefaults;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tools\Version\Version;
@@ -26,6 +28,29 @@ final class DatabaseSetupTest extends IntegrationTestCase
     // lock held by the base class' per-test transaction until lock_wait_timeout (~1 year).
     // DDL tests must opt out of the transactional isolation, per IntegrationTestCase.
     protected bool $useTransaction = false;
+
+    private const string SHIPPED_ACTIVE_CODE = 'InstallSampleShippedActive';
+
+    private const string SHIPPED_INACTIVE_CODE = 'InstallSampleShippedInactive';
+
+    private ?string $moduleDir = null;
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->moduleDir) {
+            $setup = $this->createDatabaseSetup();
+            $setup->connect();
+            $codes = [self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE];
+            $placeholders = implode(',', array_fill(0, \count($codes), '?'));
+            $setup->getPdo()->prepare("DELETE FROM `module_i18n` WHERE `id` IN (SELECT `id` FROM `module` WHERE `code` IN ($placeholders))")->execute($codes);
+            $setup->getPdo()->prepare("DELETE FROM `module` WHERE `code` IN ($placeholders)")->execute($codes);
+
+            (new Filesystem())->remove($this->moduleDir);
+            $this->moduleDir = null;
+        }
+
+        parent::tearDown();
+    }
 
     public function testConstructorRejectsInvalidDatabaseName(): void
     {
@@ -79,6 +104,91 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame($parsedVersion['minus'], ConfigQuery::read('thelia_minus_version', null, true));
         self::assertSame($parsedVersion['release'], ConfigQuery::read('thelia_release_version', null, true));
         self::assertSame($parsedVersion['extra'], ConfigQuery::read('thelia_extra_version', null, true));
+    }
+
+    /**
+     * A module ships active unless the distribution lists it as disabled by default:
+     * the module table row follows that list, and a module the list does not name keeps
+     * the historical behaviour, active on install.
+     */
+    public function testRegisteredModuleFollowsTheDistributionDefaults(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+
+        $count = $setup->registerAndApplyModules([$this->writeSampleModules()], $this->distributionDefaults());
+
+        self::assertSame(2, $count);
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+    }
+
+    /**
+     * Running the install again on a populated database (an update, a second
+     * `bin/install` pass) must never rewrite the activation the merchant chose, in
+     * either direction.
+     */
+    public function testRegisteringAgainKeepsTheActivationTheMerchantChose(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSampleModules();
+        $setup->registerAndApplyModules([$moduleDir], $this->distributionDefaults());
+
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 1 WHERE `code` = ?')->execute([self::SHIPPED_INACTIVE_CODE]);
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 0 WHERE `code` = ?')->execute([self::SHIPPED_ACTIVE_CODE]);
+
+        $setup->registerAndApplyModules([$moduleDir], $this->distributionDefaults());
+
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+    }
+
+    private function distributionDefaults(): DistributionModuleDefaults
+    {
+        return new DistributionModuleDefaults([self::SHIPPED_INACTIVE_CODE]);
+    }
+
+    private function activationOf(\PDO $pdo, string $code): int
+    {
+        $statement = $pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = ?');
+        $statement->execute([$code]);
+
+        $activate = $statement->fetchColumn();
+        self::assertNotFalse($activate, \sprintf('Module %s was not registered.', $code));
+
+        return (int) $activate;
+    }
+
+    /**
+     * Two plain descriptors in a throwaway module directory. Nothing in them says
+     * anything about activation: that is the distribution's call.
+     */
+    private function writeSampleModules(): string
+    {
+        $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
+        $filesystem = new Filesystem();
+
+        foreach ([self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE] as $code) {
+            $filesystem->mkdir($this->moduleDir.$code.'/Config');
+            $filesystem->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+                <?xml version="1.0" encoding="UTF-8"?>
+                <module xmlns="http://thelia.net/schema/dic/module">
+                    <fullnamespace>{$code}\\{$code}</fullnamespace>
+                    <descriptive locale="en_US">
+                        <title>{$code}</title>
+                    </descriptive>
+                    <languages>
+                        <language>en_US</language>
+                    </languages>
+                    <version>1.0.0</version>
+                    <type>classic</type>
+                    <stability>prod</stability>
+                </module>
+                XML);
+        }
+
+        return $this->moduleDir;
     }
 
     /**

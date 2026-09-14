@@ -108,14 +108,32 @@ final class DatabaseSetup
         ]);
     }
 
-    public function registerAndApplyModules(): int
-    {
-        $moduleDirs = array_filter([THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR], 'is_dir');
+    /**
+     * Register every module found in the given directories and apply their SQL schema.
+     *
+     * A module is registered active unless the distribution lists it under
+     * `extra.thelia.modules-disabled-by-default` in the project's composer.json: such a
+     * module ships with the shop but waits for the merchant to activate it from the
+     * back-office. On a database that already knows the module, only the namespace and
+     * the version are refreshed: the activation the merchant chose is never rewritten.
+     *
+     * The list only rules this registration step. A module the selected theme requires
+     * in its composer.json is activated afterwards by template:set whatever the list
+     * says: a module meant to ship inactive must not be a theme dependency.
+     *
+     * @param string[] $moduleDirectories
+     */
+    public function registerAndApplyModules(
+        array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR],
+        ?DistributionModuleDefaults $distributionDefaults = null,
+    ): int {
+        $distributionDefaults ??= DistributionModuleDefaults::fromComposerJson(THELIA_ROOT.'composer.json');
+        $moduleDirs = array_filter($moduleDirectories, 'is_dir');
         $position = 0;
 
         $insertModule = $this->pdo->prepare(
             'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
-             VALUES (:code, :version, :type, :category, 1, :position, :namespace, :mandatory, :hidden, NOW())
+             VALUES (:code, :version, :type, :category, :activate, :position, :namespace, :mandatory, :hidden, NOW())
              ON DUPLICATE KEY UPDATE `full_namespace` = VALUES(`full_namespace`), `version` = VALUES(`version`)'
         );
 
@@ -150,6 +168,7 @@ final class DatabaseSetup
                     'version' => (string) ($xml->version ?? '0.0.1'),
                     'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
                     'category' => $xmlType,
+                    'activate' => $distributionDefaults->isDisabledByDefault($code) ? 0 : 1,
                     'position' => ++$position,
                     'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
                     'mandatory' => (int) ($xml->mandatory ?? 0),

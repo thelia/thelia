@@ -117,6 +117,9 @@ try {
 } catch (\PDOException $e) {
     fwrite(STDERR, "ERROR: Database connection failed — {$e->getMessage()}\n");
     exit(1);
+} catch (\InvalidArgumentException|\JsonException $e) {
+    fwrite(STDERR, "ERROR: composer.json — {$e->getMessage()}\n");
+    exit(1);
 }
 
 /**
