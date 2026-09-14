@@ -83,14 +83,23 @@ final class UpdateScriptTest extends TestCase
 
         self::assertGreaterThan(2, \count($expected), \sprintf('The fresh install seeds %s in fewer locales than expected.', $table));
 
-        self::assertSame(
-            $expected,
-            $this->localesSeededIn($this->pendingScript(), $table),
-            \sprintf(
-                'A shop updated to this version would display %s with no label at all in the missing languages.',
-                $table,
-            ),
-        );
+        $statements = $this->insertsInto($this->pendingScript(), $table);
+
+        self::assertNotEmpty($statements, \sprintf('The pending script seeds nothing into %s: this test has lost its subject.', $table));
+
+        // Every statement on its own, not the script as a whole: a locale another row
+        // of the same table happens to seed does not give this row a label.
+        foreach ($statements as $statement) {
+            self::assertSame(
+                $expected,
+                $this->localesSeededIn($statement, $table),
+                \sprintf(
+                    'A shop updated to this version would display %s with no label at all in the missing languages: %s',
+                    $table,
+                    $this->firstLineOf($statement),
+                ),
+            );
+        }
     }
 
     /**
@@ -251,6 +260,19 @@ final class UpdateScriptTest extends TestCase
     private function freshInstallSeed(): string
     {
         return (string) file_get_contents($this->setupDirectory().'/insert.sql');
+    }
+
+    /**
+     * The INSERT statements of a script that write rows into the given table.
+     *
+     * @return list<string>
+     */
+    private function insertsInto(string $sql, string $table): array
+    {
+        return array_values(array_filter(
+            $this->statementsOf($sql),
+            static fn (string $statement): bool => 1 === preg_match('/^INSERT\\s+(?:IGNORE\\s+)?INTO\\s+`'.preg_quote($table, '/').'`/i', $statement),
+        ));
     }
 
     /**

@@ -189,13 +189,20 @@ INSERT IGNORE INTO `consent_i18n` (`id`, `locale`, `title`, `description`)
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.configuration.consent', NOW(), NOW());
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.consent';
+-- One row per language the fresh install seeds, as setup/insert.sql does; the
+-- locales setup/I18n has no wording for get a NULL title and fall back to the
+-- default language, instead of no row at all.
+SET @consent_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.consent');
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.consent';
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@consent_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@consent_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@consent_resource_id, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL),
+    (@consent_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@consent_resource_id, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL),
+    (@consent_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@consent_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@consent_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
 -- ---------------------------------------------------------------------
 -- Reserved sales and their countdown
