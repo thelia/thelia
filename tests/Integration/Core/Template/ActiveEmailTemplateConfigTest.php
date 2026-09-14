@@ -36,8 +36,27 @@ final class ActiveEmailTemplateConfigTest extends IntegrationTestCase
     private const STORED_CONFIG_NAME = 'active-mail-template';
     private const ANOTHER_TEMPLATE = 'an-email-template-of-its-own';
 
+    private const ENV_OVERRIDE = 'ACTIVE_MAIL_TEMPLATE';
+
+    private ?string $environmentOverride = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // An environment variable wins over the stored row in ConfigQuery::read(): a
+        // workstation that pins its email template through the environment would
+        // otherwise read that pin back instead of what these tests write.
+        $this->environmentOverride = $_ENV[self::ENV_OVERRIDE] ?? $_SERVER[self::ENV_OVERRIDE] ?? null;
+        unset($_ENV[self::ENV_OVERRIDE], $_SERVER[self::ENV_OVERRIDE]);
+    }
+
     protected function tearDown(): void
     {
+        if (null !== $this->environmentOverride) {
+            $_ENV[self::ENV_OVERRIDE] = $_SERVER[self::ENV_OVERRIDE] = $this->environmentOverride;
+        }
+
         ConfigQuery::resetCache();
 
         parent::tearDown();
