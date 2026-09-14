@@ -181,6 +181,17 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element name="enabled-by-default" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Whether the module is active right after the shop is installed. Defaults to 1. A module shipped with the distribution but declared 0 is registered inactive, even when a theme requires it: it stays listed in the back-office and waits for the merchant to activate it. The state a merchant chose is never rewritten by an update. A module listed under required by a module being activated is activated with it, whatever it declares here.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="0"/>
+                            <xs:enumeration value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
