@@ -94,7 +94,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (83, 'guest_checkout_mode', 'disabled', 0, 0, NOW(), NOW()),
 (84, 'order_return_enabled', '0', 0, 0, NOW(), NOW()),
 (85, 'order_return_window_days', '14', 0, 0, NOW(), NOW()),
-(86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW())
+(86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW()),
+(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2092,7 +2093,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (50, 'admin.configuration.order-status', NOW(), NOW()),
 (51, 'admin.configuration.consent', NOW(), NOW()),
 (52, 'admin.order-return', NOW(), NOW()),
-(53, 'admin.configuration.order-return-reason', NOW(), NOW())
+(53, 'admin.configuration.order-return-reason', NOW(), NOW()),
+(54, 'admin.configuration.checkout-step', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3781,7 +3783,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (50, '{{ locale }}', {{ intl('Configuration order status', locale) }}, NULL, NULL, NULL),
     (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
     (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
-    (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL),
+    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -3861,4 +3864,54 @@ INSERT INTO `product_association_type_i18n` (`id`, `locale`, `title`, `descripti
     (3, '{{ locale }}', {{ intl('Higher-end models', locale, true) }}, {{ intl('Products of the same kind, a range above this one', locale, true) }}){% if not loop.last %},{% endif %}
 
 {% endfor %}
+;
+
+/**
+Steps of the checkout
+
+The four screens the checkout has always had, written down so that a merchant can
+reorder them, reword them and turn off the ones their shop does not need. The code
+declares the same four through step providers: the rows are what the merchant edits,
+the providers are what runs the checks.
+
+The cart, the payment and the confirmation arrive `mandatory`: the tunnel opens on the
+cart, takes the money next to last and ends on the confirmation, and the back office
+refuses to turn any of the three off. The delivery step is the optional one — a shop
+selling nothing to ship, or handing the shipping over to something else, turns it off
+and keeps selling. Turning it off removes its screen, not the delivery check made when
+the order is placed.
+*/
+INSERT INTO `checkout_step` (`id`, `code`, `position`, `active`, `mandatory`, `created_at`, `updated_at`) VALUES
+(1, 'cart', 1, 1, 1, NOW(), NOW()),
+(2, 'delivery', 2, 1, 0, NOW(), NOW()),
+(3, 'payment', 3, 1, 1, NOW(), NOW()),
+(4, 'confirmation', 4, 1, 1, NOW(), NOW())
+;
+
+/**
+The wording of the breadcrumb, in the languages the words are written in. A step left
+without a row for a language falls back to the shop language, then to any language the
+merchant did write, and to its code last — never to the "DEFAULT TITLE" placeholder.
+
+The wordings are the ones the checkout already showed before this table existed: the
+breadcrumb of the theme read "Your cart", so that is what the cart step is called here.
+A shop that upgrades has to read exactly what it read yesterday.
+*/
+INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'en_US', 'Your cart'),
+    (1, 'es_ES', 'Tu carrito'),
+    (1, 'fr_FR', 'Votre panier'),
+    (1, 'it_IT', 'Il tuo carrello'),
+    (2, 'en_US', 'Delivery'),
+    (2, 'es_ES', 'Envío'),
+    (2, 'fr_FR', 'Livraison'),
+    (2, 'it_IT', 'Consegna'),
+    (3, 'en_US', 'Payment'),
+    (3, 'es_ES', 'Pago'),
+    (3, 'fr_FR', 'Paiement'),
+    (3, 'it_IT', 'Pagamento'),
+    (4, 'en_US', 'Confirmation'),
+    (4, 'es_ES', 'Confirmación'),
+    (4, 'fr_FR', 'Confirmation'),
+    (4, 'it_IT', 'Conferma')
 ;

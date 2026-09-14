@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\Flexy;
 
 use FlexyBundle\Controller\CheckoutController;
+use FlexyBundle\Service\CheckoutTrail;
 use FlexyBundle\Service\GuestOrderTracking;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,8 +55,10 @@ final class GuestFailedPaymentTest extends IntegrationTestCase
     {
         // A skip rather than a failure: the core ships with whichever theme version
         // it is given, and a theme that predates the guest checkout has no
-        // GuestOrderTracking to drive this scenario through.
-        if (!class_exists(GuestOrderTracking::class)) {
+        // GuestOrderTracking to drive this scenario through. CheckoutTrail is asked for
+        // the same reason — the failure page draws the progression bar of the
+        // configured tunnel, and a theme without it takes other arguments.
+        if (!class_exists(GuestOrderTracking::class) || !class_exists(CheckoutTrail::class)) {
             self::markTestSkipped('The installed theme predates the guest checkout.');
         }
 
@@ -204,6 +207,7 @@ final class GuestFailedPaymentTest extends IntegrationTestCase
             $container->get(CheckoutFacade::class),
             $request,
             $container->get(GuestOrderTracking::class),
+            $container->get(CheckoutTrail::class),
         );
     }
 
