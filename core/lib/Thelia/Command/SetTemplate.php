@@ -104,7 +104,13 @@ class SetTemplate extends ContainerAwareCommand
         // Required modules must be installed before the config switch: the cache rebuild
         // triggered by setConfigToTemplate would otherwise load the template bundle while
         // its modules are not yet available in the container.
-        $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
+        try {
+            $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
+        } catch (\Exception $exception) {
+            $output->writeln(\sprintf('<error>%s</error>', $exception->getMessage()));
+
+            return self::FAILURE;
+        }
         $output->writeln(\sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
 
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
