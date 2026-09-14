@@ -197,7 +197,12 @@ foreach (['DATABASE_HOST' => $host, 'DATABASE_PORT' => $port, 'DATABASE_NAME' =>
 // ── Phase 6: Register modules ────────────────────────────────────────
 
 echo "Registering modules...\n";
-$count = $setup->registerAndApplyModules();
+try {
+    $count = $setup->registerAndApplyModules();
+} catch (\InvalidArgumentException $e) {
+    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
+    exit(1);
+}
 echo "  {$count} module(s) registered\n";
 
 foreach ($setup->getWarnings() as $warning) {
@@ -323,10 +328,11 @@ foreach ($themes as $type => $name) {
     }
 }
 
-// Run postActivation() for all modules — DatabaseSetup inserts modules
-// with activate=1 but never calls postActivation(), which means modules
-// that seed data in postActivation() (e.g. TheliaBlocks shortcodes)
-// would be missing their initial data.
+// Run postActivation() for all active modules — DatabaseSetup registers
+// modules but never calls postActivation(), which means modules that seed
+// data in postActivation() (e.g. TheliaBlocks shortcodes) would be missing
+// their initial data. A module shipped inactive runs it when the merchant
+// activates it.
 $commands[] = [
     'label' => 'Running module post-activation hooks',
     'input' => ['command' => 'module:post-activate-all'],
