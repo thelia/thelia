@@ -1,0 +1,78 @@
+name: theme tips
+
+# The test job installs the themes at the tip of their own branch, so a theme can turn this
+# repository red without a single commit landing here. That is what happened on 14 September
+# 2026: a push on the flexy main broke the core suite, the theme's own CI said so three minutes
+# later, and nobody was looking at it. This job brings that answer back here, where it matters.
+#
+# It proves nothing about the core; it reports on what the core is tested against.
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+  # Lets a theme repository announce its own push, once one is set up to do so.
+  repository_dispatch:
+    types: [ theme-updated ]
+
+permissions:
+  contents: read
+
+jobs:
+  tips:
+    name: CI state of the themes under test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Read the CI conclusion of every theme tip
+        # The themes are public, so the repository token reads their runs without a secret.
+        run: |
+          set -euo pipefail
+
+          THEMES=(
+            "thelia-templates/flexy:main"
+            "thelia-templates/default-twig:main"
+            "thelia-templates/email:main"
+            "thelia-templates/pdf:main"
+          )
+
+          red=0
+          {
+            echo "| Theme | Tip | CI |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for entry in "${THEMES[@]}"; do
+            repo="${entry%%:*}"
+            branch="${entry##*:}"
+
+            sha="$(gh api "repos/$repo/commits/$branch" --jq '.sha')"
+
+            # The newest *completed* run on that exact sha. A tip nothing has finished running
+            # against yet is not a failure: the next hourly pass will see it.
+            verdict="$(gh api "repos/$repo/actions/runs?head_sha=$sha&per_page=20" \
+              --jq '[.workflow_runs[] | select(.status == "completed")]
+                    | if length == 0 then "none|"
+                      elif any(.conclusion != "success") then
+                        ([.[] | select(.conclusion != "success")][0] | "\(.conclusion)|\(.html_url)")
+                      else "success|" end')"
+
+            conclusion="${verdict%%|*}"
+            url="${verdict#*|}"
+
+            case "$conclusion" in
+              success) icon="green" ;;
+              none)    icon="no completed run yet" ;;
+              *)       icon="**$conclusion**"; red=1 ;;
+            esac
+
+            echo "| \`$repo\` | \`${sha:0:9}\` | $icon ${url} |" >> "$GITHUB_STEP_SUMMARY"
+            echo "$repo@${sha:0:9}: $conclusion $url"
+          done
+
+          if [ "$red" -eq 1 ]; then
+            echo "::error::A theme this repository is tested against is red at its tip. The core suite here will fail on code that did not change."
+            exit 1
+          fi
