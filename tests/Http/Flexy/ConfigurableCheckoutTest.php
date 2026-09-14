@@ -381,6 +381,46 @@ final class ConfigurableCheckoutTest extends GuestCheckoutTestCase
         );
     }
 
+    /**
+     * The several-screen checkout asks on every step whether a guest's cart still lets
+     * them order without an account, since a product that requires one may be added
+     * after the way in. The one-page layout has no steps to ask it on: its sections have
+     * to carry that refusal themselves.
+     */
+    public function testTheOnePageCheckoutLocksEverythingPastTheCartForAGuestWhoseCartGainedAProductThatRequiresAnAccount(): void
+    {
+        $this->layOutTheCheckout(CheckoutDisplayMode::OnePage);
+        $this->setGuestCheckoutMode(GuestCheckoutMode::EnabledUnlessProductForbids);
+
+        $cart = $this->openASessionWithACart();
+        $this->client->submit($this->guestFormOf($this->requestIdentificationPage()));
+
+        $fixtures = $this->fixtures();
+        $product = $fixtures->product(
+            $fixtures->category(),
+            $fixtures->taxRule(),
+            $fixtures->currency(),
+            ['title' => 'A product that requires an account'],
+        );
+        $product->setGuestCheckoutForbidden(1)->save();
+        $fixtures->cartItem($cart, $product);
+        $this->forgetHydratedCarts();
+
+        $crawler = $this->requestAPageThatMustRender('/checkout/cart');
+
+        self::assertContains('delivery', $this->sectionsOf($crawler));
+        self::assertSame(
+            ['cart'],
+            $this->unlockedSectionsOf($crawler),
+            'A guest whose cart requires an account may fill their cart and nothing else.',
+        );
+        self::assertGreaterThan(
+            0,
+            $crawler->filter('a[href^="/customer/login"]')->count(),
+            'The lock must offer the way out of it: signing in.',
+        );
+    }
+
     public function testTurningTheDeliveryStepOffTakesItOutOfTheWholeTunnel(): void
     {
         $this->setTheDeliveryStepActive(false);
