@@ -27,6 +27,7 @@ final readonly class CheckoutStepView
     public function __construct(
         public string $code,
         public string $title,
+        /** Where the step stands in the tunnel being served, from 1 — not the number the `checkout_step` row carries. */
         public int $position,
         public bool $mandatory,
         public ?string $componentName,

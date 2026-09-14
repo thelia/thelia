@@ -367,6 +367,57 @@ final class CheckoutProgressionTest extends IntegrationTestCase
         self::assertTrue((new CheckoutTunnelShape())->isRespectedBy($codes));
     }
 
+    public function testTheStepsServedCarryThePositionOfTheRankTheyAreServedAt(): void
+    {
+        $moduleStep = new class implements CheckoutStepProviderInterface {
+            public function code(): string
+            {
+                return 'fixture_late_module_step';
+            }
+
+            public function defaultPosition(): int
+            {
+                return 10;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        $progression = new CheckoutProgressionService(
+            [...$this->stepProviders(), $moduleStep],
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        );
+
+        $steps = $progression->activeSteps($this->cartWithAnItem());
+
+        // A step the shop has not synchronised yet is ordered by a default position that
+        // says where it belongs, not how far along the tunnel it stands: a theme
+        // numbering the trail on it used to put the step behind the confirmation it is
+        // served before.
+        foreach ($steps as $rank => $step) {
+            self::assertSame($rank + 1, $step->position, \sprintf('Step "%s" is served at rank %d and must carry that position.', $step->code, $rank + 1));
+        }
+    }
+
     public function testAWordingMissingInTheAskedLanguageFallsBackToTheShopLanguage(): void
     {
         $shopLocale = (string) Lang::getDefaultLanguage()->getLocale();

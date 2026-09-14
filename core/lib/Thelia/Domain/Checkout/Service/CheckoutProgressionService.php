@@ -192,10 +192,15 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
 
             $row = $rows[$code] ?? null;
 
+            // The rank the step is served at, not the number written in the table: a
+            // step the shop has not synchronised yet is ordered by a default position
+            // that says where it belongs and nothing about how far along the tunnel it
+            // stands, and a skipped step leaves a hole in the stored numbering. A theme
+            // that numbers or sorts on this has to read the tunnel it is being shown.
             $views[] = new CheckoutStepView(
                 code: $code,
                 title: $this->title($code, $row, $locale),
-                position: $row?->getPosition() ?? $provider->defaultPosition(),
+                position: \count($views) + 1,
                 mandatory: $row?->isMandatory() ?? $provider->isMandatory(),
                 componentName: $provider->componentName(),
             );
