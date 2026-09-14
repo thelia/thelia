@@ -34,6 +34,9 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
     public const OPERATION_INCREASE = 'increase';
     public const OPERATION_DECREASE = 'decrease';
 
+    /** Undoes the movements of ONE run of this action inside a transaction the caller owns. */
+    private const SAVEPOINT = 'thelia_adjust_stock';
+
     public function __construct(
         private StockDecrementer $stockDecrementer,
     ) {
@@ -76,13 +79,17 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
 
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
-        // The order is adjusted as a whole or not at all. Inside a caller's transaction
-        // a nested rollback would poison that caller's commit, so the caller's
-        // transaction is the unit then, and a failure only surfaces to the runner.
+        // The order is adjusted as a whole or not at all, WHATEVER the surrounding transaction.
+        // The status change itself is dispatched inside one (the back office as well as the admin
+        // API), so this action rarely owns it; a nested rollBack would poison the caller's commit,
+        // and doing nothing left the products adjusted before the failing one decremented for good.
+        // A savepoint undoes exactly what this action wrote, and nothing of what the caller wrote.
         $ownTransaction = !$connection->inTransaction();
 
         if ($ownTransaction) {
             $connection->beginTransaction();
+        } else {
+            $connection->exec('SAVEPOINT '.self::SAVEPOINT);
         }
 
         try {
@@ -111,10 +118,14 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
 
             if ($ownTransaction) {
                 $connection->commit();
+            } else {
+                $connection->exec('RELEASE SAVEPOINT '.self::SAVEPOINT);
             }
         } catch (\Throwable $throwable) {
             if ($ownTransaction) {
                 $connection->rollBack();
+            } else {
+                $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
             }
 
             throw $throwable;
