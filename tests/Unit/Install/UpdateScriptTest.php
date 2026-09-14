@@ -271,7 +271,7 @@ final class UpdateScriptTest extends TestCase
     {
         return array_values(array_filter(
             $this->statementsOf($sql),
-            static fn (string $statement): bool => 1 === preg_match('/^INSERT\\s+(?:IGNORE\\s+)?INTO\\s+`'.preg_quote($table, '/').'`/i', $statement),
+            static fn (string $statement): bool => 1 === preg_match('/^INSERT\s+(?:IGNORE\s+)?INTO\s+`'.preg_quote($table, '/').'`/i', $statement),
         ));
     }
 
