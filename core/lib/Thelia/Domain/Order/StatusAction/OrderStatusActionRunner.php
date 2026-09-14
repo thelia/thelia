@@ -67,9 +67,18 @@ final class OrderStatusActionRunner
             return;
         }
 
+        // The actions are matched on the EFFECTIVE code (equivalences resolved), so the exit has to
+        // reason on it too: moving to a custom status equivalent to the current one does not enter
+        // that status again, and its ENTER actions - a customer e-mail, a stock movement - do not
+        // run a second time on an order whose effective status never changed.
+        $previousStatus = $this->catalog->get($previousStatusId);
+
+        if (null !== $previousStatus && $previousStatus->getEffectiveCode() === $newStatus->getEffectiveCode()) {
+            return;
+        }
+
         $context = static fn (array $payload, Order $order, ?\Thelia\Model\OrderStatus $previousStatus, \Thelia\Model\OrderStatus $newStatus): OrderStatusActionContext => new OrderStatusActionContext($order, $previousStatus, $newStatus, $payload);
         $order = $event->getOrder();
-        $previousStatus = $this->catalog->get($previousStatusId);
 
         foreach ($this->actionsFor($previousStatusId, $newStatusId) as $action) {
             $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => $context($payload, $order, $previousStatus, $newStatus));

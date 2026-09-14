@@ -225,6 +225,24 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
         self::assertNotEmpty($this->reload($order)->getInvoiceRef());
     }
 
+    /**
+     * The mirror of the test above: an equivalence makes the actions of the canonical status
+     * fire, it must not make them fire TWICE. Moving an order already paid to a custom status
+     * equivalent to paid does not enter "paid" again.
+     */
+    public function testMovingToAStatusEquivalentToTheCurrentOneDoesNotRerunItsEnterActions(): void
+    {
+        $this->factory->orderStatus(['code' => 'paid_on_delivery', 'equivalentCode' => OrderStatus::CODE_PAID]);
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::getType(), [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE]);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $this->addOrderProduct($order, $productSaleElements, 3);
+
+        $this->moveOrderTo($order, 'paid_on_delivery');
+
+        self::assertSame(10.0, $this->stockOf($productSaleElements), 'The effective status did not change: the stock must not move a second time.');
+    }
+
     public function testTheCouponReleaseActionGivesTheUsageBackToTheCoupon(): void
     {
         $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, ReleaseCouponsAction::getType());
