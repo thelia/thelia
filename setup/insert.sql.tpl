@@ -3795,7 +3795,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
     (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
     (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL),
-    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %},
+    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL),
     (55, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
