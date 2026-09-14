@@ -268,6 +268,46 @@ final class ProductAssociationApiTest extends ApiTestCase
         );
     }
 
+    public function testWritingARelationWithoutItsSourceProductIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $associated = $this->product();
+        $type = ProductAssociationTypeQuery::create()->filterByCode('accessory')->findOne();
+
+        $response = $this->jsonRequest('POST', '/api/admin/product_associations', [
+            'associatedProduct' => '/api/admin/products/'.$associated->getId(),
+            'type' => '/api/admin/product_association_types/'.$type->getId(),
+        ], $token);
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A relation payload with no source product is refused as unprocessable: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+        self::assertStringContainsString('product', (string) $response->getContent());
+    }
+
+    public function testWritingARelationWithoutItsRelatedProductIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $product = $this->product();
+        $type = ProductAssociationTypeQuery::create()->filterByCode('accessory')->findOne();
+
+        $response = $this->jsonRequest('POST', '/api/admin/product_associations', [
+            'product' => '/api/admin/products/'.$product->getId(),
+            'type' => '/api/admin/product_association_types/'.$type->getId(),
+        ], $token);
+
+        self::assertSame(
+            422,
+            $response->getStatusCode(),
+            'A relation payload with no related product is refused as unprocessable: '
+            .substr((string) $response->getContent(), 0, 300),
+        );
+        self::assertStringContainsString('associatedProduct', (string) $response->getContent());
+    }
+
     public function testCreatingATypeWithACodeAlreadyTakenIsRefused(): void
     {
         $token = $this->authenticateAsAdmin();
