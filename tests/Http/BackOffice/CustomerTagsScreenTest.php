@@ -44,9 +44,11 @@ final class CustomerTagsScreenTest extends WebIntegrationTestCase
         // The screen lives in the back-office theme, a separate composer package.
         // Skipping rather than failing when the installed theme predates it: a
         // core test that hard-requires unreleased theme code turns this suite red
-        // for a reason that has nothing to do with core.
-        if (!class_exists('BackOfficeDefaultTwigBundle\\Controller\\Customer\\CustomerController')) {
-            self::markTestSkipped('The installed back-office theme has no customer screen.');
+        // for a reason that has nothing to do with core. The customer controller
+        // itself predates the tags, so it does not tell the two apart; the swatch
+        // service ships with the tag screens and nothing else.
+        if (!class_exists('BackOfficeDefaultTwigBundle\\Service\\Tag\\TagSwatch')) {
+            self::markTestSkipped('The installed back-office theme has no customer tag screen.');
         }
 
         $this->injector = new AdminSessionInjector();
