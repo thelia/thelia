@@ -2038,6 +2038,16 @@ INSERT INTO `order_return_reason`(`id`, `code`, `position`, `visible`, `created_
 (4, 'no_longer_needed', 4, 1, NOW(), NOW()),
 (5, 'other', 5, 1, NOW(), NOW());
 
+-- The automatisms the core runs through its listeners (invoice numbering on
+-- payment, coupon release when an order stops being paid) are offered as
+-- actions too, switched off so that nothing runs twice. No transition is
+-- seeded: every status stays free, as before.
+INSERT INTO `order_status_action`(`id`, `trigger_type`, `from_status_id`, `to_status_id`, `action_type`, `payload`, `position`, `active`, `created_at`, `updated_at`) VALUES
+(1, 'enter', NULL, 2, 'allocate_invoice_ref', NULL, 1, 0, NOW(), NOW()),
+(2, 'enter', NULL, 1, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(3, 'enter', NULL, 5, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(4, 'enter', NULL, 6, 'release_coupons', NULL, 1, 0, NOW(), NOW());
+
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
 */
@@ -2094,7 +2104,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (51, 'admin.configuration.consent', NOW(), NOW()),
 (52, 'admin.order-return', NOW(), NOW()),
 (53, 'admin.configuration.order-return-reason', NOW(), NOW()),
-(54, 'admin.configuration.checkout-step', NOW(), NOW())
+(54, 'admin.configuration.checkout-step', NOW(), NOW()),
+(55, 'admin.order.status-force', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3784,7 +3795,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, '{{ locale }}', {{ intl('Configuration checkout consents', locale) }}, NULL, NULL, NULL),
     (52, '{{ locale }}', {{ intl('Product returns', locale) }}, NULL, NULL, NULL),
     (53, '{{ locale }}', {{ intl('Return reasons', locale) }}, NULL, NULL, NULL),
-    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (54, '{{ locale }}', {{ intl('Configuration checkout steps', locale) }}, NULL, NULL, NULL),
+    (55, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

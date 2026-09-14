@@ -23,6 +23,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
+use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Order;
 use Thelia\Test\IntegrationTestCase;
@@ -101,6 +102,7 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
             $this->getService(OrderFacade::class),
             $this->getService(GuestOrderAccessService::class),
             $this->getService(URL::class),
+            $this->getService(OrderStatusTransitionGuard::class),
         );
 
         $action->sendConfirmationEmail(new OrderEvent($order));

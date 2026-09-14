@@ -139,6 +139,7 @@ final class UpdateScriptTest extends TestCase
     {
         yield 'Product returns' => ['Product returns'];
         yield 'Return reasons' => ['Return reasons'];
+        yield 'Order status transition override' => ['Order status transition override'];
     }
 
     /**

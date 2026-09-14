@@ -2038,6 +2038,16 @@ INSERT INTO `order_return_reason`(`id`, `code`, `position`, `visible`, `created_
 (4, 'no_longer_needed', 4, 1, NOW(), NOW()),
 (5, 'other', 5, 1, NOW(), NOW());
 
+-- The automatisms the core runs through its listeners (invoice numbering on
+-- payment, coupon release when an order stops being paid) are offered as
+-- actions too, switched off so that nothing runs twice. No transition is
+-- seeded: every status stays free, as before.
+INSERT INTO `order_status_action`(`id`, `trigger_type`, `from_status_id`, `to_status_id`, `action_type`, `payload`, `position`, `active`, `created_at`, `updated_at`) VALUES
+(1, 'enter', NULL, 2, 'allocate_invoice_ref', NULL, 1, 0, NOW(), NOW()),
+(2, 'enter', NULL, 1, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(3, 'enter', NULL, 5, 'release_coupons', NULL, 1, 0, NOW(), NOW()),
+(4, 'enter', NULL, 6, 'release_coupons', NULL, 1, 0, NOW(), NOW());
+
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
 */
@@ -2094,7 +2104,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (51, 'admin.configuration.consent', NOW(), NOW()),
 (52, 'admin.order-return', NOW(), NOW()),
 (53, 'admin.configuration.order-return-reason', NOW(), NOW()),
-(54, 'admin.configuration.checkout-step', NOW(), NOW())
+(54, 'admin.configuration.checkout-step', NOW(), NOW()),
+(55, 'admin.order.status-force', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -14431,6 +14442,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'cs_CZ', NULL, NULL, NULL, NULL),
     (53, 'cs_CZ', NULL, NULL, NULL, NULL),
     (54, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (55, 'cs_CZ', 'Vynucení přechodu stavu objednávky', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -14484,6 +14496,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'de_DE', 'Produktrückgaben', NULL, NULL, NULL),
     (53, 'de_DE', 'Rückgabegründe', NULL, NULL, NULL),
     (54, 'de_DE', NULL, NULL, NULL, NULL),
+    (55, 'de_DE', 'Erzwingen von Bestellstatus-Übergängen', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -14537,6 +14550,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'en_US', 'Product returns', NULL, NULL, NULL),
     (53, 'en_US', 'Return reasons', NULL, NULL, NULL),
     (54, 'en_US', 'Configuration checkout steps', NULL, NULL, NULL),
+    (55, 'en_US', 'Order status transition override', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -14590,6 +14604,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'es_ES', 'Devoluciones de productos', NULL, NULL, NULL),
     (53, 'es_ES', 'Motivos de devolución', NULL, NULL, NULL),
     (54, 'es_ES', NULL, NULL, NULL, NULL),
+    (55, 'es_ES', 'Forzar transiciones de estado de pedido', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -14643,6 +14658,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'fr_FR', 'Retours produits', NULL, NULL, NULL),
     (53, 'fr_FR', 'Motifs de retour', NULL, NULL, NULL),
     (54, 'fr_FR', 'Configuration des étapes du tunnel de commande', NULL, NULL, NULL),
+    (55, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -14696,6 +14712,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'it_IT', NULL, NULL, NULL, NULL),
     (53, 'it_IT', NULL, NULL, NULL, NULL),
     (54, 'it_IT', NULL, NULL, NULL, NULL),
+    (55, 'it_IT', 'Forzatura delle transizioni di stato dell\'ordine', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -14749,6 +14766,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (52, 'nl_NL', 'Productretouren', NULL, NULL, NULL),
     (53, 'nl_NL', 'Retourredenen', NULL, NULL, NULL),
     (54, 'nl_NL', NULL, NULL, NULL, NULL),
+    (55, 'nl_NL', 'Overschrijven van orderstatusovergangen', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -14801,7 +14819,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (51, 'ru_RU', NULL, NULL, NULL, NULL),
     (52, 'ru_RU', 'Возвраты товаров', NULL, NULL, NULL),
     (53, 'ru_RU', 'Причины возврата', NULL, NULL, NULL),
-    (54, 'ru_RU', NULL, NULL, NULL, NULL)
+    (54, 'ru_RU', NULL, NULL, NULL, NULL),
+    (55, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL)
 ;
 
 

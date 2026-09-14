@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
@@ -24,6 +25,8 @@ use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
+use Thelia\Model\Map\OrderStatusTableMap;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus as OrderStatusModel;
 use Thelia\Model\OrderStatusQuery;
@@ -35,6 +38,11 @@ use Thelia\Model\OrderStatusQuery;
  */
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        protected OrderStatusTransitionWriter $transitionWriter,
+    ) {
+    }
+
     public function create(OrderStatusCreateEvent $event): void
     {
         $this->createOrUpdate($event, new OrderStatusModel());
@@ -61,7 +69,22 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
             throw new \Exception(Translator::getInstance()->trans('Some commands use this status.').' '.Translator::getInstance()->trans('You can not delete it.'));
         }
 
-        $orderStatus->delete();
+        // The graph and the actions naming this status go with it: the foreign keys
+        // restrict, so that nothing else ever reshapes the graph silently. One
+        // transaction, so a delete that fails leaves the graph as it was.
+        $connection = Propel::getConnection(OrderStatusTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $this->transitionWriter->forgetStatus($orderStatus->getId());
+            $orderStatus->delete($connection);
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
 
         $event->setOrderStatus($orderStatus);
     }

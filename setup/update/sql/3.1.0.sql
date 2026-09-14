@@ -956,4 +956,130 @@ PREPARE add_constraint_statement FROM @statement;
 EXECUTE add_constraint_statement;
 DEALLOCATE PREPARE add_constraint_statement;
 
+-- Order status transitions and automatic actions
+--
+-- The transitions a merchant allows from a status. A status with no row
+-- leaving it stays free, which is the behaviour of every shop before this
+-- version: no row is seeded, so an updated shop keeps proposing every status.
+-- RESTRICT on both sides: a status that still carries part of the graph is
+-- removed through the core action, which drops the rows first, never by a
+-- cascade that would silently reshape the graph.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `order_status_transition`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `from_status_id` INTEGER NOT NULL,
+    `to_status_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_status_transition_from_to_UNIQUE` (`from_status_id`, `to_status_id`),
+    INDEX `idx_order_status_transition_to_status_id` (`to_status_id`),
+    CONSTRAINT `fk_order_status_transition_from_status_id`
+        FOREIGN KEY (`from_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_status_transition_to_status_id`
+        FOREIGN KEY (`to_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- What the shop does when an order enters a status (trigger_type `enter`) or
+-- follows one transition (trigger_type `transition`, from_status_id set).
+-- action_type names a service shipped by the core or a module; payload holds
+-- the parameters of that service as JSON, validated by the service itself.
+-- position orders the actions of one trigger.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `order_status_action`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `trigger_type` VARCHAR(20) NOT NULL,
+    `from_status_id` INTEGER,
+    `to_status_id` INTEGER NOT NULL,
+    `action_type` VARCHAR(100) NOT NULL,
+    `payload` TEXT,
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_status_action_to_status_id` (`to_status_id`),
+    INDEX `idx_order_status_action_from_status_id` (`from_status_id`),
+    CONSTRAINT `fk_order_status_action_from_status_id`
+        FOREIGN KEY (`from_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_status_action_to_status_id`
+        FOREIGN KEY (`to_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- A failed action leaves the status changed and lands here, so the back
+-- office can show what did not happen on which order.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `order_status_action_failure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `action_id` INTEGER NOT NULL,
+    `order_id` INTEGER NOT NULL,
+    `message` TEXT NOT NULL,
+    `created_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_status_action_failure_order_id` (`order_id`),
+    INDEX `fk_order_status_action_failure_action_id` (`action_id`),
+    CONSTRAINT `fk_order_status_action_failure_action_id`
+        FOREIGN KEY (`action_id`)
+        REFERENCES `order_status_action` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_status_action_failure_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The automatisms the core already runs through its listeners (invoice
+-- numbering on payment, coupon release when an order stops being paid) are
+-- offered as actions too, switched off so that nothing runs twice. Seeded
+-- only when the table is still empty, so the script can be replayed.
+INSERT INTO `order_status_action` (`trigger_type`, `from_status_id`, `to_status_id`, `action_type`, `payload`, `position`, `active`, `created_at`, `updated_at`)
+SELECT `seed`.`trigger_type`, NULL, `order_status`.`id`, `seed`.`action_type`, NULL, `seed`.`position`, 0, NOW(), NOW()
+FROM (
+    SELECT 'enter' AS `trigger_type`, 'paid' AS `status_code`, 'allocate_invoice_ref' AS `action_type`, 1 AS `position`
+    UNION ALL SELECT 'enter', 'not_paid', 'release_coupons', 1
+    UNION ALL SELECT 'enter', 'canceled', 'release_coupons', 1
+    UNION ALL SELECT 'enter', 'refunded', 'release_coupons', 1
+) AS `seed`
+INNER JOIN `order_status` ON `order_status`.`code` = `seed`.`status_code`
+WHERE NOT EXISTS (SELECT 1 FROM `order_status_action`);
+
+-- Forcing an order into a status its transition graph refuses is a right of its
+-- own, granted profile by profile, distinct from editing orders.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.status-force', NOW(), NOW());
+
+-- Its title in the eight languages the fresh install seeds, the way setup/insert.sql
+-- does: a locale left without a row would show the right with no name on the
+-- profile screen. A language added later gets its row from setup/I18n.
+SET @status_force_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.status-force');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@status_force_resource_id, 'cs_CZ', 'Vynucení přechodu stavu objednávky', NULL, NULL, NULL),
+    (@status_force_resource_id, 'de_DE', 'Erzwingen von Bestellstatus-Übergängen', NULL, NULL, NULL),
+    (@status_force_resource_id, 'en_US', 'Order status transition override', NULL, NULL, NULL),
+    (@status_force_resource_id, 'es_ES', 'Forzar transiciones de estado de pedido', NULL, NULL, NULL),
+    (@status_force_resource_id, 'fr_FR', 'Forçage des transitions de statut de commande', NULL, NULL, NULL),
+    (@status_force_resource_id, 'it_IT', 'Forzatura delle transizioni di stato dell\'ordine', NULL, NULL, NULL),
+    (@status_force_resource_id, 'nl_NL', 'Overschrijven van orderstatusovergangen', NULL, NULL, NULL),
+    (@status_force_resource_id, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

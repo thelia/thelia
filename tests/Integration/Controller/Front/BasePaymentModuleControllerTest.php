@@ -17,7 +17,11 @@ namespace Thelia\Tests\Integration\Controller\Front;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
+use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\BasePaymentModuleController;
 use Thelia\Test\IntegrationTestCase;
 
@@ -71,6 +75,28 @@ final class BasePaymentModuleControllerTest extends IntegrationTestCase
             'PSP-4F2A-7C10',
             OrderQuery::create()->findPk($order->getId())->getTransactionRef(),
         );
+    }
+
+    public function testAPaymentConfirmationIsHeldToTheStatusTransitionGraph(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        $notPaid = OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID);
+        $canceled = OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED);
+        self::assertNotNull($notPaid);
+        self::assertNotNull($canceled);
+
+        // A merchant who only lets an unpaid order be canceled: the gateway's confirmation
+        // takes the same road as the back office and is refused like it.
+        $this->getService(OrderStatusTransitionWriter::class)->replaceTargets($notPaid->getId(), [$canceled->getId()]);
+
+        try {
+            $this->controller()->confirmPayment($this->getService(EventDispatcherInterface::class), (int) $order->getId());
+            self::fail('The confirmation should have been refused by the transition graph.');
+        } catch (OrderStatusTransitionRefusedException $exception) {
+            self::assertSame(OrderStatus::CODE_PAID, $exception->getToStatusCode());
+        }
+
+        self::assertSame($notPaid->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
     }
 
     private function urlOfRedirect(callable $redirect): string

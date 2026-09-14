@@ -21,6 +21,7 @@ return [
     'Coupon' => 'Kupon',
     'Customer' => 'Ügyfél',
     'New York' => 'New York',
+    'Order status transition override' => 'Rendelési állapotváltás felülbírálása',
     'Product' => 'Termék',
     'Sales management' => 'Kampányok kezelése',
     'Search' => 'Keresés',

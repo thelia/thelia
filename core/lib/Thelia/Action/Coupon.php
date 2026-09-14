@@ -32,6 +32,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
+use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
@@ -48,7 +49,6 @@ use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponCountry;
 use Thelia\Model\OrderCouponModule;
-use Thelia\Model\OrderCouponQuery;
 
 /**
  * Process Coupon Events.
@@ -61,6 +61,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected RequestStack $requestStack,
         protected CouponFactory $couponFactory,
         protected CouponManager $couponManager,
+        protected OrderCouponUsageManager $couponUsageManager,
         protected MatchForEveryone $noConditionRule,
         protected ConditionFactory $conditionFactory,
         protected EventDispatcherInterface $dispatcher,
@@ -439,41 +440,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         // The order is no longer paid ?
         if ($order->isNotPaid() || $order->isCancelled() || $order->isRefunded()) {
-            // Cancel usage of all coupons for this order
-            $usedCoupons = OrderCouponQuery::create()
-                ->filterByUsageCanceled(false)
-                ->findByOrderId($order->getId());
-
-            $customerId = $order->getCustomerId();
-
-            /** @var OrderCoupon $usedCoupon */
-            foreach ($usedCoupons as $usedCoupon) {
-                if (null !== $couponModel = $this->resolveOrderCouponModel($usedCoupon)) {
-                    // If the coupon still exists, restore one usage to the usage count.
-                    $this->couponManager->incrementQuantity($couponModel, $customerId);
-                }
-
-                // Mark coupon usage as canceled in the OrderCoupon table
-                $usedCoupon->setUsageCanceled(1)->save();
-            }
+            $this->couponUsageManager->release($order);
         } elseif ($order->isPaid(false)) {
-            // Count the usage of the coupons which are not counted yet
-            $usedCoupons = OrderCouponQuery::create()
-                ->filterByUsageCanceled(true)
-                ->findByOrderId($order->getId());
-
-            $customerId = $order->getCustomerId();
-
-            /** @var OrderCoupon $usedCoupon */
-            foreach ($usedCoupons as $usedCoupon) {
-                if (null !== $couponModel = $this->resolveOrderCouponModel($usedCoupon)) {
-                    // If the coupon still exists, mark the coupon as used
-                    $this->couponManager->decrementQuantity($couponModel, $customerId);
-                }
-
-                // The coupon is no longer canceled
-                $usedCoupon->setUsageCanceled(0)->save();
-            }
+            $this->couponUsageManager->consume($order);
         }
     }
 
@@ -490,26 +459,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         if ('' !== $coupon->getCode()) {
             return CouponQuery::create()->findOneByCode($coupon->getCode());
-        }
-
-        return null;
-    }
-
-    /**
-     * The coupon row an order coupon was recorded from: by id first, falling back
-     * to the code for order coupons recorded before coupon_id existed.
-     */
-    protected function resolveOrderCouponModel(OrderCoupon $orderCoupon): ?CouponModel
-    {
-        if (null !== $orderCoupon->getCouponId()
-            && null !== $couponModel = CouponQuery::create()->findPk($orderCoupon->getCouponId())) {
-            return $couponModel;
-        }
-
-        $code = $orderCoupon->getCode();
-
-        if (null !== $code && '' !== $code) {
-            return CouponQuery::create()->findOneByCode($code);
         }
 
         return null;

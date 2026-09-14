@@ -929,6 +929,95 @@ CREATE TABLE `order_status`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_status_transition
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_status_transition`;
+
+CREATE TABLE `order_status_transition`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `from_status_id` INTEGER NOT NULL,
+    `to_status_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_status_transition_from_to_UNIQUE` (`from_status_id`, `to_status_id`),
+    INDEX `idx_order_status_transition_to_status_id` (`to_status_id`),
+    CONSTRAINT `fk_order_status_transition_from_status_id`
+        FOREIGN KEY (`from_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_status_transition_to_status_id`
+        FOREIGN KEY (`to_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_status_action
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_status_action`;
+
+CREATE TABLE `order_status_action`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `trigger_type` VARCHAR(20) NOT NULL,
+    `from_status_id` INTEGER,
+    `to_status_id` INTEGER NOT NULL,
+    `action_type` VARCHAR(100) NOT NULL,
+    `payload` TEXT,
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_status_action_to_status_id` (`to_status_id`),
+    INDEX `idx_order_status_action_from_status_id` (`from_status_id`),
+    CONSTRAINT `fk_order_status_action_from_status_id`
+        FOREIGN KEY (`from_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_status_action_to_status_id`
+        FOREIGN KEY (`to_status_id`)
+        REFERENCES `order_status` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_status_action_failure
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_status_action_failure`;
+
+CREATE TABLE `order_status_action_failure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `action_id` INTEGER NOT NULL,
+    `order_id` INTEGER NOT NULL,
+    `message` TEXT NOT NULL,
+    `created_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_status_action_failure_order_id` (`order_id`),
+    INDEX `fk_order_status_action_failure_action_id` (`action_id`),
+    CONSTRAINT `fk_order_status_action_failure_action_id`
+        FOREIGN KEY (`action_id`)
+        REFERENCES `order_status_action` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_status_action_failure_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- order_sequence
 -- ---------------------------------------------------------------------
 

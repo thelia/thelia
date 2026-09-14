@@ -22,6 +22,7 @@ return [
     'New order {{ order_ref }} placed on {{ config("store_name") }}' => 'Nová objednávka {{ order_ref }} v obchodě {{ config("store_name") }}',
     'New password request on %store' => 'Žádost o nové heslo v obchodě {{ config("store_name") }}',
     'New York' => 'New York',
+    'Order status transition override' => 'Vynucení přechodu stavu objednávky',
     'Reset your password on {{ config("store_name") }}' => 'Obnovte své heslo v obchodě {{ config("store_name") }}',
     'Search' => 'Vyhledávání',
     'Your %store activation code' => 'Váš aktivační kód pro {{ config("store_name") }}',

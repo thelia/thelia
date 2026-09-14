@@ -282,6 +282,7 @@ return [
     'Olbia-Tempio' => 'Olbia-Tempio',
     'Oman' => 'Oman',
     'Ontario' => 'Ontario',
+    'Order status transition override' => 'Forzatura delle transizioni di stato dell\'ordine',
     'Oregon' => 'Oregon',
     'Oristano' => 'Oristano',
     'Padova' => 'Padova',
