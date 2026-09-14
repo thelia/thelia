@@ -68,6 +68,8 @@ class ProductPrice implements PropelResourceInterface
         ProductSaleElements::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Product::GROUP_ADMIN_WRITE])]
     public Currency $currency;
@@ -82,6 +84,8 @@ class ProductPrice implements PropelResourceInterface
         ProductSaleElements::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Product::GROUP_ADMIN_WRITE])]
     public float $price;
@@ -96,6 +100,8 @@ class ProductPrice implements PropelResourceInterface
         ProductSaleElements::GROUP_ADMIN_WRITE,
         Product::GROUP_ADMIN_WRITE,
         Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
     ])]
     public float $promoPrice;
 

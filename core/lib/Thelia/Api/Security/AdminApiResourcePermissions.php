@@ -62,6 +62,8 @@ use Thelia\Api\Resource\OrderReturnStatus;
 use Thelia\Api\Resource\OrderStatus;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
+use Thelia\Api\Resource\ProductAssociation;
+use Thelia\Api\Resource\ProductAssociationType;
 use Thelia\Api\Resource\ProductCategory;
 use Thelia\Api\Resource\ProductDocument;
 use Thelia\Api\Resource\ProductImage;
@@ -135,6 +137,8 @@ final readonly class AdminApiResourcePermissions
         OrderReturnReason::class => AdminResources::ORDER_RETURN_REASON,
         Product::class => AdminResources::PRODUCT,
         ProductAssociatedContent::class => AdminResources::PRODUCT,
+        ProductAssociation::class => AdminResources::PRODUCT,
+        ProductAssociationType::class => AdminResources::CONFIG,
         ProductCategory::class => AdminResources::PRODUCT,
         ProductDocument::class => AdminResources::PRODUCT,
         ProductImage::class => AdminResources::PRODUCT,

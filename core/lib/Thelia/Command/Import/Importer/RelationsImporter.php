@@ -16,8 +16,11 @@ namespace Thelia\Command\Import\Importer;
 
 use Thelia\Command\Import\AbstractDemoImporter;
 use Thelia\Command\Import\DemoImportContext;
+use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundException;
 use Thelia\Model\Accessory;
 use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Model\ProductAssociationType;
+use Thelia\Model\ProductAssociationTypeQuery;
 
 /**
  * Cross-links catalog entities once products, categories and contents exist:
@@ -70,10 +73,24 @@ final class RelationsImporter extends AbstractDemoImporter
                 (new Accessory())
                     ->setProductId((int) $product->getId())
                     ->setAccessory((int) $accessory->getId())
+                    ->setTypeId($this->accessoryTypeId($context))
                     ->setPosition($offset)
                     ->save($context->connection);
             }
         }
+    }
+
+    private function accessoryTypeId(DemoImportContext $context): int
+    {
+        $type = ProductAssociationTypeQuery::create()
+            ->filterByCode(ProductAssociationType::CODE_ACCESSORY)
+            ->findOne($context->connection);
+
+        if (null === $type) {
+            throw ProductAssociationTypeNotFoundException::withCode(ProductAssociationType::CODE_ACCESSORY);
+        }
+
+        return $type->getId();
     }
 
     private function importCategoryContents(DemoImportContext $context): void
