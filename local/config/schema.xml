@@ -1716,6 +1716,21 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="checkout_step" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the name the theme, the progression guard and the code refer this step by" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="0" description="where the step stands in the tunnel: the cart opens it, the payment comes next to last and the confirmation closes it" name="position" required="true" type="INTEGER" />
+    <column defaultValue="1" description="a step turned off no longer has a screen of its own, and the check it carried is still made when the order is placed" name="active" required="true" type="TINYINT" />
+    <column defaultValue="0" description="a step the shop cannot sell without, which the back office refuses to turn off" name="mandatory" required="true" type="TINYINT" />
+    <column name="title" size="255" type="VARCHAR" />
+    <unique name="checkout_step_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
+    </behavior>
+  </table>
   <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />

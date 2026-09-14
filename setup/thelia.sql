@@ -1917,6 +1917,25 @@ CREATE TABLE `order_consent`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- checkout_step
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `checkout_step`;
+
+CREATE TABLE `checkout_step`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the theme, the progression guard and the code refer this step by',
+    `position` INTEGER DEFAULT 0 NOT NULL COMMENT 'where the step stands in the tunnel: the cart opens it, the payment comes next to last and the confirmation closes it',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a step turned off no longer has a screen of its own, and the check it carried is still made when the order is placed',
+    `mandatory` TINYINT DEFAULT 0 NOT NULL COMMENT 'a step the shop cannot sell without, which the back office refuses to turn off',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `checkout_step_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- newsletter
 -- ---------------------------------------------------------------------
 
@@ -3318,6 +3337,24 @@ CREATE TABLE `consent_i18n`
     CONSTRAINT `consent_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `consent` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- checkout_step_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `checkout_step_i18n`;
+
+CREATE TABLE `checkout_step_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `checkout_step_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `checkout_step` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 

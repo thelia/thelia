@@ -398,6 +398,98 @@ SET @statement := IF(@add_index, 'ALTER TABLE `order_coupon` ADD INDEX `idx_orde
 PREPARE add_index_statement FROM @statement;
 EXECUTE add_index_statement;
 DEALLOCATE PREPARE add_index_statement;
+-- Steps of the checkout
+--
+-- `checkout_step` is the list the merchant manages: which screens the tunnel
+-- has, in which order, and which of them the shop may do without. The code
+-- declares the same steps through step providers, so the rows are what the
+-- merchant edits and the providers are what runs the checks.
+--
+-- The cart, the payment and the confirmation arrive `mandatory`: the tunnel
+-- opens on the cart, takes the money next to last and ends on the
+-- confirmation, and the back office refuses to turn any of the three off. The
+-- delivery step is the optional one.
+--
+-- A shop that upgrades keeps the checkout it has: the four steps arrive active,
+-- which is exactly the tunnel it was already selling through. Turning one off
+-- removes its screen and nothing else — the check it carried is still made when
+-- the order is placed.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `checkout_step`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the theme, the progression guard and the code refer this step by',
+    `position` INTEGER DEFAULT 0 NOT NULL COMMENT 'where the step stands in the tunnel: the cart opens it, the payment comes next to last and the confirmation closes it',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a step turned off no longer has a screen of its own, and the check it carried is still made when the order is placed',
+    `mandatory` TINYINT DEFAULT 0 NOT NULL COMMENT 'a step the shop cannot sell without, which the back office refuses to turn off',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `checkout_step_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `checkout_step_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `checkout_step_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `checkout_step` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The unique index on the code is what makes this replayable, and what leaves
+-- alone a shop that has already reordered or turned off one of the four.
+INSERT IGNORE INTO `checkout_step` (`code`, `position`, `active`, `mandatory`, `created_at`, `updated_at`) VALUES
+    ('cart', 1, 1, 1, NOW(), NOW()),
+    ('delivery', 2, 1, 0, NOW(), NOW()),
+    ('payment', 3, 1, 1, NOW(), NOW()),
+    ('confirmation', 4, 1, 1, NOW(), NOW());
+
+-- The ids are read back from the codes: the table may already hold rows a
+-- module created, so nothing here may assume 1 to 4.
+INSERT IGNORE INTO `checkout_step_i18n` (`id`, `locale`, `title`)
+    SELECT `checkout_step`.`id`, `wording`.`locale`, `wording`.`title`
+    FROM `checkout_step`
+    JOIN (
+        SELECT 'cart' AS `code`, 'en_US' AS `locale`, 'Your cart' AS `title`
+        UNION ALL SELECT 'cart', 'es_ES', 'Tu carrito'
+        UNION ALL SELECT 'cart', 'fr_FR', 'Votre panier'
+        UNION ALL SELECT 'cart', 'it_IT', 'Il tuo carrello'
+        UNION ALL SELECT 'delivery', 'en_US', 'Delivery'
+        UNION ALL SELECT 'delivery', 'es_ES', 'Envío'
+        UNION ALL SELECT 'delivery', 'fr_FR', 'Livraison'
+        UNION ALL SELECT 'delivery', 'it_IT', 'Consegna'
+        UNION ALL SELECT 'payment', 'en_US', 'Payment'
+        UNION ALL SELECT 'payment', 'es_ES', 'Pago'
+        UNION ALL SELECT 'payment', 'fr_FR', 'Paiement'
+        UNION ALL SELECT 'payment', 'it_IT', 'Pagamento'
+        UNION ALL SELECT 'confirmation', 'en_US', 'Confirmation'
+        UNION ALL SELECT 'confirmation', 'es_ES', 'Confirmación'
+        UNION ALL SELECT 'confirmation', 'fr_FR', 'Confirmation'
+        UNION ALL SELECT 'confirmation', 'it_IT', 'Conferma'
+    ) AS `wording` ON `wording`.`code` = `checkout_step`.`code`;
+
+-- How the theme is asked to lay the tunnel out. A shop that upgrades keeps the
+-- one screen per step it already had, and INSERT IGNORE leaves alone a shop
+-- that has already chosen a value.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('checkout_display_mode', 'steps', 0, 0, NOW(), NOW());
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.checkout-step', NOW(), NOW());
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+    SELECT `resource`.`id`, 'en_US', 'Configuration checkout steps', NULL, NULL, NULL
+    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.checkout-step';
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+    SELECT `resource`.`id`, 'fr_FR', 'Configuration des étapes du tunnel de commande', NULL, NULL, NULL
+    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.checkout-step';
 
 -- ---------------------------------------------------------------------
 -- Product returns (RMA)

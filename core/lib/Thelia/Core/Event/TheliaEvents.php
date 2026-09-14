@@ -491,6 +491,12 @@ final class TheliaEvents
     public const PRODUCT_ASSOCIATION_TYPE_UPDATE_POSITION = 'action.updateProductAssociationTypePosition';
     public const PRODUCT_ASSOCIATION_TYPE_TOGGLE_VISIBLE = 'action.toggleProductAssociationTypeVisible';
 
+    // -- Checkout steps management ------------------------------------------
+
+    public const CHECKOUT_STEP_UPDATE_POSITION = 'action.updateCheckoutStepPosition';
+    public const CHECKOUT_STEP_TOGGLE_ACTIVE = 'action.toggleCheckoutStepActive';
+    public const CHECKOUT_STEP_SYNCHRONIZE = 'action.synchronizeCheckoutSteps';
+
     // -- Features management ---------------------------------------------
 
     public const FEATURE_CREATE = 'action.createFeature';
