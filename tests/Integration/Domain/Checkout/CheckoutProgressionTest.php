@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Checkout;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
@@ -29,6 +30,7 @@ use Thelia\Domain\Checkout\Service\CheckoutTunnelShape;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Checkout\Service\Step\CartStepProvider;
+use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Checkout\Service\Step\ConfirmationStepProvider;
 use Thelia\Domain\Checkout\Service\Step\DeliveryStepProvider;
 use Thelia\Domain\Checkout\Service\Step\PaymentStepProvider;
@@ -313,6 +315,58 @@ final class CheckoutProgressionTest extends IntegrationTestCase
         self::assertStringContainsString('"cart"', $logger->warnings[0]);
     }
 
+    /**
+     * A module ships `defaultPosition(): 10` and its row has not been synchronised yet.
+     * Read straight, that position lands its screen behind the confirmation, where the
+     * tunnel cannot be sold through: the progression puts it where the synchronisation
+     * would create its row, right before the payment.
+     */
+    public function testAnUnsyncedModuleStepDeclaredPastTheMoneyIsServedBeforeThePayment(): void
+    {
+        $moduleStep = new class implements CheckoutStepProviderInterface {
+            public function code(): string
+            {
+                return 'fixture_late_module_step';
+            }
+
+            public function defaultPosition(): int
+            {
+                return 10;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        $progression = new CheckoutProgressionService(
+            [...$this->stepProviders(), $moduleStep],
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        );
+
+        $codes = $this->codesOf($progression->activeSteps($this->cartWithAnItem()));
+
+        self::assertSame(['cart', 'delivery', 'fixture_late_module_step', 'payment', 'confirmation'], $codes);
+        self::assertTrue((new CheckoutTunnelShape())->isRespectedBy($codes));
+    }
+
     public function testAWordingMissingInTheAskedLanguageFallsBackToTheShopLanguage(): void
     {
         $shopLocale = (string) Lang::getDefaultLanguage()->getLocale();
@@ -378,7 +432,7 @@ final class CheckoutProgressionTest extends IntegrationTestCase
     }
 
     /**
-     * @return list<\Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface>
+     * @return list<CheckoutStepProviderInterface>
      */
     private function stepProviders(): array
     {

@@ -215,6 +215,7 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
     private function orderedCodes(array $providers, array $rows): array
     {
         $positions = [];
+        $unsynced = [];
 
         foreach ($rows as $code => $row) {
             if (!$row->isActive()) {
@@ -233,23 +234,107 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         }
 
         foreach ($providers as $code => $provider) {
-            if (!isset($rows[$code])) {
-                // A module that declares a step the shop has not synchronised yet still
-                // gets its screen, where it says it belongs.
-                $positions[$code] = $provider->defaultPosition();
+            if (isset($rows[$code])) {
+                continue;
             }
+
+            // A module that declares a step the shop has not synchronised yet still
+            // gets its screen. A required step stands where the code says; any other
+            // is placed where the synchronisation would create its row, between the
+            // cart and the payment, so that a `defaultPosition(): 10` never lands
+            // behind the confirmation, where nothing would ever show it.
+            if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
+                $positions[$code] = $provider->defaultPosition();
+
+                continue;
+            }
+
+            $unsynced[$code] = $provider->defaultPosition();
         }
 
-        $codes = $this->sortByPositionThenCode($positions);
+        $codes = $this->withUnsyncedSteps($this->sortByPositionThenCode($positions), $positions, $unsynced);
         $unsellable = $this->unsellableReason($codes);
 
         if (null !== $unsellable) {
             $this->logger->warning(\sprintf('The checkout step configuration is not one a shop can sell through: %s. The steps declared by the code are used instead.', $unsellable));
 
-            $codes = $this->sortByPositionThenCode(array_map(
-                static fn (CheckoutStepProviderInterface $provider): int => $provider->defaultPosition(),
-                $providers,
-            ));
+            $codes = $this->declaredCodes($providers);
+        }
+
+        return $codes;
+    }
+
+    /**
+     * The tunnel the code alone declares: the required steps at their default position,
+     * every other step brought back between the cart and the payment.
+     *
+     * @param array<string, CheckoutStepProviderInterface> $providers
+     *
+     * @return list<string>
+     */
+    private function declaredCodes(array $providers): array
+    {
+        $positions = [];
+        $others = [];
+
+        foreach ($providers as $code => $provider) {
+            if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
+                $positions[$code] = $provider->defaultPosition();
+
+                continue;
+            }
+
+            $others[$code] = $provider->defaultPosition();
+        }
+
+        return $this->withUnsyncedSteps($this->sortByPositionThenCode($positions), $positions, $others);
+    }
+
+    /**
+     * Slots the steps no row places into an ordered tunnel, each where it says it
+     * belongs when the tunnel has room there, and right before the payment otherwise —
+     * the same clamp CheckoutStepConfigurationService applies when it creates the row.
+     *
+     * @param list<string>       $codes     the ordered tunnel so far
+     * @param array<string, int> $positions the position of each code of $codes
+     * @param array<string, int> $wanted    the default position of each step to slot in
+     *
+     * @return list<string>
+     */
+    private function withUnsyncedSteps(array $codes, array $positions, array $wanted): array
+    {
+        foreach ($this->sortByPositionThenCode($wanted) as $code) {
+            $position = $wanted[$code];
+            $bounds = $this->tunnelShape->creationBounds(
+                $code,
+                $positions[CheckoutStep::CODE_CART] ?? null,
+                $positions[CheckoutStep::CODE_PAYMENT] ?? null,
+            );
+
+            if (null !== $bounds) {
+                $position = $bounds['highest'] < $bounds['lowest']
+                    ? $bounds['lowest']
+                    : max($bounds['lowest'], min($bounds['highest'], $position));
+            }
+
+            // Sharing a position with the payment, when the tunnel leaves no room ahead
+            // of it, means standing before it and never behind: the money is taken next
+            // to last, whatever the code of the step that shares its position.
+            $slot = [$position, 0, $code];
+            $index = \count($codes);
+
+            foreach ($codes as $rank => $existing) {
+                $existingSlot = [$positions[$existing], \in_array($existing, CheckoutStep::REQUIRED_CODES, true) ? 1 : 0, $existing];
+
+                if ($existingSlot > $slot) {
+                    $index = $rank;
+
+                    break;
+                }
+            }
+
+            array_splice($codes, $index, 0, [$code]);
+            $positions[$code] = $position;
         }
 
         return $codes;
