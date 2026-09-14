@@ -189,13 +189,19 @@ INSERT IGNORE INTO `consent_i18n` (`id`, `locale`, `title`, `description`)
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.configuration.consent', NOW(), NOW());
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.consent';
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @checkout_consent_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.consent');
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.consent';
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@checkout_consent_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'en_US', 'Configuration checkout consents', NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'fr_FR', 'Configuration des consentements du tunnel de commande', NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@checkout_consent_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
 -- ---------------------------------------------------------------------
 -- Reserved sales and their countdown
@@ -483,13 +489,19 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.configuration.checkout-step', NOW(), NOW());
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'en_US', 'Configuration checkout steps', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.checkout-step';
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @checkout_step_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.checkout-step');
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
-    SELECT `resource`.`id`, 'fr_FR', 'Configuration des étapes du tunnel de commande', NULL, NULL, NULL
-    FROM `resource` WHERE `resource`.`code` = 'admin.configuration.checkout-step';
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@checkout_step_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'en_US', 'Configuration checkout steps', NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'fr_FR', 'Configuration des étapes du tunnel de commande', NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@checkout_step_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
 -- ---------------------------------------------------------------------
 -- Product returns (RMA)
