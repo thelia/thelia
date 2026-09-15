@@ -19,9 +19,13 @@ use Thelia\Core\Event\Customer\CustomerPersonalDataExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataExporter;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
+use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Model\Customer;
 use Thelia\Model\Newsletter;
+use Thelia\Model\Order;
 use Thelia\Model\OrderConsent;
+use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\TagElement;
 use Thelia\Test\FixtureFactory;
@@ -80,6 +84,114 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         self::assertNotNull($personalData['newsletter']);
         self::assertSame('exporter-subject@test.com', $personalData['newsletter']['email']);
+    }
+
+    public function testExportOrderIncludesTheFullHistoryInChronologicalOrderWithoutAdminId(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $order = $this->factory->order($customer);
+        $admin = $this->factory->admin(['firstname' => 'Jane', 'lastname' => 'Admin']);
+
+        $this->createHistoryEntry($order, [
+            'eventType' => OrderHistoryEventType::ORDER_CREATED->value,
+            'actorType' => OrderHistoryActorType::SYSTEM->value,
+            'actorLabel' => 'System',
+            'visibleToCustomer' => 1,
+        ]);
+        $this->createHistoryEntry($order, [
+            'eventType' => OrderHistoryEventType::STATUS_CHANGED->value,
+            'actorType' => OrderHistoryActorType::ADMIN->value,
+            'actorLabel' => 'Jane Admin',
+            'adminId' => $admin->getId(),
+            'payload' => ['from' => 'not_paid', 'to' => 'paid'],
+            'comment' => 'Internal note: payment double-checked by phone',
+            'visibleToCustomer' => 0,
+        ]);
+        $this->createHistoryEntry($order, [
+            'eventType' => OrderHistoryEventType::EMAIL_SENT->value,
+            'actorType' => OrderHistoryActorType::SYSTEM->value,
+            'actorLabel' => 'System',
+            'comment' => 'Order confirmation sent',
+            'visibleToCustomer' => 1,
+        ]);
+
+        $event = new CustomerPersonalDataExportEvent($customer);
+        $this->getService(EventDispatcherInterface::class)->dispatch(
+            $event,
+            TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT,
+        );
+
+        $exportedOrder = $this->findExportedOrder($event->getPersonalData(), $order->getRef());
+        $history = $exportedOrder['history'];
+
+        self::assertCount(3, $history);
+
+        self::assertSame(OrderHistoryEventType::ORDER_CREATED->value, $history[0]['event_type']);
+        self::assertSame(OrderHistoryEventType::STATUS_CHANGED->value, $history[1]['event_type']);
+        self::assertSame(OrderHistoryEventType::EMAIL_SENT->value, $history[2]['event_type']);
+
+        // The internal note is exported like any other entry: order history is
+        // data attached to the customer's own order, not a channel the shop
+        // reserves for itself.
+        self::assertFalse($history[1]['visible_to_customer']);
+        self::assertSame('Internal note: payment double-checked by phone', $history[1]['comment']);
+        self::assertSame(OrderHistoryActorType::ADMIN->value, $history[1]['actor_type']);
+        self::assertSame('Jane Admin', $history[1]['actor_label']);
+        self::assertSame(['from' => 'not_paid', 'to' => 'paid'], $history[1]['payload']);
+        self::assertNotNull($history[1]['date']);
+        self::assertArrayNotHasKey('admin_id', $history[1]);
+
+        self::assertTrue($history[0]['visible_to_customer']);
+        self::assertTrue($history[2]['visible_to_customer']);
+    }
+
+    public function testExportOrderHistoryIsEmptyWhenTheOrderHasNoEntry(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $order = $this->factory->order($customer);
+
+        $event = new CustomerPersonalDataExportEvent($customer);
+        $this->getService(EventDispatcherInterface::class)->dispatch(
+            $event,
+            TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT,
+        );
+
+        $exportedOrder = $this->findExportedOrder($event->getPersonalData(), $order->getRef());
+
+        self::assertSame([], $exportedOrder['history']);
+    }
+
+    /**
+     * @param array<string, mixed> $personalData
+     *
+     * @return array<string, mixed>
+     */
+    private function findExportedOrder(array $personalData, ?string $orderReference): array
+    {
+        foreach ($personalData['orders'] as $exportedOrder) {
+            if ($exportedOrder['reference'] === $orderReference) {
+                return $exportedOrder;
+            }
+        }
+
+        self::fail(\sprintf('No exported order found with reference "%s".', $orderReference));
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    private function createHistoryEntry(Order $order, array $overrides): void
+    {
+        (new OrderHistory())
+            ->setOrderId($order->getId())
+            ->setEventType($overrides['eventType'])
+            ->setActorType($overrides['actorType'])
+            ->setActorLabel($overrides['actorLabel'])
+            ->setAdminId($overrides['adminId'] ?? null)
+            ->setPayload(isset($overrides['payload']) ? json_encode($overrides['payload'], \JSON_THROW_ON_ERROR) : null)
+            ->setComment($overrides['comment'] ?? null)
+            ->setVisibleToCustomer($overrides['visibleToCustomer'])
+            ->save($this->getPropelConnection());
     }
 
     public function testExportIncludesTheSectionsDeclaredByModules(): void
