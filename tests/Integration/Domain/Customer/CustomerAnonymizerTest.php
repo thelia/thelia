@@ -35,6 +35,9 @@ use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\TagElement;
+use Thelia\Model\TagElementQuery;
+use Thelia\Model\TagQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -327,6 +330,32 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             ->save($this->getPropelConnection());
 
         return $adminLog;
+    }
+
+    /**
+     * Anonymizing drops the internal markers with the rest of the identity: the
+     * tags say something about the person, not about the accounting record the
+     * orders are.
+     */
+    public function testAnonymizeRemovesTheTagsOfTheCustomer(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $tag = $this->factory->tag(['label' => 'Anonymized subject']);
+        $this->factory->tagElement($tag, TagElement::ELEMENT_KEY_CUSTOMER, $customer->getId());
+
+        $this->anonymize($customer);
+
+        self::assertSame(
+            0,
+            TagElementQuery::create()
+                ->filterByElementKey(TagElement::ELEMENT_KEY_CUSTOMER)
+                ->filterByElementId($customer->getId())
+                ->count(),
+        );
+        self::assertNotNull(
+            TagQuery::create()->findPk($tag->getId()),
+            'Anonymizing one customer must not delete a tag other customers may carry.',
+        );
     }
 
     private function anonymize(Customer $customer): void
