@@ -21,11 +21,13 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Order;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderReturnLineQuery;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
+use Thelia\Model\OrderStatus;
 
 /**
  * The single source of truth for whether a return may be opened, and for which
@@ -75,9 +77,17 @@ final class ReturnEligibilityChecker
     }
 
     /**
-     * Whether the retraction window is still open for the order. The window is
-     * counted from the order creation date; the shipping date will replace it
-     * once #168 stores it.
+     * Whether the retraction window is still open for the order.
+     *
+     * The window runs from the day the goods left, which is the day the order last
+     * moved to the "sent" status in its history: a customer who waited three weeks
+     * for a delivery has not spent their retraction period waiting for it. "Last"
+     * rather than "first" because an order sent again after coming back starts a new
+     * window, which is the reading that favours the buyer.
+     *
+     * An order placed before the history existed, or one that has not been marked as
+     * sent, has no such date on file and falls back to its creation date — the rule
+     * that applied to it until now, so no window closes or opens because of this.
      */
     public function isWithinReturnWindow(Order $order): bool
     {
@@ -86,12 +96,34 @@ final class ReturnEligibilityChecker
             return false;
         }
 
-        $createdAt = $order->getCreatedAt();
-        if (null === $createdAt) {
+        $windowStart = $this->returnWindowStartDate($order);
+        if (null === $windowStart) {
             return false;
         }
 
-        return (clone $createdAt)->modify(\sprintf('+%d days', $this->windowDays())) >= new \DateTime();
+        return (clone $windowStart)->modify(\sprintf('+%d days', $this->windowDays())) >= new \DateTime();
+    }
+
+    /**
+     * The date the retraction window is counted from: the last shipment, failing
+     * that the order creation.
+     */
+    private function returnWindowStartDate(Order $order): ?\DateTimeInterface
+    {
+        $orderId = $order->getId();
+
+        if (null !== $orderId) {
+            $shipment = OrderHistoryQuery::create()
+                ->findLastStatusChangeTo($orderId, OrderStatus::CODE_SENT);
+
+            $shippedAt = $shipment?->getCreatedAt();
+
+            if ($shippedAt instanceof \DateTimeInterface) {
+                return $shippedAt;
+            }
+        }
+
+        return $order->getCreatedAt();
     }
 
     /**

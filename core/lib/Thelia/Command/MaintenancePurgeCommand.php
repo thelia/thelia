@@ -127,7 +127,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
             $this->anonymizeInactiveAccounts($output, $dryRun);
 
-            $event = new MaintenancePurgeEvent();
+            $event = new MaintenancePurgeEvent($dryRun);
             $this->getDispatcher()->dispatch($event, TheliaEvents::MAINTENANCE_PURGE);
 
             foreach ($event->getResults() as $result) {
