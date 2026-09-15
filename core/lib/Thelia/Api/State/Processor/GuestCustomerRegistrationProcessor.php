@@ -74,7 +74,7 @@ final readonly class GuestCustomerRegistrationProcessor implements ProcessorInte
         }
 
         try {
-            $guest = $this->customerFacade->registerGuest(new CustomerGuestDTO(
+            $registration = $this->customerFacade->registerGuestReturningRegistration(new CustomerGuestDTO(
                 email: $email,
                 firstname: $data->firstname,
                 lastname: $data->lastname,
@@ -85,6 +85,7 @@ final readonly class GuestCustomerRegistrationProcessor implements ProcessorInte
             throw new ConflictHttpException($e->getMessage(), $e);
         }
 
+        $guest = $registration->customer;
         $claimedCart = $this->guestCheckoutSession->attachToGuest($cart, $guest);
 
         $response = new GuestCustomer();
@@ -92,7 +93,7 @@ final readonly class GuestCustomerRegistrationProcessor implements ProcessorInte
         $response->email = $guest->getEmail();
         $response->firstname = $guest->getFirstname();
         $response->lastname = $guest->getLastname();
-        $response->token = $this->guestTokenIssuer->issueFor($guest, $claimedCart);
+        $response->token = $this->guestTokenIssuer->issueFor($guest, $claimedCart, $registration->createdTheCustomer);
         $response->expiresIn = $this->guestTokenIssuer->lifetimeInSeconds();
         $response->cartId = $claimedCart?->getId();
 

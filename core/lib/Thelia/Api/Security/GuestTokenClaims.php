@@ -55,6 +55,19 @@ final readonly class GuestTokenClaims
     }
 
     /**
+     * Whether the registration that minted the current token created the guest row,
+     * rather than landing on one that already existed for the address.
+     */
+    public function createdTheCustomer(): bool
+    {
+        $token = $this->tokenStorage->getToken();
+
+        return null !== $token
+            && $this->isGuest()
+            && true === $token->getAttribute(GuestToken::CREATED_CUSTOMER_TOKEN_ATTRIBUTE);
+    }
+
+    /**
      * The guest account the current token belongs to, or null when the caller is not
      * a guest.
      */

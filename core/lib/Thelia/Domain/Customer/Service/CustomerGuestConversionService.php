@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\Exception\GuestConversionPendingException;
 use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -40,9 +41,13 @@ use Thelia\Model\Map\CustomerTableMap;
  * reset link, and opens no account page. {@see CustomerCodeManager::activateCustomerByCode()}
  * is where the row stops being a guest.
  *
- * A guest who chose a password and never answered the code may choose another one: the
- * row is still a guest, so this runs again, replaces the password and mails a fresh
- * code. Nothing is lost by it — neither password opens anything until a code is answered.
+ * A password that is waiting for its code is not replaced on demand. The code that was
+ * mailed opens the account on whatever password the row holds when it is answered, so
+ * letting anyone with a claim on the row rewrite that password would let them turn the
+ * owner's own activation into a takeover. Only a caller who has proved they read the
+ * mailbox — the tracking link of an order, mailed to the same address — may replace it;
+ * everybody else waits for the code to be answered or to expire, after which a fresh
+ * password and a fresh code are welcome again.
  *
  * The account always comes out disabled, and the shop's own "confirm every address"
  * setting has no say in it. That setting decides how much a *fresh* registration is
@@ -64,12 +69,17 @@ final readonly class CustomerGuestConversionService
     /**
      * @throws NotAGuestCustomerException                   when the row is an account someone already activated
      * @throws GuestCheckoutEmailAlreadyRegisteredException when a real account took the address in the meantime
+     * @throws GuestConversionPendingException              when a password is waiting for its code and may not be replaced
      * @throws PropelException
      */
-    public function convert(Customer $customer, string $plainPassword): Customer
+    public function convert(Customer $customer, string $plainPassword, bool $replacesPendingPassword = false): Customer
     {
         if (!$customer->isGuest()) {
             throw new NotAGuestCustomerException('This account is not a guest account and cannot be converted.');
+        }
+
+        if (!$replacesPendingPassword && $this->hasAnOutstandingActivationCode($customer)) {
+            throw new GuestConversionPendingException('A password has already been chosen for this account and its activation code has been sent. Answer that code, or wait for it to expire, before choosing another password.');
         }
 
         if ('' === trim($plainPassword)) {
@@ -114,6 +124,18 @@ final readonly class CustomerGuestConversionService
         $this->customerCodeManager->createCodeAndSendIt($customer);
 
         return $customer;
+    }
+
+    /**
+     * A guest row carries an activation code only once a password has been chosen for it
+     * and the code mailed. The password itself is not read here on purpose: authenticating
+     * the guest token erases the credential on the loaded row, so the code — which stays
+     * put — is the reliable mark that an activation is outstanding and must not be quietly
+     * pointed at a different password.
+     */
+    private function hasAnOutstandingActivationCode(Customer $customer): bool
+    {
+        return null !== $customer->getConfirmationToken() && !$customer->isConfirmationTokenExpired();
     }
 
     /**

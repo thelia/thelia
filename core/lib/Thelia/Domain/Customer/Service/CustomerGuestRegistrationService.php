@@ -24,6 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Customer\DTO\CustomerGuestDTO;
 use Thelia\Domain\Customer\EmailAddress;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\GuestRegistration;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -41,6 +42,11 @@ use Thelia\Model\Map\CustomerTableMap;
  * guest row is not one of those: nobody proved they own it, so it is reused, not refused.
  * A guest that chose a password but never answered its activation code is still a guest
  * row and behaves the same way.
+ *
+ * Reused for the order, that is. The result says whether the row was opened by this
+ * registration or found already there, because a visitor who landed on somebody else's
+ * row must not be able to set the password on it — see
+ * {@see \Thelia\Api\State\Processor\GuestCustomerConversionProcessor}.
  */
 final readonly class CustomerGuestRegistrationService
 {
@@ -53,7 +59,7 @@ final readonly class CustomerGuestRegistrationService
      * @throws GuestCheckoutEmailAlreadyRegisteredException when the address belongs to a real account
      * @throws PropelException
      */
-    public function registerGuest(CustomerGuestDTO $guest): Customer
+    public function registerGuest(CustomerGuestDTO $guest): GuestRegistration
     {
         $email = EmailAddress::normalize($guest->getEmail());
 
@@ -78,13 +84,13 @@ final readonly class CustomerGuestRegistrationService
 
             $existingGuest = $this->findReusableGuest($email, $connection);
 
-            $customer = $existingGuest instanceof Customer
-                ? $this->refresh($existingGuest, $guest, $connection)
-                : $this->create($guest, $email);
+            $registration = $existingGuest instanceof Customer
+                ? new GuestRegistration($this->refresh($existingGuest, $guest, $connection), createdTheCustomer: false)
+                : new GuestRegistration($this->create($guest, $email), createdTheCustomer: true);
 
             $connection->commit();
 
-            return $customer;
+            return $registration;
         } catch (\Throwable $e) {
             $connection->rollBack();
 

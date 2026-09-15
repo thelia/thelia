@@ -92,6 +92,12 @@ class JwtListener
             GuestToken::CART_TOKEN_ATTRIBUTE,
             isset($payload[GuestToken::CART_CLAIM]) ? (int) $payload[GuestToken::CART_CLAIM] : null,
         );
+        // Absent claim, older token: it was minted before the shop recorded who opened
+        // the row, so it is given the rights of a token that did not.
+        $guestToken->setAttribute(
+            GuestToken::CREATED_CUSTOMER_TOKEN_ATTRIBUTE,
+            true === ($payload[GuestToken::CREATED_CUSTOMER_CLAIM] ?? false),
+        );
 
         $event->setAuthenticatedToken($guestToken);
     }

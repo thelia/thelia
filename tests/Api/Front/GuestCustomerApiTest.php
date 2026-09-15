@@ -64,6 +64,23 @@ final class GuestCustomerApiTest extends ApiTestCase
         );
     }
 
+    /**
+     * The claim is what separates the visitor who opened the row from one who merely
+     * typed the same address later: only the first may set a password on it with the
+     * token alone.
+     */
+    public function testTheTokenSaysWhetherTheRegistrationCreatedTheAccount(): void
+    {
+        $this->enableGuestCheckout();
+
+        [, $first] = $this->registerGuestInAFreshSession();
+        [, $second] = $this->registerGuestInAFreshSession(['email' => $first['email']]);
+
+        self::assertSame($first['id'], $second['id'], 'Same address, same guest row.');
+        self::assertTrue(self::jwtPayload($first['token'])[GuestToken::CREATED_CUSTOMER_CLAIM] ?? null);
+        self::assertFalse(self::jwtPayload($second['token'])[GuestToken::CREATED_CUSTOMER_CLAIM] ?? null);
+    }
+
     public function testTheTokenExpiresWithinTheGuestLifetime(): void
     {
         $this->enableGuestCheckout();

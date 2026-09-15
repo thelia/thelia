@@ -23,6 +23,7 @@ use Thelia\Domain\Customer\DTO\CustomerGuestDTO;
 use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\Exception\GuestConversionPendingException;
 use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Domain\Customer\Service\CustomerAuthenticator;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
@@ -115,18 +116,40 @@ readonly class CustomerFacade
      */
     public function registerGuest(CustomerGuestDTO $customerGuestDTO): Customer
     {
+        return $this->customerGuestRegistrationService->registerGuest($customerGuestDTO)->customer;
+    }
+
+    /**
+     * Same registration, but reporting whether the row was opened by it or found already
+     * there for the address.
+     *
+     * A caller that hands out a credential on the strength of the registration needs to
+     * know which: a guest row is reused when the same address orders twice, so a token
+     * bound to it says nothing about who is behind it unless the registration also says
+     * it opened the row. Callers that only need the account, such as a session-based
+     * checkout, use {@see registerGuest()} instead.
+     *
+     * @throws GuestCheckoutEmailAlreadyRegisteredException when the address belongs to a real account
+     */
+    public function registerGuestReturningRegistration(CustomerGuestDTO $customerGuestDTO): GuestRegistration
+    {
         return $this->customerGuestRegistrationService->registerGuest($customerGuestDTO);
     }
 
     /**
      * Turn the guest account into a real one, with the password its owner just chose.
      *
+     * A password already chosen and waiting for its activation code is kept unless the
+     * caller says it may be replaced, which it should only say for a caller who proved
+     * they read the mailbox.
+     *
      * @throws NotAGuestCustomerException                   when the account is not a guest
      * @throws GuestCheckoutEmailAlreadyRegisteredException when a real account took the address meanwhile
+     * @throws GuestConversionPendingException              when a password is waiting for its code and may not be replaced
      */
-    public function convertGuestToCustomer(Customer $customer, string $plainPassword): Customer
+    public function convertGuestToCustomer(Customer $customer, string $plainPassword, bool $replacesPendingPassword = false): Customer
     {
-        return $this->customerGuestConversionService->convert($customer, $plainPassword);
+        return $this->customerGuestConversionService->convert($customer, $plainPassword, $replacesPendingPassword);
     }
 
     /**

@@ -180,26 +180,91 @@ final class GuestCustomerConversionApiTest extends ApiTestCase
     }
 
     /**
-     * The buyer chose a password and never opened the mail. Nothing was proved by the
-     * first attempt, so the second one is not a conflict — it replaces the password and
-     * mails a fresh code, and neither password opens anything until one is answered.
+     * The buyer chose a password and never opened the mail. Until the code is answered
+     * or expires, the password stays what it is: a guest token is a bearer credential
+     * handed out at checkout, and the row it names may also carry a password somebody
+     * else has just chosen and is about to confirm from the mailbox.
      */
-    public function testAGuestThatNeverAnsweredItsCodeMayChooseAnotherPassword(): void
+    public function testAGuestThatNeverAnsweredItsCodeCannotReplaceThePasswordWithTheSameToken(): void
     {
         $this->enableGuestCheckout();
-
         [, $guest] = $this->registerGuest();
-
         $this->convert($guest['id'], ['password' => 'a-chosen-password'], $guest['token']);
+
         $again = $this->convert($guest['id'], ['password' => 'a-second-password'], $guest['token']);
 
-        self::assertJsonResponseSuccessful($again);
-
+        self::assertSame(409, $again->getStatusCode());
+        CustomerTableMap::clearInstancePool();
         $stored = CustomerQuery::create()->findPk($guest['id'], $this->getPropelConnection());
-
         self::assertNotNull($stored);
-        self::assertTrue($stored->checkPassword('a-second-password'), 'The last password chosen is the one kept.');
+        self::assertTrue($stored->checkPassword('a-chosen-password'), 'The password a code was mailed for is the one kept.');
         self::assertTrue($stored->isGuest(), 'Still waiting for a code, so still a guest row.');
+    }
+
+    /**
+     * A tracking link was mailed to the address, so whoever holds it read the mailbox.
+     * That is proof enough to replace a password somebody else may have put on the row.
+     */
+    public function testATrackingTokenReplacesAPendingPassword(): void
+    {
+        $this->enableGuestCheckout();
+        [, $guest] = $this->registerGuest();
+        $this->convert($guest['id'], ['password' => 'put-there-first'], $guest['token']);
+        $customer = CustomerQuery::create()->findPk($guest['id'], $this->getPropelConnection());
+        self::assertNotNull($customer);
+        $order = $this->createFixtureFactory()->order($customer);
+        $orderToken = $this->getService(GuestOrderAccessService::class)->createToken($order);
+
+        $response = $this->convert($guest['id'], ['password' => 'from-the-mailbox', 'orderToken' => $orderToken]);
+
+        self::assertJsonResponseSuccessful($response);
+        CustomerTableMap::clearInstancePool();
+        $stored = CustomerQuery::create()->findPk($guest['id'], $this->getPropelConnection());
+        self::assertNotNull($stored);
+        self::assertTrue($stored->checkPassword('from-the-mailbox'), 'The mailbox decides which password stays.');
+    }
+
+    /**
+     * Registering as a guest with an address somebody already used lands on their row,
+     * and hands back a token bound to it. Knowing the address is all that took, so that
+     * token must not be what sets the password on the account carrying their orders.
+     */
+    public function testAGuestTokenIssuedOnAnAddressSomebodyElseUsedCannotCompleteTheirAccount(): void
+    {
+        $this->enableGuestCheckout();
+        [, $victim] = $this->registerGuestInAFreshSession();
+        [$registration, $attacker] = $this->registerGuestInAFreshSession(['email' => $victim['email']]);
+        self::assertSame(201, $registration->getStatusCode());
+        self::assertSame($victim['id'], $attacker['id'], 'Same address, same guest row.');
+
+        $response = $this->convert($victim['id'], ['password' => 'taken-over'], $attacker['token']);
+
+        self::assertSame(403, $response->getStatusCode());
+        $untouched = CustomerQuery::create()->findPk($victim['id'], $this->getPropelConnection());
+        self::assertNotNull($untouched);
+        self::assertTrue($untouched->isGuest());
+        self::assertEmpty($untouched->getPassword(), 'Knowing the address must not set a password on the account.');
+    }
+
+    /**
+     * Same as above, once the owner has chosen a password: the second token must not
+     * replace it, or the code the owner is about to answer would open the account on a
+     * password they never chose.
+     */
+    public function testAGuestTokenIssuedOnAnAddressSomebodyElseUsedCannotReplaceTheirPendingPassword(): void
+    {
+        $this->enableGuestCheckout();
+        [, $victim] = $this->registerGuestInAFreshSession();
+        $this->convert($victim['id'], ['password' => 'the-owners-choice'], $victim['token']);
+        [, $attacker] = $this->registerGuestInAFreshSession(['email' => $victim['email']]);
+
+        $response = $this->convert($victim['id'], ['password' => 'taken-over'], $attacker['token']);
+
+        self::assertSame(403, $response->getStatusCode());
+        CustomerTableMap::clearInstancePool();
+        $stored = CustomerQuery::create()->findPk($victim['id'], $this->getPropelConnection());
+        self::assertNotNull($stored);
+        self::assertTrue($stored->checkPassword('the-owners-choice'), 'The pending password must stay the owner\'s.');
     }
 
     /**

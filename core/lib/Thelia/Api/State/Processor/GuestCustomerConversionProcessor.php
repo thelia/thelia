@@ -24,6 +24,7 @@ use Thelia\Api\Resource\GuestCustomer;
 use Thelia\Api\Security\GuestTokenClaims;
 use Thelia\Domain\Customer\CustomerFacade;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\Exception\GuestConversionPendingException;
 use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
@@ -35,9 +36,15 @@ use Thelia\Model\CustomerQuery;
  *
  * There are exactly two proofs, and neither of them is the address: knowing an address
  * must never be enough to set a password on the account that carries its orders. Either
- * the caller still holds the guest token issued at checkout, or it holds a tracking
- * token for one of the orders on that account — which is signed, expires, and is
- * rate limited before it is even checked.
+ * the caller holds the guest token of the registration that opened the row — not one
+ * handed out later to whoever typed the same address, since a guest row is reused across
+ * visits — or it holds a tracking token for one of the orders on that account, which is
+ * signed, expires, and is rate limited before it is even checked.
+ *
+ * The two proofs are not worth the same. A tracking token was mailed to the address, so
+ * holding it means having read the mailbox, and that is enough to replace a password
+ * somebody else has chosen and not yet confirmed. A guest token was handed out over the
+ * counter; it may set a password on a row that has none, and no more.
  */
 final readonly class GuestCustomerConversionProcessor implements ProcessorInterface
 {
@@ -59,17 +66,25 @@ final readonly class GuestCustomerConversionProcessor implements ProcessorInterf
         $customerId = $this->requestedCustomerId($uriVariables);
         $customer = null === $customerId ? null : CustomerQuery::create()->findPk($customerId);
 
+        $readTheMailbox = $customer instanceof Customer && $this->holdsATrackingTokenFor($customer, $data->orderToken);
+
         // One answer for "no such account" and for "not yours": telling them apart would
         // turn the endpoint into a way to find out which customer ids are guests.
-        if (!$customer instanceof Customer || !$this->isEntitledTo($customer, $data->orderToken)) {
+        if (!$customer instanceof Customer || (!$readTheMailbox && !$this->openedTheRow($customer))) {
             throw new AccessDeniedHttpException('This guest account cannot be completed with the credentials given.');
         }
 
         try {
-            $converted = $this->customerFacade->convertGuestToCustomer($customer, (string) $data->password);
+            $converted = $this->customerFacade->convertGuestToCustomer(
+                $customer,
+                (string) $data->password,
+                replacesPendingPassword: $readTheMailbox,
+            );
         } catch (NotAGuestCustomerException $e) {
             throw new ConflictHttpException($e->getMessage(), $e);
         } catch (GuestCheckoutEmailAlreadyRegisteredException $e) {
+            throw new ConflictHttpException($e->getMessage(), $e);
+        } catch (GuestConversionPendingException $e) {
             throw new ConflictHttpException($e->getMessage(), $e);
         } catch (\InvalidArgumentException $e) {
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
@@ -101,12 +116,21 @@ final readonly class GuestCustomerConversionProcessor implements ProcessorInterf
         return is_numeric($id) ? (int) $id : null;
     }
 
-    private function isEntitledTo(Customer $customer, ?string $orderToken): bool
+    /**
+     * The caller holds the guest token of the registration that opened this very row.
+     *
+     * A token bound to the row is not enough on its own: the row is reused when the same
+     * address orders again, so a later registration on that address is handed a token
+     * for it too, and all it took was knowing the address.
+     */
+    private function openedTheRow(Customer $customer): bool
     {
-        if ($this->guestTokenClaims->customer()?->getId() === $customer->getId()) {
-            return true;
-        }
+        return $this->guestTokenClaims->createdTheCustomer()
+            && $this->guestTokenClaims->customer()?->getId() === $customer->getId();
+    }
 
+    private function holdsATrackingTokenFor(Customer $customer, ?string $orderToken): bool
+    {
         if (null === $orderToken || '' === $orderToken) {
             return false;
         }

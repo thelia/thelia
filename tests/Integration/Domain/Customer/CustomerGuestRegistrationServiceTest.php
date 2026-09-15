@@ -53,7 +53,7 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
             firstname: 'Ada',
             lastname: 'Lovelace',
             title: $this->factory->customerTitle()->getId(),
-        ));
+        ))->customer;
 
         $stored = $this->reload($guest);
 
@@ -92,7 +92,7 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
                 firstname: 'Silent',
                 lastname: 'Guest',
                 title: $this->factory->customerTitle()->getId(),
-            ));
+            ))->customer;
 
             self::assertCount(
                 $sentBefore,
@@ -119,14 +119,14 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
             firstname: 'Ada',
             lastname: 'Lovelace',
             title: $titleId,
-        ));
+        ))->customer;
 
         $second = $this->service->registerGuest(new CustomerGuestDTO(
             email: $email,
             firstname: 'Augusta',
             lastname: 'King',
             title: $titleId,
-        ));
+        ))->customer;
 
         self::assertSame(
             $first->getId(),
@@ -159,14 +159,14 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
             firstname: 'Ada',
             lastname: 'Lovelace',
             title: $titleId,
-        ));
+        ))->customer;
 
         $second = $this->service->registerGuest(new CustomerGuestDTO(
             email: '  '.strtoupper($email).' ',
             firstname: 'Ada',
             lastname: 'Lovelace',
             title: $titleId,
-        ));
+        ))->customer;
 
         self::assertSame($first->getId(), $second->getId(), 'One mailbox, one guest row.');
         self::assertSame($email, $this->reload($first)->getEmail(), 'And it is stored in the normalised form.');
@@ -184,7 +184,7 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
             firstname: 'Not',
             lastname: 'TheOwner',
             title: $this->factory->customerTitle()->getId(),
-        ));
+        ))->customer;
     }
 
     /**
@@ -199,7 +199,7 @@ final class CustomerGuestRegistrationServiceTest extends IntegrationTestCase
             firstname: 'No',
             lastname: 'Address',
             title: $this->factory->customerTitle()->getId(),
-        ));
+        ))->customer;
     }
 
     /**

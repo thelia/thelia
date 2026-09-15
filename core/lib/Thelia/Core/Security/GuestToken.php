@@ -48,6 +48,23 @@ final class GuestToken
     public const CART_TOKEN_ATTRIBUTE = 'thelia.guest_cart_id';
 
     /**
+     * Whether the registration that minted the token created the customer row, as a
+     * JWT claim.
+     *
+     * The same reuse of the row across visits means a token bound to a customer id does
+     * not say "this account is mine" either: whoever types an address somebody already
+     * used is handed a token for that person's row. Setting a password on the account
+     * carrying their orders takes more than that, and this claim is what tells the
+     * visitor who opened the row apart from one who merely landed on it.
+     */
+    public const CREATED_CUSTOMER_CLAIM = 'created_customer';
+
+    /**
+     * Where the claim above is kept on the authenticated security token.
+     */
+    public const CREATED_CUSTOMER_TOKEN_ATTRIBUTE = 'thelia.guest_created_customer';
+
+    /**
      * How long a guest token is accepted, in seconds, unless the shop says otherwise.
      *
      * Short on purpose: it is handed to a visitor the shop knows nothing about, and it

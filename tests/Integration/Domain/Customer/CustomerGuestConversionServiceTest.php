@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Customer;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
+use Thelia\Domain\Customer\Exception\GuestConversionPendingException;
 use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
 use Thelia\Domain\Customer\Service\CustomerGuestConversionService;
@@ -162,23 +163,35 @@ final class CustomerGuestConversionServiceTest extends IntegrationTestCase
     }
 
     /**
-     * The buyer chose a password, never opened the mail, and asks again — a second tab, a
-     * new device, a forgotten password before the account even existed. The row is still
-     * a guest, so this has to work: refusing would leave them with an address they cannot
-     * register and an account they cannot open.
-     *
-     * Nothing is given away by it. Neither password opens anything until a code is
-     * answered, and the code goes to the mailbox either way.
+     * The buyer chose a password and never opened the mail. Choosing another one with the
+     * service alone is refused now: the code already mailed opens the account on whatever
+     * password the row holds when it is answered, so a second password slipped in without
+     * proof of the mailbox would turn the buyer's own activation into a takeover. The
+     * caller has to prove it read the mailbox, or wait for the code to be answered or to
+     * expire.
      */
-    public function testAGuestThatNeverAnsweredItsCodeMayChooseAnotherPassword(): void
+    public function testAPendingPasswordIsNotReplacedWithoutProofOfTheMailbox(): void
     {
         $guest = $this->guest();
-
         $this->service->convert($guest, 'a-first-password');
+
+        $this->expectException(GuestConversionPendingException::class);
         $this->service->convert($guest, 'a-second-password');
+    }
+
+    /**
+     * With that proof — the flag the processor sets for a caller holding an order tracking
+     * link — the pending password is replaced.
+     */
+    public function testAPendingPasswordIsReplacedWithProofOfTheMailbox(): void
+    {
+        $guest = $this->guest();
+        $this->service->convert($guest, 'a-first-password');
+
+        $this->service->convert($guest, 'a-second-password', replacesPendingPassword: true);
 
         $stored = $this->reload($guest);
-        self::assertTrue($stored->checkPassword('a-second-password'), 'The last password chosen is the one kept.');
+        self::assertTrue($stored->checkPassword('a-second-password'), 'The replacement password is the one kept.');
         self::assertFalse($stored->checkPassword('a-first-password'), 'The earlier password must be gone.');
         self::assertTrue($stored->isGuest(), 'Still a guest: no code has been answered yet.');
     }

@@ -28,6 +28,10 @@ use Thelia\Model\Customer;
  * names the single cart it may act on. It also expires much sooner than an account
  * token: it is given to a visitor the shop knows nothing about, and it only has to
  * outlive a checkout.
+ *
+ * It also records whether the registration it comes from created the customer row or
+ * landed on one somebody else had already opened with the same address. Only the
+ * former may complete the account with the token alone.
  */
 final readonly class GuestTokenIssuer
 {
@@ -36,13 +40,14 @@ final readonly class GuestTokenIssuer
     ) {
     }
 
-    public function issueFor(Customer $guest, ?Cart $cart): string
+    public function issueFor(Customer $guest, ?Cart $cart, bool $createdTheCustomer = false): string
     {
         $payload = [
             // createFromPayload() merges this over Customer::getRoles(), so the token
             // carries the guest role and nothing else.
             'roles' => [GuestToken::ROLE],
             'exp' => time() + $this->lifetimeInSeconds(),
+            GuestToken::CREATED_CUSTOMER_CLAIM => $createdTheCustomer,
         ];
 
         if (null !== $cart?->getId()) {
