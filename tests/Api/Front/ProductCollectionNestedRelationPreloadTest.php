@@ -63,15 +63,17 @@ final class ProductCollectionNestedRelationPreloadTest extends ApiTestCase
             }
         }
 
-        sort($titles);
-
-        self::assertSame(
-            array_map(
-                static fn (Category $category): string => 'Category '.$category->getId().' en_US',
-                $categories,
-            ),
-            $titles,
+        $expected = array_map(
+            static fn (Category $category): string => 'Category '.$category->getId().' en_US',
+            $categories,
         );
+
+        // Both sides are sorted the same way: the assertion is about the rows, not their order, and
+        // a lexicographic sort on one side alone breaks as soon as the ids reach three digits.
+        sort($titles);
+        sort($expected);
+
+        self::assertSame($expected, $titles);
     }
 
     /**
