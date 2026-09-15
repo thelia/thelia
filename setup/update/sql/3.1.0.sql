@@ -556,14 +556,24 @@ CREATE TABLE IF NOT EXISTS `tag_element`
 --
 -- `code` is unique, so INSERT IGNORE is the idempotency, and the id is left to
 -- AUTO_INCREMENT: on an upgrading shop the ids the fresh seed uses may already
--- belong to a module. The i18n row therefore looks its parent up by code rather
--- than by a hard-coded id. English only, as translations are collected before a
--- release.
+-- belong to a module. The i18n rows therefore look their parent up by code
+-- rather than by a hard-coded id.
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.configuration.tag', NOW(), NOW());
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`)
-    SELECT `id`, 'en_US', 'Configuration / Tag' FROM `resource` WHERE `code` = 'admin.configuration.tag';
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @tag_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.tag');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@tag_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@tag_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@tag_resource_id, 'en_US', 'Configuration / Tag', NULL, NULL, NULL),
+    (@tag_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@tag_resource_id, 'fr_FR', 'Configuration / Étiquette', NULL, NULL, NULL),
+    (@tag_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@tag_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@tag_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
 -- ---------------------------------------------------------------------
 -- Product returns (RMA)
