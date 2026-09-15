@@ -360,12 +360,14 @@ readonly class ApiResourcePropelTransformerService
 
                     foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                         if ($isInContext && 'array' !== $property->getType()?->getName()) {
-                            $propelModel->{$propelSetter}(null);
+                            if (!$this->mapsToRequiredColumn($propelModel, $propelSetter)) {
+                                $propelModel->{$propelSetter}(null);
+                            }
                             continue 3;
                         }
                     }
 
-                    if ($isInContext && $property->getType()?->isBuiltin()) {
+                    if ($isInContext && $property->getType()?->isBuiltin() && !$this->mapsToRequiredColumn($propelModel, $propelSetter)) {
                         $propelModel->{$propelSetter}(null);
                     }
                 }
@@ -413,6 +415,14 @@ readonly class ApiResourcePropelTransformerService
                     }
                 }
 
+                // A resource property declared optional still reaches us as an
+                // explicit null when the payload omits it. Writing that null
+                // into a NOT NULL column can only end as an SQL error, and it
+                // overwrites the column default Propel would have applied.
+                if (null === $value && $this->mapsToRequiredColumn($propelModel, $propelSetter)) {
+                    continue;
+                }
+
                 if (\in_array('force', $paramNames, true)) {
                     $propelModel->{$propelSetter}($value, true);
                 }
@@ -420,6 +430,28 @@ readonly class ApiResourcePropelTransformerService
                 $propelModel->{$propelSetter}($value);
             }
         }
+    }
+
+    /**
+     * Whether the Propel setter writes a column the schema declares NOT NULL.
+     * A setter that targets a relation or a virtual field maps to no column
+     * and is left alone.
+     */
+    private function mapsToRequiredColumn(ActiveRecordInterface $propelModel, string $propelSetter): bool
+    {
+        if (!str_starts_with($propelSetter, 'set')) {
+            return false;
+        }
+
+        $tableMapClass = $propelModel::TABLE_MAP;
+        $tableMap = $tableMapClass::getTableMap();
+        $phpName = substr($propelSetter, 3);
+
+        if (!$tableMap->hasColumnByPhpName($phpName)) {
+            return false;
+        }
+
+        return $tableMap->getColumnByPhpName($phpName)->isNotNull();
     }
 
     private function determinePropelSetterName(
