@@ -62,6 +62,43 @@ final class ProductApiTest extends ApiTestCase
         self::assertSame('API-PROD-001', $product->getRef());
     }
 
+    public function testCreateProductWithoutPositionSucceeds(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $taxRule = $factory->taxRule();
+
+        // position is optional in the payload: product.position is NOT NULL in
+        // the schema, and an omitted field must not reach the INSERT as null.
+        $response = $this->jsonRequest('POST', '/api/admin/products', [
+            'ref' => 'API-PROD-NO-POS',
+            'visible' => true,
+            'virtual' => false,
+            'taxRule' => '/api/admin/tax_rules/'.$taxRule->getId(),
+            'i18ns' => [
+                'en_US' => [
+                    'title' => 'Product without position',
+                    'locale' => 'en_US',
+                ],
+            ],
+            'productCategories' => [
+                [
+                    'category' => '/api/admin/categories/'.$category->getId(),
+                    'defaultCategory' => true,
+                ],
+            ],
+        ], $token);
+
+        self::assertJsonResponseSuccessful($response);
+
+        $data = json_decode($response->getContent(), true);
+        $product = ProductQuery::create()->findPk($data['id']);
+        self::assertNotNull($product);
+        self::assertNotNull($product->getPosition());
+    }
+
     public function testGetProductReturnsFullResource(): void
     {
         $token = $this->authenticateAsAdmin();
@@ -111,6 +148,43 @@ final class ProductApiTest extends ApiTestCase
         $reloaded = ProductQuery::create()->findPk($product->getId());
         self::assertSame('PATCHED-REF', $reloaded->getRef());
         self::assertSame(0, (int) $reloaded->getVisible());
+    }
+
+    public function testUpdateProductViaPutWithoutPositionKeepsIt(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $taxRule = $factory->taxRule();
+        $product = $factory->product($category, $taxRule, $factory->currency());
+        $product->setPosition(7)->save();
+
+        // A PUT clears every writable field the payload omits: position is
+        // NOT NULL, so it must keep the stored value rather than become null.
+        $response = $this->jsonRequest('PUT', '/api/admin/products/'.$product->getId(), [
+            'ref' => $product->getRef(),
+            'visible' => true,
+            'virtual' => false,
+            'taxRule' => '/api/admin/tax_rules/'.$taxRule->getId(),
+            'i18ns' => [
+                'en_US' => [
+                    'title' => 'Put without position',
+                    'locale' => 'en_US',
+                ],
+            ],
+            'productCategories' => [
+                [
+                    'category' => '/api/admin/categories/'.$category->getId(),
+                    'defaultCategory' => true,
+                ],
+            ],
+        ], $token);
+
+        self::assertJsonResponseSuccessful($response);
+
+        $product->reload();
+        self::assertSame(7, $product->getPosition());
     }
 
     public function testDeleteProductRemovesResource(): void
