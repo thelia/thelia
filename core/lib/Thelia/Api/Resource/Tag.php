@@ -24,12 +24,16 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\Map\TagTableMap;
+use Thelia\Model\Tag as TagModel;
+use Thelia\Model\TagQuery;
 
 /**
  * A free-text marker an administrator puts on a shop object.
@@ -106,6 +110,38 @@ class Tag implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
+
+    /**
+     * The collision is looked up rather than left to the unique index, as
+     * TagService::create() and rename() do for the back-office: the index
+     * answers with a PropelException the client reads as a server fault, and
+     * under utf8mb4_general_ci it fires on a spelling the caller never typed
+     * ("vip" onto "VIP"), so the refusal has to name the tag standing in the way.
+     */
+    #[Callback]
+    public function verifyLabelIsNotAlreadyUsed(ExecutionContextInterface $context): void
+    {
+        if (!isset($this->label)) {
+            return;
+        }
+
+        $normalizedLabel = TagModel::normalizeLabel($this->label);
+
+        if ('' === $normalizedLabel) {
+            return;
+        }
+
+        $conflicting = TagQuery::create()->findOneByLabel($normalizedLabel);
+
+        if (!$conflicting instanceof TagModel || $conflicting->getId() === $this->id) {
+            return;
+        }
+
+        $context->buildViolation('Another tag already carries this label: "{{ label }}".')
+            ->setParameter('{{ label }}', (string) $conflicting->getLabel())
+            ->atPath('label')
+            ->addViolation();
+    }
 
     public function getId(): ?int
     {
