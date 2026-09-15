@@ -50,7 +50,12 @@ use Thelia\Model\TagQuery;
             uriTemplate: '/admin/tags/{id}',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
-        new Put(uriTemplate: '/admin/tags/{id}'),
+        // Not a standard PUT: the resource the validator sees is the row the URI
+        // names, populated with the body, so verifyLabelIsNotAlreadyUsed() can tell
+        // a tag saved back under its own label from a collision with another one.
+        // A standard PUT validates a fresh object that carries no id, and every
+        // write on an existing tag is then refused as a collision with itself.
+        new Put(uriTemplate: '/admin/tags/{id}', extraProperties: ['standard_put' => false]),
         new Patch(uriTemplate: '/admin/tags/{id}'),
         new Delete(uriTemplate: '/admin/tags/{id}'),
     ],
