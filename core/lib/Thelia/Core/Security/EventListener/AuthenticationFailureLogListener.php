@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Thelia\Core\HttpFoundation\RequestPath;
 
 /**
  * Writes down every authentication the API refused.
@@ -64,7 +65,7 @@ final readonly class AuthenticationFailureLogListener
         $this->logger->warning('API login refused.', [
             'caller' => $request->getClientIp(),
             'identifier' => $this->identifierAimedAt($event),
-            'endpoint' => $request->getPathInfo(),
+            'endpoint' => RequestPath::decoded($request),
             // The class, not the message: it says whether the attempt was
             // turned away for a bad password, a disabled account or a limit
             // reached, and it cannot carry anything the caller typed.
@@ -81,7 +82,7 @@ final readonly class AuthenticationFailureLogListener
 
         $request = $event->getRequest();
 
-        if (!\in_array(rtrim($request->getPathInfo(), '/'), self::TOKEN_REFRESH_PATHS, true)) {
+        if (!\in_array(rtrim(RequestPath::decoded($request), '/'), self::TOKEN_REFRESH_PATHS, true)) {
             return;
         }
 
@@ -91,7 +92,7 @@ final readonly class AuthenticationFailureLogListener
 
         $this->logger->warning('API token refresh refused.', [
             'caller' => $request->getClientIp(),
-            'endpoint' => $request->getPathInfo(),
+            'endpoint' => RequestPath::decoded($request),
         ]);
     }
 

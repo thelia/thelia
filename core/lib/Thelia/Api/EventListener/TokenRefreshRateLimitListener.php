@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\RateLimiter\RateLimitAllowlist;
 use Thelia\Core\Security\RateLimiter\RateLimitedResponse;
 
@@ -57,7 +58,7 @@ final readonly class TokenRefreshRateLimitListener
 
         $request = $event->getRequest();
 
-        if (!\in_array(rtrim($request->getPathInfo(), '/'), self::REFRESH_PATHS, true)) {
+        if (!\in_array(rtrim(RequestPath::decoded($request), '/'), self::REFRESH_PATHS, true)) {
             return;
         }
 

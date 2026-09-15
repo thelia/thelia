@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Domain\Module\Composer\ComposerHelper;
 use Thelia\Model\ConfigQuery;
 
@@ -244,7 +245,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
         if (null === $request) {
             return false;
         }
-        $match = preg_match('#/admin/?.*#', $request->getPathInfo());
+        $match = preg_match('#/admin/?.*#', RequestPath::decoded($request));
 
         return false !== $match && 0 !== $match;
     }

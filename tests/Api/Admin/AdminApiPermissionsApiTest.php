@@ -80,6 +80,42 @@ final class AdminApiPermissionsApiTest extends ApiTestCase
         self::assertSame($firstname, CustomerQuery::create()->findPk($customer->getId())->getFirstname());
     }
 
+    /**
+     * The router percent-decodes the path before matching it, so a request written as
+     * /api/%61dmin is routed to the admin operation all the same. The permission check
+     * has to see that request as the admin request it is.
+     */
+    public function testAnEncodedSpellingOfTheAdminPathIsCheckedAllTheSame(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $token = $this->authenticateAsAdmin($this->catalogueAdmin());
+
+        foreach (['/api/%61dmin/customers/', '/api/adm%69n/customers/', '/api%2Fadmin/customers/'] as $prefix) {
+            $response = $this->jsonRequest('GET', $prefix.$customer->getId(), token: $token);
+            self::assertSame(403, $response->getStatusCode(), \sprintf('Reading through %s must be refused.', $prefix));
+        }
+    }
+
+    public function testAnEncodedSpellingOfTheAdminPathCannotWriteEither(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $email = $customer->getEmail();
+        $token = $this->authenticateAsAdmin($this->catalogueAdmin());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/%61dmin/customers/'.$customer->getId(),
+            ['email' => 'hijacked@example.com'],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame($email, CustomerQuery::create()->findPk($customer->getId())->getEmail());
+    }
+
     public function testRestrictedAdminCannotListOrders(): void
     {
         $token = $this->authenticateAsAdmin($this->catalogueAdmin());

@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
@@ -47,7 +48,7 @@ class SessionManager
         }
 
         $request = $event->getRequest();
-        $path = $request->getPathInfo();
+        $path = RequestPath::decoded($request);
 
         if (
             str_starts_with($path, '/api/')

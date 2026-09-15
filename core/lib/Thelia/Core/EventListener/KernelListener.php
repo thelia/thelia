@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\HttpFoundation\Session\SessionFactory;
 use Thelia\Core\HttpFoundation\Session\SessionManager;
@@ -68,7 +69,7 @@ class KernelListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: \PHP_INT_MAX - 1)]
     public function checkIsApiRoute(RequestEvent $event): void
     {
-        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo());
+        $isApiRoute = preg_match('/^\/api\//', RequestPath::decoded($event->getRequest()));
 
         if ($isApiRoute) {
             $event->getRequest()->request->set('isApiRoute', $isApiRoute);

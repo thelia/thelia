@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Thelia\Core\HttpFoundation\RequestPath;
 
 /**
  * Counts login attempts on the two API login endpoints.
@@ -72,7 +73,7 @@ final class ApiLoginRateLimiter extends AbstractRequestRateLimiter
         $identifier = $this->normalizeIdentifier(
             (string) $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, ''),
         );
-        $scope = str_starts_with($request->getPathInfo(), self::ADMIN_SCOPE_PREFIX) ? 'admin' : 'front';
+        $scope = str_starts_with(RequestPath::decoded($request), self::ADMIN_SCOPE_PREFIX) ? 'admin' : 'front';
 
         return [
             $this->perClientLimiter->create($this->key($scope, $caller)),

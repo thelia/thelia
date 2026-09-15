@@ -100,6 +100,27 @@ final class TokenRefreshRateLimitTest extends ApiTestCase
         }
     }
 
+    /**
+     * The router decodes the path before matching, so /api/%61dmin/token/refresh reaches
+     * the very same controller. It has to spend the very same budget.
+     */
+    public function testAnEncodedSpellingOfThePathIsCountedToo(): void
+    {
+        $caller = self::CALLER.'14';
+
+        for ($attempt = 1; $attempt <= self::MAX_REFRESHES; ++$attempt) {
+            self::assertSame(
+                Response::HTTP_UNAUTHORIZED,
+                $this->refresh('/api/%61dmin/token/refresh', 'not-a-refresh-token', $caller)->getStatusCode(),
+            );
+        }
+
+        self::assertSame(
+            Response::HTTP_TOO_MANY_REQUESTS,
+            $this->refresh('/api/%61dmin/token/refresh', 'not-a-refresh-token', $caller)->getStatusCode(),
+        );
+    }
+
     private function refresh(string $uri, string $refreshToken, string $caller): Response
     {
         $this->client->request(

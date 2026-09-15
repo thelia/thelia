@@ -136,6 +136,24 @@ final class ApiRateLimitTest extends ApiTestCase
         }
     }
 
+    /**
+     * The router decodes the path before matching, so /%61pi/front/products is the
+     * products endpoint under another spelling. The budget does not depend on spelling.
+     */
+    public function testAnEncodedSpellingOfThePathSpendsTheSameBudget(): void
+    {
+        $caller = self::CALLER.'26';
+
+        for ($call = 1; $call <= self::ANONYMOUS_LIMIT; ++$call) {
+            self::assertSame(Response::HTTP_OK, $this->read('/api/front/products', $caller)->getStatusCode());
+        }
+
+        self::assertSame(
+            Response::HTTP_TOO_MANY_REQUESTS,
+            $this->read('/%61pi/front/products', $caller)->getStatusCode(),
+        );
+    }
+
     private function read(string $uri, string $caller, ?string $token = null): Response
     {
         $server = [

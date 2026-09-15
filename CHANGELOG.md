@@ -1,3 +1,9 @@
+# Unreleased
+
+## Security
+
+- GHSA-m887-7g6m-w83g — the listeners that decide something from the request path (admin API permissions, API rate limits, refresh-token limits, security log, API statelessness) read the path as the client spelled it, while the router decodes it first, so an encoded spelling such as `/api/%61dmin/...` reached the admin API without the per-resource permission check. Every path comparison now reads the path the way the router does, and the admin permission check also recognises an admin operation from the route it matched, whatever the spelling.
+
 # 3.0.0
 
 First stable release of Thelia 3. 56 commits since 3.0.0-beta5. The version number follows the update script this release ships, `setup/update/sql/3.0.0.sql`, which carries the lost password mail wording, the canonical mail template configuration row, and deactivates the module the default install no longer ships.

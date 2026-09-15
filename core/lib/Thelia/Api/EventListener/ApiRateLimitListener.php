@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\RateLimiter\RateLimitAllowlist;
 use Thelia\Core\Security\RateLimiter\RateLimitedResponse;
 use Thelia\Model\Admin;
@@ -77,7 +78,7 @@ final readonly class ApiRateLimitListener
 
         $request = $event->getRequest();
 
-        if (!str_starts_with($request->getPathInfo(), self::API_PREFIX)) {
+        if (!str_starts_with(RequestPath::decoded($request), self::API_PREFIX)) {
             return;
         }
 

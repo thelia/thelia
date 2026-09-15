@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event;
 
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\RequestPath;
 
 class IsAdminEnvEvent extends ActionEvent
 {
@@ -22,7 +23,7 @@ class IsAdminEnvEvent extends ActionEvent
 
     public function __construct(protected Request $request)
     {
-        if (preg_match('#/admin/?.*#', $this->request->getPathInfo())) {
+        if (preg_match('#/admin/?.*#', RequestPath::decoded($this->request))) {
             $this->isAdminEnv = true;
         }
     }
