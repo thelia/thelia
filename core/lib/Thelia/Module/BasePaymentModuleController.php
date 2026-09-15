@@ -96,7 +96,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             $event = new OrderEvent($order);
 
-            $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
+            $event
+                ->setStatus(OrderStatusQuery::getPaidStatus()->getId())
+                ->setSourceModuleCode($this->getModuleCode());
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
 
@@ -139,7 +141,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
         try {
             $event = new OrderEvent($order);
 
-            $event->setTransactionRef($transactionRef);
+            $event
+                ->setTransactionRef($transactionRef)
+                ->setSourceModuleCode($this->getModuleCode());
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_TRANSACTION_REF);
 
@@ -190,7 +194,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             $event = new OrderEvent($order);
 
-            $event->setStatus(OrderStatusQuery::getNotPaidStatus()->getId());
+            $event
+                ->setStatus(OrderStatusQuery::getNotPaidStatus()->getId())
+                ->setSourceModuleCode($this->getModuleCode());
 
             $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
 

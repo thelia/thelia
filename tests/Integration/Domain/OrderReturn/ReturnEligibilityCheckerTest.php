@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\OrderReturn;
 
+use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Order;
+use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderReturn;
@@ -87,6 +90,85 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
 
         $this->expectException(ReturnNotAllowedException::class);
         $this->checker->assertOrderReturnable($order, $customer);
+    }
+
+    /**
+     * The window runs from the day the goods left, not from the day the order was
+     * placed: a customer who waited three weeks for a delivery has not spent their
+     * retraction period waiting for it.
+     */
+    public function testTheWindowIsCountedFromTheDayTheOrderWasSent(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct(placedDaysAgo: 30);
+
+        self::assertFalse(
+            $this->checker->isWithinReturnWindow($order),
+            'Guard: counted from the order date, this one is long closed.',
+        );
+
+        $this->shipmentRecordedDaysAgo($order, 2);
+
+        self::assertTrue($this->checker->isWithinReturnWindow($order));
+        $this->checker->assertOrderReturnable($order, $customer);
+    }
+
+    /**
+     * An order sent again after coming back starts a new window, which is the
+     * reading that favours the buyer.
+     */
+    public function testTheLastShipmentIsTheOneThatCounts(): void
+    {
+        [$order] = $this->paidOrderWithProduct(placedDaysAgo: 60);
+
+        $this->shipmentRecordedDaysAgo($order, 50);
+        $this->shipmentRecordedDaysAgo($order, 3);
+
+        self::assertTrue($this->checker->isWithinReturnWindow($order));
+    }
+
+    public function testAShipmentOlderThanTheWindowClosesIt(): void
+    {
+        [$order] = $this->paidOrderWithProduct(placedDaysAgo: 1);
+
+        self::assertTrue(
+            $this->checker->isWithinReturnWindow($order),
+            'Guard: counted from the order date, this one is wide open.',
+        );
+
+        $this->shipmentRecordedDaysAgo($order, 40);
+
+        self::assertFalse($this->checker->isWithinReturnWindow($order));
+    }
+
+    /**
+     * An order placed before the history existed has no shipment date on file. It
+     * keeps the rule that applied to it until now, so no window closes or opens
+     * because of the change.
+     */
+    public function testAnOrderWithNoRecordedShipmentFallsBackOnItsCreationDate(): void
+    {
+        [$recentOrder] = $this->paidOrderWithProduct(placedDaysAgo: 1);
+        [$oldOrder] = $this->paidOrderWithProduct(placedDaysAgo: 30);
+
+        self::assertTrue($this->checker->isWithinReturnWindow($recentOrder));
+        self::assertFalse($this->checker->isWithinReturnWindow($oldOrder));
+    }
+
+    /**
+     * The status a transition lands on lives inside the JSON payload, and a status
+     * code that is the prefix of another one — or the same code sitting under "from"
+     * rather than "to" — must not be taken for a shipment.
+     */
+    public function testATransitionAwayFromSentIsNotAShipment(): void
+    {
+        [$order] = $this->paidOrderWithProduct(placedDaysAgo: 30);
+
+        $this->statusChangeRecordedDaysAgo($order, 1, OrderStatus::CODE_SENT, OrderStatus::CODE_REFUNDED);
+
+        self::assertFalse(
+            $this->checker->isWithinReturnWindow($order),
+            'Leaving the sent status is not being sent.',
+        );
     }
 
     public function testAnUnpaidOrderIsNotWithinTheWindow(): void
@@ -191,6 +273,33 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
     /**
      * @return array{Order, Customer}
      */
+    private function shipmentRecordedDaysAgo(Order $order, int $days): void
+    {
+        $this->statusChangeRecordedDaysAgo($order, $days, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT);
+    }
+
+    private function statusChangeRecordedDaysAgo(
+        Order $order,
+        int $days,
+        string $fromStatusCode,
+        string $toStatusCode,
+    ): void {
+        $entry = new OrderHistory();
+        $entry
+            ->setOrderId($order->getId())
+            ->setEventType(OrderHistoryEventType::STATUS_CHANGED->value)
+            ->setActorType(OrderHistoryActorType::SYSTEM->value)
+            ->setPayload(json_encode(['from' => $fromStatusCode, 'to' => $toStatusCode], \JSON_THROW_ON_ERROR))
+            ->setVisibleToCustomer(0)
+            ->save($this->getPropelConnection());
+
+        // The timestampable behavior stamps created_at on insert; a date of its own
+        // survives only the save that follows.
+        $entry
+            ->setCreatedAt(new \DateTime(\sprintf('-%d days', $days)))
+            ->save($this->getPropelConnection());
+    }
+
     private function paidOrderWithProduct(
         string $statusCode = OrderStatus::CODE_PAID,
         int $placedDaysAgo = 1,

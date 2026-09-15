@@ -22,6 +22,8 @@ use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderHistory;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnQuery;
 
@@ -171,6 +173,44 @@ final readonly class CustomerPersonalDataExporter
             'products' => $this->exportOrderProducts($order),
             'coupons' => $this->exportOrderCoupons($order),
             'consents' => $this->exportOrderConsents($order),
+            'history' => $this->exportOrderHistory($order),
+        ];
+    }
+
+    /**
+     * The full history of an order, notes an admin only left for internal use
+     * included: it is data attached to the customer's own order, not a channel
+     * the shop reserves for itself.
+     *
+     * admin_id is deliberately left out — it is an internal identifier, not
+     * something that describes the customer's order.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportOrderHistory(Order $order): array
+    {
+        $history = [];
+
+        foreach (OrderHistoryQuery::create()->filterByOrderId($order->getId())->orderById()->find() as $entry) {
+            $history[] = $this->exportOrderHistoryEntry($entry);
+        }
+
+        return $history;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function exportOrderHistoryEntry(OrderHistory $entry): array
+    {
+        return [
+            'date' => $this->formatDate($entry->getCreatedAt()),
+            'event_type' => $entry->getEventType(),
+            'actor_type' => $entry->getActorType(),
+            'actor_label' => $entry->getActorLabel(),
+            'payload' => $entry->getDecodedPayload(),
+            'comment' => $entry->getComment(),
+            'visible_to_customer' => $entry->isVisibleToCustomer(),
         ];
     }
 

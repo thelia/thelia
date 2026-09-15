@@ -178,4 +178,14 @@ class OrderAddressEvent extends ActionEvent
     {
         return $this->order;
     }
+
+    /**
+     * The order is set by the callers that know it, and nothing forces them to: a
+     * listener that only wants the order must ask before reading it, or it hits the
+     * uninitialized property.
+     */
+    public function hasOrder(): bool
+    {
+        return isset($this->order);
+    }
 }

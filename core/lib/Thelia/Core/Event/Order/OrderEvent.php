@@ -41,6 +41,16 @@ class OrderEvent extends ActionEvent
     protected ?string $transactionRef = null;
     protected ?Response $response = null;
 
+    /**
+     * The module that dispatched this event, when one did.
+     *
+     * A payment gateway confirming an order is the author of the status change it
+     * triggers, and nothing else in the event says so: the order carries the module
+     * it was paid with, not the module that is talking right now. Optional, so every
+     * existing dispatcher keeps working and simply names no module.
+     */
+    protected ?string $sourceModuleCode = null;
+
     public function __construct(Order $order)
     {
         $this->setOrder($order);
@@ -190,6 +200,15 @@ class OrderEvent extends ActionEvent
     public function getPlacedOrder(): Order
     {
         return $this->placedOrder;
+    }
+
+    /**
+     * @return bool true once the order has been placed, so that a listener can read
+     *              getPlacedOrder() without risking the uninitialized property
+     */
+    public function hasPlacedOrder(): bool
+    {
+        return isset($this->placedOrder);
     }
 
     /**
@@ -344,6 +363,21 @@ class OrderEvent extends ActionEvent
     public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): self
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
+
+        return $this;
+    }
+
+    public function getSourceModuleCode(): ?string
+    {
+        return $this->sourceModuleCode;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSourceModuleCode(?string $sourceModuleCode): self
+    {
+        $this->sourceModuleCode = $sourceModuleCode;
 
         return $this;
     }

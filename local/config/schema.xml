@@ -1792,6 +1792,30 @@
       <parameter name="i18n_columns" value="title" />
     </behavior>
   </table>
+  <table name="order_history" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column description="what happened, as a plain code: the core writes the types it knows, a module writes its own" name="event_type" required="true" size="50" type="VARCHAR" />
+    <column description="which kind of author acted: admin, customer, module or system" name="actor_type" required="true" size="20" type="VARCHAR" />
+    <column description="the author label snapshot (admin login, customer reference, module code), kept when the author is deleted" name="actor_label" size="255" type="VARCHAR" />
+    <column description="the admin who acted, NULL once that admin is gone" name="admin_id" type="INTEGER" />
+    <column description="the event details as JSON, holding codes and references only" name="payload" type="LONGVARCHAR" />
+    <column description="the free text carried by the entry, the whole content of a manual note" name="comment" type="LONGVARCHAR" />
+    <column defaultValue="0" description="whether the entry is shown to the customer alongside the order" name="visible_to_customer" required="true" type="TINYINT" />
+    <foreign-key foreignTable="order" name="fk_order_history_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="admin" name="fk_order_history_admin_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="admin_id" />
+    </foreign-key>
+    <index name="idx_order_history_order_id">
+      <index-column name="order_id" />
+    </index>
+    <index name="idx_order_history_created_at">
+      <index-column name="created_at" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />

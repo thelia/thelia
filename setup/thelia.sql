@@ -2025,6 +2025,41 @@ CREATE TABLE `checkout_step`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_history
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_history`;
+
+CREATE TABLE `order_history`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `event_type` VARCHAR(50) NOT NULL COMMENT 'what happened, as a plain code: the core writes the types it knows, a module writes its own',
+    `actor_type` VARCHAR(20) NOT NULL COMMENT 'which kind of author acted: admin, customer, module or system',
+    `actor_label` VARCHAR(255) COMMENT 'the author label snapshot (admin login, customer reference, module code), kept when the author is deleted',
+    `admin_id` INTEGER COMMENT 'the admin who acted, NULL once that admin is gone',
+    `payload` TEXT COMMENT 'the event details as JSON, holding codes and references only',
+    `comment` TEXT COMMENT 'the free text carried by the entry, the whole content of a manual note',
+    `visible_to_customer` TINYINT DEFAULT 0 NOT NULL COMMENT 'whether the entry is shown to the customer alongside the order',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_history_order_id` (`order_id`),
+    INDEX `idx_order_history_created_at` (`created_at`),
+    INDEX `fi_order_history_admin_id` (`admin_id`),
+    CONSTRAINT `fk_order_history_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_history_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- newsletter
 -- ---------------------------------------------------------------------
 
