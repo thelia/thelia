@@ -20,6 +20,23 @@ class MaintenancePurgeEvent extends Event
 {
     private array $results = [];
 
+    /**
+     * Whether the run is only reporting what it would remove.
+     *
+     * A listener that deletes rows has to be told, otherwise `maintenance:purge
+     * --dry-run` deletes everything the core kept its hands off — which is the
+     * opposite of what the option promises.
+     */
+    public function __construct(
+        private readonly bool $dryRun = false,
+    ) {
+    }
+
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
+    }
+
     public function addResult(string $message): self
     {
         $this->results[] = $message;

@@ -20,6 +20,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Customer\Service\CustomerAnonymizer;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
+use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
@@ -33,6 +35,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderConsentQuery;
+use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\TagElement;
@@ -112,6 +115,43 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         self::assertNull($orderConsent->getIpAddress());
         self::assertSame('I accept the terms and conditions of sale', $orderConsent->getTitle());
         self::assertTrue($orderConsent->isAccepted());
+    }
+
+    /**
+     * The history of an order says what happened and who did it. What happened is
+     * kept, because the order is kept. Who did it goes where that author was this
+     * customer: the label on those entries is their customer reference, which is one
+     * lookup away from the person.
+     */
+    public function testAnonymizeErasesTheCustomerLabelLeftInTheOrderHistory(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $order = $customer->getOrders()->getFirst();
+        self::assertInstanceOf(Order::class, $order);
+
+        $customerEntry = $this->orderHistoryEntry(
+            $order,
+            OrderHistoryActorType::CUSTOMER,
+            (string) $customer->getRef(),
+        );
+        $moduleEntry = $this->orderHistoryEntry($order, OrderHistoryActorType::MODULE, 'Cheque');
+
+        $this->anonymize($customer);
+
+        $customerEntry->reload(false, $this->getPropelConnection());
+        $moduleEntry->reload(false, $this->getPropelConnection());
+
+        self::assertNull($customerEntry->getActorLabel(), 'The buyer must no longer be named as the author.');
+        self::assertSame(
+            OrderHistoryActorType::CUSTOMER->value,
+            $customerEntry->getActorType(),
+            'The line stays, and still says a customer acted.',
+        );
+        self::assertSame(
+            'Cheque',
+            $moduleEntry->getActorLabel(),
+            'An entry authored by a module names the module, not the buyer, and is left alone.',
+        );
     }
 
     public function testAnonymizeStampsTheAccountWithTheErasureDate(): void
@@ -356,6 +396,21 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             TagQuery::create()->findPk($tag->getId()),
             'Anonymizing one customer must not delete a tag other customers may carry.',
         );
+    }
+
+    private function orderHistoryEntry(Order $order, OrderHistoryActorType $actorType, string $actorLabel): OrderHistory
+    {
+        $entry = new OrderHistory();
+        $entry
+            ->setOrderId($order->getId())
+            ->setEventType(OrderHistoryEventType::NOTE->value)
+            ->setActorType($actorType->value)
+            ->setActorLabel($actorLabel)
+            ->setComment('Something happened to this order.')
+            ->setVisibleToCustomer(0)
+            ->save($this->getPropelConnection());
+
+        return $entry;
     }
 
     private function anonymize(Customer $customer): void

@@ -22,6 +22,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
@@ -29,6 +30,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\MessageQuery;
+use Thelia\Model\OrderQuery;
 
 /**
  * Class MailerFactory.
@@ -38,10 +40,26 @@ use Thelia\Model\MessageQuery;
  */
 class MailerFactory
 {
+    /**
+     * The parameter names an email is written against to name the order it is about.
+     *
+     * Nothing in the signature of a send says which order a message concerns — the
+     * order confirmation, the shop notification, the cheque payment confirmation, the
+     * virtual product download and the return status change all pass it as an ordinary
+     * template parameter instead. Those two names are the convention every caller in
+     * the core and in the shipped modules already follows, so they are what is read
+     * here: `order_id` when it is there, and `order_ref` to look the order up when it
+     * is the only one passed. A message carrying neither is not about an order and
+     * records nothing.
+     */
+    private const ORDER_ID_PARAMETER = 'order_id';
+    private const ORDER_REF_PARAMETER = 'order_ref';
+
     public function __construct(
         private readonly TemplateHelperInterface $templateHelper,
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
+        private readonly OrderHistoryRecorder $orderHistoryRecorder,
     ) {
     }
 
@@ -227,6 +245,13 @@ class MailerFactory
 
             throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
+
+        // Only once the message is out. A send that failed has thrown above and
+        // leaves no line: an order history saying a customer was written to when
+        // nothing left the shop is worse than one that says nothing. Outside the
+        // try on purpose, so that a failure to record is never reported as a mail
+        // that did not leave.
+        $this->recordEmailSentOnOrder($messageCode, $messageParameters);
     }
 
     /**
@@ -240,6 +265,51 @@ class MailerFactory
     private static function withoutTransportCredentials(string $message): string
     {
         return preg_replace('#://[^@/\s]+@#', '://***@', $message) ?? $message;
+    }
+
+    /**
+     * Adds the mail to the history of the order it is about, when it is about one.
+     *
+     * Only the message code travels: never the body, never the subject, never the
+     * address it went to. What the entry answers is "the shop wrote to this order on
+     * that date, with that message" — the rest is the message template and the order
+     * itself, both of which are already on file.
+     *
+     * @param array<string, mixed> $messageParameters
+     */
+    private function recordEmailSentOnOrder(string $messageCode, array $messageParameters): void
+    {
+        $orderId = $this->orderIdFromMessageParameters($messageParameters);
+
+        if (null === $orderId) {
+            return;
+        }
+
+        $this->orderHistoryRecorder->recordEmailSent($orderId, $messageCode);
+    }
+
+    /**
+     * @param array<string, mixed> $messageParameters
+     */
+    private function orderIdFromMessageParameters(array $messageParameters): ?int
+    {
+        $orderId = $messageParameters[self::ORDER_ID_PARAMETER] ?? null;
+
+        if (\is_int($orderId) && $orderId > 0) {
+            return $orderId;
+        }
+
+        if (\is_string($orderId) && ctype_digit($orderId) && (int) $orderId > 0) {
+            return (int) $orderId;
+        }
+
+        $orderRef = $messageParameters[self::ORDER_REF_PARAMETER] ?? null;
+
+        if (!\is_string($orderRef) || '' === $orderRef) {
+            return null;
+        }
+
+        return OrderQuery::create()->findOneByRef($orderRef)?->getId();
     }
 
     /**
