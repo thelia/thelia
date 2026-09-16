@@ -24,6 +24,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -121,6 +123,7 @@ class ProductSaleElements implements PropelResourceInterface
 
     #[Relation(targetResource: Product::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public Product $product;
 
     #[Groups([
@@ -136,6 +139,7 @@ class ProductSaleElements implements PropelResourceInterface
         ProductAssociation::GROUP_ADMIN_READ,
         ProductAssociation::GROUP_FRONT_READ,
     ])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public string $ref;
 
     #[Groups([
@@ -151,6 +155,7 @@ class ProductSaleElements implements PropelResourceInterface
         ProductAssociation::GROUP_ADMIN_READ,
         ProductAssociation::GROUP_FRONT_READ,
     ])]
+    #[NotNull(groups: [self::GROUP_ADMIN_WRITE])]
     public int $quantity;
 
     #[Groups([
