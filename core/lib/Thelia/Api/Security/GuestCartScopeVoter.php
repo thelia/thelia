@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Thelia\Api\Resource\Cart;
 
@@ -43,7 +44,7 @@ final class GuestCartScopeVoter extends Voter
         return self::SCOPE === $attribute && $subject instanceof Cart;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         if (!$this->guestTokenClaims->isGuest()) {
             return true;

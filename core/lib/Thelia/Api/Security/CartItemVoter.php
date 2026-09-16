@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Model\CartItem as CartItemModel;
@@ -51,7 +52,7 @@ final class CartItemVoter extends Voter
         return \in_array($attribute, [self::OWNER, self::MUTABLE], true) && $subject instanceof CartItem;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $model = $subject->getPropelModel();
 
