@@ -66,9 +66,20 @@ through GitHub for vulnerabilities affecting released versions.
 
 | Series | Branch | Supported | End of support |
 |--------|--------|-----------|----------------|
-| 3.0 | `main` | Yes — active development | — |
+| 3.1 | `main` | Yes — active development | — |
+| 3.0 | — | No — update to 3.1 | 16 September 2026, with the 3.1.0 release |
 | 2.6 | `2.6` | Yes — security fixes | To be announced |
 | 2.5 and older | — | No | Ended |
 
-Security fixes are released for the latest 3.0 and 2.6 versions only: keep your
-installation on the most recent release of its series.
+Thelia 3 is developed on a single trunk: a security fix ships in the next 3.x release, and
+every 3.x release updates a 3.0.0 shop in place (see `UPDATE.md`). A maintenance branch is
+only opened the day a fix has to ship without the changes waiting on `main`. Security fixes
+are therefore released for the latest 3.x and 2.6 versions only: keep your installation on
+the most recent release of its series.
+
+## Published advisories
+
+Advisories fixed in a release are listed in the release notes and on the
+[Security tab](https://github.com/thelia/thelia/security/advisories). The 3.1.0 release
+fixes GHSA-59cp-795h-6wgx, GHSA-m887-7g6m-w83g, GHSA-r63g-6wfg-v5v9 and, through
+TwigEngine 1.0.9, GHSA-8ffm-2g9j-m8pp.
