@@ -9,7 +9,7 @@
     "extra": {
         "installer-name": "setup",
         "branch-alias": {
-            "dev-main": "3.0.x-dev"
+            "dev-main": "3.1.x-dev"
         }
     }
 }
