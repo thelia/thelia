@@ -82,6 +82,35 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
+     * bin/install reads a config row before deciding whether to write it, so that a value
+     * the shop already carries is never overwritten by a re-run. The shop notification
+     * address is the row this matters for: it ships seeded empty, and the install writes
+     * the administrator address into it only while it is still empty.
+     */
+    public function testGetConfigReadsTheStoredValue(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+
+        $previous = $setup->getConfig('store_notification_emails');
+
+        try {
+            $setup->setConfig('store_notification_emails', 'shop@example.com');
+            self::assertSame('shop@example.com', $setup->getConfig('store_notification_emails'));
+        } finally {
+            $setup->setConfig('store_notification_emails', (string) $previous);
+        }
+    }
+
+    public function testGetConfigReturnsNullForAnUnknownName(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+
+        self::assertNull($setup->getConfig('no_such_configuration_row'));
+    }
+
+    /**
      * Builds a DatabaseSetup pointing at the configured test database. Credentials come from
      * the environment ($_SERVER, populated from .env.test.local by the test bootstrap), so the
      * suite connects to the CI MySQL (127.0.0.1) as well as a local DDEV database (db), instead

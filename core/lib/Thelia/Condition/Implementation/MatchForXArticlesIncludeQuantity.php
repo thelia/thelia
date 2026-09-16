@@ -60,7 +60,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
             'If cart item (include quantity) count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::CART_QUANTITY],
+                '%quantity%' => $this->escapeSummaryValue($this->values[self::CART_QUANTITY]),
             ],
         );
     }
