@@ -77,6 +77,18 @@ if (is_file(dirname(__DIR__)."/.env.{$env}.local")) {
     (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
+// The code was just updated, the compiled container and the generated Propel
+// models on disk still describe the previous release. Booting on them fails as
+// soon as a bundle touches a model the old schema did not have, so both are
+// rebuilt from the new schema before the kernel starts.
+$staleEnvironment = $_ENV['APP_ENV'];
+foreach ([THELIA_CACHE_DIR.$staleEnvironment, THELIA_ROOT.'var'.DS.'propel'.DS.$staleEnvironment] as $staleDirectory) {
+    if (is_dir($staleDirectory)) {
+        cliOutput(sprintf('Removing the previous release caches in : %s', $staleDirectory), 'info');
+        (new Filesystem())->remove($staleDirectory);
+    }
+}
+
 $thelia = new App\Kernel($_ENV['APP_ENV'], false);
 
 $thelia->boot();
