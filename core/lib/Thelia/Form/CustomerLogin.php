@@ -64,9 +64,7 @@ class CustomerLogin extends BruteforceForm
             ])
             ->add('password', PasswordType::class, [
                 'constraints' => [
-                    new NotBlank([
-                        'groups' => ['existing_customer'],
-                    ]),
+                    new NotBlank(groups: ['existing_customer']),
                 ],
                 'label' => Translator::getInstance()->trans('Please enter your password'),
                 'label_attr' => [

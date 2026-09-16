@@ -46,13 +46,13 @@ class CustomerTitleI18nType extends AbstractTheliaType
             ->add('short', TextType::class, [
                 'required' => false,
                 'constraints' => [
-                    new Length(['max' => 10]),
+                    new Length(max: 10),
                 ],
             ])
             ->add('long', TextType::class, [
                 'required' => false,
                 'constraints' => [
-                    new Length(['max' => 45]),
+                    new Length(max: 45),
                 ],
             ]);
     }

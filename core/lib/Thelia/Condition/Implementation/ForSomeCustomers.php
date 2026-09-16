@@ -116,7 +116,9 @@ class ForSomeCustomers extends ConditionAbstract
         if (null !== $custList = CustomerQuery::create()->findPks($custIds)) {
             /** @var Customer $cust */
             foreach ($custList as $cust) {
-                $custStrList .= $cust->getLastname().' '.$cust->getFirstname().' ('.$cust->getRef().'), ';
+                $custStrList .= $this->escapeSummaryValue($cust->getLastname())
+                    .' '.$this->escapeSummaryValue($cust->getFirstname())
+                    .' ('.$this->escapeSummaryValue($cust->getRef()).'), ';
             }
 
             $custStrList = rtrim($custStrList, ', ');

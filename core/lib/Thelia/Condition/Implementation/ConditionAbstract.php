@@ -320,4 +320,15 @@ abstract class ConditionAbstract implements ConditionInterface
     {
         return $this->facade->getRequest()->getSession()->getLang()->getLocale();
     }
+
+    /**
+     * A summary is rendered as HTML in the back office, because the message it
+     * is built from carries its own markup on purpose. The values read from the
+     * database and inserted into that message carry none: the translator
+     * interpolates parameters verbatim, so they are made inert here.
+     */
+    protected function escapeSummaryValue(string|int|float|null $value): string
+    {
+        return htmlspecialchars((string) $value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
+    }
 }

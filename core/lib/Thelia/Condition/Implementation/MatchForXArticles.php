@@ -103,7 +103,7 @@ class MatchForXArticles extends ConditionAbstract
             'If cart item count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::CART_QUANTITY],
+                '%quantity%' => $this->escapeSummaryValue($this->values[self::CART_QUANTITY]),
             ],
         );
     }

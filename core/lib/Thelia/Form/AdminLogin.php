@@ -29,7 +29,7 @@ class AdminLogin extends BruteforceForm
             ->add('username', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Length(['min' => 3]),
+                    new Length(min: 3),
                 ],
                 'label' => Translator::getInstance()->trans('Username or e-mail address *'),
                 'label_attr' => [

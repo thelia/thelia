@@ -33,7 +33,7 @@ class SeoForm extends BaseForm
             ->add('id', HiddenType::class, [
                 'required' => true,
                 'constraints' => [
-                    new GreaterThan(['value' => 0]),
+                    new GreaterThan(value: 0),
                 ],
             ])
             ->add('locale', HiddenType::class, [
