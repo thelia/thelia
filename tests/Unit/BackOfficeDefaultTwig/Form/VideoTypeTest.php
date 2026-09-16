@@ -88,6 +88,30 @@ final class VideoTypeTest extends TestCase
         $this->assertFalse($form->isValid());
     }
 
+    public function testTheAlternativeTextIsCarriedByTheAddForm(): void
+    {
+        // Accessibility belongs to the moment a video is added, not to a second
+        // screen a merchant may never open.
+        $form = $this->submit(['url' => 'https://youtu.be/dQw4w9WgXcQ', 'alt' => 'Demonstration video of the bag']);
+
+        $this->assertTrue($form->isValid(), (string) $form->getErrors(true, false));
+        $this->assertSame('Demonstration video of the bag', $form->getData()['alt']);
+    }
+
+    public function testAnAltOfTwoHundredAndFiftyFiveCharactersIsAccepted(): void
+    {
+        $form = $this->submit(['url' => 'https://youtu.be/dQw4w9WgXcQ', 'alt' => str_repeat('a', 255)]);
+
+        $this->assertTrue($form->isValid(), (string) $form->getErrors(true, false));
+    }
+
+    public function testALongerAltIsRefusedRatherThanSentToTheDriver(): void
+    {
+        $form = $this->submit(['url' => 'https://youtu.be/dQw4w9WgXcQ', 'alt' => str_repeat('a', 256)]);
+
+        $this->assertFalse($form->isValid());
+    }
+
     /**
      * @param array<string, mixed> $values
      * @param array<string, mixed> $files
