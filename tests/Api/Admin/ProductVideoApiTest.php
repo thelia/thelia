@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Action\ProductVideo as ProductVideoAction;
 use Thelia\Model\Product;
+use Thelia\Model\ProductSaleElementsProductVideoQuery;
 use Thelia\Model\ProductVideoQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Support\Trait\CreatesTestFiles;
@@ -127,8 +129,73 @@ final class ProductVideoApiTest extends ApiTestCase
         self::assertFileExists($path);
 
         $payload = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame('file', $payload['provider']);
+        self::assertNull($payload['externalId']);
         self::assertNull($payload['embedUrl']);
-        self::assertStringContainsString('/local/media/videos/product/', (string) $payload['fileUrl']);
+
+        // The library sits outside the web root: what a visitor is handed is the
+        // link published under the cache directory, never the stored file.
+        self::assertStringContainsString('/cache/videos/product/', (string) $payload['fileUrl']);
+        self::assertStringNotContainsString('/local/', (string) $payload['fileUrl']);
+        $this->trackFileForCleanup($this->getService(ProductVideoAction::class)->cachedFilePath($video));
+    }
+
+    public function testACombinationIsGivenAVideoAndTakesItBack(): void
+    {
+        $product = $this->createProduct();
+        $factory = $this->createFixtureFactory();
+        $video = $factory->productVideo($product);
+        $combination = $factory->productSaleElement($product);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/product_sale_elements_product_video',
+            [
+                'productSaleElementsId' => $combination->getId(),
+                'productVideoId' => $video->getId(),
+            ],
+            $this->authenticateAsAdmin(),
+        );
+
+        self::assertSame(Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
+
+        $link = ProductSaleElementsProductVideoQuery::create()
+            ->filterByProductVideoId($video->getId())
+            ->findOne();
+        self::assertNotNull($link);
+
+        $response = $this->jsonRequest(
+            'DELETE',
+            '/api/admin/product_sale_elements_product_video/'.$link->getId(),
+            token: $this->authenticateAsAdmin(),
+        );
+
+        self::assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(ProductSaleElementsProductVideoQuery::create()->findPk($link->getId()));
+    }
+
+    public function testTheSameVideoIsNotGivenTwiceToACombination(): void
+    {
+        $product = $this->createProduct();
+        $factory = $this->createFixtureFactory();
+        $video = $factory->productVideo($product);
+        $combination = $factory->productSaleElement($product);
+
+        $payload = [
+            'productSaleElementsId' => $combination->getId(),
+            'productVideoId' => $video->getId(),
+        ];
+
+        $first = $this->jsonRequest('POST', '/api/admin/product_sale_elements_product_video', $payload, $this->authenticateAsAdmin());
+        self::assertSame(Response::HTTP_CREATED, $first->getStatusCode(), (string) $first->getContent());
+
+        $second = $this->jsonRequest('POST', '/api/admin/product_sale_elements_product_video', $payload, $this->authenticateAsAdmin());
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $second->getStatusCode(), (string) $second->getContent());
+        self::assertCount(
+            1,
+            ProductSaleElementsProductVideoQuery::create()->filterByProductVideoId($video->getId())->find(),
+        );
     }
 
     public function testAVideoIsRewordedGivenAThumbnailAndHidden(): void

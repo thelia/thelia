@@ -356,6 +356,9 @@ final class TheliaEvents
     /** Delete a product video, and the file it is stored in when the shop hosts it. */
     public const PRODUCT_VIDEO_DELETE = 'action.deleteProductVideo';
 
+    /** Publish a hosted video in the web space, and compute the address it is served from. */
+    public const PRODUCT_VIDEO_PROCESS = 'action.processProductVideo';
+
     public const PRODUCT_VIDEO_UPDATE_POSITION = 'action.updateProductVideoPosition';
     public const PRODUCT_VIDEO_TOGGLE_VISIBILITY = 'action.toggleProductVideoVisibility';
 
