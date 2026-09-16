@@ -75,8 +75,8 @@
         "symfony/yaml": "7.4.*",
         "symfony-cmf/routing": "3.0.*",
 
-        "thelia/config": "^3.0.0-beta1",
-        "thelia/setup": "^3.0.0-beta1",
+        "thelia/config": "~3.1.0",
+        "thelia/setup": "~3.1.0",
         "thelia/currency-converter": "~1.0",
         "thelia/propel": "^1.0"
     },
@@ -93,7 +93,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.0.x-dev"
+            "dev-main": "3.1.x-dev"
         },
         "symfony": {
             "allow-contrib": true,
