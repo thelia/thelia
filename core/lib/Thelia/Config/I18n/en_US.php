@@ -368,6 +368,7 @@ return [
     'No %obj was created.' => 'No %obj was created.',
     'No %obj was updated.' => 'No %obj was updated.',
     "No module found for code '%item'" => "No module found for code '%item'",
+    'No video platform is enabled on this shop.' => 'No video platform is enabled on this shop.',
     'No, I am a new customer.' => 'No, I am a new customer.',
     'None' => 'None',
     'Not equal to' => 'Not equal to',

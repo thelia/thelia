@@ -72,7 +72,7 @@ final readonly class ProductVideoProcessor implements ProcessorInterface
         $locale = $this->firstLocale($data);
         $wording = $this->wording($data, $locale);
 
-        $video = $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+        $video = $this->write(fn (): ProductVideoModel => $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
             productId: (int) $data->getProduct()->getId(),
             provider: $resolved?->provider,
             externalId: $resolved?->externalId,
@@ -84,7 +84,7 @@ final readonly class ProductVideoProcessor implements ProcessorInterface
             chapo: $wording['chapo'],
             postscriptum: $wording['postscriptum'],
             visible: $data->isVisible(),
-        ));
+        )));
 
         $this->writeRemainingLocales($video, $data, $locale);
 
@@ -154,7 +154,26 @@ final readonly class ProductVideoProcessor implements ProcessorInterface
         try {
             return $this->videoProviderResolver->resolve($url);
         } catch (UnsupportedVideoUrlException $exception) {
+            if ([] === $exception->getEnabledProviders()) {
+                throw new UnprocessableEntityHttpException($this->translator->trans('No video platform is enabled on this shop.', [], 'core'), $exception);
+            }
+
             throw new UnprocessableEntityHttpException($this->translator->trans('This address is not recognised. Accepted platforms: %platforms%.', ['%platforms%' => $exception->getEnabledProviderLabels()], 'core'), $exception);
+        }
+    }
+
+    /**
+     * Runs a write, turning the refusals the action reports by LogicException —
+     * its documented channel — into the 422 they are, message and all.
+     *
+     * @param callable(): ProductVideoModel $write
+     */
+    private function write(callable $write): ProductVideoModel
+    {
+        try {
+            return $write();
+        } catch (\LogicException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
     }
 

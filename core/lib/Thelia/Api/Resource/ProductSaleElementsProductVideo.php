@@ -53,10 +53,12 @@ use Thelia\Model\ProductSaleElementsQuery;
         new Put(
             uriTemplate: '/admin/product_sale_elements_product_video/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            processor: ProductSaleElementsProductVideoProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/product_sale_elements_product_video/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            processor: ProductSaleElementsProductVideoProcessor::class,
         ),
         new Delete(
             uriTemplate: '/admin/product_sale_elements_product_video/{id}',
