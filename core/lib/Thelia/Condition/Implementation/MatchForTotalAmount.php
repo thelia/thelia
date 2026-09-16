@@ -132,8 +132,8 @@ class MatchForTotalAmount extends ConditionAbstract
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             [
                 '%operator%' => $i18nOperator,
-                '%amount%' => $this->values[self::CART_TOTAL],
-                '%currency%' => $this->values[self::CART_CURRENCY],
+                '%amount%' => $this->escapeSummaryValue($this->values[self::CART_TOTAL]),
+                '%currency%' => $this->escapeSummaryValue($this->values[self::CART_CURRENCY]),
             ],
         );
     }
