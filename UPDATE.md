@@ -20,7 +20,7 @@ Thelia 3 is a Composer package, so you update the code with Composer. From the r
 of your project:
 
 ```bash
-composer update thelia/thelia --with-all-dependencies
+composer update thelia/thelia-skeleton --with-all-dependencies
 ```
 
 Check the release notes for the version you move to: a module or a template you depend
@@ -31,11 +31,12 @@ on may need its own bump in `composer.json`.
 Run the update script from the root of your project:
 
 ```bash
-php setup/update.php
+php local/setup/update.php
 ```
 
-It reports the version it starts from and the one it moves to, then applies each
-database migration in order. It offers to back the database up first; on a large
+It first removes the compiled container and the generated Propel models of the previous
+release, so the new schema is read, then reports the version it starts from and the one it
+moves to, and applies each database migration in order. It offers to back the database up first; on a large
 database, take the manual backup above instead. If a migration fails, the script stops
 and offers to restore that backup.
 
@@ -101,10 +102,11 @@ composer update thelia/core thelia/setup thelia/config thelia/flexy \
 `thelia/setup` and `thelia/config` ship as 3.1.1 with this core; the 3.1.0 tags of these two
 packages were published early and lack the last tables of the release.
 
-Then update the database, as described in section 2:
+Then update the database, as described in section 2 (the script lives under `local/`
+in a project installed from `thelia/thelia-project`):
 
 ```bash
-php setup/update.php
+php local/setup/update.php
 ```
 
 The themes follow the core. Flexy 1.1.0, default-twig 1.1.0, email 1.1.0 and pdf 1.1.0 need
