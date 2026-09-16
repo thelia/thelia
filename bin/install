@@ -11,6 +11,7 @@ declare(strict_types=1);
  * database is populated, modules are registered, and the kernel can boot.
  *
  * Usage:
+ *   php bin/install --help                                                                          (options, changes nothing)
  *   php bin/install                                                                                 (reads env vars)
  *   php bin/install --database_host=db --database_name=db --database_user=db --database_password=db (CLI flags)
  *   php bin/install --with-demo --with-admin                                                        (non-interactive)
@@ -52,7 +53,8 @@ use Thelia\Install\Standalone\DatabaseSetup;
 
 $appEnv = $_SERVER['APP_ENV'] ?? 'dev';
 
-$options = getopt('', [
+$longOptions = [
+    'help',
     'frontoffice_theme:',
     'backoffice_theme:',
     'pdf_theme:',
@@ -71,7 +73,24 @@ $options = getopt('', [
     'database_name:',
     'database_user:',
     'database_password:',
-]);
+];
+
+// getopt() drops whatever it does not recognise and leaves every value at its
+// environment default, so `--help` and a mistyped `--database_name` both used to
+// run the full install and drop the database the environment pointed at. Both are
+// refused here, before the first connection.
+$options = getopt('h', $longOptions);
+
+if (isset($options['help']) || isset($options['h'])) {
+    echo usage();
+    exit(0);
+}
+
+if (null !== $unrecognized = findUnrecognizedArgument($argv, $longOptions)) {
+    fwrite(STDERR, "ERROR: unrecognized option: {$unrecognized}\n\n");
+    fwrite(STDERR, usage());
+    exit(1);
+}
 
 $host     = $options['database_host']     ?? $_SERVER['DATABASE_HOST']     ?? '';
 $port     = $options['database_port']     ?? $_SERVER['DATABASE_PORT']     ?? '3306';
@@ -440,6 +459,86 @@ if (null !== $generatedAdminPassword) {
  * The dotenv values hold the %kernel.project_dir% placeholder, which only the
  * container resolves, hence the manual substitution.
  */
+/**
+ * getopt() reports nothing about the arguments it ignored, so the command line is
+ * walked a second time to name the first one the script does not know.
+ *
+ * @param list<string> $arguments  $argv, script name included
+ * @param list<string> $longOptions  option names, a trailing ':' marking a value
+ */
+function findUnrecognizedArgument(array $arguments, array $longOptions): ?string
+{
+    $takesValue = [];
+    foreach ($longOptions as $option) {
+        $takesValue[rtrim($option, ':')] = str_ends_with($option, ':');
+    }
+
+    for ($i = 1, $count = \count($arguments); $i < $count; ++$i) {
+        $argument = $arguments[$i];
+
+        if ('-h' === $argument) {
+            continue;
+        }
+
+        if (!str_starts_with($argument, '--')) {
+            return $argument;
+        }
+
+        [$name, $inlineValue] = array_pad(explode('=', substr($argument, 2), 2), 2, null);
+
+        if (!isset($takesValue[$name])) {
+            return $argument;
+        }
+
+        // getopt() accepts `--option value` as well as `--option=value`: the next
+        // argument belongs to the option and must not be read as one.
+        if ($takesValue[$name] && null === $inlineValue) {
+            ++$i;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * The options the script accepts, printed before anything is created or dropped.
+ */
+function usage(): string
+{
+    return <<<TXT
+        Installs Thelia: creates the database, applies the schema, registers the modules,
+        applies the themes and builds their assets.
+
+        Usage:
+          php bin/install [options]
+
+        Database credentials are resolved in this order: CLI flag > env var > default.
+        DATABASE_HOST and DATABASE_NAME are required (no default).
+
+        Options:
+          -h, --help                   Print this help and exit without touching anything
+              --database_host=HOST     Database server host
+              --database_port=PORT     Database server port (default: 3306)
+              --database_name=NAME     Database to create and populate
+              --database_user=USER     Database user
+              --database_password=PWD  Database password
+              --frontoffice_theme=NAME Front-office theme to activate (default: flexy)
+              --backoffice_theme=NAME  Back-office theme to activate (default: default-twig)
+              --pdf_theme=NAME         PDF theme to activate (default: default)
+              --email_theme=NAME       E-mail theme to activate (default: default)
+              --strict-themes          Disable the bundles of the themes that were not selected
+              --with-demo              Import the demo catalogue, customers and orders
+              --skip-demo-images       Import the demo data without copying its images
+              --with-admin             Create an administrator account
+              --admin_login=LOGIN      Administrator login (default: thelia)
+              --admin_password=PWD     Administrator password (generated and printed if omitted)
+              --admin_first_name=NAME  Administrator first name
+              --admin_last_name=NAME   Administrator last name
+              --admin_email=EMAIL      Administrator e-mail
+
+        TXT;
+}
+
 function resolveJwtKeyPath(string $envName, string $defaultFileName): string
 {
     $path = (string) ($_SERVER[$envName] ?? '');
