@@ -233,6 +233,18 @@ if (isset($options['strict-themes'])) {
     removeBundlesForNonSelectedThemes($themes);
 }
 
+// The shop notification list is seeded empty, and MailerFactory refuses to send to
+// a shop that has no recipient: on a fresh install no order notification, and no
+// module notification, ever reaches the merchant. The address given for the
+// administrator is the one address the install already knows, so it becomes the
+// first recipient — unless the list already carries one.
+$adminEmail = trim((string) ($options['admin_email'] ?? ''));
+
+if ('' !== $adminEmail && '' === trim((string) $setup->getConfig('store_notification_emails'))) {
+    echo "Setting the shop notification address to {$adminEmail}...\n";
+    $setup->setConfig('store_notification_emails', $adminEmail);
+}
+
 // Pre-copy templates from vendor to templates/ so the kernel can boot.
 // template:set does this too, but the kernel crashes if the active
 // template directory doesn't exist yet when it scans for UiComponents.
