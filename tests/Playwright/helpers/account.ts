@@ -42,29 +42,37 @@ export async function createAddress(page: Page, address: AddressInput): Promise<
   await expect(page).toHaveURL(/\/account\/addresses/);
 }
 
+// Both confirmations are POST forms carrying a CSRF token, not links: `account_address_delete`
+// and `account_address_default` are declared `methods: ['POST']`, so a GET href would be
+// refused. The trigger carries the route in `data-confirm` and the AddressCard controller
+// copies it onto the form action when it opens the dialog — which is what is asserted below,
+// in place of the `[href*=…]` the old link-based markup allowed.
+const MODAL_CONFIRM_FORM = 'form[data-molecules--modal--base-target~="confirm"]';
+
+async function confirmAddressModal(page: Page, modalId: string, expectedAction: RegExp): Promise<void> {
+  const form = page.locator(`#${modalId} ${MODAL_CONFIRM_FORM}`);
+  await expect(form).toBeVisible({ timeout: 5_000 });
+  await expect(form).toHaveAttribute('action', expectedAction);
+  await Promise.all([
+    page.waitForURL(/\/account\/addresses/, { timeout: 10_000 }),
+    form.locator('button[type="submit"]').click(),
+  ]);
+}
+
 export async function deleteFirstNonDefaultAddress(page: Page): Promise<void> {
   await gotoAddresses(page);
   const deleteButton = page.locator('.AddressCard button[data-modal="confirmDeleteAddress"]').first();
   await deleteButton.click();
-  // Modal opens — confirm.
-  const confirm = page.locator('[data-modal-target="confirm"][href*="/account/address/delete/"]').first();
-  await Promise.all([
-    page.waitForURL(/\/account\/addresses/),
-    confirm.click(),
-  ]);
+  await confirmAddressModal(page, 'confirmDeleteAddress', /\/account\/address\/delete\/\d+/);
 }
 
 export async function setNonDefaultAsDefault(page: Page): Promise<void> {
   await gotoAddresses(page);
-  // The Favorite button is rendered only when the address is NOT default.
-  const favoriteButton = page.locator('.AddressCard .Favorite[data-modal="confirmDefaultAdress"]').first();
+  // The Favorite button is actionable only when the address is NOT already the default:
+  // `Favorite:Base` drops the modal attributes entirely on the selected one.
+  const favoriteButton = page.locator('.AddressCard .Favorite[data-modal="confirmDefaultAddress"]').first();
   await favoriteButton.click();
-  const confirm = page.locator('[data-modal-target="confirm"][href*="/account/address/default/"]').first();
-  await expect(confirm).toBeVisible({ timeout: 5_000 });
-  await Promise.all([
-    page.waitForURL(/\/account\/addresses/, { timeout: 10_000 }),
-    confirm.click(),
-  ]);
+  await confirmAddressModal(page, 'confirmDefaultAddress', /\/account\/address\/default\/\d+/);
 }
 async function selectCountryFor(page: Page, addr: { countryCode: string; countryLabel: string }): Promise<void> {
   const select = page.locator('select[name$="[country]"]');

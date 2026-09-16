@@ -63,8 +63,9 @@ export async function registerCustomer(page: Page, customer: Customer): Promise<
     page.waitForURL((url) => !url.pathname.includes('/customer/informations'), { timeout: 30_000 }),
     page.locator('button[type="submit"]').last().click(),
   ]);
-  // After step 2 the customer is redirected to /customer/login (success_url) when enabled,
-  // or to /customer/activation/{email} when activation is required.
+  // Step 2 carries no success_url: an enabled customer is signed in by step 1 and comes back
+  // to the page that asked them to register, /account by default. An account still waiting for
+  // its activation code stays signed out and lands on /customer/activation instead.
 }
 
 export async function login(page: Page, email: string, password: string): Promise<void> {

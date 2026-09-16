@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures/customer';
 import { addCurrentProductToCart, gotoCart, gotoProduct } from '../helpers/cart';
 import {
+  acceptMandatoryConsents,
   clickNextOrder,
   gotoCheckoutDelivery,
   gotoCheckoutPayment,
@@ -29,6 +30,9 @@ test.describe('Checkout', () => {
 
     await selectFirstInvoiceAddress(authedPage);
     await selectPaymentByLabel(authedPage, /cheque|check/i);
+    // The payment step asks for the shop's mandatory consents before it lets the order
+    // through — the happy path has to answer them like a buyer would.
+    await acceptMandatoryConsents(authedPage);
     // /checkout/pay renders the checkout-confirm template directly when the gateway
     // returns no redirect (Cheque just returns null), so the URL may not change away from /pay.
     await clickNextOrder(authedPage, /\/checkout\/(pay|confirm|invoice)/);
@@ -47,13 +51,15 @@ test.describe('Checkout', () => {
 
     await gotoCheckoutDelivery(authedPage);
 
-    // No delivery method picked yet → "Order" button is rendered but disabled.
-    const orderLink = authedPage.locator('a:has-text("Order")');
-    if (await orderLink.count() > 0) {
-      // The Flexy Button renders a non-clickable `Button--disabled` variant when invalid.
-      const disabled = await orderLink.first().getAttribute('disabled');
-      expect(disabled !== null || (await orderLink.first().getAttribute('href')) === null).toBeTruthy();
-    }
+    // No delivery method picked yet. `Organisms:NextButton` only passes an href once the
+    // step is settled, and `Molecules:Button:Base` switches to <a> only when it gets one —
+    // so an invalid step renders a disabled <button> and no link at all.
+    // Asserted rather than guarded on: the previous `if (count > 0)` form made this test
+    // pass without checking anything, since the missing link is exactly the expected state.
+    const nextButton = authedPage.locator('[data-live-name-value="Organisms:NextButton:Base"]');
+    await expect(nextButton).toBeVisible();
+    await expect(nextButton.locator('a')).toHaveCount(0);
+    await expect(nextButton.locator('button')).toBeDisabled();
   });
 
   test('cannot reach payment with an empty cart', async ({ authedPage }) => {

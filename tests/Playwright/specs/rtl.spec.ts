@@ -60,9 +60,8 @@ test.describe('Right-to-left', () => {
   test('prices keep their left-to-right reading order inside Arabic text', async ({ page }) => {
     const stops = await shopStops(page, RTL_LANG);
 
-    // The cart needs a line to show any amount. `helpers/cart.ts` still looks the
-    // add-to-cart button up by `.Button--fill`, a class the Button component no
-    // longer renders, so the submit button is taken as the form declares it.
+    // The cart needs a line to show any amount, and the button is taken as the form
+    // declares it rather than by a class the Button component may rename.
     await page.goto(stopNamed(stops, 'product'));
     await page.locator('form[name="thelia_cart_add"] button[type="submit"]').first().click();
     await page.waitForLoadState('networkidle').catch(() => {});
