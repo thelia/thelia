@@ -25,6 +25,8 @@ readonly class ImageUpdateDTO implements DTOEventActionInterface
         public ?string $description = null,
         public ?string $postscriptum = null,
         public ?bool $visible = null,
+        public ?string $alt = null,
+        public ?bool $decorative = null,
     ) {
     }
 
@@ -37,6 +39,8 @@ readonly class ImageUpdateDTO implements DTOEventActionInterface
             'description' => $this->description,
             'postscriptum' => $this->postscriptum,
             'visible' => $this->visible,
+            'alt' => $this->alt,
+            'decorative' => $this->decorative,
         ];
     }
 }
