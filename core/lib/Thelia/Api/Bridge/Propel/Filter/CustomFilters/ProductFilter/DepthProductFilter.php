@@ -16,7 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 
@@ -64,7 +64,7 @@ class DepthProductFilter extends AbstractFilter
         return [
             'depth' => [
                 'property' => 'depth',
-                'type' => Type::BUILTIN_TYPE_INT,
+                'type' => TypeIdentifier::INT->value,
                 'required' => false,
                 'description' => 'Defines the search depth for child categories. This filter can only be used within the category filter(productCategories.category.id).',
             ],
