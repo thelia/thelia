@@ -100,6 +100,16 @@ final class DatabaseSetup
         $this->pdo->prepare("UPDATE `config` SET `value` = ? WHERE `name` = 'form.secret'")->execute([$secret]);
     }
 
+    public function getConfig(string $name): ?string
+    {
+        $statement = $this->pdo->prepare('SELECT `value` FROM `config` WHERE `name` = :name');
+        $statement->execute(['name' => $name]);
+
+        $value = $statement->fetchColumn();
+
+        return false === $value ? null : (string) $value;
+    }
+
     public function setConfig(string $name, string $value): void
     {
         $this->pdo->prepare('UPDATE `config` SET `value` = :value WHERE `name` = :name')->execute([
