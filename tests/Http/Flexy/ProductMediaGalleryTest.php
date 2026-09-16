@@ -26,8 +26,9 @@ use Thelia\Test\WebIntegrationTestCase;
  *
  * These tests pin what a shopper gets out of that: a video sits where the merchant put it
  * among the images, nothing is requested from the platform before the shopper asks for it,
- * a decorative image is announced by nothing, an image with no text of its own falls back
- * to its title, and a video taken offline is nowhere on the page.
+ * a decorative image is announced by nothing while an unnamed one falls back to its title
+ * then to the product's, every player carries a name, and a video taken offline or left
+ * stranded by a platform the shop no longer serves is nowhere on the page.
  *
  * The page belongs to the front-office theme, which ships as its own package on its own
  * release cycle: a theme older than the video player is reported as skipped rather than
@@ -36,6 +37,8 @@ use Thelia\Test\WebIntegrationTestCase;
 final class ProductMediaGalleryTest extends WebIntegrationTestCase
 {
     private const PRODUCT_URL = 'flexy-product-media-test.html';
+
+    private const PRODUCT_TITLE = 'Product media page under test';
 
     protected function setUp(): void
     {
@@ -128,6 +131,78 @@ final class ProductMediaGalleryTest extends WebIntegrationTestCase
         self::assertStringNotContainsString('alt="A short title"', $content);
     }
 
+    /**
+     * An empty alt tells a screen reader to skip the image, which is what the merchant asked
+     * for on a decorative one and on nothing else. An image nobody got round to naming is
+     * still a picture of the product, and is announced with the product's own name.
+     */
+    public function testAnImageNobodyNamedIsAnnouncedWithTheProductName(): void
+    {
+        $product = $this->productUnderTest();
+        $this->factory()->productImage($product, ['position' => 1]);
+
+        $content = $this->renderProductPage();
+
+        self::assertStringContainsString('alt="'.self::PRODUCT_TITLE.'"', $content);
+        self::assertStringNotContainsString(
+            'alt=""',
+            $content,
+            'Only a decorative image is announced by nothing.',
+        );
+    }
+
+    /**
+     * A video nobody titled still has a player, and a player with no name is a frame a screen
+     * reader announces as nothing at all.
+     */
+    public function testAVideoNobodyNamedStillHasANamedPlayer(): void
+    {
+        $product = $this->productUnderTest();
+        $this->factory()->productVideo($product, ['position' => 1]);
+
+        $content = $this->renderProductPage();
+
+        self::assertStringContainsString(
+            'data-Organisms--VideoPlayer--base-label-value="Play video"',
+            $content,
+            'The name the frame will carry is decided before the click, and is never empty.',
+        );
+        self::assertStringNotContainsString('-label-value=""', $content);
+    }
+
+    /**
+     * A merchant who stops offering a platform leaves behind videos the shop can no longer
+     * address. They are dropped from the gallery outright — a thumbnail that opens an empty
+     * slide is worse than no thumbnail.
+     */
+    public function testAVideoOnAPlatformTheShopNoLongerServesIsNowhereOnThePage(): void
+    {
+        $product = $this->productUnderTest();
+        $factory = $this->factory();
+
+        $factory->productImage($product, ['position' => 1, 'title' => 'The only visual left']);
+        $factory->productVideo($product, [
+            'position' => 2,
+            'provider' => 'retired-platform',
+            'externalId' => 'strandedVideoId',
+            'alt' => 'A video nothing can play any more',
+        ]);
+
+        $content = $this->renderProductPage();
+
+        self::assertCount(1, self::slidePositions($content), 'The stranded video leaves no empty slide.');
+        // Not the bare name: the importmap lists every controller of the theme, the video
+        // player's among them, whether or not the page mounts one.
+        self::assertStringNotContainsString(
+            'data-controller="Organisms--VideoPlayer--base"',
+            $content,
+            'And no player either.',
+        );
+        self::assertStringNotContainsString('strandedVideoId', $content);
+        self::assertStringNotContainsString('A video nothing can play any more', $content);
+        self::assertStringContainsString('alt="The only visual left"', $content);
+    }
+
     public function testAVideoTakenOfflineIsNowhereOnThePage(): void
     {
         $product = $this->productUnderTest();
@@ -169,7 +244,7 @@ final class ProductMediaGalleryTest extends WebIntegrationTestCase
 
     private function productUnderTest(): Product
     {
-        $product = $this->product($this->factory()->category(), 'Product media page under test');
+        $product = $this->product($this->factory()->category(), self::PRODUCT_TITLE);
         $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
 
         return $product;

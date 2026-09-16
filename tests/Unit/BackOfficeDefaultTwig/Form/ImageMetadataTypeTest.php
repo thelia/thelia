@@ -69,6 +69,32 @@ final class ImageMetadataTypeTest extends TestCase
         $this->assertFalse($form->getData()['decorative']);
     }
 
+    public function testAnAltOfTwoHundredAndFiftyFiveCharactersIsAccepted(): void
+    {
+        $form = $this->submit([
+            'id' => '7',
+            'locale' => 'fr_FR',
+            'title' => 'Sac',
+            'alt' => str_repeat('a', 255),
+        ]);
+
+        $this->assertTrue($form->isValid(), (string) $form->getErrors(true, false));
+    }
+
+    public function testALongerAltIsRefusedRatherThanSentToTheDriver(): void
+    {
+        // The alt column holds 255 characters: one more used to reach the database
+        // and come back as a 500.
+        $form = $this->submit([
+            'id' => '7',
+            'locale' => 'fr_FR',
+            'title' => 'Sac',
+            'alt' => str_repeat('a', 256),
+        ]);
+
+        $this->assertFalse($form->isValid());
+    }
+
     public function testAltIsOptional(): void
     {
         $form = $this->submit([
