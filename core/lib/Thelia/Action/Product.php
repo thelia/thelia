@@ -83,6 +83,7 @@ use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductVideoQuery;
 use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
@@ -471,6 +472,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             $fileList['documentList']['list'] = ProductDocumentQuery::create()
                 ->findByProductId($event->getProductId());
             $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+            // The rows go with the product through the foreign key; the files a shop
+            // hosts itself would stay in the video library for ever without this.
+            $fileList['videoList']['list'] = ProductVideoQuery::create()
+                ->findByProductId($event->getProductId());
+            $fileList['videoList']['type'] = TheliaEvents::PRODUCT_VIDEO_DELETE;
 
             // Delete product
             $product

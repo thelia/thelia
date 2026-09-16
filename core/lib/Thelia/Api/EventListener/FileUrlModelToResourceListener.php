@@ -22,6 +22,7 @@ use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 class FileUrlModelToResourceListener implements EventSubscriberInterface
 {
@@ -40,6 +41,15 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         }
 
         $documentType = $resource::getFileType();
+
+        // A video is served as it was uploaded: there is no cached rendition to
+        // build, so nothing is dispatched and the address is the stored file
+        // itself. A platform video has no stored file, and keeps a null address.
+        if ('video' === $documentType) {
+            $resource->setFileUrl($this->storedFileUrl($resource, $documentType));
+
+            return;
+        }
 
         $baseSourceFilePath = ConfigQuery::read($documentType.'s_library_path');
 
@@ -64,6 +74,27 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
         $urlGetter = 'image' === $documentType ? 'getFileUrl' : 'getDocumentUrl';
         $resource->setFileUrl($event->{$urlGetter}());
+    }
+
+    /**
+     * The address of the file as the shop stores it, relative to the project root,
+     * or null when there is no stored file.
+     */
+    private function storedFileUrl(ItemFileResourceInterface $resource, string $documentType): ?string
+    {
+        $file = $resource->getFile();
+
+        if ('' === $file) {
+            return null;
+        }
+
+        $libraryPath = ConfigQuery::read($documentType.'s_library_path') ?? 'local'.\DIRECTORY_SEPARATOR.'media'.\DIRECTORY_SEPARATOR.$documentType.'s';
+
+        return URL::getInstance()->absoluteUrl(
+            \sprintf('%s/%s/%s', trim((string) $libraryPath, '/'), $resource::getItemType(), $file),
+            null,
+            URL::PATH_TO_FILE,
+        );
     }
 
     public static function getSubscribedEvents(): array
