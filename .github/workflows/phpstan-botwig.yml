@@ -47,7 +47,10 @@ jobs:
         # code; resolving the branch through Composer keeps the two in step.
         run: |
           composer require --no-update --no-scripts --no-audit \
-            "thelia/backoffice-default-twig-template:dev-main as 1.99.0"
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
 
       - name: Install Composer dependencies
         run: composer update --no-progress --prefer-dist --optimize-autoloader
