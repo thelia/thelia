@@ -28,6 +28,7 @@ use ApiPlatform\OpenApi\Model\Response;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -139,6 +140,7 @@ class FolderImage extends AbstractTranslatableResource implements ItemFileResour
     public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[Assert\Valid]
     public I18nCollection $i18ns;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]

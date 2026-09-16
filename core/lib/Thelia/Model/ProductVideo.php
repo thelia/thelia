@@ -54,12 +54,6 @@ class ProductVideo extends BaseProductVideo implements FileModelInterface
     {
         parent::preInsert($con);
 
-        // A video uploaded through the generic file path carries no platform: it is
-        // one the shop hosts, and the column never accepts an empty value.
-        if (null === $this->getProvider() || '' === $this->getProvider()) {
-            $this->setProvider(VideoProvider::File->value);
-        }
-
         $this->setPosition($this->getNextPosition());
 
         return true;

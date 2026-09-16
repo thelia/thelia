@@ -97,11 +97,28 @@ final class VideoProviderResolverTest extends TestCase
         self::assertSame([VideoProvider::Youtube, VideoProvider::Vimeo], $resolver->enabledProviders());
     }
 
-    public function testAnEmptyConfigurationFallsBackOnEveryPlatform(): void
+    /**
+     * The fallback is for a shop that has never been asked which platforms it
+     * offers. A merchant who unticks all of them has answered, and his answer is
+     * an empty list — not a silent return to every platform the core ships with.
+     */
+    public function testAShopThatTurnedEveryPlatformOffOffersNone(): void
+    {
+        foreach (['', '   ', ' , , '] as $configured) {
+            self::assertSame([], $this->resolver($configured)->enabledProviders());
+        }
+
+        $this->expectException(UnsupportedVideoUrlException::class);
+        $this->expectExceptionMessage('No video platform is enabled on this shop.');
+
+        $this->resolver('')->resolve('https://youtu.be/dQw4w9WgXcQ');
+    }
+
+    public function testTheShippedDefaultOffersEveryPlatformButHostedFiles(): void
     {
         self::assertSame(
             [VideoProvider::Youtube, VideoProvider::Vimeo, VideoProvider::Dailymotion],
-            $this->resolver('   ')->enabledProviders(),
+            $this->resolver(VideoProviderResolver::DEFAULT_PROVIDERS)->enabledProviders(),
         );
     }
 

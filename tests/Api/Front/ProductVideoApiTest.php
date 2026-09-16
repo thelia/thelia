@@ -101,6 +101,73 @@ final class ProductVideoApiTest extends ApiTestCase
     }
 
     /**
+     * The link carries nothing but identifiers, which is what makes it worth
+     * closing: walking it was a way to learn which videos and which products exist
+     * behind what the shop shows.
+     */
+    public function testTheLinksOfAHiddenVideoAreOutOfReach(): void
+    {
+        $product = $this->createProduct();
+        $factory = $this->createFixtureFactory();
+        $combination = $factory->productSaleElement($product);
+
+        $shown = $this->link($combination->getId(), $factory->productVideo($product, ['externalId' => 'aaaaaaaaaaa'])->getId());
+        $hidden = $this->link($combination->getId(), $factory->productVideo($product, ['externalId' => 'bbbbbbbbbbb', 'visible' => 0])->getId());
+
+        $links = $this->collection('/api/front/product_sale_elements_product_video?productSaleElements.product.id='.$product->getId());
+
+        self::assertSame([$shown], array_column($links, 'id'));
+
+        $response = $this->jsonRequest('GET', '/api/front/product_sale_elements_product_video/'.$hidden);
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    public function testTheLinksOfAnOfflineProductAreOutOfReach(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $offlineProduct = $factory->product(
+            $factory->category(),
+            $factory->taxRule(),
+            $factory->currency(),
+            ['visible' => 0],
+        );
+        $combination = $factory->productSaleElement($offlineProduct);
+        $link = $this->link($combination->getId(), $factory->productVideo($offlineProduct)->getId());
+
+        self::assertSame([], $this->collection(
+            '/api/front/product_sale_elements_product_video?productSaleElements.product.id='.$offlineProduct->getId(),
+        ));
+
+        $response = $this->jsonRequest('GET', '/api/front/product_sale_elements_product_video/'.$link);
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * A platform video is a row and an identifier: there is no file to download,
+     * and asking for one is a miss, not a breakage.
+     */
+    public function testTheFileOfAPlatformVideoIsNotFound(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createFixtureFactory()->productVideo($product);
+
+        $response = $this->jsonRequest('GET', '/api/front/product_videos/'.$video->getId().'/file');
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    private function link(int $productSaleElementsId, int $productVideoId): int
+    {
+        $link = new ProductSaleElementsProductVideo();
+        $link
+            ->setProductSaleElementsId($productSaleElementsId)
+            ->setProductVideoId($productVideoId)
+            ->save();
+
+        return $link->getId();
+    }
+
+    /**
      * @return list<array<string, mixed>>
      */
     private function collection(string $uri): array

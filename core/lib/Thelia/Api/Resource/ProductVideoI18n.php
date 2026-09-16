@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProductVideoI18n extends I18n
 {
@@ -25,6 +26,7 @@ class ProductVideoI18n extends I18n
      * What a screen reader announces in place of the player.
      */
     #[Groups([ProductVideo::GROUP_ADMIN_READ, ProductVideo::GROUP_FRONT_READ, ProductVideo::GROUP_ADMIN_WRITE])]
+    #[Assert\Length(max: 255)]
     protected ?string $alt = null;
 
     #[Groups([ProductVideo::GROUP_ADMIN_READ, ProductVideo::GROUP_FRONT_READ, ProductVideo::GROUP_ADMIN_WRITE])]
