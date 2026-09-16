@@ -1,6 +1,6 @@
 # 3.1.0
 
-First minor of the 3.x line. 80 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
+First minor of the 3.x line. 83 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
 
 ## Security
 
