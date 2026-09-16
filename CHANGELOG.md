@@ -1,6 +1,6 @@
 # 3.1.0
 
-First minor of the 3.x line. 85 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
+First minor of the 3.x line. 88 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
 
 ## Security
 
@@ -115,6 +115,8 @@ The cache backend is chosen with an environment variable, `THELIA_CACHE_DSN`. It
 - The generated Propel models no longer raise a PHP 8.5 deprecation: the Thelia fork of Propel, 1.0.3, writes canonical casts, drops `ReflectionProperty::setAccessible()` and `xml_parser_free()`. The core requires it.
 - The core no longer raises a Symfony 7.4 deprecation on a page render: validator constraints take named arguments, the two API voters accept the vote argument, and the language URL form names its default protocol. The SEOne, RecentlyViewed, HeaderHighlights and CustomDelivery modules and the back-office theme received the same treatment in their own releases. #3955
 - The update script removes the compiled container and the generated Propel models of the previous release before it boots, so a shop that ran `composer update` no longer has to clear its caches by hand before `local/setup/update.php`.
+- A message a module seeded for Thelia 2, with `{$order_ref}` or `{config key="…"}` in its subject or body, is interpolated instead of reaching the customer as a raw placeholder: the simple Smarty variables are rewritten to Twig before rendering. The Cheque, CustomDelivery and VirtualProductDelivery modules also rewrite their seeds in their own releases. #3958
+- The country choices of the address form no longer collapse every untranslated country under one blank entry: a country without a title in the current language is labelled by the title of the default language, then by its ISO code. #3957
 - The demo shop ships with a carrier: the demo import attaches the CustomDelivery module to every shipping zone with a flat price, so a fresh `--with-demo` install can be ordered from end to end. #3953
 
 # 3.0.0
