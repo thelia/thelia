@@ -16,6 +16,7 @@ namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
 use Thelia\Model\Accessory;
 use Thelia\Model\Address;
@@ -50,8 +51,10 @@ use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductAssociationTypeQuery;
+use Thelia\Model\ProductImage;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductVideo;
 use Thelia\Model\Profile;
 use Thelia\Model\ProfileResource;
 use Thelia\Model\Resource;
@@ -957,5 +960,90 @@ final class FixtureFactory
         $link->save($this->connection);
 
         return $link;
+    }
+
+    /**
+     * An image of a product, row and stored file both.
+     *
+     * The file is written outside the test transaction, as an upload would be: the
+     * caller deletes it, usually through the CreatesTestFiles trait.
+     */
+    public function productImage(Product $product, array $overrides = []): ProductImage
+    {
+        $n = $this->next();
+
+        $image = new ProductImage();
+        $image->setProductId($product->getId());
+        $image->setVisible($overrides['visible'] ?? 1);
+
+        if (isset($overrides['title'])) {
+            $image
+                ->setLocale($overrides['locale'] ?? 'en_US')
+                ->setTitle($overrides['title']);
+        }
+
+        $image->setFile($overrides['file'] ?? 'fixture-image-'.$n.'.png');
+        $image->save($this->connection);
+
+        if ($overrides['position'] ?? null) {
+            $image->setPosition($overrides['position'])->save($this->connection);
+        }
+
+        self::writePng($image->getUploadDir().\DIRECTORY_SEPARATOR.$image->getFile());
+
+        return $image;
+    }
+
+    /**
+     * A video of a product, played from a platform by default. A caller wanting a
+     * hosted video passes `provider` and `file`, and cleans the file up itself.
+     */
+    public function productVideo(Product $product, array $overrides = []): ProductVideo
+    {
+        $video = new ProductVideo();
+        $video->setProductId($product->getId());
+        $video->setProvider($overrides['provider'] ?? VideoProvider::Youtube->value);
+        $video->setExternalId(\array_key_exists('externalId', $overrides) ? $overrides['externalId'] : 'dQw4w9WgXcQ');
+        $video->setFile($overrides['file'] ?? null);
+        $video->setThumbnailImageId($overrides['thumbnailImageId'] ?? null);
+        $video->setVisible($overrides['visible'] ?? 1);
+
+        if (isset($overrides['title'])) {
+            $video
+                ->setLocale($overrides['locale'] ?? 'en_US')
+                ->setTitle($overrides['title']);
+        }
+
+        if (isset($overrides['alt'])) {
+            $video
+                ->setLocale($overrides['locale'] ?? 'en_US')
+                ->setAlt($overrides['alt']);
+        }
+
+        $video->save($this->connection);
+
+        // preInsert() hands out the next free position, so one asked for at
+        // creation time only survives if it is written afterwards.
+        if ($overrides['position'] ?? null) {
+            $video->setPosition($overrides['position'])->save($this->connection);
+        }
+
+        return $video;
+    }
+
+    /**
+     * The smallest valid PNG, written where an upload would have put it.
+     */
+    private static function writePng(string $path): void
+    {
+        $directory = \dirname($path);
+
+        if (!is_dir($directory)) {
+            mkdir($directory, 0o775, true);
+        }
+
+        $image = imagecreatetruecolor(1, 1);
+        imagepng($image, $path);
+        imagedestroy($image);
     }
 }

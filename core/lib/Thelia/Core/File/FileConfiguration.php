@@ -19,12 +19,13 @@ use Thelia\Model\ConfigQuery;
 /**
  * Single source of truth for what may be uploaded in a Thelia shop.
  *
- * Images are restricted by a mime type whitelist, documents by an extension
- * blacklist. Both lists ship with a safe default and can be adjusted per shop
+ * Images and videos are restricted by a mime type whitelist, documents by an
+ * extension blacklist. Both lists ship with a safe default and can be adjusted per shop
  * through a configuration variable, so that a legitimate file type nobody
  * anticipated does not require a core patch:
  *
  *   image_upload_allowed_mime_types    image/jpeg, image/png, image/avif
+ *   video_upload_allowed_mime_types    video/mp4, video/webm
  *   document_upload_forbidden_extensions   php, phtml, exe
  *
  * An empty or missing variable means "use the default list". Loosening these
@@ -39,6 +40,8 @@ class FileConfiguration
 
     public const DOCUMENT_EXTENSION_BLACKLIST_VARIABLE = 'document_upload_forbidden_extensions';
 
+    public const VIDEO_MIME_TYPES_VARIABLE = 'video_upload_allowed_mime_types';
+
     /**
      * Mime types accepted for an image upload, in the absence of a shop configuration.
      */
@@ -48,6 +51,18 @@ class FileConfiguration
         'image/gif',
         'image/webp',
         'image/svg+xml',
+    ];
+
+    /**
+     * Mime types accepted for a video upload, in the absence of a shop configuration.
+     *
+     * Only the three formats every current browser plays natively: the shop serves
+     * the uploaded file as it is, and never transcodes it.
+     */
+    public const DEFAULT_VIDEO_MIME_TYPES = [
+        'video/mp4',
+        'video/webm',
+        'video/ogg',
     ];
 
     /**
@@ -94,6 +109,9 @@ class FileConfiguration
         'image/vnd.microsoft.icon' => ['ico'],
         'image/x-icon' => ['ico'],
         'image/heic' => ['heic'],
+        'video/mp4' => ['mp4', 'm4v'],
+        'video/webm' => ['webm'],
+        'video/ogg' => ['ogv', 'ogg'],
     ];
 
     /**
@@ -126,6 +144,20 @@ class FileConfiguration
     }
 
     /**
+     * @return array{objectType: string, validMimeTypes: array<string, list<string>>, extBlackList: list<string>}
+     */
+    public static function getVideoConfig(): array
+    {
+        return [
+            'objectType' => 'video',
+            'validMimeTypes' => self::buildMimeTypeMap(
+                self::readList(self::VIDEO_MIME_TYPES_VARIABLE, self::DEFAULT_VIDEO_MIME_TYPES),
+            ),
+            'extBlackList' => [],
+        ];
+    }
+
+    /**
      * Constraints to apply to an upload of the given object type, for callers
      * that do not carry their own policy. Unknown object types get no constraint.
      *
@@ -136,6 +168,7 @@ class FileConfiguration
         return match ($objectType) {
             'image' => self::getImageConfig(),
             'document' => self::getDocumentConfig(),
+            'video' => self::getVideoConfig(),
             default => ['objectType' => $objectType, 'validMimeTypes' => [], 'extBlackList' => []],
         };
     }
