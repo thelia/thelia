@@ -4,6 +4,7 @@
 
 - GHSA-59cp-795h-6wgx — registering as a guest with an address somebody had already used as a guest handed back a token that could set a password on their account, and a password waiting for its activation code could be replaced by anyone holding such a token. The guest token now records whether its registration opened the row, and only that token, or the tracking link of an order mailed to the address, completes the account; a password waiting for its code is only replaced by a caller holding a tracking link.
 - GHSA-m887-7g6m-w83g — the listeners that decide something from the request path (admin API permissions, API rate limits, refresh-token limits, security log, API statelessness) read the path as the client spelled it, while the router decodes it first, so an encoded spelling such as `/api/%61dmin/...` reached the admin API without the per-resource permission check. Every path comparison now reads the path the way the router does, and the admin permission check also recognises an admin operation from the route it matched, whatever the spelling.
+- GHSA-r63g-6wfg-v5v9 — a coupon condition summary is built from a message that carries its own markup, and the back office renders it as such; the customer names, product, category, country and module titles it inserted came straight from the database, so a name holding a tag ran as a tag on the coupon screen. Every value a condition summary inserts is now escaped before it reaches the message, and the message keeps its markup.
 
 # 3.0.0
 

@@ -114,9 +114,7 @@ class MatchDeliveryModules extends ConditionAbstract
         if (null !== $moduleList = ModuleQuery::create()->findPks($this->values[self::MODULES_LIST] ?? [])) {
             /** @var Module $module */
             foreach ($moduleList as $module) {
-                // The summary is rendered as HTML in the back-office: a module title is
-                // shopkeeper data, not markup.
-                $moduleStrList .= htmlspecialchars((string) $module->setLocale($this->getCurrentLocale())->getTitle()).', ';
+                $moduleStrList .= $this->escapeSummaryValue($module->setLocale($this->getCurrentLocale())->getTitle()).', ';
             }
 
             $moduleStrList = rtrim($moduleStrList, ', ');

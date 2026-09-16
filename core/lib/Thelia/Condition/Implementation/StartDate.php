@@ -107,7 +107,7 @@ class StartDate extends ConditionAbstract
         return $this->translator->trans(
             'Valid only from %date% to the coupon expiration date',
             [
-                '%date%' => $strDate,
+                '%date%' => $this->escapeSummaryValue($strDate),
             ],
             'condition',
         );
