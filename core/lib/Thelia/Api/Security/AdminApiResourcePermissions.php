@@ -53,6 +53,7 @@ use Thelia\Api\Resource\NewsLetter;
 use Thelia\Api\Resource\Order;
 use Thelia\Api\Resource\OrderAddress;
 use Thelia\Api\Resource\OrderCoupon;
+use Thelia\Api\Resource\OrderHistory;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
 use Thelia\Api\Resource\OrderReturn;
@@ -130,6 +131,7 @@ final readonly class AdminApiResourcePermissions
         Order::class => AdminResources::ORDER,
         OrderAddress::class => AdminResources::ORDER,
         OrderCoupon::class => AdminResources::ORDER,
+        OrderHistory::class => AdminResources::ORDER,
         OrderProduct::class => AdminResources::ORDER,
         OrderProductTax::class => AdminResources::ORDER,
         OrderStatus::class => AdminResources::ORDER_STATUS,

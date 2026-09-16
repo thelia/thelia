@@ -22,6 +22,7 @@ use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
 use Thelia\Domain\OrderReturn\Service\OrderReturnComposer;
@@ -220,6 +221,7 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
+            $this->getService(OrderHistoryRecorder::class),
         );
 
         $dispatcher = new EventDispatcher();

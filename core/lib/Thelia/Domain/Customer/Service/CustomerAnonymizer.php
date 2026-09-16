@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
@@ -28,6 +29,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsentQuery;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnVersionQuery;
@@ -43,7 +45,8 @@ use Thelia\Model\TagElementQuery;
  * coupons and their status history. What disappears is who placed them: the
  * account identity, the address book, the identity frozen on the invoice and
  * delivery order addresses, the carts, the newsletter subscription, the address
- * the consents of the checkout were accepted from, and the identity the
+ * the consents of the checkout were accepted from, the label naming them as the
+ * author of an entry in the history of their own orders, and the identity the
  * administrator audit trail recorded about that customer.
  *
  * The country and state of an order address are kept, because they justify
@@ -79,6 +82,7 @@ final readonly class CustomerAnonymizer
             $this->anonymizeOrderAddresses($customer, $connection);
             $this->anonymizeOrderReturns($customer, $connection);
             $this->anonymizeOrderConsents($customer, $connection);
+            $this->anonymizeOrderHistory($customer, $connection);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
@@ -193,6 +197,36 @@ final readonly class CustomerAnonymizer
         OrderConsentQuery::create()
             ->filterByOrderId($orderIds)
             ->update(['IpAddress' => null], $connection);
+    }
+
+    /**
+     * The history of an order says what happened to it and who did it. What
+     * happened is kept — it is the record of the order, and the order is kept.
+     * Who did it is erased where that author is this customer: the entries they
+     * are the author of carry their customer reference as a label, which is one
+     * lookup away from the person. The line itself stays, still saying a
+     * customer acted, which is what the timeline is for.
+     *
+     * Nothing else in the table is touched: an entry authored by an
+     * administrator or by a payment module names that administrator or that
+     * module, not the buyer.
+     */
+    private function anonymizeOrderHistory(Customer $customer, ConnectionInterface $connection): void
+    {
+        $orderIds = OrderQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->select('Id')
+            ->find($connection)
+            ->toArray();
+
+        if ([] === $orderIds) {
+            return;
+        }
+
+        OrderHistoryQuery::create()
+            ->filterByOrderId($orderIds)
+            ->filterByActorType(OrderHistoryActorType::CUSTOMER->value)
+            ->update(['ActorLabel' => null], $connection);
     }
 
     /**

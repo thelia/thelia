@@ -1154,4 +1154,111 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@status_force_resource_id, 'nl_NL', 'Overschrijven van orderstatusovergangen', NULL, NULL, NULL),
     (@status_force_resource_id, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- Timestamped history of an order
+--
+-- What happened to an order, when, and who did it. Until now the answer lived
+-- in the order_version rows the versionable behavior writes, which say what the
+-- order looked like and not what was done to it: nothing there separates a
+-- status change from an address correction, an invoice number allocated with
+-- versioning disabled leaves no row at all, and a mail sent to the buyer leaves
+-- nothing anywhere.
+--
+-- Created only if missing, so the statement can be replayed and so a shop that
+-- already installed the table from setup/thelia.sql is left alone.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `order_history`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `event_type` VARCHAR(50) NOT NULL COMMENT 'what happened, as a plain code: the core writes the types it knows, a module writes its own',
+    `actor_type` VARCHAR(20) NOT NULL COMMENT 'which kind of author acted: admin, customer, module or system',
+    `actor_label` VARCHAR(255) COMMENT 'the author label snapshot (admin login, customer reference, module code), kept when the author is deleted',
+    `admin_id` INTEGER COMMENT 'the admin who acted, NULL once that admin is gone',
+    `payload` TEXT COMMENT 'the event details as JSON, holding codes and references only',
+    `comment` TEXT COMMENT 'the free text carried by the entry, the whole content of a manual note',
+    `visible_to_customer` TINYINT DEFAULT 0 NOT NULL COMMENT 'whether the entry is shown to the customer alongside the order',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_history_order_id` (`order_id`),
+    INDEX `idx_order_history_created_at` (`created_at`),
+    INDEX `fi_order_history_admin_id` (`admin_id`),
+    CONSTRAINT `fk_order_history_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_history_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The status changes a shop already made, recovered from order_version so that
+-- an order placed before this release opens with a timeline instead of a blank
+-- page. Each pair of consecutive versions of the same order is one transition;
+-- the pair is kept only when the status actually moved, because an address
+-- correction or a delivery reference also writes a version and moving nothing
+-- is not an event. The first version of an order is the order being created,
+-- not a transition, so it produces nothing.
+--
+-- The previous version is looked up as the greatest one below the current one,
+-- rather than as "the current one minus one": a history with a hole in its
+-- numbering would otherwise silently lose every transition around the hole.
+--
+-- The author is the system: order_version records version_created_by only when
+-- an authenticated user saved the row, most of these rows have nothing there,
+-- and inventing an author for a line recovered after the fact would be worse
+-- than admitting there is none.
+--
+-- A transition whose status has since been deleted from order_status is left
+-- out rather than written with a code guessed from an id nobody can resolve.
+--
+-- The payload is written exactly as the recorder writes it — the same two keys,
+-- in the same order, with no spaces — so a reconstituted line and a line
+-- written live are indistinguishable to whoever reads them back.
+--
+-- Replayable: an order that already has a single status_changed entry, whether
+-- from a previous run of this script or from the application itself, is skipped
+-- whole. The already-recorded set is read through a derived table rather than
+-- directly, because MySQL refuses a subquery that names the table an INSERT is
+-- writing into, and materializing it into a derived table is what lifts that.
+INSERT INTO `order_history`
+    (`order_id`, `event_type`, `actor_type`, `actor_label`, `admin_id`, `payload`, `comment`, `visible_to_customer`, `created_at`, `updated_at`)
+SELECT
+    `to_version`.`id`,
+    'status_changed',
+    'system',
+    NULL,
+    NULL,
+    CONCAT('{"from":"', `from_status`.`code`, '","to":"', `to_status`.`code`, '"}'),
+    NULL,
+    0,
+    `to_version`.`version_created_at`,
+    `to_version`.`version_created_at`
+FROM `order_version` AS `to_version`
+INNER JOIN `order` ON `order`.`id` = `to_version`.`id`
+INNER JOIN `order_version` AS `from_version`
+    ON `from_version`.`id` = `to_version`.`id`
+   AND `from_version`.`version` = (
+        SELECT MAX(`previous_version`.`version`)
+        FROM `order_version` AS `previous_version`
+        WHERE `previous_version`.`id` = `to_version`.`id`
+          AND `previous_version`.`version` < `to_version`.`version`
+   )
+INNER JOIN `order_status` AS `from_status` ON `from_status`.`id` = `from_version`.`status_id`
+INNER JOIN `order_status` AS `to_status` ON `to_status`.`id` = `to_version`.`status_id`
+WHERE NOT EXISTS (
+    SELECT 1 FROM (
+        SELECT DISTINCT `order_id` FROM `order_history` WHERE `event_type` = 'status_changed'
+    ) AS `already_recorded`
+    WHERE `already_recorded`.`order_id` = `to_version`.`id`
+)
+  AND `from_version`.`status_id` <> `to_version`.`status_id`
+  AND `to_version`.`version_created_at` IS NOT NULL
+ORDER BY `to_version`.`id`, `to_version`.`version`;
+
 SET FOREIGN_KEY_CHECKS = 1;
