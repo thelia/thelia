@@ -19,6 +19,30 @@ use Thelia\Test\ApiTestCase;
 
 final class CustomerApiTest extends ApiTestCase
 {
+    /**
+     * firstname and lastname are NOT NULL columns with no default. A payload
+     * that misspells them - an ERP sending firstName rather than firstname -
+     * used to reach the database and come back as a 500 carrying the failed
+     * INSERT, with nothing naming the field at fault.
+     */
+    public function testCreateCustomerWithoutANameIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+
+        $response = $this->jsonRequest('POST', '/api/admin/customers', [
+            'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
+            'email' => 'no-name@example.com',
+            'password' => 'Password1!',
+        ], $token);
+
+        self::assertSame(422, $response->getStatusCode(), $response->getContent());
+        self::assertStringContainsString('firstname', $response->getContent());
+        self::assertNull(CustomerQuery::create()->findOneByEmail('no-name@example.com'));
+    }
+
     public function testGetCustomerReturnsResource(): void
     {
         $token = $this->authenticateAsAdmin();
