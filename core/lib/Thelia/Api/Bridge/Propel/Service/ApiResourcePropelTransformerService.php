@@ -434,8 +434,10 @@ readonly class ApiResourcePropelTransformerService
 
     /**
      * Whether the Propel setter writes a column the schema declares NOT NULL.
-     * A setter that targets a relation or a virtual field maps to no column
-     * and is left alone.
+     * A setter that targets a virtual field maps to no column and is left
+     * alone. A setter that targets a relation writes the foreign key behind
+     * it - setProduct() fills product_id - so the foreign key's own
+     * nullability is what decides.
      */
     private function mapsToRequiredColumn(ActiveRecordInterface $propelModel, string $propelSetter): bool
     {
@@ -447,11 +449,21 @@ readonly class ApiResourcePropelTransformerService
         $tableMap = $tableMapClass::getTableMap();
         $phpName = substr($propelSetter, 3);
 
-        if (!$tableMap->hasColumnByPhpName($phpName)) {
+        if ($tableMap->hasColumnByPhpName($phpName)) {
+            return $tableMap->getColumnByPhpName($phpName)->isNotNull();
+        }
+
+        if (!$tableMap->hasRelation($phpName)) {
             return false;
         }
 
-        return $tableMap->getColumnByPhpName($phpName)->isNotNull();
+        foreach ($tableMap->getRelation($phpName)->getLocalColumns() as $localColumn) {
+            if ($localColumn->isNotNull()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function determinePropelSetterName(
