@@ -975,11 +975,18 @@ final class FixtureFactory
         $image = new ProductImage();
         $image->setProductId($product->getId());
         $image->setVisible($overrides['visible'] ?? 1);
+        $image->setDecorative(($overrides['decorative'] ?? false) ? 1 : 0);
 
         if (isset($overrides['title'])) {
             $image
                 ->setLocale($overrides['locale'] ?? 'en_US')
                 ->setTitle($overrides['title']);
+        }
+
+        if (isset($overrides['alt'])) {
+            $image
+                ->setLocale($overrides['locale'] ?? 'en_US')
+                ->setAlt($overrides['alt']);
         }
 
         $image->setFile($overrides['file'] ?? 'fixture-image-'.$n.'.png');

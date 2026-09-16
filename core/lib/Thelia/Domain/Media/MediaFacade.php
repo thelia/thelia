@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Media;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -24,6 +25,7 @@ use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\File\FileManager;
 use Thelia\Core\File\FileModelInterface;
+use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\DocumentUploadDTO;
 use Thelia\Domain\Media\DTO\ImageProcessDTO;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
@@ -38,6 +40,7 @@ final readonly class MediaFacade
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private FileManager $fileManager,
+        private FileProcessorService $fileProcessorService,
     ) {
     }
 
@@ -247,6 +250,8 @@ final readonly class MediaFacade
      */
     public function createVideo(ProductVideoCreateDTO $dto): ProductVideo
     {
+        $this->guardUploadedVideo($dto->uploadedFile);
+
         $video = new ProductVideo();
         $video->setParentId($dto->productId);
         $video->setProvider(($dto->provider ?? VideoProvider::File)->value);
@@ -279,6 +284,8 @@ final readonly class MediaFacade
 
     public function updateVideo(ProductVideo $video, ProductVideoUpdateDTO $dto): ProductVideo
     {
+        $this->guardUploadedVideo($dto->uploadedFile);
+
         $oldModel = clone $video;
 
         $video->setLocale($dto->locale);
@@ -338,6 +345,26 @@ final readonly class MediaFacade
         $event = new FileToggleVisibilityEvent($video->getQueryInstance(), $video->getId());
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY);
+    }
+
+    /**
+     * Applies the shop upload policy to a video before anything is written.
+     *
+     * The policy lives here rather than in each caller: the video library is
+     * published into the web space by symbolic link, so a file the shop accepts is
+     * a file the shop serves. A back-office screen calling the facade gets the same
+     * refusal the API gets, and a caller that forgets to ask cannot be the hole.
+     *
+     * @throws ProcessFileException when the file may not be uploaded
+     */
+    private function guardUploadedVideo(?UploadedFile $uploadedFile): void
+    {
+        if (!$uploadedFile instanceof UploadedFile) {
+            return;
+        }
+
+        $this->fileProcessorService->validateUpload($uploadedFile, 'video');
+        $this->fileProcessorService->sanitizeUpload($uploadedFile);
     }
 
     /**

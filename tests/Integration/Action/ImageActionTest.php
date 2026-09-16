@@ -26,6 +26,7 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileManager;
+use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
 use Thelia\Domain\Media\MediaFacade;
 use Thelia\Model\ProductImage;
@@ -181,7 +182,11 @@ final class ImageActionTest extends ActionIntegrationTestCase
         $savedModel = $saveEvent->getModel();
         $this->trackFileForCleanup($savedModel->getUploadDir().DS.$savedModel->getFile());
 
-        $facade = new MediaFacade($this->dispatcher, $this->getService(FileManager::class));
+        $facade = new MediaFacade(
+            $this->dispatcher,
+            $this->getService(FileManager::class),
+            $this->getService(FileProcessorService::class),
+        );
 
         $facade->updateImage($savedModel, new ImageUpdateDTO(
             locale: 'fr_FR',

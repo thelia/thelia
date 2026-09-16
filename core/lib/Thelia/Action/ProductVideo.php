@@ -22,6 +22,7 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\Exception\FileException;
+use Thelia\Domain\Media\Video\IncompleteVideoException;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Exception\DocumentException;
 use Thelia\Model\ConfigQuery;
@@ -86,6 +87,8 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
                 $model->setFile(\sprintf('tmp/%s', $uploadedFile->getFilename()));
             }
 
+            $this->guardAgainstAnEmptyVideo($model, $uploadedFile);
+
             $savedLines = $model->save($con);
             $event->setModel($model);
 
@@ -144,6 +147,27 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
         }
 
         $model->delete();
+    }
+
+    /**
+     * A video has to point at something: a file the shop stores, or an identifier
+     * on a platform. Neither would be a row nothing can ever play, which no screen
+     * would show and no one would notice until a merchant wondered why his gallery
+     * is short of one item.
+     *
+     * @throws IncompleteVideoException
+     */
+    private function guardAgainstAnEmptyVideo(ProductVideoModel $model, ?UploadedFile $uploadedFile): void
+    {
+        $isHosted = VideoProvider::File->value === $model->getProvider();
+
+        if ($isHosted && !$uploadedFile instanceof UploadedFile) {
+            throw new IncompleteVideoException('A video hosted by the shop needs a file.');
+        }
+
+        if (!$isHosted && null === $model->getExternalId()) {
+            throw new IncompleteVideoException('A video played from a platform needs the identifier of the video on it.');
+        }
     }
 
     /**
@@ -213,7 +237,7 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
             @unlink($cachedFile);
         }
 
-        @unlink(str_replace('..', '', $model->getUploadDir().DS.$model->getFile()));
+        @unlink($model->getUploadDir().DS.basename($model->getFile()));
     }
 
     public static function getSubscribedEvents(): array
