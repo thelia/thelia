@@ -312,6 +312,14 @@ readonly class ApiResourcePropelTransformerService
                 return $propelModel;
             }
 
+            if (null === $id) {
+                $matchedByReference = $this->matchNestedModelByReference($data, $propelModel, $previousPropelModel);
+
+                if ($matchedByReference instanceof ActiveRecordInterface) {
+                    return $matchedByReference;
+                }
+            }
+
             $this->queryFilterById(uriVariables: $uriVariables, query: $query, columnValues: $columnValues);
 
             if (null !== $query->findOne() && \count($query->getMap()) > 0) {
@@ -320,6 +328,73 @@ readonly class ApiResourcePropelTransformerService
         }
 
         return $propelModel;
+    }
+
+    /**
+     * The existing row a nested element refers to when it carries no id, found
+     * by the reference it holds under its parent.
+     *
+     * A collection sent inside its parent is rebuilt element by element, so an
+     * element with no id becomes a new row and the previous one is deleted with
+     * everything hanging off it: its attribute combinations, and the customer
+     * family prices a shop had set on it. Clients that hold their own
+     * references, an ERP above all, send the same reference on every
+     * synchronisation and expect to address the same row.
+     *
+     * Matching stays deliberately narrow. The element must sit under a
+     * persisted parent, carry a non-empty reference, and its table must have
+     * both a ref column and a foreign key to that parent. The reference has no
+     * unique index, so an ambiguous match resolves to nothing rather than to a
+     * guess, and the caller falls back to creating a row.
+     */
+    private function matchNestedModelByReference(
+        PropelResourceInterface $data,
+        ActiveRecordInterface $propelModel,
+        ?ActiveRecordInterface $previousPropelModel,
+    ): ?ActiveRecordInterface {
+        if (!$previousPropelModel instanceof ActiveRecordInterface || !method_exists($previousPropelModel, 'getId')) {
+            return null;
+        }
+
+        $parentId = $previousPropelModel->getId();
+
+        if (null === $parentId || !method_exists($data, 'getRef')) {
+            return null;
+        }
+
+        $reference = $data->getRef();
+
+        if (!\is_string($reference) || '' === $reference) {
+            return null;
+        }
+
+        $tableMapClass = $propelModel::TABLE_MAP;
+        $tableMap = $tableMapClass::getTableMap();
+
+        if (!$tableMap->hasColumnByPhpName('Ref')) {
+            return null;
+        }
+
+        $parentName = (new \ReflectionClass($previousPropelModel::class))->getShortName();
+
+        if (!$tableMap->hasRelation($parentName)) {
+            return null;
+        }
+
+        $foreignKeys = $tableMap->getRelation($parentName)->getLocalColumns();
+
+        if (1 !== \count($foreignKeys)) {
+            return null;
+        }
+
+        /** @var ModelCriteria $queryClass */
+        $queryClass = $tableMap->getClassName().'Query';
+        $matches = $queryClass::create()
+            ->filterBy($foreignKeys[0]->getPhpName(), $parentId)
+            ->filterBy('Ref', $reference)
+            ->find();
+
+        return 1 === $matches->count() ? $matches->getFirst() : null;
     }
 
     private function processPropertiesModel(
