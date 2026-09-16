@@ -112,6 +112,7 @@ The cache backend is chosen with an environment variable, `THELIA_CACHE_DSN`. It
 - `bin/install --help` prints the options and exits, and an unknown option is refused before anything is created or dropped, where both used to run the full install against the database the environment pointed at. #3950
 - A fresh install writes the administrator address into the shop notification list when the list is empty, so order and module notifications reach the merchant without a configuration step. #3951
 - A coupon carrying no condition no longer writes an ERROR line in the shop log on a path that behaves as intended. #3952
+- The demo shop ships with a carrier: the demo import attaches the CustomDelivery module to every shipping zone with a flat price, so a fresh `--with-demo` install can be ordered from end to end. #3953
 
 # 3.0.0
 
