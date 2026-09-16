@@ -14,17 +14,25 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Localization;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Domain\Localization\Service\LocaleDirection;
 use Thelia\Model\Admin;
 use Thelia\Model\Lang;
 
 final readonly class LocalizationFacade
 {
-    public function __construct(private LangService $langService)
-    {
+    public function __construct(
+        private LangService $langService,
+        // Both defaulted so the single-argument constructor this facade used to have keeps
+        // working: LocaleDirection holds a hard-coded list and no state, so building one is
+        // free and always correct, and the logger is only used to explain a fallback.
+        private LocaleDirection $localeDirection = new LocaleDirection(),
+        private ?LoggerInterface $logger = null,
+    ) {
     }
 
     /**
@@ -41,6 +49,36 @@ final readonly class LocalizationFacade
     public function getCurrentLocale(): ?string
     {
         return $this->langService->getLocale();
+    }
+
+    /**
+     * The writing direction of the current language, ready for an HTML "dir" attribute.
+     *
+     * Read from the locale rather than from the language: getCurrentLang() answers null
+     * outside a session - a console command, a worker, a message consumer - while the
+     * locale falls back to the default language of the shop. A template asks for a
+     * direction to write an attribute with it, so this never throws and never answers
+     * an empty string: a shop with no default language at all still reads left to right.
+     *
+     * @return LocaleDirection::LEFT_TO_RIGHT|LocaleDirection::RIGHT_TO_LEFT
+     */
+    public function getCurrentLangDirection(): string
+    {
+        try {
+            return $this->localeDirection->forLocale($this->langService->getLocale());
+        } catch (\Throwable $failure) {
+            // The expected failure is a shop with no default language, but resolving the
+            // locale also reaches the database and the session, so this catches whatever
+            // comes. Losing a page over a "dir" attribute would be a poor trade, and a
+            // silent one would be worse: the direction degrades, the cause is written
+            // down, and the real symptom stays findable in the log.
+            $this->logger?->warning(
+                'Could not resolve the current locale, falling back to a left-to-right writing direction.',
+                ['exception' => $failure],
+            );
+
+            return LocaleDirection::LEFT_TO_RIGHT;
+        }
     }
 
     /**
