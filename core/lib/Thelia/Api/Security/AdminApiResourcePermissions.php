@@ -71,6 +71,8 @@ use Thelia\Api\Resource\ProductImage;
 use Thelia\Api\Resource\ProductPrice;
 use Thelia\Api\Resource\ProductSaleElements;
 use Thelia\Api\Resource\ProductSaleElementsProductImage;
+use Thelia\Api\Resource\ProductSaleElementsProductVideo;
+use Thelia\Api\Resource\ProductVideo;
 use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\State;
 use Thelia\Api\Resource\Tag;
@@ -148,6 +150,8 @@ final readonly class AdminApiResourcePermissions
         ProductPrice::class => AdminResources::PRODUCT,
         ProductSaleElements::class => AdminResources::PRODUCT,
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
+        ProductSaleElementsProductVideo::class => AdminResources::PRODUCT,
+        ProductVideo::class => AdminResources::PRODUCT,
         Sale::class => AdminResources::SALES,
         CatalogPriceRule::class => AdminResources::CATALOG_PRICE_RULE,
         State::class => AdminResources::STATE,

@@ -636,6 +636,7 @@ return [
     'There is no id "%ref" in the imports' => 'L\'import "%ref" n\'existe pas',
     'There is no ref "%ref" in the exports' => 'L\'export "%ref" n\'existe pas',
     'There\'s a conflict between your file extension "%ext" and the mime type "%mime"' => 'Il y a un conflit entre l\'extension "%ext" et le type MIME "%mime" ',
+    'This address is not recognised. Accepted platforms: %platforms%.' => 'Cette adresse n\'est pas reconnue. Plateformes acceptées : %platforms%.',
     'This administrator login already exists' => 'Ce login administrateur existe déjà',
     'This brand is online' => 'Cette marque est en ligne',
     'This category is online' => 'Cette catégorie est en ligne',
