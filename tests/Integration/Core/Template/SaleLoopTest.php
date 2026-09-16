@@ -68,7 +68,9 @@ final class SaleLoopTest extends IntegrationTestCase
             'active' => true,
             'countdownMode' => Sale::COUNTDOWN_MODE_FROM_OPENING,
             'startDate' => new \DateTime('-1 day'),
-            'endDate' => new \DateTime('+2 hours'),
+            // Truncated to the second: MariaDB rounds a fractional DATETIME up,
+            // which pushed the remaining seconds to 7201 on an unlucky run.
+            'endDate' => new \DateTime((new \DateTime('+2 hours'))->format('Y-m-d H:i:s')),
         ]);
 
         $row = $this->saleRow($sale);
