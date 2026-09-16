@@ -26,6 +26,8 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileManager;
+use Thelia\Domain\Media\DTO\ImageUpdateDTO;
+use Thelia\Domain\Media\MediaFacade;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -150,6 +152,51 @@ final class ImageActionTest extends ActionIntegrationTestCase
 
         $reloaded = ProductImageQuery::create()->findPk($savedModel->getId());
         self::assertSame(0, (int) $reloaded->getVisible());
+    }
+
+    public function testUpdateImageThroughTheMediaFacadeKeepsAltPerLocaleAndPersistsDecorative(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product(
+            $factory->category(),
+            $factory->taxRule(),
+            $factory->currency(),
+        );
+
+        $tmpFile = $this->createTestPng();
+        $uploadedFile = $this->createUploadedFile($tmpFile, 'alt-per-locale.png', 'image/png');
+
+        $model = new ProductImage();
+        $model->setProductId($product->getId());
+        $model->setVisible(1);
+        $model->setPosition(1);
+
+        $saveEvent = new FileCreateOrUpdateEvent($product->getId());
+        $saveEvent
+            ->setModel($model)
+            ->setUploadedFile($uploadedFile)
+            ->setParentName('Test Product');
+        $this->dispatch($saveEvent, TheliaEvents::IMAGE_SAVE);
+
+        $savedModel = $saveEvent->getModel();
+        $this->trackFileForCleanup($savedModel->getUploadDir().DS.$savedModel->getFile());
+
+        $facade = new MediaFacade($this->dispatcher, $this->getService(FileManager::class));
+
+        $facade->updateImage($savedModel, new ImageUpdateDTO(
+            locale: 'fr_FR',
+            alt: 'Un sac en cuir vu de face',
+            decorative: true,
+        ));
+        $facade->updateImage($savedModel, new ImageUpdateDTO(
+            locale: 'en_US',
+            alt: 'A leather bag seen from the front',
+        ));
+
+        $reloaded = ProductImageQuery::create()->findPk($savedModel->getId());
+        self::assertSame('Un sac en cuir vu de face', $reloaded->setLocale('fr_FR')->getAlt());
+        self::assertSame('A leather bag seen from the front', $reloaded->setLocale('en_US')->getAlt());
+        self::assertSame(1, (int) $reloaded->getDecorative());
     }
 
     public function testProcessImageServesAnSvgWithoutRasterizingIt(): void

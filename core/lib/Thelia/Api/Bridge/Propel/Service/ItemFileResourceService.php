@@ -66,6 +66,12 @@ readonly class ItemFileResourceService
             $fileModel->setPosition((int) $position);
         }
 
+        // Only image models carry alt/decorative: the same service also
+        // handles documents, whose model has no such setter.
+        if (method_exists($fileModel, 'setDecorative') && null !== $request->request->get('decorative')) {
+            $fileModel->setDecorative((int) filter_var($request->request->get('decorative'), \FILTER_VALIDATE_BOOLEAN));
+        }
+
         $i18ns = json_decode((string) $request->request->get('i18ns', '{}'), true);
 
         foreach (\is_array($i18ns) ? $i18ns : [] as $locale => $i18n) {
@@ -74,6 +80,10 @@ readonly class ItemFileResourceService
                 ->setDescription($i18n['description'] ?? '')
                 ->setChapo($i18n['chapo'] ?? '')
                 ->setPostscriptum($i18n['postscriptum'] ?? '');
+
+            if (method_exists($fileModel, 'setAlt') && isset($i18n['alt'])) {
+                $fileModel->setAlt($i18n['alt']);
+            }
         }
 
         $fileEvent = new FileCreateOrUpdateEvent($parentId);

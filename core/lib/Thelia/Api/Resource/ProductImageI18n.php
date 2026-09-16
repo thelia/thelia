@@ -22,6 +22,9 @@ class ProductImageI18n extends I18n
     protected ?string $title = null;
 
     #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
+    protected ?string $alt = null;
+
+    #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $description = null;
 
     #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
@@ -38,6 +41,18 @@ class ProductImageI18n extends I18n
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAlt(): ?string
+    {
+        return $this->alt;
+    }
+
+    public function setAlt(?string $alt): self
+    {
+        $this->alt = $alt;
 
         return $this;
     }
