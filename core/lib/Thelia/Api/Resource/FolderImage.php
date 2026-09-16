@@ -143,6 +143,9 @@ class FolderImage extends AbstractTranslatableResource implements ItemFileResour
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    public bool $decorative = false;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $position = null;
 
@@ -205,6 +208,18 @@ class FolderImage extends AbstractTranslatableResource implements ItemFileResour
     public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
+        return $this;
+    }
+
+    public function isDecorative(): bool
+    {
+        return $this->decorative;
+    }
+
+    public function setDecorative(bool $decorative): self
+    {
+        $this->decorative = $decorative;
 
         return $this;
     }
