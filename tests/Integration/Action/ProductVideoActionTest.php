@@ -19,9 +19,11 @@ use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\File\Exception\ProcessFileException;
 use Thelia\Domain\Media\DTO\ProductVideoCreateDTO;
 use Thelia\Domain\Media\DTO\ProductVideoUpdateDTO;
 use Thelia\Domain\Media\MediaFacade;
+use Thelia\Domain\Media\Video\IncompleteVideoException;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsProductVideo;
@@ -127,6 +129,89 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
             file_exists($cachedFile) || is_link($cachedFile),
             'The link that published the video must go with it.',
         );
+    }
+
+    /**
+     * The video library is published into the web space by symbolic link, so a file
+     * the shop accepts is a file the shop serves: a name the web server would
+     * execute has to be refused before anything is written, whoever is uploading —
+     * the API, a back-office screen, or a module calling the facade.
+     */
+    public function testAnExecutableNameIsRefusedWhoeverUploadsIt(): void
+    {
+        $product = $this->createProduct();
+
+        foreach (['shell.php', 'shell.php.mp4'] as $fileName) {
+            $before = $this->videoLibraryContents();
+
+            try {
+                $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+                    productId: $product->getId(),
+                    provider: VideoProvider::File,
+                    uploadedFile: $this->createUploadedFile(
+                        $this->createTestTextFile('<?php echo 1;', 'thelia_test_video_'),
+                        $fileName,
+                        'video/mp4',
+                    ),
+                ));
+                self::fail(\sprintf('"%s" must not be accepted as a video.', $fileName));
+            } catch (ProcessFileException $exception) {
+                self::assertSame(415, $exception->getCode());
+            }
+
+            self::assertSame($before, $this->videoLibraryContents(), 'Nothing may be written for a refused upload.');
+        }
+
+        self::assertNull(ProductVideoQuery::create()->filterByProductId($product->getId())->findOne());
+    }
+
+    public function testAFileThatIsNotAVideoIsRefused(): void
+    {
+        $product = $this->createProduct();
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+            productId: $product->getId(),
+            provider: VideoProvider::File,
+            uploadedFile: $this->createUploadedFile(
+                $this->createTestTextFile('not a video', 'thelia_test_video_'),
+                'assembly.mp4',
+                'video/mp4',
+            ),
+        ));
+    }
+
+    /**
+     * A row pointing at neither a file nor a platform identifier can never be
+     * played, and nothing downstream would report it: it would simply be one item
+     * missing from a gallery.
+     */
+    public function testAVideoThatPointsAtNothingIsRefused(): void
+    {
+        $product = $this->createProduct();
+
+        try {
+            $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+                productId: $product->getId(),
+                provider: VideoProvider::File,
+            ));
+            self::fail('A hosted video with no file must be refused.');
+        } catch (IncompleteVideoException $exception) {
+            self::assertStringContainsString('needs a file', $exception->getMessage());
+        }
+
+        try {
+            $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+                productId: $product->getId(),
+                provider: VideoProvider::Youtube,
+            ));
+            self::fail('A platform video with no identifier must be refused.');
+        } catch (IncompleteVideoException $exception) {
+            self::assertStringContainsString('needs the identifier', $exception->getMessage());
+        }
+
+        self::assertNull(ProductVideoQuery::create()->filterByProductId($product->getId())->findOne());
     }
 
     public function testWordingIsWrittenPerLanguage(): void
@@ -262,6 +347,20 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         $this->dispatch($event, TheliaEvents::PRODUCT_VIDEO_PROCESS);
 
         return (string) $event->getDocumentUrl();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function videoLibraryContents(): array
+    {
+        $directory = (new ProductVideo())->getUploadDir();
+
+        if (!is_dir($directory)) {
+            return [];
+        }
+
+        return array_values(array_diff(scandir($directory) ?: [], ['.', '..']));
     }
 
     private function createProduct(): Product

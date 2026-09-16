@@ -25,7 +25,7 @@ use Thelia\Model\ConfigQuery;
  * anticipated does not require a core patch:
  *
  *   image_upload_allowed_mime_types    image/jpeg, image/png, image/avif
- *   video_upload_allowed_mime_types    video/mp4, video/webm
+ *   video_upload_allowed_mime_types    video/mp4, video/webm, video/ogg
  *   document_upload_forbidden_extensions   php, phtml, exe
  *
  * An empty or missing variable means "use the default list". Loosening these

@@ -17,6 +17,7 @@ namespace Thelia\Api\Controller\Admin;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Model\Lang;
@@ -42,9 +43,17 @@ class BinaryFileController
             $propelModel->setLocale(self::requestedLocale($request));
         }
 
-        $filePath = $propelModel->getUploadDir().DS.$propelModel->getFile();
+        $fileName = (string) $propelModel->getFile();
 
-        return new BinaryFileResponse($filePath);
+        // A media row does not always carry a file: a product video played from a
+        // platform is a row and an identifier, nothing more. Building the path
+        // anyway hands BinaryFileResponse the upload directory itself, which it
+        // reports as a 500 rather than as the missing file it is.
+        if ('' === $fileName) {
+            throw new NotFoundHttpException('This resource carries no file.');
+        }
+
+        return new BinaryFileResponse($propelModel->getUploadDir().DS.$fileName);
     }
 
     private static function requestedLocale(Request $request): string

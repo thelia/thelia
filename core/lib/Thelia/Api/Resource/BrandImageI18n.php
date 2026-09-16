@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class BrandImageI18n extends I18n
 {
@@ -38,6 +39,7 @@ class BrandImageI18n extends I18n
         BrandImage::GROUP_FRONT_READ,
         BrandImage::GROUP_ADMIN_WRITE,
     ])]
+    #[Assert\Length(max: 255)]
     protected ?string $alt = null;
 
     #[Groups([

@@ -369,6 +369,7 @@ return [
     'No %obj was created.' => 'aucun %obj n\'a été créé.',
     'No %obj was updated.' => 'Aucun %obj mis à jour',
     "No module found for code '%item'" => 'Aucun module trouvé pour \'%item\' ',
+    'No video platform is enabled on this shop.' => 'Aucune plateforme vidéo n\'est activée sur cette boutique.',
     'No, I am a new customer.' => 'Non, je suis un nouveau client.',
     'None' => 'Aucun',
     'Not equal to' => 'N\'est pas égal à',

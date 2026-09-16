@@ -242,6 +242,107 @@ final class ProductVideoApiTest extends ApiTestCase
         self::assertNull(ProductVideoQuery::create()->findPk($video->getId()));
     }
 
+    public function testALinkIsNotMovedOntoAPairAnotherLinkHolds(): void
+    {
+        $product = $this->createProduct();
+        $factory = $this->createFixtureFactory();
+        $combination = $factory->productSaleElement($product);
+        $firstVideo = $factory->productVideo($product, ['externalId' => 'aaaaaaaaaaa']);
+        $secondVideo = $factory->productVideo($product, ['externalId' => 'bbbbbbbbbbb']);
+
+        $token = $this->authenticateAsAdmin();
+        $held = $this->createLink($combination->getId(), $firstVideo->getId(), $token);
+        $moved = $this->createLink($combination->getId(), $secondVideo->getId(), $token);
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_sale_elements_product_video/'.$moved,
+            ['productVideoId' => $firstVideo->getId()],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            $secondVideo->getId(),
+            ProductSaleElementsProductVideoQuery::create()->findPk($moved)?->getProductVideoId(),
+            'A refused move must leave the link where it was.',
+        );
+
+        // The very same payload on the link that already holds the pair is not a
+        // duplicate of itself, and has to go through.
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_sale_elements_product_video/'.$held,
+            ['productVideoId' => $firstVideo->getId()],
+            $token,
+            'merge-patch+json',
+        );
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * The column is a VARCHAR(255) and the connection runs in strict mode, so an
+     * alt one character too long is a refusal to state, not a write to attempt.
+     */
+    public function testAnAlternativeTextLongerThanTheColumnIsRefused(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createFixtureFactory()->productVideo($product);
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_videos/'.$video->getId(),
+            ['i18ns' => ['en_US' => ['alt' => str_repeat('a', 256)]]],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), (string) $response->getContent());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/product_videos/'.$video->getId(),
+            ['i18ns' => ['en_US' => ['alt' => str_repeat('a', 255)]]],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * A platform video is a row and an identifier: there is no file to download.
+     */
+    public function testTheFileOfAPlatformVideoIsNotFound(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createFixtureFactory()->productVideo($product);
+
+        $response = $this->jsonRequest(
+            'GET',
+            '/api/admin/product_videos/'.$video->getId().'/file',
+            token: $this->authenticateAsAdmin(),
+        );
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    private function createLink(int $productSaleElementsId, int $productVideoId, string $token): int
+    {
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/product_sale_elements_product_video',
+            ['productSaleElementsId' => $productSaleElementsId, 'productVideoId' => $productVideoId],
+            $token,
+        );
+
+        self::assertSame(Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
+
+        return (int) json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR)['id'];
+    }
+
     public function testTheAdminCollectionIsClosedToAnAnonymousCaller(): void
     {
         $response = $this->jsonRequest('GET', '/api/admin/product_videos');

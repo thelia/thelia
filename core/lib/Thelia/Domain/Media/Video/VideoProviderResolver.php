@@ -70,12 +70,13 @@ final readonly class VideoProviderResolver
      */
     public function enabledProviders(): array
     {
+        // The default applies to a shop that has never been asked the question, and
+        // to that shop only. A merchant who unticks every platform has answered it:
+        // turning his empty list back into the full one would re-enable, behind his
+        // back, exactly what he took off the shop.
         $raw = $this->configuredProviders
-            ?? (string) ConfigQuery::read(self::PROVIDERS_VARIABLE, self::DEFAULT_PROVIDERS);
-
-        if ('' === trim($raw)) {
-            $raw = self::DEFAULT_PROVIDERS;
-        }
+            ?? ConfigQuery::read(self::PROVIDERS_VARIABLE)
+            ?? self::DEFAULT_PROVIDERS;
 
         $providers = [];
 
@@ -193,6 +194,13 @@ final readonly class VideoProviderResolver
      */
     private function refuse(array $enabledProviders): UnsupportedVideoUrlException
     {
+        if ([] === $enabledProviders) {
+            return new UnsupportedVideoUrlException(
+                'No video platform is enabled on this shop.',
+                $enabledProviders,
+            );
+        }
+
         $labels = implode(', ', array_map(
             static fn (VideoProvider $provider): string => $provider->label(),
             $enabledProviders,
