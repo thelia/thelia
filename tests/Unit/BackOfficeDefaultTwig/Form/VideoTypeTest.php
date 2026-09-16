@@ -27,6 +27,18 @@ use Thelia\Domain\Media\Video\VideoProviderResolver;
 
 final class VideoTypeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // The core is tested against the tip of the theme, which may predate the
+        // product videos: VideoType ships with the alt text and the video screens,
+        // so its absence means the theme under test has none of them yet.
+        if (!class_exists(VideoType::class)) {
+            self::markTestSkipped('The installed back-office theme predates the product media screens.');
+        }
+
+        parent::setUp();
+    }
+
     public function testAnAddressOfAnEnabledPlatformIsAccepted(): void
     {
         $form = $this->submit(['url' => 'https://youtu.be/dQw4w9WgXcQ', 'title' => 'Demo']);

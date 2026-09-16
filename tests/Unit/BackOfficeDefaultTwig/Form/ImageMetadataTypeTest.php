@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Form;
 
 use BackOfficeDefaultTwigBundle\Form\File\ImageMetadataType;
+use BackOfficeDefaultTwigBundle\Form\File\VideoType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
@@ -24,6 +25,18 @@ use Symfony\Component\Validator\Validation;
 
 final class ImageMetadataTypeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // The core is tested against the tip of the theme, which may predate the
+        // product videos: VideoType ships with the alt text and the video screens,
+        // so its absence means the theme under test has none of them yet.
+        if (!class_exists(VideoType::class)) {
+            self::markTestSkipped('The installed back-office theme predates the product media screens.');
+        }
+
+        parent::setUp();
+    }
+
     public function testAltAndDecorativeAreSubmitted(): void
     {
         $form = $this->submit([
