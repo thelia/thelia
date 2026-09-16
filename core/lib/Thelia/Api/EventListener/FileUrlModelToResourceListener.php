@@ -22,7 +22,6 @@ use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\URL;
 
 class FileUrlModelToResourceListener implements EventSubscriberInterface
 {
@@ -42,11 +41,11 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
         $documentType = $resource::getFileType();
 
-        // A video is served as it was uploaded: there is no cached rendition to
-        // build, so nothing is dispatched and the address is the stored file
-        // itself. A platform video has no stored file, and keeps a null address.
-        if ('video' === $documentType) {
-            $resource->setFileUrl($this->storedFileUrl($resource, $documentType));
+        // A platform video is a row with no stored file, and so no address to
+        // publish: asking the video cache for it would only fail on a source file
+        // that was never meant to exist.
+        if ('video' === $documentType && '' === $resource->getFile()) {
+            $resource->setFileUrl(null);
 
             return;
         }
@@ -60,7 +59,14 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         }
 
         $event = 'image' === $documentType ? new ImageEvent() : new DocumentEvent();
-        $eventName = 'image' === $documentType ? TheliaEvents::IMAGE_PROCESS : TheliaEvents::DOCUMENT_PROCESS;
+        // A video takes the document route, not the image one: it is published as
+        // it was uploaded, and only its place in the web space is computed. It has
+        // its own cache directory, hence its own event.
+        $eventName = match ($documentType) {
+            'image' => TheliaEvents::IMAGE_PROCESS,
+            'video' => TheliaEvents::PRODUCT_VIDEO_PROCESS,
+            default => TheliaEvents::DOCUMENT_PROCESS,
+        };
         $sourceFilePath = \sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,
@@ -74,27 +80,6 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
         $urlGetter = 'image' === $documentType ? 'getFileUrl' : 'getDocumentUrl';
         $resource->setFileUrl($event->{$urlGetter}());
-    }
-
-    /**
-     * The address of the file as the shop stores it, relative to the project root,
-     * or null when there is no stored file.
-     */
-    private function storedFileUrl(ItemFileResourceInterface $resource, string $documentType): ?string
-    {
-        $file = $resource->getFile();
-
-        if ('' === $file) {
-            return null;
-        }
-
-        $libraryPath = ConfigQuery::read($documentType.'s_library_path') ?? 'local'.\DIRECTORY_SEPARATOR.'media'.\DIRECTORY_SEPARATOR.$documentType.'s';
-
-        return URL::getInstance()->absoluteUrl(
-            \sprintf('%s/%s/%s', trim((string) $libraryPath, '/'), $resource::getItemType(), $file),
-            null,
-            URL::PATH_TO_FILE,
-        );
     }
 
     public static function getSubscribedEvents(): array

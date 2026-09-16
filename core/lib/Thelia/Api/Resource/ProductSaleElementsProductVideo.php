@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\State\Processor\ProductSaleElementsProductVideoProcessor;
 use Thelia\Model\Map\ProductSaleElementsProductVideoTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -40,6 +41,7 @@ use Thelia\Model\ProductSaleElementsQuery;
             uriTemplate: '/admin/product_sale_elements_product_video',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            processor: ProductSaleElementsProductVideoProcessor::class,
         ),
         new GetCollection(
             uriTemplate: '/admin/product_sale_elements_product_video',
@@ -109,9 +111,15 @@ class ProductSaleElementsProductVideo implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $productSaleElementsId = null;
 
+    /**
+     * Left uninitialized on purpose: Propel's relation setter writes the foreign
+     * key, so a property defaulting to null would blank the combination the
+     * payload just named. Uninitialized, the write path skips it and the read
+     * path fills it.
+     */
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     #[Relation(targetResource: ProductSaleElements::class)]
-    public ?ProductSaleElements $productSaleElements = null;
+    public ?ProductSaleElements $productSaleElements;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $productVideoId = null;
@@ -168,7 +176,7 @@ class ProductSaleElementsProductVideo implements PropelResourceInterface
 
     public function getProductSaleElements(): ?ProductSaleElements
     {
-        return $this->productSaleElements;
+        return $this->productSaleElements ?? null;
     }
 
     public function setProductSaleElements(?ProductSaleElements $productSaleElements): self

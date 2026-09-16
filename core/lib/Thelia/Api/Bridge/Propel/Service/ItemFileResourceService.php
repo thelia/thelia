@@ -90,9 +90,17 @@ readonly class ItemFileResourceService
         $fileEvent->setModel($fileModel);
         $fileEvent->setUploadedFile($file);
 
+        // Each kind of file has its own listener, and a video has one of its own:
+        // the generic document save would store the row and the file correctly, but
+        // it would not know a video is a video, and nothing downstream could tell a
+        // video the shop hosts from one played from a platform.
         $file = $this->eventDispatcher->dispatch(
             $fileEvent,
-            'image' === $fileType ? TheliaEvents::IMAGE_SAVE : TheliaEvents::DOCUMENT_SAVE,
+            match ($fileType) {
+                'image' => TheliaEvents::IMAGE_SAVE,
+                'video' => TheliaEvents::PRODUCT_VIDEO_CREATE,
+                default => TheliaEvents::DOCUMENT_SAVE,
+            },
         );
 
         if ('image' !== $fileType) {
