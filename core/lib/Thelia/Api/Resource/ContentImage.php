@@ -28,6 +28,7 @@ use ApiPlatform\OpenApi\Model\Response;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -148,6 +149,9 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public bool $visible;
 
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    public bool $decorative = false;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE_UPDATE])]
     public ?int $position = null;
 
@@ -158,6 +162,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
     public ?\DateTime $updatedAt = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Assert\Valid]
     public I18nCollection $i18ns;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
@@ -210,6 +215,18 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
     public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
+        return $this;
+    }
+
+    public function isDecorative(): bool
+    {
+        return $this->decorative;
+    }
+
+    public function setDecorative(bool $decorative): self
+    {
+        $this->decorative = $decorative;
 
         return $this;
     }

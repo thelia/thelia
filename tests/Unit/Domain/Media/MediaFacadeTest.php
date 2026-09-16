@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\File\FileManager;
+use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\DocumentUploadDTO;
 use Thelia\Domain\Media\DTO\ImageProcessDTO;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
@@ -35,7 +36,11 @@ class MediaFacadeTest extends TestCase
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->fileManager = $this->createMock(FileManager::class);
-        $this->facade = new MediaFacade($this->dispatcher, $this->fileManager);
+        $this->facade = new MediaFacade(
+            $this->dispatcher,
+            $this->fileManager,
+            $this->createMock(FileProcessorService::class),
+        );
     }
 
     public function testImageUploadDTOToArray(): void

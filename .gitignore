@@ -27,6 +27,7 @@ local/config/key
 local/config/runtime-conf.xml
 local/media/documents/*
 local/media/images/*
+local/media/videos/*
 local/library/*
 !local/media/images/store/favicon.png
 !local/media/images/store/thelia.svg

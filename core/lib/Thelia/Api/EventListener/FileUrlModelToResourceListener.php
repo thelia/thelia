@@ -41,6 +41,15 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
         $documentType = $resource::getFileType();
 
+        // A platform video is a row with no stored file, and so no address to
+        // publish: asking the video cache for it would only fail on a source file
+        // that was never meant to exist.
+        if ('video' === $documentType && '' === $resource->getFile()) {
+            $resource->setFileUrl(null);
+
+            return;
+        }
+
         $baseSourceFilePath = ConfigQuery::read($documentType.'s_library_path');
 
         if (null === $baseSourceFilePath) {
@@ -50,7 +59,14 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         }
 
         $event = 'image' === $documentType ? new ImageEvent() : new DocumentEvent();
-        $eventName = 'image' === $documentType ? TheliaEvents::IMAGE_PROCESS : TheliaEvents::DOCUMENT_PROCESS;
+        // A video takes the document route, not the image one: it is published as
+        // it was uploaded, and only its place in the web space is computed. It has
+        // its own cache directory, hence its own event.
+        $eventName = match ($documentType) {
+            'image' => TheliaEvents::IMAGE_PROCESS,
+            'video' => TheliaEvents::PRODUCT_VIDEO_PROCESS,
+            default => TheliaEvents::DOCUMENT_PROCESS,
+        };
         $sourceFilePath = \sprintf(
             '%s/%s/%s',
             $baseSourceFilePath,

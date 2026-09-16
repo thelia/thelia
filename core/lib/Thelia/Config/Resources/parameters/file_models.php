@@ -25,12 +25,14 @@ use Thelia\Model\FolderImage;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductVideo;
 
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
         ->set('file_model.classes', [
             'document.product' => ProductDocument::class,
             'image.product' => ProductImage::class,
+            'video.product' => ProductVideo::class,
             'document.category' => CategoryDocument::class,
             'image.category' => CategoryImage::class,
             'document.content' => ContentDocument::class,

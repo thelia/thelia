@@ -15,11 +15,16 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class FolderImageI18n extends I18n
 {
     #[Groups([FolderImage::GROUP_ADMIN_READ, FolderImage::GROUP_ADMIN_WRITE])]
     protected ?string $title = null;
+
+    #[Groups([FolderImage::GROUP_ADMIN_READ, FolderImage::GROUP_ADMIN_WRITE])]
+    #[Assert\Length(max: 255)]
+    protected ?string $alt = null;
 
     #[Groups([FolderImage::GROUP_ADMIN_READ, FolderImage::GROUP_ADMIN_WRITE])]
     protected ?string $description = null;
@@ -38,6 +43,18 @@ class FolderImageI18n extends I18n
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAlt(): ?string
+    {
+        return $this->alt;
+    }
+
+    public function setAlt(?string $alt): self
+    {
+        $this->alt = $alt;
 
         return $this;
     }
