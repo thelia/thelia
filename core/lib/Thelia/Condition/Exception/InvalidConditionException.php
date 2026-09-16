@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Condition\Exception;
 
-use Thelia\Log\Tlog;
-
 /**
- * Thrown when a Condition is badly implemented.
+ * Thrown when a coupon carries no usable condition.
+ *
+ * The exception used to log itself at ERROR level. A coupon without a condition is a
+ * normal thing for a merchant to create and the checkout handles it by ignoring the
+ * coupon, so the line said "failure" on a path that behaves as intended. Whether it is
+ * worth a log line, and at which level, belongs to the caller that catches it.
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
@@ -30,9 +33,6 @@ class InvalidConditionException extends \RuntimeException
      */
     public function __construct(string $className)
     {
-        $message = 'Invalid Condition given to '.$className;
-        Tlog::getInstance()->addError($message);
-
-        parent::__construct($message);
+        parent::__construct('Invalid Condition given to '.$className);
     }
 }
