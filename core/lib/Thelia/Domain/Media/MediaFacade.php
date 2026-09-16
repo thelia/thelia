@@ -55,6 +55,10 @@ final readonly class MediaFacade
         if (null !== $dto->postscriptum) {
             $model->setPostscriptum($dto->postscriptum);
         }
+        if (null !== $dto->alt) {
+            $model->setAlt($dto->alt);
+        }
+        $model->setDecorative($dto->decorative ? 1 : 0);
 
         $event = new FileCreateOrUpdateEvent($dto->parentId);
         $event->setModel($model);
@@ -84,6 +88,12 @@ final readonly class MediaFacade
         }
         if (null !== $dto->visible) {
             $image->setVisible($dto->visible);
+        }
+        if (null !== $dto->alt) {
+            $image->setAlt($dto->alt);
+        }
+        if (null !== $dto->decorative) {
+            $image->setDecorative($dto->decorative ? 1 : 0);
         }
 
         $event = new FileCreateOrUpdateEvent($image->getParentId());

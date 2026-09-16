@@ -38,6 +38,13 @@ class BrandImageI18n extends I18n
         BrandImage::GROUP_FRONT_READ,
         BrandImage::GROUP_ADMIN_WRITE,
     ])]
+    protected ?string $alt = null;
+
+    #[Groups([
+        BrandImage::GROUP_ADMIN_READ,
+        BrandImage::GROUP_FRONT_READ,
+        BrandImage::GROUP_ADMIN_WRITE,
+    ])]
     protected ?string $description = null;
 
     #[Groups([
@@ -62,6 +69,18 @@ class BrandImageI18n extends I18n
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAlt(): ?string
+    {
+        return $this->alt;
+    }
+
+    public function setAlt(?string $alt): self
+    {
+        $this->alt = $alt;
 
         return $this;
     }
