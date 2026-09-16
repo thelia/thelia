@@ -604,8 +604,8 @@ CREATE TABLE IF NOT EXISTS `order_return_status` (
   `color` char(7) DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
   `protected_status` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_return_status_code_UNIQUE` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
@@ -614,8 +614,8 @@ CREATE TABLE IF NOT EXISTS `order_return_reason` (
   `code` varchar(45) DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
   `visible` tinyint(1) DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_return_reason_code_UNIQUE` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
@@ -633,10 +633,10 @@ CREATE TABLE IF NOT EXISTS `order_return` (
   `refund_amount` decimal(16,6) DEFAULT 0.000000 COMMENT 'the amount to refund, computed on the paid prices of the returned lines',
   `include_postage` tinyint(1) DEFAULT 0 COMMENT 'whether the postage is included in the refundable amount',
   `created_by_admin` tinyint(1) DEFAULT 0 COMMENT 'true when the merchant opened the return without a customer request',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT NULL,
   `version` int(11) DEFAULT 0,
-  `version_created_at` timestamp NULL DEFAULT NULL,
+  `version_created_at` DATETIME DEFAULT NULL,
   `version_created_by` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_return_ref_UNIQUE` (`ref`),
@@ -659,8 +659,8 @@ CREATE TABLE IF NOT EXISTS `order_return_line` (
   `received_condition` varchar(45) DEFAULT NULL COMMENT 'the condition the returned goods were received in',
   `resellable` tinyint(1) DEFAULT 0 COMMENT 'whether the received goods can be sold again',
   `refund_amount` decimal(16,6) DEFAULT 0.000000 COMMENT 'the paid taxed price for the returned quantity of this line',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_order_return_line_order_return_id` (`order_return_id`),
   KEY `idx_order_return_line_order_product_id` (`order_product_id`),
@@ -675,7 +675,7 @@ CREATE TABLE IF NOT EXISTS `order_return_status_i18n` (
   `chapo` text DEFAULT NULL,
   `postscriptum` text DEFAULT NULL,
   PRIMARY KEY (`id`,`locale`),
-  CONSTRAINT `order_return_status_i18n_fk_2bef6d` FOREIGN KEY (`id`) REFERENCES `order_return_status` (`id`) ON DELETE CASCADE
+  CONSTRAINT `order_return_status_i18n_FK_1` FOREIGN KEY (`id`) REFERENCES `order_return_status` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 CREATE TABLE IF NOT EXISTS `order_return_reason_i18n` (
   `id` int(11) NOT NULL,
@@ -683,7 +683,7 @@ CREATE TABLE IF NOT EXISTS `order_return_reason_i18n` (
   `title` varchar(255) DEFAULT NULL,
   `description` longtext DEFAULT NULL,
   PRIMARY KEY (`id`,`locale`),
-  CONSTRAINT `order_return_reason_i18n_fk_c07ca8` FOREIGN KEY (`id`) REFERENCES `order_return_reason` (`id`) ON DELETE CASCADE
+  CONSTRAINT `order_return_reason_i18n_FK_1` FOREIGN KEY (`id`) REFERENCES `order_return_reason` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 CREATE TABLE IF NOT EXISTS `order_return_version` (
   `id` int(11) NOT NULL,
@@ -699,15 +699,15 @@ CREATE TABLE IF NOT EXISTS `order_return_version` (
   `refund_amount` decimal(16,6) DEFAULT 0.000000 COMMENT 'the amount to refund, computed on the paid prices of the returned lines',
   `include_postage` tinyint(1) DEFAULT 0 COMMENT 'whether the postage is included in the refundable amount',
   `created_by_admin` tinyint(1) DEFAULT 0 COMMENT 'true when the merchant opened the return without a customer request',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` DATETIME DEFAULT NULL,
+  `updated_at` DATETIME DEFAULT NULL,
   `version` int(11) NOT NULL DEFAULT 0,
-  `version_created_at` timestamp NULL DEFAULT NULL,
+  `version_created_at` DATETIME DEFAULT NULL,
   `version_created_by` varchar(100) DEFAULT NULL,
   `order_id_version` int(11) DEFAULT 0,
   `customer_id_version` int(11) DEFAULT 0,
   PRIMARY KEY (`id`,`version`),
-  CONSTRAINT `order_return_version_fk_6cd0c8` FOREIGN KEY (`id`) REFERENCES `order_return` (`id`) ON DELETE CASCADE
+  CONSTRAINT `order_return_version_FK_1` FOREIGN KEY (`id`) REFERENCES `order_return` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_version' AND `COLUMN_NAME` = 'order_return_ids');
