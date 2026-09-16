@@ -152,6 +152,7 @@ class Customer implements PropelResourceInterface
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_WRITE,
     ])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
     public string $firstname;
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -162,6 +163,7 @@ class Customer implements PropelResourceInterface
         self::GROUP_FRONT_READ_SINGLE,
         self::GROUP_FRONT_WRITE,
     ])]
+    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_WRITE])]
     public string $lastname;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE,
