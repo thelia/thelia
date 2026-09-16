@@ -25,7 +25,7 @@ test.describe('Cart', () => {
     await addCurrentProductToCart(page);
     await gotoCart(page);
     await expectCartItemCount(page, 1);
-    await expect(cartItem(page, 0).locator('input[type="text"]')).toHaveValue('2');
+    await expect(cartItem(page, 0).locator('.CartItem-quantity input[type="number"]')).toHaveValue('2');
   });
 
   test('add two different products', async ({ page }) => {
@@ -53,7 +53,7 @@ test.describe('Cart', () => {
     await addCurrentProductToCart(page);
     await gotoCart(page);
     await expectCartItemCount(page, 1);
-    await expect(cartItem(page, 0).locator('input[type="text"]')).toHaveValue('3');
+    await expect(cartItem(page, 0).locator('.CartItem-quantity input[type="number"]')).toHaveValue('3');
   });
 
   test('increment then decrement an existing cart item', async ({ page }) => {
@@ -62,10 +62,10 @@ test.describe('Cart', () => {
     await gotoCart(page);
 
     await changeCartItemQuantity(page, 0, 'plus');
-    await expect(cartItem(page, 0).locator('input[type="text"]')).toHaveValue('2');
+    await expect(cartItem(page, 0).locator('.CartItem-quantity input[type="number"]')).toHaveValue('2');
 
     await changeCartItemQuantity(page, 0, 'minus');
-    await expect(cartItem(page, 0).locator('input[type="text"]')).toHaveValue('1');
+    await expect(cartItem(page, 0).locator('.CartItem-quantity input[type="number"]')).toHaveValue('1');
   });
 
   test('remove a cart item shows a Restore notice', async ({ page }) => {

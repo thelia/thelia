@@ -40,7 +40,7 @@ test.describe('Account', () => {
     await setNonDefaultAsDefault(authedPage);
     // Now the formerly-non-default is the default; one Favorite (selected) remains, no other.
     await gotoAddresses(authedPage);
-    const favorites = authedPage.locator('.AddressCard .Favorite.selected');
+    const favorites = authedPage.locator('.AddressCard .Favorite--selected');
     await expect(favorites).toHaveCount(1);
   });
 
