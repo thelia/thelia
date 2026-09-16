@@ -682,6 +682,7 @@ return [
     'This the unique name of this message. Do not change this value unless you understand what you do.' => 'Ceci est le nom unique du message. Ne le modifiez que si vous savez ce que vous faîtes',
     'This value should not be blank.' => 'Cette valeur ne doit pas être vide.',
     'This VAT number does not start with the country code of the address, which is %prefix.' => 'Ce numéro de TVA ne commence pas par le code pays de l\'adresse, qui est %prefix.',
+    'This video is already attached to this combination.' => 'Cette vidéo est déjà associée à cette déclinaison.',
     'This zip code should respect the following format : %format.' => 'Ce code postal doit respecter le format suivant : %format.',
     'Timeout' => 'Délai d\'attente expiré',
     'Title' => 'Titre',
