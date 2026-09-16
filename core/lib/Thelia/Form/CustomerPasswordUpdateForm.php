@@ -48,7 +48,7 @@ class CustomerPasswordUpdateForm extends BaseForm
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new Length(min: (int) ConfigQuery::read('password.length', 4)),
                 ],
                 'label' => Translator::getInstance()->trans('New Password'),
                 'label_attr' => [
@@ -61,7 +61,7 @@ class CustomerPasswordUpdateForm extends BaseForm
             ->add('password_confirm', PasswordType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new Length(min: (int) ConfigQuery::read('password.length', 4)),
                     new Callback($this->verifyPasswordField(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Password confirmation'),

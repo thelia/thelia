@@ -49,7 +49,7 @@ class TaxRuleType extends AbstractTheliaType
                 'allow_delete' => true,
                 'cascade_validation' => 'true',
                 'constraints' => [
-                    new Count(['min' => 1]),
+                    new Count(min: 1),
                 ],
             ])
             ->add('tax', CollectionType::class, [
@@ -58,7 +58,7 @@ class TaxRuleType extends AbstractTheliaType
                 'allow_delete' => true,
                 'cascade_validation' => 'true',
                 'constraints' => [
-                    new Count(['min' => 1]),
+                    new Count(min: 1),
                 ],
             ])
             ->add('i18n', 'collection', [
@@ -67,7 +67,7 @@ class TaxRuleType extends AbstractTheliaType
                 'allow_add' => true,
                 'cascade_validation' => true,
                 'constraints' => [
-                    new Count(['min' => 1]),
+                    new Count(min: 1),
                 ],
             ])
             ->add('id', 'tax_rule_id', [

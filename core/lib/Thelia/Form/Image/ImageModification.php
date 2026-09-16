@@ -45,10 +45,7 @@ abstract class ImageModification extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Image([
-                            // 'minWidth' => 200,
-                            // 'minHeight' => 200
-                        ]),
+                        new Image(),
                     ],
                     'label' => $translator->trans('Replace current image by this file'),
                     'label_attr' => [

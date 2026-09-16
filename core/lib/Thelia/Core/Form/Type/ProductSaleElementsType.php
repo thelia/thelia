@@ -64,37 +64,37 @@ class ProductSaleElementsType extends AbstractTheliaType
             ->add('price', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('price_with_tax', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('weight', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('quantity', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('sale_price', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('sale_price_with_tax', NumberType::class, [
                 'required' => false,
                 'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ])
             ->add('ean_code', TextType::class, [
