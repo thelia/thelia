@@ -17,6 +17,7 @@ namespace Thelia\Domain\Localization\Service;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Lang;
 
 readonly class CountryService
 {
@@ -31,10 +32,22 @@ readonly class CountryService
             ->filterByVisible(1)
             ->find();
         $locale = $this->session->getLang()->getLocale();
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
 
         foreach ($countries as $country) {
             $country->setLocale($locale);
-            $choices[$country->getTitle()] = $country->getId();
+            $title = $country->getTitle();
+
+            if (null === $title || '' === $title) {
+                $country->setLocale($defaultLocale);
+                $title = $country->getTitle();
+            }
+
+            // A country translated in no locale at all still has to be told
+            // apart from the next one: keying it on its missing title put
+            // every one of them under the same empty label, so the form
+            // offered a single blank entry for all of them.
+            $choices[$title ?: ($country->getIsoalpha2() ?: $country->getIsocode())] = $country->getId();
         }
 
         return $choices;
