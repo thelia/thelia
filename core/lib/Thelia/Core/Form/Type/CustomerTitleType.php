@@ -38,7 +38,7 @@ class CustomerTitleType extends AbstractTheliaType
                 'required' => true,
                 'cascade_validation' => true,
                 'constraints' => [
-                    new Count(['min' => 1]),
+                    new Count(min: 1),
                 ],
             ])
             ->add('default', 'checkbox')

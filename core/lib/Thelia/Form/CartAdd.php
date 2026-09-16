@@ -76,9 +76,7 @@ class CartAdd extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback($this->checkStock(...)),
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
                 'label' => Translator::getInstance()->trans('Quantity'),
                 'label_attr' => [
