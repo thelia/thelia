@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Thelia\Action\ProductVideo as ProductVideoAction;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -39,10 +41,13 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
 
     private MediaFacade $mediaFacade;
 
+    private ProductVideoAction $videoAction;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->mediaFacade = $this->getService(MediaFacade::class);
+        $this->videoAction = $this->getService(ProductVideoAction::class);
     }
 
     protected function tearDown(): void
@@ -88,6 +93,40 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         $path = $video->getUploadDir().DS.$video->getFile();
         $this->trackFileForCleanup($path);
         self::assertFileExists($path);
+    }
+
+    public function testAHostedVideoIsPublishedInTheWebSpace(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createHostedVideo($product);
+
+        $cachedFile = $this->videoAction->cachedFilePath($video);
+        $this->trackFileForCleanup($cachedFile);
+        self::assertFileDoesNotExist($cachedFile, 'Nothing is published until the address is asked for.');
+
+        $url = $this->publish($video);
+
+        self::assertTrue(file_exists($cachedFile) || is_link($cachedFile));
+        self::assertStringContainsString('/cache/videos/product/', $url);
+        self::assertStringNotContainsString('/local/', $url, 'The video library is outside the web space.');
+    }
+
+    public function testDeletingAVideoUnpublishesIt(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createHostedVideo($product);
+        $this->publish($video);
+
+        $cachedFile = $this->videoAction->cachedFilePath($video);
+        $this->trackFileForCleanup($cachedFile);
+        self::assertTrue(file_exists($cachedFile) || is_link($cachedFile));
+
+        $this->mediaFacade->deleteVideo($video);
+
+        self::assertFalse(
+            file_exists($cachedFile) || is_link($cachedFile),
+            'The link that published the video must go with it.',
+        );
     }
 
     public function testWordingIsWrittenPerLanguage(): void
@@ -208,6 +247,21 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         $this->trackFileForCleanup($path);
 
         return $path;
+    }
+
+    /**
+     * Publishes a hosted video in the web space the way the API read does, and
+     * hands back the address it is served from.
+     */
+    private function publish(ProductVideo $video): string
+    {
+        $event = new DocumentEvent();
+        $event->setSourceFilepath($video->getUploadDir().DS.$video->getFile());
+        $event->setCacheSubdirectory(ProductVideoAction::CACHE_SUBDIRECTORY);
+
+        $this->dispatch($event, TheliaEvents::PRODUCT_VIDEO_PROCESS);
+
+        return (string) $event->getDocumentUrl();
     }
 
     private function createProduct(): Product

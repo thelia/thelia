@@ -679,6 +679,7 @@ return [
     'This the unique name of this message. Do not change this value unless you understand what you do.' => 'This the unique name of this message. Do not change this value unless you understand what you do.',
     'This value should not be blank.' => 'This value should not be blank.',
     'This VAT number does not start with the country code of the address, which is %prefix.' => 'This VAT number does not start with the country code of the address, which is %prefix.',
+    'This video is already attached to this combination.' => 'This video is already attached to this combination.',
     'This zip code should respect the following format : %format.' => 'This zip code should respect the following format : %format.',
     'Timeout' => 'Timeout',
     'Title' => 'Title',

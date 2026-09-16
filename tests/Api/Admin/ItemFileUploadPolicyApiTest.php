@@ -20,6 +20,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
+use Thelia\Model\ProductVideoQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Support\Trait\CreatesTestFiles;
 
@@ -105,6 +106,57 @@ final class ItemFileUploadPolicyApiTest extends ApiTestCase
         );
 
         self::assertSame(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * A video carries a real mime type and a real extension, so the double
+     * extension is the way past the type check: the floor has to catch the `php`
+     * segment wherever it sits in the name.
+     */
+    public function testAServerExecutableVideoNameIsRefused(): void
+    {
+        $product = $this->createProduct();
+
+        $response = $this->upload(
+            '/api/admin/product_videos/upload',
+            $product,
+            $this->createTestMp4(),
+            'shell.php.mp4',
+        );
+
+        self::assertSame(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(ProductVideoQuery::create()->filterByProductId($product->getId())->findOne());
+    }
+
+    public function testANonVideoIsRefusedAsAVideo(): void
+    {
+        $product = $this->createProduct();
+
+        $response = $this->upload(
+            '/api/admin/product_videos/upload',
+            $product,
+            $this->createTestTextFile('not a video'),
+            'assembly.mp4',
+        );
+
+        self::assertSame(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(ProductVideoQuery::create()->filterByProductId($product->getId())->findOne());
+    }
+
+    /**
+     * The smallest file a mime type guesser reads as an MP4: an ftyp box and
+     * nothing after it.
+     */
+    private function createTestMp4(): string
+    {
+        $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('thelia_test_video_').'.mp4';
+        file_put_contents(
+            $path,
+            "\x00\x00\x00\x20ftypisom\x00\x00\x02\x00isomiso2avc1mp41\x00\x00\x00\x08free".str_repeat("\x00", 64),
+        );
+        $this->trackFileForCleanup($path);
+
+        return $path;
     }
 
     public function testALegitimateUploadStillGoesThrough(): void
