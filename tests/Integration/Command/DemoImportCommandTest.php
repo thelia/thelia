@@ -17,10 +17,12 @@ namespace Thelia\Tests\Integration\Command;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
@@ -69,6 +71,53 @@ final class DemoImportCommandTest extends IntegrationTestCase
 
         self::assertSame($firstProducts, ProductQuery::create()->count(), 'product count is stable across reruns');
         self::assertSame($firstOrders, OrderQuery::create()->count(), 'order count is stable across reruns');
+    }
+
+    /**
+     * The point of the demo data is that the shop can be walked end to end. Without a
+     * carrier the walk stops at the delivery step with "No delivery method is available
+     * for this order", one click short of the order.
+     */
+    public function testImportGivesTheDemoShopACarrier(): void
+    {
+        $this->runImport();
+
+        $module = ModuleQuery::create()->findOneByCode('CustomDelivery');
+        self::assertNotNull($module, 'CustomDelivery ships with the themes and is activated by the install');
+
+        $franceAreaId = 1;
+
+        self::assertNotNull(
+            AreaDeliveryModuleQuery::create()
+                ->filterByAreaId($franceAreaId)
+                ->filterByDeliveryModuleId($module->getId())
+                ->findOne(),
+            'the demo shipping zone is served by a delivery module',
+        );
+
+        // The slice table belongs to the module, so it is read through SQL. A slice whose
+        // bounds sit at zero — the column default — is matched by nothing: the demo needs
+        // bounds above any cart it can build.
+        $statement = $this->getPropelConnection()->prepare(
+            'SELECT price, price_max, weight_max FROM custom_delivery_slice WHERE area_id = :areaId'
+        );
+        $statement->execute(['areaId' => $franceAreaId]);
+        $slice = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        self::assertIsArray($slice, 'the demo shipping zone carries a price slice');
+        self::assertGreaterThan(0.0, (float) $slice['price'], 'the slice quotes a price');
+        self::assertGreaterThan(1000.0, (float) $slice['price_max'], 'the slice covers any demo cart total');
+        self::assertGreaterThan(1000.0, (float) $slice['weight_max'], 'the slice covers any demo cart weight');
+    }
+
+    public function testReimportDoesNotDuplicateTheDemoCarrier(): void
+    {
+        $this->runImport();
+        $firstAttachments = AreaDeliveryModuleQuery::create()->count();
+
+        $this->runImport();
+
+        self::assertSame($firstAttachments, AreaDeliveryModuleQuery::create()->count(), 'carrier attachments are stable across reruns');
     }
 
     private function runImport(): void
