@@ -1,10 +1,117 @@
-# Unreleased
+# 3.1.0
+
+First minor of the 3.x line. 66 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
 
 ## Security
 
 - GHSA-59cp-795h-6wgx — registering as a guest with an address somebody had already used as a guest handed back a token that could set a password on their account, and a password waiting for its activation code could be replaced by anyone holding such a token. The guest token now records whether its registration opened the row, and only that token, or the tracking link of an order mailed to the address, completes the account; a password waiting for its code is only replaced by a caller holding a tracking link.
 - GHSA-m887-7g6m-w83g — the listeners that decide something from the request path (admin API permissions, API rate limits, refresh-token limits, security log, API statelessness) read the path as the client spelled it, while the router decodes it first, so an encoded spelling such as `/api/%61dmin/...` reached the admin API without the per-resource permission check. Every path comparison now reads the path the way the router does, and the admin permission check also recognises an admin operation from the route it matched, whatever the spelling.
 - GHSA-r63g-6wfg-v5v9 — a coupon condition summary is built from a message that carries its own markup, and the back office renders it as such; the customer names, product, category, country and module titles it inserted came straight from the database, so a name holding a tag ran as a tag on the coupon screen. Every value a condition summary inserts is now escaped before it reaches the message, and the message keeps its markup.
+- The form firewall stores IPv6 addresses. A fifteen-character column only held an IPv4 address, so a visitor arriving over IPv6 was counted by no attempt at all.
+- The remember-me token is retired on logout and on a password change.
+- The administrator password is generated when the install is given none.
+
+## Behaviour changes
+
+These apply to any shop that updates, without asking for them. The first two concern integrations that call the API.
+
+- The API page size is capped at one hundred. The caller picks its page size and nothing bounded it, so a single call could ask the shop to load, hydrate and serialize a whole table. An integration asking for more now receives one hundred items without an error: if it walks a catalogue assuming it gets everything at once, it has to move to paginated reads. A project that needs another ceiling redefines `pagination_maximum_items_per_page` in its own `api_platform` configuration.
+- The API limits its rate. Two hundred requests a minute for an anonymous caller, eight hundred for an authenticated customer, two thousand for the administration, ten failed login attempts and twenty token refreshes. The `THELIA_API_RATE_LIMIT_*` variables set each ceiling, and a list of addresses and CIDR ranges exempts trusted callers.
+- The connection character set is named in the DSN, `utf8mb4`, when the DSN named none. A shop that picked its own keeps it: a DSN written in a `database.yml` is taken as it is. A database inherited from a Thelia 2 migration whose tables stayed in `latin1` has to name its set in the DSN before updating.
+- The session id is renewed when a customer or an administrator authenticates. An integration that carried the session id across the login has to read the one in the response.
+- Every response carries three headers by default: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`. They are only set when absent, so a shop writing its own keeps the last word. A shop displayed in an iframe on another domain has to write its own `X-Frame-Options`.
+- The `locale` filter refuses an inactive language instead of accepting it, and names the active languages in its message.
+- The cart refuses a zero or negative quantity. Removing an article is done by deleting the line, not by setting its quantity to zero.
+- `publicUrl` answers in the language that was asked for. The value came from whatever language the translation loop had left behind, which produced an address in a language nobody had requested.
+- The logging handlers a shop declares win over those of the core. A core default always beat the file written by the shop, which could write thousands of lines per request into the error log.
+- `/api/front/currencies` and `/api/front/currencies/{id}` serialize through a read group, and the response no longer carries `visible`, `createdAt` and `updatedAt`. A headless front that read `visible` now finds no such field, without an error.
+- Writing `null` into a NOT NULL column through the API is ignored instead of failing: the column keeps its value and the call answers 200 where it used to answer 500. #3948
+- When `THELIA_CACHE_DSN` names a backend, the configuration table is cached without expiry and invalidated when a setting is written through the model. A setting written straight in SQL, a restored dump or a second application writing the table stays unseen until the cache is cleared.
+- On a persistent worker runtime such as FrankenPHP or RoadRunner, the memo of the active languages and of the default country is no longer reset on every request; a change written outside the model is seen when the worker restarts. PHP-FPM shops see no difference.
+- A customer can open at most twenty return requests an hour, under the `order_return_request_per_client` limiter.
+
+## Breaking changes
+
+- `OrderService::saveTransactionRef()` takes the transaction reference as a string instead of an integer. A gateway reference is a string: a payment module passing an integer was already truncating it.
+- `AdminForm::SEO` is `thelia_seo` instead of `thelia.admin.seo`. The constant named something the registry did not know. A module reading the constant has nothing to do; a module that hard-coded the string has to fix it.
+- `ResourceService::preload()` takes the collection to preload and the language, instead of the collection, the resource class and the context.
+- The product price filter `PriceFilter`, which nothing called, is removed.
+- The `accessory` table gains a `type_id` foreign key towards the new relation types, and stops being declared as a pure junction table. Propel therefore no longer generates the many-to-many methods `getProductsRelatedByAccessory()`, `addProductRelatedByAccessory()` and their twenty-odd neighbours on `Product` and `ProductQuery`. Nothing in the core, the bundled themes or the published modules calls them; a third-party module that does goes through `AccessoryQuery`, or through `addAccessory()` and `removeAccessory()`, which are unchanged. #3920
+- `Thelia\Action\Product` takes a second constructor argument, `ReservedSaleVisibility`, and its `addAccessory()` and `removeAccessory()` listeners receive the event name and the dispatcher like every other listener. A module that instantiates the action itself or calls those two methods directly has to follow; dispatching `TheliaEvents::PRODUCT_ADD_ACCESSORY` and `PRODUCT_REMOVE_ACCESSORY` is unchanged.
+- `CheckoutValidationService` is built from the tagged checkout step providers instead of a `CartGuard`. A module that instantiated or decorated it with a `CartGuard` has to follow.
+- `CouponCreateOrUpdateEvent::getCode()` may return null, since an automatic promotion has no code. A caller under `strict_types` that hands the value to a `string` parameter has to deal with the null, and an override has to widen its return type.
+- `CustomerPersonalDataExporter::CORE_SECTION_NAMES` gains `order_returns`. A module that counted or pinned the exported sections has to follow.
+- The test double `Thelia\Test\RecordingMailerFactory` drops `sendEmailToCustomer()` for `sendEmailMessageOrFail()`; only the test suite of a module is concerned.
+
+No route or API operation is removed, no existing interface changes and no event disappears: a module that extends the core through its events, hooks and interfaces has nothing to revisit beyond the constructors listed above.
+
+## Checkout
+
+A visitor can order without opening an account. The guest is a `customer` row like any other, with no password, marked by `is_guest`: everything an order already hangs off, the addresses, the invoice, the history, keeps working unchanged. The guest finds the order again through its tracking token, and can turn the purchase into an account afterwards.
+
+The feature ships switched off: the `guest_checkout_mode` setting decides, and a shop that updates keeps the tunnel it had. A product whose after-sales needs an account, a subscription or a downloadable licence, is kept out of the guest tunnel by `guest_checkout_forbidden`.
+
+The tunnel itself is now described by configuration rather than by theme code. A `checkout_step` table carries the order, the activation and the wording of each step, while what a step does lives on a `CheckoutStepProviderInterface` service, so a module can ship a step of its own. Turning a step off removes its screen and never its check: placement runs the check of every registered provider, so a module step is enforced at payment and not only on screen. A broken configuration falls back to the shipped defaults with a warning in the log, and a cart with nothing to ship no longer sees the delivery screen. The `checkout_display_mode` setting publishes the form the theme renders, steps or a single page. Fresh installs get the four current steps; an updated shop keeps the historical wordings. The developer map is in `docs/checkout-steps.md`. #3942
+
+The buyer accepts the terms and conditions before paying, and the merchant manages further consent boxes from the back office. A consent carries translated wording, an optional link to a content, a mandatory or optional flag and a position, and can be deactivated without being deleted. The `terms_and_conditions` consent is created on install and on update, taking over the content the `terms_conditions_content_id` setting points at. A mandatory active consent left unanswered stops the order and names the consent by the wording the buyer was shown. One `order_consent` row is written per active consent in the order transaction, freezing the wording as displayed, the answer, the date and the buyer's IP address, so a later rewording never rewrites what was accepted. Orders created from the back office or the command line record nothing, since nobody was asked. The IP address travels with the customer's personal data export, and anonymization erases it while keeping the wording, the answer and the date. #3896
+
+## Promotions and sales
+
+A cart promotion can apply on its own. It carries no code, is evaluated on every cart change, and shows in the summary under its public title. The engine is the coupon one: a `trigger_mode` column decides whether a code is required, and automatic promotions join the session coupons before the usual sort. #3928
+
+A new `BuyXGetY` effect is described in data: a triggering lot (a quantity of products, of a category, of a selection, or the whole cart), what the offer covers (the same lot, a named product, the cheapest of the lot) and the discount (free, a percentage, an amount). The whole-cart lot forms a single lot whatever the cart holds and reads the triggering quantity as a floor, which is how a merchant says "one gift from a spending threshold" without seven articles producing seven gifts. When the offer names another product, the line is added by a dedicated service after the evaluation. An offered line is flagged in the database, refused on the event path and on the front API, sized down to the remaining stock, and taken back when the promotion stops applying. A gift out of stock never blocks the order: the promotion is skipped and the shopper is told. #3931
+
+An order freezes what it used. `order_coupon` gains the coupon id and the serialized effects, so a later edit of the coupon never rewrites the order and a codeless promotion stays countable. `order_product.is_offered` copies the cart marker when the order is written, so the back office, the invoice and a partial refund see a gift as a gift. A new `MatchDeliveryModules` condition covers the chosen carrier. The promotions are priced again just before the order is written, for the buyer who sat on the payment page while an automatic promotion expired or ran out of stock.
+
+A sale can be public or reserved for named customers, and can hide its products from everyone else instead of showing them at their usual price. A reserved sale never writes `promo` or `promo_price` to the catalogue: its price is resolved at read time for entitled customers only, batched, with the same taxed-offset formula as the public path. Visibility is enforced at query level across the front API, the loops, the product view and the theme sitemap. Cart prices are settled when the cart changes, at sign-in and on restore, and an order keeps the price it was placed at. A sale also carries a countdown display setting: never, from a given number of hours before the end, or from the opening. Read-only `/front/sales` and `/admin/sales` resources expose the settings, the remaining seconds and the rewritten url. `docs/reserved-sales.md` maps the feature. #3921
+
+## Orders
+
+A customer can request a return, and the shop processes it to the end. Returns ship switched off, behind `order_return_enabled`, with a window of fourteen days set by `order_return_window_days`. A request carries its lines, a reason drawn from a list the merchant manages, and moves through a state machine: requested, information awaited, accepted, received, refused, settled, expired. Eligibility is checked line by line against what was already returned, the postage can only be returned once, the refund amount is computed from the order, and receiving a return can put the stock back. The return has a reference of its own, a PDF document rendered in the customer's language, back-office screens, front-office screens in the customer account, and admin and front API resources. Returns are part of the personal data export and of anonymization.
+
+The merchant declares, status by status, which statuses an order may move to, and what runs when an order enters a status or takes a given transition. A status with no declared transition stays free, so a fresh install and an updated 3.0.0 shop behave exactly as before. The guard sits in the core status listener, so the back office, the admin API, payment modules returning from a provider and console commands are held to the same graph, and a custom status follows the graph of the canonical status it stands for. Forcing a refused transition is a right of its own, `admin.order.status-force`, traced in the admin log. Actions are services collected by tag, so a module adds an effect by declaring a service; the shipped ones are the mail to the customer, the mail to the shop managers, the stock movement, the invoice numbering and the coupon release, seeded switched off next to the existing core listeners. A failing action is journalled and skipped without undoing the status change, and the following actions still run. #3939
+
+## Catalog
+
+The relation between two products carries a configurable type. Three types ship and are active on a fresh install: accessory, cross-selling, which is reciprocal, and up-selling, each with a translated label and a stable code. Every relation already saved takes the accessory type, and the `accessory` table keeps its columns, so a module querying `AccessoryQuery` keeps working. The merchant creates, renames, reorders, hides and deletes the types from the back office, and deleting a type a shop still uses is refused rather than taking its relations along. Positions are scoped to the product and the type, so reordering one block leaves the others where they were. The facade gains `addAssociation()`, `removeAssociation()` and `getAssociations()`, alongside three new events; `addAccessory()`, `removeAccessory()` and the three accessory events are kept and still fire. A self-relation is refused. #3920, #3941
+
+The product collection of the API sorts by creation date and by title. #3885
+
+## Customers
+
+- A visitor signing in from a page comes back to that page instead of being sent to their account. #3903
+- Customer records carry free-text tags. A tag has a label and a colour, is created from the tag configuration screen or attached from a customer screen, and a label already taken is refused with the tag standing in the way named in the message. The customer list shows a tag column and filters on a tag, reading the tags of every row in one query. Two tags can be merged, and a console command, `tag:prune-orphans`, lists or removes attachments pointing at a customer that no longer exists. Anonymizing a customer drops their tags, and the personal data export handed to the customer carries no trace of them; an admin API resource exposes them.
+
+## API
+
+- The rewritten urls of a page resolve in one read, the relations reached under a collection are read in batches, and a paginated collection is counted once. #3910, #3905, #3907
+- The addons of a resource are no longer rebuilt when a parent is reached through a back reference. #3908
+- The front currency resource declares a read group, so it answers again instead of walking every accessible getter until it meets a Propel table map.
+
+## Performance
+
+- The kernel no longer opens a second connection on every request to ask whether the shop is installed. #3909
+- The configuration of a module is read in one go, the module of a hook is resolved once per process, and the configuration table is read once per request from a shared cache entry. #3901, #3900, #3915
+- The active languages and the default country keep their memo across requests, which used to be a full table read per request on a persistent worker runtime. #3916
+- A cached image is decoded only when something asks for the decoded object, instead of on every call. #3917
+
+## Cache
+
+The cache backend is chosen with an environment variable, `THELIA_CACHE_DSN`. It is empty by default, so a shop that updates does not change engine. #3892
+
+## Fixes
+
+- The module chosen for delivery and for payment is judged at order time the way it was judged when the offer was made.
+- Boot survives a cache clear instead of requiring files that are gone: the `sql_mode` verdict and the Propel runtime cache are rebuilt rather than read.
+- A module `config.xml` that declares a loop name is honoured again. #3925
+- A written module row announces its change again.
+- Link positions stay untouched when a link is read.
+- The kernel survives a module template directory that is gone.
+- Translation catalogues are exported with `var_export`.
+- Every seeded message has a subject in every install locale, and the checkout steps and consent resource titles are seeded for every shop language.
+- `bin/install --help` prints the options and exits, and an unknown option is refused before anything is created or dropped, where both used to run the full install against the database the environment pointed at. #3950
+- A fresh install writes the administrator address into the shop notification list when the list is empty, so order and module notifications reach the merchant without a configuration step. #3951
+- A coupon carrying no condition no longer writes an ERROR line in the shop log on a path that behaves as intended. #3952
 
 # 3.0.0
 
