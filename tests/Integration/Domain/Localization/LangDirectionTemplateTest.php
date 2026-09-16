@@ -38,6 +38,13 @@ final class LangDirectionTemplateTest extends IntegrationTestCase
 
     protected function setUp(): void
     {
+        // The parser assigns lang_direction from TwigEngine 1.1.0 onwards, and the
+        // suite runs against whichever version the checkout installed - the published
+        // package on CI, not the working copy. Older module, nothing to assert.
+        if (!class_exists(\TwigEngine\Extension\LangDirectionExtension::class)) {
+            self::markTestSkipped('The installed TwigEngine predates the writing direction.');
+        }
+
         parent::setUp();
 
         $this->previousAdminEnv = Request::$isAdminEnv;
@@ -59,6 +66,13 @@ final class LangDirectionTemplateTest extends IntegrationTestCase
 
     protected function tearDown(): void
     {
+        // A skipped setUp leaves these unset, and tearDown still runs.
+        if (!isset($this->templateDirectory)) {
+            parent::tearDown();
+
+            return;
+        }
+
         $session = $this->session();
 
         $this->previousLang instanceof Lang
