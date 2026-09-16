@@ -633,6 +633,7 @@ return [
     'There is no ref "%ref" in the exports' => 'There is no ref "%ref" in the exports',
     'There\'s a conflict between your file extension "%ext" and the mime type "%mime"' => 'There\'s a conflict between your file extension "%ext" and the mime type "%mime"',
     'This PHP extension should be installed and loaded.' => 'This PHP extension should be installed and loaded.',
+    'This address is not recognised. Accepted platforms: %platforms%.' => 'This address is not recognised. Accepted platforms: %platforms%.',
     'This administrator login already exists' => 'This administrator login already exists',
     'This brand is online' => 'This brand is online',
     'This category is online' => 'This category is online',
