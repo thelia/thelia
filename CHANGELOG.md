@@ -1,6 +1,6 @@
 # 3.1.0
 
-First minor of the 3.x line. 83 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
+First minor of the 3.x line. 85 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
 
 ## Security
 
@@ -112,6 +112,7 @@ The cache backend is chosen with an environment variable, `THELIA_CACHE_DSN`. It
 - `bin/install --help` prints the options and exits, and an unknown option is refused before anything is created or dropped, where both used to run the full install against the database the environment pointed at. #3950
 - A fresh install writes the administrator address into the shop notification list when the list is empty, so order and module notifications reach the merchant without a configuration step. #3951
 - A coupon carrying no condition no longer writes an ERROR line in the shop log on a path that behaves as intended. #3952
+- The generated Propel models no longer raise a PHP 8.5 deprecation: the Thelia fork of Propel, 1.0.3, writes canonical casts, drops `ReflectionProperty::setAccessible()` and `xml_parser_free()`. The core requires it.
 - The core no longer raises a Symfony 7.4 deprecation on a page render: validator constraints take named arguments, the two API voters accept the vote argument, and the language URL form names its default protocol. The SEOne, RecentlyViewed, HeaderHighlights and CustomDelivery modules and the back-office theme received the same treatment in their own releases. #3955
 - The update script removes the compiled container and the generated Propel models of the previous release before it boots, so a shop that ran `composer update` no longer has to clear its caches by hand before `local/setup/update.php`.
 - The demo shop ships with a carrier: the demo import attaches the CustomDelivery module to every shipping zone with a flat price, so a fresh `--with-demo` install can be ordered from end to end. #3953
