@@ -18,6 +18,7 @@ use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\LegacyMessagePlaceholders;
 use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
@@ -47,7 +48,7 @@ class Message extends BaseMessage
 
         // We did not get it ? Use the message entered in the back-office
         if (false === $body) {
-            $body = $parser->renderString($message, [], $compressOutput);
+            $body = $parser->renderString(LegacyMessagePlaceholders::interpolate($message), [], $compressOutput);
         }
 
         // Do we have a layout ?
@@ -173,7 +174,7 @@ class Message extends BaseMessage
         );
 
         try {
-            $subject = $parser->renderString($this->getSubjectWithFallback());
+            $subject = $parser->renderString(LegacyMessagePlaceholders::interpolate($this->getSubjectWithFallback()));
             $htmlMessage = $this->getHtmlMessageBody($parser);
             $textMessage = $this->getTextMessageBody($parser);
 

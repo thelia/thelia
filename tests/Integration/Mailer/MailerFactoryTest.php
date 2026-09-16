@@ -87,6 +87,31 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('reply@test.com', $email->getReplyTo()[0]->getAddress());
     }
 
+    public function testCreateEmailMessageInterpolatesTheSmartyPlaceholdersOfAMessageSeededForThelia2(): void
+    {
+        // A module ported from Thelia 2 whose setup.sql still seeds the Smarty wording:
+        // without the rewrite, the customer reads the placeholder itself in the subject line.
+        $message = new Message();
+        $message->setName('test_legacy_smarty_message');
+        $message->setLocale('en_US');
+        $message->setSubject('Payment of order {$order_ref}');
+        $message->setHtmlMessage('<p>Order {$order_ref} is paid.</p>');
+        $message->setTextMessage('Order {$order_ref} is paid.');
+        $message->save();
+
+        $email = $this->mailerFactory->createEmailMessage(
+            'test_legacy_smarty_message',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            ['order_ref' => 'ORD-42'],
+            'en_US',
+        );
+
+        self::assertSame('Payment of order ORD-42', $email->getSubject());
+        self::assertStringContainsString('ORD-42', (string) $email->getHtmlBody());
+        self::assertStringContainsString('ORD-42', (string) $email->getTextBody());
+    }
+
     public function testCreateEmailMessageRestoresTheSessionLangWhenRenderingFails(): void
     {
         $session = $this->getService(RequestStack::class)->getMainRequest()->getSession();
