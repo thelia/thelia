@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Install;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\TheliaKernel;
 use Thelia\Install\Standalone\DatabaseSetup;
 use Thelia\Model\ConfigQuery;
@@ -26,6 +27,31 @@ final class DatabaseSetupTest extends IntegrationTestCase
     // lock held by the base class' per-test transaction until lock_wait_timeout (~1 year).
     // DDL tests must opt out of the transactional isolation, per IntegrationTestCase.
     protected bool $useTransaction = false;
+
+    private const string SHIPPED_ACTIVE_CODE = 'InstallSampleShippedActive';
+
+    private const string SHIPPED_INACTIVE_CODE = 'InstallSampleShippedInactive';
+
+    private const string UNDECLARED_CODE = 'InstallSampleUndeclared';
+
+    private ?string $moduleDir = null;
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->moduleDir) {
+            $setup = $this->createDatabaseSetup();
+            $setup->connect();
+            $codes = [self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE];
+            $placeholders = implode(',', array_fill(0, \count($codes), '?'));
+            $setup->getPdo()->prepare("DELETE FROM `module_i18n` WHERE `id` IN (SELECT `id` FROM `module` WHERE `code` IN ($placeholders))")->execute($codes);
+            $setup->getPdo()->prepare("DELETE FROM `module` WHERE `code` IN ($placeholders)")->execute($codes);
+
+            (new Filesystem())->remove($this->moduleDir);
+            $this->moduleDir = null;
+        }
+
+        parent::tearDown();
+    }
 
     public function testConstructorRejectsInvalidDatabaseName(): void
     {
@@ -108,6 +134,106 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $setup->connect();
 
         self::assertNull($setup->getConfig('no_such_configuration_row'));
+    }
+
+    /**
+     * A module ships active unless its descriptor says otherwise: the module table row
+     * follows `<enabled-by-default>`, and a descriptor that does not declare it keeps the
+     * historical behaviour, active on install.
+     */
+    public function testRegisteredModuleFollowsTheActivationItsDescriptorDeclares(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+
+        $count = $setup->registerAndApplyModules([$this->writeSampleModules()]);
+
+        self::assertSame(3, $count);
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::UNDECLARED_CODE));
+    }
+
+    /**
+     * Registering again on a populated database (a module table that already knows the
+     * module) must never rewrite the activation the merchant chose, in either direction.
+     */
+    public function testRegisteringAgainKeepsTheActivationTheMerchantChose(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSampleModules();
+        $setup->registerAndApplyModules([$moduleDir]);
+
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 1 WHERE `code` = ?')->execute([self::SHIPPED_INACTIVE_CODE]);
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 0 WHERE `code` = ?')->execute([self::UNDECLARED_CODE]);
+
+        $setup->registerAndApplyModules([$moduleDir]);
+
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::UNDECLARED_CODE));
+    }
+
+    public function testAnInvalidActivationValueStopsTheRegistration(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSampleModules('<enabled-by-default>maybe</enabled-by-default>');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('enabled-by-default');
+
+        $setup->registerAndApplyModules([$moduleDir]);
+    }
+
+    private function activationOf(\PDO $pdo, string $code): int
+    {
+        $statement = $pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = ?');
+        $statement->execute([$code]);
+
+        $activate = $statement->fetchColumn();
+        self::assertNotFalse($activate, \sprintf('Module %s was not registered.', $code));
+
+        return (int) $activate;
+    }
+
+    /**
+     * Three descriptors in a throwaway module directory: one declaring itself active,
+     * one declaring itself inactive, one saying nothing about it. The first declaration
+     * can be replaced to exercise an invalid value.
+     */
+    private function writeSampleModules(string $activeDeclaration = '<enabled-by-default>1</enabled-by-default>'): string
+    {
+        $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
+        $filesystem = new Filesystem();
+
+        $declarations = [
+            self::SHIPPED_ACTIVE_CODE => $activeDeclaration,
+            self::SHIPPED_INACTIVE_CODE => '<enabled-by-default>0</enabled-by-default>',
+            self::UNDECLARED_CODE => '',
+        ];
+
+        foreach ($declarations as $code => $declaration) {
+            $filesystem->mkdir($this->moduleDir.$code.'/Config');
+            $filesystem->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+                <?xml version="1.0" encoding="UTF-8"?>
+                <module xmlns="http://thelia.net/schema/dic/module">
+                    <fullnamespace>{$code}\\{$code}</fullnamespace>
+                    <descriptive locale="en_US">
+                        <title>{$code}</title>
+                    </descriptive>
+                    <languages>
+                        <language>en_US</language>
+                    </languages>
+                    <version>1.0.0</version>
+                    <type>classic</type>
+                    <stability>prod</stability>
+                    {$declaration}
+                </module>
+                XML);
+        }
+
+        return $this->moduleDir;
     }
 
     /**

@@ -16,6 +16,7 @@ namespace Thelia\Install\Standalone;
 
 use Thelia\Core\Install\Database;
 use Thelia\Core\TheliaKernel;
+use Thelia\Module\ModuleDescriptor;
 use Thelia\Tools\Version\Version;
 
 final class DatabaseSetup
@@ -118,14 +119,26 @@ final class DatabaseSetup
         ]);
     }
 
-    public function registerAndApplyModules(): int
+    /**
+     * Register every module found in the given directories and apply their SQL schema.
+     *
+     * A module is registered active unless its descriptor declares
+     * `<enabled-by-default>0</enabled-by-default>`: such a module ships with the
+     * distribution but waits for the merchant to activate it from the back-office, and
+     * template:set leaves it alone too (see ModuleManagement). On a database that
+     * already knows the module, only the namespace and the version are refreshed: the
+     * activation the merchant chose is never rewritten.
+     *
+     * @param string[] $moduleDirectories
+     */
+    public function registerAndApplyModules(array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): int
     {
-        $moduleDirs = array_filter([THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR], 'is_dir');
+        $moduleDirs = array_filter($moduleDirectories, 'is_dir');
         $position = 0;
 
         $insertModule = $this->pdo->prepare(
             'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
-             VALUES (:code, :version, :type, :category, 1, :position, :namespace, :mandatory, :hidden, NOW())
+             VALUES (:code, :version, :type, :category, :activate, :position, :namespace, :mandatory, :hidden, NOW())
              ON DUPLICATE KEY UPDATE `full_namespace` = VALUES(`full_namespace`), `version` = VALUES(`version`)'
         );
 
@@ -160,6 +173,7 @@ final class DatabaseSetup
                     'version' => (string) ($xml->version ?? '0.0.1'),
                     'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
                     'category' => $xmlType,
+                    'activate' => ModuleDescriptor::enabledByDefault($xml, $moduleXml) ? 1 : 0,
                     'position' => ++$position,
                     'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
                     'mandatory' => (int) ($xml->mandatory ?? 0),

@@ -237,15 +237,30 @@ class ModuleManagement
     public function installModule(string $absolutePathToModule): Module
     {
         $moduleValidator = new ModuleValidator($absolutePathToModule);
+
+        return $this->findRegistered($moduleValidator) ?? $this->install($moduleValidator, $absolutePathToModule);
+    }
+
+    /**
+     * The row the module table already holds for the module the validator describes.
+     */
+    private function findRegistered(ModuleValidator $moduleValidator): ?Module
+    {
         $moduleValidator->loadModuleDefinition();
 
-        $checkModule = ModuleQuery::create()->findOneByFullNamespace(
+        return ModuleQuery::create()->findOneByFullNamespace(
             $moduleValidator->getModuleDefinition()?->getNamespace() ?? '',
         );
-        if ($checkModule) {
-            return $checkModule;
-        }
+    }
 
+    /**
+     * Install a module the shop does not know yet, and activate it unless its descriptor
+     * says it ships inactive. The validator has already loaded and validated the
+     * descriptor: every decision below reads it from there instead of parsing module.xml
+     * again.
+     */
+    private function install(ModuleValidator $moduleValidator, string $absolutePathToModule): Module
+    {
         $moduleDefinition = $moduleValidator->getModuleDefinition();
         if (null === $moduleDefinition) {
             throw new InvalidModuleException((array) 'Module definition is not valid or not found in ');
@@ -258,12 +273,40 @@ class ModuleManagement
 
         $this->eventDispatcher->dispatch($moduleInstallEvent, TheliaEvents::MODULE_INSTALL);
 
-        $toggleEvent = new ModuleToggleActivationEvent($moduleInstallEvent->getModule()->getId());
+        $module = $moduleInstallEvent->getModule();
+
+        if ($this->shipsInactive($moduleValidator, $absolutePathToModule)) {
+            return $module;
+        }
+
+        $toggleEvent = new ModuleToggleActivationEvent($module->getId());
         $toggleEvent->setNoCheck(false);
         $toggleEvent->setRecursive(true);
         $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
-        return $moduleInstallEvent->getModule();
+        // The activation wrote the row through another instance: read it back so the caller
+        // never decides on a stale state.
+        $module->reload();
+
+        return $module;
+    }
+
+    /**
+     * The install step honours `<enabled-by-default>0</enabled-by-default>`: a module a
+     * theme requires is installed and registered, but not activated on the merchant's behalf.
+     */
+    private function shipsInactive(ModuleValidator $moduleValidator, string $absolutePathToModule): bool
+    {
+        $descriptor = $moduleValidator->getModuleDescriptor();
+
+        // The validator parsed and validated module.xml when it was built, and an invalid
+        // file already threw there. Anything but a document here means there is nothing to
+        // read, so the historical default, active, applies.
+        if (!$descriptor instanceof \SimpleXMLElement) {
+            return false;
+        }
+
+        return !ModuleDescriptor::enabledByDefault($descriptor, rtrim($absolutePathToModule, DS).DS.'Config'.DS.'module.xml');
     }
 
     /**
@@ -316,44 +359,34 @@ class ModuleManagement
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
 
         foreach ($composerModuleDTOS as $composerModuleDTO) {
-            $module = $this->installModule($composerModuleDTO->getPath());
+            $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
+            $registered = $this->findRegistered($moduleValidator);
+            $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath());
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
             $modulesInstalled[] = $module;
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+                if (null === $registered) {
+                    $output?->writeln(\sprintf('<fg=gray>Module %s successfully installed and activated.</>', $module->getCode()));
+                }
+
                 continue;
             }
 
-            try {
-                $event = new ModuleToggleActivationEvent($module->getId());
-                $event->setRecursive(true);
-                $event->setNoCheck(false);
-
-                $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-
-                $output?->writeln(
-                    \sprintf(
-                        '<fg=gray>Module %s successfully installed and activated.</>',
-                        $module->getCode()
-                    )
-                );
-            } catch (\Exception $e) {
-                Tlog::getInstance()->addError(
-                    \sprintf('Failed to activate module %s', $module->getCode()),
-                    $e
-                );
-                $output?->writeln(
-                    \sprintf(
-                        '<fg=red>Failed to activate module %s: %s %s</>',
-                        $module->getCode(),
-                        $e->getMessage(),
-                        $e->getTraceAsString()
-                    )
-                );
-                continue;
-            }
+            // Only a module the theme brings is activated on its behalf, above. A module the
+            // shop already knows keeps its state: the descriptor asked for it, or the
+            // merchant switched it off, and applying a theme is not the moment to overrule
+            // either. The install output says which module the theme is missing.
+            $output?->writeln(
+                \sprintf(
+                    $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath())
+                        ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
+                        : '<comment>Module %s is required by the theme but was switched off: left as the merchant set it, activate it from the back-office if the theme needs it.</comment>',
+                    $module->getCode()
+                )
+            );
         }
 
         return $modulesInstalled;
