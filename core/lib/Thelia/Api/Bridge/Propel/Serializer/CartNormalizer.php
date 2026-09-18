@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel\Serializer;
 
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -30,6 +29,9 @@ use Thelia\Api\Resource\Cart;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
+use Thelia\Model\Cart as PropelCart;
+use Thelia\Model\Country;
+use Thelia\Model\State;
 
 class CartNormalizer extends AbstractItemNormalizer
 {
@@ -52,9 +54,19 @@ class CartNormalizer extends AbstractItemNormalizer
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker);
     }
 
+    /**
+     * Every payload that hands back a whole cart, and no other.
+     *
+     * The group is what decides, rather than the kind of operation: the totals, the taxes
+     * and the estimated postage are only ever declared in the "read a single cart" group,
+     * so computing them for a payload that cannot show them was work thrown away — and
+     * keying on `Get` left out the checkout operations, which hand back the very cart a
+     * choice has just changed and are the ones a buyer reads a delivery cost off.
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof Cart && isset($context['operation']) && $context['operation'] instanceof Get;
+        return $data instanceof Cart
+            && \in_array(Cart::GROUP_FRONT_READ_SINGLE, (array) ($context['groups'] ?? []), true);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
@@ -68,13 +80,7 @@ class CartNormalizer extends AbstractItemNormalizer
         $propelCart = $object->getPropelModel();
         $country = $this->taxEngine->getDeliveryCountry();
         $state = $this->taxEngine->getDeliveryState();
-        $postageInfo = $this->postageEstimator->estimatePostageForCountry(
-            cart: $propelCart,
-            country: $country,
-            state: $state,
-        );
-        $estimatedPostage = $postageInfo->getBestPostageAmount();
-        $postageTax = $postageInfo->getBestPostageTax();
+        [$estimatedPostage, $postageTax] = $this->deliveryCostOf($propelCart, $country, $state);
         /* @var Cart $object */
         $object
             ->setTotalWithoutTax($propelCart->getTotalAmount())
@@ -85,6 +91,39 @@ class CartNormalizer extends AbstractItemNormalizer
             ->setVirtual($propelCart->isVirtual());
 
         return parent::normalize($object, $format, $context);
+    }
+
+    /**
+     * What the delivery of this cart costs, and what asking costs.
+     *
+     * Estimating means asking every carrier module that can serve the country for a price,
+     * one dispatch each, some of them over the network to a carrier's API — and it was
+     * done on every single payload carrying a cart, including the four answers of the
+     * checkout, where the buyer has already picked a carrier and the price it quoted is
+     * written on the cart. That is a round of quotes per request to recompute a number
+     * the shop had already settled and will bill.
+     *
+     * So: a cart that names its carrier and carries its postage answers with the postage
+     * it carries. An estimate is for the cart that has not chosen yet — the cheapest of
+     * what could serve it — and that is exactly the cart where nothing is written to read
+     * instead. The postage is compared to null and not to zero: free shipping is a price
+     * the shop settled, not the absence of one.
+     *
+     * @return array{0: float|null, 1: float|null}
+     */
+    private function deliveryCostOf(PropelCart $propelCart, Country $country, ?State $state): array
+    {
+        if (null !== $propelCart->getDeliveryModuleId() && null !== $propelCart->getPostage()) {
+            return [(float) $propelCart->getPostage(), (float) $propelCart->getPostageTax()];
+        }
+
+        $postageInfo = $this->postageEstimator->estimatePostageForCountry(
+            cart: $propelCart,
+            country: $country,
+            state: $state,
+        );
+
+        return [$postageInfo->getBestPostageAmount(), $postageInfo->getBestPostageTax()];
     }
 
     public function getSupportedTypes(?string $format): array

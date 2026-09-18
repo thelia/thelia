@@ -139,6 +139,16 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public ?float $discount = null;
 
+    // What the carrier chosen at checkout actually quoted, as opposed to `delivery`,
+    // which is an estimate over every carrier that could serve the cart. Read-only for
+    // the same reason the discount is: a body able to name the postage is a body able to
+    // choose what the delivery costs.
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $postage = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $postageTax = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt = null;
 
@@ -259,6 +269,30 @@ class Cart implements PropelResourceInterface
         return $this;
     }
 
+    public function getPostage(): ?float
+    {
+        return null === $this->postage ? null : round($this->postage, 2);
+    }
+
+    public function setPostage(?float $postage): self
+    {
+        $this->postage = $postage;
+
+        return $this;
+    }
+
+    public function getPostageTax(): ?float
+    {
+        return null === $this->postageTax ? null : round($this->postageTax, 2);
+    }
+
+    public function setPostageTax(?float $postageTax): self
+    {
+        $this->postageTax = $postageTax;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
@@ -309,7 +343,9 @@ class Cart implements PropelResourceInterface
 
     public function getTaxes(): ?float
     {
-        return round($this->taxes, 2);
+        // Null until something computes it: the field is declared nullable, and rounding
+        // a null is a TypeError rather than an answer.
+        return null === $this->taxes ? null : round($this->taxes, 2);
     }
 
     public function setTaxes(?float $taxes): self
