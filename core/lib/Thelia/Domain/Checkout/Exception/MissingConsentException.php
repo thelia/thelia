@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Exception;
 
+use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+
 /**
  * A consent the shop requires was not given.
  *
@@ -35,5 +37,18 @@ class MissingConsentException extends CheckoutException
             $previous,
             ['%consent' => $consentTitle],
         );
+    }
+
+    public function violationCode(): string
+    {
+        return CheckoutViolationCode::ConsentMissing->value;
+    }
+
+    public function violationDetails(): array
+    {
+        return [
+            'consentCode' => $this->consentCode,
+            'consentTitle' => $this->consentTitle,
+        ];
     }
 }

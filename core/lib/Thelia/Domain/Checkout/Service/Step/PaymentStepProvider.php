@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service\Step;
 
 use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Service\ConsentGuard;
 use Thelia\Model\Cart;
 use Thelia\Model\CheckoutStep;
@@ -30,7 +31,7 @@ use Thelia\Model\CheckoutStep;
  * session directly, so that the verdict this step gives about a cart can be reproduced
  * outside a browser — from the API, from a command line — by binding another reader.
  */
-final readonly class PaymentStepProvider implements CheckoutStepProviderInterface
+final readonly class PaymentStepProvider implements CheckoutStepProviderInterface, CheckoutStepViolationCollectorInterface
 {
     public function __construct(
         private CartGuard $cartGuard,
@@ -60,13 +61,56 @@ final readonly class PaymentStepProvider implements CheckoutStepProviderInterfac
 
     public function check(Cart $cart): void
     {
-        $this->cartGuard->checkInvoiceAddressLegalIdentifiers($cart);
-        $this->cartGuard->checkValidPayment($cart);
-        $this->consentGuard->checkMandatoryConsentsAccepted();
+        foreach ($this->guardsFor($cart) as $guard) {
+            $guard();
+        }
+    }
+
+    /**
+     * The three guards are independent of one another — a billing address missing its
+     * legal identifiers says nothing about the payment module, and neither says anything
+     * about the boxes under it — so a buyer who got two of them wrong is told about both
+     * rather than sent back to the same screen twice.
+     */
+    public function collectRefusals(Cart $cart): array
+    {
+        $refusals = [];
+
+        foreach ($this->guardsFor($cart) as $guard) {
+            try {
+                $guard();
+            } catch (CheckoutException $refusal) {
+                $refusals[] = $refusal;
+            }
+        }
+
+        return $refusals;
     }
 
     public function componentName(): ?string
     {
         return null;
+    }
+
+    /**
+     * What this step asks the cart, in the order the buyer meets it on the screen: the
+     * billing address, the payment choice, then the boxes under it. The single list both
+     * `check()` and `collectRefusals()` read, so the two can never drift apart.
+     *
+     * @return list<callable(): void>
+     */
+    private function guardsFor(Cart $cart): array
+    {
+        return [
+            function () use ($cart): void {
+                $this->cartGuard->checkInvoiceAddressLegalIdentifiers($cart);
+            },
+            function () use ($cart): void {
+                $this->cartGuard->checkValidPayment($cart);
+            },
+            function (): void {
+                $this->consentGuard->checkMandatoryConsentsAccepted();
+            },
+        ];
     }
 }
