@@ -65,14 +65,17 @@ class AttributeAvFilter implements TheliaFilterInterface, TheliaChoiceFilterInte
 
             // One IN for every checked value, and the HAVING asks a single sale element to hold
             // as many distinct attributes as were checked: values of one attribute count as one.
+            // The whole thing lives in an EXISTS: grouping the outer query by sale element
+            // instead would return a product once per variant it matches, and a product
+            // declined in five checked colours would fill five tiles of the listing.
             $query
-                ->useProductSaleElementsQuery()
+                ->useExistsQuery('ProductSaleElements')
                     ->useAttributeCombinationQuery()
                         ->filterByAttributeAvId($attributeAvIds, Criteria::IN)
                     ->endUse()
-                ->endUse()
-                ->groupBy(ProductSaleElementsTableMap::COL_ID)
-                ->having('COUNT(DISTINCT '.AttributeCombinationTableMap::COL_ATTRIBUTE_ID.') = ?', $count);
+                    ->groupBy(ProductSaleElementsTableMap::COL_ID)
+                    ->having('COUNT(DISTINCT '.AttributeCombinationTableMap::COL_ATTRIBUTE_ID.') = ?', $count)
+                ->endUse();
         }
 
         foreach ($bounded as $attributeId => $bounds) {
