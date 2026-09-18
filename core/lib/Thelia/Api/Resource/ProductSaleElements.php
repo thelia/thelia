@@ -191,6 +191,19 @@ class ProductSaleElements implements PropelResourceInterface
     ])]
     public ?bool $promo = null;
 
+    /**
+     * Whether the catalog price is to be shown struck through next to the promo
+     * price. Answered by the catalog price rule or the reserved operation pricing
+     * the sale element on this read; null when the catalog's own promo price stands.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    public ?bool $displayInitialPrice = null;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
@@ -331,6 +344,18 @@ class ProductSaleElements implements PropelResourceInterface
     public function setPromo(?bool $promo): self
     {
         $this->promo = $promo;
+
+        return $this;
+    }
+
+    public function getDisplayInitialPrice(): ?bool
+    {
+        return $this->displayInitialPrice;
+    }
+
+    public function setDisplayInitialPrice(?bool $displayInitialPrice): self
+    {
+        $this->displayInitialPrice = $displayInitialPrice;
 
         return $this;
     }

@@ -317,6 +317,7 @@ return [
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration checkout consents' => 'Configuration des consentements du tunnel de commande',
     'Configuration checkout steps' => 'Configuration des étapes du tunnel de commande',
+    'Catalog price rules' => 'Règles de prix catalogue',
     'Configuration variables' => 'Variables de configuration',
     'Confirm your %store account' => 'Confirmez la création de votre compte {{ config("store_name") }}',
     'Congo' => 'Congo',

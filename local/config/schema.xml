@@ -2074,6 +2074,136 @@
       <unique-column name="customer_id" />
     </unique>
   </table>
+  <table name="catalog_price_rule" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <column defaultValue="0" name="active" required="true" type="BOOLEAN" />
+    <column defaultValue="100" description="rules covering the same sale element apply by ascending priority, then by ascending id" name="priority" required="true" type="INTEGER" />
+    <column defaultValue="0" description="once this rule has applied, the rules of a higher priority value are not examined" name="stop_processing" required="true" type="BOOLEAN" />
+    <column defaultValue="NULL" name="start_date" type="TIMESTAMP" />
+    <column defaultValue="NULL" description="a rule without an end date runs until it is turned off" name="end_date" type="TIMESTAMP" />
+    <column defaultValue="1" description="1 percentage off, 2 amount off per currency, 3 fixed price per currency" name="effect_type" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="the percentage taken off, read only when effect_type is 1" name="percentage_value" scale="4" size="8" type="DECIMAL" />
+    <column defaultValue="0" description="who the rule prices for: 0 everyone, 1 the customers named on it, 2 the customer groups named on it" name="audience_mode" required="true" type="TINYINT" />
+    <column defaultValue="1" description="show the catalog price struck through next to the rule price" name="display_initial_price" required="true" type="BOOLEAN" />
+    <column defaultValue="1" description="a category criterion also covers the products of its descendant categories" name="include_subcategories" required="true" type="BOOLEAN" />
+    <column defaultValue="0" description="the stored prices of this rule are behind its definition or the catalog, and the recompute command owes it a pass" name="dirty" required="true" type="BOOLEAN" />
+    <column defaultValue="NULL" description="when the stored prices of this rule were last computed" name="computed_at" type="TIMESTAMP" />
+    <index name="idx_catalog_price_rule_active_audience_mode">
+      <index-column name="active" />
+      <index-column name="audience_mode" />
+    </index>
+    <index name="idx_catalog_price_rule_active_start_end_date">
+      <index-column name="active" />
+      <index-column name="start_date" />
+      <index-column name="end_date" />
+    </index>
+    <index name="idx_catalog_price_rule_priority">
+      <index-column name="priority" />
+    </index>
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="catalog_price_rule_effect_currency" namespace="Thelia\Model">
+    <column name="catalog_price_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0.000000" description="the amount taken off or the fixed price, tax included at the shop location, in this currency" name="value" required="true" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_effect_currency_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_catalog_price_rule_effect_currency_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <index name="fk_catalog_price_rule_effect_currency_currency_idx">
+      <index-column name="currency_id" />
+    </index>
+  </table>
+  <table name="catalog_price_rule_criterion" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="catalog_price_rule_id" required="true" type="INTEGER" />
+    <column description="what the criterion names: category, brand, template, feature_av, attribute_av or product; a module may register its own" name="type" required="true" size="32" type="VARCHAR" />
+    <column description="the id of the named object; no foreign key on purpose, a deleted target matches nothing rather than widening the rule" name="target_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_criterion_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <index name="idx_catalog_price_rule_criterion_type_target_id">
+      <index-column name="type" />
+      <index-column name="target_id" />
+    </index>
+    <unique name="idx_catalog_price_rule_criterion_rule_id_type_target_id">
+      <unique-column name="catalog_price_rule_id" />
+      <unique-column name="type" />
+      <unique-column name="target_id" />
+    </unique>
+  </table>
+  <table name="catalog_price_rule_customer" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="catalog_price_rule_id" required="true" type="INTEGER" />
+    <column description="a customer the rule prices for, read when audience_mode is 1" name="customer_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_customer_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_catalog_price_rule_customer_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <index name="fk_catalog_price_rule_customer_customer_idx">
+      <index-column name="customer_id" />
+    </index>
+    <unique name="idx_catalog_price_rule_customer_rule_id_customer_id">
+      <unique-column name="catalog_price_rule_id" />
+      <unique-column name="customer_id" />
+    </unique>
+  </table>
+  <table name="catalog_price_rule_product_sale_elements" namespace="Thelia\Model">
+    <column name="catalog_price_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="a sale element the rule covers, as last materialized from its criteria" name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_pse_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_catalog_price_rule_pse_pse_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <index name="idx_catalog_price_rule_pse_pse_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
+  </table>
+  <table name="catalog_price_rule_price" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the stored price applies from this moment; null when it applies since the rules were computed, whatever the clock says" name="valid_from" type="TIMESTAMP" />
+    <column defaultValue="NULL" description="the stored price applies until this moment, excluded; null when no covering rule has an end date" name="valid_until" type="TIMESTAMP" />
+    <column defaultValue="0.000000" description="the price the public rules give the sale element, untaxed, before any customer discount" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column description="the last rule that applied in this segment" name="catalog_price_rule_id" required="true" type="INTEGER" />
+    <column defaultValue="1" name="display_initial_price" required="true" type="BOOLEAN" />
+    <column defaultValue="NULL" name="computed_at" type="TIMESTAMP" />
+    <foreign-key foreignTable="product_sale_elements" name="fk_catalog_price_rule_price_pse_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_catalog_price_rule_price_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_price_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <index name="idx_catalog_price_rule_price_pse_currency_valid_from">
+      <index-column name="product_sale_elements_id" />
+      <index-column name="currency_id" />
+      <index-column name="valid_from" />
+    </index>
+    <index name="idx_catalog_price_rule_price_valid_until">
+      <index-column name="valid_until" />
+    </index>
+    <index name="fk_catalog_price_rule_price_currency_idx">
+      <index-column name="currency_id" />
+    </index>
+    <index name="fk_catalog_price_rule_price_rule_idx">
+      <index-column name="catalog_price_rule_id" />
+    </index>
+  </table>
   <table name="export_category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />

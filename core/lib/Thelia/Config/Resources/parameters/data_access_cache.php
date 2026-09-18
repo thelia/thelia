@@ -44,12 +44,17 @@ return static function (ContainerConfigurator $container): void {
             '/api/front/currencies',
             '/api/front/taxes',
         ])
-        // Of the paths above, the ones a reserved price travels on: a running
-        // reserved operation owes two visitors two different prices for the same
+        // Of the paths above, the ones a price that depends on the visitor travels
+        // on: a running reserved operation, or a catalog price rule reserved for
+        // named customers, owes two visitors two different prices for the same
         // product, and the cache key holds no customer. They are bypassed for as
-        // long as such an operation runs, and cached again as soon as none does.
-        ->set('thelia.api.data_access.cache.reserved_sale_sensitive_prefixes', [
+        // long as such a rule or operation runs, and cached again as soon as none
+        // does. The public rules price everyone the same and stay cacheable.
+        ->set('thelia.api.data_access.cache.visitor_dependent_price_prefixes', [
             '/api/front/products',
             '/api/front/product_sale_elements',
-        ]);
+        ])
+        // The name this list carried before the catalog price rules; kept for a
+        // project that reads it.
+        ->set('thelia.api.data_access.cache.reserved_sale_sensitive_prefixes', '%thelia.api.data_access.cache.visitor_dependent_price_prefixes%');
 };
