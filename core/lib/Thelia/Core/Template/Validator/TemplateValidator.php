@@ -189,15 +189,23 @@ class TemplateValidator
     {
         $authors = [];
 
-        if (0 !== \count($this->xmlDescriptorContent->authors->author)) {
-            foreach ($this->xmlDescriptorContent->authors->author as $author) {
-                $authors[] = [
-                    (string) $author->name,
-                    (string) $author->company,
-                    (string) $author->email,
-                    (string) $author->website,
-                ];
-            }
+        // <authors> is optional in the descriptor, and a template that inherits from another
+        // one is written down to almost nothing. SimpleXML hands back an empty element for
+        // the missing <authors>, and null for the <author> children it does not have: there
+        // is nothing to count and nothing to walk.
+        $declaredAuthors = $this->xmlDescriptorContent->authors->author;
+
+        if (!$declaredAuthors instanceof \SimpleXMLElement) {
+            return $authors;
+        }
+
+        foreach ($declaredAuthors as $author) {
+            $authors[] = [
+                (string) $author->name,
+                (string) $author->company,
+                (string) $author->email,
+                (string) $author->website,
+            ];
         }
 
         return $authors;

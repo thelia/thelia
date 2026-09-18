@@ -36,22 +36,27 @@ class TemplateAttributeLoader extends Loader
 
         $routes = new RouteCollection();
 
-        $templates = TemplateService::getTemplatesAbsolutePath();
+        $templates = TemplateService::getTemplatesAbsolutePathWithParents();
 
-        foreach ($templates as $templatePath) {
-            $templateControllerPath = $templatePath.\DIRECTORY_SEPARATOR.'src';
+        foreach ($templates as $templateChain) {
+            // Furthest ancestor first: a collection added later overrides the routes of the
+            // same name added before it, and it is the template the shop actually runs -
+            // the nearest one - whose controllers must win.
+            foreach (array_reverse($templateChain) as $templatePath) {
+                $templateControllerPath = $templatePath.\DIRECTORY_SEPARATOR.'src';
 
-            if (!is_dir($templateControllerPath)) {
-                continue;
+                if (!is_dir($templateControllerPath)) {
+                    continue;
+                }
+
+                $templateRoutes = $loader->load($templateControllerPath, 'attribute');
+
+                if (!$templateRoutes instanceof RouteCollection) {
+                    continue;
+                }
+
+                $routes->addCollection($templateRoutes);
             }
-
-            $templateRoutes = $loader->load($templateControllerPath, 'attribute');
-
-            if (!$templateRoutes instanceof RouteCollection) {
-                continue;
-            }
-
-            $routes->addCollection($templateRoutes);
         }
 
         foreach ($routes as $route) {
