@@ -1,3 +1,19 @@
+# 3.2.0 (unreleased)
+
+The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules.
+
+## Promotions and sales
+
+- Catalog price rules: a named, dated rule with a priority prices a slice of the catalog - categories with or without their descendants, brands, templates, feature values, attribute values, named products, combined with AND - for everyone or for named customers, by a percentage, an amount per currency or a fixed price per currency. The price replaces the promo price in the loops, on the product page, in the cart, on the order and through the front API, without writing anything into `product_price`; it is stored as dated segments in a table of its own, so an opening or a closing takes effect at the second, and follows the catalog when a product, a category or a price changes. `catalog-price-rule:recompute` catches up whatever a change too large for its request left over. A flash sale converts into turned-off rules. See `docs/catalog-price-rules.md`.
+
+## Breaking changes
+
+- `Thelia\Core\Template\Loop\Product` takes `EffectivePriceCatalog` and `PricingActivityChecker` in place of `ReservedSalePriceCatalog`; `Loop\ProductSaleElements` and `ProductSaleElementsAccessService` take `EffectivePriceCatalog` in place of `ReservedSalePriceCatalog`; `Thelia\Action\Cart` takes `EffectivePriceResolver` and `PricingActivityChecker` in place of `ReservedSalePriceResolver` and `SaleAudienceChecker`. A module instantiating one of them itself has to follow.
+- `Thelia\Api\EventListener\ReservedSalePriceListener` is `EffectivePriceListener`: it now serves the rule price as well as the reserved one.
+- `Thelia\Api\Service\API\ResourceCache` reads `thelia.api.data_access.cache.visitor_dependent_price_prefixes` and asks `PricingActivityChecker`; the former `reserved_sale_sensitive_prefixes` parameter is kept as an alias of the new one.
+- The API persist and remove processors dispatch `Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent` after a write, and the collection provider dispatches `CollectionModelsLoadedEvent` before transforming a page. Nothing listens to them but the core; a module may.
+- The front `ProductSaleElements` resource carries `displayInitialPrice`, null unless a rule or a reserved operation priced the sale element on that read.
+
 # 3.1.0
 
 First minor of the 3.x line. 88 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.

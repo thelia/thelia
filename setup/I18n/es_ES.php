@@ -1146,4 +1146,5 @@ return [
     'French 10% VAT (France only)' => '10% de IVA francés (solo Francia metropolitana)',
     'French 20% VAT  for all European countries (metropolitan only)' => 'IVA francés al 20% para todos los países de Europa (solo países metropolitanos)',
     'French 10% VAT (for metropolitan France only)' => 'IVA francés al 10% (solo para Francia metropolitana)',
+    'Catalog price rules' => 'Reglas de precios del catálogo',
 ];

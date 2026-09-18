@@ -45,6 +45,12 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
             TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT,
             TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,
 
+            TheliaEvents::CATALOG_PRICE_RULE_CREATE,
+            TheliaEvents::CATALOG_PRICE_RULE_UPDATE,
+            TheliaEvents::CATALOG_PRICE_RULE_DELETE,
+            TheliaEvents::CATALOG_PRICE_RULE_TOGGLE_ACTIVITY,
+            TheliaEvents::CATALOG_PRICE_RULE_RECOMPUTE,
+
             TheliaEvents::CATEGORY_CREATE,
             TheliaEvents::CATEGORY_UPDATE,
             TheliaEvents::CATEGORY_DELETE,

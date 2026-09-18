@@ -323,6 +323,7 @@ return [
     'Configuration / Template' => 'Configuration / Template',
     'Configuration checkout consents' => 'Configuration checkout consents',
     'Configuration checkout steps' => 'Configuration checkout steps',
+    'Catalog price rules' => 'Catalog price rules',
     'Configuration order status' => 'Configuration order status',
     'Configuration variables' => 'Configuration variables',
     'Confirm your %store account' => 'Confirm your {{ config("store_name") }} account',

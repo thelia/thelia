@@ -16,7 +16,7 @@ namespace Thelia\Api\Service\API;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Thelia\Domain\Sale\SaleAudienceChecker;
+use Thelia\Domain\Pricing\PricingActivityChecker;
 
 /**
  * Cross-request cache for the data access layer.
@@ -38,7 +38,7 @@ readonly class ResourceCache
 {
     /**
      * @param string[] $allowedPrefixes
-     * @param string[] $reservedSaleSensitivePrefixes
+     * @param string[] $visitorDependentPricePrefixes
      */
     public function __construct(
         #[Autowire(service: 'thelia.cache.data_access')]
@@ -49,9 +49,9 @@ readonly class ResourceCache
         private int $ttl,
         #[Autowire(param: 'thelia.api.data_access.cache.allowed_prefixes')]
         private array $allowedPrefixes,
-        #[Autowire(param: 'thelia.api.data_access.cache.reserved_sale_sensitive_prefixes')]
-        private array $reservedSaleSensitivePrefixes,
-        private SaleAudienceChecker $saleAudienceChecker,
+        #[Autowire(param: 'thelia.api.data_access.cache.visitor_dependent_price_prefixes')]
+        private array $visitorDependentPricePrefixes,
+        private PricingActivityChecker $pricingActivityChecker,
     ) {
     }
 
@@ -100,15 +100,16 @@ readonly class ResourceCache
     /**
      * Whether the answer to this path stopped being the same for everybody.
      *
-     * The operations are only asked about for a path a reserved price can travel
-     * on, and the answer is memoised for the request: a shop with no reserved
-     * operation pays one indexed existence check per request for its whole cache.
+     * The rules and the operations are only asked about for a path a visitor
+     * dependent price can travel on, and the answer is memoised for the request: a
+     * shop with neither pays two indexed existence checks per request for its whole
+     * cache.
      */
     private function answerDependsOnWhoIsAsking(string $path): bool
     {
-        foreach ($this->reservedSaleSensitivePrefixes as $prefix) {
+        foreach ($this->visitorDependentPricePrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
-                return $this->saleAudienceChecker->hasActiveReservedSale();
+                return $this->pricingActivityChecker->hasVisitorDependentPricing();
             }
         }
 

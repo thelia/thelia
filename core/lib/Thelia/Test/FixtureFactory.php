@@ -22,10 +22,15 @@ use Thelia\Model\Address;
 use Thelia\Model\Admin;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
+use Thelia\Model\AttributeCombination;
 use Thelia\Model\Brand;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CartItem;
+use Thelia\Model\CatalogPriceRule;
+use Thelia\Model\CatalogPriceRuleCriterion;
+use Thelia\Model\CatalogPriceRuleCustomer;
+use Thelia\Model\CatalogPriceRuleEffectCurrency;
 use Thelia\Model\Category;
 use Thelia\Model\Content;
 use Thelia\Model\Country;
@@ -38,6 +43,7 @@ use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAv;
+use Thelia\Model\FeatureProduct;
 use Thelia\Model\Folder;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -50,6 +56,7 @@ use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductAssociationTypeQuery;
+use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Profile;
@@ -65,6 +72,7 @@ use Thelia\Model\TagElement;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Model\Template;
 
 /**
  * Creates test entities with sensible defaults.
@@ -957,5 +965,133 @@ final class FixtureFactory
         $link->save($this->connection);
 
         return $link;
+    }
+
+    /**
+     * Files a product in an additional category, the way the back office does when a
+     * product is added to a second category. Product::create() already filed it in
+     * its default one.
+     */
+    public function productCategory(Product $product, Category $category): ProductCategory
+    {
+        $link = new ProductCategory();
+        $link->setProductId($product->getId());
+        $link->setCategoryId($category->getId());
+        $link->setDefaultCategory(false);
+        $link->setPosition($this->next());
+        $link->save($this->connection);
+
+        return $link;
+    }
+
+    /**
+     * Gives a product a feature value, the row a "feature values" criterion reads.
+     */
+    public function featureProduct(Product $product, FeatureAv $featureAv): FeatureProduct
+    {
+        $featureProduct = new FeatureProduct();
+        $featureProduct->setProductId($product->getId());
+        $featureProduct->setFeatureId($featureAv->getFeatureId());
+        $featureProduct->setFeatureAvId($featureAv->getId());
+        $featureProduct->setIsFreeText(false);
+        $featureProduct->setPosition($this->next());
+        $featureProduct->save($this->connection);
+
+        return $featureProduct;
+    }
+
+    /**
+     * Makes a sale element carry an attribute value, the row an "attribute values"
+     * criterion and a flash sale narrowed to an attribute value both read.
+     */
+    public function attributeCombination(ProductSaleElements $productSaleElements, AttributeAv $attributeAv): AttributeCombination
+    {
+        $combination = new AttributeCombination();
+        $combination->setAttributeId($attributeAv->getAttributeId());
+        $combination->setAttributeAvId($attributeAv->getId());
+        $combination->setProductSaleElementsId($productSaleElements->getId());
+        $combination->setPosition($this->next());
+        $combination->save($this->connection);
+
+        return $combination;
+    }
+
+    public function template(array $overrides = []): Template
+    {
+        $n = $this->next();
+
+        $template = new Template();
+        $template->setLocale($overrides['locale'] ?? 'en_US');
+        $template->setName($overrides['name'] ?? 'Template '.$n);
+        $template->save($this->connection);
+
+        return $template;
+    }
+
+    /**
+     * A catalog price rule, turned off and open to everyone unless asked otherwise,
+     * with no criterion: pass the criteria through catalogPriceRuleCriterion(). The
+     * scope and the stored prices are NOT materialized: a test drives the services
+     * that do, or the action events.
+     */
+    public function catalogPriceRule(array $overrides = []): CatalogPriceRule
+    {
+        $n = $this->next();
+
+        $rule = new CatalogPriceRule();
+        $rule->setActive($overrides['active'] ?? false);
+        $rule->setPriority($overrides['priority'] ?? 100);
+        $rule->setStopProcessing($overrides['stopProcessing'] ?? false);
+        $rule->setStartDate(self::wholeSeconds($overrides['startDate'] ?? null));
+        $rule->setEndDate(self::wholeSeconds($overrides['endDate'] ?? null));
+        $rule->setEffectType($overrides['effectType'] ?? CatalogPriceRule::EFFECT_TYPE_PERCENTAGE);
+        $rule->setPercentageValue(isset($overrides['percentageValue']) ? (string) $overrides['percentageValue'] : null);
+        $rule->setAudienceMode($overrides['audienceMode'] ?? CatalogPriceRule::AUDIENCE_MODE_PUBLIC);
+        $rule->setDisplayInitialPrice($overrides['displayInitialPrice'] ?? true);
+        $rule->setIncludeSubcategories($overrides['includeSubcategories'] ?? true);
+        $rule->setLocale($overrides['locale'] ?? 'en_US');
+        $rule->setTitle($overrides['title'] ?? 'Price rule '.$n);
+        $rule->save($this->connection);
+
+        return $rule;
+    }
+
+    public function catalogPriceRuleCriterion(CatalogPriceRule $rule, string $type, int $targetId): CatalogPriceRuleCriterion
+    {
+        $criterion = new CatalogPriceRuleCriterion();
+        $criterion->setCatalogPriceRuleId($rule->getId());
+        $criterion->setType($type);
+        $criterion->setTargetId($targetId);
+        $criterion->save($this->connection);
+
+        return $criterion;
+    }
+
+    /**
+     * Names a customer a reserved rule prices for. Only read when the rule's
+     * audience mode is CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS.
+     */
+    public function catalogPriceRuleCustomer(CatalogPriceRule $rule, Customer $customer): CatalogPriceRuleCustomer
+    {
+        $ruleCustomer = new CatalogPriceRuleCustomer();
+        $ruleCustomer->setCatalogPriceRuleId($rule->getId());
+        $ruleCustomer->setCustomerId($customer->getId());
+        $ruleCustomer->save($this->connection);
+
+        return $ruleCustomer;
+    }
+
+    /**
+     * The amount off or the fixed price of a rule in one currency, tax included.
+     */
+    public function catalogPriceRuleEffectCurrency(CatalogPriceRule $rule, Currency $currency, float $value): CatalogPriceRuleEffectCurrency
+    {
+        $effectCurrency = new CatalogPriceRuleEffectCurrency();
+        $effectCurrency->setCatalogPriceRuleId($rule->getId());
+        $effectCurrency->setCurrencyId($currency->getId());
+        $effectCurrency->setValue((string) $value);
+        $effectCurrency->save($this->connection);
+
+        return $effectCurrency;
     }
 }

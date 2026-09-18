@@ -1524,4 +1524,5 @@ return [
     'tinymce wysiwyg editor' => 'WYSIWYG редактор TinyMCE',
     'Đồng' => 'Донг',
     'Гривна' => 'Гривна',
+    'Catalog price rules' => 'Правила цен каталога',
 ];
