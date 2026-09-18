@@ -72,7 +72,7 @@ then the code — never the `DEFAULT TITLE` placeholder `I18n` forges.
 - `isReachable(Cart, code)` — whether every step before `code` passes.
 
 It never reads the session: the cart is always passed in, so the CLI and the
-front API (#116) consume it the same way the theme does. The one indirect
+front API consume it the same way the theme does. The one indirect
 session read left — the payment step checks the buyer's consents — goes
 through `ConsentAcceptanceReaderInterface`, bound to `ConsentAnswerChain`: the
 answers stated in the request that places the order come first, and the session

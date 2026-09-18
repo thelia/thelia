@@ -943,5 +943,5 @@ return [
     'This order cannot be placed yet.' => 'Cette commande ne peut pas encore être passée.',
     'This order is already being placed. Please wait a moment and try again.' => 'Cette commande est déjà en cours de création. Merci de patienter un instant puis de réessayer.',
     'This order requires an account.' => 'Cette commande nécessite un compte.',
-    'This shop is not asking for the consent "%consent".' => 'Cette boutique ne demande pas le consentement "%consent".',
+    'This shop is not asking for the consent "%consent".' => 'Cette boutique ne demande pas le consentement « %consent ».',
 ];
