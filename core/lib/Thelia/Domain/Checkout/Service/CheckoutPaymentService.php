@@ -21,11 +21,17 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\DTO\OrderPaymentOutcome;
+use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
+use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 
@@ -51,30 +57,69 @@ readonly class CheckoutPaymentService
         int $deliveryModuleId,
         int $paymentModuleId,
     ): ?Response {
+        return $this->payAndReturnOutcome(new OrderPaymentRequest(
+            $cart,
+            $deliveryAddressId,
+            $invoiceAddressId,
+            $deliveryModuleId,
+            $paymentModuleId,
+        ))->paymentResponse;
+    }
+
+    /**
+     * The same placement, with the order it produced handed back next to the answer of
+     * the payment module.
+     *
+     * `pay()` only ever returned the response, because the caller it was written for read
+     * the order back out of the session afterwards. A caller with no session has nowhere
+     * to read it from, so it comes back here — and the two go down the same path, ORDER_PAY,
+     * so there is no second way to place an order to keep in step with the first.
+     *
+     * @throws GuestCheckoutNotAllowedException when the shop stopped allowing this cart to be ordered without an account
+     * @throws CartAlreadyOrderedException      when this very cart was turned into an order by another request
+     * @throws TheliaProcessException           when nothing answered ORDER_PAY with an order
+     * @throws \Exception
+     */
+    public function payAndReturnOutcome(OrderPaymentRequest $request): OrderPaymentOutcome
+    {
+        $cart = $request->cart;
+
         $this->refuseAGuestTheShopNoLongerAllows($cart);
 
         $newOrder = (new Order())
-            ->setDeliveryOrderAddressId($deliveryAddressId)
-            ->setInvoiceOrderAddressId($invoiceAddressId)
-            ->setPaymentModuleId($paymentModuleId)
-            ->setDeliveryModuleId($deliveryModuleId)
+            ->setDeliveryOrderAddressId($request->deliveryAddressId)
+            ->setInvoiceOrderAddressId($request->invoiceAddressId)
+            ->setPaymentModuleId($request->paymentModuleId)
+            ->setDeliveryModuleId($request->deliveryModuleId)
             ->setPostage((string) $cart->getPostage())
             ->setPostageTax($cart->getPostageTax())
             ->setPostageTaxRuleTitle($cart->getPostageTaxRuleTitle())
             ->setCustomerId($cart->getCustomerId())
             ->setCartId($cart->getId());
 
+        if ($request->currency instanceof Currency) {
+            $newOrder->setCurrency($request->currency);
+        }
+
+        if ($request->lang instanceof Lang) {
+            $newOrder->setLang($request->lang);
+        }
+
         $orderEvent = new OrderEvent($newOrder);
 
         $this->dispatcher->dispatch($orderEvent, TheliaEvents::ORDER_PAY);
 
-        $placedOrder = $orderEvent->getPlacedOrder();
-
-        if ((null !== $placedOrder->getId()) && $orderEvent->hasResponse()) {
-            return $orderEvent->getResponse();
+        if (!$orderEvent->hasPlacedOrder()) {
+            throw new TheliaProcessException('Nothing answered the order payment with an order.');
         }
 
-        return null;
+        $placedOrder = $orderEvent->getPlacedOrder();
+
+        $paymentResponse = (null !== $placedOrder->getId()) && $orderEvent->hasResponse()
+            ? $orderEvent->getResponse()
+            : null;
+
+        return new OrderPaymentOutcome($placedOrder, $paymentResponse);
     }
 
     /**

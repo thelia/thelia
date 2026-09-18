@@ -74,9 +74,13 @@ then the code — never the `DEFAULT TITLE` placeholder `I18n` forges.
 It never reads the session: the cart is always passed in, so the CLI and the
 front API (#116) consume it the same way the theme does. The one indirect
 session read left — the payment step checks the buyer's consents — goes
-through `ConsentAcceptanceReaderInterface`, whose default implementation is
-the session store; a sessionless consumer swaps the reader instead of the
-service. Results are memoised per cart *and per state of that cart* for the
+through `ConsentAcceptanceReaderInterface`, bound to `ConsentAnswerChain`: the
+answers stated in the request that places the order come first, and the session
+a buyer ticked their boxes in answers when there are none. A consumer with
+neither swaps the reader instead of the service. The fuller question — what was
+answered, under which wording and when, which `OrderFacade` freezes onto the
+order — is `ConsentAnswerStoreInterface`, bound to the same chain.
+Results are memoised per cart *and per state of that cart* for the
 request — the key carries the cart timestamp and the choices made on it, so a
 saved change invalidates itself; `forget()` remains for what the key cannot see
 (a step row that moved, a consent toggled) and `kernel.reset` for persistent

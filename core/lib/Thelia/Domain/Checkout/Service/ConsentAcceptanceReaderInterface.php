@@ -17,12 +17,12 @@ namespace Thelia\Domain\Checkout\Service;
 /**
  * What the buyer has agreed to, whatever holds the answers.
  *
- * The checkout ships one implementation, ConsentAcceptanceStore, which reads the session
- * — that is where an answer lives while the order is still being placed. The interface
- * exists because the reading is also done outside a browser: the progression is asked
- * whether a cart is ready to pay from the API and from a command line too, and there the
- * answers come from somewhere else. Binding this interface to another service replaces
- * the source everywhere the checkout asks the question, without any caller knowing.
+ * What the checkout is bound to is ConsentAnswerChain, which asks the two sources the
+ * core ships in the one order that lets them work side by side: the answers stated in
+ * the request that places the order, then the session a buyer walking the screens of a
+ * theme ticked their boxes in. The interface exists because neither has to be the
+ * source: binding it to another service replaces them everywhere the checkout asks the
+ * question, without any caller knowing, and all it has to answer is this one method.
  */
 interface ConsentAcceptanceReaderInterface
 {
