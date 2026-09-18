@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Exception;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 
 /**
@@ -43,6 +44,9 @@ final class StockShortageException extends TheliaProcessException
 
     public static function messageFor(?string $productReference): string
     {
-        return \sprintf('Not enough stock for product %s', $productReference ?? '');
+        return Translator::getInstance()->trans(
+            'Not enough stock for product %ref',
+            ['%ref' => $productReference ?? ''],
+        );
     }
 }
