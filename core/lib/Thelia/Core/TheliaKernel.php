@@ -77,6 +77,7 @@ use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Core\Template\TemplateService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
@@ -180,11 +181,14 @@ class TheliaKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
+        $frontTemplate = $this->propelConnectionAvailable
+            ? (string) ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default')
+            : 'default';
+
+        $container->parameters()->set('thelia_front_template', $frontTemplate);
         $container->parameters()->set(
-            'thelia_front_template',
-            $this->propelConnectionAvailable
-                ? ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default')
-                : 'default',
+            'thelia_front_template_components_dir',
+            self::getFrontTemplateComponentsDir($frontTemplate),
         );
         $container->parameters()->set(
             'thelia_admin_template',
@@ -203,6 +207,31 @@ class TheliaKernel extends Kernel
         $container->import(__DIR__.'/../Config/Resources/services/integrations/*.php');
         $container->import(__DIR__.'/../Config/Resources/services/providers/*.php');
         $container->import(__DIR__.'/../Config/Resources/services/utilities/*.php');
+    }
+
+    /**
+     * Where the anonymous Twig components of the front office are read from, relative to the
+     * templates directory.
+     *
+     * A template that inherits from another one ships only what it overrides, so the answer is
+     * the nearest template of the chain that ships components at all - not the active template,
+     * which may ship none.
+     */
+    private static function getFrontTemplateComponentsDir(string $frontTemplate): string
+    {
+        $templateChain = TemplateService::getTemplateChainAbsolutePath(
+            TemplateDefinition::FRONT_OFFICE_SUBDIR,
+            $frontTemplate,
+        );
+
+        foreach ($templateChain as $templateDirectory) {
+            if (is_dir($templateDirectory.DS.'components')) {
+                $frontTemplate = basename($templateDirectory);
+                break;
+            }
+        }
+
+        return TemplateDefinition::FRONT_OFFICE_SUBDIR.'/'.$frontTemplate.'/components/';
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
