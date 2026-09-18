@@ -29,6 +29,8 @@ use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Model\Brand;
+use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
@@ -150,9 +152,10 @@ readonly class FilterService
      * The facets of the browsed set. A filter that is part of the selection reads its facet
      * from the set narrowed by every other filter but itself, so a checked value keeps its
      * siblings on offer (checking one brand must not hide the other brands); a filter that is
-     * not selected reads it from the fully narrowed set. The category filter is the browsing
-     * scope, never relaxed. A collection restricted to a set of ids (`id[]=…`, the products a
-     * search engine ranked) gets its facets from that set, category or not.
+     * not selected reads it from the fully narrowed set. The browsing scope of the listing — its
+     * category, or its brand — is never relaxed nor offered. A collection restricted to a set of
+     * ids (`id[]=…`, the products a search engine ranked) gets its facets from that set, category
+     * or not.
      */
     public function getFilters(array $context, string $resource): array
     {
@@ -169,19 +172,27 @@ readonly class FilterService
             $visible = $request->query->get('visible');
             $scopeIds = $request->query->all('id');
             $categoryDepth = (int) $request->query->get(CategoryFilter::CATEGORY_DEPTH_NAME);
+            $scope = $request->query->all('scope');
         } else {
             $tfilters = $context['filters']['tfilters'] ?? [];
             $visible = $context['filters']['visible'] ?? null;
             $scopeIds = $context['filters']['id'] ?? [];
             $categoryDepth = (int) ($context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null);
+            $scope = $context['filters']['scope'] ?? [];
         }
 
         $scopeIds = $this->scopeIds($scopeIds);
         $browsesCategory = $this->hasFilter(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
+        $browsedBrandId = $this->browsedBrandId(
+            scope: (array) $scope,
+            tfilters: $tfilters,
+            browsesCategory: $browsesCategory,
+            scopeIds: $scopeIds,
+        );
 
-        // Without a browsed category nor an explicit set of ids the facets would describe the
-        // whole catalogue, which no listing shows.
-        if (!$browsesCategory && $scopeIds === null) {
+        // Without a browsed category, a browsed brand nor an explicit set of ids the facets would
+        // describe the whole catalogue, which no listing shows.
+        if (!$browsesCategory && $browsedBrandId === null && $scopeIds === null) {
             return [];
         }
 
@@ -198,10 +209,18 @@ readonly class FilterService
 
         $narrowedIds = $resolveIds($tfilters);
         $narrowedQuery = null;
-        $choiceFilters = $this->choiceFiltersOfBrowsedCategory($tfilters);
+        $choiceFilters = $browsedBrandId === null
+            ? $this->choiceFiltersOfBrowsedCategory($tfilters)
+            : $this->choiceFiltersOfBrowsedBrand($browsedBrandId);
         $filterObjects = [];
 
         foreach ($this->getAvailableFilters($resource) as $filter) {
+            // The whole listing is that brand's: the facet would offer a single value keeping
+            // every product, and unchecking it would leave the page it belongs to.
+            if ($browsedBrandId !== null && $filter instanceof BrandFilter) {
+                continue;
+            }
+
             if ($filter instanceof TheliaAggregatedFilterInterface) {
                 $values = $this->aggregatedFacet(
                     filter: $filter,
@@ -377,6 +396,67 @@ readonly class FilterService
         }
 
         return array_map('array_values', array_values($groups));
+    }
+
+    /**
+     * The brand a listing is the page of, when it is one. A page says so itself, with
+     * `scope[brand]`: its brand is not something the visitor checked, so nothing he checks
+     * relaxes it — a category ticked on a brand page leaves it the page of that brand.
+     *
+     * Read from the selection alone, `category=3 & brand=2` is the same string for a category
+     * page with a brand checked and for a brand page with a category checked, and the two want
+     * opposite facet columns. So a caller that declares no scope only gets the reading of
+     * before: a single brand, outside any category and any ranked set of ids, is the one
+     * listing such a selection can describe.
+     *
+     * @param array<string, mixed> $scope
+     * @param array<string, mixed> $tfilters
+     * @param array<int>|null      $scopeIds
+     */
+    private function browsedBrandId(array $scope, array $tfilters, bool $browsesCategory, ?array $scopeIds): ?int
+    {
+        $brandId = $scope['brand'] ?? null;
+
+        if ($brandId === null && !$browsesCategory && $scopeIds === null) {
+            $brandId = $this->retrieveFilterValue(theliaFilterNames: BrandFilter::getFilterName(), tfilters: $tfilters);
+        }
+
+        while (\is_array($brandId) && \count($brandId) === 1) {
+            $brandId = reset($brandId);
+        }
+
+        if (!is_numeric($brandId)) {
+            return null;
+        }
+
+        return (int) $brandId > 0 ? (int) $brandId : null;
+    }
+
+    /**
+     * The choice_filter rows that rule a browsed brand. Thelia configures filters per category,
+     * never per brand, so the page of a brand borrows the columns of the categories where its
+     * visible products are filed, deduplicated by the feature or the attribute each row rules.
+     *
+     * @return array{rows: array<ChoiceFilter>, template_id: int|null}|null null when nothing rules them
+     */
+    private function choiceFiltersOfBrowsedBrand(int $brandId): ?array
+    {
+        $brand = BrandQuery::create()->findPk(key: $brandId);
+
+        if (!$brand instanceof Brand) {
+            return null;
+        }
+
+        $templateId = null;
+        // The rows of the brand's categories come back resolved, template fallback included:
+        // unlike the category reading below, there is nothing left to go and fetch.
+        $rows = ChoiceFilterQuery::findChoiceFilterByBrand(brand: $brand, templateId: $templateId);
+
+        if ($rows === [] && $templateId === null) {
+            return null;
+        }
+
+        return ['rows' => $rows, 'template_id' => $templateId];
     }
 
     /**

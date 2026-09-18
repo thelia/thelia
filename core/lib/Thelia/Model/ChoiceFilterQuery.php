@@ -197,4 +197,287 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
         return new ObjectCollection();
     }
+
+    /**
+     * The filter column of a brand. Thelia configures filters per category, never per brand, so
+     * the page of a brand borrows the columns of the categories where at least one of its
+     * visible products is filed — each read the way that category's own page reads it, parent
+     * template included — then deduplicated by what a row rules: a feature, an attribute, or
+     * another criterion.
+     *
+     * Two categories can rule the same feature differently. The row kept is the visible one with
+     * the lowest position: a brand page offers a filter as soon as one of its categories offers
+     * it, and hides it only when none of them shows it.
+     *
+     * Every category is read in the same handful of queries rather than one after the other:
+     * asking category by category cost three queries per category, on every render of the
+     * column, for a page whose whole point is to gather many of them.
+     *
+     * @return array<ChoiceFilter>
+     */
+    public static function findChoiceFilterByBrand(Brand $brand, ?int &$templateId = null): array
+    {
+        $categoryIds = ProductCategoryQuery::create()
+            ->useProductQuery()
+                ->filterByBrandId($brand->getId())
+                ->filterByVisible(1)
+            ->endUse()
+            ->select('CategoryId')
+            ->distinct()
+            ->find()
+            ->getData();
+
+        if ([] === $categoryIds) {
+            return [];
+        }
+
+        $categories = CategoryQuery::create()
+            ->filterById($categoryIds, Criteria::IN)
+            ->orderById()
+            ->find()
+            ->getData();
+
+        if ([] === $categories) {
+            return [];
+        }
+
+        $ancestors = self::nearestCategoriesHavingTemplate($categories);
+        $read = array_merge($categories, array_values($ancestors));
+        $rowsByCategory = self::choiceFiltersByCategory($read);
+        $rowsByTemplate = self::choiceFiltersByTemplate($read);
+
+        $choiceFilters = [];
+
+        foreach ($categories as $category) {
+            [$categoryChoiceFilters, $categoryTemplateId] = self::choiceFiltersOfCategory(
+                category: $category,
+                ancestor: $ancestors[(int) $category->getId()] ?? null,
+                rowsByCategory: $rowsByCategory,
+                rowsByTemplate: $rowsByTemplate,
+            );
+
+            $templateId ??= $categoryTemplateId;
+
+            foreach ($categoryChoiceFilters as $choiceFilter) {
+                $criterion = self::ruledCriterion($choiceFilter);
+                $choiceFilters[$criterion] = self::preferredChoiceFilter($choiceFilters[$criterion] ?? null, $choiceFilter);
+            }
+        }
+
+        $choiceFilters = array_values($choiceFilters);
+
+        usort(
+            $choiceFilters,
+            static fn (ChoiceFilter $left, ChoiceFilter $right): int => (int) $left->getPosition() <=> (int) $right->getPosition(),
+        );
+
+        return $choiceFilters;
+    }
+
+    /**
+     * What one category brings to the column, read from rows already in hand and in the order
+     * {@see self::findChoiceFilterByCategory()} reads them: its own rows when it or its nearest
+     * ancestor carrying a template gives them one, else the rows of that ancestor, else the rows
+     * of the template itself.
+     *
+     * @param array<int, array<ChoiceFilter>> $rowsByCategory
+     * @param array<int, array<ChoiceFilter>> $rowsByTemplate
+     *
+     * @return array{0: array<ChoiceFilter>, 1: int|null}
+     */
+    private static function choiceFiltersOfCategory(
+        Category $category,
+        ?Category $ancestor,
+        array $rowsByCategory,
+        array $rowsByTemplate,
+    ): array {
+        $categoryTemplateId = $category->getDefaultTemplateId();
+        $ancestorTemplateId = $ancestor?->getDefaultTemplateId();
+        $own = $rowsByCategory[(int) $category->getId()] ?? [];
+
+        if ([] !== $own) {
+            if (null !== $categoryTemplateId) {
+                return [$own, (int) $categoryTemplateId];
+            }
+
+            if (null !== $ancestorTemplateId) {
+                return [$own, (int) $ancestorTemplateId];
+            }
+        }
+
+        if ($ancestor instanceof Category && null !== $ancestorTemplateId) {
+            $ancestorRows = $rowsByCategory[(int) $ancestor->getId()] ?? [];
+
+            if ([] !== $ancestorRows) {
+                return [$ancestorRows, (int) $ancestorTemplateId];
+            }
+        }
+
+        if (null !== $categoryTemplateId) {
+            return [$rowsByTemplate[(int) $categoryTemplateId] ?? [], (int) $categoryTemplateId];
+        }
+
+        if (null !== $ancestorTemplateId) {
+            $templateRows = $rowsByTemplate[(int) $ancestorTemplateId] ?? [];
+
+            if ([] !== $templateRows) {
+                return [$templateRows, (int) $ancestorTemplateId];
+            }
+        }
+
+        return [[], null];
+    }
+
+    /**
+     * The nearest ancestor carrying a default template, for every category at once: one query
+     * per level of the tree, where climbing category by category costs one per category and
+     * per level.
+     *
+     * @param array<Category> $categories
+     *
+     * @return array<int, Category> category id => that ancestor
+     */
+    private static function nearestCategoriesHavingTemplate(array $categories): array
+    {
+        $found = [];
+        $climbing = [];
+        $seen = [];
+
+        foreach ($categories as $category) {
+            $parentId = (int) $category->getParent();
+
+            if (0 !== $parentId) {
+                $climbing[(int) $category->getId()] = $parentId;
+                $seen[(int) $category->getId()] = [$parentId => true];
+            }
+        }
+
+        while ([] !== $climbing) {
+            $parentsById = [];
+
+            foreach (CategoryQuery::create()->filterById(array_values(array_unique($climbing)), Criteria::IN)->find() as $parent) {
+                $parentsById[(int) $parent->getId()] = $parent;
+            }
+
+            $next = [];
+
+            foreach ($climbing as $categoryId => $parentId) {
+                $parent = $parentsById[$parentId] ?? null;
+
+                if (null === $parent) {
+                    continue;
+                }
+
+                if (null !== $parent->getDefaultTemplateId()) {
+                    $found[$categoryId] = $parent;
+                    continue;
+                }
+
+                $grandParentId = (int) $parent->getParent();
+
+                // A tree whose branch loops back on itself would climb forever.
+                if (0 === $grandParentId || isset($seen[$categoryId][$grandParentId])) {
+                    continue;
+                }
+
+                $seen[$categoryId][$grandParentId] = true;
+                $next[$categoryId] = $grandParentId;
+            }
+
+            $climbing = $next;
+        }
+
+        return $found;
+    }
+
+    /**
+     * @param array<Category> $categories
+     *
+     * @return array<int, array<ChoiceFilter>> category id => the rows it rules itself, by position
+     */
+    private static function choiceFiltersByCategory(array $categories): array
+    {
+        $categoryIds = self::identifiersOf($categories);
+
+        if ([] === $categoryIds) {
+            return [];
+        }
+
+        $rows = [];
+
+        foreach (self::create()->filterByCategoryId($categoryIds, Criteria::IN)->orderByPosition()->find() as $choiceFilter) {
+            $rows[(int) $choiceFilter->getCategoryId()][] = $choiceFilter;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<Category> $categories
+     *
+     * @return array<int, array<ChoiceFilter>> template id => every row it rules, by position
+     */
+    private static function choiceFiltersByTemplate(array $categories): array
+    {
+        $templateIds = [];
+
+        foreach ($categories as $category) {
+            if (null !== $category->getDefaultTemplateId()) {
+                $templateIds[] = (int) $category->getDefaultTemplateId();
+            }
+        }
+
+        $templateIds = array_values(array_unique($templateIds));
+
+        if ([] === $templateIds) {
+            return [];
+        }
+
+        $rows = [];
+
+        foreach (self::create()->filterByTemplateId($templateIds, Criteria::IN)->orderByPosition()->find() as $choiceFilter) {
+            $rows[(int) $choiceFilter->getTemplateId()][] = $choiceFilter;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<Category> $categories
+     *
+     * @return array<int>
+     */
+    private static function identifiersOf(array $categories): array
+    {
+        return array_values(array_unique(array_map(
+            static fn (Category $category): int => (int) $category->getId(),
+            $categories,
+        )));
+    }
+
+    /**
+     * What a row rules, as a key two rows of two categories can be compared on.
+     */
+    private static function ruledCriterion(ChoiceFilter $choiceFilter): string
+    {
+        return match (true) {
+            null !== $choiceFilter->getFeatureId() => 'feature-'.$choiceFilter->getFeatureId(),
+            null !== $choiceFilter->getAttributeId() => 'attribute-'.$choiceFilter->getAttributeId(),
+            null !== $choiceFilter->getOtherId() => 'other-'.$choiceFilter->getOtherId(),
+            default => 'row-'.$choiceFilter->getId(),
+        };
+    }
+
+    private static function preferredChoiceFilter(?ChoiceFilter $kept, ChoiceFilter $candidate): ChoiceFilter
+    {
+        if (!$kept instanceof ChoiceFilter) {
+            return $candidate;
+        }
+
+        if ((bool) $kept->isVisible() !== (bool) $candidate->isVisible()) {
+            return $candidate->isVisible() ? $candidate : $kept;
+        }
+
+        return (int) $candidate->getPosition() < (int) $kept->getPosition() ? $candidate : $kept;
+    }
 }
