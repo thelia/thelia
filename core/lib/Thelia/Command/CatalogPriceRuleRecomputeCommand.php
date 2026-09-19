@@ -87,6 +87,9 @@ class CatalogPriceRuleRecomputeCommand extends ContainerAwareCommand
                 }
 
                 $written = $this->writer->recomputeAll();
+                // recomputeAll() has just written the prices of every rule, including
+                // the ones repriceRule() deferred: none of them still owes a recompute.
+                $this->repricer->markAllComputed();
                 $output->writeln(\sprintf('<info>%d rule(s) rematerialized, %d price segment(s) written</info>', $count, $written));
             } else {
                 $count = $this->repricer->repriceDirtyRules();

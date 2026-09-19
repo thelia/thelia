@@ -144,6 +144,16 @@ class RuleRepricer
     }
 
     /**
+     * Clears the recompute mark of every rule: what a full run owes once it has
+     * written the prices of all of them itself.
+     */
+    public function markAllComputed(): void
+    {
+        Propel::getWriteConnection(CatalogPriceRuleTableMap::DATABASE_NAME)
+            ->exec('UPDATE catalog_price_rule SET dirty = 0, computed_at = NOW()');
+    }
+
+    /**
      * The rules still owing a recompute, repriced in full; what the command runs.
      *
      * @return int the number of rules brought up to date
