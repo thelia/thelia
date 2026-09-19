@@ -241,8 +241,8 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
             return [];
         }
 
-        $ancestors = self::nearestCategoriesHavingTemplate($categories);
-        $read = array_merge($categories, array_values($ancestors));
+        $ancestors = self::ancestorsHavingTemplate($categories);
+        $read = array_merge($categories, ...array_values($ancestors));
         $rowsByCategory = self::choiceFiltersByCategory($read);
         $rowsByTemplate = self::choiceFiltersByTemplate($read);
 
@@ -251,7 +251,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
         foreach ($categories as $category) {
             [$categoryChoiceFilters, $categoryTemplateId] = self::choiceFiltersOfCategory(
                 category: $category,
-                ancestor: $ancestors[(int) $category->getId()] ?? null,
+                ancestors: $ancestors[(int) $category->getId()] ?? [],
                 rowsByCategory: $rowsByCategory,
                 rowsByTemplate: $rowsByTemplate,
             );
@@ -276,10 +276,12 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
 
     /**
      * What one category brings to the column, read from rows already in hand and in the order
-     * {@see self::findChoiceFilterByCategory()} reads them: its own rows when it or its nearest
-     * ancestor carrying a template gives them one, else the rows of that ancestor, else the rows
-     * of the template itself.
+     * {@see self::findChoiceFilterByCategory()} reads them: its own rows when it or an ancestor
+     * carrying a template gives them one, else the own rows of the nearest ancestor that has
+     * some, else the rows of its template, else the rows of the nearest ancestor's template
+     * that has some.
      *
+     * @param array<Category>                 $ancestors      the ancestors carrying a template, nearest first
      * @param array<int, array<ChoiceFilter>> $rowsByCategory
      * @param array<int, array<ChoiceFilter>> $rowsByTemplate
      *
@@ -287,12 +289,11 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
      */
     private static function choiceFiltersOfCategory(
         Category $category,
-        ?Category $ancestor,
+        array $ancestors,
         array $rowsByCategory,
         array $rowsByTemplate,
     ): array {
         $categoryTemplateId = $category->getDefaultTemplateId();
-        $ancestorTemplateId = $ancestor?->getDefaultTemplateId();
         $own = $rowsByCategory[(int) $category->getId()] ?? [];
 
         if ([] !== $own) {
@@ -300,16 +301,18 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 return [$own, (int) $categoryTemplateId];
             }
 
-            if (null !== $ancestorTemplateId) {
-                return [$own, (int) $ancestorTemplateId];
+            foreach ($ancestors as $ancestor) {
+                if (null !== $ancestor->getDefaultTemplateId()) {
+                    return [$own, (int) $ancestor->getDefaultTemplateId()];
+                }
             }
         }
 
-        if ($ancestor instanceof Category && null !== $ancestorTemplateId) {
+        foreach ($ancestors as $ancestor) {
             $ancestorRows = $rowsByCategory[(int) $ancestor->getId()] ?? [];
 
             if ([] !== $ancestorRows) {
-                return [$ancestorRows, (int) $ancestorTemplateId];
+                return [$ancestorRows, (int) $ancestor->getDefaultTemplateId()];
             }
         }
 
@@ -317,11 +320,11 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
             return [$rowsByTemplate[(int) $categoryTemplateId] ?? [], (int) $categoryTemplateId];
         }
 
-        if (null !== $ancestorTemplateId) {
-            $templateRows = $rowsByTemplate[(int) $ancestorTemplateId] ?? [];
+        foreach ($ancestors as $ancestor) {
+            $templateRows = $rowsByTemplate[(int) $ancestor->getDefaultTemplateId()] ?? [];
 
             if ([] !== $templateRows) {
-                return [$templateRows, (int) $ancestorTemplateId];
+                return [$templateRows, (int) $ancestor->getDefaultTemplateId()];
             }
         }
 
@@ -329,15 +332,17 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
     }
 
     /**
-     * The nearest ancestor carrying a default template, for every category at once: one query
-     * per level of the tree, where climbing category by category costs one per category and
-     * per level.
+     * Every ancestor carrying a default template, nearest first, for every category at once:
+     * one query per level of the tree, where climbing category by category costs one per
+     * category and per level. The climb goes on past the first match, the way
+     * {@see self::getParentCategoriesHasTemplate()} does for a single category: a nearer
+     * ancestor may carry a template and still rule no row, while a further one does.
      *
      * @param array<Category> $categories
      *
-     * @return array<int, Category> category id => that ancestor
+     * @return array<int, array<Category>> category id => its ancestors carrying a template, nearest first
      */
-    private static function nearestCategoriesHavingTemplate(array $categories): array
+    private static function ancestorsHavingTemplate(array $categories): array
     {
         $found = [];
         $climbing = [];
@@ -369,8 +374,7 @@ class ChoiceFilterQuery extends BaseChoiceFilterQuery
                 }
 
                 if (null !== $parent->getDefaultTemplateId()) {
-                    $found[$categoryId] = $parent;
-                    continue;
+                    $found[$categoryId][] = $parent;
                 }
 
                 $grandParentId = (int) $parent->getParent();

@@ -19,6 +19,8 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\AttributeCombination;
+use Thelia\Model\ChoiceFilter;
+use Thelia\Model\ChoiceFilterQuery;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -170,6 +172,68 @@ final class FacetSelectionTest extends IntegrationTestCase
             ['path_info' => '/api/front/products', 'filters' => ['tfilters' => [], 'locale' => 'en_US']],
             'products',
         ));
+    }
+
+    /**
+     * The column of a brand borrows the column of each category where one of its visible
+     * products is filed, read the way that category's own page reads it: when the nearest
+     * ancestor carrying a template rules no row of its own, the climb goes on to the next one.
+     */
+    public function testABrandFiledUnderATemplateAncestorWithoutRowsStillGetsTheFurtherAncestorsColumn(): void
+    {
+        $connection = $this->getPropelConnection();
+        $factory = $this->createFixtureFactory();
+
+        $templateFar = new Template();
+        $templateFar->setLocale('en_US');
+        $templateFar->setName('Far template');
+        $templateFar->save($connection);
+
+        $templateNear = new Template();
+        $templateNear->setLocale('en_US');
+        $templateNear->setName('Near template');
+        $templateNear->save($connection);
+
+        // Far ancestor: carries a template AND its own choice_filter row.
+        $far = $factory->category(['parent' => 0]);
+        $far->setDefaultTemplateId($templateFar->getId())->save($connection);
+
+        $colour = $factory->feature(['title' => 'Colour']);
+
+        $choiceFilter = new ChoiceFilter();
+        $choiceFilter->setCategoryId($far->getId());
+        $choiceFilter->setTemplateId($templateFar->getId());
+        $choiceFilter->setFeatureId($colour->getId());
+        $choiceFilter->setPosition(1);
+        $choiceFilter->setVisible(true);
+        $choiceFilter->setType('checkbox');
+        $choiceFilter->save($connection);
+
+        // Near ancestor: carries a template too (so it is the NEAREST one), but no own row.
+        $near = $factory->category(['parent' => $far->getId()]);
+        $near->setDefaultTemplateId($templateNear->getId())->save($connection);
+
+        // Leaf category: no template, no own row. This is where the brand's product is filed.
+        $leaf = $factory->category(['parent' => $near->getId()]);
+
+        $taxRule = $factory->taxRule();
+        $currency = $factory->currency();
+        $brand = $factory->brand(['title' => 'Ancestor chain brand']);
+
+        $product = $factory->product($leaf, $taxRule, $currency, ['ref' => 'BRAND-ANCESTOR-CHAIN', 'visible' => 1]);
+        $product->setBrandId($brand->getId())->save($connection);
+
+        $brandRows = ChoiceFilterQuery::findChoiceFilterByBrand($brand);
+        $brandFeatureIds = array_map(
+            static fn (ChoiceFilter $row): ?int => $row->getFeatureId() !== null ? (int) $row->getFeatureId() : null,
+            $brandRows,
+        );
+
+        self::assertContains(
+            (int) $colour->getId(),
+            $brandFeatureIds,
+            'A brand whose only visible product is filed in a category should offer the same choice_filter column as that category\'s own page, even when the nearest template-carrying ancestor has no own row and a further one does.',
+        );
     }
 
     /**
