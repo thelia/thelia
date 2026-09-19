@@ -37,6 +37,14 @@ use Thelia\Model\CatalogPriceRuleQuery;
 )]
 class CatalogPriceRuleRecomputeCommand extends ContainerAwareCommand
 {
+    public function __construct(
+        private readonly RuleRepricer $repricer,
+        private readonly PublicPriceSegmentWriter $writer,
+        private readonly ResourceCache $resourceCache,
+    ) {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -48,11 +56,8 @@ class CatalogPriceRuleRecomputeCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $repricer = $this->getContainer()->get(RuleRepricer::class);
-        $writer = $this->getContainer()->get(PublicPriceSegmentWriter::class);
-
         try {
-            $purged = $writer->purgeExpired();
+            $purged = $this->writer->purgeExpired();
             $output->writeln(\sprintf('<info>%d expired price segment(s) purged</info>', $purged));
 
             if ($input->getOption('purge-only')) {
@@ -68,28 +73,28 @@ class CatalogPriceRuleRecomputeCommand extends ContainerAwareCommand
                     return 1;
                 }
 
-                $repricer->repriceRule($rule);
+                $this->repricer->repriceRule($rule);
                 $output->writeln(\sprintf('<info>Rule %d recomputed</info>', $rule->getId()));
             } elseif (null !== $productId = $input->getOption('product')) {
-                $repricer->afterProductChanged((int) $productId);
+                $this->repricer->afterProductChanged((int) $productId);
                 $output->writeln(\sprintf('<info>Product %d re-evaluated</info>', (int) $productId));
             } elseif ($input->getOption('full')) {
                 $count = 0;
 
                 foreach (CatalogPriceRuleQuery::create()->find() as $rule) {
-                    $repricer->repriceRule($rule);
+                    $this->repricer->repriceRule($rule);
                     ++$count;
                 }
 
-                $written = $writer->recomputeAll();
+                $written = $this->writer->recomputeAll();
                 $output->writeln(\sprintf('<info>%d rule(s) rematerialized, %d price segment(s) written</info>', $count, $written));
             } else {
-                $count = $repricer->repriceDirtyRules();
+                $count = $this->repricer->repriceDirtyRules();
                 $output->writeln(\sprintf('<info>%d dirty rule(s) recomputed</info>', $count));
             }
 
             // The shared data access cache may hold prices this run just changed.
-            $this->getContainer()->get(ResourceCache::class)->clear();
+            $this->resourceCache->clear();
         } catch (\Exception $exception) {
             $output->writeln(\sprintf('<error>Error : %s</error>', $exception->getMessage()));
 
