@@ -252,6 +252,127 @@ final class FacetSelectionTest extends IntegrationTestCase
     }
 
     /**
+     * A brand is not filed anywhere: its column is borrowed from the categories where its visible
+     * products are. Two categories, two columns, and the brand gets their union - with one row per
+     * criterion ruled, not one per category, otherwise the same feature would be offered twice.
+     */
+    public function testABrandBorrowsTheUnionOfItsCategoriesColumnsWithoutRulingACriterionTwice(): void
+    {
+        $connection = $this->getPropelConnection();
+        $factory = $this->createFixtureFactory();
+
+        $template = new Template();
+        $template->setLocale('en_US');
+        $template->setName('Two column template');
+        $template->save($connection);
+
+        $colour = $factory->feature(['title' => 'Union colour']);
+        $weight = $factory->feature(['title' => 'Union weight']);
+
+        // Both categories rule Colour - the shared criterion the union must not duplicate - and
+        // only the second one rules Weight.
+        $left = $this->categoryRuling($template, [$colour], 'left');
+        $right = $this->categoryRuling($template, [$colour, $weight], 'right');
+
+        $taxRule = $factory->taxRule();
+        $currency = $factory->currency();
+        $brand = $factory->brand(['title' => 'Union brand']);
+
+        foreach ([[$left, 'UNION-LEFT'], [$right, 'UNION-RIGHT']] as [$category, $reference]) {
+            $product = $factory->product($category, $taxRule, $currency, ['ref' => $reference, 'visible' => 1]);
+            $product->setBrandId($brand->getId())->save($connection);
+        }
+
+        $ruled = array_map(
+            static fn (ChoiceFilter $row): ?int => $row->getFeatureId() !== null ? (int) $row->getFeatureId() : null,
+            ChoiceFilterQuery::findChoiceFilterByBrand($brand),
+        );
+
+        self::assertContains((int) $colour->getId(), $ruled, 'The column shared by both categories must be offered.');
+        self::assertContains((int) $weight->getId(), $ruled, 'The column of the second category alone must be offered too.');
+        self::assertSame(
+            1,
+            \count(array_keys($ruled, (int) $colour->getId(), true)),
+            'A criterion ruled by both categories must be offered once, not once per category.',
+        );
+    }
+
+    /**
+     * The values of a brand page are counted on the products a visitor can actually reach. A value
+     * carried by a hidden product alone would send that visitor to an empty listing, so it is not
+     * offered at all - the count would be zero and the row pointless.
+     */
+    public function testAValueCarriedOnlyByAHiddenProductOfTheBrandIsNotOffered(): void
+    {
+        $connection = $this->getPropelConnection();
+        $factory = $this->createFixtureFactory();
+
+        $hidden = $factory->product(
+            \Thelia\Model\CategoryQuery::create()->findPk($this->categoryId),
+            $factory->taxRule(),
+            $factory->currency(),
+            ['ref' => 'ACME-HIDDEN-GREEN', 'visible' => 0],
+        );
+        $hidden->setBrandId($this->ids['acme'])->save($connection);
+
+        $green = $factory->featureAv(
+            \Thelia\Model\FeatureQuery::create()->findPk($this->ids['colour']),
+            ['title' => 'Hidden green'],
+        );
+
+        $featureProduct = new FeatureProduct();
+        $featureProduct->setProductId($hidden->getId());
+        $featureProduct->setFeatureId($this->ids['colour']);
+        $featureProduct->setFeatureAvId($green->getId());
+        $featureProduct->save($connection);
+
+        // `visible` is what the theme sends when it reads the facets of a listing
+        // (templates/frontOffice/flexy/components/Layouts/ProductListing/Base.php): the facets are
+        // read from the products the visitor can reach, never from the whole catalogue.
+        $facets = $this->filterService->getFilters(
+            [
+                'path_info' => '/api/front/products',
+                'filters' => [
+                    'tfilters' => [],
+                    'scope' => ['brand' => $this->ids['acme']],
+                    'visible' => true,
+                    'locale' => 'en_US',
+                ],
+            ],
+            'products',
+        );
+
+        $counts = $this->counts($facets, 'feature', $this->ids['colour']);
+
+        self::assertArrayNotHasKey('Hidden green', $counts, 'A value held only by a hidden product must not be offered.');
+        self::assertSame(['Blue' => 1, 'Red' => 1], $counts);
+        self::assertNotContains(0, $counts, 'No offered value may announce an empty listing.');
+    }
+
+    /**
+     * A category carrying `$template` and one choice_filter row per given feature.
+     */
+    private function categoryRuling(Template $template, array $features, string $tag): \Thelia\Model\Category
+    {
+        $connection = $this->getPropelConnection();
+        $category = $this->createFixtureFactory()->category(['title' => 'Union '.$tag]);
+        $category->setDefaultTemplateId($template->getId())->save($connection);
+
+        foreach ($features as $position => $feature) {
+            $row = new ChoiceFilter();
+            $row->setCategoryId($category->getId());
+            $row->setTemplateId($template->getId());
+            $row->setFeatureId($feature->getId());
+            $row->setPosition($position + 1);
+            $row->setVisible(true);
+            $row->setType('checkbox');
+            $row->save($connection);
+        }
+
+        return $category;
+    }
+
+    /**
      * @return array<Filter>
      */
     private function facets(array $tfilters): array
