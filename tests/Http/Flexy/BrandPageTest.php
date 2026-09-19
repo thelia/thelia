@@ -62,6 +62,27 @@ final class BrandPageTest extends WebIntegrationTestCase
     }
 
     /**
+     * A brand page now offers the facets of the categories its products are filed in, so the
+     * panel behind the mobile trigger holds filters on top of the sort: the trigger must say so,
+     * exactly as a category page does. Pinned here because the wording is the only thing that
+     * tells a visitor below lg that the page can be narrowed at all.
+     */
+    public function testTheMobileTriggerOfABrandPageOffersToFilterAndNotOnlyToSort(): void
+    {
+        $this->brandWithAProduct();
+
+        $this->assertPageRenders('/'.self::BRAND_URL);
+
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertMatchesRegularExpression(
+            '/Filter (&|&amp;) Sort/',
+            $content,
+            'The mobile panel trigger of a brand page must offer to filter, not only to sort.',
+        );
+    }
+
+    /**
      * A brand with nothing to show is still a page: the merchant published it, and the listing
      * says it is empty instead of answering an error.
      */
