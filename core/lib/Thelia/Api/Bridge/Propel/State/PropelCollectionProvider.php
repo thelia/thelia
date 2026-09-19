@@ -20,6 +20,8 @@ use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Bridge\Propel\Event\CollectionModelsLoadedEvent;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\PropelRelationPreloader;
@@ -36,6 +38,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
         private PropelRelationPreloader $propelRelationPreloader,
         private PublicUrlPreloader $publicUrlPreloader,
         private iterable $propelCollectionExtensions = [],
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -83,6 +86,13 @@ readonly class PropelCollectionProvider implements ProviderInterface
             $this->propelRelationPreloader->preload($models, $resourceClass, $context);
         }
 
+        $modelList = array_values(iterator_to_array($results instanceof PropelModelPager ? $results->getResults() : $results));
+
+        // The page is known here and nowhere else before the transform: what a
+        // per-member listener would look up one member at a time, it can look up
+        // once for the page now.
+        $this->eventDispatcher?->dispatch(new CollectionModelsLoadedEvent($resourceClass, $modelList, $context));
+
         $resources = array_map(
             fn ($propelModel): PropelResourceInterface => $this->apiResourcePropelTransformerService->modelToResource(
                 resourceClass: $resourceClass,
@@ -90,7 +100,7 @@ readonly class PropelCollectionProvider implements ProviderInterface
                 context: $context,
                 langs: $langs,
             ),
-            iterator_to_array($results instanceof PropelModelPager ? $results->getResults() : $results),
+            $modelList,
         );
 
         // A resource answering a field out of a query of its own reads it for the

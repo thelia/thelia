@@ -26,6 +26,7 @@ use Thelia\Api\Resource\BrandImage;
 use Thelia\Api\Resource\Cart;
 use Thelia\Api\Resource\CartAddress;
 use Thelia\Api\Resource\CartItem;
+use Thelia\Api\Resource\CatalogPriceRule;
 use Thelia\Api\Resource\Category;
 use Thelia\Api\Resource\CategoryDocument;
 use Thelia\Api\Resource\CategoryImage;
@@ -148,6 +149,7 @@ final readonly class AdminApiResourcePermissions
         ProductSaleElements::class => AdminResources::PRODUCT,
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
         Sale::class => AdminResources::SALES,
+        CatalogPriceRule::class => AdminResources::CATALOG_PRICE_RULE,
         State::class => AdminResources::STATE,
         Tag::class => AdminResources::TAG,
         // Attaching a tag to a customer is editing that customer, so the

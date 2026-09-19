@@ -24,7 +24,9 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
@@ -38,6 +40,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private RequestStack $requestStack,
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -84,6 +87,10 @@ readonly class PropelPersistProcessor implements ProcessorInterface
 
             throw $exception;
         }
+
+        // Written and committed: whatever keeps itself in step with the catalog can
+        // now hear of it, the way it hears of a back-office edit through its action.
+        $this->eventDispatcher?->dispatch(new ResourcePersistedEvent($data::class, $propelModel, ResourcePersistedEvent::OPERATION_WRITE));
 
         /** @var ?Post $postOperation */
         $postOperation = $context['operation'] ?? $operation;

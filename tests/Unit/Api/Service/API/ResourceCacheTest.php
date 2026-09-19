@@ -17,7 +17,7 @@ namespace Thelia\Tests\Unit\Api\Service\API;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Thelia\Api\Service\API\ResourceCache;
-use Thelia\Domain\Sale\SaleAudienceChecker;
+use Thelia\Domain\Pricing\PricingActivityChecker;
 
 /**
  * The cross-request cache of the data access layer keys on the path, the format
@@ -76,16 +76,16 @@ final class ResourceCacheTest extends TestCase
 
     public function testTheSaleOperationsAreNeverAskedAboutWhenTheCacheIsOff(): void
     {
-        $saleAudienceChecker = $this->createMock(SaleAudienceChecker::class);
-        $saleAudienceChecker->expects(self::never())->method('hasActiveReservedSale');
+        $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);
+        $pricingActivityChecker->expects(self::never())->method('hasVisitorDependentPricing');
 
         $cache = new ResourceCache(
             new ArrayAdapter(),
             enabled: false,
             ttl: 60,
             allowedPrefixes: ['/api/front/products'],
-            reservedSaleSensitivePrefixes: ['/api/front/products'],
-            saleAudienceChecker: $saleAudienceChecker,
+            visitorDependentPricePrefixes: ['/api/front/products'],
+            pricingActivityChecker: $pricingActivityChecker,
         );
 
         self::assertSame(['computed'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['computed']));
@@ -93,16 +93,16 @@ final class ResourceCacheTest extends TestCase
 
     private function cache(bool $hasActiveReservedSale): ResourceCache
     {
-        $saleAudienceChecker = $this->createMock(SaleAudienceChecker::class);
-        $saleAudienceChecker->method('hasActiveReservedSale')->willReturn($hasActiveReservedSale);
+        $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);
+        $pricingActivityChecker->method('hasVisitorDependentPricing')->willReturn($hasActiveReservedSale);
 
         return new ResourceCache(
             new ArrayAdapter(),
             enabled: true,
             ttl: 60,
             allowedPrefixes: ['/api/front/products', '/api/front/product_sale_elements', '/api/front/countries'],
-            reservedSaleSensitivePrefixes: ['/api/front/products', '/api/front/product_sale_elements'],
-            saleAudienceChecker: $saleAudienceChecker,
+            visitorDependentPricePrefixes: ['/api/front/products', '/api/front/product_sale_elements'],
+            pricingActivityChecker: $pricingActivityChecker,
         );
     }
 }

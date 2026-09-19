@@ -412,4 +412,5 @@ return [
     'Åland Islands' => 'Åland',
     'Đồng' => 'Dong',
     'Гривна' => 'Hryvnia',
+    'Catalog price rules' => 'Catalogusprijsregels',
 ];

@@ -41,7 +41,21 @@ final class UpdateScriptTest extends TestCase
      * The script a released shop has not run yet, and the only one still open
      * to being fixed: the ones before it are already applied in the field.
      */
-    private const string PENDING_SCRIPT = '3.1.0.sql';
+    private const string PENDING_SCRIPT = '3.2.0.sql';
+
+    /**
+     * The reference tables whose rows a shop reads by their translated label: a row
+     * seeded in fewer locales than the fresh install shows up unnamed in the back
+     * office of a shop that updated.
+     *
+     * @var list<string>
+     */
+    private const array TRANSLATED_REFERENCE_TABLES = [
+        'order_return_status_i18n',
+        'order_return_reason_i18n',
+        'message_i18n',
+        'resource_i18n',
+    ];
 
     public function testNoUpdateScriptUsesConditionalDdlMySqlRefuses(): void
     {
@@ -76,41 +90,52 @@ final class UpdateScriptTest extends TestCase
         }
     }
 
-    #[DataProvider('translatedReferenceTables')]
-    public function testThePendingUpdateScriptSeedsTheLocalesTheFreshInstallSeeds(string $table): void
-    {
-        $expected = $this->localesSeededIn($this->freshInstallSeed(), $table);
-
-        self::assertGreaterThan(2, \count($expected), \sprintf('The fresh install seeds %s in fewer locales than expected.', $table));
-
-        $statements = $this->insertsInto($this->pendingScript(), $table);
-
-        self::assertNotEmpty($statements, \sprintf('The pending script seeds nothing into %s: this test has lost its subject.', $table));
-
-        // Every statement on its own, not the script as a whole: a locale another row
-        // of the same table happens to seed does not give this row a label.
-        foreach ($statements as $statement) {
-            self::assertSame(
-                $expected,
-                $this->localesSeededIn($statement, $table),
-                \sprintf(
-                    'A shop updated to this version would display %s with no label at all in the missing languages: %s',
-                    $table,
-                    $this->firstLineOf($statement),
-                ),
-            );
-        }
-    }
-
     /**
-     * @return iterable<string, array{string}>
+     * A release seeds the reference tables its own feature needs, not all of them,
+     * so the tables to judge are the ones the pending script actually writes into.
+     * Demanding a fixed list would leave this test without a subject on the first
+     * release that seeds something else.
      */
-    public static function translatedReferenceTables(): iterable
+    public function testThePendingUpdateScriptSeedsTheLocalesTheFreshInstallSeeds(): void
     {
-        yield 'order_return_status_i18n' => ['order_return_status_i18n'];
-        yield 'order_return_reason_i18n' => ['order_return_reason_i18n'];
-        yield 'message_i18n' => ['message_i18n'];
-        yield 'resource_i18n' => ['resource_i18n'];
+        $judged = 0;
+
+        foreach (self::TRANSLATED_REFERENCE_TABLES as $table) {
+            $statements = $this->insertsInto($this->pendingScript(), $table);
+
+            if ([] === $statements) {
+                continue;
+            }
+
+            $expected = $this->localesSeededIn($this->freshInstallSeed(), $table);
+
+            self::assertGreaterThan(2, \count($expected), \sprintf('The fresh install seeds %s in fewer locales than expected.', $table));
+
+            // Every statement on its own, not the script as a whole: a locale another row
+            // of the same table happens to seed does not give this row a label.
+            foreach ($statements as $statement) {
+                ++$judged;
+
+                self::assertSame(
+                    $expected,
+                    $this->localesSeededIn($statement, $table),
+                    \sprintf(
+                        'A shop updated to this version would display %s with no label at all in the missing languages: %s',
+                        $table,
+                        $this->firstLineOf($statement),
+                    ),
+                );
+            }
+        }
+
+        self::assertGreaterThan(
+            0,
+            $judged,
+            \sprintf(
+                'The pending script seeds none of the translated reference tables (%s): this test has lost its subject.',
+                implode(', ', self::TRANSLATED_REFERENCE_TABLES),
+            ),
+        );
     }
 
     /**
@@ -140,6 +165,7 @@ final class UpdateScriptTest extends TestCase
         yield 'Product returns' => ['Product returns'];
         yield 'Return reasons' => ['Return reasons'];
         yield 'Order status transition override' => ['Order status transition override'];
+        yield 'Catalog price rules' => ['Catalog price rules'];
     }
 
     /**
@@ -172,28 +198,33 @@ final class UpdateScriptTest extends TestCase
      * from, and it makes the first row of an updated shop take an id the fresh
      * install gives to the seventh.
      */
-    public function testThePendingUpdateScriptForcesNoAutoIncrementOnATableItDoesNotSeed(): void
+    public function testNoUpdateScriptForcesAutoIncrementOnATableItDoesNotSeed(): void
     {
-        $script = $this->pendingScript();
-        $seeded = $this->tablesInsertedInto($script);
         $checked = 0;
 
-        foreach ($this->statementsOf($script) as $statement) {
-            if (1 !== preg_match('/^CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+`(\w+)`/i', $statement, $table)) {
-                continue;
+        // Every script, not only the pending one: a release that creates no table with
+        // a forced AUTO_INCREMENT would otherwise leave this test without a subject,
+        // and the scripts already applied in the field keep guarding the rule.
+        foreach ($this->updateScripts() as $name => $script) {
+            $seeded = $this->tablesInsertedInto($script);
+
+            foreach ($this->statementsOf($script) as $statement) {
+                if (1 !== preg_match('/^CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+`(\w+)`/i', $statement, $table)) {
+                    continue;
+                }
+
+                if (1 !== preg_match('/AUTO_INCREMENT\s*=\s*(\d+)/i', $statement, $start)) {
+                    continue;
+                }
+
+                ++$checked;
+
+                self::assertContains(
+                    $table[1],
+                    $seeded,
+                    \sprintf('%s starts `%s` at AUTO_INCREMENT=%s without inserting a single row into it.', $name, $table[1], $start[1]),
+                );
             }
-
-            if (1 !== preg_match('/AUTO_INCREMENT\s*=\s*(\d+)/i', $statement, $start)) {
-                continue;
-            }
-
-            ++$checked;
-
-            self::assertContains(
-                $table[1],
-                $seeded,
-                \sprintf('The script starts `%s` at AUTO_INCREMENT=%s without inserting a single row into it.', $table[1], $start[1]),
-            );
         }
 
         self::assertGreaterThan(0, $checked, 'No forced AUTO_INCREMENT left to judge: this test has lost its subject.');
