@@ -78,8 +78,7 @@ class CartNormalizer extends AbstractItemNormalizer
     {
         $this->requestStack->getMainRequest()?->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCart = $object->getPropelModel();
-        $country = $this->taxEngine->getDeliveryCountry();
-        $state = $this->taxEngine->getDeliveryState();
+        [$country, $state] = $this->taxationPlaceOf($propelCart);
         [$estimatedPostage, $postageTax] = $this->deliveryCostOf($propelCart, $country, $state);
         /* @var Cart $object */
         $object
@@ -91,6 +90,30 @@ class CartNormalizer extends AbstractItemNormalizer
             ->setVirtual($propelCart->isVirtual());
 
         return parent::normalize($object, $format, $context);
+    }
+
+    /**
+     * Where this cart is taxed: the country and the state of the delivery address it
+     * carries.
+     *
+     * The tax engine reads the cart of the SESSION, and an API request has none: there it
+     * falls back to the shop's default country, so a cart delivered abroad was answered
+     * with the taxes of the shop — right after the checkout operation that had recorded
+     * the buyer's address. The cart being normalized is the one to read. The engine
+     * stays the answer for a cart that names no delivery address yet.
+     *
+     * @return array{0: Country, 1: State|null}
+     */
+    private function taxationPlaceOf(PropelCart $propelCart): array
+    {
+        $deliveryAddress = $propelCart->getCartAddressRelatedByAddressDeliveryId();
+        $country = $deliveryAddress?->getCountry();
+
+        if ($country instanceof Country) {
+            return [$country, $deliveryAddress->getState()];
+        }
+
+        return [$this->taxEngine->getDeliveryCountry(), $this->taxEngine->getDeliveryState()];
     }
 
     /**
