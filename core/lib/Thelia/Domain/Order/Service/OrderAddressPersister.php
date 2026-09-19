@@ -16,6 +16,7 @@ namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Order as ModelOrder;
@@ -39,45 +40,39 @@ readonly class OrderAddressPersister
         $deliveryAddress = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId());
         $invoiceAddress = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
 
-        $deliveryOrderAddress = (new OrderAddress())
-            ->setCustomerTitleId($deliveryAddress->getCustomerTitleId())
-            ->setCompany($deliveryAddress->getCompany())
-            ->setSiret($deliveryAddress->getSiret())
-            ->setVatNumber($deliveryAddress->getVatNumber())
-            ->setFirstname($deliveryAddress->getFirstname())
-            ->setLastname($deliveryAddress->getLastname())
-            ->setAddress1($deliveryAddress->getAddress1())
-            ->setAddress2($deliveryAddress->getAddress2())
-            ->setAddress3($deliveryAddress->getAddress3())
-            ->setZipcode($deliveryAddress->getZipcode())
-            ->setCity($deliveryAddress->getCity())
-            ->setPhone($deliveryAddress->getPhone())
-            ->setCellphone($deliveryAddress->getCellphone())
-            ->setCountryId($deliveryAddress->getCountryId())
-            ->setStateId($deliveryAddress->getStateId());
-        $deliveryOrderAddress->save($connection);
-
-        $invoiceOrderAddress = (new OrderAddress())
-            ->setCustomerTitleId($invoiceAddress->getCustomerTitleId())
-            ->setCompany($invoiceAddress->getCompany())
-            ->setSiret($invoiceAddress->getSiret())
-            ->setVatNumber($invoiceAddress->getVatNumber())
-            ->setFirstname($invoiceAddress->getFirstname())
-            ->setLastname($invoiceAddress->getLastname())
-            ->setAddress1($invoiceAddress->getAddress1())
-            ->setAddress2($invoiceAddress->getAddress2())
-            ->setAddress3($invoiceAddress->getAddress3())
-            ->setZipcode($invoiceAddress->getZipcode())
-            ->setCity($invoiceAddress->getCity())
-            ->setPhone($invoiceAddress->getPhone())
-            ->setCellphone($invoiceAddress->getCellphone())
-            ->setCountryId($invoiceAddress->getCountryId())
-            ->setStateId($deliveryAddress->getStateId());
-        $invoiceOrderAddress->save($connection);
+        $deliveryOrderAddress = $this->freeze($deliveryAddress, $connection);
+        $invoiceOrderAddress = $this->freeze($invoiceAddress, $connection);
 
         $order->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
         $order->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
 
         return $deliveryAddress->getCountry();
+    }
+
+    /**
+     * Copies a cart address, field by field, into an order address of its own: the order
+     * keeps what the buyer had entered even when the cart address is edited or deleted.
+     */
+    private function freeze(CartAddress $cartAddress, ConnectionInterface $connection): OrderAddress
+    {
+        $orderAddress = (new OrderAddress())
+            ->setCustomerTitleId($cartAddress->getCustomerTitleId())
+            ->setCompany($cartAddress->getCompany())
+            ->setSiret($cartAddress->getSiret())
+            ->setVatNumber($cartAddress->getVatNumber())
+            ->setFirstname($cartAddress->getFirstname())
+            ->setLastname($cartAddress->getLastname())
+            ->setAddress1($cartAddress->getAddress1())
+            ->setAddress2($cartAddress->getAddress2())
+            ->setAddress3($cartAddress->getAddress3())
+            ->setZipcode($cartAddress->getZipcode())
+            ->setCity($cartAddress->getCity())
+            ->setPhone($cartAddress->getPhone())
+            ->setCellphone($cartAddress->getCellphone())
+            ->setCountryId($cartAddress->getCountryId())
+            ->setStateId($cartAddress->getStateId());
+        $orderAddress->save($connection);
+
+        return $orderAddress;
     }
 }
