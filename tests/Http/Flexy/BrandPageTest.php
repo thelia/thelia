@@ -171,6 +171,55 @@ final class BrandPageTest extends WebIntegrationTestCase
         self::assertSame(404, $this->client->getResponse()->getStatusCode());
     }
 
+    /**
+     * Thelia defines its filters per category, so a brand whose products carry no filterable
+     * characteristic has nothing to offer. The page is still a page: it lists, and it renders no
+     * filter field rather than an empty panel or an error.
+     */
+    public function testABrandWithNoFilterableCharacteristicRendersItsListingWithoutAFilterField(): void
+    {
+        $this->brandWithAProduct();
+
+        $this->assertPageRenders('/'.self::BRAND_URL);
+
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertStringContainsString('Brand page product', $content, 'The listing must still be served.');
+        self::assertStringNotContainsString('form[tfilters]', $content, 'A brand with nothing to filter on must render no filter field.');
+    }
+
+    /**
+     * The other side of the same contract: once one of the brand's products carries a filterable
+     * characteristic ruled by its category, the page does render the filter field. Without this
+     * pair, the assertion above would pass on a page that never renders filters at all.
+     */
+    public function testABrandWhoseProductsCarryAFilterableCharacteristicRendersTheFilterField(): void
+    {
+        $brand = $this->brandWithAProduct();
+        $connection = $this->getPropelConnection();
+        $factory = $this->factory();
+
+        $product = \Thelia\Model\ProductQuery::create()->filterByBrandId($brand->getId())->findOne($connection);
+        $category = \Thelia\Model\CategoryQuery::create()->findPk($product->getDefaultCategoryId(), $connection);
+
+        $template = new \Thelia\Model\Template();
+        $template->setLocale('en_US')->setName('Probe template')->save($connection);
+        $category->setDefaultTemplateId($template->getId())->save($connection);
+
+        $feature = $factory->feature(['title' => 'Probe colour']);
+        $value = $factory->featureAv($feature, ['title' => 'Probe blue']);
+        $fp = new \Thelia\Model\FeatureProduct();
+        $fp->setProductId($product->getId())->setFeatureId($feature->getId())->setFeatureAvId($value->getId())->save($connection);
+
+        $row = new \Thelia\Model\ChoiceFilter();
+        $row->setCategoryId($category->getId())->setTemplateId($template->getId())->setFeatureId($feature->getId());
+        $row->setPosition(1)->setVisible(true)->setType('checkbox')->save($connection);
+
+        $this->assertPageRenders('/'.self::BRAND_URL);
+        $content = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('form[tfilters]', $content, 'A brand page must render the filter field as soon as one of its categories rules a characteristic its products carry.');
+    }
+
     private function brandWithAProduct(array $productOverrides = []): Brand
     {
         $factory = $this->factory();
