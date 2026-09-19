@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Contract;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -48,5 +49,35 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
         $response = $this->jsonRequest('GET', '/api/front/modules');
 
         self::assertSame(404, $response->getStatusCode(), 'The module list (and its versions) must not be reachable from the front API.');
+    }
+
+    /**
+     * The checkout of an account is six operations that read a cart, change what an order
+     * will be built from, and place it. Not one of them is anonymous, and this is the
+     * contract that says so operation by operation rather than trusting a path prefix to
+     * stay what it is.
+     */
+    #[DataProvider('checkoutOperations')]
+    public function testCheckoutOperationsRejectAnonymousAccess(string $method, string $path): void
+    {
+        $factory = $this->createFixtureFactory();
+        $cart = $factory->cart($factory->customer($factory->customerTitle()));
+
+        $response = $this->jsonRequest($method, '/api/front/account/checkout/'.$cart->getId().'/'.$path);
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('%s /front/account/checkout/{cartId}/%s must demand an account.', $method, $path));
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function checkoutOperations(): iterable
+    {
+        yield 'delivery address' => ['POST', 'delivery_address'];
+        yield 'invoice address' => ['POST', 'invoice_address'];
+        yield 'delivery module' => ['POST', 'delivery_module'];
+        yield 'payment module' => ['POST', 'payment_module'];
+        yield 'validation' => ['GET', 'validation'];
+        yield 'placement' => ['POST', 'place'];
     }
 }

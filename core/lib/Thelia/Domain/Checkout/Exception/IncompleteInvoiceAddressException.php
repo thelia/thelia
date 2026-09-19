@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Exception;
 
+use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+
 /**
  * The billing address of the cart is there but not usable for an invoice.
  *
@@ -26,5 +28,10 @@ class IncompleteInvoiceAddressException extends CheckoutException
     public function __construct(string $message = 'The billing address is missing information an invoice requires', int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
+    }
+
+    public function violationCode(): string
+    {
+        return CheckoutViolationCode::InvoiceAddressIncomplete->value;
     }
 }

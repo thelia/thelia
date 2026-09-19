@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
@@ -107,7 +108,40 @@ abstract class WebIntegrationTestCase extends WebTestCase
 
         $this->connection = null;
 
+        $this->forgetTheVisitorSession();
+
         parent::tearDown();
+    }
+
+    /**
+     * Drops what the finished test left in the visitor session.
+     *
+     * The kernel is not rebooted between the tests of a file, so the session is one
+     * object for the whole process, and Session holds the cart of a visit in a static on
+     * top of that. The rollback above touches neither: the next test opens on a session
+     * naming a cart id — or holding a cart object — whose row was taken back with the
+     * transaction, and the shop hands it out as the current cart rather than opening a
+     * new one. What fails then is the test after, on a cart it never made.
+     */
+    private function forgetTheVisitorSession(): void
+    {
+        $container = static::getContainer();
+
+        if (!$container->has(Session::class)) {
+            return;
+        }
+
+        $session = $container->get(Session::class);
+
+        if (!$session instanceof Session) {
+            return;
+        }
+
+        // Both are needed: the first clears the static the cart of an unsaved visit
+        // lives in, the second the bag holding the id of a saved one — along with the
+        // order, the currency and everything else a checkout writes there.
+        $session->setSessionCart(null);
+        $session->clear();
     }
 
     /**

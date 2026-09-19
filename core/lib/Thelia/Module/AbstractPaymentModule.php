@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Module;
 
+use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
@@ -51,13 +53,59 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         $renderedTemplate = $parser->render(
             'checkout-gateway', [
                 'order_id' => $order->getId(),
-                'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
+                'cart_count' => $this->cartItemCount(),
                 'gateway_url' => $gateway_url,
                 'payment_form_data' => $form_data,
             ]
         );
 
         return new Response($renderedTemplate);
+    }
+
+    /**
+     * How many lines the cart of the session holds, and none when there is no session to
+     * ask.
+     *
+     * The gateway form is rendered from the payment module, which is called at the very
+     * end of the placement — so this used to reach into the session of a request that,
+     * from the front API or a command line, either is not there or carries no session at
+     * all, and `Request::getSession()` throws on the latter. Throwing there aborts a
+     * payment for an order that has already been written, over a number no template the
+     * core ships even reads.
+     *
+     * Zero on purpose rather than a count taken off the order: by the time a module is
+     * asked to pay, ORDER_CART_CLEAR has already run and the session holds a new empty
+     * cart, so zero is exactly what a browser has been getting all along. A module that
+     * wants the lines of the order has the order.
+     */
+    protected function cartItemCount(): int
+    {
+        $request = $this->currentRequest();
+        $session = $request?->hasSession() === true ? $request->getSession() : null;
+
+        if (!$session instanceof Session) {
+            return 0;
+        }
+
+        return $session->getSessionCart($this->getDispatcher())->getCartItems()->count();
+    }
+
+    /**
+     * The request behind this call, when there is one. `getRequest()` throws instead of
+     * answering null, which is the right thing for a module that cannot work without one
+     * and the wrong thing here.
+     */
+    private function currentRequest(): ?HttpFoundationRequest
+    {
+        if ($this->hasRequest()) {
+            return $this->getRequest();
+        }
+
+        if (!$this->hasContainer()) {
+            return null;
+        }
+
+        return $this->getContainer()->get('request_stack')?->getMainRequest();
     }
 
     /**

@@ -14,10 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Exception;
 
+use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+
 class MissingAddressException extends CheckoutException
 {
     public function __construct(string $message = 'Required address is missing', int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
+    }
+
+    public function violationCode(): string
+    {
+        return CheckoutViolationCode::AddressMissing->value;
     }
 }
