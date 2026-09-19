@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @phpstan-type ConsentAnswer array{accepted: bool, title: string, description: string, answeredAt: \DateTimeImmutable}
  */
-final readonly class ConsentAcceptanceStore implements ConsentAcceptanceReaderInterface
+final readonly class ConsentAcceptanceStore implements ConsentAnswerStoreInterface
 {
     public const SESSION_KEY = 'thelia.checkout.consent_acceptances';
 

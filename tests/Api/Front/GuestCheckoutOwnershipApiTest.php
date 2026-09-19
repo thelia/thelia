@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerTitle;
+use Thelia\Model\OrderQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Api\Trait\RegistersGuestCustomers;
 
@@ -167,6 +170,93 @@ final class GuestCheckoutOwnershipApiTest extends ApiTestCase
             (string) $collection->getContent(),
             'The cart line listing must not leak the basket of the earlier visit either.',
         );
+    }
+
+    /**
+     * The order tunnel under `/front/account/checkout` is the tunnel of an account, and a
+     * guest is not one — checking out without an account is another story, told by another
+     * set of operations. A guest row carries ROLE_CUSTOMER like any other customer, so the
+     * firewall lets the token through and the refusal has to happen in the code.
+     *
+     * The refusal is a 403 and it comes from the role, not from the code: a guest token is
+     * pinned to ROLE_GUEST, which deliberately implies nothing, and every one of the six
+     * operations demands ROLE_CUSTOMER. The ownership check inside them answers the same
+     * caller with a 404 and never gets the chance — it stays as the second barrier, for
+     * the day a guest is given a role that does imply ROLE_CUSTOMER.
+     *
+     * What matters either way is that the answer says nothing about the cart: the body for
+     * the guest's own cart and for a cart that was never created are compared word for
+     * word, because a refusal that reads differently is a way of counting the carts of the
+     * shop.
+     */
+    public function testAGuestTokenReachesNoneOfTheAccountCheckoutOperations(): void
+    {
+        $this->enableGuestCheckout();
+
+        [, $guest] = $this->registerGuest();
+        $unknownCartId = 1 + (int) CartQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findOne($this->getPropelConnection())
+            ?->getId();
+
+        foreach (self::everyCheckoutOperation() as $label => [$method, $step, $payload]) {
+            $onItsOwnCart = $this->jsonRequest($method, $this->checkoutUrl($guest['cartId'], $step), $payload, token: $guest['token']);
+            $onNothing = $this->jsonRequest($method, $this->checkoutUrl($unknownCartId, $step), $payload, token: $guest['token']);
+
+            self::assertSame(403, $onItsOwnCart->getStatusCode(), \sprintf('"%s" must not be reachable with a guest token.', $label));
+            self::assertSame(403, $onNothing->getStatusCode());
+            self::assertSame(
+                $this->comparableBody($onNothing),
+                $this->comparableBody($onItsOwnCart),
+                \sprintf('"%s" must answer a guest exactly as it answers a cart that does not exist.', $label),
+            );
+        }
+
+        self::assertCount(
+            0,
+            OrderQuery::create()->filterByCartId($guest['cartId'])->find($this->getPropelConnection()),
+            'A refused placement must not have written an order.',
+        );
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: array<string, mixed>}>
+     */
+    private static function everyCheckoutOperation(): iterable
+    {
+        // The identifiers are never read: the ownership check answers before the body is
+        // looked at, which is the whole point of the operations refusing this token.
+        yield 'delivery address' => ['POST', 'delivery_address', ['addressId' => 1]];
+        yield 'invoice address' => ['POST', 'invoice_address', ['addressId' => 1]];
+        yield 'delivery module' => ['POST', 'delivery_module', ['deliveryModuleId' => 1]];
+        yield 'payment module' => ['POST', 'payment_module', ['paymentModuleId' => 1]];
+        yield 'validation' => ['GET', 'validation', []];
+        yield 'placement' => ['POST', 'place', []];
+    }
+
+    private function checkoutUrl(int $cartId, string $step): string
+    {
+        return '/api/front/account/checkout/'.$cartId.'/'.$step;
+    }
+
+    /**
+     * The body of an error answer, with the fields that legitimately differ from one
+     * request to the next taken out, so that two refusals can be compared word for word.
+     *
+     * @return array<string, mixed>
+     */
+    private function comparableBody(Response $response): array
+    {
+        $body = json_decode((string) $response->getContent(), true) ?? [];
+
+        unset($body['trace'], $body['hydra:trace'], $body['@id'], $body['hydra:description'], $body['detail']);
+
+        // The description is the message, and comparing it is the whole point; it is put
+        // back under one key so that a hydra body and a problem body compare the same.
+        $message = json_decode((string) $response->getContent(), true) ?? [];
+        $body['message'] = $message['hydra:description'] ?? $message['detail'] ?? $message['description'] ?? null;
+
+        return $body;
     }
 
     public function testAGuestWritesItsOwnAddress(): void

@@ -14,13 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Domain\Checkout\Service\ConsentAcceptanceStore;
+use Thelia\Domain\Checkout\Service\ConsentAnswerStoreInterface;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
+use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
@@ -43,6 +46,8 @@ use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
+use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 readonly class OrderFacade
@@ -60,7 +65,7 @@ readonly class OrderFacade
         private StockDecrementer $stockDecrementer,
         private PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
         private ConsentProvider $consentProvider,
-        private ConsentAcceptanceStore $consentAcceptanceStore,
+        private ConsentAnswerStoreInterface $consentAnswers,
         private RequestStack $requestStack,
     ) {
     }
@@ -106,6 +111,8 @@ readonly class OrderFacade
         $connection = $this->orderTransactionManager->begin();
 
         try {
+            $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection);
+
             $placedOrder = $this->orderFactory->createFromSessionOrder($sessionOrder, $currency, $lang, $cart, $customer);
 
             $taxCountry = $this->orderAddressPersister->prepareOrderAddresses(
@@ -145,22 +152,31 @@ readonly class OrderFacade
                 $checkStock = $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock);
 
                 if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
-                    // Atomic conditional decrement: check and write are a single
-                    // statement, so concurrent checkouts cannot oversell.
-                    $this->stockDecrementer->decrement(
-                        $productSaleElements->getId(),
-                        (float) $cartItem->getQuantity(),
-                        guardAvailability: $checkStock,
-                        allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
-                        connection: $connection,
-                    );
+                    try {
+                        // Atomic conditional decrement: check and write are a single
+                        // statement, so concurrent checkouts cannot oversell.
+                        $this->stockDecrementer->decrement(
+                            $productSaleElements->getId(),
+                            (float) $cartItem->getQuantity(),
+                            guardAvailability: $checkStock,
+                            allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
+                            connection: $connection,
+                        );
+                    } catch (TheliaProcessException $shortage) {
+                        // The decrementer knows a row id and a quantity; only here is
+                        // there a product to name, and a caller told "not enough stock"
+                        // about a cart of ten lines has nothing to act on. The type is
+                        // what a caller maps to an answer: everything else this class
+                        // raises is a defect, not a shortage.
+                        throw new StockShortageException($product->getRef(), previous: $shortage);
+                    }
                 } elseif ($checkStock) {
                     // Stock is managed later (e.g. at payment): keep the
                     // advisory availability check on order creation.
                     $this->stockPolicy->assertStockIsAvailable(
                         $cartItem->getQuantity(),
                         $productSaleElements->getQuantity(),
-                        'Not enough stock'
+                        $product->getRef(),
                     );
                 }
 
@@ -214,13 +230,68 @@ readonly class OrderFacade
             if ($recordConsentAnswers) {
                 // Only once the answers are on the order: dropped before the commit, a
                 // rollback would leave the buyer with boxes to tick again and no way to know it.
-                $this->consentAcceptanceStore->clear();
+                $this->consentAnswers->clear();
             }
 
             return $placedOrder;
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
             throw $throwable;
+        }
+    }
+
+    /**
+     * The one guarantee that a cart is ordered once, taken inside the transaction the
+     * order is written in and before its first row.
+     *
+     * Everything above this is a narrowing, not a guarantee: the placement re-reads the
+     * table before it starts, and it takes a lock — but a lock is only as shared as its
+     * store, the shipped default is a file on the local disk, and a second application
+     * server reads the very same "no order yet" and writes a second order. Only the
+     * database arbitrates between two nodes.
+     *
+     * The row of the cart is what is locked, and not the orders of that cart. Locking a
+     * set of orders that is empty — which is the normal case — takes a gap lock on
+     * `cart_id`, and that gap spans the carts either side of it: measured on MariaDB
+     * 10.11, `SELECT … WHERE cart_id = 100 FOR UPDATE` blocks the insert of an order for
+     * cart 101. Two placements of two different carts would each hold that gap, gap locks
+     * being compatible with one another, and each would then wait on the other's insert:
+     * a deadlock, produced by the guard, between two requests that have nothing to do with
+     * each other. The cart row exists, so locking it is a plain record lock and it
+     * serialises exactly the two requests that are about the same cart.
+     *
+     * The re-read that follows is a consistent read and it is not stale: the read view of
+     * a transaction is opened by its first consistent read, and the statement before it is
+     * a locking one, which opens none. Measured on the same server — a row committed by
+     * another session while this transaction holds a locking read is seen by the plain
+     * read that comes after it.
+     *
+     * A cancelled order is not one: a payment that did not go through takes the order back
+     * and leaves the buyer with the cart they still have, and refusing to let them order it
+     * again would strand them. That is also why the guard is not a unique index on
+     * `cart_id`, which would refuse the second, legitimate order as well.
+     *
+     * @throws CartAlreadyOrderedException when this very cart already carries an order that stands
+     * @throws PropelException
+     */
+    private function refuseACartThatHasAlreadyBeenOrdered(CartModel $cart, ConnectionInterface $connection): void
+    {
+        $cartId = (int) $cart->getId();
+
+        $lockTheCart = $connection->prepare('SELECT `id` FROM `cart` WHERE `id` = :cartId FOR UPDATE');
+        $lockTheCart->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
+        $lockTheCart->execute();
+
+        $existingOrder = OrderQuery::create()
+            ->filterByCartId($cartId)
+            ->useOrderStatusQuery()
+                ->filterByCode(OrderStatus::CODE_CANCELED, Criteria::NOT_EQUAL)
+            ->endUse()
+            ->orderById(Criteria::DESC)
+            ->findOne($connection);
+
+        if ($existingOrder instanceof ModelOrder) {
+            throw new CartAlreadyOrderedException((int) $existingOrder->getId(), $cartId);
         }
     }
 
@@ -271,8 +342,9 @@ readonly class OrderFacade
      * acceptance, and an order with no row for an optional consent would later read as
      * an order placed before that consent existed.
      *
-     * Everything comes from the answer held in the session — the wording, the long text
-     * and the moment the box was answered — and nothing is read back from the consent
+     * Everything comes from the answer as it was given — the wording, the long text and
+     * the moment the box was answered, held in the session of a buyer walking the screens
+     * of a theme or in the request of a caller with none — and nothing is read back from the consent
      * table. That is the whole point: a merchant who rewords a consent between the tick
      * and the payment must not end up with an order stating the buyer agreed to a
      * sentence they never saw. The one legitimate re-read is the consent nobody
@@ -291,7 +363,7 @@ readonly class OrderFacade
         LangModel $lang,
         ConnectionInterface $connection,
     ): void {
-        $answers = $this->consentAcceptanceStore->answers();
+        $answers = $this->consentAnswers->answers();
         $ipAddress = $this->requestStack->getMainRequest()?->getClientIp();
         $locale = (string) $lang->getLocale();
 
@@ -317,7 +389,7 @@ readonly class OrderFacade
      * Virtual products are skipped: their stock usage is decided by an event
      * that requires the placed order, so they are handled in the main loop.
      *
-     * @throws TheliaProcessException
+     * @throws StockShortageException
      */
     private function assertCartStockIsAvailable(CartModel $cart): void
     {
@@ -333,7 +405,7 @@ readonly class OrderFacade
             $this->stockPolicy->assertStockIsAvailable(
                 $cartItem->getQuantity(),
                 $cartItem->getProductSaleElements()->getQuantity(),
-                'Not enough stock'
+                $cartItem->getProduct()->getRef(),
             );
         }
     }

@@ -161,7 +161,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        $session = $this->requestStack->getMainRequest()?->getSession();
+        $session = $this->getSession();
 
         if (!$session instanceof Session || !$session->isStarted()) {
             return;
@@ -202,7 +202,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function reconcileBeforeOrder(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
-        $session = $this->requestStack->getMainRequest()?->getSession();
+        $session = $this->getSession();
 
         if (!$session instanceof Session || !$session->isStarted()) {
             return;
@@ -312,10 +312,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function checkFreePostage(OrderEvent $event): void
     {
-        /** @var Cart $cart */
-        $cart = $this->requestStack->getMainRequest()?->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->getSession()?->getSessionCart($this->dispatcher);
 
-        if ($this->couponManager->isCouponRemovingPostage($cart)) {
+        if ($cart instanceof Cart && $this->couponManager->isCouponRemovingPostage($cart)) {
             $cart->setPostage(null)
                 ->setPostageTax(null)
                 ->setPostageTaxRuleTitle(null)
@@ -327,10 +326,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function forceFreePostage(mixed $event): void
     {
-        /** @var Cart $cart */
-        $cart = $this->requestStack->getMainRequest()?->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->getSession()?->getSessionCart($this->dispatcher);
 
-        if ($this->couponManager->isCouponRemovingPostage($cart)) {
+        if ($cart instanceof Cart && $this->couponManager->isCouponRemovingPostage($cart)) {
             $cart->setPostage(null)
                 ->setPostageTax(null)
                 ->setPostageTaxRuleTitle(null)
@@ -498,13 +496,25 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns the session from the current request.
+     * Returns the session from the current request, and nothing at all when the request
+     * has none.
+     *
+     * A request with no session is not the same thing as a session that has not started,
+     * and Request::getSession() throws on the first rather than answering null. The front
+     * API is stateless, so every coupon listener on the path of a cart change used to end
+     * a perfectly valid request in "Session has not been set" instead of in the nothing
+     * they have to do without one.
      */
     protected function getSession(): ?Session
     {
-        /** @var Session $session */
-        $session = $this->requestStack->getMainRequest()?->getSession();
+        $request = $this->requestStack->getMainRequest();
 
-        return $session;
+        if (null === $request || !$request->hasSession()) {
+            return null;
+        }
+
+        $session = $request->getSession();
+
+        return $session instanceof Session ? $session : null;
     }
 }

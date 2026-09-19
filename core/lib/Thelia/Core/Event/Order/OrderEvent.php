@@ -193,6 +193,19 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * Whether a listener has already put the placed order on this event.
+     *
+     * The property is typed and has no default, so reading it before ORDER_PAY has run —
+     * or after a listener stopped the propagation before the one that writes it — raises
+     * a PHP Error rather than answering null. Ask this first, the way hasResponse() is
+     * asked before getResponse().
+     */
+    public function hasPlacedOrder(): bool
+    {
+        return isset($this->placedOrder);
+    }
+
+    /**
      * @return int|null the invoice address ID
      */
     public function getInvoiceAddress(): ?int

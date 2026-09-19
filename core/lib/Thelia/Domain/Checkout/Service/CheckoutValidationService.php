@@ -16,8 +16,10 @@ namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
+use Thelia\Domain\Checkout\Service\Step\CheckoutStepViolationCollectorInterface;
 use Thelia\Model\Cart;
 
 /**
@@ -56,6 +58,56 @@ readonly class CheckoutValidationService
         foreach ($this->orderedProviders() as $provider) {
             $provider->check($cart);
         }
+    }
+
+    /**
+     * The same questions, asked of the same steps, with every refusal gathered instead
+     * of the first one raised.
+     *
+     * The tunnel of a theme has one screen per step and stops at the first refusal, which
+     * is what validateForOrder() is for and why its contract is left alone. A caller with
+     * no screens — the front API — hands over a whole checkout in one request, and
+     * sending it back one missing thing at a time would make the buyer pay for a round
+     * trip per field.
+     *
+     * Reported in the order of the tunnel, so the first violation of the list is still
+     * the first thing the buyer has to go back and do.
+     *
+     * @return list<CheckoutViolation> empty when this cart may be ordered
+     *
+     * @throws PropelException
+     */
+    public function collectViolations(Cart $cart): array
+    {
+        $violations = [];
+
+        foreach ($this->orderedProviders() as $provider) {
+            foreach ($this->refusalsOf($provider, $cart) as $refusal) {
+                $violations[] = CheckoutViolation::fromRefusal($provider->code(), $refusal);
+            }
+        }
+
+        return $violations;
+    }
+
+    /**
+     * @return list<CheckoutException>
+     *
+     * @throws PropelException
+     */
+    private function refusalsOf(CheckoutStepProviderInterface $provider, Cart $cart): array
+    {
+        if ($provider instanceof CheckoutStepViolationCollectorInterface) {
+            return $provider->collectRefusals($cart);
+        }
+
+        try {
+            $provider->check($cart);
+        } catch (CheckoutException $refusal) {
+            return [$refusal];
+        }
+
+        return [];
     }
 
     /**

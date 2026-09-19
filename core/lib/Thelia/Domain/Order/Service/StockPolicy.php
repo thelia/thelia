@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Service;
 
-use Thelia\Exception\TheliaProcessException;
+use Thelia\Domain\Order\Exception\StockShortageException;
 
 readonly class StockPolicy
 {
@@ -23,10 +23,17 @@ readonly class StockPolicy
         return $checkAvailableStock && $useStock;
     }
 
-    public function assertStockIsAvailable(float $requestedQuantity, float $availableQuantity, string $message): void
+    /**
+     * The product is named rather than a whole message passed in: every shortage of the
+     * core is one exception class with one wording, so a caller branches on the type and
+     * never on the sentence.
+     *
+     * @throws StockShortageException
+     */
+    public function assertStockIsAvailable(float $requestedQuantity, float $availableQuantity, ?string $productReference): void
     {
         if ($requestedQuantity > $availableQuantity) {
-            throw new TheliaProcessException($message);
+            throw new StockShortageException($productReference);
         }
     }
 

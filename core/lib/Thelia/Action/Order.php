@@ -37,6 +37,7 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Base\CartQuery;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
@@ -174,10 +175,15 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $placedOrder = $this->orderFacade->createOrder(
             $dispatcher,
-            $event->getOrder(),
-            $session?->getCurrency() ?? CurrencyModel::getDefaultCurrency(),
-            $session?->getLang() ?? LangModel::getDefaultLanguage(),
-            $session?->getSessionCart($dispatcher) ?? CartQuery::create()->findPk($order->getCartId()),
+            $order,
+            // Whatever the order already states comes first, then the session, then the
+            // shop default. The tunnel of a theme states neither, so it still reads the
+            // session exactly as before; a caller with no session states both, which is
+            // the only way an order placed outside a browser gets a currency and a
+            // language that are not the shop's own.
+            $order->getCurrency() ?? $session?->getCurrency() ?? CurrencyModel::getDefaultCurrency(),
+            $order->getLang() ?? $session?->getLang() ?? LangModel::getDefaultLanguage(),
+            $this->resolveCart($order, $session, $dispatcher),
             // The session customer when there is one — a signed-in customer or a guest
             // checking out — and the one the order already names otherwise, which is how
             // an order placed from the command line finds its customer.
@@ -200,6 +206,29 @@ class Order extends BaseAction implements EventSubscriberInterface
         if ($payEvent->hasResponse()) {
             $event->setResponse($payEvent->getResponse());
         }
+    }
+
+    /**
+     * The cart the order is about to be written from.
+     *
+     * The order names it — `order.cart_id` is required, and every path that raises
+     * ORDER_PAY writes it — so that is what is read first, and the session cart is the
+     * fallback for a caller that left it out. In the tunnel of a theme the two are the
+     * same row, since the order was built from the session cart a moment earlier; asking
+     * the session first would hand a caller with no session a brand new empty cart, which
+     * is what getSessionCart() answers when it has nothing to restore.
+     *
+     * @throws TheliaProcessException when neither names a cart
+     */
+    private function resolveCart(OrderModel $order, ?SessionInterface $session, EventDispatcherInterface $dispatcher): CartModel
+    {
+        $cart = null !== $order->getCartId()
+            ? CartQuery::create()->findPk($order->getCartId())
+            : null;
+
+        $cart ??= $session instanceof Session ? $session->getSessionCart($dispatcher) : null;
+
+        return $cart ?? throw new TheliaProcessException('The order names no cart to be built from');
     }
 
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -541,15 +570,18 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns the session from the current request.
+     * The session of the current request, when there is a request and it has one.
      *
-     * @return Session
+     * `Request::getSession()` throws on a request that carries none, which is the shape
+     * of a stateless API request: asking whether there is one first is what lets the very
+     * same listener place an order for a browser and for a caller that has no session at
+     * all.
      */
     protected function getSession(): ?SessionInterface
     {
-        /** @var Request $request */
+        /** @var Request|null $request */
         $request = $this->requestStack->getMainRequest();
 
-        return $request?->getSession();
+        return $request?->hasSession() === true ? $request->getSession() : null;
     }
 }

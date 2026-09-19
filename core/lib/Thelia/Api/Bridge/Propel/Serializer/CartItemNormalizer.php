@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
+use Thelia\Model\CartItem as PropelCartItem;
+use Thelia\Model\Country;
 
 class CartItemNormalizer extends AbstractItemNormalizer
 {
@@ -64,7 +66,7 @@ class CartItemNormalizer extends AbstractItemNormalizer
     {
         $this->requestStack->getMainRequest()->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCartItem = $object->getPropelModel();
-        $country = $this->taxEngine->getDeliveryCountry();
+        $country = $this->taxationCountryOf($propelCartItem);
         /* @var CartItem $object */
         $object
             ->setCalculatedTotalPrice($propelCartItem->getTotalPrice())
@@ -78,6 +80,22 @@ class CartItemNormalizer extends AbstractItemNormalizer
             ->setIsPromo((bool) $propelCartItem->getPromo());
 
         return parent::normalize($object, $format, $context);
+    }
+
+    /**
+     * Where this line is taxed: the country of the delivery address its cart carries,
+     * the very rule the totals of that cart follow in {@see CartNormalizer}.
+     *
+     * The tax engine reads the cart of the SESSION, and an API request has none: there it
+     * falls back to the shop's default country, and the lines of a cart delivered abroad
+     * no longer added up to its own total. The engine stays the answer for a cart that
+     * names no delivery address yet.
+     */
+    private function taxationCountryOf(PropelCartItem $propelCartItem): Country
+    {
+        $country = $propelCartItem->getCart()?->getCartAddressRelatedByAddressDeliveryId()?->getCountry();
+
+        return $country instanceof Country ? $country : $this->taxEngine->getDeliveryCountry();
     }
 
     public function getSupportedTypes(?string $format): array

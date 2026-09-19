@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Exception;
 
+use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+
 /**
  * The shop no longer lets this cart be ordered without an account.
  *
@@ -26,5 +28,10 @@ class GuestCheckoutNotAllowedException extends CheckoutException
     public function __construct(string $message = 'This order requires an account.', int $code = 0, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
+    }
+
+    public function violationCode(): string
+    {
+        return CheckoutViolationCode::GuestCheckoutNotAllowed->value;
     }
 }
