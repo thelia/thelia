@@ -34,6 +34,7 @@ use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
+use Thelia\Model\ProductQuery;
 
 readonly class FilterService
 {
@@ -199,10 +200,11 @@ readonly class FilterService
         $locale = $context['filters']['locale'] ?? $request->query->get('locale');
         $locale ??= $this->langService->getLocale();
 
-        $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds): array {
+        $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds, $browsedBrandId): array {
             $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth);
             $this->restrictToVisibility($query, $visible);
             $this->restrictToScope($query, $scopeIds);
+            $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
             return $this->resolveResourceIds($query);
         };
@@ -233,7 +235,7 @@ readonly class FilterService
                 if ($narrowedIds === []) {
                     continue;
                 }
-                $narrowedQuery ??= $this->restrictedQuery($tfilters, $resource, $visible, $categoryDepth, $scopeIds);
+                $narrowedQuery ??= $this->restrictedQuery($tfilters, $resource, $visible, $categoryDepth, $scopeIds, $browsedBrandId);
                 $values = $this->getValues(query: $narrowedQuery, filter: $filter, tfilters: $tfilters, locale: $locale);
             }
 
@@ -258,11 +260,12 @@ readonly class FilterService
     /**
      * @param array<int>|null $scopeIds
      */
-    private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth, ?array $scopeIds): ModelCriteria
+    private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth, ?array $scopeIds, ?int $browsedBrandId): ModelCriteria
     {
         $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth);
         $this->restrictToVisibility($query, $visible);
         $this->restrictToScope($query, $scopeIds);
+        $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
         return $query;
     }
@@ -298,6 +301,20 @@ readonly class FilterService
         }
 
         $query->filterById($scopeIds, Criteria::IN);
+    }
+
+    /**
+     * The page of a brand describes that brand's products and nothing else, whatever the
+     * selection says: a `scope[brand]` declared without the brand among the tfilters would
+     * otherwise get the facets of the whole catalogue.
+     */
+    private function restrictToBrowsedBrand(ModelCriteria $query, ?int $brandId): void
+    {
+        if ($brandId === null || !$query instanceof ProductQuery) {
+            return;
+        }
+
+        $query->filterByBrandId($brandId);
     }
 
     /**

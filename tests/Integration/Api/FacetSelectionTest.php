@@ -174,6 +174,21 @@ final class FacetSelectionTest extends IntegrationTestCase
         ));
     }
 
+    public function testABrandDeclaredAsTheScopeNarrowsTheFacetsToItsOwnProducts(): void
+    {
+        $facets = $this->filterService->getFilters(
+            [
+                'path_info' => '/api/front/products',
+                'filters' => ['tfilters' => [], 'scope' => ['brand' => $this->ids['acme']], 'locale' => 'en_US'],
+            ],
+            'products',
+        );
+
+        self::assertSame([], $this->counts($facets, 'brand'));
+        self::assertSame(['Blue' => 1, 'Red' => 1], $this->counts($facets, 'feature', $this->ids['colour']));
+        self::assertSame(['S' => 1, 'M' => 1], $this->counts($facets, 'attribute', $this->ids['size']));
+    }
+
     /**
      * The column of a brand borrows the column of each category where one of its visible
      * products is filed, read the way that category's own page reads it: when the nearest
