@@ -55,17 +55,21 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
             return;
         }
 
+        // Read before the visitor is looked up: this event is fired for every Propel
+        // collection, and a page of brands or of countries carries no price. Looking
+        // the customer up there would open a session, and stop the response from
+        // being cached, on collections a rule can never change.
+        $productSaleElementsIds = $this->saleElementIdsOf($event->getModels());
+
+        if ([] === $productSaleElementsIds) {
+            return;
+        }
+
         $customer = $this->currentCustomerProvider->getCurrentCustomer();
 
         // Gathering the sale elements of a page of products is one query: not spent
         // in a shop where nothing prices for this visitor beyond the catalog.
         if (!$this->effectivePriceCatalog->pricesAnythingFor($customer)) {
-            return;
-        }
-
-        $productSaleElementsIds = $this->saleElementIdsOf($event->getModels());
-
-        if ([] === $productSaleElementsIds) {
             return;
         }
 
