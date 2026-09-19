@@ -417,6 +417,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // cart item
         foreach ($cart->getCartItems() as $cartItem) {
+            // An offered line belongs to the promotion that placed it, which set its
+            // price: settling it against the catalog would charge the customer for a
+            // gift the shop decided to give.
+            if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
             $productSaleElements = $cartItem->getProductSaleElements();
 
             if (null === $productSaleElements) {
@@ -461,11 +468,36 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     private function settlePrices(CartModel $cart): void
     {
-        if (!$this->pricingActivityChecker->hasActivePublicRule() && !$this->pricingActivityChecker->hasVisitorDependentPricing()) {
+        if (!$this->pricingActivityChecker->hasActivePublicRule()
+            && !$this->pricingActivityChecker->hasVisitorDependentPricing()
+            && !$this->holdsSpecialOffer($cart)) {
             return;
         }
 
         $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
+    }
+
+    /**
+     * Whether a line of the cart still carries a special offer.
+     *
+     * The last rule of a shop being turned off, or deleted, leaves no rule to detect
+     * and the line keeps the price that rule gave it. Reading what the cart already
+     * holds is what tells the shop apart from one that never had a rule at all: the
+     * refresh below then gives the line its catalog price back.
+     */
+    private function holdsSpecialOffer(CartModel $cart): bool
+    {
+        if (null === $cartId = $cart->getId()) {
+            return false;
+        }
+
+        // Asked of the database, not of getCartItems(): loading the collection here
+        // would freeze it in memory before the promotions have placed their lines.
+        return CartItemQuery::create()
+            ->filterByCartId($cartId)
+            ->filterByPromo(1)
+            ->filterByIsOffered(0)
+            ->exists();
     }
 
     /**
