@@ -16,7 +16,6 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 use Thelia\Model\Map\OrderTableMap;
@@ -175,27 +174,6 @@ class OrderQuery extends BaseOrderQuery
             ->filterByCreatedAt(\sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(\sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
-    }
-
-    /**
-     * The order this cart has already been turned into, if it has one that still stands.
-     *
-     * A cancelled order is not one: a payment that did not go through takes the order
-     * back and leaves the buyer with the cart they still have. Anything else — waiting
-     * for its payment, paid, sent — is an order that exists, and a cart is only ever
-     * ordered once.
-     *
-     * @throws PropelException
-     */
-    public static function findStandingOrderOfCart(int $cartId, ?ConnectionInterface $con = null): ?Order
-    {
-        return self::create()
-            ->filterByCartId($cartId)
-            ->useOrderStatusQuery()
-                ->filterByCode(OrderStatus::CODE_CANCELED, Criteria::NOT_EQUAL)
-            ->endUse()
-            ->orderById(Criteria::DESC)
-            ->findOne($con);
     }
 }
 

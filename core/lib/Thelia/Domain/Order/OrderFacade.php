@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -46,6 +47,7 @@ use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 readonly class OrderFacade
@@ -280,7 +282,13 @@ readonly class OrderFacade
         $lockTheCart->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
         $lockTheCart->execute();
 
-        $existingOrder = OrderQuery::findStandingOrderOfCart($cartId, $connection);
+        $existingOrder = OrderQuery::create()
+            ->filterByCartId($cartId)
+            ->useOrderStatusQuery()
+                ->filterByCode(OrderStatus::CODE_CANCELED, Criteria::NOT_EQUAL)
+            ->endUse()
+            ->orderById(Criteria::DESC)
+            ->findOne($connection);
 
         if ($existingOrder instanceof ModelOrder) {
             throw new CartAlreadyOrderedException((int) $existingOrder->getId(), $cartId);

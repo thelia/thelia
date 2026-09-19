@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Lock\LockFactory;
 use Thelia\Domain\Checkout\CheckoutFacade;
@@ -29,6 +30,7 @@ use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Model\CheckoutStep;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
 
 /**
  * Placing an order for a cart, with nobody at a browser.
@@ -202,11 +204,22 @@ final readonly class CheckoutPlacementService
     /**
      * The order this cart has already been turned into, if it has one that still stands.
      *
+     * A cancelled order is not one: a payment that did not go through takes the order
+     * back and leaves the buyer with the cart they still have, and refusing to let them
+     * try again would strand them. Anything else — waiting for its payment, paid, sent —
+     * is an order that exists, and a cart is only ever ordered once.
+     *
      * @throws PropelException
      */
     private function existingOrderFor(int $cartId): ?Order
     {
-        return OrderQuery::findStandingOrderOfCart($cartId);
+        return OrderQuery::create()
+            ->filterByCartId($cartId)
+            ->useOrderStatusQuery()
+                ->filterByCode(OrderStatus::CODE_CANCELED, Criteria::NOT_EQUAL)
+            ->endUse()
+            ->orderById(Criteria::DESC)
+            ->findOne();
     }
 
     /**
