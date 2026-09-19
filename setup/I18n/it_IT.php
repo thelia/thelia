@@ -430,4 +430,5 @@ return [
     'Zaire' => 'RD del Congo',
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabwe',
+    'Catalog price rules' => 'Regole di prezzo del catalogo',
 ];

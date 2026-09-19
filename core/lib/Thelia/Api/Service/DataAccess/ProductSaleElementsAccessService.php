@@ -23,7 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Localization\Service\LangService;
-use Thelia\Domain\Sale\ReservedSalePriceCatalog;
+use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
@@ -45,7 +45,7 @@ class ProductSaleElementsAccessService
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LangService $langService,
         private readonly ReservedSaleVisibility $reservedSaleVisibility,
-        private readonly ReservedSalePriceCatalog $reservedSalePriceCatalog,
+        private readonly EffectivePriceCatalog $effectivePriceCatalog,
     ) {
         $this->request = $requestStack->getMainRequest();
     }
@@ -76,12 +76,20 @@ class ProductSaleElementsAccessService
 
         $this->reservedSaleVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
 
-        $reservedPrices = $this->reservedSalePriceCatalog->prices(
+        $pses = $query->find();
+        $productSaleElementsIds = [];
+
+        foreach ($pses as $pse) {
+            $productSaleElementsIds[] = (int) $pse->getId();
+        }
+
+        $effectivePrices = $this->effectivePriceCatalog->warm(
+            $productSaleElementsIds,
             $currency,
             $this->reservedSaleVisibility->currentCustomer(),
         );
 
-        foreach ($query->find() as $pse) {
+        foreach ($pses as $pse) {
             $attributes = [];
             $isPromo = (bool) $pse->getPromo();
 
@@ -94,16 +102,16 @@ class ProductSaleElementsAccessService
             $pse->setVirtualColumn('price_PRICE', $prices->getPrice());
             $pse->setVirtualColumn('price_PROMO_PRICE', $prices->getPromoPrice());
 
-            // A reserved operation writes nothing in the catalog, so its price is
-            // substituted in the virtual column the getters below read: the customer
-            // discount and the tax are then applied to it exactly the way they are
-            // applied to a public promo price.
-            $reservedPrice = $reservedPrices[$pse->getId()] ?? null;
+            // A catalog price rule or a reserved operation writes nothing in the
+            // catalog, so its price is substituted in the virtual column the getters
+            // below read: the customer discount and the tax are then applied to it
+            // exactly the way they are applied to a public promo price.
+            $effectivePrice = $effectivePrices[(int) $pse->getId()] ?? null;
 
-            if (null !== $reservedPrice) {
+            if (null !== $effectivePrice) {
                 $pse->setVirtualColumn(
                     'price_PROMO_PRICE',
-                    $reservedPrice->untaxedPromoPrice * (1 - ((float) $discount / 100)),
+                    $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100)),
                 );
                 $isPromo = true;
             }

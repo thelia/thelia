@@ -17,6 +17,8 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
@@ -25,6 +27,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
 {
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -57,5 +60,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
 
             throw $exception;
         }
+
+        $this->eventDispatcher?->dispatch(new ResourcePersistedEvent($data::class, $propelModel, ResourcePersistedEvent::OPERATION_DELETE));
     }
 }

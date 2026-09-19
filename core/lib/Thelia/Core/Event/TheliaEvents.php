@@ -637,6 +637,14 @@ final class TheliaEvents
     public const UPDATE_PRODUCT_SALE_STATUS = 'action.updateProductSaleStatus';
     public const CHECK_SALE_ACTIVATION_EVENT = 'action.checkSaleActivationEvent';
 
+    // -- Catalog price rules --------------------------------------------
+
+    public const CATALOG_PRICE_RULE_CREATE = 'action.createCatalogPriceRule';
+    public const CATALOG_PRICE_RULE_UPDATE = 'action.updateCatalogPriceRule';
+    public const CATALOG_PRICE_RULE_DELETE = 'action.deleteCatalogPriceRule';
+    public const CATALOG_PRICE_RULE_TOGGLE_ACTIVITY = 'action.toggleCatalogPriceRuleActivity';
+    public const CATALOG_PRICE_RULE_RECOMPUTE = 'action.recomputeCatalogPriceRule';
+
     // -- Meta Data ---------------------------------------------
 
     public const META_DATA_CREATE = 'thelia.metadata.create';
