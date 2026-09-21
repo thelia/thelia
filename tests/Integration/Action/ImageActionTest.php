@@ -29,6 +29,7 @@ use Thelia\Core\File\FileManager;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
 use Thelia\Domain\Media\MediaFacade;
+use Thelia\Domain\Media\ProductMediaOrder;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -186,6 +187,7 @@ final class ImageActionTest extends ActionIntegrationTestCase
             $this->dispatcher,
             $this->getService(FileManager::class),
             $this->getService(FileProcessorService::class),
+            new ProductMediaOrder(),
         );
 
         $facade->updateImage($savedModel, new ImageUpdateDTO(

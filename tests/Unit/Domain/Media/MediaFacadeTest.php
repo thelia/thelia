@@ -25,6 +25,7 @@ use Thelia\Domain\Media\DTO\ImageProcessDTO;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
 use Thelia\Domain\Media\DTO\ImageUploadDTO;
 use Thelia\Domain\Media\MediaFacade;
+use Thelia\Domain\Media\ProductMediaOrder;
 
 class MediaFacadeTest extends TestCase
 {
@@ -40,6 +41,7 @@ class MediaFacadeTest extends TestCase
             $this->dispatcher,
             $this->fileManager,
             $this->createMock(FileProcessorService::class),
+            new ProductMediaOrder(),
         );
     }
 
