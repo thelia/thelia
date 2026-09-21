@@ -19,10 +19,13 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Cart\Service\CartGiftWrappingService;
 use Thelia\Domain\Cart\Service\CartItemService;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
+use Thelia\Domain\Checkout\Exception\GiftMessageTooLongException;
+use Thelia\Domain\Checkout\Exception\UnknownGiftWrappingException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -35,6 +38,7 @@ final readonly class CartFacade
         private CartSelectionService $cartSelectionService,
         private PostageHandler $postageHandler,
         private CartRetriever $cartRetriever,
+        private CartGiftWrappingService $cartGiftWrappingService,
     ) {
     }
 
@@ -62,6 +66,37 @@ final readonly class CartFacade
     public function updateItemQuantity(CartItemUpdateQuantityDTO $dto): CartItem
     {
         return $this->cartItemService->updateQuantityItem($dto);
+    }
+
+    /**
+     * Record the gift wrapping the buyer picked on the cart, or clear the choice with null.
+     *
+     * Only the identifier travels: the price and the tax rule are read off the wrapping
+     * itself, here and again when the order freezes its line.
+     *
+     * @throws UnknownGiftWrappingException when the shop does not offer that wrapping
+     */
+    public function chooseGiftWrapping(Cart $cart, ?int $giftWrappingId): void
+    {
+        $this->cartGiftWrappingService->chooseGiftWrapping($cart, $giftWrappingId);
+    }
+
+    /**
+     * Record the note the buyer wrote for whoever receives the parcel, or clear it with null.
+     *
+     * @throws GiftMessageTooLongException when the note exceeds what the shop accepts
+     */
+    public function writeGiftMessage(Cart $cart, ?string $giftMessage): void
+    {
+        $this->cartGiftWrappingService->writeGiftMessage($cart, $giftMessage);
+    }
+
+    /**
+     * Drop a wrapping the shop stopped offering while the cart was sitting there.
+     */
+    public function dropGiftWrappingThatIsNoLongerOffered(Cart $cart): void
+    {
+        $this->cartGiftWrappingService->dropGiftWrappingThatIsNoLongerOffered($cart);
     }
 
     /**

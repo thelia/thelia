@@ -51,6 +51,11 @@ readonly class OrderFactory
         $order->setDiscount($cart->getDiscount());
         $order->setCustomerDiscountRate($this->resolveCustomerDiscountRate($customer));
 
+        // The note for whoever receives the parcel, copied off the cart the way every other
+        // wording the order needs to keep is. The wrapping itself is not copied here: it
+        // becomes a line of the order, built beside the product lines.
+        $order->setGiftMessage($cart->getGiftMessage());
+
         return $order;
     }
 

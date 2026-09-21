@@ -49,6 +49,20 @@ enum CheckoutViolationCode: string
      */
     case ConsentUnknown = 'consent-unknown';
 
+    /**
+     * A gift wrapping was asked for that this shop does not offer — turned off, deleted,
+     * or never its own. Refused rather than ignored, for the reason ConsentUnknown is: a
+     * caller working from a stale list would otherwise get an order without the service
+     * it thinks it bought.
+     */
+    case GiftWrappingUnknown = 'gift-wrapping-unknown';
+
+    /**
+     * The note for the recipient is longer than the shop accepts. Refused whole: cutting
+     * it would print half a sentence on the parcel.
+     */
+    case GiftMessageTooLong = 'gift-message-too-long';
+
     case GuestCheckoutNotAllowed = 'guest-checkout-not-allowed';
 
     /**
