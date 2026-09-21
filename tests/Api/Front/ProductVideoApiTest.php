@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Front;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Cache\ConfigCacheService;
+use Thelia\Domain\Media\Video\VideoProviderResolver;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsProductVideo;
 use Thelia\Test\ApiTestCase;
@@ -28,6 +31,13 @@ use Thelia\Test\ApiTestCase;
  */
 final class ProductVideoApiTest extends ApiTestCase
 {
+    protected function tearDown(): void
+    {
+        // The database changes are rolled back, the static config cache is not.
+        ConfigQuery::resetCache();
+        parent::tearDown();
+    }
+
     public function testTheCollectionOfAProductComesInPositionOrder(): void
     {
         $product = $this->createProduct();
@@ -43,6 +53,38 @@ final class ProductVideoApiTest extends ApiTestCase
         self::assertSame($second->getId(), $videos[1]['id']);
         self::assertSame('https://www.youtube-nocookie.com/embed/aaaaaaaaaaa', $videos[0]['embedUrl']);
         self::assertNull($videos[0]['fileUrl']);
+    }
+
+    public function testAVideoOfAPlatformTheShopSwitchedOffHasNoFrameAddress(): void
+    {
+        $product = $this->createProduct();
+        $factory = $this->createFixtureFactory();
+
+        $youtube = $factory->productVideo($product, ['externalId' => 'aaaaaaaaaaa']);
+        $vimeo = $factory->productVideo($product, ['provider' => 'vimeo', 'externalId' => '76979871']);
+
+        // The request warms the shared config cache from the database as it stands,
+        // uncommitted value included, and that entry outlives the rollback: it is
+        // dropped before the request, so that it reads the new value, and after, so
+        // that no later test reads it back.
+        $configCache = $this->getService(ConfigCacheService::class);
+        $previous = ConfigQuery::read(VideoProviderResolver::PROVIDERS_VARIABLE);
+        ConfigQuery::write(VideoProviderResolver::PROVIDERS_VARIABLE, 'youtube');
+        $configCache->initCacheConfigs(true);
+
+        try {
+            $videos = $this->collection('/api/front/product_videos?product.id='.$product->getId().'&order[position]=asc');
+        } finally {
+            ConfigQuery::write(VideoProviderResolver::PROVIDERS_VARIABLE, $previous ?? VideoProviderResolver::DEFAULT_PROVIDERS);
+            $configCache->initCacheConfigs(true);
+        }
+
+        // The row stays: a merchant who re-enables the platform gets his video back.
+        // What goes is the address a gallery would frame.
+        self::assertSame([$youtube->getId(), $vimeo->getId()], array_column($videos, 'id'));
+        self::assertSame('https://www.youtube-nocookie.com/embed/aaaaaaaaaaa', $videos[0]['embedUrl']);
+        self::assertNull($videos[1]['embedUrl'], 'A platform the shop switched off is not framed.');
+        self::assertSame('vimeo', $videos[1]['provider']);
     }
 
     public function testAHiddenVideoIsOutOfReachWithoutTheCallerAskingForIt(): void
