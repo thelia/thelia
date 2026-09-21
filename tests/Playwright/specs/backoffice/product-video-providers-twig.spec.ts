@@ -618,6 +618,57 @@ test.describe('Product videos — every source, from the paste to the click (BO 
     }
   });
 
+  test('a video bound to one variant shows for that variant and for no other', async ({ page }) => {
+    const { productId, frontUrl } = await findProduct(page);
+    await deleteAllVideos(page, productId);
+
+    try {
+      expect(await addVideo(page, productId, { url: PLATFORMS[0].pasted }, 'Variant demo')).toBe(200);
+      const [videoId] = await videoIdsOf(page, productId);
+
+      // The variants that already show an image of their own: binding the video to one
+      // of those would prove nothing, the gallery would stop on the image.
+      await page.goto(frontUrl);
+      const taken = new Set(
+        await page.locator('.ProductGallery-list li button[data-pse-id]').evaluateAll((nodes) =>
+          nodes
+            .filter((node) => !node.querySelector('.ProductGallery-videoBadge'))
+            .flatMap((node) => (node.getAttribute('data-pse-id') ?? '').split(',').filter(Boolean)),
+        ),
+      );
+
+      await page.goto(`/admin/products/update?product_id=${productId}&current_tab=pse`);
+      const buttons = page.locator('[data-testid^="combinations-assoc-video-"]');
+      const pseIds = await buttons.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-pse-id') ?? ''));
+      const pseId = pseIds.find((id) => id !== '' && !taken.has(id));
+      test.skip(pseId === undefined, 'every combination of this product already shows an image of its own');
+
+      const token = await page.locator('#pse-assoc-modal').getAttribute('data-bo-pse-assoc-picker-token-value');
+      const bound = await page.request.post(`/admin/product_sale_elements/${pseId}/video/${videoId}`, { form: { _token: token ?? '' } });
+      expect(bound.status()).toBe(200);
+
+      // On the sheet, every variant is tried in turn. The pills carry no variant id,
+      // so the gallery answers for itself: the video is on screen for one variant and
+      // for one only, which is what binding it to a combination is supposed to mean.
+      await page.goto(frontUrl);
+      const pills = page.locator('[data-live-action-param="updateCurrentCombination"]');
+      const total = await pills.count();
+      expect(total, 'the product must offer several variants').toBeGreaterThan(1);
+
+      const showsVideo: boolean[] = [];
+      for (let i = 0; i < total; i++) {
+        await pills.nth(i).click();
+        // The variant change is a live round trip; the gallery follows it afterwards.
+        await page.waitForTimeout(1200);
+        showsVideo.push(await page.locator('.splide__slide.is-active .VideoPlayer').count() > 0);
+      }
+
+      expect(showsVideo.filter(Boolean)).toHaveLength(1);
+    } finally {
+      await deleteAllVideos(page, productId);
+    }
+  });
+
   test('an address whose video the platform cannot play is still accepted: only the platform knows', async ({ page }) => {
     const { productId, frontUrl } = await findProduct(page);
     await deleteAllVideos(page, productId);
