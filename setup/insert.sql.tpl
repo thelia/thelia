@@ -3931,3 +3931,27 @@ INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
     (4, 'fr_FR', 'Confirmation'),
     (4, 'it_IT', 'Conferma')
 ;
+
+/**
+The filters a product listing offers that hang off neither a feature nor an attribute.
+
+A row here is what makes such a filter reachable from the back office: the category and
+the template screens list them, and a merchant decides there whether the facet shows,
+where it sits and how it is drawn. The filters themselves live in code, matched to these
+rows by `type`, never by id.
+
+Brand and category are deliberately absent: they were seeded by the 2.x update script and
+never by a fresh install, and repairing that is its own change.
+*/
+INSERT INTO `choice_filter_other` (`id`, `type`, `visible`) VALUES
+    (4, 'promo', 1),
+    (5, 'new', 1)
+;
+
+INSERT INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+{% for locale in locales %}
+    (4, '{{ locale }}', {{ intl('Promotion', locale) }}, NULL),
+    (5, '{{ locale }}', {{ intl('Newness', locale) }}, NULL){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
