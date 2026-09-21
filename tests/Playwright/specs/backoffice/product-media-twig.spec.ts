@@ -32,6 +32,9 @@ async function findProductWithImages(page: Page): Promise<Shop> {
       continue;
     }
     const html = await response.text();
+    // The theme the test job installs may predate this feature: without the alt
+    // field and the media grid there is nothing here to judge.
+    test.skip(!html.includes('data-bo-file-list-reorder-url-value'), 'the installed back-office theme predates the product media screens');
     const imageId = /data-testid="bo-file-alt-input-(\d+)"/.exec(html)?.[1];
     if (imageId) {
       return { productId, imageId };
@@ -81,8 +84,12 @@ async function openImagesTab(page: Page, productId: string, editLanguageId?: str
   await expect(page.getByTestId('bo-file-list-grid')).toBeVisible();
 }
 
+/**
+ * The videos of a product are added and listed on its images tab, in the same
+ * grid as the images: opening "the videos" is opening that tab.
+ */
 async function openVideosTab(page: Page, productId: string): Promise<void> {
-  await page.goto(`/admin/products/update?product_id=${productId}&current_tab=videos`);
+  await page.goto(`/admin/products/update?product_id=${productId}&current_tab=images`);
   await expect(page.getByTestId('bo-video-panel')).toBeVisible();
 }
 
@@ -90,14 +97,45 @@ async function addVideo(page: Page, productId: string, url: string, title: strin
   await openVideosTab(page, productId);
   await page.getByTestId('bo-video-url').fill(url);
   await page.getByTestId('bo-video-title').fill(title);
-  await page.getByTestId('bo-video-add-submit').click();
+  // The form posts without leaving the page: wait for the answer, whatever it is,
+  // so that what the next step reads back is what this post produced.
+  await Promise.all([
+    page.waitForResponse((response) => response.url().includes('/save-ajax') && response.request().method() === 'POST'),
+    page.getByTestId('bo-video-add-submit').click(),
+  ]);
 }
 
 async function videoIdsOf(page: Page, productId: string): Promise<string[]> {
-  const response = await page.request.get(`/admin/video/product/${productId}/list-ajax`);
+  const response = await page.request.get(`/admin/image/type/product/${productId}/list-ajax`);
   const html = await response.text();
 
   return Array.from(html.matchAll(/data-testid="bo-video-item-(\d+)"/g)).map((match) => match[1]);
+}
+
+/**
+ * Every card of the media grid, first card first, as the `type:id` entries the
+ * reorder endpoint takes.
+ */
+async function mediaOrderOf(page: Page, productId: string): Promise<string[]> {
+  const response = await page.request.get(`/admin/image/type/product/${productId}/list-ajax`);
+  const html = await response.text();
+
+  return Array.from(html.matchAll(/data-file-id="(\d+)"\s+data-media-type="(\w+)"/g)).map((match) => `${match[2]}:${match[1]}`);
+}
+
+/**
+ * Posts a media order the way the grid does on a drop: one `order[]` entry per card.
+ * Playwright's `form` option takes no array, so the body is written by hand.
+ */
+async function postOrder(page: Page, productId: string, order: string[], token: string) {
+  const body = new URLSearchParams();
+  order.forEach((entry) => body.append('order[]', entry));
+  body.set('_token', token);
+
+  return page.request.post(`/admin/product/${productId}/media/reorder`, {
+    data: body.toString(),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+  });
 }
 
 async function deleteAllVideos(page: Page, productId: string): Promise<void> {
@@ -326,11 +364,14 @@ test.describe('Back-office — product media: alternative text and videos (BO Tw
       // An unknown address is refused, and the message names the platforms the shop accepts.
       await addVideo(page, productId, UNKNOWN_URL, 'Refused');
       await expect(page.getByTestId('bo-video-add-form')).toContainText('YouTube');
-      await expect(page.getByTestId('bo-video-list-empty')).toBeVisible();
+      expect(await videoIdsOf(page, productId)).toEqual([]);
 
-      // A YouTube address is accepted and shows up in the grid.
+      // A YouTube address is accepted and shows up in the media grid, after the images.
       await addVideo(page, productId, YOUTUBE_URL, 'Demo');
-      await expect(page.getByTestId('bo-video-list-grid')).toBeVisible();
+      await expect(page.getByTestId('bo-file-list-grid')).toBeVisible();
+      await expect(page.locator('[data-testid^="bo-video-item-"]')).toHaveCount(1);
+      const orderAfterAdd = await mediaOrderOf(page, productId);
+      expect(orderAfterAdd[orderAfterAdd.length - 1]).toMatch(/^video:/);
 
       const [firstVideoId] = await videoIdsOf(page, productId);
       expect(firstVideoId, 'the YouTube address must have produced a video').toBeTruthy();
@@ -359,7 +400,7 @@ test.describe('Back-office — product media: alternative text and videos (BO Tw
       expect(ids.length).toBe(2);
 
       await openVideosTab(page, productId);
-      const token = await page.getByTestId('bo-video-list-grid')
+      const token = await page.getByTestId('bo-file-list-grid')
         .locator('xpath=ancestor::div[@data-controller="bo-file-list"]')
         .getAttribute('data-bo-file-list-token-value');
       const moved = await page.request.post(`/admin/video/product/${productId}/update-position`, {
@@ -367,6 +408,20 @@ test.describe('Back-office — product media: alternative text and videos (BO Tw
       });
       expect(moved.ok()).toBeTruthy();
       expect(await videoIdsOf(page, productId)).toEqual([ids[1], ids[0]]);
+
+      // Images and videos share one order: the grid posts the whole list on a drop,
+      // and reads it back with a video before the first image.
+      const before = await mediaOrderOf(page, productId);
+      const reversed = [...before].reverse();
+      const reordered = await postOrder(page, productId, reversed, token ?? '');
+      expect(reordered.ok()).toBeTruthy();
+      expect(await mediaOrderOf(page, productId)).toEqual(reversed);
+      expect(reversed[0]).toMatch(/^video:/);
+
+      // A list that leaves a medium out is refused, and nothing moves.
+      const partial = await postOrder(page, productId, reversed.slice(1), token ?? '');
+      expect(partial.status()).toBe(409);
+      expect(await mediaOrderOf(page, productId)).toEqual(reversed);
 
       // The combination picker offers the videos of the product.
       await page.goto(`/admin/products/update?product_id=${productId}&current_tab=pse`);

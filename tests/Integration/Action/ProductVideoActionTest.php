@@ -26,6 +26,8 @@ use Thelia\Domain\Media\MediaFacade;
 use Thelia\Domain\Media\Video\IncompleteVideoException;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Model\Product;
+use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductSaleElementsProductVideo;
 use Thelia\Model\ProductSaleElementsProductVideoQuery;
 use Thelia\Model\ProductVideo;
@@ -361,6 +363,132 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         }
 
         return array_values(array_diff(scandir($directory) ?: [], ['.', '..']));
+    }
+
+    public function testANewMediumGoesAfterEveryImageAndVideoOfTheProduct(): void
+    {
+        $product = $this->createProduct();
+
+        $firstImage = $this->productImage($product);
+        $video = $this->platformVideo($product);
+        $secondImage = $this->productImage($product);
+        $secondVideo = $this->platformVideo($product);
+
+        self::assertSame(1, $firstImage->getPosition());
+        self::assertSame(2, $video->getPosition(), 'A video goes after the images the product already has.');
+        self::assertSame(3, $secondImage->getPosition(), 'An image goes after the videos the product already has.');
+        self::assertSame(4, $secondVideo->getPosition());
+    }
+
+    public function testTheMediaOfAProductAreReorderedAsOneList(): void
+    {
+        $product = $this->createProduct();
+        $firstImage = $this->productImage($product);
+        $secondImage = $this->productImage($product);
+        $video = $this->platformVideo($product);
+
+        $this->mediaFacade->reorderProductMedia($product->getId(), [
+            ['type' => 'video', 'id' => $video->getId()],
+            ['type' => 'image', 'id' => $secondImage->getId()],
+            ['type' => 'image', 'id' => $firstImage->getId()],
+        ]);
+
+        self::assertSame(1, ProductVideoQuery::create()->findPk($video->getId())?->getPosition());
+        self::assertSame(2, ProductImageQuery::create()->findPk($secondImage->getId())?->getPosition());
+        self::assertSame(3, ProductImageQuery::create()->findPk($firstImage->getId())?->getPosition());
+    }
+
+    public function testAReorderNamingTheMediumOfAnotherProductIsRefusedAndWritesNothing(): void
+    {
+        $product = $this->createProduct();
+        $image = $this->productImage($product);
+        $video = $this->platformVideo($product);
+        $foreignVideo = $this->platformVideo($this->createProduct());
+
+        try {
+            $this->mediaFacade->reorderProductMedia($product->getId(), [
+                ['type' => 'video', 'id' => $foreignVideo->getId()],
+                ['type' => 'image', 'id' => $image->getId()],
+            ]);
+            self::fail('A medium of another product must be refused.');
+        } catch (\InvalidArgumentException) {
+        }
+
+        self::assertSame(1, ProductImageQuery::create()->findPk($image->getId())?->getPosition());
+        self::assertSame(2, ProductVideoQuery::create()->findPk($video->getId())?->getPosition());
+        self::assertSame(1, ProductVideoQuery::create()->findPk($foreignVideo->getId())?->getPosition());
+    }
+
+    public function testAReorderNamingAMediumTwiceIsRefused(): void
+    {
+        $product = $this->createProduct();
+        $image = $this->productImage($product);
+        $video = $this->platformVideo($product);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->mediaFacade->reorderProductMedia($product->getId(), [
+            ['type' => 'video', 'id' => $video->getId()],
+            ['type' => 'video', 'id' => $video->getId()],
+        ]);
+
+        self::assertSame(1, ProductImageQuery::create()->findPk($image->getId())?->getPosition());
+    }
+
+    public function testDeletingAnImageClosesTheGapInTheSharedSequence(): void
+    {
+        $product = $this->createProduct();
+        $firstImage = $this->productImage($product);
+        $video = $this->platformVideo($product);
+        $secondImage = $this->productImage($product);
+
+        $firstImage->delete();
+
+        // The video was second and is now first: it does not fall behind the
+        // image that followed it, which a one-table renumbering would have caused.
+        self::assertSame(1, ProductVideoQuery::create()->findPk($video->getId())?->getPosition());
+        self::assertSame(2, ProductImageQuery::create()->findPk($secondImage->getId())?->getPosition());
+    }
+
+    public function testMovingAnImageThroughTheFacadeKeepsOneSequenceWithTheVideos(): void
+    {
+        $product = $this->createProduct();
+        $firstImage = $this->productImage($product);
+        $video = $this->platformVideo($product);
+        $secondImage = $this->productImage($product);
+
+        $this->mediaFacade->updateImagePosition($secondImage, 1, UpdatePositionEvent::POSITION_ABSOLUTE);
+
+        self::assertSame(1, ProductImageQuery::create()->findPk($secondImage->getId())?->getPosition());
+        self::assertSame(2, ProductImageQuery::create()->findPk($firstImage->getId())?->getPosition());
+        self::assertSame(3, ProductVideoQuery::create()->findPk($video->getId())?->getPosition(), 'The video moves down with the rest.');
+
+        $this->mediaFacade->updateVideoPosition($video, 1, UpdatePositionEvent::POSITION_ABSOLUTE);
+
+        self::assertSame(1, ProductVideoQuery::create()->findPk($video->getId())?->getPosition());
+        self::assertSame(2, ProductImageQuery::create()->findPk($secondImage->getId())?->getPosition());
+        self::assertSame(3, ProductImageQuery::create()->findPk($firstImage->getId())?->getPosition());
+    }
+
+    public function testAReorderLeavingAMediumOutIsRefused(): void
+    {
+        $product = $this->createProduct();
+        $this->productImage($product);
+        $video = $this->platformVideo($product);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->mediaFacade->reorderProductMedia($product->getId(), [
+            ['type' => 'video', 'id' => $video->getId()],
+        ]);
+    }
+
+    private function productImage(Product $product): ProductImage
+    {
+        $image = $this->factory->productImage($product);
+        $this->trackFileForCleanup($image->getUploadDir().DS.$image->getFile());
+
+        return $image;
     }
 
     private function createProduct(): Product
