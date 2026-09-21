@@ -209,7 +209,14 @@ every `CATALOG_PRICE_RULE_*` event and by the recompute command.
   customer groups (US #122) plug in here.
 - `Thelia\Domain\Pricing\CatalogPriceResolverInterface`: the contract a module pricing
   by rules of its own decorates, answering for the sale elements it covers and handing
-  the rest to the core resolver.
+  the rest to the core resolver. The alias to `Rule\CatalogPriceRuleResolver` is declared
+  in `Config/Resources/services/core/pricing.php`, not left to the singly-implemented
+  interface rule of the loader: that rule spans the core and the modules of one container
+  build, and the decorator of a module, implementing the interface, would remove the
+  alias and leave every reader of a price without a resolver. A module decorates with
+  `#[AsDecorator(CatalogPriceResolverInterface::class)]`. A module whose prices depend on
+  the visitor or on the cart also decorates `PricingActivityChecker`, so that the core
+  asks and the shared API cache steps aside (the QueryBuilder module does both).
 
 ## Where things live
 
