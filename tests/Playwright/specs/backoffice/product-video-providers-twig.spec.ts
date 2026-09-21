@@ -503,6 +503,68 @@ test.describe('Product videos — every source, from the paste to the click (BO 
     }
   });
 
+  test('the source is replaced without losing what the merchant arranged around it', async ({ page }) => {
+    const { productId, frontUrl } = await findProduct(page);
+    await deleteAllVideos(page, productId);
+    const sample = await recordSampleVideo(page);
+
+    try {
+      expect(await addVideo(page, productId, { url: PLATFORMS[0].pasted }, 'Source demo')).toBe(200);
+      const [videoId] = await videoIdsOf(page, productId);
+
+      // Give it a poster and an alternative text, the things a merchant would lose
+      // by deleting the video and adding it again.
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      const choice = page.getByTestId('bo-video-edit-thumbnail-choice');
+      const options = await choice.locator('option').evaluateAll((nodes) => nodes.map((n) => (n as HTMLOptionElement).value).filter(Boolean));
+      await choice.selectOption(options[1]);
+      await page.getByTestId('bo-video-edit-alt').fill('A demonstration of the bag');
+      await page.getByTestId('bo-video-edit-save-stay').click();
+
+      // The screen states the source it plays from.
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      await expect(page.getByTestId('bo-video-edit-source')).toContainText(PLATFORMS[0].identifier);
+
+      // An address of no known platform is refused, and nothing moves.
+      await page.getByTestId('bo-video-edit-url').fill(UNKNOWN_URL);
+      await page.getByTestId('bo-video-edit-save-stay').click();
+      await expect(page.locator('.invalid-feedback, .form-error-message, [role="alert"]').first()).toContainText(/YouTube/);
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      await expect(page.getByTestId('bo-video-edit-source')).toContainText(PLATFORMS[0].identifier);
+
+      // Another platform address takes its place, and the rest is untouched.
+      await page.getByTestId('bo-video-edit-url').fill(PLATFORMS[1].pasted);
+      await page.getByTestId('bo-video-edit-save-stay').click();
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      await expect(page.getByTestId('bo-video-edit-source')).toContainText(PLATFORMS[1].identifier);
+      await expect(page.getByTestId('bo-video-edit-alt')).toHaveValue('A demonstration of the bag');
+      await expect(page.getByTestId('bo-video-edit-thumbnail-choice')).toHaveValue(options[1]);
+      expect(await videoIdsOf(page, productId)).toEqual([videoId]);
+
+      // The front plays the new address.
+      await openFront(page, frontUrl);
+      await (await showVideoSlide(page)).locator('button.VideoPlayer-play').click();
+      const frame = page.locator('iframe.VideoPlayer-frame');
+      expect((await frame.getAttribute('src')) ?? '').toContain(PLATFORMS[1].identifier);
+
+      // And a file takes the place of the address, served by the shop.
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      await page.getByTestId('bo-video-edit-file').setInputFiles(sample);
+      await page.getByTestId('bo-video-edit-save-stay').click();
+      await page.goto(`/admin/video/product/${productId}/${videoId}/update`);
+      await expect(page.getByTestId('bo-video-edit-source')).toContainText(/webm/i);
+
+      await openFront(page, frontUrl);
+      await (await showVideoSlide(page)).locator('button.VideoPlayer-play').click();
+      const video = page.locator('video.VideoPlayer-file');
+      await expect(video).toHaveCount(1);
+      expect((await video.getAttribute('src')) ?? '').toMatch(/\/cache\/videos\//);
+    } finally {
+      await deleteAllVideos(page, productId);
+      fs.rmSync(sample, { force: true });
+    }
+  });
+
   test('an address whose video the platform cannot play is still accepted: only the platform knows', async ({ page }) => {
     const { productId, frontUrl } = await findProduct(page);
     await deleteAllVideos(page, productId);
