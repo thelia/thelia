@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Action\ProductVideo as ProductVideoAction;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
@@ -363,6 +364,30 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         }
 
         return array_values(array_diff(scandir($directory) ?: [], ['.', '..']));
+    }
+
+    public function testAFileTheServerRefusedForItsSizeIsNotStored(): void
+    {
+        $product = $this->createProduct();
+
+        // What PHP hands the application when the upload went past upload_max_filesize:
+        // the file is there, its error says why it is not usable.
+        $tooLarge = new UploadedFile($this->createTestMp4(), 'demo.mp4', 'video/mp4', \UPLOAD_ERR_INI_SIZE, true);
+
+        try {
+            $this->mediaFacade->createVideo(new ProductVideoCreateDTO(
+                productId: $product->getId(),
+                provider: VideoProvider::File,
+                uploadedFile: $tooLarge,
+                locale: 'en_US',
+                title: 'Too large',
+            ));
+            self::fail('A file the server refused for its size must not be stored.');
+        } catch (ProcessFileException $exception) {
+            self::assertStringContainsString('too large', strtolower($exception->getMessage()));
+        }
+
+        self::assertSame(0, ProductVideoQuery::create()->filterByProductId($product->getId())->count());
     }
 
     public function testReplacingTheAddressOfAPlatformVideoKeepsEverythingElse(): void
