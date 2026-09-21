@@ -413,4 +413,6 @@ return [
     'Đồng' => 'Dong',
     'Гривна' => 'Hryvnia',
     'Catalog price rules' => 'Catalogusprijsregels',
+    'Promotion' => 'Promotie',
+    'Newness' => 'Nieuw',
 ];
