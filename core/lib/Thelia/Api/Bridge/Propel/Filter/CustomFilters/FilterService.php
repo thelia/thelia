@@ -24,6 +24,8 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\NewnessFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PromoFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
@@ -692,6 +694,12 @@ readonly class FilterService
         }
         if ($filter instanceof BrandFilter) {
             $mainTitle = $this->translator->trans(id: 'Brand', locale: $locale);
+        }
+        if ($filter instanceof PromoFilter) {
+            $mainTitle = $this->translator->trans(id: 'Promotion', locale: $locale);
+        }
+        if ($filter instanceof NewnessFilter) {
+            $mainTitle = $this->translator->trans(id: 'Newness', locale: $locale);
         }
         $position = null;
         $isVisible = true;
