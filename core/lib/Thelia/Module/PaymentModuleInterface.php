@@ -45,4 +45,16 @@ interface PaymentModuleInterface extends BaseModuleInterface
      * Return false to decrease the stock when order status switch to pay.
      */
     public function manageStockOnCreation(): bool;
+
+    /**
+     * Whether an order this module was already asked to pay may be presented to it
+     * again, on a new payment attempt, instead of being cancelled and placed anew.
+     *
+     * Say so only when the provider reference varies at each attempt and the
+     * notification finds the order back by the order's own reference: a module that
+     * writes a single provider key on the order and overwrites it at each attempt would
+     * let a late notification of the first attempt land on the wrong transaction, or on
+     * none. AbstractPaymentModule answers false, which is the safe answer.
+     */
+    public function supportsPaymentRetry(): bool;
 }

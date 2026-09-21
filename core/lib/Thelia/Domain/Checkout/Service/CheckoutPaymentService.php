@@ -18,6 +18,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
@@ -25,8 +26,10 @@ use Thelia\Domain\Checkout\DTO\OrderPaymentOutcome;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
+use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
+use Thelia\Domain\Order\Service\OrderFingerprint;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -34,6 +37,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
+use Thelia\Module\PaymentModuleInterface;
 
 readonly class CheckoutPaymentService
 {
@@ -43,6 +47,8 @@ readonly class CheckoutPaymentService
         private GuestOrderAccessLimiter $guestOrderAccessLimiter,
         private GuestOrderAccessService $guestOrderAccessService,
         private GuestCheckoutPolicy $guestCheckoutPolicy,
+        private OrderFacade $orderFacade,
+        private OrderFingerprint $orderFingerprint,
     ) {
     }
 
@@ -86,6 +92,19 @@ readonly class CheckoutPaymentService
 
         $this->refuseAGuestTheShopNoLongerAllows($cart);
 
+        $unpaidOrder = $this->orderFacade->findUnpaidOrderOf($cart);
+
+        if ($unpaidOrder instanceof Order) {
+            if ($this->mayBePresentedAgain($unpaidOrder, $cart, $request)) {
+                return $this->payAgain($unpaidOrder);
+            }
+
+            // Through the status flow, not written to the row: the stock the previous
+            // order took is given back and the status listeners run. Done before the new
+            // placement, which then finds a cart with no order standing on it.
+            $unpaidOrder->setCancelled($this->dispatcher);
+        }
+
         $newOrder = (new Order())
             ->setDeliveryOrderAddressId($request->deliveryAddressId)
             ->setInvoiceOrderAddressId($request->invoiceAddressId)
@@ -120,6 +139,46 @@ readonly class CheckoutPaymentService
             : null;
 
         return new OrderPaymentOutcome($placedOrder, $paymentResponse);
+    }
+
+    /**
+     * Whether the unpaid order of the cart can carry this payment attempt.
+     *
+     * Two conditions, and both are needed. The order must still describe what the buyer
+     * is paying for — the fingerprint. And the payment module must have said it can be
+     * presented the same order twice: a module whose provider reference is one key on
+     * the order, overwritten at each attempt, cannot, and gets a new order instead.
+     */
+    private function mayBePresentedAgain(Order $unpaidOrder, Cart $cart, OrderPaymentRequest $request): bool
+    {
+        if (!$this->orderFingerprint->matches(
+            $unpaidOrder,
+            $cart,
+            $request->deliveryModuleId,
+            $request->paymentModuleId,
+            $request->currency?->getId(),
+        )) {
+            return false;
+        }
+
+        $paymentModule = $unpaidOrder->getPaymentModuleInstance();
+
+        return $paymentModule instanceof PaymentModuleInterface && $paymentModule->supportsPaymentRetry();
+    }
+
+    /**
+     * The order exists and was announced: only the payment module is asked again.
+     *
+     * ORDER_PAY is not raised, so nothing is written and ORDER_BEFORE_PAYMENT — the
+     * confirmation e-mail and the shop notification — does not go out a second time.
+     */
+    private function payAgain(Order $unpaidOrder): OrderPaymentOutcome
+    {
+        $payEvent = new OrderPaymentEvent($unpaidOrder);
+
+        $this->dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY);
+
+        return new OrderPaymentOutcome($unpaidOrder, $payEvent->hasResponse() ? $payEvent->getResponse() : null);
     }
 
     /**
@@ -189,7 +248,7 @@ readonly class CheckoutPaymentService
             throw new \InvalidArgumentException(Translator::getInstance()->trans('This order is no longer waiting for its payment and cannot be cancelled here.'));
         }
 
-        $failedOrder->setCancelled();
+        $failedOrder->setCancelled($this->dispatcher);
 
         return $failedOrder;
     }

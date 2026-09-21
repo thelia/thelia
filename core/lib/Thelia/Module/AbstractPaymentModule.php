@@ -73,10 +73,9 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      * payment for an order that has already been written, over a number no template the
      * core ships even reads.
      *
-     * Zero on purpose rather than a count taken off the order: by the time a module is
-     * asked to pay, ORDER_CART_CLEAR has already run and the session holds a new empty
-     * cart, so zero is exactly what a browser has been getting all along. A module that
-     * wants the lines of the order has the order.
+     * Zero on purpose rather than a count taken off the order: the count is what the
+     * session holds, and a caller with no session holds nothing. A module that wants the
+     * lines of the order has the order.
      */
     protected function cartItemCount(): int
     {
@@ -162,6 +161,21 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     public function manageStockOnCreation(): bool
     {
         return true;
+    }
+
+    /**
+     * Whether an order this module was already asked to pay may be presented to it
+     * again, on a new payment attempt, instead of being cancelled and placed anew.
+     *
+     * False unless the module says otherwise. A module may only say so when its
+     * provider reference varies at each attempt and its notification finds the order
+     * back by the order's own reference: a module that writes a single provider key on
+     * the order and overwrites it at each attempt would let a late notification of the
+     * first attempt land on the wrong transaction, or on none.
+     */
+    public function supportsPaymentRetry(): bool
+    {
+        return false;
     }
 
     public function getMinimumAmount(): int

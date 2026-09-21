@@ -592,6 +592,11 @@ final class ModuleActionTest extends ActionIntegrationTestCase
                 {
                     return true;
                 }
+
+                public function supportsPaymentRetry(): bool
+                {
+                    return false;
+                }
             }
 
             PHP;

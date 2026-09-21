@@ -31,12 +31,21 @@ use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
+use Thelia\Model\OrderQuery;
 use Thelia\Tools\URL;
 
 class Session extends BaseSession
 {
     protected static ?Cart $transientCart = null;
     public const SESSION_CART_ID_NAME = 'thelia.cart_id';
+
+    /**
+     * Whether each cart read in this request has been paid for, with the order write
+     * generation the answer was drawn at — see hasBeenPaidFor().
+     *
+     * @var array<int, array{int, bool}>
+     */
+    private array $paidForByCartId = [];
 
     /**
      * @deprecated the guest state is carried by customer.is_guest; nothing writes this
@@ -298,7 +307,7 @@ class Session extends BaseSession
         }
 
         if (null !== $cart && $this->isValidCart($cart)) {
-            return $cart;
+            return $this->hasBeenPaidFor($cart) ? $this->consume($cart, $dispatcher) : $cart;
         }
         $cartEvent = new CartRestoreEvent();
 
@@ -311,9 +320,94 @@ class Session extends BaseSession
             throw new \LogicException('Unable to get a Cart.');
         }
 
+        // The persistent cookie restores a cart by its token, and that token may well
+        // name a cart whose order was paid while the session was gone.
+        if (!$cart->isNew() && $this->hasBeenPaidFor($cart)) {
+            return $this->consume($cart, $dispatcher);
+        }
+
         $this->setSessionCart($cart);
 
         return $cart;
+    }
+
+    /**
+     * Whether an order placed from this cart has been paid, in the sense of the status
+     * flow: paid, processing, sent or refunded, a status of the shop's own that stands
+     * for one of them included.
+     *
+     * This is where the cart is consumed, rather than at the placement: it covers the
+     * buyer coming back, the notification of the payment provider arriving on its own
+     * and the tab closed on the payment page, without depending on any of them. One
+     * query, on the index of `order.cart_id`, with the statuses hydrated alongside.
+     *
+     * The session cart is read several times in a request, and the answer only changes
+     * when an order row is written: it is kept per cart for as long as no order has been
+     * saved or deleted since, so a page costs one lookup, not one per read.
+     */
+    private function hasBeenPaidFor(Cart $cart): bool
+    {
+        $cartId = $cart->getId();
+
+        if (null === $cartId) {
+            return false;
+        }
+
+        $generation = Order::writeGeneration();
+        $known = $this->paidForByCartId[$cartId] ?? null;
+
+        if (null !== $known && $known[0] === $generation) {
+            return $known[1];
+        }
+
+        $paid = $this->anOrderOfTheCartIsPaid($cartId);
+        $this->paidForByCartId[$cartId] = [$generation, $paid];
+
+        return $paid;
+    }
+
+    private function anOrderOfTheCartIsPaid(int $cartId): bool
+    {
+        $orders = OrderQuery::create()
+            ->filterByCartId($cartId)
+            ->joinWithOrderStatus()
+            ->find();
+
+        foreach ($orders as $order) {
+            if ($order->isPaid(false) || $order->isRefunded(false)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Hands the session a new empty cart in place of one that has been paid for.
+     *
+     * The paid cart stays the row its order names, and is never handed back: the new
+     * cart replaces it in the session and the persistent cookie is dropped with it.
+     * A guest was put in the session only to carry that order through, and the order is
+     * paid: leaving them there would hand the next person on this browser an identity
+     * nobody signed into, so they are retired here, before the new cart is created with
+     * nobody to attach it to.
+     */
+    private function consume(Cart $paidCart, EventDispatcherInterface $dispatcher): Cart
+    {
+        if ($this->isCustomerGuest()) {
+            $this->clearCustomerUser();
+        }
+
+        $event = new CartCreateEvent();
+        $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
+
+        $newCart = $event->getCart() ?? throw new \LogicException('Unable to get a new empty Cart.');
+
+        if ($newCart->getId() === $paidCart->getId()) {
+            throw new \LogicException('The cart that replaces a paid cart cannot be the paid cart itself.');
+        }
+
+        return $newCart;
     }
 
     public function clearSessionCart(EventDispatcherInterface $dispatcher): void

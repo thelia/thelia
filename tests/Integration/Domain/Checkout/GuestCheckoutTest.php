@@ -33,6 +33,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -43,7 +44,7 @@ use Thelia\Test\ActionIntegrationTestCase;
  *
  * The two things that make it different from a normal checkout are covered here: the
  * shop decides whether it is offered at all, and the guest must not be left signed in
- * on the browser once the order is placed.
+ * on the browser once the order is paid and the cart consumed.
  */
 final class GuestCheckoutTest extends ActionIntegrationTestCase
 {
@@ -92,18 +93,26 @@ final class GuestCheckoutTest extends ActionIntegrationTestCase
     }
 
     /**
-     * The guest was put in the session to carry one order through. Leaving them there
-     * would hand the next person on this browser an identity nobody signed into.
+     * The guest was put in the session to carry one order through, and the order is not
+     * through until it is paid: a declined card sends them back to the payment step, and
+     * they must still be there to pay again. Once the order is paid the cart is consumed,
+     * and that is when leaving them there would hand the next person on this browser an
+     * identity nobody signed into.
      */
-    public function testTheGuestIsNotLeftInTheSessionOnceTheOrderIsPlaced(): void
+    public function testTheGuestStaysInTheSessionUntilTheOrderIsPaid(): void
     {
         ConfigQuery::write('guest_checkout_mode', 'enabled');
         $fixtures = $this->createCheckoutReadyCart();
 
-        $this->checkout($fixtures);
+        $placedOrder = $this->checkout($fixtures);
 
         $session = $this->session();
-        self::assertNull($session->getCustomerUser(), 'The guest must be out of the session.');
+        self::assertTrue($session->isCustomerGuest(), 'An order waiting for its payment keeps the guest in the session, ready to pay again.');
+
+        $placedOrder->setStatusId(OrderStatusQuery::getPaidStatus()->getId())->save($this->getPropelConnection());
+        $session->getSessionCart($this->kernelDispatcher());
+
+        self::assertNull($session->getCustomerUser(), 'The guest must be out of the session once the paid cart is consumed.');
         self::assertFalse($session->isCustomerGuest(), 'And nothing must still read the session as a guest one.');
     }
 

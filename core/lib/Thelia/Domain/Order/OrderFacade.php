@@ -47,7 +47,6 @@ use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 readonly class OrderFacade
@@ -282,17 +281,61 @@ readonly class OrderFacade
         $lockTheCart->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
         $lockTheCart->execute();
 
-        $existingOrder = OrderQuery::create()
-            ->filterByCartId($cartId)
-            ->useOrderStatusQuery()
-                ->filterByCode(OrderStatus::CODE_CANCELED, Criteria::NOT_EQUAL)
-            ->endUse()
-            ->orderById(Criteria::DESC)
-            ->findOne($connection);
+        $existingOrder = $this->liveOrderOf($cartId, $connection);
 
         if ($existingOrder instanceof ModelOrder) {
             throw new CartAlreadyOrderedException((int) $existingOrder->getId(), $cartId);
         }
+    }
+
+    /**
+     * The order of this cart that is still waiting for its payment, when there is one.
+     *
+     * The same reading as the guard above, taken before the placement starts: a new
+     * payment attempt on a cart that already carries an unpaid order either reuses that
+     * order or cancels it first, and the guard then lets the cart through. An order that
+     * stands but is no longer unpaid — paid, further along, or refunded — is not handed
+     * back: the cart is consumed, and the guard is what refuses it. This is the exact
+     * complement of the reading Session::hasBeenPaidFor() makes of the same order.
+     */
+    public function findUnpaidOrderOf(CartModel $cart): ?ModelOrder
+    {
+        if (null === $cart->getId()) {
+            return null;
+        }
+
+        $liveOrder = $this->liveOrderOf((int) $cart->getId());
+
+        if (!$liveOrder instanceof ModelOrder) {
+            return null;
+        }
+
+        return $liveOrder->isPaid(false) || $liveOrder->isRefunded(false) ? null : $liveOrder;
+    }
+
+    /**
+     * The most recent order of the cart that was not cancelled: the one that stands.
+     *
+     * Cancelled is read on the effective code of the status, so a status of the shop's
+     * own that stands for cancelled excludes the order exactly like the native one. That
+     * reading lives in the model, not in a column the query could filter on: the few
+     * orders a cart can carry are fetched with their status and sifted here.
+     */
+    private function liveOrderOf(int $cartId, ?ConnectionInterface $connection = null): ?ModelOrder
+    {
+        $orders = OrderQuery::create()
+            ->filterByCartId($cartId)
+            ->joinWithOrderStatus()
+            ->orderById(Criteria::DESC)
+            ->find($connection);
+
+        foreach ($orders as $order) {
+            if (!$order->isCancelled(false)) {
+                return $order;
+            }
+        }
+
+        return null;
     }
 
     /**

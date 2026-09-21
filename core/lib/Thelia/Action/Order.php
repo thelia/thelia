@@ -192,7 +192,13 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $placedOrderEvent = new OrderEvent($placedOrder);
         $dispatcher->dispatch($placedOrderEvent, TheliaEvents::ORDER_BEFORE_PAYMENT);
-        $dispatcher->dispatch($placedOrderEvent, TheliaEvents::ORDER_CART_CLEAR);
+
+        // The cart is deliberately not cleared here. The payment module has not answered
+        // yet, and a declined card or a closed tab used to leave the buyer on an empty
+        // cart with nothing pointing at the one they filled. The cart stays the session
+        // cart until an order that names it is paid: Session::getSessionCart() consumes
+        // it on the next read. ORDER_CART_CLEAR stays declared and listened to for the
+        // modules that raise it themselves.
 
         /* but memorize placed order */
         $event->setOrder(new OrderModel());
@@ -239,8 +245,11 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Clear the cart and the order in the customer session once the order is placed,
-     * and the payment performed.
+     * Clear the cart and the order in the customer session, and retire the guest.
+     *
+     * The core no longer raises ORDER_CART_CLEAR itself — the cart is consumed by
+     * Session::getSessionCart() once its order is paid — but the event stays for the
+     * modules that raise it at a moment of their own, and it still does what it did.
      */
     public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

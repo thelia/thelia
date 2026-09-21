@@ -578,7 +578,7 @@ final class CheckoutPlacementTest extends IntegrationTestCase
     {
         $order = OrderQuery::create()->findPk($orderId, $this->getPropelConnection());
         self::assertInstanceOf(Order::class, $order);
-        $order->setCancelled();
+        $order->setCancelled($this->dispatcher());
     }
 
     /**
