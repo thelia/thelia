@@ -93,6 +93,30 @@ final class PaymentRetryTest extends IntegrationTestCase
     }
 
     /**
+     * The order stops describing its cart as soon as a module rewrites it. A pickup module
+     * replaces the delivery address with the store's, which is what every click and collect shop
+     * does, and the buyer's address is nowhere on the order any more.
+     */
+    public function testAnOrderWhoseAddressAModuleRewroteIsStillReused(): void
+    {
+        [$cart] = $this->cartReadyToPay(RetryingPaymentModule::getModuleCode());
+
+        $first = $this->pay($cart);
+
+        // What Dealer, LocalPickup and the relay modules do on ORDER_PAY.
+        $first->getOrderAddressRelatedByDeliveryOrderAddressId()
+            ->setAddress1('10 Avenue Gustave Eiffel')
+            ->setZipcode('33600')
+            ->setCity('Pessac')
+            ->save();
+
+        $second = $this->pay($cart);
+
+        self::assertSame($first->getId(), $second->getId(), 'The very same order is handed back.');
+        self::assertCount(1, $this->ordersOf($cart), 'One single order row for the cart.');
+    }
+
+    /**
      * AC5 (a) — same module, but the cart changed in between: the first order is
      * cancelled through the status flow and exactly one new unpaid order exists.
      */
