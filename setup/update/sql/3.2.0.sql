@@ -193,7 +193,16 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
 -- What the cart said when an order was placed, so a new payment attempt can tell whether it still
 -- says the same thing. Null on every order placed before this column existed, which reads as
 -- "cannot be compared", so those orders are replaced rather than reused.
-ALTER TABLE `order` ADD COLUMN `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`;
-ALTER TABLE `order_version` ADD COLUMN `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`;
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'cart_fingerprint');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'cart_fingerprint');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
 
 SET FOREIGN_KEY_CHECKS = 1;
