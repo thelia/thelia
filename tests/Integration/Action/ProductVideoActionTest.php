@@ -365,6 +365,79 @@ final class ProductVideoActionTest extends ActionIntegrationTestCase
         return array_values(array_diff(scandir($directory) ?: [], ['.', '..']));
     }
 
+    public function testReplacingTheAddressOfAPlatformVideoKeepsEverythingElse(): void
+    {
+        $product = $this->createProduct();
+        $image = $this->productImage($product);
+        $video = $this->platformVideo($product);
+        $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
+            locale: 'en_US',
+            thumbnailImageId: $image->getId(),
+            title: 'Demo',
+            alt: 'A demonstration of the bag',
+        ));
+        $position = $video->getPosition();
+
+        $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
+            provider: VideoProvider::Vimeo,
+            externalId: '76979871',
+            locale: 'en_US',
+        ));
+
+        $reloaded = ProductVideoQuery::create()->findPk($video->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('vimeo', $reloaded->getProvider());
+        self::assertSame('76979871', $reloaded->getExternalId());
+        // What the merchant arranged around the video is not his to type again.
+        self::assertSame($position, $reloaded->getPosition());
+        self::assertSame($image->getId(), $reloaded->getThumbnailImageId());
+        self::assertSame('Demo', $reloaded->setLocale('en_US')->getTitle());
+        self::assertSame('A demonstration of the bag', $reloaded->setLocale('en_US')->getAlt());
+    }
+
+    public function testLeavingAHostedFileForAPlatformTakesTheFileWithIt(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createHostedVideo($product);
+
+        $stored = $video->getUploadDir().DS.$video->getFile();
+        $published = $this->videoAction->cachedFilePath($video);
+        self::assertFileExists($stored);
+
+        $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
+            provider: VideoProvider::Youtube,
+            externalId: 'dQw4w9WgXcQ',
+            locale: 'en_US',
+        ));
+
+        $reloaded = ProductVideoQuery::create()->findPk($video->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('youtube', $reloaded->getProvider());
+        self::assertSame('', $reloaded->getFile(), 'The row no longer names a file.');
+        self::assertFileDoesNotExist($stored, 'The file the shop was serving goes with the source that used it.');
+        self::assertFileDoesNotExist($published, 'And so does its copy in the web space.');
+    }
+
+    public function testReplacingAHostedFileRemovesTheOneItHeld(): void
+    {
+        $product = $this->createProduct();
+        $video = $this->createHostedVideo($product);
+        $firstStored = $video->getUploadDir().DS.$video->getFile();
+
+        $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
+            uploadedFile: $this->createUploadedFile($this->createTestMp4(), 'other.mp4', 'video/mp4'),
+            locale: 'en_US',
+        ));
+
+        $reloaded = ProductVideoQuery::create()->findPk($video->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame('file', $reloaded->getProvider());
+        self::assertNotSame('', $reloaded->getFile());
+        $this->trackFileForCleanup($reloaded->getUploadDir().DS.$reloaded->getFile());
+        $this->trackFileForCleanup($this->videoAction->cachedFilePath($reloaded));
+        self::assertFileDoesNotExist($firstStored, 'The file it held is not left behind.');
+    }
+
     public function testANewMediumGoesAfterEveryImageAndVideoOfTheProduct(): void
     {
         $product = $this->createProduct();
