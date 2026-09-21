@@ -9,9 +9,12 @@ test.describe('Back-office — modules + module hooks (BO Twig)', () => {
 
   test.beforeEach(async ({ page }) => { await loginAdmin(page); });
 
-  test('modules list loads with install form', async ({ page }) => {
+  test('modules list loads, and offers the install form', async ({ page }) => {
     await page.goto('/admin/modules');
     await expect(page.getByTestId('modules-page')).toBeVisible();
+
+    // The form lives in a dialog: what the page offers is the button that opens it.
+    await page.getByTestId('module-install-open').click();
     await expect(page.getByTestId('module-install-form')).toBeVisible();
   });
 
