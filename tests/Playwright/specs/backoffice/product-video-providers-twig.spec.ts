@@ -236,6 +236,16 @@ async function openFront(page: Page, frontUrl: string) {
   return players;
 }
 
+/** The thumbnail of the first visual that is not a video. */
+function firstImageThumbnail(page: Page) {
+  return page
+    .locator('.ProductGallery-list li')
+    .filter({ hasNot: page.locator('.ProductGallery-videoBadge') })
+    .first()
+    .locator('button')
+    .first();
+}
+
 /**
  * Brings the first video slide of the gallery on screen, the way a shopper does: through
  * its thumbnail. A slide the carousel keeps off screen is hidden from assistive technology
@@ -559,6 +569,49 @@ test.describe('Product videos — every source, from the paste to the click (BO 
       const video = page.locator('video.VideoPlayer-file');
       await expect(video).toHaveCount(1);
       expect((await video.getAttribute('src')) ?? '').toMatch(/\/cache\/videos\//);
+    } finally {
+      await deleteAllVideos(page, productId);
+      fs.rmSync(sample, { force: true });
+    }
+  });
+
+  test('a video stops when the shopper moves to another visual', async ({ page }) => {
+    const { productId, frontUrl } = await findProduct(page);
+    await deleteAllVideos(page, productId);
+    const sample = await recordSampleVideo(page);
+
+    try {
+      // A platform video: the frame is taken down and the poster comes back, which is
+      // the only way to stop a player the shop does not script.
+      expect(await addVideo(page, productId, { url: PLATFORMS[0].pasted }, 'Pause demo')).toBe(200);
+
+      await openFront(page, frontUrl);
+      const player = await showVideoSlide(page);
+      await player.locator('button.VideoPlayer-play').click();
+      await expect(page.locator('iframe.VideoPlayer-frame')).toHaveCount(1);
+
+      await firstImageThumbnail(page).click();
+      await expect(page.locator('iframe.VideoPlayer-frame')).toHaveCount(0);
+      await expect(player.locator('img.VideoPlayer-poster')).toBeAttached();
+      // One click starts it again.
+      await (await showVideoSlide(page)).locator('button.VideoPlayer-play').click();
+      await expect(page.locator('iframe.VideoPlayer-frame')).toHaveCount(1);
+
+      // A file the shop serves is paused where it is, and keeps its place.
+      await deleteAllVideos(page, productId);
+      expect(await addVideo(page, productId, { file: sample }, 'Hosted pause demo')).toBe(200);
+
+      await openFront(page, frontUrl);
+      await (await showVideoSlide(page)).locator('button.VideoPlayer-play').click();
+      const video = page.locator('video.VideoPlayer-file');
+      await expect(video).toHaveCount(1);
+      await video.evaluate((element: HTMLVideoElement) => element.play().catch(() => {}));
+      await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(false);
+
+      await firstImageThumbnail(page).click();
+      await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
+      // Paused, not rewound: the element is still there with its position.
+      await expect(video).toHaveCount(1);
     } finally {
       await deleteAllVideos(page, productId);
       fs.rmSync(sample, { force: true });
