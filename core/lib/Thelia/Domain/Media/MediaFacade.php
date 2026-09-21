@@ -41,6 +41,7 @@ final readonly class MediaFacade
         private EventDispatcherInterface $dispatcher,
         private FileManager $fileManager,
         private FileProcessorService $fileProcessorService,
+        private ProductMediaOrder $productMediaOrder,
     ) {
     }
 
@@ -122,7 +123,9 @@ final readonly class MediaFacade
 
     public function updateImagePosition(FileModelInterface $image, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void
     {
-        $event = new UpdatePositionEvent($image->getId(), $mode, $position);
+        // The file actions listen for the file flavour of the event, which carries
+        // the query of the table to move in; the bare event would not reach them.
+        $event = new UpdateFilePositionEvent($image->getQueryInstance(), $image->getId(), $mode, $position);
 
         $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_UPDATE_POSITION);
     }
@@ -220,7 +223,7 @@ final readonly class MediaFacade
 
     public function updateDocumentPosition(FileModelInterface $document, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void
     {
-        $event = new UpdatePositionEvent($document->getId(), $mode, $position);
+        $event = new UpdateFilePositionEvent($document->getQueryInstance(), $document->getId(), $mode, $position);
 
         $this->dispatcher->dispatch($event, TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
@@ -345,6 +348,19 @@ final readonly class MediaFacade
         $event = new FileToggleVisibilityEvent($video->getQueryInstance(), $video->getId());
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY);
+    }
+
+    /**
+     * Gives the images and the videos of a product the order of the list, the way a
+     * merchant arranges the sheet in the back office: the first entry takes position 1.
+     *
+     * @param list<array{type: string, id: int}> $order every medium of the product, once
+     *
+     * @throws \InvalidArgumentException when the list does not match the media of the product
+     */
+    public function reorderProductMedia(int $productId, array $order): void
+    {
+        $this->productMediaOrder->reorder($productId, $order);
     }
 
     /**
