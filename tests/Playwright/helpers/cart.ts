@@ -1,7 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 
-const ADD_TO_CART_BUTTON = 'form[name="thelia_cart_add"] button.Button--fill';
-const CART_LIVE_ROOT = '[data-live-name-value="Flexy:Checkout:Cart"]';
+// Taken as the form declares it rather than by a css class: the theme's Button component
+// renders its filled variant as `button--fill` (html_cva), and the quantity stepper around
+// it renders `type="button"`, so the submit is the only submit inside the form.
+const ADD_TO_CART_BUTTON = 'form[name="thelia_cart_add"] button[type="submit"]';
+const CART_LIVE_ROOT = '[data-live-name-value="Organisms:Cart:Base"]';
 const QUANTITY_INPUT = 'form[name="thelia_cart_add"] input[name="thelia_cart_add[quantity]"]';
 
 export async function gotoProduct(page: Page, slug: string): Promise<void> {

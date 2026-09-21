@@ -59,6 +59,36 @@ export async function selectPaymentByLabel(page: Page, label: RegExp | string): 
   await page.waitForTimeout(1500);
 }
 
+/**
+ * Ticks every mandatory consent box of the payment step.
+ *
+ * The shop refuses an order until each active mandatory consent is accepted
+ * (`ConsentGuard::checkMandatoryConsentsAccepted`), and `Organisms:NextButton` greys the
+ * "Order" CTA out on the very same rule — so without this the payment step never offers a
+ * link to click. The demo dataset ships `terms_and_conditions` and `age_over_18` mandatory.
+ *
+ * The raw input is hidden behind the `.Checkbox` label styling, so the label is the click
+ * target; each answer is a live action that re-renders the step, hence the re-query per box.
+ */
+export async function acceptMandatoryConsents(page: Page): Promise<void> {
+  const boxes = page.locator('input[id^="consent-"][required]');
+  const codes: string[] = [];
+  for (const box of await boxes.all()) {
+    const id = await box.getAttribute('id');
+    if (id) codes.push(id);
+  }
+
+  for (const id of codes) {
+    const input = page.locator(`#${id}`);
+    if (await input.isChecked()) continue;
+    await page.locator(`label:has(#${id})`).click();
+    await expect(input).toBeChecked({ timeout: 10_000 });
+  }
+
+  // The CTA re-evaluates isValid on the live round-trip each answer triggers.
+  await page.waitForLoadState('networkidle').catch(() => {});
+}
+
 export async function selectFirstInvoiceAddress(page: Page): Promise<void> {
   const radio = page
     .locator('button[data-live-event-param="SET_INVOICE_ORDER_ADDRESS_ID"]')

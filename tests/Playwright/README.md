@@ -65,6 +65,24 @@ also looks safe. Forms are re-submitted with their **own** initial values, so
 the test does not need to invent fixture data and does not mutate the demo
 dataset in surprising ways.
 
+## Right-to-left
+
+`specs/rtl.spec.ts` walks the buying journey (home, category, product, cart) in
+Arabic and replays it in French. It checks the `dir` attribute, the absence of a
+horizontal scroll at 1440px and at 390px, that the header flips to the other
+side, and that prices and the store phone number are still painted left to right
+inside right-to-left text. The reading order is measured character by character
+from the boxes the browser paints, so removing a `dir="ltr"` or a `<bdi>` from
+the theme fails the test.
+
+It needs an active Arabic language on the shop (`ar` / `ar_SA`) and reads the
+category and product URLs off the home page — a language without rewritten URLs
+serves `?view=…` links where French serves slugs.
+
+```bash
+npx playwright test specs/rtl.spec.ts
+```
+
 ## Reports
 
 After a run, open `playwright-report/index.html` (`npm run report`).
