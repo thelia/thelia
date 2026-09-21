@@ -38,6 +38,7 @@ use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\State\Processor\ProductVideoProcessor;
 use Thelia\Domain\Media\Video\VideoProvider;
+use Thelia\Domain\Media\Video\VideoProviderResolver;
 use Thelia\Model\Map\ProductVideoTableMap;
 
 /**
@@ -384,7 +385,10 @@ class ProductVideo extends AbstractTranslatableResource implements ItemFileResou
 
     /**
      * The address of the player frame, rebuilt from the platform and the
-     * identifier. Null for a video the shop hosts itself.
+     * identifier. Null for a video the shop hosts itself, and null for a video
+     * whose platform the shop has since switched off: a gallery that reads null
+     * shows nothing, and a shop that dropped a platform from its Content Security
+     * Policy is not asked to frame it anyway.
      */
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getEmbedUrl(): ?string
@@ -393,7 +397,12 @@ class ProductVideo extends AbstractTranslatableResource implements ItemFileResou
             return null;
         }
 
-        return VideoProvider::tryFrom((string) $this->provider)?->embedUrl($this->externalId);
+        $provider = VideoProvider::tryFrom((string) $this->provider);
+        if (null === $provider || !\in_array($provider, (new VideoProviderResolver())->enabledProviders(), true)) {
+            return null;
+        }
+
+        return $provider->embedUrl($this->externalId);
     }
 
     /**
