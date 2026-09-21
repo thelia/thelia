@@ -637,6 +637,11 @@
     <column name="status_id" required="true" type="INTEGER" />
     <column name="lang_id" required="true" type="INTEGER" />
     <column name="cart_id" required="true" type="INTEGER" />
+    <!-- What the cart said when this order was placed, so a new payment attempt can tell whether
+         it still says the same thing. Frozen here rather than read back off the order: a delivery
+         module is free to rewrite the order afterwards, a pickup one replaces the delivery address
+         with the store's, and the order then no longer describes the cart it came from. -->
+    <column name="cart_fingerprint" size="64" type="VARCHAR" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>

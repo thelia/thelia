@@ -18,18 +18,21 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Order;
-use Thelia\Model\OrderAddress;
 
 /**
  * Whether an unpaid order still describes the cart it was placed from.
  *
- * An order is the cart frozen at its placement: the lines, the two addresses, the
- * carrier and the postage, the payment module, the currency and the discount. A new
- * payment attempt may reuse the order only while the cart it comes back with says the
- * same thing — otherwise the buyer would pay for something other than what the order
- * describes. Both sides are read into the same shape and compared as a whole, so a
- * change anywhere is a change. Amounts are compared at the six decimals the columns
- * store, never as floats.
+ * What a cart says at a given moment: the lines, the two addresses, the carrier and the
+ * postage, the payment module, the currency and the discount, read into one shape and
+ * reduced to a string. A new payment attempt may reuse the unpaid order only while the
+ * cart still says exactly what it said when that order was placed — otherwise the buyer
+ * would pay for something other than what they are being shown. Amounts are read at the
+ * six decimals the columns store, never as floats.
+ *
+ * Taken of the CART on both sides, and frozen on the order at its placement, rather than
+ * read back off the order. An order stops describing the cart it came from as soon as a
+ * module rewrites it: a pickup module replaces the delivery address with the store's, and
+ * comparing that address to the buyer's would report a change on every single attempt.
  *
  * The same-ness is about the description, not about the validity: what the stock and
  * the prices allow at the moment of the payment is checked by the placement, not here.
@@ -38,9 +41,27 @@ final readonly class OrderFingerprint
 {
     private const AMOUNT_DECIMALS = 6;
 
+    /**
+     * The fingerprint to freeze on an order being placed, and to compare a later attempt against.
+     */
+    public function of(Cart $cart, int $deliveryModuleId, int $paymentModuleId, ?int $currencyId): string
+    {
+        return hash('sha256', json_encode(
+            $this->ofCart($cart, $deliveryModuleId, $paymentModuleId, $currencyId ?? (int) $cart->getCurrencyId()),
+            \JSON_THROW_ON_ERROR,
+        ));
+    }
+
+    /**
+     * Whether the cart still says what it said when that order was placed. An order carrying no
+     * fingerprint — every order placed before the column existed — can never be answered for.
+     */
     public function matches(Order $order, Cart $cart, int $deliveryModuleId, int $paymentModuleId, ?int $currencyId): bool
     {
-        return $this->ofOrder($order) === $this->ofCart($cart, $deliveryModuleId, $paymentModuleId, $currencyId ?? (int) $cart->getCurrencyId());
+        $frozen = $order->getCartFingerprint();
+
+        return null !== $frozen && '' !== $frozen
+            && $frozen === $this->of($cart, $deliveryModuleId, $paymentModuleId, $currencyId);
     }
 
     /**
@@ -71,37 +92,6 @@ final readonly class OrderFingerprint
             'payment_module' => $paymentModuleId,
             'currency' => $currencyId,
             'discount' => $this->amount((string) $cart->getDiscount()),
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function ofOrder(Order $order): array
-    {
-        $lines = [];
-
-        foreach ($order->getOrderProducts() as $orderProduct) {
-            $lines[] = $this->line(
-                (int) $orderProduct->getProductSaleElementsId(),
-                (float) $orderProduct->getQuantity(),
-                (string) $orderProduct->getPrice(),
-                (string) $orderProduct->getPromoPrice(),
-                (int) ($orderProduct->getWasInPromo() ?? 0),
-                (int) ($orderProduct->getIsOffered() ?? 0),
-            );
-        }
-
-        return [
-            'lines' => $this->sorted($lines),
-            'delivery' => $this->orderAddress($order->getOrderAddressRelatedByDeliveryOrderAddressId()),
-            'invoice' => $this->orderAddress($order->getOrderAddressRelatedByInvoiceOrderAddressId()),
-            'delivery_module' => (int) $order->getDeliveryModuleId(),
-            'postage' => $this->amount((string) $order->getPostage()),
-            'postage_tax' => $this->amount((string) $order->getPostageTax()),
-            'payment_module' => (int) $order->getPaymentModuleId(),
-            'currency' => (int) $order->getCurrencyId(),
-            'discount' => $this->amount((string) $order->getDiscount()),
         ];
     }
 
@@ -149,35 +139,7 @@ final readonly class OrderFingerprint
     }
 
     /**
-     * @return array<string, mixed>|null
-     */
-    private function orderAddress(?OrderAddress $address): ?array
-    {
-        if (null === $address) {
-            return null;
-        }
-
-        return $this->address(
-            $address->getCustomerTitleId(),
-            $address->getCompany(),
-            $address->getSiret(),
-            $address->getVatNumber(),
-            $address->getFirstname(),
-            $address->getLastname(),
-            $address->getAddress1(),
-            $address->getAddress2(),
-            $address->getAddress3(),
-            $address->getZipcode(),
-            $address->getCity(),
-            $address->getPhone(),
-            $address->getCellphone(),
-            $address->getCountryId(),
-            $address->getStateId(),
-        );
-    }
-
-    /**
-     * The fields OrderAddressPersister copies from the cart address onto the order.
+     * The fields of an address that make it the address it is.
      *
      * @return array<string, mixed>
      */

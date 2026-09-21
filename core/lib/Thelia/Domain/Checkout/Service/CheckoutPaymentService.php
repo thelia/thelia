@@ -114,7 +114,16 @@ readonly class CheckoutPaymentService
             ->setPostageTax($cart->getPostageTax())
             ->setPostageTaxRuleTitle($cart->getPostageTaxRuleTitle())
             ->setCustomerId($cart->getCustomerId())
-            ->setCartId($cart->getId());
+            ->setCartId($cart->getId())
+            // Frozen now, while the order still describes the cart it comes from: the delivery
+            // module is about to be told about this order, and a pickup one rewrites its delivery
+            // address to the store's.
+            ->setCartFingerprint($this->orderFingerprint->of(
+                $cart,
+                $request->deliveryModuleId,
+                $request->paymentModuleId,
+                $request->currency?->getId(),
+            ));
 
         if ($request->currency instanceof Currency) {
             $newOrder->setCurrency($request->currency);

@@ -190,4 +190,10 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@catalog_price_rule_resource_id, 'nl_NL', 'Catalogusprijsregels', NULL, NULL, NULL),
     (@catalog_price_rule_resource_id, 'ru_RU', 'Правила цен каталога', NULL, NULL, NULL);
 
+-- What the cart said when an order was placed, so a new payment attempt can tell whether it still
+-- says the same thing. Null on every order placed before this column existed, which reads as
+-- "cannot be compared", so those orders are replaced rather than reused.
+ALTER TABLE `order` ADD COLUMN `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`;
+ALTER TABLE `order_version` ADD COLUMN `cart_fingerprint` VARCHAR(64) NULL AFTER `cart_id`;
+
 SET FOREIGN_KEY_CHECKS = 1;
