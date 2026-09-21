@@ -30,6 +30,31 @@ enum VideoProvider: string
     case File = 'file';
 
     /**
+     * Whether this identifier has the shape the platform gives its videos.
+     *
+     * The shape is what tells an address read wrong from an address read right:
+     * without it a mistyped or truncated identifier is stored as it is, and the
+     * shopper is handed a player that answers nothing - the platform is the only
+     * one that can say the video exists, but it cannot say it about an identifier
+     * it would never have issued.
+     */
+    public function hasIdentifierShape(string $externalId): bool
+    {
+        $pattern = match ($this) {
+            // 11 characters, the length YouTube has always issued.
+            self::Youtube => '#^[A-Za-z0-9_-]{11}$#',
+            // A number, as many digits as the platform has published videos.
+            self::Vimeo => '#^[0-9]{1,12}$#',
+            // A letter and a handful of characters after it: x97z2zc, k1ABCdef.
+            self::Dailymotion => '#^[a-zA-Z][a-zA-Z0-9]{5,31}$#',
+            // Nothing is issued for a video the shop hosts: it has a file, not an id.
+            self::File => null,
+        };
+
+        return null !== $pattern && 1 === preg_match($pattern, $externalId);
+    }
+
+    /**
      * The address of the player frame, null for a video the shop hosts itself.
      */
     public function embedUrl(string $externalId): ?string

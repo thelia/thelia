@@ -129,7 +129,12 @@ final readonly class VideoProviderResolver
             VideoProvider::File => null,
         };
 
-        if (null === $externalId || 1 !== preg_match(self::EXTERNAL_ID_PATTERN, $externalId)) {
+        // The generic pattern keeps anything unprintable out of an address the front
+        // office builds; the platform's own shape is what tells a real identifier
+        // from an address that was mistyped, truncated or pasted with something else.
+        if (null === $externalId
+            || 1 !== preg_match(self::EXTERNAL_ID_PATTERN, $externalId)
+            || !$provider->hasIdentifierShape($externalId)) {
             throw $this->refuse($enabledProviders);
         }
 
