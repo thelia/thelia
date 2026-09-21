@@ -142,4 +142,47 @@ final class VideoProviderResolverTest extends TestCase
     {
         return new VideoProviderResolver($providers);
     }
+
+    #[DataProvider('addressesWhoseIdentifierIsNotOne')]
+    public function testAnAddressWhoseIdentifierIsNotOneIsRefused(string $url): void
+    {
+        // The platform is the only one that can say a video exists, but it can say
+        // straight away that it never issued an identifier of that shape. Stored, it
+        // would hand the shopper a player that answers nothing.
+        $this->expectException(UnsupportedVideoUrlException::class);
+
+        (new VideoProviderResolver('youtube,vimeo,dailymotion'))->resolve($url);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function addressesWhoseIdentifierIsNotOne(): iterable
+    {
+        yield 'a vimeo identifier with something pasted after it' => ['https://vimeo.com/5249338642345678O'];
+        yield 'a vimeo identifier that is not a number' => ['https://vimeo.com/my-holiday-film'];
+        yield 'a youtube identifier of ten characters' => ['https://youtu.be/dQw4w9WgXc'];
+        yield 'a youtube identifier of twelve characters' => ['https://www.youtube.com/watch?v=dQw4w9WgXcQ2'];
+        yield 'a dailymotion identifier of four characters' => ['https://www.dailymotion.com/video/x97z'];
+    }
+
+    #[DataProvider('addressesWhoseIdentifierIsOne')]
+    public function testAnAddressWhoseIdentifierHasTheRightShapeIsAccepted(string $url, string $externalId): void
+    {
+        $resolved = (new VideoProviderResolver('youtube,vimeo,dailymotion'))->resolve($url);
+
+        self::assertSame($externalId, $resolved->externalId);
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function addressesWhoseIdentifierIsOne(): iterable
+    {
+        yield 'a vimeo number' => ['https://vimeo.com/524933864', '524933864'];
+        yield 'the oldest vimeo numbers' => ['https://vimeo.com/9', '9'];
+        yield 'a vimeo address carrying a share parameter' => ['https://vimeo.com/524933864?share=copy', '524933864'];
+        yield 'a youtube identifier of eleven characters' => ['https://youtu.be/dQw4w9WgXcQ', 'dQw4w9WgXcQ'];
+        yield 'a dailymotion identifier' => ['https://www.dailymotion.com/video/x97z2zc', 'x97z2zc'];
+    }
 }
