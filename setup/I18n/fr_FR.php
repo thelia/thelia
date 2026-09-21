@@ -1542,4 +1542,6 @@ return [
     'Wrong item received' => 'Mauvais article reçu',
     'No longer needed' => 'Plus nécessaire',
     'Other' => 'Autre',
+    'Promotion' => 'Promotion',
+    'Newness' => 'Nouveauté',
 ];

@@ -29,4 +29,6 @@ return [
     'Your account information on {{ config("store_name") }} has been changed.' => 'Informace o účtu v obchodě {{ config("store_name") }} byly změněny.',
     'Your order {{ order_ref }} at {{ config("store_name") }}' => 'Vaše objednávka {{ order_ref }} v obchodě {{ config("store_name") }}',
     'Your subscription to %store newsletter' => 'Váš odběr novinek z obchodu {{ config("store_name") }}',
+    'Promotion' => 'Akce',
+    'Newness' => 'Novinka',
 ];

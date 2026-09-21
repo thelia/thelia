@@ -1563,4 +1563,6 @@ return [
     'Wrong item received' => 'Wrong item received',
     'No longer needed' => 'No longer needed',
     'Other' => 'Other',
+    'Promotion' => 'Promotion',
+    'Newness' => 'Newness',
 ];

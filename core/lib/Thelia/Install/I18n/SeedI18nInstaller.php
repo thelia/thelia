@@ -55,6 +55,7 @@ class SeedI18nInstaller
         'order_status_i18n' => ['title', 'description', 'chapo', 'postscriptum'],
         'resource_i18n' => ['title', 'chapo', 'description', 'postscriptum'],
         'message_i18n' => ['title', 'subject'],
+        'choice_filter_other_i18n' => ['title'],
     ];
 
     public function __construct(private readonly SeedTranslationCatalog $catalog)
