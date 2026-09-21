@@ -30,6 +30,8 @@ return [
     'Back Office' => 'Backoffice',
     'Error occured while processing order ref. %ref, ID %id: %err' => 'Error occured while processing order ref. %ref, ID %id: %err',
     'Message content: %message%' => 'Berichtinhoud: %message%',
+    'Newness' => 'Nieuw',
+    'Promotion' => 'Promotie',
     "Sender's e-mail address: %email%" => 'E-mailadres afzender: %email%',
     'Sender name: %name%' => 'Naam afzender: %name%',
     'Sorry, an error occured: %msg' => 'Sorry, an error occured: %msg',
