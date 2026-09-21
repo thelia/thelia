@@ -117,17 +117,23 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
         }
 
         $uploadedFile = $event->getUploadedFile();
+        $oldModel = $event->getOldModel();
+        $leftHostedFile = $oldModel instanceof ProductVideoModel && $oldModel->isHostedFile();
 
         if ($uploadedFile instanceof UploadedFile) {
-            $oldModel = $event->getOldModel();
-
-            if ($oldModel instanceof ProductVideoModel && $oldModel->isHostedFile()) {
+            if ($leftHostedFile) {
                 $this->removeStoredFile($oldModel);
             }
 
             $model->setProvider(VideoProvider::File->value);
             $model->setFile('')->save();
             $event->setUploadedFile($this->fileManager->copyUploadedFile($model, $uploadedFile));
+        } elseif ($leftHostedFile && VideoProvider::File->value !== $model->getProvider()) {
+            // The video plays from a platform now: the file the shop was serving for
+            // it goes with it, in the library and in the web space, rather than
+            // staying behind as a file nothing points at any more.
+            $this->removeStoredFile($oldModel);
+            $model->setFile('');
         }
 
         $model->save();
