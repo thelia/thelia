@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
@@ -35,6 +36,8 @@ use Thelia\Module\PaymentModuleInterface;
 class Order extends BaseOrder
 {
     use TaxCalculatorResolverTrait;
+
+    private static int $writeGeneration = 0;
 
     protected ?int $choosenDeliveryAddress = null;
 
@@ -127,6 +130,18 @@ class Order extends BaseOrder
     }
 
     /**
+     * How many order rows this process has written or deleted so far.
+     *
+     * A reader that memoizes an answer drawn from `order` rows keys it on this value:
+     * the answer stands until an order is saved or deleted, whatever the path that
+     * wrote it — the status flow, a direct save(), a delete.
+     */
+    public static function writeGeneration(): int
+    {
+        return self::$writeGeneration;
+    }
+
+    /**
      * @throws PropelException
      */
     public function preSave(?ConnectionInterface $con = null): bool
@@ -154,6 +169,20 @@ class Order extends BaseOrder
         $this->refGenerationDeferred = $deferred;
 
         return $this;
+    }
+
+    public function postSave(?ConnectionInterface $con = null): void
+    {
+        ++self::$writeGeneration;
+
+        parent::postSave($con);
+    }
+
+    public function postDelete(?ConnectionInterface $con = null): void
+    {
+        ++self::$writeGeneration;
+
+        parent::postDelete($con);
     }
 
     public function postInsert(?ConnectionInterface $con = null): void
@@ -507,13 +536,27 @@ class Order extends BaseOrder
     }
 
     /**
-     * Set the status of the current order to CANCELED.
+     * Cancel the order through the status flow.
+     *
+     * Raised as ORDER_UPDATE_STATUS rather than written to the row: that is what gives
+     * back the stock taken at the placement, and what runs the listeners a shop has on
+     * its statuses. The dispatcher is asked for the same way isStockManagedOnOrderCreation()
+     * asks for it — a model has no service of its own to reach for.
      *
      * @throws PropelException
      */
-    public function setCancelled(): void
+    public function setCancelled(EventDispatcherInterface $dispatcher): void
     {
-        $this->setStatusHelper(OrderStatus::CODE_CANCELED);
+        $cancelled = OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED);
+
+        if (null === $cancelled) {
+            return;
+        }
+
+        $dispatcher->dispatch(
+            (new OrderEvent($this))->setStatus((int) $cancelled->getId()),
+            TheliaEvents::ORDER_UPDATE_STATUS,
+        );
     }
 
     /**

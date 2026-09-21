@@ -17,13 +17,23 @@ namespace Thelia\Tests\Http\Flexy;
 use FlexyBundle\Controller\CheckoutController;
 use FlexyBundle\Service\CheckoutTrail;
 use FlexyBundle\Service\GuestOrderTracking;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Checkout\CheckoutFacade;
+use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
+use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
+use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Customer;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
@@ -31,8 +41,8 @@ use Thelia\Test\IntegrationTestCase;
 
 /**
  * A guest coming back from a failed payment has no session customer to check the
- * failure page against — the core retires them from the session the moment the order
- * exists. What is left to prove the order is theirs is the tracking token this session
+ * failure page against when their session is gone — a payment page may hand them back
+ * without it. What is left to prove the order is theirs is the tracking token this session
  * was handed when it was placed, which CheckoutController::failedAction() must read and
  * hand to the core cancellation the same way it already does for a signed-in customer.
  *
@@ -65,20 +75,36 @@ final class GuestFailedPaymentTest extends IntegrationTestCase
         parent::setUp();
     }
 
-    public function testAGuestsOrderIsCancelledWhenThePaymentComesBackFailed(): void
+    /**
+     * AC7 — a guest whose payment came back failed finds the cart they left: the
+     * failure page answers, and the cart behind the session still holds the same lines,
+     * ready for another attempt. The order is placed the way the tunnel places it, since
+     * that is where the cart used to be emptied.
+     */
+    public function testAC7AGuestComingBackFromAFailedPaymentFindsTheirCart(): void
     {
-        $order = $this->guestOrder();
+        $previousMode = ConfigQuery::getGuestCheckoutMode();
+        ConfigQuery::write('guest_checkout_mode', 'enabled');
 
-        $this->callFailedAction($order->getId(), $this->tokenFor($order));
+        try {
+            [$order, $cart, $guest] = $this->placeAGuestOrderThroughTheTunnel();
+            $itemIdsBefore = $this->itemIdsOf($cart);
 
-        $this->forgetHydratedOrders();
-        $afterFailure = OrderQuery::create()->findPk($order->getId());
+            $response = $this->callFailedAction($order->getId(), $this->tokenFor($order));
 
-        self::assertNotNull($afterFailure);
-        self::assertTrue(
-            $afterFailure->isCancelled(),
-            'An order still waiting for a payment that came back failed must be cancelled, guest or not.',
-        );
+            self::assertSame(200, $response->getStatusCode(), 'The failure page is answered.');
+
+            $sessionCart = $this->session()->getSessionCart($this->dispatcher());
+
+            self::assertSame($cart->getId(), $sessionCart->getId(), 'The cart the guest left is still the session cart.');
+            self::assertSame($itemIdsBefore, $this->itemIdsOf($sessionCart), 'With the same lines in it, ready for another attempt.');
+            self::assertNotSame([], $itemIdsBefore);
+            self::assertSame($guest->getId(), $sessionCart->getCustomerId());
+        } finally {
+            ConfigQuery::write('guest_checkout_mode', (string) $previousMode);
+            $this->session()->clearCustomerUser();
+            $this->session()->setSessionCart(null);
+        }
     }
 
     public function testATokenNamingAnotherOrderDoesNotCancelThisOne(): void
@@ -138,7 +164,7 @@ final class GuestFailedPaymentTest extends IntegrationTestCase
         $order = $this->guestOrder();
         $token = $this->tokenFor($order);
 
-        $order->setCancelled();
+        $order->setCancelled(static::getContainer()->get(EventDispatcherInterface::class));
 
         $response = $this->callFailedAction($order->getId(), $token);
 
@@ -209,6 +235,85 @@ final class GuestFailedPaymentTest extends IntegrationTestCase
             $container->get(GuestOrderTracking::class),
             $container->get(CheckoutTrail::class),
         );
+    }
+
+    /**
+     * A guest at the browser, a cart with a line in it, and an order placed from that
+     * cart through the same service the theme's pay step calls. The payment module is
+     * stopped before it answers: its page is not what this is about.
+     *
+     * @return array{0: Order, 1: Cart, 2: Customer}
+     */
+    private function placeAGuestOrderThroughTheTunnel(): array
+    {
+        $factory = $this->createFixtureFactory();
+        $country = $factory->country();
+        $guest = $factory->guestCustomer($factory->customerTitle());
+
+        $deliveryModule = ModuleQuery::create()->findOneByCode('CustomDelivery')
+            ?? throw new \RuntimeException('No delivery module installed — run bin/test-prepare.');
+        $paymentModule = ModuleQuery::create()->findOneByCode('Cheque')
+            ?? throw new \RuntimeException('No payment module installed — run bin/test-prepare.');
+
+        $cart = $factory->cart($guest);
+        $factory->cartItem($cart, $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => 100]));
+        $cart
+            ->setAddressDeliveryId($factory->cartAddress(null, $country)->getId())
+            ->setAddressInvoiceId($factory->cartAddress(null, $country)->getId())
+            ->setDeliveryModuleId($deliveryModule->getId())
+            ->setPaymentModuleId($paymentModule->getId())
+            ->save($this->getPropelConnection());
+
+        $session = $this->session();
+        $session->setCustomerUser($guest);
+        $session->setSessionCart($cart);
+        $session->setCurrency($factory->currency());
+
+        $stopTheModule = static function (OrderPaymentEvent $event): void {
+            $event->stopPropagation();
+        };
+        $this->dispatcher()->addListener(TheliaEvents::MODULE_PAY, $stopTheModule, 512);
+
+        try {
+            $order = $this->getService(CheckoutPaymentService::class)->payAndReturnOutcome(new OrderPaymentRequest(
+                $cart,
+                (int) $cart->getAddressDeliveryId(),
+                (int) $cart->getAddressInvoiceId(),
+                $deliveryModule->getId(),
+                $paymentModule->getId(),
+            ))->placedOrder;
+        } finally {
+            $this->dispatcher()->removeListener(TheliaEvents::MODULE_PAY, $stopTheModule);
+        }
+
+        return [$order, $cart, $guest];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function itemIdsOf(Cart $cart): array
+    {
+        $ids = [];
+        foreach ($cart->getCartItems() as $item) {
+            $ids[] = (int) $item->getId();
+        }
+        sort($ids);
+
+        return $ids;
+    }
+
+    private function session(): Session
+    {
+        $session = static::getContainer()->get(RequestStack::class)->getMainRequest()?->getSession();
+        self::assertInstanceOf(Session::class, $session);
+
+        return $session;
+    }
+
+    private function dispatcher(): EventDispatcherInterface
+    {
+        return static::getContainer()->get(EventDispatcherInterface::class);
     }
 
     private function tokenFor(Order $order): string
