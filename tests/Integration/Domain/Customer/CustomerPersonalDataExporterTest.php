@@ -49,7 +49,13 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         $personalData = $event->getPersonalData();
 
-        self::assertSame(CustomerPersonalDataExporter::CORE_SECTION_NAMES, array_keys($personalData));
+        // Core sections come first, in their canonical order. An active module may
+        // append its own section afterwards through CustomerPersonalDataProviderInterface,
+        // so the core file is the leading slice rather than the whole key set.
+        self::assertSame(
+            CustomerPersonalDataExporter::CORE_SECTION_NAMES,
+            \array_slice(array_keys($personalData), 0, \count(CustomerPersonalDataExporter::CORE_SECTION_NAMES)),
+        );
 
         self::assertSame('Exported', $personalData['customer']['firstname']);
         self::assertSame('exporter-subject@test.com', $personalData['customer']['email']);
@@ -154,7 +160,17 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         $personalData = $event->getPersonalData();
 
-        self::assertSame(CustomerPersonalDataExporter::CORE_SECTION_NAMES, array_keys($personalData));
+        $sectionNames = array_keys($personalData);
+
+        // Core sections come first and in order; a module may append its own after.
+        self::assertSame(
+            CustomerPersonalDataExporter::CORE_SECTION_NAMES,
+            \array_slice($sectionNames, 0, \count(CustomerPersonalDataExporter::CORE_SECTION_NAMES)),
+        );
+
+        // A tag must never surface as an export section, whatever a module appends.
+        self::assertNotContains('tag', $sectionNames);
+        self::assertNotContains('tags', $sectionNames);
 
         // The label itself, wherever it might have slipped in. Not a naive search
         // for "tag": "postage" contains it.
