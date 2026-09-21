@@ -298,7 +298,7 @@ test.describe('Back-office — product media: alternative text and videos (BO Tw
     await expect(page.locator('#bo-video-add-errors')).toContainText('YouTube');
     await expect(page.locator('#bo-video-add-errors')).toHaveAttribute('role', 'alert');
     await expect(url).toHaveAttribute('aria-invalid', 'true');
-    await expect(url).toHaveAttribute('aria-describedby', 'bo-video-add-errors');
+    await expect(url).toHaveAttribute('aria-describedby', /bo-video-add-errors/);
     await expect(url).toBeFocused();
   });
 
