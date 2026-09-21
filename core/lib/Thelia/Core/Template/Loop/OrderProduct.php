@@ -190,6 +190,9 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set('POSTSCRIPTUM', $orderProduct->getPostscriptum())
                 ->set('VIRTUAL', $orderProduct->getVirtual())
                 ->set('VIRTUAL_DOCUMENT', $orderProduct->getVirtualDocument())
+                // What the line stands for — a good, or a service the shop invoiced beside
+                // them. A picking list leaves the services out, an invoice states them.
+                ->set('LINE_TYPE', $orderProduct->getLineType())
                 ->set('QUANTITY', $orderProduct->getQuantity())
 
                 ->set('PRICE', $orderProduct->getPrice())

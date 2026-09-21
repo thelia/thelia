@@ -24,6 +24,7 @@ use Thelia\Domain\Checkout\Service\ConsentAnswerStoreInterface;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\Exception\StockShortageException;
+use Thelia\Domain\Order\Service\GiftWrappingLineFactory;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
@@ -66,6 +67,7 @@ readonly class OrderFacade
         private ConsentProvider $consentProvider,
         private ConsentAnswerStoreInterface $consentAnswers,
         private RequestStack $requestStack,
+        private GiftWrappingLineFactory $giftWrappingLineFactory,
     ) {
     }
 
@@ -215,6 +217,19 @@ readonly class OrderFacade
                     $connection
                 );
             }
+
+            // After the goods, so it reads last on the invoice the way it is charged last:
+            // the service the shop is selling beside them. Nothing is written when the
+            // buyer picked no wrapping, which is every order placed on a shop that offers
+            // none — those orders are byte for byte the orders they were before.
+            $this->giftWrappingLineFactory->createFor(
+                $placedOrder,
+                $cart,
+                $taxCountry,
+                OrderAddressQuery::create()->findPk($placedOrder->getDeliveryOrderAddressId())?->getState(),
+                (string) $lang->getLocale(),
+                $connection,
+            );
 
             // Allocate the ref from the gapless sequence as the very last
             // operation: the counter lock is only held for the commit window,

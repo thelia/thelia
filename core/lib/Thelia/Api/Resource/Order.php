@@ -262,6 +262,16 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $deliveryModuleTitle = null;
 
+    /**
+     * The note the buyer wrote for whoever receives the parcel, frozen on the order.
+     *
+     * Read only: it is what was printed on the delivery note, and an order already
+     * shipped must not start saying something else. It never reaches the invoice — the
+     * recipient reads the parcel, the buyer reads the bill.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $giftMessage = null;
+
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -626,6 +636,18 @@ class Order implements PropelResourceInterface
     public function setDeliveryModuleTitle(?string $deliveryModuleTitle): self
     {
         $this->deliveryModuleTitle = $deliveryModuleTitle;
+
+        return $this;
+    }
+
+    public function getGiftMessage(): ?string
+    {
+        return $this->giftMessage;
+    }
+
+    public function setGiftMessage(?string $giftMessage): self
+    {
+        $this->giftMessage = $giftMessage;
 
         return $this;
     }

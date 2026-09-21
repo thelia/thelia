@@ -316,6 +316,7 @@ return [
     'Configuration / Tax' => 'Configuration / Taxe',
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration checkout consents' => 'Configuration des consentements du tunnel de commande',
+    'Configuration gift wrappings' => 'Configuration des emballages cadeaux',
     'Configuration checkout steps' => 'Configuration des étapes du tunnel de commande',
     'Catalog price rules' => 'Règles de prix catalogue',
     'Configuration variables' => 'Variables de configuration',

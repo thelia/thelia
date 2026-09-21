@@ -270,10 +270,10 @@ class AttributeAccessService
                 break;
             case 'total_price':
             case 'total_price_with_discount':
-                $result = $cart->getTotalAmount(true, $taxCountry, $taxState, true);
+                $result = $cart->getTotalAmount(true, $taxCountry, $taxState, true, true);
                 break;
             case 'total_price_without_discount':
-                $result = $cart->getTotalAmount(false, $taxCountry, $taxState, true);
+                $result = $cart->getTotalAmount(false, $taxCountry, $taxState, true, true);
                 break;
             case 'total_price_without_postage':
                 $result = $cart->getTotalAmount(true, $taxCountry, $taxState);
@@ -283,10 +283,10 @@ class AttributeAccessService
                 break;
             case 'total_taxed_price':
             case 'total_taxed_price_with_discount':
-                $result = $cart->getTaxedAmount($taxCountry, true, $taxState, true);
+                $result = $cart->getTaxedAmount($taxCountry, true, $taxState, true, true);
                 break;
             case 'total_taxed_price_without_discount':
-                $result = $cart->getTaxedAmount($taxCountry, false, $taxState, true);
+                $result = $cart->getTaxedAmount($taxCountry, false, $taxState, true, true);
                 break;
             case 'total_taxed_price_without_postage':
                 $result = $cart->getTaxedAmount($taxCountry, true, $taxState);
@@ -300,10 +300,10 @@ class AttributeAccessService
                 break;
             case 'total_vat':
             case 'total_tax_amount':
-                $result = $cart->getTotalVAT($taxCountry, $taxState, true, true);
+                $result = $cart->getTotalVAT($taxCountry, $taxState, true, true, true);
                 break;
             case 'total_tax_amount_without_discount':
-                $result = $cart->getTotalVAT($taxCountry, $taxState, false, true);
+                $result = $cart->getTotalVAT($taxCountry, $taxState, false, true, true);
                 break;
             case 'raw_total_tax_amount':
                 $result = $cart->getTotalVAT($taxCountry, $taxState, false, false);
@@ -334,6 +334,24 @@ class AttributeAccessService
                 break;
             case 'unavailable_promotions':
                 $result = $this->offeredCartLineService->getUnavailablePromotions();
+                break;
+            case 'gift_wrapping_id':
+                $result = $cart->getGiftWrappingId();
+                break;
+            case 'gift_wrapping_title':
+                // The wording of the service as the shop writes it today. The order freezes
+                // its own copy, so a theme showing a placed order reads that one, not this.
+                $result = $cart->getGiftWrapping()?->setLocale((string) $this->getSession()->getLang()?->getLocale())->getTitle();
+                break;
+            case 'gift_wrapping':
+            case 'untaxed_gift_wrapping':
+                $result = $cart->getUntaxedGiftWrapping();
+                break;
+            case 'taxed_gift_wrapping':
+                $result = $cart->getTaxedGiftWrapping($taxCountry, $taxState);
+                break;
+            case 'gift_message':
+                $result = $cart->getGiftMessage();
                 break;
         }
 
