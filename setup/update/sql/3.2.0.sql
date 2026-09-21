@@ -205,4 +205,107 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Gift wrapping services, the note for the recipient, and the order line
+-- that invoices the service beside the goods.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `gift_wrapping`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the cart, the order lines and the code refer this wrapping by',
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the price of the service, tax excluded, the way a product price is stored',
+    `tax_rule_id` INTEGER NOT NULL,
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a wrapping turned off is no longer offered at checkout, and is kept so the orders already placed keep reading',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `gift_wrapping_code_UNIQUE` (`code`),
+    INDEX `idx_gift_wrapping_tax_rule_id` (`tax_rule_id`),
+    CONSTRAINT `fk_gift_wrapping_tax_rule_id`
+        FOREIGN KEY (`tax_rule_id`)
+        REFERENCES `tax_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `gift_wrapping_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `gift_wrapping_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `gift_wrapping` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The wrapping the buyer picked, released rather than blocked when the merchant deletes
+-- the service: the cart loses the choice, which is what deleting it means.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'gift_wrapping_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD `gift_wrapping_id` INTEGER NULL AFTER `discount`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_gift_wrapping_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_gift_wrapping_id` (`gift_wrapping_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_constraint := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_gift_wrapping_id');
+SET @statement := IF(@add_constraint, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_gift_wrapping_id` FOREIGN KEY (`gift_wrapping_id`) REFERENCES `gift_wrapping` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT', 'DO 0');
+PREPARE add_constraint_statement FROM @statement;
+EXECUTE add_constraint_statement;
+DEALLOCATE PREPARE add_constraint_statement;
+
+-- The note for whoever receives the parcel, on the cart while it is being written and on
+-- the order once it is placed. Null on every cart and every order that predates it, which
+-- reads as "no note", exactly right.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'gift_message');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD `gift_message` TEXT NULL AFTER `gift_wrapping_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'gift_message');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `gift_message` TEXT NULL AFTER `cart_fingerprint`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'gift_message');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `gift_message` TEXT NULL AFTER `cart_fingerprint`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- What an order line stands for. Every line written before this column existed is a good
+-- taken off the catalogue, which is what the default says, so nothing has to be backfilled.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'line_type');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `line_type` VARCHAR(32) NOT NULL DEFAULT ''product'' AFTER `is_offered`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.gift-wrapping', NOW(), NOW());
+
+SET @gift_wrapping_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.gift-wrapping');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@gift_wrapping_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'en_US', 'Configuration gift wrappings', NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'fr_FR', 'Configuration des emballages cadeaux', NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@gift_wrapping_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

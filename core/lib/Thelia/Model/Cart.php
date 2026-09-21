@@ -139,6 +139,7 @@ class Cart extends BaseCart
         bool $withDiscount = true,
         ?State $state = null,
         bool $withPostage = false,
+        bool $withGiftWrapping = false,
     ): float {
         $total = 0;
 
@@ -158,6 +159,14 @@ class Cart extends BaseCart
             $total += $this->getTaxedPostage();
         }
 
+        // Off by default, and asked for only by the callers that want the grand total the
+        // buyer pays. A delivery module reading the cart to decide whether the order has
+        // reached free shipping is not one of them: the wrapping is a service, not goods,
+        // and paying for one must not carry an order over that threshold.
+        if ($withGiftWrapping) {
+            $total += $this->getTaxedGiftWrapping($country, $state);
+        }
+
         return round($total, 2);
     }
 
@@ -171,6 +180,7 @@ class Cart extends BaseCart
         ?Country $country = null,
         ?State $state = null,
         bool $withPostage = false,
+        bool $withGiftWrapping = false,
     ): float {
         $total = 0;
 
@@ -190,6 +200,10 @@ class Cart extends BaseCart
             $total += $this->getUntaxedPostage();
         }
 
+        if ($withGiftWrapping) {
+            $total += $this->getUntaxedGiftWrapping();
+        }
+
         return round($total, 2);
     }
 
@@ -198,9 +212,10 @@ class Cart extends BaseCart
      *
      * @throws PropelException
      */
-    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true, $withPostage = false): float|int|string
+    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true, $withPostage = false, bool $withGiftWrapping = false): float|int|string
     {
-        return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState, $withPostage) - $this->getTotalAmount($withDiscount, $taxCountry, $taxState, $withPostage);
+        return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState, $withPostage, $withGiftWrapping)
+            - $this->getTotalAmount($withDiscount, $taxCountry, $taxState, $withPostage, $withGiftWrapping);
     }
 
     /**
@@ -289,5 +304,55 @@ class Cart extends BaseCart
         return 0 < (float) $this->getPostageTax()
             ? (float) $this->getPostage() - (float) $this->getPostageTax()
             : (float) $this->getPostage();
+    }
+
+    /**
+     * The price of the gift wrapping the buyer picked, tax excluded, and zero when they
+     * picked none or picked one the shop offers.
+     *
+     * Read off the wrapping row rather than off a column of the cart: nothing the browser
+     * sends carries an amount, and a merchant who reprices the service before the order is
+     * placed charges the new price. What is frozen is the order, not the cart.
+     */
+    public function getUntaxedGiftWrapping(): float
+    {
+        return round((float) $this->getGiftWrapping()?->getPrice(), 2);
+    }
+
+    /**
+     * The same price with the tax the wrapping's own rule puts on it, for the country the
+     * order is delivered to.
+     *
+     * The same computation GiftWrappingProvider::taxedPrice() makes, written twice on
+     * purpose: a Propel model receives nothing by autowiring, so it reaches the tax
+     * engine through the dispatcher carried by its connection, the way every other
+     * amount on this class does. The service is what a theme and the checkout call.
+     *
+     * @throws PropelException
+     */
+    public function getTaxedGiftWrapping(?Country $country = null, ?State $state = null): float
+    {
+        $giftWrapping = $this->getGiftWrapping();
+
+        if (!$giftWrapping instanceof GiftWrapping) {
+            return 0.0;
+        }
+
+        $untaxedPrice = (float) $giftWrapping->getPrice();
+        $taxRule = $giftWrapping->getTaxRule();
+
+        // No country to tax against — a cart with no delivery address yet — and the service
+        // reads at its bare price. The order is what the tax is finally computed on, and it
+        // always has an address.
+        if (!$country instanceof Country || !$taxRule instanceof TaxRule) {
+            return round($untaxedPrice, 2);
+        }
+
+        return round(
+            $this->createTaxCalculator()
+                ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
+                ->getTaxedPrice($untaxedPrice),
+            2,
+        );
     }
 }

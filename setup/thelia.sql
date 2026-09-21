@@ -738,6 +738,7 @@ CREATE TABLE `order`
     `lang_id` INTEGER NOT NULL,
     `cart_id` INTEGER NOT NULL,
     `cart_fingerprint` VARCHAR(64),
+    `gift_message` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -898,6 +899,7 @@ CREATE TABLE `order_product`
     `virtual` TINYINT DEFAULT 0 NOT NULL,
     `virtual_document` VARCHAR(255),
     `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT 'the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone',
+    `line_type` VARCHAR(32) DEFAULT 'product' NOT NULL COMMENT 'what the line stands for: a good taken off the catalogue, or a service the shop invoices beside them such as a gift wrapping',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1426,6 +1428,51 @@ CREATE TABLE `content_folder`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- gift_wrapping
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `gift_wrapping`;
+
+CREATE TABLE `gift_wrapping`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the cart, the order lines and the code refer this wrapping by',
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the price of the service, tax excluded, the way a product price is stored',
+    `tax_rule_id` INTEGER NOT NULL,
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a wrapping turned off is no longer offered at checkout, and is kept so the orders already placed keep reading',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `gift_wrapping_code_UNIQUE` (`code`),
+    INDEX `idx_gift_wrapping_tax_rule_id` (`tax_rule_id`),
+    CONSTRAINT `fk_gift_wrapping_tax_rule_id`
+        FOREIGN KEY (`tax_rule_id`)
+        REFERENCES `tax_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- gift_wrapping_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `gift_wrapping_i18n`;
+
+CREATE TABLE `gift_wrapping_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `gift_wrapping_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `gift_wrapping` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- cart
 -- ---------------------------------------------------------------------
 
@@ -1445,11 +1492,14 @@ CREATE TABLE `cart`
     `postage_tax_rule_title` VARCHAR(255),
     `currency_id` INTEGER,
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
+    `gift_wrapping_id` INTEGER COMMENT 'the gift wrapping the buyer picked, at most one, null while they picked none',
+    `gift_message` TEXT COMMENT 'the note the buyer wrote for whoever receives the parcel, distinct from any comment addressed to the merchant',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `token_UNIQUE` (`token`),
     INDEX `idx_cart_customer_id` (`customer_id`),
+    INDEX `idx_cart_gift_wrapping_id` (`gift_wrapping_id`),
     INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
     INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
@@ -1482,7 +1532,12 @@ CREATE TABLE `cart`
         FOREIGN KEY (`payment_module_id`)
         REFERENCES `module` (`id`)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `fk_cart_gift_wrapping_id`
+        FOREIGN KEY (`gift_wrapping_id`)
+        REFERENCES `gift_wrapping` (`id`)
+        ON DELETE SET NULL
+        ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -4026,6 +4081,7 @@ CREATE TABLE `order_version`
     `lang_id` INTEGER NOT NULL,
     `cart_id` INTEGER NOT NULL,
     `cart_fingerprint` VARCHAR(64),
+    `gift_message` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

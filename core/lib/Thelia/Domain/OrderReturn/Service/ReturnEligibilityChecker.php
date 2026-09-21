@@ -154,11 +154,14 @@ final class ReturnEligibilityChecker
     }
 
     /**
-     * Whether the product line may be returned at all (i.e. it is not virtual).
+     * Whether the product line may be returned at all: it has to be something that was
+     * shipped, so neither a virtual product nor a service the shop invoiced beside the
+     * goods. A gift wrapping has nothing to send back, and offering to take it back
+     * would promise a refund the return flow has no unit to count.
      */
     public function isProductReturnable(OrderProduct $orderProduct): bool
     {
-        return 1 !== (int) $orderProduct->getVirtual();
+        return 1 !== (int) $orderProduct->getVirtual() && $orderProduct->isProductLine();
     }
 
     /**

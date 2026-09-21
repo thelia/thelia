@@ -354,6 +354,8 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('CURRENCY_RATE', $order->getCurrencyRate())
                 ->set('TRANSACTION_REF', $order->getTransactionRef())
                 ->set('DELIVERY_REF', $order->getDeliveryRef())
+                // Printed on the picking list and the delivery note, never on the invoice.
+                ->set('GIFT_MESSAGE', $order->getGiftMessage())
                 ->set('INVOICE_REF', $order->getInvoiceRef())
                 ->set('VIRTUAL', $hasVirtualDownload)
                 ->set('POSTAGE', $order->getPostage())

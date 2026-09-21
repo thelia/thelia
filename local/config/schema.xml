@@ -642,6 +642,10 @@
          module is free to rewrite the order afterwards, a pickup one replaces the delivery address
          with the store's, and the order then no longer describes the cart it came from. -->
     <column name="cart_fingerprint" size="64" type="VARCHAR" />
+    <!-- The note the buyer wrote for whoever receives the parcel, frozen on the order the way
+         every other wording of it is. It goes on the picking list and the delivery note, never
+         on the invoice: the recipient reads the parcel, the buyer reads the bill. -->
+    <column name="gift_message" type="LONGVARCHAR" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
@@ -787,6 +791,7 @@
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column name="virtual_document" size="255" type="VARCHAR" />
     <column defaultValue="0" description="the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone" name="is_offered" required="true" type="TINYINT" />
+    <column defaultValue="product" description="what the line stands for: a good taken off the catalogue, or a service the shop invoices beside them such as a gift wrapping. Everything that walks the lines of an order reads this to know whether it is looking at something to pick, to ship or to count as stock." name="line_type" required="true" size="32" type="VARCHAR" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -1314,6 +1319,33 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <!-- A service the shop invoices on the order beside its goods: a gift wrapping, priced
+       and taxed like a product, that the buyer picks at most one of. A price of zero is a
+       wrapping offered, which is why the price is a column and not a configuration entry:
+       ConfigQuery::read() reads '0' as absent. -->
+  <table name="gift_wrapping" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the name the cart, the order lines and the code refer this wrapping by" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="0.000000" description="the price of the service, tax excluded, the way a product price is stored" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column name="tax_rule_id" required="true" type="INTEGER" />
+    <column defaultValue="1" description="a wrapping turned off is no longer offered at checkout, and is kept so the orders already placed keep reading" name="active" required="true" type="TINYINT" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="LONGVARCHAR" />
+    <foreign-key foreignTable="tax_rule" name="fk_gift_wrapping_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="tax_rule_id" />
+    </foreign-key>
+    <unique name="gift_wrapping_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <index name="idx_gift_wrapping_tax_rule_id">
+      <index-column name="tax_rule_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
   <table name="cart" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="token" size="255" type="VARCHAR" />
@@ -1332,6 +1364,9 @@
     <column name="currency_id" type="INTEGER" />
 
     <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
+
+    <column description="the gift wrapping the buyer picked, at most one, null while they picked none" name="gift_wrapping_id" type="INTEGER" />
+    <column description="the note the buyer wrote for whoever receives the parcel, distinct from any comment addressed to the merchant" name="gift_message" type="LONGVARCHAR" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -1350,9 +1385,15 @@
     <foreign-key foreignTable="currency" name="fk_cart_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
+    <foreign-key foreignTable="gift_wrapping" name="fk_cart_gift_wrapping_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="gift_wrapping_id" />
+    </foreign-key>
 
     <index name="idx_cart_customer_id">
       <index-column name="customer_id" />
+    </index>
+    <index name="idx_cart_gift_wrapping_id">
+      <index-column name="gift_wrapping_id" />
     </index>
     <index name="idx_cart_address_delivery_id">
       <index-column name="address_delivery_id" />

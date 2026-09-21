@@ -154,9 +154,19 @@ class Calculator implements TaxCalculatorInterface
 
         /** @var OrderProduct $orderProduct */
         foreach ($order->getOrderProducts() as $orderProduct) {
+            $linePrice = (float) $orderProduct->getPrice();
+
+            // A line charged nothing — a gift wrapping the shop offers — has no rate to
+            // read and dividing by it would end the request. It is left out of the
+            // average rather than counted as untaxed, which would drag the factor down
+            // and under-tax the discount spread over the rest of the order.
+            if (0.0 === $linePrice) {
+                continue;
+            }
+
             /** @var \Thelia\Core\Template\Loop\OrderProductTax $orderProductTax */
             foreach ($orderProduct->getOrderProductTaxes() as $orderProductTax) {
-                $orderTaxFactors[] = 1 + $orderProductTax->getAmount() / $orderProduct->getPrice();
+                $orderTaxFactors[] = 1 + $orderProductTax->getAmount() / $linePrice;
             }
         }
 
