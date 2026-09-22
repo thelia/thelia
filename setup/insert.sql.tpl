@@ -95,7 +95,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (84, 'order_return_enabled', '0', 0, 0, NOW(), NOW()),
 (85, 'order_return_window_days', '14', 0, 0, NOW(), NOW()),
 (86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW()),
-(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW())
+(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW()),
+(88, 'image_formats', 'webp', 0, 0, NOW(), NOW()),
+(89, 'image_quality_webp', '75', 0, 0, NOW(), NOW()),
+(90, 'image_quality_avif', '50', 0, 0, NOW(), NOW())
 
 ;
 
