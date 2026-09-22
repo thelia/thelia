@@ -483,6 +483,14 @@ final class TheliaEvents
     public const CONSENT_UPDATE_POSITION = 'action.updateConsentPosition';
     public const CONSENT_TOGGLE_ACTIVE = 'action.toggleConsentActive';
 
+    // -- Gift wrapping services management ----------------------------------
+
+    public const GIFT_WRAPPING_CREATE = 'action.createGiftWrapping';
+    public const GIFT_WRAPPING_UPDATE = 'action.updateGiftWrapping';
+    public const GIFT_WRAPPING_DELETE = 'action.deleteGiftWrapping';
+    public const GIFT_WRAPPING_UPDATE_POSITION = 'action.updateGiftWrappingPosition';
+    public const GIFT_WRAPPING_TOGGLE_ACTIVE = 'action.toggleGiftWrappingActive';
+
     // -- Types of relation between products management ----------------------
 
     public const PRODUCT_ASSOCIATION_TYPE_CREATE = 'action.createProductAssociationType';

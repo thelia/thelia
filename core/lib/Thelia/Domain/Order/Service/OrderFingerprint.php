@@ -23,11 +23,11 @@ use Thelia\Model\Order;
  * Whether an unpaid order still describes the cart it was placed from.
  *
  * What a cart says at a given moment: the lines, the two addresses, the carrier and the
- * postage, the payment module, the currency and the discount, read into one shape and
- * reduced to a string. A new payment attempt may reuse the unpaid order only while the
- * cart still says exactly what it said when that order was placed — otherwise the buyer
- * would pay for something other than what they are being shown. Amounts are read at the
- * six decimals the columns store, never as floats.
+ * postage, the payment module, the currency, the discount and the gift the buyer asked
+ * for, read into one shape and reduced to a string. A new payment attempt may reuse the
+ * unpaid order only while the cart still says exactly what it said when that order was
+ * placed — otherwise the buyer would pay for something other than what they are being
+ * shown. Amounts are read at the six decimals the columns store, never as floats.
  *
  * Taken of the CART on both sides, and frozen on the order at its placement, rather than
  * read back off the order. An order stops describing the cart it came from as soon as a
@@ -92,6 +92,12 @@ final readonly class OrderFingerprint
             'payment_module' => $paymentModuleId,
             'currency' => $currencyId,
             'discount' => $this->amount((string) $cart->getDiscount()),
+            // The gift wrapping is charged on the order, so changing it changes what the
+            // buyer owes and the unpaid order no longer describes this cart. The note is
+            // in for a different reason: it is printed on the parcel and frozen on the
+            // order, so an order placed before it was written would ship without it.
+            'gift_wrapping' => null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId(),
+            'gift_message' => (string) $cart->getGiftMessage(),
         ];
     }
 

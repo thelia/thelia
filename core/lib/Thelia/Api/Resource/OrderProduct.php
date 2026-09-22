@@ -323,6 +323,17 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public bool $isOffered = false;
 
+    /**
+     * What the line stands for: a good taken off the catalogue, or a service the shop
+     * invoiced beside them. Read only, for the reason isOffered is: the order says what
+     * was sold, and no caller turns a wrapping into a product after the fact.
+     *
+     * A theme reads it to leave the service lines out of the list of things to ship, and
+     * to state them where it states the postage instead.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public string $lineType = OrderProductModel::LINE_TYPE_PRODUCT;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $createdAt = null;
 
@@ -645,6 +656,18 @@ class OrderProduct implements PropelResourceInterface
     public function isOffered(): bool
     {
         return $this->isOffered;
+    }
+
+    public function getLineType(): string
+    {
+        return $this->lineType;
+    }
+
+    public function setLineType(string $lineType): self
+    {
+        $this->lineType = $lineType;
+
+        return $this;
     }
 
     public function setIsOffered(bool $isOffered): self
