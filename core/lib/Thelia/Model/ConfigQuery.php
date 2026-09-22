@@ -291,6 +291,20 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * The modern image formats the shop offers on top of the source one.
+     *
+     * The raw stored value, a comma-separated list:
+     * {@see \Thelia\Domain\Media\Enum\ImageFormat} turns it into formats and drops what
+     * it does not know, and {@see \Thelia\Domain\Media\Service\ImageFormatPolicy} drops
+     * what the server cannot write. Empty means the shop serves the source format only,
+     * which is what a shop upgrading from an earlier version keeps.
+     */
+    public static function getImageFormats(): string
+    {
+        return (string) self::read('image_formats', '');
+    }
+
+    /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList(): array
