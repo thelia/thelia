@@ -431,4 +431,6 @@ return [
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabwe',
     'Catalog price rules' => 'Regole di prezzo del catalogo',
+    'Promotion' => 'Promozione',
+    'Newness' => 'Novità',
 ];

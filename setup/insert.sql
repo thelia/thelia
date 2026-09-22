@@ -15056,3 +15056,38 @@ INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
     (4, 'fr_FR', 'Confirmation'),
     (4, 'it_IT', 'Conferma')
 ;
+
+/**
+The filters a product listing offers that hang off neither a feature nor an attribute.
+
+A row here is what makes such a filter reachable from the back office: the category and
+the template screens list them, and a merchant decides there whether the facet shows,
+where it sits and how it is drawn. The filters themselves live in code, matched to these
+rows by `type`, never by id.
+
+Brand and category are deliberately absent: they were seeded by the 2.x update script and
+never by a fresh install, and repairing that is its own change.
+*/
+INSERT INTO `choice_filter_other` (`id`, `type`, `visible`) VALUES
+    (4, 'promo', 1),
+    (5, 'new', 1)
+;
+
+INSERT INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (4, 'cs_CZ', 'Akce', NULL),
+    (5, 'cs_CZ', 'Novinka', NULL),
+    (4, 'de_DE', 'Aktion', NULL),
+    (5, 'de_DE', 'Neuheit', NULL),
+    (4, 'en_US', 'Promotion', NULL),
+    (5, 'en_US', 'Newness', NULL),
+    (4, 'es_ES', 'Promoción', NULL),
+    (5, 'es_ES', 'Novedad', NULL),
+    (4, 'fr_FR', 'Promotion', NULL),
+    (5, 'fr_FR', 'Nouveauté', NULL),
+    (4, 'it_IT', 'Promozione', NULL),
+    (5, 'it_IT', 'Novità', NULL),
+    (4, 'nl_NL', 'Promotie', NULL),
+    (5, 'nl_NL', 'Nieuw', NULL),
+    (4, 'ru_RU', 'Акция', NULL),
+    (5, 'ru_RU', 'Новинка', NULL)
+;
