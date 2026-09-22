@@ -347,6 +347,21 @@ final class TheliaEvents
     /** Delete given document. */
     public const DOCUMENT_DELETE = 'action.deleteDocument';
 
+    /** Attach a video to a product, either played from a platform or hosted by the shop. */
+    public const PRODUCT_VIDEO_CREATE = 'action.createProductVideo';
+
+    /** Update a product video: its wording, its thumbnail, the file it is stored in. */
+    public const PRODUCT_VIDEO_UPDATE = 'action.updateProductVideo';
+
+    /** Delete a product video, and the file it is stored in when the shop hosts it. */
+    public const PRODUCT_VIDEO_DELETE = 'action.deleteProductVideo';
+
+    /** Publish a hosted video in the web space, and compute the address it is served from. */
+    public const PRODUCT_VIDEO_PROCESS = 'action.processProductVideo';
+
+    public const PRODUCT_VIDEO_UPDATE_POSITION = 'action.updateProductVideoPosition';
+    public const PRODUCT_VIDEO_TOGGLE_VISIBILITY = 'action.toggleProductVideoVisibility';
+
     /** Sent when creating a Coupon. */
     public const COUPON_CREATE = 'action.create_coupon';
 

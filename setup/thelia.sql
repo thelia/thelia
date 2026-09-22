@@ -669,6 +669,7 @@ CREATE TABLE `product_image`
     `product_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
+    `decorative` TINYINT DEFAULT 0 NOT NULL COMMENT 'a decorative image carries no information and is published with an empty alt attribute; the flag tells it apart from an image not described yet',
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -704,6 +705,40 @@ CREATE TABLE `product_document`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_video
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_video`;
+
+CREATE TABLE `product_video`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `provider` VARCHAR(32) NOT NULL COMMENT 'where the video is played from: youtube, vimeo, dailymotion, or file for a video the shop hosts itself',
+    `external_id` VARCHAR(255) COMMENT 'the identifier of the video on its platform, the only part of the address the shop keeps; empty for a hosted file',
+    `file` VARCHAR(255) COMMENT 'the name of the hosted file in the videos library; empty for a platform video',
+    `thumbnail_image_id` INTEGER COMMENT 'the product image shown until the player is loaded; the first image of the product when empty',
+    `visible` TINYINT DEFAULT 1 NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_product_video_product_id` (`product_id`),
+    INDEX `idx_product_video_product_id_position` (`product_id`, `position`),
+    INDEX `idx_product_video_thumbnail_image_id` (`thumbnail_image_id`),
+    CONSTRAINT `fk_product_video_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_video_thumbnail_image_id`
+        FOREIGN KEY (`thumbnail_image_id`)
+        REFERENCES `product_image` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -1622,6 +1657,7 @@ CREATE TABLE `category_image`
     `category_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
+    `decorative` TINYINT DEFAULT 0 NOT NULL COMMENT 'a decorative image carries no information and is published with an empty alt attribute; the flag tells it apart from an image not described yet',
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1647,6 +1683,7 @@ CREATE TABLE `folder_image`
     `folder_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
+    `decorative` TINYINT DEFAULT 0 NOT NULL COMMENT 'a decorative image carries no information and is published with an empty alt attribute; the flag tells it apart from an image not described yet',
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1672,6 +1709,7 @@ CREATE TABLE `content_image`
     `content_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
+    `decorative` TINYINT DEFAULT 0 NOT NULL COMMENT 'a decorative image carries no information and is published with an empty alt attribute; the flag tells it apart from an image not described yet',
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -2256,6 +2294,7 @@ CREATE TABLE `brand_image`
     `brand_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 1 NOT NULL,
+    `decorative` TINYINT DEFAULT 0 NOT NULL COMMENT 'a decorative image carries no information and is published with an empty alt attribute; the flag tells it apart from an image not described yet',
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -2712,6 +2751,32 @@ CREATE TABLE `product_sale_elements_product_document`
     CONSTRAINT `fk_pse_product_document_product_document_id`
         FOREIGN KEY (`product_document_id`)
         REFERENCES `product_document` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_sale_elements_product_video
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_product_video`;
+
+CREATE TABLE `product_sale_elements_product_video`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_video_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_sale_elements_product_video_UNIQUE` (`product_sale_elements_id`, `product_video_id`),
+    INDEX `fk_pse_product_video_product_video_id_idx` (`product_video_id`),
+    CONSTRAINT `fk_pse_product_video_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_pse_product_video_product_video_id`
+        FOREIGN KEY (`product_video_id`)
+        REFERENCES `product_video` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -3237,6 +3302,7 @@ CREATE TABLE `product_image_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
+    `alt` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
@@ -3265,6 +3331,28 @@ CREATE TABLE `product_document_i18n`
     CONSTRAINT `product_document_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `product_document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_video_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_video_i18n`;
+
+CREATE TABLE `product_video_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `alt` VARCHAR(255) COMMENT 'the accessible name of the player, read out in place of the video',
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `product_video_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `product_video` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
@@ -3441,6 +3529,7 @@ CREATE TABLE `category_image_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
+    `alt` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
@@ -3462,6 +3551,7 @@ CREATE TABLE `folder_image_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
+    `alt` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
@@ -3483,6 +3573,7 @@ CREATE TABLE `content_image_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
+    `alt` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
@@ -3688,6 +3779,7 @@ CREATE TABLE `brand_image_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
+    `alt` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,

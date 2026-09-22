@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\Media\ProductMediaOrder;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
@@ -37,6 +38,15 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     protected function addCriteriaToPositionQuery(ProductImageQuery $query): void
     {
         $query->filterByProduct($this->getProduct());
+    }
+
+    /**
+     * The images and the videos of a product share one sequence: a new medium goes
+     * after every medium the product already shows, whichever table it lives in.
+     */
+    public function getNextPosition(): int|float
+    {
+        return (new ProductMediaOrder())->nextPosition((int) $this->getProductId());
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool
@@ -60,17 +70,27 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         return $this->getProductId();
     }
 
-    public function preDelete(?ConnectionInterface $con = null): bool
+    /**
+     * Puts this medium at the given rank among the images and the videos of its
+     * product: the sequence is shared, so the trait's one-table shift would leave
+     * two media on the same position.
+     */
+    public function changeAbsolutePosition($newPosition): void
     {
-        parent::preDelete($con);
+        if (null === $newPosition || (int) $newPosition <= 0) {
+            return;
+        }
 
-        $this->reorderBeforeDelete(
-            [
-                'product_id' => $this->getProductId(),
-            ],
-        );
+        (new ProductMediaOrder())->moveTo($this, (int) $newPosition);
+    }
 
-        return true;
+    public function postDelete(?ConnectionInterface $con = null): void
+    {
+        parent::postDelete($con);
+
+        // Closes the gap in the sequence the images and the videos of the product
+        // share; the trait's reorderBeforeDelete() would only close it in this table.
+        (new ProductMediaOrder())->compact((int) $this->getProductId());
     }
 
     public function getBreadcrumb(Router $router, $tab, $locale): array

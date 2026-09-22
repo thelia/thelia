@@ -14,25 +14,34 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Media;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\File\FileManager;
 use Thelia\Core\File\FileModelInterface;
+use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\DocumentUploadDTO;
 use Thelia\Domain\Media\DTO\ImageProcessDTO;
 use Thelia\Domain\Media\DTO\ImageUpdateDTO;
 use Thelia\Domain\Media\DTO\ImageUploadDTO;
+use Thelia\Domain\Media\DTO\ProductVideoCreateDTO;
+use Thelia\Domain\Media\DTO\ProductVideoUpdateDTO;
+use Thelia\Domain\Media\Video\VideoProvider;
+use Thelia\Model\ProductVideo;
 
 final readonly class MediaFacade
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private FileManager $fileManager,
+        private FileProcessorService $fileProcessorService,
+        private ProductMediaOrder $productMediaOrder,
     ) {
     }
 
@@ -55,6 +64,10 @@ final readonly class MediaFacade
         if (null !== $dto->postscriptum) {
             $model->setPostscriptum($dto->postscriptum);
         }
+        if (null !== $dto->alt) {
+            $model->setAlt($dto->alt);
+        }
+        $model->setDecorative($dto->decorative ? 1 : 0);
 
         $event = new FileCreateOrUpdateEvent($dto->parentId);
         $event->setModel($model);
@@ -85,6 +98,12 @@ final readonly class MediaFacade
         if (null !== $dto->visible) {
             $image->setVisible($dto->visible);
         }
+        if (null !== $dto->alt) {
+            $image->setAlt($dto->alt);
+        }
+        if (null !== $dto->decorative) {
+            $image->setDecorative($dto->decorative ? 1 : 0);
+        }
 
         $event = new FileCreateOrUpdateEvent($image->getParentId());
         $event->setModel($image);
@@ -104,7 +123,9 @@ final readonly class MediaFacade
 
     public function updateImagePosition(FileModelInterface $image, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void
     {
-        $event = new UpdatePositionEvent($image->getId(), $mode, $position);
+        // The file actions listen for the file flavour of the event, which carries
+        // the query of the table to move in; the bare event would not reach them.
+        $event = new UpdateFilePositionEvent($image->getQueryInstance(), $image->getId(), $mode, $position);
 
         $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_UPDATE_POSITION);
     }
@@ -202,7 +223,7 @@ final readonly class MediaFacade
 
     public function updateDocumentPosition(FileModelInterface $document, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void
     {
-        $event = new UpdatePositionEvent($document->getId(), $mode, $position);
+        $event = new UpdateFilePositionEvent($document->getQueryInstance(), $document->getId(), $mode, $position);
 
         $this->dispatcher->dispatch($event, TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
@@ -221,5 +242,173 @@ final readonly class MediaFacade
         $event->setCacheSubdirectory($cacheSubdirectory);
 
         $this->dispatcher->dispatch($event, TheliaEvents::DOCUMENT_CLEAR_CACHE);
+    }
+
+    /**
+     * Attaches a video to a product.
+     *
+     * The caller has already turned the address a merchant pasted into a platform
+     * and an identifier through VideoProviderResolver, or hands an uploaded file
+     * for a video the shop stores itself.
+     */
+    public function createVideo(ProductVideoCreateDTO $dto): ProductVideo
+    {
+        $this->guardUploadedVideo($dto->uploadedFile);
+
+        $video = new ProductVideo();
+        $video->setParentId($dto->productId);
+        $video->setProvider(($dto->provider ?? VideoProvider::File)->value);
+        $video->setExternalId($dto->externalId);
+        $video->setThumbnailImageId($dto->thumbnailImageId);
+        $video->setVisible($dto->visible ? 1 : 0);
+        $video->setLocale($dto->locale);
+
+        $this->writeVideoWording(
+            $video,
+            $dto->title,
+            $dto->alt,
+            $dto->description,
+            $dto->chapo,
+            $dto->postscriptum,
+        );
+
+        $event = new FileCreateOrUpdateEvent($dto->productId);
+        $event->setModel($video);
+        $event->setUploadedFile($dto->uploadedFile);
+        $event->setParentName('product');
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_CREATE);
+
+        /** @var ProductVideo $created */
+        $created = $event->getModel();
+
+        return $created;
+    }
+
+    public function updateVideo(ProductVideo $video, ProductVideoUpdateDTO $dto): ProductVideo
+    {
+        $this->guardUploadedVideo($dto->uploadedFile);
+
+        $oldModel = clone $video;
+
+        $video->setLocale($dto->locale);
+
+        if (null !== $dto->provider) {
+            $video->setProvider($dto->provider->value);
+        }
+        if (null !== $dto->externalId) {
+            $video->setExternalId($dto->externalId);
+        }
+        if (null !== $dto->thumbnailImageId) {
+            $video->setThumbnailImageId(false === $dto->thumbnailImageId ? null : $dto->thumbnailImageId);
+        }
+        if (null !== $dto->visible) {
+            $video->setVisible($dto->visible ? 1 : 0);
+        }
+
+        $this->writeVideoWording(
+            $video,
+            $dto->title,
+            $dto->alt,
+            $dto->description,
+            $dto->chapo,
+            $dto->postscriptum,
+        );
+
+        $event = new FileCreateOrUpdateEvent($video->getParentId());
+        $event->setModel($video);
+        $event->setOldModel($oldModel);
+        $event->setUploadedFile($dto->uploadedFile);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_UPDATE);
+
+        /** @var ProductVideo $updated */
+        $updated = $event->getModel();
+
+        return $updated;
+    }
+
+    /**
+     * Deletes a video, and the file it is stored in when the shop hosts it.
+     */
+    public function deleteVideo(ProductVideo $video): void
+    {
+        $this->dispatcher->dispatch(new FileDeleteEvent($video), TheliaEvents::PRODUCT_VIDEO_DELETE);
+    }
+
+    public function updateVideoPosition(ProductVideo $video, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void
+    {
+        $event = new UpdateFilePositionEvent($video->getQueryInstance(), $video->getId(), $mode, $position);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION);
+    }
+
+    public function toggleVideoVisibility(ProductVideo $video): void
+    {
+        $event = new FileToggleVisibilityEvent($video->getQueryInstance(), $video->getId());
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY);
+    }
+
+    /**
+     * Gives the images and the videos of a product the order of the list, the way a
+     * merchant arranges the sheet in the back office: the first entry takes position 1.
+     *
+     * @param list<array{type: string, id: int}> $order every medium of the product, once
+     *
+     * @throws \InvalidArgumentException when the list does not match the media of the product
+     */
+    public function reorderProductMedia(int $productId, array $order): void
+    {
+        $this->productMediaOrder->reorder($productId, $order);
+    }
+
+    /**
+     * Applies the shop upload policy to a video before anything is written.
+     *
+     * The policy lives here rather than in each caller: the video library is
+     * published into the web space by symbolic link, so a file the shop accepts is
+     * a file the shop serves. A back-office screen calling the facade gets the same
+     * refusal the API gets, and a caller that forgets to ask cannot be the hole.
+     *
+     * @throws ProcessFileException when the file may not be uploaded
+     */
+    private function guardUploadedVideo(?UploadedFile $uploadedFile): void
+    {
+        if (!$uploadedFile instanceof UploadedFile) {
+            return;
+        }
+
+        $this->fileProcessorService->validateUpload($uploadedFile, 'video');
+        $this->fileProcessorService->sanitizeUpload($uploadedFile);
+    }
+
+    /**
+     * Writes the fields the caller carried, in the locale already set on the model.
+     * A field left null is one the caller said nothing about.
+     */
+    private function writeVideoWording(
+        ProductVideo $video,
+        ?string $title,
+        ?string $alt,
+        ?string $description,
+        ?string $chapo,
+        ?string $postscriptum,
+    ): void {
+        if (null !== $title) {
+            $video->setTitle($title);
+        }
+        if (null !== $alt) {
+            $video->setAlt($alt);
+        }
+        if (null !== $description) {
+            $video->setDescription($description);
+        }
+        if (null !== $chapo) {
+            $video->setChapo($chapo);
+        }
+        if (null !== $postscriptum) {
+            $video->setPostscriptum($postscriptum);
+        }
     }
 }
