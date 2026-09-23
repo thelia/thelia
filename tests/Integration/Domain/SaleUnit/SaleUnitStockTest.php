@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\SaleUnit;
 
 use Thelia\Domain\Order\Service\StockDecrementer;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\SaleUnit;
@@ -52,6 +54,14 @@ final class SaleUnitStockTest extends IntegrationTestCase
         $this->productSaleElements = $product->getDefaultSaleElements();
         $this->productSaleElements->setQuantity(100)->save();
         $this->saleUnit = $this->fixtures->saleUnit();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->getService(SaleUnitContext::class)->reset();
+        $this->getService(SaleUnitActivityChecker::class)->reset();
+
+        parent::tearDown();
     }
 
     public function testTheUnitStockIsDecrementedAndTheNationalCounterUntouched(): void

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\SaleUnit;
 
 use Thelia\Domain\Order\Service\OrderFactory;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Order;
 use Thelia\Test\IntegrationTestCase;
@@ -36,6 +37,14 @@ final class SaleUnitOrderTaggingTest extends IntegrationTestCase
 
         $this->orderFactory = $this->getService(OrderFactory::class);
         $this->saleUnitContext = $this->getService(SaleUnitContext::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->getService(SaleUnitContext::class)->reset();
+        $this->getService(SaleUnitActivityChecker::class)->reset();
+
+        parent::tearDown();
     }
 
     public function testAnOrderIsStampedWithTheCurrentSaleUnit(): void

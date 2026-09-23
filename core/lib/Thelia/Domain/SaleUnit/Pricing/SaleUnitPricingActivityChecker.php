@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\SaleUnit\Pricing;
 
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\SaleUnitProductPriceQuery;
 
@@ -23,7 +24,9 @@ use Thelia\Model\SaleUnitProductPriceQuery;
  * outside any unit — and a unit that never overrode a price — keeps the query
  * plans and the caches the shop had before.
  *
- * One indexed existence check per unit, asked of the database once per request.
+ * Every method short-circuits on the multi-sale-unit check first, which the
+ * request listener has already warmed: a single-shop shop pays no extra query
+ * here at all, exactly the compatibility promise the feature stands on.
  */
 class SaleUnitPricingActivityChecker implements ResetInterface
 {
@@ -32,12 +35,18 @@ class SaleUnitPricingActivityChecker implements ResetInterface
 
     private ?bool $anyUnitPricesAnything = null;
 
-    public function __construct(private readonly SaleUnitContext $saleUnitContext)
-    {
+    public function __construct(
+        private readonly SaleUnitContext $saleUnitContext,
+        private readonly SaleUnitActivityChecker $activityChecker,
+    ) {
     }
 
     public function currentSaleUnitPricesAnything(): bool
     {
+        if (!$this->activityChecker->isMultiSaleUnitMode()) {
+            return false;
+        }
+
         $saleUnit = $this->saleUnitContext->getSaleUnit();
 
         if (null === $saleUnit) {
@@ -56,6 +65,10 @@ class SaleUnitPricingActivityChecker implements ResetInterface
      */
     public function anySaleUnitPricesAnything(): bool
     {
+        if (!$this->activityChecker->isMultiSaleUnitMode()) {
+            return false;
+        }
+
         return $this->anyUnitPricesAnything ??= SaleUnitProductPriceQuery::create()->exists();
     }
 

@@ -19,6 +19,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\SaleUnit\Exception\NoCurrentSaleUnitException;
 use Thelia\Domain\SaleUnit\Resolver\ApiHeaderSaleUnitResolver;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Service\SaleUnitService;
 use Thelia\Model\SaleUnit;
@@ -41,6 +42,17 @@ final class SaleUnitResolutionTest extends IntegrationTestCase
 
         $this->saleUnitService = $this->getService(SaleUnitService::class);
         $this->saleUnitContext = $this->getService(SaleUnitContext::class);
+    }
+
+    protected function tearDown(): void
+    {
+        // The context and the memoised checkers are request-scoped: a test that set
+        // them directly, without a request lifecycle to reset them, would leak into
+        // the next one. Reset here what the request would have reset on its own.
+        $this->getService(SaleUnitContext::class)->reset();
+        $this->getService(SaleUnitActivityChecker::class)->reset();
+
+        parent::tearDown();
     }
 
     public function testAShopWithNoSaleUnitKeepsANullContext(): void

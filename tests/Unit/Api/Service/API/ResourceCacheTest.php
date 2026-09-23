@@ -22,6 +22,7 @@ use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 
 /**
  * The cross-request cache of the data access layer keys on the path, the format
@@ -125,6 +126,9 @@ final class ResourceCacheTest extends TestCase
         $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);
         $pricingActivityChecker->expects(self::never())->method('hasVisitorDependentPricing');
 
+        $saleUnitPricingActivityChecker = $this->createMock(SaleUnitPricingActivityChecker::class);
+        $saleUnitPricingActivityChecker->expects(self::never())->method('anySaleUnitPricesAnything');
+
         $cache = new ResourceCache(
             new ArrayAdapter(),
             enabled: false,
@@ -132,6 +136,7 @@ final class ResourceCacheTest extends TestCase
             allowedPrefixes: ['/api/front/products'],
             visitorDependentPricePrefixes: ['/api/front/products'],
             pricingActivityChecker: $pricingActivityChecker,
+            saleUnitPricingActivityChecker: $saleUnitPricingActivityChecker,
         );
 
         self::assertSame(['computed'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['computed']));
@@ -145,6 +150,12 @@ final class ResourceCacheTest extends TestCase
         $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);
         $pricingActivityChecker->method('hasVisitorDependentPricing')->willReturn($hasActiveReservedSale);
 
+        // No sale unit prices anything in these cases: the cache eligibility under
+        // test is the one the reserved operations decide, kept isolated from the
+        // sale-unit bypass, which has its own coverage.
+        $saleUnitPricingActivityChecker = $this->createMock(SaleUnitPricingActivityChecker::class);
+        $saleUnitPricingActivityChecker->method('anySaleUnitPricesAnything')->willReturn(false);
+
         return new ResourceCache(
             new ArrayAdapter(),
             enabled: true,
@@ -157,6 +168,7 @@ final class ResourceCacheTest extends TestCase
                 $this->createStub(CurrentCustomerProvider::class),
                 $productVisibilityRules,
             ),
+            saleUnitPricingActivityChecker: $saleUnitPricingActivityChecker,
         );
     }
 }

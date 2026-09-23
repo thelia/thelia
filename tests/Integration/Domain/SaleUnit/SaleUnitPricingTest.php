@@ -16,7 +16,10 @@ namespace Thelia\Tests\Integration\Domain\SaleUnit;
 
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\Currency;
@@ -58,6 +61,21 @@ final class SaleUnitPricingTest extends IntegrationTestCase
             ['basePrice' => 100.0],
         );
         $this->productSaleElements = $product->getDefaultSaleElements();
+    }
+
+    protected function tearDown(): void
+    {
+        // These services memoise per request and are reset by the request lifecycle
+        // in production. A test that populates them directly, with no request to reset
+        // them, would otherwise leak into the next test — a stale "a rule is active"
+        // or "this unit prices" turning a later query-count assertion red.
+        $this->getService(SaleUnitContext::class)->reset();
+        $this->getService(SaleUnitActivityChecker::class)->reset();
+        $this->getService(SaleUnitPricingActivityChecker::class)->reset();
+        $this->getService(PricingActivityChecker::class)->reset();
+        $this->getService(EffectivePriceCatalog::class)->reset();
+
+        parent::tearDown();
     }
 
     public function testTheUnitPriceReplacesTheEffectivePriceOfItsUnit(): void
