@@ -95,7 +95,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (84, 'order_return_enabled', '0', 0, 0, NOW(), NOW()),
 (85, 'order_return_window_days', '14', 0, 0, NOW(), NOW()),
 (86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW()),
-(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW())
+(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW()),
+(88, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
+(89, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2187,6 +2189,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'cs_CZ', NULL, NULL, NULL, NULL),
     (72, 'cs_CZ', NULL, NULL, NULL, NULL),
     (73, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (88, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (89, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2246,6 +2250,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'de_DE', NULL, NULL, NULL, NULL),
     (72, 'de_DE', NULL, NULL, NULL, NULL),
     (73, 'de_DE', 'Modulinstallation aus ZIP-Dateien zulassen.', NULL, NULL, NULL),
+    (88, 'de_DE', NULL, NULL, NULL, NULL),
+    (89, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2305,6 +2311,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'en_US', NULL, NULL, NULL, NULL),
     (72, 'en_US', NULL, NULL, NULL, NULL),
     (73, 'en_US', 'Allow module installation from ZIP files.', NULL, NULL, NULL),
+    (88, 'en_US', 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)', NULL, NULL, NULL),
+    (89, 'en_US', 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2364,6 +2372,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'es_ES', NULL, NULL, NULL, NULL),
     (72, 'es_ES', NULL, NULL, NULL, NULL),
     (73, 'es_ES', 'Permitir la instalación del módulo desde archivos ZIP.', NULL, NULL, NULL),
+    (88, 'es_ES', NULL, NULL, NULL, NULL),
+    (89, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2423,6 +2433,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'fr_FR', NULL, NULL, NULL, NULL),
     (72, 'fr_FR', NULL, NULL, NULL, NULL),
     (73, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
+    (88, 'fr_FR', 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d\'un autre État membre (nécessite un module de vérification)', NULL, NULL, NULL),
+    (89, 'fr_FR', 'Nombre de jours pendant lesquels la vérification d\'un numéro de TVA permet l\'exonération (0 ou moins revient à 90)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2482,6 +2494,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'it_IT', NULL, NULL, NULL, NULL),
     (72, 'it_IT', NULL, NULL, NULL, NULL),
     (73, 'it_IT', NULL, NULL, NULL, NULL),
+    (88, 'it_IT', NULL, NULL, NULL, NULL),
+    (89, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2541,6 +2555,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'nl_NL', NULL, NULL, NULL, NULL),
     (72, 'nl_NL', NULL, NULL, NULL, NULL),
     (73, 'nl_NL', NULL, NULL, NULL, NULL),
+    (88, 'nl_NL', NULL, NULL, NULL, NULL),
+    (89, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2599,7 +2615,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'ru_RU', NULL, NULL, NULL, NULL),
     (71, 'ru_RU', NULL, NULL, NULL, NULL),
     (72, 'ru_RU', NULL, NULL, NULL, NULL),
-    (73, 'ru_RU', NULL, NULL, NULL, NULL)
+    (73, 'ru_RU', NULL, NULL, NULL, NULL),
+    (88, 'ru_RU', NULL, NULL, NULL, NULL),
+    (89, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks

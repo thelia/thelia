@@ -18,9 +18,12 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Tax\CartTaxCalculatorEvent;
 use Thelia\Core\Event\Tax\TaxCalculatorEvent;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\Service\VatExemptionResolver;
+use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Model\Tax as TaxModel;
 use Thelia\Model\TaxQuery;
@@ -33,6 +36,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
         #[AutowireLocator('thelia.taxType')]
         ServiceLocator $taxTypeLocator,
         private readonly TaxCalculatorFactoryInterface $taxCalculatorFactory,
+        private readonly VatExemptionResolver $vatExemptionResolver,
     ) {
         $this->taxTypeLocator = $taxTypeLocator;
     }
@@ -102,6 +106,28 @@ class Tax extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Prices the lines of a cart whose buyer accounts for the VAT himself with a
+     * calculator that taxes nothing.
+     *
+     * A cart that is not exempt is left unanswered on purpose, so the caller
+     * falls back to TAX_GET_CALCULATOR: a module that replaced the calculator
+     * there keeps pricing cart lines, as it did before this event existed.
+     *
+     * Runs last, like getTaxCalculator(), so a module only has to register a
+     * listener at any regular priority to take over.
+     */
+    public function getCartTaxCalculator(CartTaxCalculatorEvent $event): void
+    {
+        if ($event->hasTaxCalculator()) {
+            return;
+        }
+
+        if ($this->vatExemptionResolver->isExemptedForCart($event->getCart())) {
+            $event->setTaxCalculator(new ExemptTaxCalculator());
+        }
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -110,6 +136,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TAX_DELETE => ['delete', 128],
             TheliaEvents::TAX_GET_TYPE_SERVICE => ['getTaxTypeService', 128],
             TheliaEvents::TAX_GET_CALCULATOR => ['getTaxCalculator', -128],
+            TheliaEvents::TAX_GET_CART_CALCULATOR => ['getCartTaxCalculator', -128],
         ];
     }
 }

@@ -91,6 +91,12 @@ class CartAddress implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
     public ?string $vatNumber = null;
 
+    #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
+    public ?\DateTime $vatVerifiedAt = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, ...self::GROUP_CART_COMBINED])]
+    public ?string $vatVerifiedName = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, ...self::GROUP_CART_COMBINED])]
     public string $address1;
 
@@ -210,6 +216,30 @@ class CartAddress implements PropelResourceInterface
     public function setVatNumber(?string $vatNumber): self
     {
         $this->vatNumber = $vatNumber;
+
+        return $this;
+    }
+
+    public function getVatVerifiedAt(): ?\DateTime
+    {
+        return $this->vatVerifiedAt;
+    }
+
+    public function setVatVerifiedAt(?\DateTime $vatVerifiedAt): self
+    {
+        $this->vatVerifiedAt = $vatVerifiedAt;
+
+        return $this;
+    }
+
+    public function getVatVerifiedName(): ?string
+    {
+        return $this->vatVerifiedName;
+    }
+
+    public function setVatVerifiedName(?string $vatVerifiedName): self
+    {
+        $this->vatVerifiedName = $vatVerifiedName;
 
         return $this;
     }

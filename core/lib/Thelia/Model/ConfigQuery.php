@@ -25,6 +25,8 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
+    public const DEFAULT_VAT_VERIFICATION_LIFETIME_DAYS = 90;
+
     /**
      * Every unit price is rounded to the cent before being multiplied by the
      * quantity. This is the historical Thelia behaviour and stays the default.
@@ -245,6 +247,21 @@ class ConfigQuery extends BaseConfigQuery
     public static function isStoreVatExempt(): bool
     {
         return '1' === self::read('store_vat_exempt', '0');
+    }
+
+    /**
+     * How long a VAT number verification is trusted before it has to be made again.
+     *
+     * A shop does not run the same risk as the next one, hence a variable rather
+     * than a constant. A value that is not a positive number of days falls back
+     * to the default instead of disabling the ageing, which would let a
+     * verification made years ago keep exempting.
+     */
+    public static function getVatVerificationLifetimeDays(): int
+    {
+        $days = (int) self::read('vat_verification_lifetime_days', self::DEFAULT_VAT_VERIFICATION_LIFETIME_DAYS);
+
+        return $days > 0 ? $days : self::DEFAULT_VAT_VERIFICATION_LIFETIME_DAYS;
     }
 
     public static function isStoreRegistrationExempt(): bool

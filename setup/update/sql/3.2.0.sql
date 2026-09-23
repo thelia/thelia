@@ -205,4 +205,88 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Intra-community VAT exemption
+--
+-- `vat_verified_at` and `vat_verified_name` record what a verification service
+-- answered about the VAT number an address carries. Thelia never fills them
+-- itself: it defines the contract and ships an implementation that answers
+-- "undetermined" to everything, so a shop without a verification module has no
+-- verified address and exempts nobody. They live on the three tables a VAT
+-- number already travels through - the address book, the cart copy the checkout
+-- reads, and the order copy - because the decision is taken on the cart and has
+-- to survive on the order.
+--
+-- `vat_exempted` is on `order_address` only, and it is an attestation rather
+-- than a lever: the amounts are already frozen by the absence of
+-- `order_product_tax` rows. It is what lets the back office and the invoice say
+-- why an order left untaxed, after the number has been revoked.
+--
+-- `vat_exemption_mode` arrives disabled, so an upgrade changes no price.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'address' AND `COLUMN_NAME` = 'vat_verified_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `address` ADD `vat_verified_at` DATETIME NULL DEFAULT NULL COMMENT \'when a verification service last confirmed the VAT number, NULL as long as none has, which is what keeps an unverified address taxed\' AFTER `vat_number`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'address' AND `COLUMN_NAME` = 'vat_verified_name');
+SET @statement := IF(@add_column, 'ALTER TABLE `address` ADD `vat_verified_name` VARCHAR(255) NULL DEFAULT NULL COMMENT \'the business name the verification service returned for the VAT number, when it discloses one\' AFTER `vat_verified_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_address' AND `COLUMN_NAME` = 'vat_verified_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_address` ADD `vat_verified_at` DATETIME NULL DEFAULT NULL COMMENT \'when a verification service last confirmed the VAT number, NULL as long as none has, which is what keeps an unverified address taxed\' AFTER `vat_number`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_address' AND `COLUMN_NAME` = 'vat_verified_name');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_address` ADD `vat_verified_name` VARCHAR(255) NULL DEFAULT NULL COMMENT \'the business name the verification service returned for the VAT number, when it discloses one\' AFTER `vat_verified_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_address' AND `COLUMN_NAME` = 'vat_verified_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_address` ADD `vat_verified_at` DATETIME NULL DEFAULT NULL COMMENT \'when a verification service last confirmed the VAT number, NULL as long as none has, which is what keeps an unverified address taxed\' AFTER `vat_number`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_address' AND `COLUMN_NAME` = 'vat_verified_name');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_address` ADD `vat_verified_name` VARCHAR(255) NULL DEFAULT NULL COMMENT \'the business name the verification service returned for the VAT number, when it discloses one\' AFTER `vat_verified_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_address' AND `COLUMN_NAME` = 'vat_exempted');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_address` ADD `vat_exempted` TINYINT DEFAULT 0 NOT NULL COMMENT \'the order left without VAT because the buyer is liable for it, frozen here so that revoking the number afterwards never changes what was invoiced\' AFTER `vat_verified_name`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_address' AND `COLUMN_NAME` = 'vat_exempted_amount');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_address` ADD `vat_exempted_amount` DECIMAL(16,6) NULL DEFAULT NULL COMMENT \'the VAT the order would have carried had it not been exempted, frozen at creation because an exempt order writes no tax line to read it back from\' AFTER `vat_exempted`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- A shop that upgrades keeps taxing the way it did: the setting arrives
+-- disabled, and INSERT IGNORE leaves alone a shop that already chose a value.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
+    ('vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'vat_exemption_mode' AS `name`, 'en_US' AS `locale`, 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' AS `title`
+    UNION ALL SELECT 'vat_exemption_mode', 'fr_FR', 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d''un autre État membre (nécessite un module de vérification)'
+    UNION ALL SELECT 'vat_verification_lifetime_days', 'en_US', 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)'
+    UNION ALL SELECT 'vat_verification_lifetime_days', 'fr_FR', 'Nombre de jours pendant lesquels la vérification d''un numéro de TVA permet l''exonération (0 ou moins revient à 90)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
 SET FOREIGN_KEY_CHECKS = 1;

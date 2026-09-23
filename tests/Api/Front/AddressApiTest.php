@@ -247,6 +247,76 @@ final class AddressApiTest extends ApiTestCase
     /**
      * @return array<string, mixed>
      */
+    public function testTheVerificationStateIsReadableButNotWritable(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $address = $factory->address($customer);
+        // Written straight to the row: saving the model here would run the Propel
+        // listeners, and some of them expect a request this test has not made yet.
+        $statement = $this->getPropelConnection()->prepare(
+            'UPDATE `address` SET `company` = ?, `vat_number` = ?, `vat_verified_at` = ?, `vat_verified_name` = ? WHERE `id` = ?'
+        );
+        $statement->execute(['Acme', 'BE0123456789', '2026-01-15 10:00:00', 'Acme SPRL', $address->getId()]);
+
+        $address->reload();
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $response = $this->jsonRequest('GET', '/api/front/account/addresses/'.$address->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertSame('Acme SPRL', $data['vatVerifiedName']);
+        self::assertStringStartsWith('2026-01-15', $data['vatVerifiedAt']);
+        self::assertFalse($data['vatVerificationValid'], 'A verification older than its configured lifetime must no longer read as valid.');
+
+        // Declaring one's own VAT exemption is exactly what this must not allow.
+        // Proven on the creation rather than the update: PUT on this resource is
+        // broken independently of this feature (400 "Session has not been set."),
+        // with or without any of the fields below.
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/addresses',
+            [
+                'vatVerifiedAt' => '2030-01-01T00:00:00+00:00',
+                'vatVerifiedName' => 'Forged',
+            ] + $this->payload($customer->getCustomerTitle()),
+            $token,
+        );
+
+        self::assertJsonResponseSuccessful($response);
+        $created = json_decode($response->getContent(), true);
+
+        $createdAddress = AddressQuery::create()->findPk($created['id']);
+        self::assertNotNull($createdAddress);
+        self::assertNull(
+            $createdAddress->getVatVerifiedAt(),
+            'A buyer must never be able to declare his own verification.',
+        );
+        self::assertNull($createdAddress->getVatVerifiedName());
+    }
+
+    public function testARecentVerificationIsReadableAsValid(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $address = $factory->address($customer);
+        $statement = $this->getPropelConnection()->prepare(
+            'UPDATE `address` SET `vat_verified_at` = ? WHERE `id` = ?'
+        );
+        $statement->execute([(new \DateTime('-10 days'))->format('Y-m-d H:i:s'), $address->getId()]);
+        $address->reload();
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $response = $this->jsonRequest('GET', '/api/front/account/addresses/'.$address->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertTrue($data['vatVerificationValid']);
+    }
+
     private function payload(CustomerTitle $title): array
     {
         $country = CountryQuery::create()->findOneByIsoalpha3('FRA');

@@ -32,6 +32,7 @@ use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Cart;
@@ -66,6 +67,7 @@ class AttributeAccessService
         private readonly EventDispatcherInterface $dispatcher,
         private readonly CouponManager $couponManager, private readonly EventDispatcherInterface $eventDispatcher,
         private readonly OfferedCartLineService $offeredCartLineService,
+        private readonly VatExemptionResolver $vatExemptionResolver,
     ) {
     }
 
@@ -334,6 +336,12 @@ class AttributeAccessService
                 break;
             case 'unavailable_promotions':
                 $result = $this->offeredCartLineService->getUnavailablePromotions();
+                break;
+            case 'is_vat_exempted':
+                $result = $this->vatExemptionResolver->isExemptedForCart($cart);
+                break;
+            case 'invoice_vat_number':
+                $result = $cart->getCartAddressRelatedByAddressInvoiceId()?->getVatNumber() ?? '';
                 break;
         }
 
@@ -620,6 +628,10 @@ class AttributeAccessService
                 return $order->getPaymentModuleId();
             case 'has_virtual_product':
                 return $order->hasVirtualProduct();
+            case 'vat_exempted':
+                return $order->getVatExempted();
+            case 'invoice_vat_number':
+                return $order->getOrderAddressRelatedByInvoiceOrderAddressId()?->getVatNumber() ?? '';
         }
 
         throw new \InvalidArgumentException(\sprintf("%s has no '%s' attribute", 'Order', $attributeName));

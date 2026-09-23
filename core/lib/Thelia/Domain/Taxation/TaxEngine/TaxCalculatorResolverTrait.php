@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Domain\Taxation\TaxEngine;
 
 use Propel\Runtime\Propel;
+use Thelia\Core\Event\Tax\CartTaxCalculatorEvent;
 use Thelia\Core\Event\Tax\TaxCalculatorEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Cart;
 use Thelia\Model\Map\TaxTableMap;
 
 /**
@@ -42,5 +44,27 @@ trait TaxCalculatorResolverTrait
         $eventDispatcher->dispatch($event, TheliaEvents::TAX_GET_CALCULATOR);
 
         return $event->getTaxCalculator() ?? new Calculator();
+    }
+
+    /**
+     * The calculator for one cart, which a listener can swap to price a buyer
+     * who accounts for the VAT himself - every entry point pricing a cart line
+     * or a cart-level amount (discount, postage) must resolve through here
+     * rather than through {@see createTaxCalculator()}, or it silently ignores
+     * the exemption.
+     */
+    protected function createCartTaxCalculator(Cart $cart): TaxCalculatorInterface
+    {
+        $connection = Propel::getServiceContainer()->getWriteConnection(TaxTableMap::DATABASE_NAME);
+
+        // No dispatcher outside of a booted kernel (install scripts, standalone CLI).
+        if (!method_exists($connection, 'getEventDispatcher') || null === $eventDispatcher = $connection->getEventDispatcher()) {
+            return $this->createTaxCalculator();
+        }
+
+        $event = new CartTaxCalculatorEvent($cart);
+        $eventDispatcher->dispatch($event, TheliaEvents::TAX_GET_CART_CALCULATOR);
+
+        return $event->getTaxCalculator() ?? $this->createTaxCalculator();
     }
 }

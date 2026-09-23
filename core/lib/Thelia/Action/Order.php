@@ -515,6 +515,16 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $orderAddress = $event->getOrderAddress();
 
+        // A verification answers about one number. Editing the number makes that
+        // answer say nothing about the new one, so it is dropped rather than left
+        // to vouch for a number nobody checked. vat_exempted is untouched on
+        // purpose: it records what the order was invoiced on, not what is true now.
+        if ($event->getVatNumber() !== $orderAddress->getVatNumber()) {
+            $orderAddress
+                ->setVatVerifiedAt(null)
+                ->setVatVerifiedName(null);
+        }
+
         $orderAddress
             ->setCustomerTitleId($event->getTitle() === null ? null : (int) $event->getTitle())
             ->setCompany($event->getCompany())

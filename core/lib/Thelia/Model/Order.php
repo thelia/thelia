@@ -406,6 +406,11 @@ class Order extends BaseOrder
             : (float) $this->getPostage();
     }
 
+    public function getVatExempted(): bool
+    {
+        return 1 === $this->getOrderAddressRelatedByInvoiceOrderAddressId()?->getVatExempted();
+    }
+
     /**
      * Check if the current order contains at least 1 virtual product, whether it has a document to
      * download or not. Virtual delivery modules that do not rely on the core document mechanism use

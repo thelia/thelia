@@ -57,4 +57,28 @@ final class AccountOrderApiTest extends ApiTestCase
         self::assertTrue($data['orderProducts'][0]['virtual']);
         self::assertSame('user-guide.pdf', $data['orderProducts'][0]['virtualDocument']);
     }
+
+    public function testOrderPayloadExposesItsFrozenVatExemptionState(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $factory->order($customer, ['statusCode' => 'paid']);
+
+        $order->getOrderAddressRelatedByInvoiceOrderAddressId()
+            ->setVatExempted(1)
+            ->setVatNumber('BE0123456789')
+            ->setVatVerifiedAt(new \DateTime('-10 days'))
+            ->setVatVerifiedName('Acme SPRL')
+            ->save($this->getPropelConnection());
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+
+        self::assertTrue($data['vatExempted']);
+        self::assertSame('Acme SPRL', $data['invoiceOrderAddress']['vatVerifiedName']);
+    }
 }
