@@ -146,6 +146,11 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         $this->forgetWhatTheTestLeftInMemory();
 
+        // setUp() turned instance pooling off for this test; turn it back on so a
+        // later test — a query-count assertion in another suite — is not measured
+        // against a globally disabled pool it never asked for.
+        Propel::enableInstancePooling();
+
         parent::tearDown();
 
         if ($closedByTheCodeUnderTest) {
