@@ -425,6 +425,25 @@ final class TheliaEvents
      */
     public const TAX_GET_CALCULATOR = 'action.getTaxCalculator';
 
+    /**
+     * Sent by a call site with no container to obtain the tax calculator for the
+     * lines of one cart, which is named by the event. Listen to it to price a
+     * given cart differently - a buyer who accounts for the VAT himself, for
+     * instance - without touching the prices the catalogue shows everyone.
+     *
+     * @see Tax\CartTaxCalculatorEvent
+     */
+    public const TAX_GET_CART_CALCULATOR = 'action.getCartTaxCalculator';
+
+    /**
+     * Sent by a verification module once an authority has answered about the VAT
+     * number of an address. Thelia records the answer on that address; listen to
+     * it to tell an accounting system or a CRM.
+     *
+     * @see Legal\VatNumberVerifiedEvent
+     */
+    public const VAT_NUMBER_VERIFIED = 'action.vatNumberVerified';
+
     // -- Profile management ---------------------------------------------
 
     public const PROFILE_CREATE = 'action.createProfile';

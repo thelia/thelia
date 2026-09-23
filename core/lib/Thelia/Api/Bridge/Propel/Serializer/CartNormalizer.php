@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\Cart;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
+use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Cart as PropelCart;
 use Thelia\Model\Country;
@@ -40,6 +41,7 @@ class CartNormalizer extends AbstractItemNormalizer
         private readonly Session $session,
         private readonly RequestStack $requestStack,
         private readonly PostageEstimator $postageEstimator,
+        private readonly VatExemptionResolver $vatExemptionResolver,
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         PropertyMetadataFactoryInterface $propertyMetadataFactory,
         IriConverterInterface $iriConverter,
@@ -87,7 +89,8 @@ class CartNormalizer extends AbstractItemNormalizer
             ->setTaxes($propelCart->getTotalVAT($country, null, false))
             ->setDelivery($estimatedPostage)
             ->setTotal($propelCart->getTaxedAmount($country, false, null))
-            ->setVirtual($propelCart->isVirtual());
+            ->setVirtual($propelCart->isVirtual())
+            ->setIsVatExempted($this->vatExemptionResolver->isExemptedForCart($propelCart));
 
         return parent::normalize($object, $format, $context);
     }

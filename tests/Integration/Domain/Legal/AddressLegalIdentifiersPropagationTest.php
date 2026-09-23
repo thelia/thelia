@@ -79,7 +79,7 @@ final class AddressLegalIdentifiersPropagationTest extends ActionIntegrationTest
         $order = $this->factory->order($customer);
 
         $this->getService(OrderAddressPersister::class)
-            ->prepareOrderAddresses($order, $cart, false, $connection);
+            ->prepareOrderAddresses($order, $cart, false, false, $connection);
         $order->save($connection);
 
         $invoiceOrderAddress = OrderAddressQuery::create()->findPk($order->getInvoiceOrderAddressId());

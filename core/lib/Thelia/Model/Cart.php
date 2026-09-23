@@ -267,7 +267,7 @@ class Cart extends BaseCart
             return (float) $this->getDiscount();
         }
 
-        return round($this->createTaxCalculator()->computeUntaxedCartDiscount($this, $country, $state), 2);
+        return round($this->createCartTaxCalculator($this)->computeUntaxedCartDiscount($this, $country, $state), 2);
     }
 
     /**

@@ -108,6 +108,15 @@ class OrderAddress implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public ?string $vatNumber = null;
 
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    public ?\DateTime $vatVerifiedAt = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    public ?string $vatVerifiedName = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
+    public ?string $vatExemptedAmount = null;
+
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups(groups: [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE])]
     public CustomerTitle $customerTitle;
@@ -278,6 +287,42 @@ class OrderAddress implements PropelResourceInterface
     public function setVatNumber(?string $vatNumber): self
     {
         $this->vatNumber = $vatNumber;
+
+        return $this;
+    }
+
+    public function getVatVerifiedAt(): ?\DateTime
+    {
+        return $this->vatVerifiedAt;
+    }
+
+    public function setVatVerifiedAt(?\DateTime $vatVerifiedAt): self
+    {
+        $this->vatVerifiedAt = $vatVerifiedAt;
+
+        return $this;
+    }
+
+    public function getVatVerifiedName(): ?string
+    {
+        return $this->vatVerifiedName;
+    }
+
+    public function setVatVerifiedName(?string $vatVerifiedName): self
+    {
+        $this->vatVerifiedName = $vatVerifiedName;
+
+        return $this;
+    }
+
+    public function getVatExemptedAmount(): ?string
+    {
+        return $this->vatExemptedAmount;
+    }
+
+    public function setVatExemptedAmount(?string $vatExemptedAmount): self
+    {
+        $this->vatExemptedAmount = $vatExemptedAmount;
 
         return $this;
     }

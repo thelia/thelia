@@ -36,6 +36,7 @@ use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
+use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
@@ -73,6 +74,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
         protected EffectivePriceResolver $effectivePriceResolver,
         protected PricingActivityChecker $pricingActivityChecker,
+        protected VatExemptionResolver $vatExemptionResolver,
     ) {
     }
 
@@ -154,9 +156,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         try {
             $postage = $this->getPostageByDeliveryModuleId($cart, $dispatcher, $moduleId, $deliveryAddressId);
+
+            // Reverse charge covers the carriage as well as the goods. The
+            // delivery module quoted a taxed postage without knowing who is
+            // buying - its buildOrderPostage() is given a country, not a cart -
+            // so the tax it added is taken back here, where the cart is known.
+            $amountTax = (float) ($postage->getAmountTax() ?? 0.0);
+            $amount = (float) $postage->getAmount();
+
+            if ($this->vatExemptionResolver->isExemptedForCart($cart)) {
+                $amount -= $amountTax;
+                $amountTax = 0.0;
+            }
+
             $cart
-                ->setPostage((string) $postage->getAmount())
-                ->setPostageTax((string) ($postage->getAmountTax() ?? 0.0))
+                ->setPostage((string) $amount)
+                ->setPostageTax((string) $amountTax)
                 ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
                 ->save();
         } catch (\Exception $e) {
@@ -165,13 +180,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function setInvoiceAddress(CartCheckoutEvent $event): void
+    public function setInvoiceAddress(CartCheckoutEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
         $addressId = $event->getInvoiceAddressId();
         if (!$addressId) {
             $cart->setAddressInvoiceId(null)
                 ->save();
+            $this->recalculatePostageForNewInvoiceAddress($cart, $dispatcher);
 
             return;
         }
@@ -191,15 +207,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart
             ->setAddressInvoiceId($cartAddress->getId())
             ->save();
+        $this->recalculatePostageForNewInvoiceAddress($cart, $dispatcher);
     }
 
-    public function setInvoiceAddressManual(CartCheckoutEvent $event): void
+    public function setInvoiceAddressManual(CartCheckoutEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
         $cartAddress = $event->getCartAddress();
         if (null === $cartAddress) {
             $cart->setAddressInvoiceId(null)
                 ->save();
+            $this->recalculatePostageForNewInvoiceAddress($cart, $dispatcher);
 
             return;
         }
@@ -209,6 +227,26 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart
             ->setAddressInvoiceId($cartAddress->getId())
             ->save();
+        $this->recalculatePostageForNewInvoiceAddress($cart, $dispatcher);
+    }
+
+    /**
+     * The billing address is what VAT exemption is decided on, but postage is
+     * only ever priced once, by calculatePostage() reacting to CART_SET_POSTAGE.
+     * A buyer who picks a delivery module and only then changes, adds or drops
+     * an exempting VAT number would otherwise keep whatever postage tax was
+     * quoted before - wrong in either direction. Re-firing the same event is a
+     * no-op through calculatePostage() itself when no module is selected yet.
+     */
+    private function recalculatePostageForNewInvoiceAddress(CartModel $cart, EventDispatcherInterface $dispatcher): void
+    {
+        if (null === $cart->getDeliveryModuleId() || null === $cart->getAddressDeliveryId()) {
+            return;
+        }
+
+        $postageEvent = new CartCheckoutEvent($cart);
+        $postageEvent->setDeliveryModuleId($cart->getDeliveryModuleId());
+        $dispatcher->dispatch($postageEvent, TheliaEvents::CART_SET_POSTAGE);
     }
 
     public function persistCart(CartPersistEvent $event): void

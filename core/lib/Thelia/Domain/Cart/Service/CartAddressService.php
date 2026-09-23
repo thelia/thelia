@@ -35,6 +35,8 @@ class CartAddressService
             ->setCompany($address->getCompany())
             ->setSiret($address->getSiret())
             ->setVatNumber($address->getVatNumber())
+            ->setVatVerifiedAt($address->getVatVerifiedAt())
+            ->setVatVerifiedName($address->getVatVerifiedName())
             ->setFirstname($address->getFirstname())
             ->setLastname($address->getLastname())
             ->setAddress1($address->getAddress1())

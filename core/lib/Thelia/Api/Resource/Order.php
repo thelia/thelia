@@ -221,6 +221,9 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalShippingWithTaxes = null;
 
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?bool $vatExempted = null;
+
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -446,6 +449,18 @@ class Order implements PropelResourceInterface
     public function setDiscount(?float $discount): self
     {
         $this->discount = $discount;
+
+        return $this;
+    }
+
+    public function getVatExempted(): ?bool
+    {
+        return $this->vatExempted;
+    }
+
+    public function setVatExempted(?bool $vatExempted): self
+    {
+        $this->vatExempted = $vatExempted;
 
         return $this;
     }

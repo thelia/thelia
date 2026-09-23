@@ -1542,4 +1542,6 @@ return [
     'Wrong item received' => 'Mauvais article reçu',
     'No longer needed' => 'Plus nécessaire',
     'Other' => 'Autre',
+    'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d\'un autre État membre (nécessite un module de vérification)',
+    'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Nombre de jours pendant lesquels la vérification d\'un numéro de TVA permet l\'exonération (0 ou moins revient à 90)',
 ];

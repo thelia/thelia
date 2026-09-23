@@ -40,4 +40,18 @@ class Address extends BaseAddress
 
         return !$this->getIsDefault();
     }
+
+    public function getVatVerificationValid(): bool
+    {
+        $verifiedAt = $this->getVatVerifiedAt();
+
+        if (null === $verifiedAt) {
+            return false;
+        }
+
+        $expiresAt = \DateTimeImmutable::createFromInterface($verifiedAt)
+            ->modify(\sprintf('+%d days', ConfigQuery::getVatVerificationLifetimeDays()));
+
+        return $expiresAt >= new \DateTimeImmutable();
+    }
 }

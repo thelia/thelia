@@ -195,6 +195,23 @@ class Address implements PropelResourceInterface
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $vatNumber = null;
 
+    /**
+     * Read-only on purpose, here as everywhere else: only a verification service
+     * answering through VAT_NUMBER_VERIFIED may set these. A buyer able to write
+     * them would be declaring his own VAT exemption.
+     *
+     * Read-only is expressed by their absence from every write group, the way
+     * createdAt and updatedAt below are.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?\DateTime $vatVerifiedAt = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $vatVerifiedName = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $vatVerificationValid = null;
+
     #[Groups([...self::GROUP_ADMIN_COMBINED, ...self::GROUP_FRONT_COMBINED])]
     public ?string $cellphone = null;
 
@@ -356,6 +373,47 @@ class Address implements PropelResourceInterface
     public function setSiret(?string $siret): self
     {
         $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function getVatVerifiedAt(): ?\DateTime
+    {
+        return $this->vatVerifiedAt;
+    }
+
+    /**
+     * Only ever called by the transformer filling the resource from the model:
+     * the property is read-only by the absence of a write group, as documented
+     * above, so nothing a client sends reaches it.
+     */
+    public function setVatVerifiedAt(?\DateTime $vatVerifiedAt): self
+    {
+        $this->vatVerifiedAt = $vatVerifiedAt;
+
+        return $this;
+    }
+
+    public function getVatVerifiedName(): ?string
+    {
+        return $this->vatVerifiedName;
+    }
+
+    public function setVatVerifiedName(?string $vatVerifiedName): self
+    {
+        $this->vatVerifiedName = $vatVerifiedName;
+
+        return $this;
+    }
+
+    public function getVatVerificationValid(): ?bool
+    {
+        return $this->vatVerificationValid;
+    }
+
+    public function setVatVerificationValid(?bool $vatVerificationValid): self
+    {
+        $this->vatVerificationValid = $vatVerificationValid;
 
         return $this;
     }

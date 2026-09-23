@@ -67,6 +67,7 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
                 ->set('COMPANY', $orderAddress->getCompany())
                 ->set('SIRET', $orderAddress->getSiret())
                 ->set('VAT_NUMBER', $orderAddress->getVatNumber())
+                ->set('VAT_EXEMPTED', 1 === $orderAddress->getVatExempted())
                 ->set('FIRSTNAME', $orderAddress->getFirstname())
                 ->set('LASTNAME', $orderAddress->getLastname())
                 ->set('ADDRESS1', $orderAddress->getAddress1())

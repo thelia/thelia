@@ -130,6 +130,12 @@ final readonly class CustomerAnonymizer
                 // belongs to, so it is erased with it rather than left on the kept order.
                 ->setSiret(null)
                 ->setVatNumber(null)
+                // The name a verification service returned is the company name again,
+                // and the date only means something next to the number it checked.
+                // vat_exempted stays: it is an accounting fact about the order, and
+                // it names nobody.
+                ->setVatVerifiedAt(null)
+                ->setVatVerifiedName(null)
                 ->setFirstname(self::ANONYMIZED_VALUE)
                 ->setLastname(self::ANONYMIZED_VALUE)
                 ->setAddress1(self::ANONYMIZED_VALUE)
