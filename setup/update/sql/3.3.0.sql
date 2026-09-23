@@ -766,4 +766,46 @@ PREPARE convert_column_statement FROM @statement;
 EXECUTE convert_column_statement;
 DEALLOCATE PREPARE convert_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Sale units
+--
+-- A sale unit is a place the shop sells from: a storefront on its own
+-- domain, a pick-up store behind a shared one, a logical outlet an API
+-- consumer addresses by header. The catalog stays national and shared;
+-- what a unit owns comes in later scripts (prices, stocks, carts and
+-- orders tagged by unit).
+--
+-- The table alone changes nothing: with no active row, every code path
+-- behaves exactly as before. The multi-sale-unit mode is on as soon as
+-- one row is active.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `sale_unit`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a sale unit by; never shown to a customer',
+    `url` VARCHAR(255) COMMENT 'the domain that resolves to this sale unit, scheme-less (shop-a.example.com); null for a unit resolved by session or API header only',
+    `active` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'an inactive unit is never resolved; the multi-sale-unit mode is on as soon as one unit is active',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_code_unique` (`code`),
+    UNIQUE INDEX `sale_unit_url_unique` (`url`),
+    INDEX `idx_sale_unit_active` (`active`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `sale_unit_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_unit_i18n_fk_e2d6ae`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

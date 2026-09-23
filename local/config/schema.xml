@@ -2924,4 +2924,29 @@
 
     <behavior name="timestampable" />
   </table>
+
+  <table name="sale_unit" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="stable machine name a deployment references a sale unit by; never shown to a customer" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="NULL" description="the domain that resolves to this sale unit, scheme-less (shop-a.example.com); null for a unit resolved by session or API header only" name="url" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <column defaultValue="0" description="an inactive unit is never resolved; the multi-sale-unit mode is on as soon as one unit is active" name="active" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+
+    <unique name="sale_unit_code_unique">
+      <unique-column name="code" />
+    </unique>
+    <unique name="sale_unit_url_unique">
+      <unique-column name="url" />
+    </unique>
+    <index name="idx_sale_unit_active">
+      <index-column name="active" />
+    </index>
+
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
 </database>

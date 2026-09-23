@@ -106,6 +106,29 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * Only the id of the current sale unit is kept: the row is read and its
+     * activity checked again on every request by SessionSaleUnitResolver, so a
+     * sale unit turned off in the back office stops being served immediately.
+     */
+    public function setSaleUnitId(?int $saleUnitId): static
+    {
+        if (null === $saleUnitId) {
+            $this->remove('thelia.current.sale_unit_id');
+
+            return $this;
+        }
+
+        $this->set('thelia.current.sale_unit_id', $saleUnitId);
+
+        return $this;
+    }
+
+    public function getSaleUnitId(): ?int
+    {
+        return $this->get('thelia.current.sale_unit_id');
+    }
+
     public function setCurrency(Currency $currency): void
     {
         $this->set('thelia.current.currency', $currency);
