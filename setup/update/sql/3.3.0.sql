@@ -864,6 +864,34 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- The sale unit an order was placed on, so a drive of 130 shops can tell whose
+-- order is whose. NULL for a national (single-shop) order, so an existing shop is
+-- untouched. `order` is versionable: the column is mirrored on `order_version`.
+-- Added with the information_schema guard MySQL 8 needs to replay the script.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'sale_unit_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `cart_fingerprint`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'fi_order_sale_unit_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `fi_order_sale_unit_id` (`sale_unit_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_fk := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `CONSTRAINT_NAME` = 'fk_order_sale_unit_id');
+SET @statement := IF(@add_fk, 'ALTER TABLE `order` ADD CONSTRAINT `fk_order_sale_unit_id` FOREIGN KEY (`sale_unit_id`) REFERENCES `sale_unit` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT', 'DO 0');
+PREPARE add_fk_statement FROM @statement;
+EXECUTE add_fk_statement;
+DEALLOCATE PREPARE add_fk_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'sale_unit_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL AFTER `cart_fingerprint`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 -- The back office needs the resource to exist before a profile can be granted it.
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.sale-unit', NOW(), NOW());

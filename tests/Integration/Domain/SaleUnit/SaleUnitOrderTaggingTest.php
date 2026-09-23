@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Tests\Integration\Domain\SaleUnit;
+
+use Thelia\Domain\Order\Service\OrderFactory;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
+use Thelia\Model\Order;
+use Thelia\Test\IntegrationTestCase;
+
+/**
+ * The order carries the sale unit it was placed on, stamped by the server from
+ * the resolved context — never taken from the client — and NULL for a national,
+ * single-shop order.
+ */
+final class SaleUnitOrderTaggingTest extends IntegrationTestCase
+{
+    private OrderFactory $orderFactory;
+
+    private SaleUnitContext $saleUnitContext;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->orderFactory = $this->getService(OrderFactory::class);
+        $this->saleUnitContext = $this->getService(SaleUnitContext::class);
+    }
+
+    public function testAnOrderIsStampedWithTheCurrentSaleUnit(): void
+    {
+        $fixtures = $this->createFixtureFactory();
+        $saleUnit = $fixtures->saleUnit();
+        $sessionOrder = $fixtures->order();
+        $customer = $sessionOrder->getCustomer();
+
+        $this->saleUnitContext->setSaleUnit($saleUnit);
+
+        $order = $this->orderFactory->createFromSessionOrder(
+            $sessionOrder,
+            $fixtures->currency(),
+            $fixtures->lang(),
+            \Thelia\Model\CartQuery::create()->findPk($sessionOrder->getCartId(), $this->getPropelConnection()),
+            $customer,
+        );
+
+        self::assertSame($saleUnit->getId(), $order->getSaleUnitId());
+    }
+
+    public function testAnOrderPlacedOutsideAnySaleUnitIsNational(): void
+    {
+        $fixtures = $this->createFixtureFactory();
+        $sessionOrder = $fixtures->order();
+
+        $this->saleUnitContext->setSaleUnit(null);
+
+        $order = $this->orderFactory->createFromSessionOrder(
+            $sessionOrder,
+            $fixtures->currency(),
+            $fixtures->lang(),
+            \Thelia\Model\CartQuery::create()->findPk($sessionOrder->getCartId(), $this->getPropelConnection()),
+            $sessionOrder->getCustomer(),
+        );
+
+        self::assertNull($order->getSaleUnitId(), 'no sale unit resolved: a national order, exactly as before the feature');
+    }
+
+    public function testTheStampSurvivesTheSave(): void
+    {
+        $fixtures = $this->createFixtureFactory();
+        $saleUnit = $fixtures->saleUnit();
+        $sessionOrder = $fixtures->order();
+
+        $this->saleUnitContext->setSaleUnit($saleUnit);
+
+        $order = $this->orderFactory->createFromSessionOrder(
+            $sessionOrder,
+            $fixtures->currency(),
+            $fixtures->lang(),
+            \Thelia\Model\CartQuery::create()->findPk($sessionOrder->getCartId(), $this->getPropelConnection()),
+            $sessionOrder->getCustomer(),
+        );
+        $order->setRef('SU-TAG-'.$saleUnit->getId())->save($this->getPropelConnection());
+
+        $reread = (new \Thelia\Model\OrderQuery())->findPk($order->getId(), $this->getPropelConnection());
+        self::assertInstanceOf(Order::class, $reread);
+        self::assertSame($saleUnit->getId(), $reread->getSaleUnitId());
+    }
+}

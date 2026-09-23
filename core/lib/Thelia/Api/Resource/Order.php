@@ -160,6 +160,10 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?string $ref = null;
 
+    /** The sale unit the order was placed on, NULL for a national (single-shop) order. Read-only: stamped by the server at checkout. */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?int $saleUnitId = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?\DateTime $invoiceDate = null;
 

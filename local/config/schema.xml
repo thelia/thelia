@@ -707,8 +707,12 @@
     <column description="the slot the buyer picked, NULL once that slot is deleted from the carrier settings" name="delivery_slot_id" type="INTEGER" />
     <column description="the local hour the picked slot started at, copied off the slot" name="delivery_slot_start" type="TIME" />
     <column description="the local hour the picked slot ended at, copied off the slot" name="delivery_slot_end" type="TIME" />
+    <column defaultValue="NULL" description="the sale unit this order was placed on, NULL for a national (single-shop) order" name="sale_unit_id" type="INTEGER" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <foreign-key foreignTable="sale_unit" name="fk_order_sale_unit_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
     </foreign-key>
     <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
