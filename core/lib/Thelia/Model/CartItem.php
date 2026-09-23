@@ -22,6 +22,7 @@ use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 
@@ -181,11 +182,31 @@ class CartItem extends BaseCartItem
     }
 
     /**
+     * The calculator for this line, which is the calculator for its cart: the
+     * VAT a line carries depends on who is buying, not only on what is bought.
+     *
+     * A line with no cart yet - one being built - falls back to the plain
+     * calculator rather than guessing.
+     *
+     * @throws PropelException
+     */
+    private function createLineCartTaxCalculator(): TaxCalculatorInterface
+    {
+        $cart = $this->getCart();
+
+        if (!$cart instanceof Cart) {
+            return $this->createTaxCalculator();
+        }
+
+        return $this->createCartTaxCalculator($cart);
+    }
+
+    /**
      * @throws PropelException
      */
     public function getTaxedPrice(Country $country, ?State $state = null): float
     {
-        return $this->createTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
+        return $this->createLineCartTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
     }
 
     /**
@@ -193,7 +214,7 @@ class CartItem extends BaseCartItem
      */
     public function getTaxedPromoPrice(Country $country, ?State $state = null): float
     {
-        return $this->createTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
+        return $this->createLineCartTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
     }
 
     /**

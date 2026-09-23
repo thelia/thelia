@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Country;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -26,6 +29,14 @@ use Thelia\Test\ApiTestCase;
  */
 final class CartApiTest extends ApiTestCase
 {
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+        Country::resetDefaultCountryCache();
+
+        parent::tearDown();
+    }
+
     public function testGetCartReturns404WithoutActiveCart(): void
     {
         $response = $this->jsonRequest('GET', '/api/front/cart');
@@ -131,6 +142,40 @@ final class CartApiTest extends ApiTestCase
             'An address typed at checkout has no account address.',
         );
         self::assertArrayNotHasKey('addressInvoice', $data);
+    }
+
+    public function testCartExposesItsVatExemptionState(): void
+    {
+        ConfigQuery::write(VatExemptionMode::CONFIG_KEY, VatExemptionMode::VERIFIED_VAT_NUMBER->value);
+        ConfigQuery::write('store_vat_exempt', '0');
+
+        $factory = $this->createFixtureFactory();
+        $shopCountry = $factory->country(['isocode' => 'FR', 'isoalpha2' => 'FR', 'isoalpha3' => 'FRX', 'shopCountry' => true]);
+        ConfigQuery::write('store_country', (string) $shopCountry->getId());
+
+        $title = $factory->customerTitle();
+        $customer = $factory->customer($title, ['password' => 'password']);
+        $buyerCountry = $factory->country(['isocode' => 'BE', 'isoalpha2' => 'BE', 'isoalpha3' => 'BEX']);
+
+        $invoiceAddress = $factory->cartAddress(null, $buyerCountry, $title);
+        $invoiceAddress
+            ->setVatNumber('BE0123456789')
+            ->setVatVerifiedAt(new \DateTime('-10 days'))
+            ->setVatVerifiedName('Acme SPRL')
+            ->save($this->getPropelConnection());
+
+        $cart = $factory->cart($customer);
+        $cart->setAddressInvoiceId($invoiceAddress->getId())->save($this->getPropelConnection());
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $response = $this->jsonRequest('GET', '/api/front/carts/'.$cart->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+
+        self::assertTrue($data['isVatExempted']);
+        self::assertSame('Acme SPRL', $data['addressInvoice']['vatVerifiedName']);
     }
 
     public function testCreateCartViaPost(): void

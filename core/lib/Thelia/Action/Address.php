@@ -72,6 +72,16 @@ class Address extends BaseAction implements EventSubscriberInterface
         $isNewAddress = $addressModel->isNew();
 
         try {
+            // A verification answers about one number. Editing the number makes that
+            // answer say nothing about the new one, so it is dropped rather than left
+            // to vouch for a number nobody checked - which would otherwise hand the
+            // buyer an exemption by simply retyping the field.
+            if ($event->getVatNumber() !== $addressModel->getVatNumber()) {
+                $addressModel
+                    ->setVatVerifiedAt(null)
+                    ->setVatVerifiedName(null);
+            }
+
             $addressModel
                 ->setLabel($event->getLabel())
                 ->setTitleId(null !== $event->getTitle() ? (int) $event->getTitle() : $this->customerTitleService->getDefaultCustomerTitle()?->getId())

@@ -15,7 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Api;
 
 use Thelia\Api\Service\DataAccess\AttributeAccessService;
+use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
+use Thelia\Model\Country;
 use Thelia\Model\Product;
 use Thelia\Test\IntegrationTestCase;
 
@@ -34,6 +37,14 @@ final class AttributeAccessServiceTest extends IntegrationTestCase
     {
         parent::setUp();
         $this->attributeAccess = static::getContainer()->get(AttributeAccessService::class);
+    }
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+        Country::resetDefaultCountryCache();
+
+        parent::tearDown();
     }
 
     public function testFolderAttributeIsEmptyForContentWithoutDefaultFolder(): void
@@ -69,6 +80,45 @@ final class AttributeAccessServiceTest extends IntegrationTestCase
         $this->setRequestParam('product_id', $product->getId());
 
         self::assertSame('', $this->attributeAccess->attributeCategory('TITLE'));
+    }
+
+    public function testCartAttributesExposeTheVatExemptionState(): void
+    {
+        $factory = $this->createFixtureFactory();
+        ConfigQuery::write(VatExemptionMode::CONFIG_KEY, VatExemptionMode::VERIFIED_VAT_NUMBER->value);
+        ConfigQuery::write('store_vat_exempt', '0');
+        $shopCountry = $factory->country(['isocode' => 'FR', 'isoalpha2' => 'FR', 'isoalpha3' => 'FRX', 'shopCountry' => true]);
+        ConfigQuery::write('store_country', (string) $shopCountry->getId());
+
+        $title = $factory->customerTitle();
+        $buyerCountry = $factory->country(['isocode' => 'BE', 'isoalpha2' => 'BE', 'isoalpha3' => 'BEX']);
+        $invoiceAddress = $factory->cartAddress(null, $buyerCountry, $title);
+        $invoiceAddress
+            ->setVatNumber('BE0123456789')
+            ->setVatVerifiedAt(new \DateTime('-10 days'))
+            ->save($this->getPropelConnection());
+
+        $cart = $factory->cart();
+        $cart->setAddressInvoiceId($invoiceAddress->getId())->save($this->getPropelConnection());
+
+        static::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->setSessionCart($cart);
+
+        self::assertTrue($this->attributeAccess->attributeCart('is_vat_exempted'));
+        self::assertSame('BE0123456789', $this->attributeAccess->attributeCart('invoice_vat_number'));
+    }
+
+    public function testOrderAttributesExposeTheFrozenVatExemptionState(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        $order->getOrderAddressRelatedByInvoiceOrderAddressId()
+            ->setVatExempted(1)
+            ->setVatNumber('BE0123456789')
+            ->save($this->getPropelConnection());
+
+        static::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->setOrder($order);
+
+        self::assertTrue($this->attributeAccess->orderDataAccess('vat_exempted'));
+        self::assertSame('BE0123456789', $this->attributeAccess->orderDataAccess('invoice_vat_number'));
     }
 
     private function setRequestParam(string $key, mixed $value): void
