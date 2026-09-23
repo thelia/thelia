@@ -2974,4 +2974,20 @@
     </index>
     <behavior name="timestampable" />
   </table>
+
+  <table name="sale_unit_product_sale_elements" namespace="Thelia\Model">
+    <column name="sale_unit_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0.000000" name="quantity" required="true" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="sale_unit" name="fk_sale_unit_pse_sale_unit_id" onDelete="CASCADE">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_sale_unit_pse_product_sale_elements_id" onDelete="CASCADE">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <index name="idx_sale_unit_pse_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
 </database>

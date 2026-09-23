@@ -36,6 +36,8 @@ use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
 use Thelia\Exception\TheliaProcessException;
@@ -72,6 +74,8 @@ readonly class OrderFacade
         private GiftWrappingLineFactory $giftWrappingLineFactory,
         private ExemptedVatCalculator $exemptedVatCalculator,
         private DeliverySlotBooker $deliverySlotBooker,
+        private SaleUnitContext $saleUnitContext,
+        private SaleUnitStockResolver $saleUnitStockResolver,
     ) {
     }
 
@@ -190,6 +194,7 @@ readonly class OrderFacade
                             guardAvailability: $checkStock,
                             allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
                             connection: $connection,
+                            saleUnitId: $this->saleUnitContext->getSaleUnit()?->getId(),
                         );
                     } catch (TheliaProcessException $shortage) {
                         // The decrementer knows a row id and a quantity; only here is
@@ -541,14 +546,22 @@ readonly class OrderFacade
             return;
         }
 
+        $saleUnitId = $this->saleUnitContext->getSaleUnit()?->getId();
+
         foreach ($cart->getCartItems() as $cartItem) {
             if (1 === $cartItem->getProduct()->getVirtual()) {
                 continue;
             }
 
+            $productSaleElements = $cartItem->getProductSaleElements();
+
             $this->stockPolicy->assertStockIsAvailable(
                 $cartItem->getQuantity(),
-                $cartItem->getProductSaleElements()->getQuantity(),
+                $this->saleUnitStockResolver->availableQuantity(
+                    $saleUnitId,
+                    $productSaleElements->getId(),
+                    (float) $productSaleElements->getQuantity(),
+                ),
                 $cartItem->getProduct()->getRef(),
             );
         }

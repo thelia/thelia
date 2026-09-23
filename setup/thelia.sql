@@ -5005,5 +5005,30 @@ CREATE TABLE `sale_unit_product_price`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- sale_unit_product_sale_elements
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_product_sale_elements`;
+
+CREATE TABLE `sale_unit_product_sale_elements`
+(
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`),
+    INDEX `idx_sale_unit_pse_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_sale_unit_pse_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_pse_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

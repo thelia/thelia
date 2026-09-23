@@ -840,6 +840,30 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- The stock a sale unit keeps of its own: one row per (unit, sale element). A
+-- sale element without a row for the unit decrements the shared national counter
+-- `product_sale_elements.quantity` — right for a dematerialised or centralised
+-- stock, a compatibility mode rather than the target for units with a stock of
+-- their own, whose sale elements are expected to each carry a row.
+CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
+(
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`),
+    INDEX `idx_sale_unit_pse_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_sale_unit_pse_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_pse_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 -- The back office needs the resource to exist before a profile can be granted it.
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.sale-unit', NOW(), NOW());
