@@ -31,6 +31,7 @@ use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentAcceptanceStore;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
@@ -491,13 +492,15 @@ final class CheckoutConsentTest extends ActionIntegrationTestCase
      */
     private function quotePostageOnCart(Cart $cart): void
     {
-        $action = new class extends CartAction {
+        $action = new class($this->getService(VatExemptionResolver::class)) extends CartAction {
             public OrderPostage $quote;
 
-            public function __construct()
+            public function __construct(VatExemptionResolver $vatExemptionResolver)
             {
-                // The overridden method below is the only one this test calls, and it
-                // uses none of the parent's dependencies.
+                // The overridden method below is the only one this test calls.
+                // It needs the exemption resolver, because the listener takes the
+                // VAT back off a postage quoted for a buyer who accounts for it.
+                $this->vatExemptionResolver = $vatExemptionResolver;
             }
 
             protected function getPostageByDeliveryModuleId(

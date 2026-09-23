@@ -54,7 +54,7 @@ final class OrderAddressPersisterStateTest extends IntegrationTestCase
 
         $order = new Order();
 
-        $this->getService(OrderAddressPersister::class)->prepareOrderAddresses($order, $cart, false, $connection);
+        $this->getService(OrderAddressPersister::class)->prepareOrderAddresses($order, $cart, false, false, $connection);
 
         $invoiceOrderAddress = OrderAddressQuery::create()->findPk($order->getInvoiceOrderAddressId(), $connection);
         $deliveryOrderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId(), $connection);

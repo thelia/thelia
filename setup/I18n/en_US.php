@@ -1566,4 +1566,6 @@ return [
     'Other' => 'Other',
     'Promotion' => 'Promotion',
     'Newness' => 'Newness',
+    'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)',
+    'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)',
 ];

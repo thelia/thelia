@@ -29,6 +29,7 @@ readonly class OrderAddressPersister
         ModelOrder $order,
         CartModel $cart,
         bool $useOrderDefinedAddresses,
+        bool $vatExempted,
         ConnectionInterface $connection,
     ): Country {
         if ($useOrderDefinedAddresses) {
@@ -41,7 +42,7 @@ readonly class OrderAddressPersister
         $invoiceAddress = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
 
         $deliveryOrderAddress = $this->freeze($deliveryAddress, $connection);
-        $invoiceOrderAddress = $this->freeze($invoiceAddress, $connection);
+        $invoiceOrderAddress = $this->freeze($invoiceAddress, $connection, $vatExempted);
 
         $order->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
         $order->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
@@ -53,13 +54,15 @@ readonly class OrderAddressPersister
      * Copies a cart address, field by field, into an order address of its own: the order
      * keeps what the buyer had entered even when the cart address is edited or deleted.
      */
-    private function freeze(CartAddress $cartAddress, ConnectionInterface $connection): OrderAddress
+    private function freeze(CartAddress $cartAddress, ConnectionInterface $connection, bool $vatExempted = false): OrderAddress
     {
         $orderAddress = (new OrderAddress())
             ->setCustomerTitleId($cartAddress->getCustomerTitleId())
             ->setCompany($cartAddress->getCompany())
             ->setSiret($cartAddress->getSiret())
             ->setVatNumber($cartAddress->getVatNumber())
+            ->setVatVerifiedAt($cartAddress->getVatVerifiedAt())
+            ->setVatVerifiedName($cartAddress->getVatVerifiedName())
             ->setFirstname($cartAddress->getFirstname())
             ->setLastname($cartAddress->getLastname())
             ->setAddress1($cartAddress->getAddress1())
@@ -70,7 +73,9 @@ readonly class OrderAddressPersister
             ->setPhone($cartAddress->getPhone())
             ->setCellphone($cartAddress->getCellphone())
             ->setCountryId($cartAddress->getCountryId())
-            ->setStateId($cartAddress->getStateId());
+            ->setStateId($cartAddress->getStateId())
+            // TINYINT: the generated setter is typed ?int, a bool would not pass.
+            ->setVatExempted($vatExempted ? 1 : 0);
         $orderAddress->save($connection);
 
         return $orderAddress;

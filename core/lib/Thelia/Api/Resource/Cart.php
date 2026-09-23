@@ -173,6 +173,9 @@ class Cart implements PropelResourceInterface
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?bool $virtual = null;
 
+    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $isVatExempted = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -387,6 +390,18 @@ class Cart implements PropelResourceInterface
     public function setVirtual(?bool $virtual): self
     {
         $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    public function getIsVatExempted(): ?bool
+    {
+        return $this->isVatExempted;
+    }
+
+    public function setIsVatExempted(?bool $isVatExempted): self
+    {
+        $this->isVatExempted = $isVatExempted;
 
         return $this;
     }
