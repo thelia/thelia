@@ -65,6 +65,7 @@ class AdminResources
     public const CATEGORY = 'admin.category';
     public const CATALOG_PRICE_RULE = 'admin.catalog-price-rule';
     public const CHECKOUT_STEP = 'admin.configuration.checkout-step';
+    public const SALE_UNIT = 'admin.sale-unit';
     public const CONFIG = 'admin.configuration';
     public const CONSENT = 'admin.configuration.consent';
     public const CONTENT = 'admin.content';

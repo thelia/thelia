@@ -332,6 +332,7 @@ return [
     'Saint Martin (French part)' => 'Saint-Martin',
     'Saint Vincent and the Grenadines' => 'Saint Vincent e Grenadine',
     'Salerno' => 'Salerno',
+    'Sale units' => 'Unità di vendita',
     'Sales management' => 'Gestione vendite',
     'San Marino' => 'San Marino',
     'Santa Cruz' => 'Santa Cruz',

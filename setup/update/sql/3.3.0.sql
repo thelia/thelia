@@ -808,4 +808,22 @@ CREATE TABLE IF NOT EXISTS `sale_unit_i18n`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.sale-unit', NOW(), NOW());
+
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @sale_unit_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.sale-unit');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@sale_unit_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'de_DE', 'Verkaufseinheiten', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'en_US', 'Sale units', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'es_ES', 'Unidades de venta', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'fr_FR', 'Unités de vente', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'it_IT', 'Unità di vendita', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'ru_RU', 'Точки продаж', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
