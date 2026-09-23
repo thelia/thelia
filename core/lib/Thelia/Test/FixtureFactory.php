@@ -72,6 +72,7 @@ use Thelia\Model\SaleCustomer;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleUnit;
+use Thelia\Model\SaleUnitProductPrice;
 use Thelia\Model\Tag;
 use Thelia\Model\TagElement;
 use Thelia\Model\Tax;
@@ -995,6 +996,25 @@ final class FixtureFactory
         $saleUnit->save($this->connection);
 
         return $saleUnit;
+    }
+
+    public function saleUnitProductPrice(
+        SaleUnit $saleUnit,
+        ProductSaleElements $productSaleElements,
+        Currency $currency,
+        float $price,
+        ?float $promoPrice = null,
+    ): SaleUnitProductPrice {
+        $saleUnitProductPrice = new SaleUnitProductPrice();
+        $saleUnitProductPrice->setSaleUnitId($saleUnit->getId());
+        $saleUnitProductPrice->setProductSaleElementsId($productSaleElements->getId());
+        $saleUnitProductPrice->setCurrencyId($currency->getId());
+        $saleUnitProductPrice->setPrice((string) $price);
+        $saleUnitProductPrice->setPromoPrice((string) ($promoPrice ?? $price));
+        $saleUnitProductPrice->setFromDefaultCurrency(false);
+        $saleUnitProductPrice->save($this->connection);
+
+        return $saleUnitProductPrice;
     }
 
     public function tag(array $overrides = []): Tag

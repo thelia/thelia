@@ -4972,5 +4972,38 @@ CREATE TABLE `sale_unit_i18n`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- sale_unit_product_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_product_price`;
+
+CREATE TABLE `sale_unit_product_price`
+(
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`,`currency_id`),
+    INDEX `idx_sale_unit_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_sale_unit_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_sale_unit_product_price_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

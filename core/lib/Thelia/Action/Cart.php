@@ -35,6 +35,7 @@ use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -73,6 +74,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
         protected EffectivePriceResolver $effectivePriceResolver,
         protected PricingActivityChecker $pricingActivityChecker,
+        protected SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker,
     ) {
     }
 
@@ -478,6 +480,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         if (!$this->pricingActivityChecker->hasActivePublicRule()
             && !$this->pricingActivityChecker->hasVisitorDependentPricing()
+            && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()
             && !$this->holdsSpecialOffer($cart)) {
             return;
         }

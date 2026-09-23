@@ -32,6 +32,8 @@ final readonly class EffectivePrice
 
     public const SOURCE_RESERVED_SALE = 'reserved_sale';
 
+    public const SOURCE_SALE_UNIT = 'sale_unit';
+
     public function __construct(
         public int $productSaleElementsId,
         public float $untaxedPromoPrice,
@@ -40,6 +42,7 @@ final readonly class EffectivePrice
         public ?int $ruleId = null,
         public ?int $saleId = null,
         public ?\DateTimeInterface $endsAt = null,
+        public ?int $saleUnitId = null,
     ) {
     }
 }

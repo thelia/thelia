@@ -20,6 +20,7 @@ use Thelia\Api\Bridge\Propel\Event\CollectionModelsLoadedEvent;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -39,6 +40,7 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
         private readonly CurrentCustomerProvider $currentCustomerProvider,
         private readonly ProductPriceCurrencyListener $productPriceCurrencyListener,
         private readonly PricingActivityChecker $activityChecker,
+        private readonly SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker,
     ) {
     }
 
@@ -51,7 +53,9 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
         // Asked before the visitor is looked up: reading the customer may open the
         // session, and an API request in a shop where nothing prices beyond the
         // catalog must stay stateless.
-        if (!$this->activityChecker->hasActivePublicRule() && !$this->activityChecker->hasVisitorDependentPricing()) {
+        if (!$this->activityChecker->hasActivePublicRule()
+            && !$this->activityChecker->hasVisitorDependentPricing()
+            && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()) {
             return;
         }
 

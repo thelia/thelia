@@ -808,6 +808,38 @@ CREATE TABLE IF NOT EXISTS `sale_unit_i18n`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- What a sale unit sells at when it does not sell at the national price: one row
+-- per (unit, sale element, currency), read with the exact semantics of
+-- `product_price` — same columns, same from_default_currency conversion, same
+-- obedience to `product_sale_elements.promo`. A sale element without a row keeps
+-- the national price: the fallback is the mode of compatibility, not an error.
+CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
+(
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`,`currency_id`),
+    INDEX `idx_sale_unit_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_sale_unit_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_sale_unit_product_price_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 -- The back office needs the resource to exist before a profile can be granted it.
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.sale-unit', NOW(), NOW());

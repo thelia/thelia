@@ -21,6 +21,7 @@ use Thelia\Api\Resource\ProductSaleElements as ProductSaleElementsResource;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 
 /**
  * Serves the price a catalog price rule or a reserved operation gives the caller, on
@@ -46,6 +47,7 @@ class EffectivePriceListener implements EventSubscriberInterface
         private readonly CurrentCustomerProvider $currentCustomerProvider,
         private readonly ProductPriceCurrencyListener $productPriceCurrencyListener,
         private readonly PricingActivityChecker $activityChecker,
+        private readonly SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker,
     ) {
     }
 
@@ -67,7 +69,9 @@ class EffectivePriceListener implements EventSubscriberInterface
         // Asked before the visitor is looked up: reading the customer may open the
         // session, and an API request in a shop where nothing prices beyond the
         // catalog must stay stateless.
-        if (!$this->activityChecker->hasActivePublicRule() && !$this->activityChecker->hasVisitorDependentPricing()) {
+        if (!$this->activityChecker->hasActivePublicRule()
+            && !$this->activityChecker->hasVisitorDependentPricing()
+            && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()) {
             return;
         }
 
