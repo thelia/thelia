@@ -12,6 +12,10 @@ The version number follows the update script this release ships, `setup/update/s
 - A new payment attempt reuses the unpaid order of the cart instead of placing another one. `Thelia\Domain\Checkout\Service\CheckoutPaymentService` compares a fingerprint of the cart lines, both addresses, the delivery module and its postage, the payment module, the currency and the discounts: unchanged, and with a payment module that declares it supports retries, the same order is presented to the module again, with the same reference and no second confirmation e-mail. Changed, or with a module that does not declare the capability, the previous order is cancelled through the status flow and one new order is placed. A cart never carries more than one live unpaid order.
 - `Thelia\Model\Order::setCancelled()` goes through `ORDER_UPDATE_STATUS` instead of writing the status on the row. Cancelling an order therefore gives its stock back and runs the status listeners, which it did not before, whatever raised it.
 
+## Exports and imports
+
+- A conversion funnel export, `thelia.export.conversion_funnel` in a new Reports category, writes one row per day with the carts created, the carts holding a line, those with a delivery module, those with a payment module, the orders placed and the orders paid. The period rate of paid orders to carts holding a line is read on the back-office report, not per day. Days without activity are kept with zero counts. Without a period it covers the last twelve months up to today.
+
 ## Breaking changes
 
 - `Thelia\Module\PaymentModuleInterface` declares `supportsPaymentRetry(): bool`. `AbstractPaymentModule` answers false, so a module extending it has nothing to do; a module implementing the interface directly has to declare the method. Say true only when the provider reference varies at each attempt and the notification finds the order back by the order's own reference.
