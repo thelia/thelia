@@ -25,6 +25,10 @@
             <title locale="en_US">Modules</title>
             <title locale="fr_FR">Modules</title>
         </export_category>
+        <export_category id="thelia.export.reports">
+            <title locale="en_US">Reports</title>
+            <title locale="fr_FR">Rapports</title>
+        </export_category>
     </export_categories>
 
     <exports>
@@ -129,6 +133,21 @@
                 <title>Informations I18n des produits</title>
                 <description>
                     Exporter les informations I18n de vos produits (titre produit, résumé, description, conclusion)
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.conversion_funnel" class="Thelia\Domain\DataTransfer\Export\Type\ConversionFunnelExport" category_id="thelia.export.reports">
+            <export_descriptive locale="en_US">
+                <title>Conversion funnel</title>
+                <description>
+                    Carts created, carts with a line, carts with a delivery module, carts with a payment module, orders placed and orders paid, one row per day. Without a period, the last twelve months.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Entonnoir de conversion</title>
+                <description>
+                    Paniers créés, paniers avec article, paniers avec mode de livraison, paniers avec moyen de paiement, commandes passées et payées, une ligne par jour. Sans période, les douze derniers mois.
                 </description>
             </export_descriptive>
         </export>

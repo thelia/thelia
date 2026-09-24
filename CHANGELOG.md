@@ -42,6 +42,9 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - Known limit: the shared secret is stored in the database unencrypted, so a leaked database gives it away; encrypting it waits for a vault of the shop secrets.
 - The admin log no longer keeps the `Cookie` and `Authorization` headers of a request, which carried the session, remember-me and API credentials of whoever made it, and a failed back-office sign-in or password creation no longer keeps the request body, which held the password that was typed.
 - A remember-me cookie that does not decode, for an administrator or a customer, is ignored instead of failing every page of the shop for the browser that carries it.
+## Exports and imports
+
+- A conversion funnel export, `thelia.export.conversion_funnel` in a new Reports category, writes one row per day with the carts created, the carts holding a line, those with a delivery module, those with a payment module, the orders placed and the orders paid. The period rate of paid orders to carts holding a line is read on the back-office report, not per day. Days without activity are kept with zero counts. Without a period it covers the last twelve months up to today.
 
 ## Breaking changes
 
