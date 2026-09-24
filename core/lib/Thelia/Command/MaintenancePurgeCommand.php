@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Admin\Service\AdminLogPurger;
+use Thelia\Domain\Cart\Service\CartPurgeHorizon;
 use Thelia\Domain\Cart\Service\CartPurger;
 use Thelia\Domain\Customer\Service\CustomerPurger;
 use Thelia\Domain\Form\Service\FormFirewallPurger;
@@ -27,8 +28,6 @@ use Thelia\Model\ConfigQuery;
 
 class MaintenancePurgeCommand extends ContainerAwareCommand
 {
-    private const DEFAULT_CART_NO_ORDER_DAYS_KEY = 'purification_cart_no_order_days';
-    private const DEFAULT_CART_ANONYMOUS_DAYS_KEY = 'purification_cart_anonymous_days';
     private const DEFAULT_ADMIN_LOGS_DAYS_KEY = 'purification_admin_logs_days';
     private const DEFAULT_FORM_FIREWALL_DAYS_KEY = 'purification_form_firewall_days';
     private const DEFAULT_CUSTOMER_NO_ORDER_DAYS_KEY = 'purification_customer_no_order_days';
@@ -68,8 +67,8 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
 
         try {
             $cartNoOrderDays = (int) ConfigQuery::read(
-                self::DEFAULT_CART_NO_ORDER_DAYS_KEY,
-                60
+                CartPurgeHorizon::CONFIG_KEY_CART_NO_ORDER_DAYS,
+                CartPurgeHorizon::DEFAULT_CART_NO_ORDER_DAYS
             );
 
             $deletedCartNoOrder = $dryRun
@@ -84,8 +83,8 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
             ));
 
             $cartAnonymousDays = (int) ConfigQuery::read(
-                self::DEFAULT_CART_ANONYMOUS_DAYS_KEY,
-                30
+                CartPurgeHorizon::CONFIG_KEY_CART_ANONYMOUS_DAYS,
+                CartPurgeHorizon::DEFAULT_CART_ANONYMOUS_DAYS
             );
 
             $deletedAnonymousCarts = $dryRun
