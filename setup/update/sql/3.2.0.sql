@@ -205,4 +205,14 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- The image formats a shop offers on top of the source one, and the encoder quality of
+-- each. A shop that upgrades keeps the images it has: the list arrives empty, so nothing
+-- is re-encoded and no catalogue is regenerated on the first crawl. A fresh install gets
+-- WebP, which every current browser reads. INSERT IGNORE leaves alone a shop that has
+-- already chosen.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('image_formats', '', 0, 0, NOW(), NOW()),
+    ('image_quality_webp', '75', 0, 0, NOW(), NOW()),
+    ('image_quality_avif', '50', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
