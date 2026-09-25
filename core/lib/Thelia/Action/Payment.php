@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Module\Payment\PaymentCartContext;
 
 /**
  * Class Payment.
@@ -26,10 +27,23 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Payment implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly PaymentCartContext $paymentCartContext,
+    ) {
+    }
+
     /**
      * Check if a module is valid.
      */
     public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $this->paymentCartContext->within(
+            $event->getCart(),
+            fn () => $this->judge($event, $dispatcher),
+        );
+    }
+
+    private function judge(IsValidPaymentEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $module = $event->getModule();
 

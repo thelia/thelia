@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -74,6 +75,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         protected GuestOrderAccessService $guestOrderAccessService,
         protected URL $urlManager,
         protected OrderStatusTransitionGuard $transitionGuard,
+        protected PaymentCartContext $paymentCartContext,
     ) {
     }
 
@@ -173,6 +175,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             throw new TheliaProcessException('Order is not defined');
         }
 
+        $cart = $this->resolveCart($order, $session, $dispatcher);
+
         $placedOrder = $this->orderFacade->createOrder(
             $dispatcher,
             $order,
@@ -183,7 +187,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             // language that are not the shop's own.
             $order->getCurrency() ?? $session?->getCurrency() ?? CurrencyModel::getDefaultCurrency(),
             $order->getLang() ?? $session?->getLang() ?? LangModel::getDefaultLanguage(),
-            $this->resolveCart($order, $session, $dispatcher),
+            $cart,
             // The session customer when there is one — a signed-in customer or a guest
             // checking out — and the one the order already names otherwise, which is how
             // an order placed from the command line finds its customer.
@@ -207,7 +211,10 @@ class Order extends BaseAction implements EventSubscriberInterface
         /* call pay method */
         $payEvent = new OrderPaymentEvent($placedOrder);
 
-        $dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY);
+        $this->paymentCartContext->within(
+            $cart,
+            static fn () => $dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY),
+        );
 
         if ($payEvent->hasResponse()) {
             $event->setResponse($payEvent->getResponse());
