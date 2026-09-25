@@ -19,6 +19,7 @@ use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\AdminCreatePassword;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\AdminLostPassword;
+use Thelia\Form\AdminTwoFactorCode;
 use Thelia\Form\CartAdd;
 use Thelia\Form\ContactForm;
 use Thelia\Form\CouponCode;
@@ -49,6 +50,7 @@ return static function (ContainerConfigurator $configurator): void {
         'thelia.admin.login' => AdminLogin::class,
         'thelia.admin.lostpassword' => AdminLostPassword::class,
         'thelia.admin.createpassword' => AdminCreatePassword::class,
+        'thelia.admin.two_factor_code' => AdminTwoFactorCode::class,
 
         // Frontend forms
         'thelia.front.customer.login' => CustomerLogin::class,

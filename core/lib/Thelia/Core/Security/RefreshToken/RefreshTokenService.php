@@ -46,13 +46,13 @@ final readonly class RefreshTokenService
     ) {
     }
 
-    public function issue(string $username, string $scope): string
+    public function issue(string $username, string $scope, ?string $secondFactorMark = null): string
     {
         $this->assertScope($scope);
 
         $token = bin2hex(random_bytes(self::TOKEN_BYTES));
         $item = $this->cache->getItem(self::CACHE_NAMESPACE.$token);
-        $item->set(['username' => $username, 'scope' => $scope]);
+        $item->set(['username' => $username, 'scope' => $scope, 'second_factor' => $secondFactorMark]);
         $item->expiresAfter($this->ttl);
         $this->cache->save($item);
 
@@ -60,7 +60,7 @@ final readonly class RefreshTokenService
     }
 
     /**
-     * @return array{username: string, scope: string}|null
+     * @return array{username: string, scope: string, second_factor?: string|null}|null
      */
     public function consume(string $token): ?array
     {

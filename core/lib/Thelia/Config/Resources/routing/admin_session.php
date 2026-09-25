@@ -61,4 +61,27 @@ return static function (RoutingConfigurator $routes): void {
     $routes->add('admin.checklogin', '/admin/checklogin')
         ->controller([SessionController::class, 'checkLoginAction'])
         ->defaults(['not-logged' => '1']);
+
+    $routes->add('admin.two-factor.verify', '/admin/two-factor')
+        ->controller([SessionController::class, 'showTwoFactorAction'])
+        ->methods(['GET'])
+        ->defaults(['not-logged' => '1']);
+
+    $routes->add('admin.two-factor.check', '/admin/two-factor/check')
+        ->controller([SessionController::class, 'checkTwoFactorAction'])
+        ->methods(['POST'])
+        ->defaults(['not-logged' => '1']);
+
+    $routes->add('admin.two-factor.cancel', '/admin/two-factor/cancel')
+        ->controller([SessionController::class, 'cancelTwoFactorAction'])
+        ->methods(['POST'])
+        ->defaults(['not-logged' => '1']);
+
+    $routes->add('admin.two-factor.setup', '/admin/two-factor/setup')
+        ->controller([SessionController::class, 'showTwoFactorSetupAction'])
+        ->methods(['GET']);
+
+    $routes->add('admin.two-factor.confirm', '/admin/two-factor/setup/confirm')
+        ->controller([SessionController::class, 'confirmTwoFactorSetupAction'])
+        ->methods(['POST']);
 };

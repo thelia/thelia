@@ -25,6 +25,9 @@ use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
+use Thelia\Domain\Admin\TwoFactor\TwoFactorChallenge;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -38,6 +41,8 @@ class SessionManager
 
     public function __construct(
         private readonly SessionFactory $sessionFactory,
+        private readonly AdminTwoFactorManager $twoFactorManager,
+        private readonly TwoFactorChallenge $twoFactorChallenge,
     ) {
     }
 
@@ -87,8 +92,12 @@ class SessionManager
 
         try {
             // If have found a user, store it in the security context
-            /** @var Customer $user */
             $user = $authenticator->getAuthentifiedUser();
+
+            if (!$user instanceof Customer) {
+                throw new TokenAuthenticationException('No user found for this token');
+            }
+
             $session->setCustomerUser($user);
 
             $dispatcher->dispatch(
@@ -121,13 +130,26 @@ class SessionManager
             if (null === $user) {
                 throw new TokenAuthenticationException('No user found for this token');
             }
+
+            if ($user instanceof Admin && $this->twoFactorManager->isEnabledFor($user)) {
+                $path = RequestPath::decoded($request);
+                $isBackOfficeRequest = '/admin' === $path || str_starts_with($path, '/admin/');
+
+                if ($isBackOfficeRequest && !$this->twoFactorChallenge->pendingAdmin($session) instanceof Admin) {
+                    $this->twoFactorChallenge->start($session, $user, false, null, true);
+                    AdminLog::append('admin', 'LOGIN', 'Remember-me cookie accepted, second factor required', $request, $user, false);
+                }
+
+                return;
+            }
+
             $session->setAdminUser($user);
 
             $this->applyUserLocale($user, $session);
 
             AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
         } catch (\Exception) {
-            AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
+            AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request, null, false);
 
             // Clear the cookie
             $this->clearRememberMeCookie($cookieAdminName);
