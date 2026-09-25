@@ -117,6 +117,9 @@ try {
 } catch (\PDOException $e) {
     fwrite(STDERR, "ERROR: Database connection failed — {$e->getMessage()}\n");
     exit(1);
+} catch (\InvalidArgumentException $e) {
+    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
+    exit(1);
 }
 
 /**
