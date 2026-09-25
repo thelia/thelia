@@ -1251,6 +1251,51 @@ CREATE TABLE `admin`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- admin_two_factor
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `admin_two_factor`;
+
+CREATE TABLE `admin_two_factor`
+(
+    `admin_id` INTEGER NOT NULL,
+    `secret` VARCHAR(64) NOT NULL COMMENT 'the shared TOTP secret, base32 encoded',
+    `enabled_at` DATETIME COMMENT 'when the administrator proved the secret with a first code',
+    `last_used_step` INTEGER COMMENT 'the last 30-second TOTP step accepted, so that a code cannot be used twice',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`admin_id`),
+    CONSTRAINT `fk_admin_two_factor_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- admin_two_factor_backup_code
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `admin_two_factor_backup_code`;
+
+CREATE TABLE `admin_two_factor_backup_code`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `admin_id` INTEGER NOT NULL,
+    `code_hash` VARCHAR(255) NOT NULL COMMENT 'the password hash of a backup code, never the code itself',
+    `used_at` DATETIME COMMENT 'set when the code was used, a used code is refused',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_admin_two_factor_backup_code_admin_id` (`admin_id`),
+    CONSTRAINT `fk_admin_two_factor_backup_code_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile_resource
 -- ---------------------------------------------------------------------
 

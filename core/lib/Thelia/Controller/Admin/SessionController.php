@@ -22,8 +22,12 @@ use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
+use Thelia\Core\Security\EventListener\AdminTwoFactorEnrolmentListener;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
+use Thelia\Domain\Admin\TwoFactor\TwoFactorChallenge;
+use Thelia\Domain\Admin\TwoFactor\TwoFactorVerification;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\Definition\AdminForm;
@@ -42,9 +46,12 @@ class SessionController extends BaseAdminController
     use RememberMeTrait;
 
     public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
+    public const TWO_FACTOR_PENDING_SECRET_SESSION_KEY = 'thelia.admin_two_factor_pending_secret';
 
     public function __construct(
         private readonly LangService $langService,
+        private readonly AdminTwoFactorManager $twoFactorManager,
+        private readonly TwoFactorChallenge $twoFactorChallenge,
     ) {
     }
 
@@ -81,6 +88,10 @@ class SessionController extends BaseAdminController
     {
         if (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse) {
             return $response;
+        }
+
+        if ($this->twoFactorChallenge->pendingAdmin($this->getSession()) instanceof Admin) {
+            return $this->redirectToSessionRoute('admin.two-factor.verify');
         }
 
         return $this->renderLoginPage();
@@ -202,7 +213,7 @@ class SessionController extends BaseAdminController
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
             // Log authentication failure
-            AdminLog::append('admin', 'ADMIN_CREATE_PASSWORD', $ex->getMessage(), $this->getRequest());
+            AdminLog::append('admin', 'ADMIN_CREATE_PASSWORD', $ex->getMessage(), $this->getRequest(), null, false);
 
             $message = $ex->getMessage();
         }
@@ -235,6 +246,9 @@ class SessionController extends BaseAdminController
         }
 
         $this->getSecurityContext()->clearAdminUser();
+        $this->twoFactorChallenge->clear($this->getSession());
+        $this->getSession()->remove(self::TWO_FACTOR_PENDING_SECRET_SESSION_KEY);
+        $this->getSession()->remove(AdminTwoFactorEnrolmentListener::ENROLLED_SESSION_KEY);
 
         // Clear the remember me cookie, if any
         $this->clearRememberMeCookie($this->getRememberMeCookieName());
@@ -267,47 +281,31 @@ class SessionController extends BaseAdminController
 
             /** @var Admin $user */
             $user = $authenticator->getAuthentifiedUser();
+            $rememberMe = (int) $form->get('remember_me')->getData() > 0;
+            $successUrl = $this->retrieveSuccessUrl($adminLoginForm);
+            $successUrl = \is_string($successUrl) ? $successUrl : null;
 
-            // Success -> store user in security context
-            $this->getSecurityContext()->setAdminUser($user);
+            if ($this->twoFactorManager->isEnabledFor($user)) {
+                $this->twoFactorChallenge->start($this->getSession(), $user, $rememberMe, $successUrl);
 
-            // Log authentication success
-            AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
+                AdminLog::append('admin', 'LOGIN', 'Password accepted, second factor required', $request, $user, false);
 
-            $this->applyUserLocale($user);
-
-            if ((int) $form->get('remember_me')->getData() > 0) {
-                // If a remember me field if present and set in the form, create
-                // the cookie thant store "remember me" information
-                $this->createRememberMeCookie(
-                    $user,
-                    $this->getRememberMeCookieName(),
-                    $this->getRememberMeCookieExpiration(),
-                );
+                return $this->redirectToSessionRoute('admin.two-factor.verify');
             }
 
-            $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGIN);
-
-            // Check if we have to ask the user to set its address email.
-            // This is the case if Thelia has been updated from a pre 2.3.0 version
-            if (!str_contains((string) $user->getEmail(), '@')) {
-                return $this->generateRedirectFromRoute('admin.set-email-address');
-            }
-
-            // Redirect to the success URL, passing the cookie if one exists.
-            return $this->generateSuccessRedirect($adminLoginForm);
+            return $this->completeLogin($user, $rememberMe, $successUrl, $eventDispatcher);
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (AuthenticationException $ex) {
             $username = $authenticator instanceof AdminUsernamePasswordFormAuthenticator ? $authenticator->getUsername() : 'unknown';
             // Log authentication failure
-            AdminLog::append('admin', 'LOGIN', \sprintf("Authentication failure for username '%s'", $username), $request);
+            AdminLog::append('admin', 'LOGIN', \sprintf("Authentication failure for username '%s'", $username), $request, null, false);
 
             $message = $this->getTranslator()->trans('Login failed. Please check your username and password.');
         } catch (\Exception $ex) {
             // Log authentication failure
-            AdminLog::append('admin', 'LOGIN', \sprintf('Undefined error: %s', $ex->getMessage()), $request);
+            AdminLog::append('admin', 'LOGIN', \sprintf('Undefined error: %s', $ex->getMessage()), $request, null, false);
 
             $message = $this->getTranslator()->trans(
                 'Unable to process your request. Please try again (%err).',
@@ -319,6 +317,231 @@ class SessionController extends BaseAdminController
 
         // Display the login form again
         return $this->renderLoginPage();
+    }
+
+    public function showTwoFactorAction(): RedirectResponse|Response
+    {
+        if (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse) {
+            return $response;
+        }
+
+        if (!$this->twoFactorChallenge->pendingAdmin($this->getSession()) instanceof Admin) {
+            return $this->redirectToSessionRoute('admin.login');
+        }
+
+        return $this->renderTwoFactorPage();
+    }
+
+    public function checkTwoFactorAction(EventDispatcherInterface $eventDispatcher): RedirectResponse|Response
+    {
+        if (($response = $this->checkAdminLoggedIn()) instanceof RedirectResponse) {
+            return $response;
+        }
+
+        $session = $this->getSession();
+        $admin = $this->twoFactorChallenge->pendingAdmin($session);
+
+        if (!$admin instanceof Admin) {
+            return $this->redirectToSessionRoute('admin.login');
+        }
+
+        $codeForm = $this->createForm(AdminForm::ADMIN_TWO_FACTOR_CODE);
+
+        try {
+            $form = $this->validateForm($codeForm, 'post');
+        } catch (FormValidationException $exception) {
+            $this->setupFormErrorContext('Second factor verification', $exception->getMessage(), $codeForm, $exception);
+
+            return $this->renderTwoFactorPage();
+        }
+
+        $verification = $this->twoFactorManager->verify($admin, (string) $form->get('code')->getData());
+
+        if ($verification->isAccepted()) {
+            $rememberMe = $this->twoFactorChallenge->rememberMeRequested($session);
+            $successUrl = $this->twoFactorChallenge->successUrl($session);
+            $this->twoFactorChallenge->clear($session);
+
+            return $this->completeLogin(
+                $admin,
+                $rememberMe,
+                $successUrl,
+                $eventDispatcher,
+                TwoFactorVerification::BackupCode === $verification ? 'Authentication successful with a backup code' : 'Authentication successful',
+            );
+        }
+
+        $startedFromRememberMeCookie = $this->twoFactorChallenge->startedFromRememberMeCookie($session);
+
+        if (!$this->twoFactorChallenge->recordFailedAttempt($session)) {
+            if ($startedFromRememberMeCookie) {
+                $this->forgetRememberMe($admin);
+            }
+
+            return $this->redirectToSessionRoute('admin.login');
+        }
+
+        $this->setupFormErrorContext(
+            'Second factor verification',
+            $this->getTranslator()->trans('Login failed. Please check your username and password.'),
+            $codeForm,
+        );
+
+        return $this->renderTwoFactorPage();
+    }
+
+    public function cancelTwoFactorAction(): RedirectResponse
+    {
+        $session = $this->getSession();
+        $admin = $this->twoFactorChallenge->pendingAdmin($session);
+
+        if ($admin instanceof Admin && $this->twoFactorChallenge->startedFromRememberMeCookie($session)) {
+            $this->forgetRememberMe($admin);
+        }
+
+        $this->twoFactorChallenge->clear($session);
+
+        return $this->redirectToSessionRoute('admin.login');
+    }
+
+    public function showTwoFactorSetupAction(): RedirectResponse|Response
+    {
+        $admin = $this->getSecurityContext()->getAdminUser();
+
+        if (!$admin instanceof Admin) {
+            return $this->redirectToSessionRoute('admin.login');
+        }
+
+        if ($this->twoFactorManager->isEnabledFor($admin)) {
+            return $this->redirectToSessionRoute('admin');
+        }
+
+        return $this->renderTwoFactorSetupPage($admin);
+    }
+
+    public function confirmTwoFactorSetupAction(): RedirectResponse|Response
+    {
+        $admin = $this->getSecurityContext()->getAdminUser();
+
+        if (!$admin instanceof Admin) {
+            return $this->redirectToSessionRoute('admin.login');
+        }
+
+        if ($this->twoFactorManager->isEnabledFor($admin)) {
+            return $this->redirectToSessionRoute('admin');
+        }
+
+        $codeForm = $this->createForm(AdminForm::ADMIN_TWO_FACTOR_CODE);
+        $secret = $this->pendingSecretOf($admin);
+
+        try {
+            $form = $this->validateForm($codeForm, 'post');
+            $backupCodes = null === $secret ? null : $this->twoFactorManager->confirmEnrolment($admin, $secret, (string) $form->get('code')->getData());
+        } catch (FormValidationException $exception) {
+            $this->setupFormErrorContext('Second factor activation', $exception->getMessage(), $codeForm, $exception);
+
+            return $this->renderTwoFactorSetupPage($admin);
+        }
+
+        if (null === $backupCodes) {
+            $this->setupFormErrorContext(
+                'Second factor activation',
+                $this->getTranslator()->trans('This code does not match. Check the time of your device and try again.'),
+                $codeForm,
+            );
+
+            return $this->renderTwoFactorSetupPage($admin);
+        }
+
+        $this->getSession()->remove(self::TWO_FACTOR_PENDING_SECRET_SESSION_KEY);
+        $this->clearRememberMeCookie($this->getRememberMeCookieName());
+
+        return $this->noStore($this->render('two-factor-backup-codes', ['backup_codes' => $backupCodes]));
+    }
+
+    private function completeLogin(
+        Admin $user,
+        bool $rememberMe,
+        ?string $successUrl,
+        EventDispatcherInterface $eventDispatcher,
+        string $logMessage = 'Authentication successful',
+    ): RedirectResponse {
+        // Success -> store user in security context
+        $this->getSecurityContext()->setAdminUser($user);
+
+        // Log authentication success
+        AdminLog::append('admin', 'LOGIN', $logMessage, $this->getRequest(), $user, false);
+
+        $this->applyUserLocale($user);
+
+        if ($rememberMe) {
+            // If a remember me field if present and set in the form, create
+            // the cookie thant store "remember me" information
+            $this->createRememberMeCookie(
+                $user,
+                $this->getRememberMeCookieName(),
+                $this->getRememberMeCookieExpiration(),
+            );
+        }
+
+        $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGIN);
+
+        // Check if we have to ask the user to set its address email.
+        // This is the case if Thelia has been updated from a pre 2.3.0 version
+        if (!str_contains((string) $user->getEmail(), '@')) {
+            return $this->generateRedirectFromRoute('admin.set-email-address');
+        }
+
+        // Redirect to the success URL, passing the cookie if one exists.
+        return null !== $successUrl ? $this->generateRedirect($successUrl) : $this->redirectToSessionRoute('admin');
+    }
+
+    private function renderTwoFactorPage(): Response
+    {
+        return $this->noStore($this->render('two-factor-verify'));
+    }
+
+    private function renderTwoFactorSetupPage(Admin $admin): Response
+    {
+        $secret = $this->pendingSecretOf($admin);
+
+        if (null === $secret) {
+            $secret = $this->twoFactorManager->newSecret($admin);
+            $this->getSession()->set(self::TWO_FACTOR_PENDING_SECRET_SESSION_KEY, ['admin_id' => (int) $admin->getId(), 'secret' => $secret]);
+        }
+
+        return $this->noStore($this->render('two-factor-setup', [
+            'two_factor_secret' => $secret,
+            'two_factor_provisioning_uri' => $this->twoFactorManager->provisioningUriFor($admin, $secret),
+            'two_factor_required' => $this->twoFactorManager->isRequired(),
+        ]));
+    }
+
+    private function pendingSecretOf(Admin $admin): ?string
+    {
+        $pending = $this->getSession()->get(self::TWO_FACTOR_PENDING_SECRET_SESSION_KEY);
+
+        return \is_array($pending) && ($pending['admin_id'] ?? null) === (int) $admin->getId() && \is_string($pending['secret'] ?? null)
+            ? $pending['secret']
+            : null;
+    }
+
+    private function forgetRememberMe(Admin $admin): void
+    {
+        $admin->setRememberMeToken(null)->save();
+        $this->clearRememberMeCookie($this->getRememberMeCookieName());
+    }
+
+    private function redirectToSessionRoute(string $routeId): RedirectResponse
+    {
+        return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRouteFromRouter('router', $routeId)));
+    }
+
+    private function noStore(Response $response): Response
+    {
+        $response->headers->set('Cache-Control', 'no-store');
+
+        return $response;
     }
 
     protected function renderLoginPage(): Response

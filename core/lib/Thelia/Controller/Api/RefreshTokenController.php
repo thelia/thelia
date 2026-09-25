@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Thelia\Core\Security\RefreshToken\RefreshTokenService;
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
+use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
+use Thelia\Model\Admin;
 
 /**
  * Token refresh endpoints.
@@ -41,6 +43,7 @@ final readonly class RefreshTokenController
         private JWTTokenManagerInterface $jwtManager,
         private AdminUserProvider $adminProvider,
         private CustomerUserProvider $customerProvider,
+        private AdminTwoFactorManager $twoFactorManager,
     ) {
     }
 
@@ -86,9 +89,15 @@ final readonly class RefreshTokenController
             return new JsonResponse(['message' => 'Invalid or expired refresh token.'], 401);
         }
 
+        $secondFactorMark = $user instanceof Admin ? $this->twoFactorManager->enrolmentMarkOf($user) : null;
+
+        if ($user instanceof Admin && ($this->twoFactorManager->mustEnrol($user) || $secondFactorMark !== ($payload['second_factor'] ?? null))) {
+            return new JsonResponse(['message' => 'Invalid or expired refresh token.'], 401);
+        }
+
         return new JsonResponse([
             'token' => $this->jwtManager->create($user),
-            'refresh_token' => $this->refreshTokens->issue($payload['username'], $expectedScope),
+            'refresh_token' => $this->refreshTokens->issue($payload['username'], $expectedScope, $secondFactorMark),
             'refresh_token_ttl' => $this->refreshTokens->ttl(),
         ]);
     }

@@ -66,6 +66,11 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '1 hour',
             ],
+            'admin_two_factor_failures_per_account' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
             // Login attempts on the two API login endpoints. The narrow window is
             // per caller and per identifier, the wide one per caller: one stops
             // passwords being tried on a single account, the other stops one

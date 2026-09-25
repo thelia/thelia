@@ -17,6 +17,7 @@ namespace Thelia\Core\Security\RefreshToken;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
 use Thelia\Model\Admin;
 use Thelia\Model\Customer;
 
@@ -30,6 +31,7 @@ final readonly class AuthenticationSuccessSubscriber implements EventSubscriberI
 {
     public function __construct(
         private RefreshTokenService $refreshTokens,
+        private AdminTwoFactorManager $twoFactorManager,
     ) {
     }
 
@@ -62,7 +64,11 @@ final readonly class AuthenticationSuccessSubscriber implements EventSubscriberI
         }
 
         $data = $event->getData();
-        $data['refresh_token'] = $this->refreshTokens->issue($username, $scope);
+        $data['refresh_token'] = $this->refreshTokens->issue(
+            $username,
+            $scope,
+            $user instanceof Admin ? $this->twoFactorManager->enrolmentMarkOf($user) : null,
+        );
         $data['refresh_token_ttl'] = $this->refreshTokens->ttl();
         $event->setData($data);
     }

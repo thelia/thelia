@@ -478,4 +478,51 @@ WHERE `code` = 'terms_and_conditions'
   AND `content_id` IS NULL
   AND @terms_content_id IS NOT NULL;
 
+-- ---------------------------------------------------------------------
+-- Second factor of the administrator accounts
+--
+-- `admin_two_factor` holds the TOTP secret of an administrator and the last
+-- step it accepted; `admin_two_factor_backup_code` the hashes of the one-time
+-- codes that stand in for the phone. Both go with the account they belong to.
+-- The `admin_two_factor_required` setting, off by default, makes the second
+-- factor mandatory for every administrator: an updated shop keeps signing in
+-- as before until it is turned on.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `admin_two_factor`
+(
+    `admin_id` INTEGER NOT NULL,
+    `secret` VARCHAR(64) NOT NULL COMMENT 'the shared TOTP secret, base32 encoded',
+    `enabled_at` DATETIME COMMENT 'when the administrator proved the secret with a first code',
+    `last_used_step` INTEGER COMMENT 'the last 30-second TOTP step accepted, so that a code cannot be used twice',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`admin_id`),
+    CONSTRAINT `fk_admin_two_factor_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `admin_two_factor_backup_code`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `admin_id` INTEGER NOT NULL,
+    `code_hash` VARCHAR(255) NOT NULL COMMENT 'the password hash of a backup code, never the code itself',
+    `used_at` DATETIME COMMENT 'set when the code was used, a used code is refused',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_admin_two_factor_backup_code_admin_id` (`admin_id`),
+    CONSTRAINT `fk_admin_two_factor_backup_code_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('admin_two_factor_required', '0', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;

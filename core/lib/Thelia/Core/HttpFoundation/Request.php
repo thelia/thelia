@@ -85,9 +85,13 @@ class Request extends BaseRequest
 
     public function toString($withContent = true): string
     {
+        $headers = clone $this->headers;
+        $headers->remove('cookie');
+        $headers->remove('authorization');
+
         $string =
             \sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
-            ."\r\n".$this->headers."\r\n";
+            ."\r\n".$headers."\r\n";
 
         if (true === $withContent) {
             $string .= $this->getContent();
