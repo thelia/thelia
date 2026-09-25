@@ -37,7 +37,13 @@
         "symfony/flex": "^2.4",
         "thelia/flexy": "^1.1",
         "ext-simplexml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "thelia/cheque-module": "^3.0",
+        "thelia/custom-delivery-module": "^4.0",
+        "thelia/free-order-module": "^3.0",
+        "thelia/virtual-product-delivery-module": "^3.0",
+        "thelia/header-highlights-module": "^2.0",
+        "thelia/recently-viewed-module": "^2.1"
     },
     "replace": {
         "thelia/config": "*"
