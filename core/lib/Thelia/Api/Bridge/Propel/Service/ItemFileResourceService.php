@@ -18,14 +18,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Action\Image as ImageAction;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelInterface;
+use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 readonly class ItemFileResourceService
 {
@@ -76,6 +80,11 @@ readonly class ItemFileResourceService
                 ->setPostscriptum($i18n['postscriptum'] ?? '');
         }
 
+        // A translated file lands in the language the request names, the default one otherwise.
+        if ($fileModel instanceof LocalizedFileModelInterface) {
+            $fileModel->setLocale($this->resolveFileLocale($request));
+        }
+
         $fileEvent = new FileCreateOrUpdateEvent($parentId);
         $fileEvent->setModel($fileModel);
         $fileEvent->setUploadedFile($file);
@@ -114,6 +123,64 @@ readonly class ItemFileResourceService
         $event->setResizeMode((string) ImageAction::EXACT_RATIO_WITH_BORDERS);
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+    }
+
+    /**
+     * Gives one language of an image the uploaded file, replacing the one it stored.
+     *
+     * The previous file leaves the storage only when no other language shows it.
+     *
+     * @return string the locale the file was written for
+     */
+    public function replaceItemFileTranslation(
+        LocalizedFileModelInterface $fileModel,
+        string $fileType,
+        Request $request,
+    ): string {
+        /** @var UploadedFile $file */
+        $file = $request->files->get('fileToUpload');
+
+        if (!$file->isValid()) {
+            throw new FileException($file->getErrorMessage());
+        }
+
+        $this->fileProcessorService->validateUpload($file, $fileType);
+        $this->fileProcessorService->sanitizeUpload($file);
+
+        $locale = $this->resolveFileLocale($request);
+
+        $oldModel = clone $fileModel;
+        $fileModel->setLocale($locale);
+
+        $fileEvent = new FileCreateOrUpdateEvent($fileModel->getParentId());
+        $fileEvent->setModel($fileModel);
+        $fileEvent->setOldModel($oldModel);
+        $fileEvent->setUploadedFile($file);
+
+        $this->eventDispatcher->dispatch(
+            $fileEvent,
+            'image' === $fileType ? TheliaEvents::IMAGE_UPDATE : TheliaEvents::DOCUMENT_UPDATE,
+        );
+
+        return $locale;
+    }
+
+    /**
+     * The language a multipart body names under "locale", the default language when it names none.
+     */
+    public function resolveFileLocale(Request $request): string
+    {
+        $locale = $request->request->get('locale');
+
+        if (null === $locale || '' === $locale) {
+            return Lang::getDefaultLanguage()->getLocale();
+        }
+
+        if (null === LangQuery::create()->findOneByLocale((string) $locale)) {
+            throw new UnprocessableEntityHttpException(\sprintf('The locale "%s" is not a language of this shop.', $locale));
+        }
+
+        return (string) $locale;
     }
 
     /**
