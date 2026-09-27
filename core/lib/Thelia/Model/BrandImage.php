@@ -16,18 +16,20 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandImage as BaseBrandImage;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
+use Thelia\Model\Tools\LocalizedFileTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 
-class BrandImage extends BaseBrandImage implements FileModelInterface, BreadcrumbInterface
+class BrandImage extends BaseBrandImage implements LocalizedFileModelInterface, BreadcrumbInterface
 {
     use BrandBreadcrumbTrait;
+    use LocalizedFileTrait;
     use PositionManagementTrait;
 
     /**
@@ -115,10 +117,5 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     public function getQueryInstance(): ModelCriteria
     {
         return BrandImageQuery::create();
-    }
-
-    public function getFile(): string
-    {
-        return parent::getFile();
     }
 }

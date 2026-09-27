@@ -18,9 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
 use Thelia\Api\Resource\ItemFileResourceInterface;
+use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Model\ConfigQuery;
 
 class FileUrlModelToResourceListener implements EventSubscriberInterface
@@ -32,11 +34,19 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
 
     public function addFileUrl(ModelToResourceEvent $modelToResourceEvent): void
     {
-        /** @var ItemFileResourceInterface $resource */
+        /** @var ItemFileResourceInterface&PropelResourceInterface $resource */
         $resource = $modelToResourceEvent->getResource();
 
         if (!$resource instanceof ItemFileResourceInterface) {
             return;
+        }
+
+        // A translated file is read in the language the payload answers in, which the
+        // transformer has just put the model on (?locale=, otherwise the default language).
+        $model = $resource->getPropelModel();
+
+        if ($model instanceof LocalizedFileModelInterface) {
+            $resource->setFile($model->getFile());
         }
 
         $documentType = $resource::getFileType();

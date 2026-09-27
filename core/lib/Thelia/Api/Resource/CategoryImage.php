@@ -34,6 +34,8 @@ use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
+use Thelia\Api\Controller\Admin\PostItemFileTranslationController;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Map\CategoryImageTableMap;
 
 #[ApiResource(
@@ -61,6 +63,21 @@ use Thelia\Model\Map\CategoryImageTableMap;
                     '200' => new Response(description: 'The binary file'),
                 ],
             ),
+        ),
+        new Post(
+            uriTemplate: '/admin/category_images/{id}/file',
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            status: 200,
+            controller: PostItemFileTranslationController::class,
+            openapi: new Operation(
+                summary: 'Sets the file of one language of the image',
+                description: 'Multipart body: `fileToUpload`, and `locale` naming the language (the default language when left out). The file this language stored before leaves the storage unless another language still shows it.',
+            ),
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+            read: false,
+            deserialize: false,
+            write: false,
+            extraProperties: ['admin_access' => AccessManager::UPDATE],
         ),
         new Put(
             uriTemplate: '/admin/category_images/{id}',
