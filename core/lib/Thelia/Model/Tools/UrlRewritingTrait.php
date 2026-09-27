@@ -158,7 +158,7 @@ trait UrlRewritingTrait
         // ModelCriteria::update() writes SQL directly and never instantiates
         // a RewritingUrl object, so the model's postSave/postDelete hooks never
         // run: the cache has to be cleared explicitly here.
-        URL::getInstance()->clearRewritingUrlCache();
+        URL::clearInstanceRewritingUrlCache();
     }
 
     /**
@@ -240,7 +240,7 @@ trait UrlRewritingTrait
 
         // Belt and suspenders alongside RewritingUrl::postSave(): a cache entry set for
         // this key before the url existed must not survive past the write that creates it.
-        URL::getInstance()->clearRewritingUrlCache();
+        URL::clearInstanceRewritingUrlCache();
 
         return $this;
     }

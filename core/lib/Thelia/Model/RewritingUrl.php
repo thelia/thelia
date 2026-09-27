@@ -50,14 +50,14 @@ class RewritingUrl extends BaseRewritingUrl
     {
         parent::postSave($con);
 
-        URL::getInstance()->clearRewritingUrlCache();
+        URL::clearInstanceRewritingUrlCache();
     }
 
     public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
-        URL::getInstance()->clearRewritingUrlCache();
+        URL::clearInstanceRewritingUrlCache();
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool
