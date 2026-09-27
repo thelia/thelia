@@ -143,6 +143,13 @@ final class ImageFormatPolicyTest extends IntegrationTestCase
 
         ConfigQuery::write(ImageFormat::Webp->qualityConfigName(), 'best');
         self::assertSame(ImageFormat::Webp->defaultQuality(), $policy->qualityFor(ImageFormat::Webp));
+
+        // A fractional value outside the scale is not truncated back into it.
+        ConfigQuery::write(ImageFormat::Webp->qualityConfigName(), '100.5');
+        self::assertSame(ImageFormat::Webp->defaultQuality(), $policy->qualityFor(ImageFormat::Webp));
+
+        ConfigQuery::write(ImageFormat::Webp->qualityConfigName(), '0.5');
+        self::assertSame(ImageFormat::Webp->defaultQuality(), $policy->qualityFor(ImageFormat::Webp));
     }
 
     public function testQualityIsReadPerFormat(): void

@@ -88,8 +88,10 @@ final readonly class ImageFormatPolicy
             return $format->defaultQuality();
         }
 
-        $quality = (int) $stored;
+        // The scale is checked on the value as stored: truncating first would let 100.5
+        // through as 100 and 0.5 through as 0.
+        $quality = (float) $stored;
 
-        return $quality >= 1 && $quality <= 100 ? $quality : $format->defaultQuality();
+        return $quality >= 1 && $quality <= 100 ? (int) $quality : $format->defaultQuality();
     }
 }
