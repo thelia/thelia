@@ -78,6 +78,11 @@ class FileManager
         }
 
         $fileName = $this->renameFile($model->getId(), $uploadedFile);
+
+        if ($model instanceof LocalizedFileModelInterface) {
+            $fileName = $this->freeLocalizedFileName($directory, $fileName, (string) $model->getLocale());
+        }
+
         $filePath = $directory.DS.$fileName;
 
         $fileSystem->rename($uploadedFile->getPathname(), $filePath);
@@ -130,11 +135,65 @@ class FileManager
 
     public function deleteFile(FileModelInterface $model): void
     {
-        $url = $model->getUploadDir().DS.$model->getFile();
+        $files = $model instanceof LocalizedFileModelInterface ? $model->getStoredFiles() : [$model->getFile()];
 
-        @unlink(str_replace('..', '', $url));
+        foreach ($files as $file) {
+            @unlink(str_replace('..', '', $model->getUploadDir().DS.$file));
+        }
 
         $model->delete();
+    }
+
+    /**
+     * Removes from storage the file an upload is about to replace.
+     *
+     * A translated file is the one of the language being edited, and it stays on disk
+     * as long as another language still shows it: after an upgrade every language of
+     * an image shares the same file.
+     */
+    public function removeReplacedFile(FileModelInterface $model, FileModelInterface $oldModel): void
+    {
+        if (!$model instanceof LocalizedFileModelInterface) {
+            unlink(str_replace('..', '', $model->getUploadDir().'/'.$oldModel->getFile()));
+
+            return;
+        }
+
+        $file = $model->getOwnFile();
+
+        if (null === $file || $model->isFileUsedByAnotherLocale($file)) {
+            return;
+        }
+
+        $path = str_replace('..', '', $model->getUploadDir().'/'.$file);
+
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
+
+    /**
+     * A name no stored file carries yet: two languages uploading files of the same name
+     * would otherwise write over each other.
+     */
+    private function freeLocalizedFileName(string $directory, string $fileName, string $locale): string
+    {
+        if (!file_exists($directory.DS.$fileName)) {
+            return $fileName;
+        }
+
+        $extension = pathinfo($fileName, \PATHINFO_EXTENSION);
+        $baseName = pathinfo($fileName, \PATHINFO_FILENAME).'-'.$this->sanitizeFileName($locale);
+        $suffix = '' === $extension ? '' : '.'.$extension;
+        $candidate = $baseName.$suffix;
+        $counter = 1;
+
+        while (file_exists($directory.DS.$candidate)) {
+            $candidate = $baseName.'-'.$counter.$suffix;
+            ++$counter;
+        }
+
+        return $candidate;
     }
 
     public function renameFile(int $modelId, UploadedFile $uploadedFile): string
