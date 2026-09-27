@@ -13,18 +13,6 @@ parameters:
 			path: core/lib/Thelia/Action/Image.php
 
 		-
-			message: '#^Caught class ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Api/Bridge/Propel/Service/ApiResourcePropelTransformerService.php
-
-		-
-			message: '#^Instantiated class ApiPlatform\\Symfony\\Validator\\Exception\\ValidationException not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Api/Bridge/Propel/Service/ApiResourcePropelTransformerService.php
-
-		-
 			message: '#^Call to an undefined method Thelia\\Api\\Resource\\Sale\:\:getLocale\(\)\.$#'
 			identifier: method.notFound
 			count: 1
