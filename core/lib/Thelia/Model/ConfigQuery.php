@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Media\Service\ImageFormatPolicy;
 use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 
 /**
@@ -295,13 +296,13 @@ class ConfigQuery extends BaseConfigQuery
      *
      * The raw stored value, a comma-separated list:
      * {@see \Thelia\Domain\Media\Enum\ImageFormat} turns it into formats and drops what
-     * it does not know, and {@see \Thelia\Domain\Media\Service\ImageFormatPolicy} drops
+     * it does not know, and {@see ImageFormatPolicy} drops
      * what the server cannot write. Empty means the shop serves the source format only,
      * which is what a shop upgrading from an earlier version keeps.
      */
     public static function getImageFormats(): string
     {
-        return (string) self::read('image_formats', '');
+        return (string) self::read(ImageFormatPolicy::FORMATS_CONFIG_NAME, '');
     }
 
     /**

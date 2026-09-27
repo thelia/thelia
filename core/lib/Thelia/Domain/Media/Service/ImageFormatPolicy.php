@@ -46,7 +46,7 @@ final readonly class ImageFormatPolicy
     public function activeFormats(): array
     {
         return array_values(array_filter(
-            ImageFormat::listFromStoredValue(ConfigQuery::read(self::FORMATS_CONFIG_NAME, '')),
+            ImageFormat::listFromStoredValue(ConfigQuery::getImageFormats()),
             fn (ImageFormat $format): bool => $this->capabilities->supports($format)
         ));
     }
@@ -62,7 +62,7 @@ final readonly class ImageFormatPolicy
     public function unsupportedActiveFormats(): array
     {
         return array_values(array_filter(
-            ImageFormat::listFromStoredValue(ConfigQuery::read(self::FORMATS_CONFIG_NAME, '')),
+            ImageFormat::listFromStoredValue(ConfigQuery::getImageFormats()),
             fn (ImageFormat $format): bool => !$this->capabilities->supports($format)
         ));
     }
