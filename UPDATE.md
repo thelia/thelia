@@ -53,6 +53,42 @@ php Thelia cache:warmup --env=prod
 
 In development, `var/cache/dev` and `var/propel/dev` are the ones to remove.
 
+## Converting a database migrated from Thelia 2 to utf8mb4
+
+Thelia 2 created its tables in `utf8` (`utf8mb3`) and the migration keeps them in it. Thelia 3
+connects in `utf8mb4`, and a fresh install creates its tables in `utf8mb4`. On a migrated shop
+the database refuses an emoji, or any other character outside the Basic Multilingual Plane,
+with error 1366 ("Incorrect string value"), while a fresh install stores it.
+
+The update script does not convert these tables. The conversion rebuilds each table and locks
+it for writes while it runs, for a time that grows with its size, so you run it yourself, once,
+during a maintenance window. List what would change first:
+
+```bash
+php bin/console thelia:database:convert-utf8mb4
+```
+
+The command lists each table that is not in `utf8mb4` with its columns and approximate size.
+It flags the tables it moves from the `COMPACT` to the `DYNAMIC` row format: in `COMPACT`,
+InnoDB caps an index at 767 bytes, a `VARCHAR(255)` in `utf8mb4` needs 1020, and the fresh
+install creates its tables in `DYNAMIC`. It also names what it cannot convert on its own and
+converts nothing until that is settled: a text column used by a foreign key, or an index longer
+than the engine accepts. A table in another character set, such as `latin1`, is reported and
+left alone, because its bytes may be UTF-8 written through a `latin1` connection.
+
+Back the database up, then convert:
+
+```bash
+php bin/console thelia:database:convert-utf8mb4 --force
+```
+
+Each table moves to `utf8mb4` with `utf8mb4_general_ci`, the collation of the fresh install,
+and its `TEXT` columns stay `TEXT`. The database default follows, so a module installed later
+creates its tables in `utf8mb4`. If a table fails, the command stops there and prints the
+database error. The tables converted before it stay converted, and the next run picks up the
+rest. `--table=<name>`, repeated, converts only the named tables, which lets you spread the
+largest ones over several windows.
+
 ## Release notes
 
 ### Moving from 3.0.0 to 3.1.0
