@@ -102,6 +102,32 @@ final class ImageFormatPolicyTest extends IntegrationTestCase
         self::assertSame($unsupported, $policy->unsupportedActiveFormats());
     }
 
+    /**
+     * The variants are encoded by LiipImagine, whose driver is set in its own configuration.
+     * The capabilities answer for that library, whatever imagine_graphic_driver says: a
+     * shop set to Imagick there while LiipImagine runs on GD must not be told a format
+     * is writable by a library the variants never go through.
+     */
+    public function testTheCapabilitiesAnswerForTheDriverThatEncodesTheVariants(): void
+    {
+        $previousDriver = ConfigQuery::read('imagine_graphic_driver', 'gd');
+        ConfigQuery::write('imagine_graphic_driver', 'imagick');
+
+        try {
+            $imagine = static::getContainer()->get('liip_imagine');
+            $encodingDriver = match (true) {
+                $imagine instanceof \Imagine\Imagick\Imagine => 'imagick',
+                $imagine instanceof \Imagine\Gmagick\Imagine => 'gmagick',
+                default => 'gd',
+            };
+
+            self::assertSame($encodingDriver, (new ImageFormatCapabilities($imagine))->driver());
+            self::assertSame($encodingDriver, static::getContainer()->get(ImageFormatCapabilities::class)->driver());
+        } finally {
+            ConfigQuery::write('imagine_graphic_driver', $previousDriver);
+        }
+    }
+
     public function testQualityFallsBackToTheFormatDefaultWhenUnsetOrOutOfScale(): void
     {
         $policy = new ImageFormatPolicy();

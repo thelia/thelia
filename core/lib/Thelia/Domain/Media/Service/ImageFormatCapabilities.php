@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Media\Service;
 
+use Imagine\Gmagick\Imagine as GmagickImagine;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Domain\Media\Enum\ImageFormat;
-use Thelia\Model\ConfigQuery;
 
 /**
  * Which image formats this server can actually write.
@@ -28,6 +31,18 @@ use Thelia\Model\ConfigQuery;
  */
 final readonly class ImageFormatCapabilities
 {
+    /**
+     * @param ImagineInterface|null $imagine the Imagine instance the variants are encoded
+     *                                       with: LiipImagine's, whose driver is set in its
+     *                                       own configuration. Without one, GD is assumed,
+     *                                       the driver LiipImagine uses unless told otherwise.
+     */
+    public function __construct(
+        #[Autowire(service: 'liip_imagine')]
+        private ?ImagineInterface $imagine = null,
+    ) {
+    }
+
     /**
      * The formats this server can write, in the order a browser is offered them.
      *
@@ -48,14 +63,20 @@ final readonly class ImageFormatCapabilities
     }
 
     /**
-     * The graphics library the shop is configured to use.
+     * The graphics library the variants are actually encoded with.
      *
-     * The same setting drives the core's own image pipeline, so a shop that switches
-     * driver changes what it can produce in one place.
+     * It is read off the Imagine instance LiipImagine encodes with, not off the shop's
+     * imagine_graphic_driver setting: that setting drives the core's own image pipeline,
+     * and a shop set to Imagick there while LiipImagine runs on GD would be told a format
+     * is writable by a library the variants never go through.
      */
     public function driver(): string
     {
-        return strtolower((string) ConfigQuery::read('imagine_graphic_driver', 'gd'));
+        return match (true) {
+            $this->imagine instanceof ImagickImagine => 'imagick',
+            $this->imagine instanceof GmagickImagine => 'gmagick',
+            default => 'gd',
+        };
     }
 
     private function gdWrites(ImageFormat $format): bool
