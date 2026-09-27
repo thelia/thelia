@@ -210,4 +210,10 @@ DEALLOCATE PREPARE add_column_statement;
 -- and the back office already give a filter that has none. Replaying it changes nothing.
 UPDATE `choice_filter` SET `type` = 'checkbox' WHERE `type` IS NULL OR `type` = '';
 
+-- 2.3.0-alpha2 added the password renewal token as NOT NULL without a default, while the fresh
+-- install lets it be NULL. On a shop upgraded across that version, creating an administrator
+-- (the token is left out of the INSERT) and changing a password (the token is emptied) both
+-- failed. MODIFY gives the column its fresh install definition; replaying it changes nothing.
+ALTER TABLE `admin` MODIFY `password_renew_token` VARCHAR(255) NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
