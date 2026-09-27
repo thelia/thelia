@@ -305,14 +305,6 @@ class Update
     {
         $database = new Database($this->connection);
 
-        if (!$this->checkBackupIsPossible()) {
-            $message = 'Your database is too big for an automatic backup';
-
-            $this->log('error', $message);
-
-            throw new UpdateException($message);
-        }
-
         $this->backupFile = THELIA_ROOT.$this->backupDir.'update.sql';
         $backupDir = THELIA_ROOT.$this->backupDir;
 
@@ -514,21 +506,16 @@ class Update
     /**
      * Checks whether it is possible to make a data base backup.
      *
-     * The backup accumulates the whole dump in memory, so a finite memory_limit
-     * caps the database size the backup can handle. A negative memory_limit
-     * means unlimited memory: the backup is always possible.
+     * It used to refuse any database larger than an eighth of memory_limit, because
+     * the backup built the whole dump in memory. The dump is now written as it is
+     * read and takes the same memory whatever the size of the database, so memory no
+     * longer decides it and backupDb() no longer asks.
+     *
+     * @deprecated since Thelia 3.2, always true: the backup no longer depends on memory_limit
      */
     public function checkBackupIsPossible(): bool
     {
-        $memoryLimit = self::parseMemoryLimit(\ini_get('memory_limit'));
-
-        if ($memoryLimit < 0) {
-            return true;
-        }
-
-        $memoryLimitInMegabytes = $memoryLimit / (1024 ** 2);
-
-        return !($this->getDataBaseSize() > ($memoryLimitInMegabytes - 64) / 8);
+        return true;
     }
 
     /**

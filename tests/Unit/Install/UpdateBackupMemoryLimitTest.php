@@ -19,11 +19,14 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Core\Install\Update;
 
 /**
- * `Update::checkBackupIsPossible()` sizes the pre-update backup against
- * `memory_limit`, so its parsing has to follow the php.ini shorthand-byte
- * semantics: a negative value means unlimited, k/m/g suffixes are
- * case-insensitive, a bare number is bytes, and a fractional prefix such
- * as "0.5G" is truncated to its integer part exactly as PHP truncates it.
+ * `Update::parseMemoryLimit()` follows the php.ini shorthand-byte semantics:
+ * a negative value means unlimited, k/m/g suffixes are case-insensitive, a
+ * bare number is bytes, and a fractional prefix such as "0.5G" is truncated
+ * to its integer part exactly as PHP truncates it.
+ *
+ * `Update::checkBackupIsPossible()` used to size the pre-update backup against
+ * `memory_limit` and refused any database larger than an eighth of it. The
+ * backup now streams, so no memory_limit may refuse it any more.
  */
 final class UpdateBackupMemoryLimitTest extends TestCase
 {
@@ -49,42 +52,21 @@ final class UpdateBackupMemoryLimitTest extends TestCase
         yield 'no leading digits' => ['abc', 0];
     }
 
-    public function testBackupIsAlwaysPossibleWhenMemoryIsUnlimited(): void
+    #[DataProvider('memoryLimitsAndDatabaseSizes')]
+    public function testNoMemoryLimitRefusesTheBackupAnyMore(string $memoryLimit, float $databaseSizeInMegabytes): void
     {
-        $update = $this->updateWithDatabaseSize(100000.0);
+        $update = $this->updateWithDatabaseSize($databaseSizeInMegabytes);
 
-        self::assertTrue($this->checkBackupWithMemoryLimit($update, '-1'));
+        self::assertTrue($this->checkBackupWithMemoryLimit($update, $memoryLimit));
     }
 
-    public function testBackupIsPossibleWhenTheDatabaseFitsUnderTheFiniteLimit(): void
+    public static function memoryLimitsAndDatabaseSizes(): iterable
     {
-        $update = $this->updateWithDatabaseSize(10.0);
-
-        // (512 - 64) / 8 = 56 MB allowed
-        self::assertTrue($this->checkBackupWithMemoryLimit($update, '512M'));
-    }
-
-    public function testBackupIsRefusedWhenTheDatabaseExceedsTheFiniteLimit(): void
-    {
-        $update = $this->updateWithDatabaseSize(100.0);
-
-        self::assertFalse($this->checkBackupWithMemoryLimit($update, '512M'));
-    }
-
-    public function testBackupIsPossibleWhenTheLimitIsGivenAsBareBytes(): void
-    {
-        $update = $this->updateWithDatabaseSize(5.0);
-
-        // 134217728 bytes = 128 MB, (128 - 64) / 8 = 8 MB allowed
-        self::assertTrue($this->checkBackupWithMemoryLimit($update, '134217728'));
-    }
-
-    public function testBackupIsRefusedWhenTheLimitIsTooSmallForTheDump(): void
-    {
-        $update = $this->updateWithDatabaseSize(5.0);
-
-        // (96 - 64) / 8 = 4 MB allowed, the 5 MB database does not fit
-        self::assertFalse($this->checkBackupWithMemoryLimit($update, '96M'));
+        yield 'unlimited' => ['-1', 100000.0];
+        yield 'a database larger than an eighth of the limit' => ['512M', 100.0];
+        yield 'a limit given as bare bytes' => ['134217728', 20.0];
+        yield 'a limit barely above the old 64 MB reserve' => ['96M', 5.0];
+        yield 'a 2.8 GB database under a 512 MB limit' => ['512M', 2867.0];
     }
 
     private function checkBackupWithMemoryLimit(Update $update, string $memoryLimit): bool
