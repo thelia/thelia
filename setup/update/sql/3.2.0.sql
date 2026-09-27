@@ -205,4 +205,9 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- The display type of a filter arrived empty in 3.0.0-alpha1: a shop upgraded from Thelia 2
+-- carries its choice_filter rows without one. They get the checkbox list, the type the storefront
+-- and the back office already give a filter that has none. Replaying it changes nothing.
+UPDATE `choice_filter` SET `type` = 'checkbox' WHERE `type` IS NULL OR `type` = '';
+
 SET FOREIGN_KEY_CHECKS = 1;
