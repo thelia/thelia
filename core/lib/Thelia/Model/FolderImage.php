@@ -17,18 +17,20 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\FolderImage as BaseFolderImage;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
+use Thelia\Model\Tools\LocalizedFileTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 
-class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileModelInterface
+class FolderImage extends BaseFolderImage implements BreadcrumbInterface, LocalizedFileModelInterface
 {
     use FolderBreadcrumbTrait;
+    use LocalizedFileTrait;
     use PositionManagementTrait;
 
     /**
@@ -121,10 +123,5 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
     public function getQueryInstance(): ModelCriteria
     {
         return FolderImageQuery::create();
-    }
-
-    public function getFile(): string
-    {
-        return parent::getFile();
     }
 }
