@@ -34,6 +34,24 @@ final class NewsletterActionTest extends ActionIntegrationTestCase
         self::assertSame(0, (int) $newsletter->getUnsubscribed());
     }
 
+    /**
+     * An anonymous subscription (email only, e.g. a footer form with no name
+     * fields) never calls setFirstname()/setLastname(). subscribe() reads
+     * both unconditionally to fill the Newsletter row, and used to crash on
+     * the uninitialized typed properties instead of storing an empty name.
+     */
+    public function testSubscribeWithNoNameDoesNotCrash(): void
+    {
+        $event = new NewsletterEvent('anonymous+nltest@example.com', 'en_US');
+
+        $this->dispatch($event, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+
+        $newsletter = $event->getNewsletter();
+        self::assertNotNull($newsletter);
+        self::assertSame('', $newsletter->getFirstname());
+        self::assertSame('', $newsletter->getLastname());
+    }
+
     public function testSubscribeReactivatesAPreviouslyUnsubscribedEmail(): void
     {
         $first = new NewsletterEvent('again+nltest@example.com', 'en_US');

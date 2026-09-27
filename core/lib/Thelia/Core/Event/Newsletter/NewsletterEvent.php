@@ -27,11 +27,18 @@ class NewsletterEvent extends ActionEvent
     /** @var string email to save */
     protected string $id;
 
-    /** @var string first name subscriber */
-    protected string $firstname;
+    /**
+     * Anonymous newsletter subscriptions (email only) never call
+     * setFirstname()/setLastname(): the columns are optional (see
+     * local/config/schema.xml), and every consumer already reads these
+     * through getFirstname()/getLastname() unconditionally
+     * (Action\Newsletter::subscribe(), ::update(), ::confirmSubscription()).
+     * Without a default, that read crashed with "must not be accessed
+     * before initialization" instead of just carrying an empty name.
+     */
+    protected string $firstname = '';
 
-    /** @var string last name subscriber */
-    protected string $lastname;
+    protected string $lastname = '';
 
     protected Newsletter $newsletter;
 
