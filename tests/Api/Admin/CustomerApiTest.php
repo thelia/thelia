@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Test\ApiTestCase;
 
@@ -41,6 +42,47 @@ final class CustomerApiTest extends ApiTestCase
         self::assertSame(422, $response->getStatusCode(), $response->getContent());
         self::assertStringContainsString('firstname', $response->getContent());
         self::assertNull(CustomerQuery::create()->findOneByEmail('no-name@example.com'));
+    }
+
+    /**
+     * The addresses posted with a customer are validated one by one while they
+     * are turned into models. A violation found there must name the address it
+     * comes from, otherwise the client reads "label" on a customer, which has
+     * no such field, and cannot tell which of its addresses is at fault.
+     */
+    public function testAViolationInAPostedAddressNamesThatAddress(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $title = $this->createFixtureFactory()->customerTitle();
+        $country = CountryQuery::create()->findOneByIsoalpha3('FRA');
+        self::assertNotNull($country);
+
+        $address = [
+            'label' => 'Home',
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'address1' => '1 rue de la Paix',
+            'zipcode' => '63000',
+            'city' => 'Clermont-Ferrand',
+            'country' => '/api/admin/countries/'.$country->getId(),
+            'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
+        ];
+
+        $response = $this->jsonRequest('POST', '/api/admin/customers', [
+            'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'email' => 'nested-address@example.com',
+            'password' => 'Password1!',
+            'addresses' => [$address, ['label' => ''] + $address],
+        ], $token);
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        $error = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame(['addresses[1].label'], array_column($error['violations'], 'propertyPath'));
+        self::assertSame('addresses[1].label: This value should not be blank.', $error['detail']);
+        self::assertNull(CustomerQuery::create()->findOneByEmail('nested-address@example.com'));
     }
 
     public function testGetCustomerReturnsResource(): void
