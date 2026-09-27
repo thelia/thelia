@@ -33,6 +33,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Module\Exception\ModuleException;
+use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
@@ -50,6 +51,7 @@ use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\State;
 use Thelia\Tools\Image;
 
 class BaseModule implements BaseModuleInterface
@@ -441,7 +443,7 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * A convenient method to get the current order total, with or without tax, discount or postage.
-     * This method operates on the order currently in the user's session, and should not be used to
+     * This method operates on the cart being paid, or the cart of the user's session, and should not be used to
      * get the total amount of an order already stored in the database. For such orders, use
      * Order::getTotalAmount() method.
      *
@@ -453,34 +455,50 @@ class BaseModule implements BaseModuleInterface
      */
     public function getCurrentOrderTotalAmount(bool $with_tax = true, bool $with_discount = true, bool $with_postage = true): float|int
     {
-        /** @var Session $session */
-        $session = $this->getRequest()->getSession();
+        $cart = $this->getContainer()->get(PaymentCartContext::class)->cart() ?? $this->getSessionCart();
 
-        /** @var Cart $cart */
-        $cart = $session->getSessionCart($this->getDispatcher());
+        if (!$cart instanceof Cart) {
+            return 0;
+        }
 
-        /** @var Order $order */
-        $order = $session->getOrder();
+        [$country, $state] = $this->taxationPlaceOf($cart);
+
+        return $with_tax
+            ? $cart->getTaxedAmount($country, $with_discount, $state, $with_postage)
+            : $cart->getTotalAmount($with_discount, $country, $state, $with_postage);
+    }
+
+    private function getSessionCart(): ?Cart
+    {
+        $request = $this->hasRequest() ? $this->request : $this->getContainer()->get('request_stack')->getMainRequest();
+        $session = $request?->hasSession() ? $request->getSession() : null;
+
+        return $session instanceof Session ? $session->getSessionCart($this->getDispatcher()) : null;
+    }
+
+    /**
+     * @return array{0: Country, 1: State|null}
+     */
+    private function taxationPlaceOf(Cart $cart): array
+    {
+        $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $country = $deliveryAddress?->getCountry();
+
+        if ($country instanceof Country) {
+            return [$country, $deliveryAddress->getState()];
+        }
+
+        $defaultAddress = $cart->getCustomer()?->getDefaultAddress();
+        $country = $defaultAddress?->getCountry();
+
+        if ($country instanceof Country) {
+            return [$country, $defaultAddress->getState()];
+        }
 
         /** @var TaxEngine $taxEngine */
         $taxEngine = $this->getContainer()->get('thelia.taxEngine');
 
-        /** @var Country $country */
-        $country = $taxEngine->getDeliveryCountry();
-
-        $state = $taxEngine->getDeliveryState();
-
-        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount, $state) : $cart->getTotalAmount($with_discount, $country, $state);
-
-        if ($with_postage) {
-            if ($with_tax) {
-                $amount += $order->getPostage();
-            } else {
-                $amount += $order->getPostage() - $order->getPostageTax();
-            }
-        }
-
-        return $amount;
+        return [$taxEngine->getDeliveryCountry(), $taxEngine->getDeliveryState()];
     }
 
     public static function getCompilers(): array

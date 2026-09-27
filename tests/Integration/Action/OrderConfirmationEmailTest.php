@@ -21,6 +21,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -60,6 +61,7 @@ final class OrderConfirmationEmailTest extends IntegrationTestCase
             $this->getService(GuestOrderAccessService::class),
             $this->getService(URL::class),
             $this->getService(OrderStatusTransitionGuard::class),
+            $this->getService(PaymentCartContext::class),
         );
     }
 

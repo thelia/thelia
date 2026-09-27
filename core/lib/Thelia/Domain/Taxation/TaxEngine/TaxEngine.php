@@ -17,7 +17,7 @@ namespace Thelia\Domain\Taxation\TaxEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Thelia\Model\Cart;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Country;
 use Thelia\Model\Customer;
 use Thelia\Model\State;
@@ -46,8 +46,8 @@ class TaxEngine
      */
     public function getDeliveryCountry(): Country
     {
-        /** @var Cart $cart */
-        $cart = $this->getSession()->getSessionCart($this->dispatcher);
+        $session = $this->getSession();
+        $cart = $session instanceof Session ? $session->getSessionCart($this->dispatcher) : null;
         $currentDeliveryAddress = null;
 
         if ($cart) {
@@ -102,6 +102,8 @@ class TaxEngine
 
     protected function getSession(): ?SessionInterface
     {
-        return $this->requestStack->getMainRequest()?->getSession();
+        $request = $this->requestStack->getMainRequest();
+
+        return $request?->hasSession() ? $request->getSession() : null;
     }
 }

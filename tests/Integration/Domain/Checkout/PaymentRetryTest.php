@@ -93,6 +93,30 @@ final class PaymentRetryTest extends IntegrationTestCase
     }
 
     /**
+     * A retry runs without the session that placed the order, as the front API does. The
+     * module still prices the cart being paid, as it did on the first attempt.
+     */
+    public function testARetriedPaymentPricesTheCartBeingPaid(): void
+    {
+        [$cart] = $this->cartReadyToPay(RetryingPaymentModule::getModuleCode());
+        $module = new RetryingPaymentModule();
+        $module->setContainer(static::getContainer());
+
+        $amountsSeen = [];
+        $this->listen(TheliaEvents::MODULE_PAY, static function () use ($module, &$amountsSeen): void {
+            $amountsSeen[] = $module->getCurrentOrderTotalAmount();
+        }, priority: 1024);
+
+        $first = $this->pay($cart);
+        $second = $this->pay($cart);
+
+        self::assertSame($first->getId(), $second->getId(), 'The second attempt is a retry of the same order.');
+        self::assertCount(2, $amountsSeen);
+        self::assertGreaterThan(0, $amountsSeen[0], 'The first attempt prices the cart.');
+        self::assertEqualsWithDelta($amountsSeen[0], $amountsSeen[1], 0.001, 'The retry prices the same cart.');
+    }
+
+    /**
      * The order stops describing its cart as soon as a module rewrites it. A pickup module
      * replaces the delivery address with the store's, which is what every click and collect shop
      * does, and the buyer's address is nowhere on the order any more.

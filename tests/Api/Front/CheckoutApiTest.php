@@ -17,6 +17,7 @@ namespace Thelia\Tests\Api\Front;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
@@ -41,6 +42,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -146,6 +148,88 @@ final class CheckoutApiTest extends ApiTestCase
         $order = $this->jsonRequest('GET', '/api/front/account/orders/'.$placed['orderId'], token: $token);
         self::assertJsonResponseSuccessful($order);
         self::assertSame($placed['orderReference'], $this->decode($order)['ref']);
+    }
+
+    public function testAPaymentModuleJudgingTheCartItPricesAcceptsAPlacementWithoutSession(): void
+    {
+        $checkout = $this->readyCheckout(judgePaymentForReal: true);
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $validation = $this->jsonRequest('GET', $this->url($cartId, 'validation'), token: $token);
+        self::assertJsonResponseSuccessful($validation);
+        self::assertSame(['ready' => true, 'violations' => []], $this->decode($validation));
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+        self::assertJsonResponseSuccessful($placement);
+        $placed = $this->decode($placement);
+
+        self::assertFalse($placed['paid']);
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $placed['orderStatusCode']);
+        self::assertSame($checkout['paymentModule']->getId(), OrderQuery::create()->findPk($placed['orderId'])?->getPaymentModuleId());
+    }
+
+    public function testTheAmountAPaymentModuleIsAskedToCollectIsTheTotalOfTheOrderItPays(): void
+    {
+        $checkout = $this->readyCheckout(judgePaymentForReal: true);
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $amountSeenWhilePaying = null;
+        $this->listen(TheliaEvents::MODULE_PAY, static function (OrderPaymentEvent $event) use (&$amountSeenWhilePaying): void {
+            $module = ModuleQuery::create()->findPk($event->getOrder()->getPaymentModuleId())?->getPaymentModuleInstance(static::getContainer());
+            self::assertInstanceOf(BaseModule::class, $module);
+            $amountSeenWhilePaying = $module->getCurrentOrderTotalAmount();
+        });
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+        self::assertJsonResponseSuccessful($placement);
+
+        $order = OrderQuery::create()->findPk($this->decode($placement)['orderId']);
+        self::assertNotNull($order);
+        self::assertGreaterThan(self::POSTAGE_AMOUNT, $order->getTotalAmount());
+        self::assertEqualsWithDelta($order->getTotalAmount(), $amountSeenWhilePaying, 0.001);
+    }
+
+    public function testTheFreeOrderModuleRefusesACartThatCostsSomething(): void
+    {
+        $checkout = $this->readyCheckout(judgePaymentForReal: true);
+        $checkout['paymentModule'] = ModuleQuery::create()->findOneByCode('FreeOrder')
+            ?? throw new \RuntimeException('No FreeOrder module installed — run bin/test-prepare.');
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(422, $placement->getStatusCode());
+        self::assertContains(CheckoutViolationCode::PaymentInvalid->value, array_column($this->decode($placement)['violations'], 'code'));
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    public function testAPaymentModuleJudgingTheCartItPricesStillRefusesACartWorthNothing(): void
+    {
+        $checkout = $this->readyCheckout(judgePaymentForReal: true);
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        foreach ($checkout['cart']->getCartItems() as $cartItem) {
+            $cartItem->setPrice('0')->setPromoPrice('0')->save($this->getPropelConnection());
+        }
+        $checkout['cart']->setPostage('0')->setPostageTax('0')->save($this->getPropelConnection());
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(422, $placement->getStatusCode());
+        self::assertContains(CheckoutViolationCode::PaymentInvalid->value, array_column($this->decode($placement)['violations'], 'code'));
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
     }
 
     /**
@@ -725,7 +809,7 @@ final class CheckoutApiTest extends ApiTestCase
     /**
      * @return array{cart: Cart, customer: Customer, address: Address, country: Country, deliveryModule: Module, paymentModule: Module, product: Product}
      */
-    private function readyCheckout(bool $virtual = false): array
+    private function readyCheckout(bool $virtual = false, bool $judgePaymentForReal = false): array
     {
         $factory = $this->createFixtureFactory();
         $country = $factory->country();
@@ -737,7 +821,9 @@ final class CheckoutApiTest extends ApiTestCase
 
         $this->serveCountryWith($deliveryModule, $country);
         $this->answerDeliveryQuoteWith(valid: true);
-        $this->answerPaymentValidityWith(valid: true);
+        if (!$judgePaymentForReal) {
+            $this->answerPaymentValidityWith(valid: true);
+        }
 
         $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
         $address = $factory->address($customer, $country);
