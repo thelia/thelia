@@ -73,9 +73,14 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         $resolver = $this->resolveRewritingData($pathInfo);
 
         $this->rejectObsoleteUrl($resolver);
+
+        // A pure redirect row (view/viewId/locale all NULL, redirected set) is not a page:
+        // it carries no locale of its own, so it must be sent to its target before either
+        // locale check below reads $resolver->locale/view, which is null for such a row.
+        $this->maybeRedirectForManualRedirect($resolver);
+
         $this->maybeRedirectForRequestedLocale($request, $resolver);
         $this->ensureActiveLocaleOrRedirect($resolver);
-        $this->maybeRedirectForManualRedirect($resolver);
 
         $this->applyRewritingAttributes($request, $resolver);
 
@@ -197,7 +202,10 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             ->filterByRedirected(null, Criteria::ISNULL)
             ->findOne();
 
-        $this->redirect(URL::getInstance()->absoluteUrl($redirect?->getUrl()), 301);
+        // A pure alias row (no view/viewId/locale of its own, e.g. a legacy url
+        // migrated with no page behind it) cannot be looked up this way: fall
+        // back to the target url the resolver's join already resolved.
+        $this->redirect(URL::getInstance()->absoluteUrl($redirect?->getUrl() ?? $resolver->redirectedToUrl), 301);
     }
 
     private function applyRewritingAttributes(Request $request, RewritingResolver $resolver): void
