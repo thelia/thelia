@@ -107,6 +107,26 @@ final class DatabaseBackupTest extends IntegrationTestCase
         self::assertSame($before, $this->rows());
     }
 
+    public function testBinaryBytesComeBackAsTheyWentIn(): void
+    {
+        // Every byte value, then the ones an escaper has to get right: NUL, quotes,
+        // backslash, CR, LF and CTRL-Z, and a lone utf8mb4 lead byte before a quote.
+        $bytes = implode('', array_map(\chr(...), range(0, 255)))."\0'\"\\\r\n\x1a\xF0'";
+
+        $statement = $this->connection()->prepare(
+            'INSERT INTO `'.self::TABLE.'` (`nullable_int`, `payload`, `binary_payload`) VALUES (NULL, NULL, ?)',
+        );
+        $statement->bindValue(1, $bytes, \PDO::PARAM_LOB);
+        $statement->execute();
+        $before = $this->rows();
+
+        $this->database()->backupDb($this->dumpFile, [self::TABLE]);
+        $this->database()->restoreDb($this->dumpFile);
+
+        self::assertSame($before, $this->rows());
+        self::assertSame($bytes, $this->rows()[0]['binary_payload']);
+    }
+
     public function testANullIsDumpedAsNullRatherThanAnEmptyString(): void
     {
         $this->insert(null, 'anything');
@@ -184,6 +204,7 @@ final class DatabaseBackupTest extends IntegrationTestCase
                 `id` INTEGER NOT NULL AUTO_INCREMENT,
                 `nullable_int` INTEGER NULL,
                 `payload` LONGTEXT NULL,
+                `binary_payload` LONGBLOB NULL,
                 PRIMARY KEY (`id`)
             ) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\'',
         );
