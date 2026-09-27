@@ -205,6 +205,22 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- A shop upgraded from Thelia 2 still carries these columns as the Thelia 2 install and scripts
+-- created them: NOT NULL without a default, and a DATE for the invoice date. Propel leaves out of
+-- an INSERT every column it has nothing to write, the model default included, so the database
+-- refused a folder created at the root and a coupon, a currency, a state or an order status saved
+-- without their optional value, and the invoice date lost its time on every write. MODIFY gives
+-- each column its fresh install definition; replaying it changes nothing.
+ALTER TABLE `folder` MODIFY `parent` INTEGER DEFAULT 0 NOT NULL;
+ALTER TABLE `folder_version` MODIFY `parent` INTEGER DEFAULT 0 NOT NULL;
+ALTER TABLE `coupon` MODIFY `expiration_date` DATETIME NULL;
+ALTER TABLE `coupon_version` MODIFY `expiration_date` DATETIME NULL;
+ALTER TABLE `currency` MODIFY `format` CHAR(10) NULL;
+ALTER TABLE `state` MODIFY `isocode` VARCHAR(4) NULL;
+ALTER TABLE `order_status` MODIFY `color` CHAR(7) NULL, MODIFY `position` INTEGER NULL;
+ALTER TABLE `order` MODIFY `invoice_date` DATETIME NULL;
+ALTER TABLE `order_version` MODIFY `invoice_date` DATETIME NULL;
+
 -- The display type of a filter arrived empty in 3.0.0-alpha1: a shop upgraded from Thelia 2
 -- carries its choice_filter rows without one. They get the checkbox list, the type the storefront
 -- and the back office already give a filter that has none. Replaying it changes nothing.
