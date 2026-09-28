@@ -186,6 +186,23 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
 
         self::assertResponseRedirects('/admin/configuration/administrators');
         self::assertFalse($this->getService(AdminTwoFactorManager::class)->isEnabledFor($locked));
+
+        $afterReset = $this->request('GET', '/admin/configuration/administrators');
+        self::assertStringContainsString($locked->getLogin(), $afterReset->filter('.alert-success')->text(''));
+    }
+
+    public function testTheOwnRowOfTheListLeadsToTheAccountSecurityPage(): void
+    {
+        $admin = $this->admin();
+        $other = $this->admin();
+        $this->signInWithPassword($admin);
+
+        $list = $this->request('GET', '/admin/configuration/administrators');
+
+        self::assertCount(1, $list->filter('a[href="/admin/account/two-factor"]')->reduce(
+            static fn (Crawler $link): bool => str_contains($link->ancestors()->filter('tr')->first()->text(''), $admin->getLogin())
+                && !str_contains($link->ancestors()->filter('tr')->first()->text(''), $other->getLogin()),
+        ));
     }
 
     public function testResettingASecondFactorWithoutTheTokenChangesNothing(): void
