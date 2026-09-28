@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
 use Thelia\Domain\Admin\TwoFactor\Totp;
 use Thelia\Domain\Admin\TwoFactor\TwoFactorChallenge;
@@ -39,6 +40,12 @@ final class AdminTwoFactorLoginTest extends WebIntegrationTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $adminTemplate = $this->getService(TemplateHelperInterface::class)->getActiveAdminTemplate();
+
+        if (!file_exists($adminTemplate->getAbsolutePath().\DIRECTORY_SEPARATOR.'two-factor-verify.html.twig')) {
+            self::markTestSkipped('The installed back-office theme has no second factor pages.');
+        }
 
         $dispatcher = $this->getService(EventDispatcherInterface::class);
 
