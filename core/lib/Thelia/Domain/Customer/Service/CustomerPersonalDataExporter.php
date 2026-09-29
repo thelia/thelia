@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerListItemQuery;
+use Thelia\Model\CustomerListQuery;
 use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
@@ -35,7 +37,7 @@ use Thelia\Model\OrderReturnQuery;
  */
 final readonly class CustomerPersonalDataExporter
 {
-    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter'];
+    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter', 'customer_lists'];
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
@@ -58,6 +60,7 @@ final readonly class CustomerPersonalDataExporter
             'order_returns' => $this->exportOrderReturns($customer),
             'carts' => $this->exportCarts($customer),
             'newsletter' => $this->exportNewsletterSubscription($customer),
+            'customer_lists' => $this->exportCustomerLists($customer),
         ];
 
         foreach ($this->personalDataProviders as $provider) {
@@ -276,6 +279,57 @@ final readonly class CustomerPersonalDataExporter
         }
 
         return $returns;
+    }
+
+    /**
+     * The lists the customer owns, of every sort, with their lines.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function exportCustomerLists(Customer $customer): array
+    {
+        $lists = CustomerListQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->orderById()
+            ->find();
+
+        $listIds = [];
+
+        foreach ($lists as $list) {
+            $listIds[] = (int) $list->getId();
+        }
+
+        $itemsByList = [];
+
+        if ([] !== $listIds) {
+            $items = CustomerListItemQuery::create()
+                ->filterByCustomerListId($listIds)
+                ->orderByPosition()
+                ->orderById()
+                ->find();
+
+            foreach ($items as $item) {
+                $itemsByList[(int) $item->getCustomerListId()][] = [
+                    'reference' => $item->getRef(),
+                    'quantity' => $item->getQuantity(),
+                ];
+            }
+        }
+
+        $export = [];
+
+        foreach ($lists as $list) {
+            $export[] = [
+                'type' => $list->getType(),
+                'title' => $list->getTitle(),
+                'shared' => (bool) $list->getShared(),
+                'created_at' => $this->formatDate($list->getCreatedAt()),
+                'updated_at' => $this->formatDate($list->getUpdatedAt()),
+                'items' => $itemsByList[(int) $list->getId()] ?? [],
+            ];
+        }
+
+        return $export;
     }
 
     /**
