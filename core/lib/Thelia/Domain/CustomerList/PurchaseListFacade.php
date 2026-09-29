@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomerList\PurchaseListEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Exception\InvalidPurchaseListException;
 use Thelia\Domain\CustomerList\Exception\PurchaseListAccessDeniedException;
 use Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException;
@@ -76,7 +76,7 @@ final readonly class PurchaseListFacade
         return $this->accessPolicy->canShare($customer, $list);
     }
 
-    public function create(Customer $customer, string $title, PurchaseListLines $lines = new PurchaseListLines()): CustomerList
+    public function create(Customer $customer, string $title, ReferenceQuantityLines $lines = new ReferenceQuantityLines()): CustomerList
     {
         if ($this->repository->countOwnedBy($customer) >= self::MAX_LISTS_PER_CUSTOMER) {
             throw new InvalidPurchaseListException(\sprintf('A customer keeps at most %d purchase lists.', self::MAX_LISTS_PER_CUSTOMER));
@@ -115,14 +115,14 @@ final readonly class PurchaseListFacade
      * Adds lines after the current ones; a reference already on the list adds
      * its quantity to the existing line.
      */
-    public function appendItems(Customer $customer, int $listId, PurchaseListLines $lines): CustomerList
+    public function appendItems(Customer $customer, int $listId, ReferenceQuantityLines $lines): CustomerList
     {
         $list = $this->getWritable($customer, $listId);
 
         return $this->update($list, $customer, null, $this->repository->linesOf($list)->merge($lines));
     }
 
-    public function replaceItems(Customer $customer, int $listId, PurchaseListLines $lines): CustomerList
+    public function replaceItems(Customer $customer, int $listId, ReferenceQuantityLines $lines): CustomerList
     {
         return $this->update($this->getWritable($customer, $listId), $customer, null, $lines);
     }
@@ -164,7 +164,7 @@ final readonly class PurchaseListFacade
         return $list;
     }
 
-    private function update(CustomerList $list, Customer $customer, ?string $title, ?PurchaseListLines $lines): CustomerList
+    private function update(CustomerList $list, Customer $customer, ?string $title, ?ReferenceQuantityLines $lines): CustomerList
     {
         $event = new PurchaseListEvent($customer, $list, $title, $lines);
         $this->dispatcher->dispatch($event, TheliaEvents::PURCHASE_LIST_UPDATE);

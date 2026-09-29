@@ -12,14 +12,14 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\CustomerList\DTO;
+namespace Thelia\Domain\Catalog\DTO;
 
-use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
-use Thelia\Domain\CustomerList\Exception\InvalidPurchaseListException;
+use Thelia\Domain\Catalog\Exception\InvalidReferenceQuantityException;
 
 /**
- * The lines of a purchase list, checked once when they are built so that every
- * writer (the facade, the action, a module) receives lines the list can hold.
+ * References and quantities as a buyer types, imports or saves them, checked once
+ * when they are built: the quick order and the purchase lists both receive lines
+ * they can take.
  *
  * References arrive from keyboards and spreadsheets: surrounding whitespace, the
  * non-breaking spaces and the invisible format characters a copy from a sheet
@@ -29,7 +29,7 @@ use Thelia\Domain\CustomerList\Exception\InvalidPurchaseListException;
  *
  * @implements \IteratorAggregate<int, ReferenceQuantity>
  */
-final readonly class PurchaseListLines implements \Countable, \IteratorAggregate
+final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggregate
 {
     public const int MAX_LINES = 500;
 
@@ -49,15 +49,15 @@ final readonly class PurchaseListLines implements \Countable, \IteratorAggregate
             $reference = self::normalizeReference($line->reference);
 
             if ('' === $reference) {
-                throw new InvalidPurchaseListException('A purchase list line needs a reference.');
+                throw new InvalidReferenceQuantityException('A line needs a reference.');
             }
 
             if (mb_strlen($reference) > self::MAX_REFERENCE_LENGTH) {
-                throw new InvalidPurchaseListException(\sprintf('A reference is at most %d characters long.', self::MAX_REFERENCE_LENGTH));
+                throw new InvalidReferenceQuantityException(\sprintf('A reference is at most %d characters long.', self::MAX_REFERENCE_LENGTH));
             }
 
             if ($line->quantity < 1) {
-                throw new InvalidPurchaseListException(\sprintf('The quantity of reference "%s" must be at least 1.', $reference));
+                throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" must be at least 1.', $reference));
             }
 
             $key = $reference."\0".($line->productSaleElementsId ?? '');
@@ -66,7 +66,7 @@ final readonly class PurchaseListLines implements \Countable, \IteratorAggregate
         }
 
         if (\count($merged) > self::MAX_LINES) {
-            throw new InvalidPurchaseListException(\sprintf('A purchase list holds at most %d lines.', self::MAX_LINES));
+            throw new InvalidReferenceQuantityException(\sprintf('At most %d lines are taken at once.', self::MAX_LINES));
         }
 
         $this->lines = array_values($merged);

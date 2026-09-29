@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomerList\PurchaseListEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
 use Thelia\Domain\CustomerList\Exception\InvalidPurchaseListException;
 use Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException;
@@ -209,7 +209,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
     {
         $customer = $this->customer();
         [, $saleElements] = $this->productWithSaleElement('SOON-GONE');
-        $list = $this->facade->create($customer, 'Old list', new PurchaseListLines([
+        $list = $this->facade->create($customer, 'Old list', new ReferenceQuantityLines([
             new ReferenceQuantity('SOON-GONE', 2, (int) $saleElements->getId()),
         ]));
 
@@ -260,7 +260,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
     /**
      * @param array<string, int> $quantities
      */
-    private static function lines(array $quantities): PurchaseListLines
+    private static function lines(array $quantities): ReferenceQuantityLines
     {
         $lines = [];
 
@@ -268,7 +268,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
             $lines[] = new ReferenceQuantity((string) $reference, $quantity);
         }
 
-        return new PurchaseListLines($lines);
+        return new ReferenceQuantityLines($lines);
     }
 
     /**
