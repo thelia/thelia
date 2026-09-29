@@ -61,6 +61,20 @@ final class ModuleDescriptorValidatorTest extends TestCase
         self::assertSame(self::DESCRIPTOR_VERSION_2_2, $validator->getModuleVersion());
     }
 
+    /**
+     * A value written on its own line, as most descriptors format their elements, is the
+     * same value: the schema must not refuse what the install reader accepts.
+     */
+    public function testEnabledByDefaultToleratesSurroundingWhitespace(): void
+    {
+        $validator = new ModuleDescriptorValidator();
+
+        $descriptor = $validator->getDescriptor($this->writeDescriptor("<enabled-by-default>\n        0\n    </enabled-by-default>"));
+
+        self::assertNotFalse($descriptor);
+        self::assertSame('0', trim((string) $descriptor->{'enabled-by-default'}));
+    }
+
     public function testEnabledByDefaultOnlyAcceptsZeroOrOne(): void
     {
         $validator = new ModuleDescriptorValidator();
