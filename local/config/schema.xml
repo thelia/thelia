@@ -2685,4 +2685,52 @@
 
     <behavior name="timestampable" />
   </table>
+
+  <table name="customer_list" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the customer who created the list and owns it" name="customer_id" required="true" type="INTEGER" />
+    <column defaultValue="purchase" description="the sort of list, one of the CustomerListType values" name="type" required="true" size="32" type="VARCHAR" />
+    <column name="title" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="0" description="the list is shared with the company of its owner" name="shared" required="true" type="BOOLEAN" />
+
+    <foreign-key foreignTable="customer" name="fk_customer_list_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+
+    <index name="idx_customer_list_customer_id_type">
+      <index-column name="customer_id" />
+      <index-column name="type" />
+    </index>
+    <index name="idx_customer_list_shared">
+      <index-column name="shared" />
+    </index>
+
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="customer_list_item" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="customer_list_id" required="true" type="INTEGER" />
+    <column description="the reference as the customer entered it, kept when the sale element is gone" name="ref" required="true" size="255" type="VARCHAR" />
+    <column description="the sale element the reference was resolved to, null once it left the catalog" name="product_sale_elements_id" type="INTEGER" />
+    <column name="quantity" required="true" type="INTEGER" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+
+    <foreign-key foreignTable="customer_list" name="fk_customer_list_item_customer_list_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_list_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_customer_list_item_product_sale_elements_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+
+    <index name="idx_customer_list_item_customer_list_id_position">
+      <index-column name="customer_list_id" />
+      <index-column name="position" />
+    </index>
+    <index name="fk_customer_list_item_product_sale_elements_idx">
+      <index-column name="product_sale_elements_id" />
+    </index>
+
+    <behavior name="timestampable" />
+  </table>
 </database>
