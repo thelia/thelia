@@ -250,8 +250,7 @@ abstract class BaseCachedFile extends BaseAction
         // Copy and save file
         if ($uploadedFile instanceof UploadedFile) {
             // Remove old picture file from file storage
-            $url = $model->getUploadDir().'/'.$oldModel->getFile();
-            unlink(str_replace('..', '', $url));
+            $this->fileManager->removeReplacedFile($model, $oldModel);
             $model->setFile('')->save();
 
             $newUploadedFile = $this->fileManager->copyUploadedFile($model, $uploadedFile);

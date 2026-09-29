@@ -25,6 +25,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\DTO\OrderPaymentOutcome;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
@@ -49,6 +50,7 @@ readonly class CheckoutPaymentService
         private GuestCheckoutPolicy $guestCheckoutPolicy,
         private OrderFacade $orderFacade,
         private OrderFingerprint $orderFingerprint,
+        private PaymentCartContext $paymentCartContext,
     ) {
     }
 
@@ -96,7 +98,7 @@ readonly class CheckoutPaymentService
 
         if ($unpaidOrder instanceof Order) {
             if ($this->mayBePresentedAgain($unpaidOrder, $cart, $request)) {
-                return $this->payAgain($unpaidOrder);
+                return $this->payAgain($unpaidOrder, $cart);
             }
 
             // Through the status flow, not written to the row: the stock the previous
@@ -181,11 +183,14 @@ readonly class CheckoutPaymentService
      * ORDER_PAY is not raised, so nothing is written and ORDER_BEFORE_PAYMENT — the
      * confirmation e-mail and the shop notification — does not go out a second time.
      */
-    private function payAgain(Order $unpaidOrder): OrderPaymentOutcome
+    private function payAgain(Order $unpaidOrder, Cart $cart): OrderPaymentOutcome
     {
         $payEvent = new OrderPaymentEvent($unpaidOrder);
 
-        $this->dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY);
+        $this->paymentCartContext->within(
+            $cart,
+            fn () => $this->dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY),
+        );
 
         return new OrderPaymentOutcome($unpaidOrder, $payEvent->hasResponse() ? $payEvent->getResponse() : null);
     }

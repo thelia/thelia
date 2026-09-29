@@ -30,6 +30,12 @@ class Database
     /** The statement backupDb() closes a dump with, and restoreDb() looks for to tell a whole file from a truncated one. */
     private const DUMP_TERMINATOR = 'SET foreign_key_checks=1;';
 
+    /**
+     * The most a single INSERT of the dump carries (a row longer than that gets one of
+     * its own). A quarter of the 4 MiB max_allowed_packet MySQL 5.7 defaults to.
+     */
+    private const INSERT_BATCH_BYTES = 1024 * 1024;
+
     protected ConnectionInterface|\PDO $connection;
 
     /**
@@ -168,77 +174,156 @@ class Database
 
     /**
      * Backup the db OR just a table.
+     *
+     * The dump is written as it is read: rows come off the server one at a time and
+     * leave for the file in INSERT statements of at most INSERT_BATCH_BYTES, so the
+     * memory it takes does not grow with the database. Building the whole dump in
+     * memory first, on top of a result set the driver had buffered in full, took
+     * several times the size of the data, and a large shop could not be backed up.
      */
     public function backupDb(string $filename, string|array $tables = '*'): void
     {
-        $data = [];
+        $tables = $this->tablesToBackup($tables);
 
-        // get all of the tables
-        if ('*' === $tables) {
-            $tables = [];
-            $result = $this->connection->prepare('SHOW TABLES');
-            $result->execute();
+        $file = fopen($filename, 'w');
 
-            while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-                $tables[] = $row[0];
-            }
-        } else {
-            $tables = \is_array($tables) ? $tables : explode(',', $tables);
+        if (false === $file) {
+            throw new \RuntimeException(\sprintf('Unable to open the backup file %s for writing.', $filename));
         }
 
-        $data[] = "\n";
-        $data[] = 'SET foreign_key_checks=0;';
-        $data[] = "\n\n";
+        try {
+            $this->write($file, "\nSET foreign_key_checks=0;\n\n");
 
-        foreach ($tables as $table) {
-            if (!preg_match('/^[\\w_\\-]+$/', (string) $table)) {
-                Tlog::getInstance()->alert(
-                    \sprintf(
-                        "Attempt to backup the db with this invalid table name: '%s'",
-                        $table,
-                    ),
-                );
+            foreach ($tables as $table) {
+                if (!preg_match('/^[\\w_\\-]+$/', (string) $table)) {
+                    Tlog::getInstance()->alert(
+                        \sprintf(
+                            "Attempt to backup the db with this invalid table name: '%s'",
+                            $table,
+                        ),
+                    );
 
-                continue;
+                    continue;
+                }
+
+                $this->dumpTable($file, (string) $table);
             }
 
-            $result = $this->execute('SELECT * FROM `'.$table.'`');
+            $this->write($file, self::DUMP_TERMINATOR);
+        } catch (\Throwable $throwable) {
+            // A dump that stopped half way is no backup. restoreDb() would refuse it
+            // anyway, for it lacks the terminator; removing it says so sooner.
+            fclose($file);
+            @unlink($filename);
 
-            $fieldCount = $result->columnCount();
+            throw $throwable;
+        }
 
-            $data[] = 'DROP TABLE `'.$table.'`;';
+        if (!fclose($file)) {
+            throw new \RuntimeException(\sprintf('Unable to finish writing the backup file %s.', $filename));
+        }
+    }
 
-            $resultStruct = $this->execute('SHOW CREATE TABLE `'.$table.'`');
+    /**
+     * @return array<string>
+     */
+    private function tablesToBackup(string|array $tables): array
+    {
+        if ('*' !== $tables) {
+            return \is_array($tables) ? $tables : explode(',', $tables);
+        }
 
-            $rowStruct = $resultStruct->fetch(\PDO::FETCH_NUM);
+        $result = $this->connection->prepare('SHOW TABLES');
+        $result->execute();
 
-            $data[] = "\n\n";
-            $data[] = $rowStruct[1];
-            $data[] = ";\n\n";
+        return $result->fetchAll(\PDO::FETCH_COLUMN);
+    }
 
-            for ($i = 0; $i < $fieldCount; ++$i) {
-                while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-                    $data[] = 'INSERT INTO `'.$table.'` VALUES(';
+    /**
+     * @param resource $file
+     */
+    private function dumpTable($file, string $table): void
+    {
+        // Asked before the rows are: an unbuffered read keeps the connection busy
+        // until its last row has been fetched, and no other query can run meanwhile.
+        $structure = $this->execute('SHOW CREATE TABLE `'.$table.'`');
+        $createTable = $structure->fetch(\PDO::FETCH_NUM)[1];
+        $structure->closeCursor();
 
-                    for ($j = 0; $j < $fieldCount; ++$j) {
-                        $data[] = $this->quoteForDump($row[$j]);
+        $this->write($file, 'DROP TABLE `'.$table.'`;'."\n\n".$createTable.";\n\n");
 
-                        if ($j < ($fieldCount - 1)) {
-                            $data[] = ',';
-                        }
+        $this->withUnbufferedReads(function () use ($file, $table): void {
+            $rows = $this->execute('SELECT * FROM `'.$table.'`');
+            $insert = 'INSERT INTO `'.$table.'` VALUES';
+            $batch = '';
+
+            try {
+                while (false !== ($row = $rows->fetch(\PDO::FETCH_NUM))) {
+                    $values = '('.implode(',', array_map($this->quoteForDump(...), $row)).')';
+
+                    if ('' !== $batch && \strlen($batch) + \strlen($values) > self::INSERT_BATCH_BYTES) {
+                        $this->write($file, $insert.$batch.";\n");
+                        $batch = '';
                     }
 
-                    $data[] = ");\n";
+                    $batch .= ('' === $batch ? '' : ',').$values;
                 }
+            } finally {
+                $rows->closeCursor();
             }
 
-            $data[] = "\n\n\n";
+            if ('' !== $batch) {
+                $this->write($file, $insert.$batch.";\n");
+            }
+        });
+
+        $this->write($file, "\n\n\n");
+    }
+
+    /**
+     * MySQL hands a whole result set over to the client before the first row is read
+     * unless it is told otherwise, and a table of several gigabytes then sits in the
+     * memory of the process. The setting is put back as it was: the caller goes on
+     * using the connection, and it may rely on buffered reads.
+     */
+    private function withUnbufferedReads(callable $read): void
+    {
+        if ('mysql' !== $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            $read();
+
+            return;
         }
 
-        $data[] = self::DUMP_TERMINATOR;
+        $attribute = self::bufferedQueryAttribute();
+        $previous = $this->connection->getAttribute($attribute);
+        $this->connection->setAttribute($attribute, false);
 
-        // save filename
-        $this->writeFilename($filename, $data);
+        try {
+            $read();
+        } finally {
+            $this->connection->setAttribute($attribute, $previous);
+        }
+    }
+
+    /**
+     * PHP 8.4 moved the driver specific constants to Pdo\Mysql, and 8.5 deprecates
+     * the old names on PDO.
+     */
+    private static function bufferedQueryAttribute(): int
+    {
+        return \defined('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY')
+            ? \constant('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY')
+            : \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+    }
+
+    /**
+     * @param resource $file
+     */
+    private function write($file, string $content): void
+    {
+        if (fwrite($file, $content) !== \strlen($content)) {
+            throw new \RuntimeException('Unable to write the backup file: is the disk full?');
+        }
     }
 
     /**
@@ -334,17 +419,6 @@ class Database
         }
 
         return $dump;
-    }
-
-    /**
-     * Save an array of data to a filename.
-     */
-    private function writeFilename(string $filename, array $data): void
-    {
-        $f = fopen($filename, 'wb+');
-
-        fwrite($f, implode('', $data));
-        fclose($f);
     }
 
     /**

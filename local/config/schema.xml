@@ -570,7 +570,7 @@
   <table name="product_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -589,7 +589,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="product_document" namespace="Thelia\Model">
@@ -1470,7 +1470,7 @@
   <table name="category_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -1489,13 +1489,13 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="folder_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -1514,13 +1514,13 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="content_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="content_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -1539,7 +1539,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="category_document" namespace="Thelia\Model">
@@ -1690,7 +1690,7 @@
   <table name="module_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="module_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -1709,7 +1709,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="order_product_tax" namespace="Thelia\Model">
@@ -1958,7 +1958,7 @@
   <table name="brand_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="brand_id" required="true" type="INTEGER" />
-    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="file" size="255" type="VARCHAR" />
     <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
@@ -1973,7 +1973,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="file, title, description, chapo, postscriptum" />
     </behavior>
   </table>
   <table name="form_firewall" namespace="Thelia\Model">

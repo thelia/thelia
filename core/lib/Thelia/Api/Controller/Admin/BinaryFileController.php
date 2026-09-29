@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
+use Thelia\Core\File\LocalizedFileModelInterface;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 #[AsController]
 class BinaryFileController
@@ -32,8 +35,26 @@ class BinaryFileController
         }
 
         $propelModel = $resource->getPropelModel();
+
+        // A translated file is served in the language asked for (?locale=), the default
+        // language otherwise, with the fallback every translated read follows.
+        if ($propelModel instanceof LocalizedFileModelInterface) {
+            $propelModel->setLocale(self::requestedLocale($request));
+        }
+
         $filePath = $propelModel->getUploadDir().DS.$propelModel->getFile();
 
         return new BinaryFileResponse($filePath);
+    }
+
+    private static function requestedLocale(Request $request): string
+    {
+        $requested = $request->query->get('locale');
+
+        if (\is_string($requested) && '' !== $requested && null !== LangQuery::create()->findOneByLocale($requested)) {
+            return $requested;
+        }
+
+        return Lang::getDefaultLanguage()->getLocale();
     }
 }

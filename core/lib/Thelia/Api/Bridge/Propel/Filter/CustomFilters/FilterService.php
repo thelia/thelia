@@ -698,7 +698,12 @@ readonly class FilterService
         $fieldType = CheckboxType::getName();
         if ($choiceFilter) {
             $position = $choiceFilter->getPosition();
-            $fieldType = $choiceFilter->getType();
+            // A row carried over from Thelia 2 has no display type: that version had no such
+            // column. It is offered the way a filter without any row is.
+            $storedFieldType = $choiceFilter->getType();
+            if (null !== $storedFieldType && '' !== $storedFieldType) {
+                $fieldType = $storedFieldType;
+            }
             $isVisible = (bool) $choiceFilter->isVisible();
         }
         $filterDto = new Filter();

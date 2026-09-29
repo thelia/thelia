@@ -345,6 +345,19 @@ class URL
     }
 
     /**
+     * Clears the rewritten url cache of the instance, if one was ever
+     * instantiated. The cache lives on the instance: a caller that only
+     * writes a RewritingUrl and cannot say whether a request booted the
+     * instance (a model postSave/postDelete hook, a console command) has
+     * nothing to clear when there is none, rather than a missing service to
+     * fail on.
+     */
+    public static function clearInstanceRewritingUrlCache(): void
+    {
+        self::$instance?->clearRewritingUrlCache();
+    }
+
+    /**
      * Retrieve a rewritten URL from the current GET parameters.
      *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method

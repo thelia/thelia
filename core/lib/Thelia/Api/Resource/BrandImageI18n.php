@@ -18,6 +18,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class BrandImageI18n extends I18n
 {
+    use ImageFileI18nTrait;
+
+    /**
+     * The file stored for this language, null when it shows the one of the default language.
+     */
+    #[Groups([BrandImage::GROUP_ADMIN_READ, BrandImage::GROUP_FRONT_READ])]
+    protected ?string $file;
+
     #[Groups([
         BrandImage::GROUP_ADMIN_READ,
         BrandImage::GROUP_FRONT_READ,

@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
+use Thelia\Model\Lang;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentI18n;
 use Thelia\Model\ProductDocumentI18nQuery;
@@ -42,6 +43,7 @@ class File extends BaseAction implements EventSubscriberInterface
     {
         $originalProductId = $event->getOriginalProduct()->getId();
         $clonedProduct = $event->getClonedProduct();
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
 
         foreach ($event->getTypes() as $type) {
             if (!\in_array($type, ['images', 'documents'], true)) {
@@ -64,9 +66,23 @@ class File extends BaseAction implements EventSubscriberInterface
             // Set clone's files
             /** @var ProductDocument|ProductImage $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
-                $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
+                if ($originalProductFile instanceof ProductImage) {
+                    // The file of an image is translated: the copy starts from the one of
+                    // the default language, the others follow once the copy exists. The
+                    // source is put back on its language afterwards, Propel hands the same
+                    // instance to whoever reads it next.
+                    $sourceLocale = $originalProductFile->getLocale();
+                    $originalProductFile->setLocale($defaultLocale);
+                    $sourceFile = $originalProductFile->getOwnFile() ?? $originalProductFile->getStoredFiles()[0] ?? '';
+                    $originalProductFile->setLocale($sourceLocale);
+                } else {
+                    $sourceFile = $originalProductFile->getFile();
+                }
 
-                if (file_exists($srcPath)) {
+                $srcPath = $originalProductFile->getUploadDir().DS.$sourceFile;
+                $primaryFile = $sourceFile;
+
+                if ('' !== $sourceFile && file_exists($srcPath)) {
                     $ext = pathinfo($srcPath, \PATHINFO_EXTENSION);
 
                     $clonedProductFile = [];
@@ -98,6 +114,10 @@ class File extends BaseAction implements EventSubscriberInterface
                         ->setPosition($originalProductFile->getPosition())
                         ->setLocale($clonedProduct->getLocale())
                         ->setTitle($clonedProduct->getTitle());
+
+                    if ($clonedProductFile instanceof ProductImage) {
+                        $clonedProductFile->setLocale($defaultLocale);
+                    }
 
                     $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType);
 
@@ -136,6 +156,10 @@ class File extends BaseAction implements EventSubscriberInterface
 
                     // Clone file's I18n
                     $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, $event, $dispatcher);
+
+                    if ($clonedProductFile instanceof ProductImage) {
+                        $this->cloneTranslatedImageFiles($originalProductFile, $clonedProductFile, $primaryFile, $clonedProduct->getRef(), $clonedProduct->getId(), $dispatcher);
+                    }
                 } else {
                     Tlog::getInstance()->addWarning('Failed to find media file '.$srcPath);
                 }
@@ -168,6 +192,56 @@ class File extends BaseAction implements EventSubscriberInterface
                     $dispatcher->dispatch($clonedProductUpdateFileEvent, TheliaEvents::DOCUMENT_UPDATE);
                     break;
             }
+        }
+    }
+
+    /**
+     * Gives the copy the file of each language whose file differs from the one it was
+     * created with. A language without a file of its own keeps none, and goes on showing
+     * the file of the default language.
+     */
+    private function cloneTranslatedImageFiles(
+        ProductImage $originalImage,
+        ProductImage $clonedImage,
+        string $primaryFile,
+        string $clonedProductRef,
+        int $clonedProductId,
+        EventDispatcherInterface $dispatcher,
+    ): void {
+        $translations = ProductImageI18nQuery::create()->filterById($originalImage->getId())->find();
+
+        foreach ($translations as $translation) {
+            $file = (string) $translation->getFile();
+
+            if ('' === $file || $file === $primaryFile) {
+                continue;
+            }
+
+            $srcPath = $originalImage->getUploadDir().DS.$file;
+
+            if (!is_file($srcPath)) {
+                Tlog::getInstance()->addWarning('Failed to find media file '.$srcPath);
+
+                continue;
+            }
+
+            // The upload is moved into place: it has to be a copy, the source stays.
+            $copyPath = $srcPath.'.'.$translation->getLocale().'.tmp';
+            copy($srcPath, $copyPath);
+
+            $fileName = $clonedProductRef.'_'.$translation->getLocale().'.'.pathinfo($srcPath, \PATHINFO_EXTENSION);
+            $fileMimeType = (new \finfo())->file($copyPath, \FILEINFO_MIME_TYPE);
+
+            $oldModel = clone $clonedImage;
+            $clonedImage->setLocale($translation->getLocale());
+
+            $updateEvent = new FileCreateOrUpdateEvent($clonedProductId);
+            $updateEvent
+                ->setModel($clonedImage)
+                ->setUploadedFile(new UploadedFile($copyPath, $fileName, $fileMimeType));
+            $updateEvent->setOldModel($oldModel);
+
+            $dispatcher->dispatch($updateEvent, TheliaEvents::IMAGE_UPDATE);
         }
     }
 

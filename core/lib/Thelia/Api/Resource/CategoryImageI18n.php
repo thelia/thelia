@@ -18,6 +18,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CategoryImageI18n extends I18n
 {
+    use ImageFileI18nTrait;
+
+    /**
+     * The file stored for this language, null when it shows the one of the default language.
+     */
+    #[Groups([CategoryImage::GROUP_ADMIN_READ, CategoryImage::GROUP_FRONT_READ])]
+    protected ?string $file;
+
     #[Groups([ProductImage::GROUP_ADMIN_READ, ProductImage::GROUP_FRONT_READ, ProductImage::GROUP_ADMIN_WRITE])]
     protected ?string $title = null;
 

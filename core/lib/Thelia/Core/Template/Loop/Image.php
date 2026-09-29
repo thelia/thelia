@@ -326,12 +326,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $event->setFormat($format);
             }
 
-            // Put source image file path
+            // Put source image file path: the file of the loop language, or the one it
+            // falls back on when that language has none of its own.
             $sourceFilePath = \sprintf(
                 '%s/%s/%s',
                 $baseSourceFilePath,
                 $this->objectType,
-                $result->getFile(),
+                $result->setLocale($this->locale)->getFile(),
             );
 
             $event->setSourceFilepath($sourceFilePath);

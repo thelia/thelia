@@ -17,16 +17,18 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Core\File\LocalizedFileModelInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\Base\ModuleImage as BaseModuleImage;
+use Thelia\Model\Tools\LocalizedFileTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Tools\URL;
 
-class ModuleImage extends BaseModuleImage implements FileModelInterface
+class ModuleImage extends BaseModuleImage implements LocalizedFileModelInterface
 {
+    use LocalizedFileTrait;
     use PositionManagementTrait;
 
     /**
@@ -119,10 +121,5 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
         );
 
         return $breadcrumb;
-    }
-
-    public function getFile(): string
-    {
-        return parent::getFile();
     }
 }

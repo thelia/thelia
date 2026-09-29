@@ -23,6 +23,8 @@ use Thelia\Core\Routing\RewritingRouter;
 use Thelia\Model\Category;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrl;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class RewritingRouterTest extends IntegrationTestCase
@@ -245,6 +247,35 @@ final class RewritingRouterTest extends IntegrationTestCase
 
             self::assertStringEndsWith('/'.$englishUrl, (string) parse_url($target, \PHP_URL_PATH));
             self::assertSame(['page' => '2'], self::queryParametersOf($target));
+        }
+    }
+
+    /**
+     * A row can be a pure alias, e.g. a legacy url migrated with no page behind
+     * it: url and redirected are set, view/viewId/viewLocale stay NULL because
+     * no object ever owned that url. Such a row must still 301 to its target
+     * instead of being read as the url of a page in no particular language.
+     */
+    public function testMatchRequestRedirectsAPureRedirectRowWithNoViewOrLocale(): void
+    {
+        $category = $this->createCategory('Target of a pure redirect');
+        $targetUrl = $category->getRewrittenUrl('en_US');
+        $target = RewritingUrlQuery::create()->findOneByUrl($targetUrl);
+
+        $pureRedirect = (new RewritingUrl())->setUrl('legacy-url-with-no-page.html');
+        $pureRedirect->save();
+        $pureRedirect->setRedirected($target->getId())->save();
+
+        self::assertNull($pureRedirect->getView());
+        self::assertNull($pureRedirect->getViewId());
+        self::assertNull($pureRedirect->getViewLocale());
+
+        try {
+            $this->router->matchRequest($this->request('legacy-url-with-no-page.html'));
+            self::fail('A pure redirect row must send a 301 to its target.');
+        } catch (RedirectException $redirectException) {
+            self::assertSame(301, $redirectException->getStatusCode());
+            self::assertStringEndsWith('/'.$targetUrl, $redirectException->getUrl());
         }
     }
 
