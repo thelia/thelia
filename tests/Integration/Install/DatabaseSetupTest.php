@@ -206,6 +206,28 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $setup->registerAndApplyModules([$moduleDir]);
     }
 
+    /**
+     * The descriptors are all read before anything is written: a refused value must not
+     * leave the modules iterated before it registered, whatever order the disk lists them.
+     */
+    public function testAnInvalidActivationValueRegistersNoModuleAtAll(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSampleModules(undeclaredDeclaration: '<enabled-by-default>maybe</enabled-by-default>');
+
+        try {
+            $setup->registerAndApplyModules([$moduleDir]);
+            self::fail('An invalid value must stop the registration.');
+        } catch (\InvalidArgumentException) {
+        }
+
+        $statement = $setup->getPdo()->prepare('SELECT COUNT(*) FROM `module` WHERE `code` IN (?, ?, ?)');
+        $statement->execute([self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE]);
+
+        self::assertSame(0, (int) $statement->fetchColumn());
+    }
+
     private function activationOf(\PDO $pdo, string $code): int
     {
         $statement = $pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = ?');
@@ -219,10 +241,10 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
     /**
      * Three descriptors in a throwaway module directory: one declaring itself active,
-     * one declaring itself inactive, one saying nothing about it. The first declaration
-     * can be replaced to exercise an invalid value.
+     * one declaring itself inactive, one saying nothing about it. The first and the last
+     * declarations can be replaced to exercise an invalid value.
      */
-    private function writeSampleModules(string $activeDeclaration = '<enabled-by-default>1</enabled-by-default>'): string
+    private function writeSampleModules(string $activeDeclaration = '<enabled-by-default>1</enabled-by-default>', string $undeclaredDeclaration = ''): string
     {
         $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
         $filesystem = new Filesystem();
@@ -230,7 +252,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $declarations = [
             self::SHIPPED_ACTIVE_CODE => $activeDeclaration,
             self::SHIPPED_INACTIVE_CODE => '<enabled-by-default>0</enabled-by-default>',
-            self::UNDECLARED_CODE => '',
+            self::UNDECLARED_CODE => $undeclaredDeclaration,
         ];
 
         foreach ($declarations as $code => $declaration) {

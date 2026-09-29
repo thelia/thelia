@@ -135,12 +135,15 @@ final class DatabaseSetup
      * already knows the module, only the namespace and the version are refreshed: the
      * activation the merchant chose is never rewritten.
      *
+     * Every descriptor is read before anything is written: a refused declaration stops
+     * the registration with the module table untouched, whatever order the disk lists
+     * the modules in.
+     *
      * @param string[] $moduleDirectories
      */
     public function registerAndApplyModules(array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): int
     {
-        $moduleDirs = array_filter($moduleDirectories, 'is_dir');
-        $position = 0;
+        $modules = $this->readModuleDescriptors(array_filter($moduleDirectories, 'is_dir'));
 
         $insertModule = $this->pdo->prepare(
             'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
@@ -154,6 +157,25 @@ final class DatabaseSetup
              ON DUPLICATE KEY UPDATE `title` = VALUES(`title`)'
         );
         $selectModuleId = $this->pdo->prepare('SELECT `id` FROM `module` WHERE `code` = :code');
+
+        foreach ($modules as $position => $module) {
+            $insertModule->execute([...$module['row'], 'position' => $position + 1]);
+
+            $this->insertModuleDescriptions($module['xml'], $module['code'], $upsertModuleI18n, $selectModuleId);
+            $this->applyModuleSchema($module['path'], $module['code']);
+        }
+
+        return \count($modules);
+    }
+
+    /**
+     * @param string[] $moduleDirs
+     *
+     * @return list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}>
+     */
+    private function readModuleDescriptors(array $moduleDirs): array
+    {
+        $modules = [];
 
         foreach ($moduleDirs as $baseDir) {
             foreach (new \DirectoryIterator($baseDir) as $entry) {
@@ -174,24 +196,25 @@ final class DatabaseSetup
                 $code = $entry->getFilename();
                 $xmlType = (string) ($xml->type ?? 'classic');
 
-                $insertModule->execute([
+                $modules[] = [
                     'code' => $code,
-                    'version' => (string) ($xml->version ?? '0.0.1'),
-                    'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
-                    'category' => $xmlType,
-                    'activate' => ModuleDescriptor::enabledByDefault($xml, $moduleXml) ? 1 : 0,
-                    'position' => ++$position,
-                    'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
-                    'mandatory' => (int) ($xml->mandatory ?? 0),
-                    'hidden' => (int) ($xml->hidden ?? 0),
-                ]);
-
-                $this->insertModuleDescriptions($xml, $code, $upsertModuleI18n, $selectModuleId);
-                $this->applyModuleSchema($entry->getPathname(), $code);
+                    'path' => $entry->getPathname(),
+                    'xml' => $xml,
+                    'row' => [
+                        'code' => $code,
+                        'version' => (string) ($xml->version ?? '0.0.1'),
+                        'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
+                        'category' => $xmlType,
+                        'activate' => ModuleDescriptor::enabledByDefault($xml, $moduleXml) ? 1 : 0,
+                        'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
+                        'mandatory' => (int) ($xml->mandatory ?? 0),
+                        'hidden' => (int) ($xml->hidden ?? 0),
+                    ],
+                ];
             }
         }
 
-        return $position;
+        return $modules;
     }
 
     /**
