@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Customer;
 
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Customer\Service\CustomerAnonymizer;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataExporter;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Model\CustomerListItemQuery;
 use Thelia\Model\CustomerListQuery;
@@ -43,7 +43,7 @@ final class CustomerListsPersonalDataTest extends IntegrationTestCase
     public function testTheExportListsTheCustomerListsWithTheirLines(): void
     {
         $customer = $this->factory->customer($this->factory->customerTitle());
-        $this->getService(PurchaseListFacade::class)->create($customer, 'Restock', new PurchaseListLines([new ReferenceQuantity('ABC', 3)]));
+        $this->getService(PurchaseListFacade::class)->create($customer, 'Restock', new ReferenceQuantityLines([new ReferenceQuantity('ABC', 3)]));
 
         $data = $this->getService(CustomerPersonalDataExporter::class)->export($customer);
 
@@ -59,7 +59,7 @@ final class CustomerListsPersonalDataTest extends IntegrationTestCase
         $customer = $this->factory->customer($this->factory->customerTitle());
         $other = $this->factory->customer($this->factory->customerTitle());
         $facade = $this->getService(PurchaseListFacade::class);
-        $list = $facade->create($customer, 'Private', new PurchaseListLines([new ReferenceQuantity('ABC', 1)]));
+        $list = $facade->create($customer, 'Private', new ReferenceQuantityLines([new ReferenceQuantity('ABC', 1)]));
         $kept = $facade->create($other, 'Someone else');
 
         $this->getService(CustomerAnonymizer::class)->anonymize($customer);

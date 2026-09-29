@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\CustomerList;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerList;
 
@@ -33,7 +33,7 @@ class PurchaseListEvent extends ActionEvent
         private readonly Customer $customer,
         private ?CustomerList $customerList = null,
         private readonly ?string $title = null,
-        private readonly ?PurchaseListLines $lines = null,
+        private readonly ?ReferenceQuantityLines $lines = null,
     ) {
     }
 
@@ -59,7 +59,7 @@ class PurchaseListEvent extends ActionEvent
         return $this->title;
     }
 
-    public function getLines(): ?PurchaseListLines
+    public function getLines(): ?ReferenceQuantityLines
     {
         return $this->lines;
     }

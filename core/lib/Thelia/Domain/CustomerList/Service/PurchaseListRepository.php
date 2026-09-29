@@ -16,7 +16,7 @@ namespace Thelia\Domain\CustomerList\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
@@ -66,7 +66,7 @@ final readonly class PurchaseListRepository
             ->count();
     }
 
-    public function linesOf(CustomerList $list): PurchaseListLines
+    public function linesOf(CustomerList $list): ReferenceQuantityLines
     {
         $items = CustomerListItemQuery::create()
             ->filterByCustomerListId((int) $list->getId())
@@ -84,13 +84,13 @@ final readonly class PurchaseListRepository
             );
         }
 
-        return new PurchaseListLines($lines);
+        return new ReferenceQuantityLines($lines);
     }
 
     /**
      * The lines of a cart, the reference being the one of its sale element.
      */
-    public function linesOfCart(Cart $cart): PurchaseListLines
+    public function linesOfCart(Cart $cart): ReferenceQuantityLines
     {
         $items = CartItemQuery::create()
             ->filterByCartId((int) $cart->getId())
@@ -109,7 +109,7 @@ final readonly class PurchaseListRepository
             );
         }
 
-        return new PurchaseListLines($lines);
+        return new ReferenceQuantityLines($lines);
     }
 
     /**
@@ -118,7 +118,7 @@ final readonly class PurchaseListRepository
      * from the line, its reference stays. Null when the order is not one of
      * the customer's.
      */
-    public function linesOfOrder(Customer $customer, int $orderId): ?PurchaseListLines
+    public function linesOfOrder(Customer $customer, int $orderId): ?ReferenceQuantityLines
     {
         $order = OrderQuery::create()
             ->filterById($orderId)
@@ -162,7 +162,7 @@ final readonly class PurchaseListRepository
             );
         }
 
-        return new PurchaseListLines($lines);
+        return new ReferenceQuantityLines($lines);
     }
 
     private function readableQuery(Customer $customer): CustomerListQuery

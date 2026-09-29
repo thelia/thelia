@@ -19,7 +19,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\CustomerList\PurchaseListEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\CustomerList\DTO\PurchaseListLines;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
 use Thelia\Model\CustomerList;
 use Thelia\Model\CustomerListItem;
@@ -43,7 +43,7 @@ class PurchaseList extends BaseAction implements EventSubscriberInterface
                 ->setShared(false);
             $list->save($connection);
 
-            $this->insertLines($list, $event->getLines() ?? new PurchaseListLines(), $connection);
+            $this->insertLines($list, $event->getLines() ?? new ReferenceQuantityLines(), $connection);
 
             $event->setCustomerList($list);
         });
@@ -88,7 +88,7 @@ class PurchaseList extends BaseAction implements EventSubscriberInterface
         ];
     }
 
-    private function insertLines(CustomerList $list, PurchaseListLines $lines, ConnectionInterface $connection): void
+    private function insertLines(CustomerList $list, ReferenceQuantityLines $lines, ConnectionInterface $connection): void
     {
         foreach ($lines as $position => $line) {
             (new CustomerListItem())
