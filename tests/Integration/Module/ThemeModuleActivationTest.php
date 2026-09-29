@@ -42,6 +42,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
     private const string NEW_CODE = 'ThemeShipSampleNew';
 
+    private const string NEW_INACTIVE_CODE = 'ThemeShipSampleNewInactive';
+
     private const string INACTIVE_CODE = 'ThemeShipSampleInactive';
 
     private const string SWITCHED_OFF_CODE = 'ThemeShipSampleSwitchedOff';
@@ -73,13 +75,15 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     {
         // Brought by the theme: not on the shop's disk, unknown to the module table.
         $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
+        // Brought by the theme too, and declared to ship inactive.
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE, self::NEW_INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
         // Registered by the install, declared to ship inactive.
         $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
         $this->registerSampleModule(self::INACTIVE_CODE);
         // Registered by the install as active, switched off by the merchant since.
         $this->writeSampleModule(THELIA_MODULE_DIR.self::SWITCHED_OFF_CODE, self::SWITCHED_OFF_CODE, '');
         $this->registerSampleModule(self::SWITCHED_OFF_CODE);
-        $themeDir = $this->writeTheme([self::NEW_CODE, self::INACTIVE_CODE, self::SWITCHED_OFF_CODE]);
+        $themeDir = $this->writeTheme([self::NEW_CODE, self::NEW_INACTIVE_CODE, self::INACTIVE_CODE, self::SWITCHED_OFF_CODE]);
 
         $output = new BufferedOutput();
         /** @var ModuleManagement $moduleManagement */
@@ -89,10 +93,13 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
         self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE), 'A module the theme brings is installed and activated.');
         self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_CODE, 'The module the theme brings is copied where the shop keeps its modules.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE), 'A module the theme brings is registered but left inactive when its descriptor says so.');
+        self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_INACTIVE_CODE, 'The module the theme brings is copied even though it ships inactive.');
+        self::assertStringContainsString(self::NEW_INACTIVE_CODE.' is required by the theme but ships inactive', $written);
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'A module declaring <enabled-by-default>0</enabled-by-default> stays inactive even though the theme requires it.');
         self::assertStringContainsString(self::INACTIVE_CODE.' is required by the theme but ships inactive', $written);
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE), 'A module the merchant switched off is not switched back on by the theme.');
-        self::assertStringContainsString(self::SWITCHED_OFF_CODE.' is required by the theme but was switched off', $written);
+        self::assertStringContainsString(self::SWITCHED_OFF_CODE.' is required by the theme but is registered inactive', $written);
     }
 
     /**

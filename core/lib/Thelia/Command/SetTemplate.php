@@ -25,6 +25,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Domain\Module\Composer\ComposerHelper;
+use Thelia\Log\Tlog;
+use Thelia\Model\Module;
+use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 
 #[AsCommand(name: 'template:set', description: 'set template')]
@@ -105,13 +108,15 @@ class SetTemplate extends ContainerAwareCommand
         // triggered by setConfigToTemplate would otherwise load the template bundle while
         // its modules are not yet available in the container.
         try {
-            $moduledInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
+            $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         } catch (\Exception $exception) {
+            Tlog::getInstance()->error(\sprintf('template:set could not install the modules of theme "%s": %s', $name, $exception->getMessage()), ['exception' => $exception]);
             $output->writeln(\sprintf('<error>%s</error>', $exception->getMessage()));
 
             return self::FAILURE;
         }
-        $output->writeln(\sprintf('<fg=blue>%d modules installed and activated.</>', \count($moduledInstalled)));
+        $activeCount = \count(array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED === $module->getActivate()));
+        $output->writeln(\sprintf('<fg=blue>%d theme modules installed, %d active.</>', \count($modulesInstalled), $activeCount));
 
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
         $this->execDumpAutoload($output);

@@ -226,7 +226,7 @@ class Install extends ContainerAwareCommand
         try {
             $count = $setup->registerAndApplyModules();
         } catch (\InvalidArgumentException $e) {
-            $output->writeln(\sprintf('<error>%s</error>', $e->getMessage()));
+            $output->writeln(\sprintf('<error>ERROR: %s</error>', $e->getMessage()));
 
             return false;
         }

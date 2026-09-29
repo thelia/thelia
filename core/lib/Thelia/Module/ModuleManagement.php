@@ -376,14 +376,16 @@ class ModuleManagement
             }
 
             // Only a module the theme brings is activated on its behalf, above. A module the
-            // shop already knows keeps its state: the descriptor asked for it, or the
-            // merchant switched it off, and applying a theme is not the moment to overrule
-            // either. The install output says which module the theme is missing.
+            // shop already knows keeps its state: the descriptor asked for it, the merchant
+            // switched it off, or module:refresh registered it inactive, and applying a
+            // theme is not the moment to overrule any of them. Nothing in the module table
+            // tells the last two apart, so the output states the fact, not its author, and
+            // says which module the theme is missing.
             $output?->writeln(
                 \sprintf(
                     $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath())
                         ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
-                        : '<comment>Module %s is required by the theme but was switched off: left as the merchant set it, activate it from the back-office if the theme needs it.</comment>',
+                        : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
                     $module->getCode()
                 )
             );
