@@ -24,17 +24,23 @@ final readonly class ModuleDescriptor
 
     /**
      * Whether the module is active right after the shop is installed. A descriptor that
-     * says nothing keeps the historical behaviour: active. A value other than 0 or 1 is
-     * refused rather than guessed, so a typo never ships a module in the wrong state.
+     * says nothing keeps the historical behaviour: active. A value other than 0 or 1, or
+     * the element declared twice, is refused rather than guessed, so a typo never ships a
+     * module in the wrong state.
      *
      * @param string $descriptorPath where the descriptor comes from, for the error message
      */
     public static function enabledByDefault(\SimpleXMLElement $descriptor, string $descriptorPath): bool
     {
         $element = $descriptor->{self::ENABLED_BY_DEFAULT};
+        $occurrences = \count($element);
 
-        if (0 === \count($element)) {
+        if (0 === $occurrences) {
             return true;
+        }
+
+        if ($occurrences > 1) {
+            throw new \InvalidArgumentException(\sprintf('<%s> in %s is declared %d times, expected once.', self::ENABLED_BY_DEFAULT, $descriptorPath, $occurrences));
         }
 
         return match (trim((string) $element)) {
