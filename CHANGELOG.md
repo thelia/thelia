@@ -59,6 +59,14 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - The admin log no longer keeps the `Cookie` and `Authorization` headers of a request, which carried the session, remember-me and API credentials of whoever made it, and a failed back-office sign-in or password creation no longer keeps the request body, which held the password that was typed.
 - A remember-me cookie that does not decode, for an administrator or a customer, is ignored instead of failing every page of the shop for the browser that carries it.
 
+## Modules
+
+- A module declares in its `module.xml` whether it is active right after the shop is installed, through the optional `<enabled-by-default>0|1</enabled-by-default>` element of the 2.2 descriptor format. A module that says nothing, or says 1, is registered active as before; a module that says 0 is registered inactive, stays listed in the back-office and waits for the merchant to activate it. The install reads the element without the kernel (`bin/install`, `bin/test-prepare`, `thelia:install`) and stops with a readable error, nothing written in the module table, on a value that is neither 0 nor 1. Registering again a module the database already knows only refreshes its namespace and version: the activation the merchant chose is never rewritten.
+
+## Behaviour changes
+
+- `template:set` (phase 7 of the install) only activates the modules the theme brings to the shop. A module the shop already knows keeps its state, whether its descriptor ships it inactive, the merchant switched it off or `module:refresh` registered it inactive, and the install output names the module the theme is missing. Before, applying a theme switched every inactive dependency back on. `ModuleManagement::installModule()` follows the same rule: a module declaring `<enabled-by-default>0</enabled-by-default>` is installed and registered, not activated.
+
 ## Breaking changes
 
 - The Smarty back office (`thelia/backoffice-default-template`) is no longer required nor activated: `default-twig` is the only back office the core installs, and the Smarty one is not maintained in 3.x. The update script switches a shop whose `active-admin-template` is still `default` to `default-twig`, and turns off `TheliaSmarty` and `VirtualProductControl`, which only came with it. A shop that still runs the Smarty back office has to require `thelia/backoffice-default-template` itself, register `BackOfficeDefaultBundle\BackOfficeDefaultBundle` in `config/bundles.php`, set `active-admin-template` back to `default` and activate `TheliaSmarty` again. `thelia/hook-admin-home-module`, which fills the dashboard of `default-twig`, is now required by the root package; `thelia/smarty-module` and `thelia/web-profiler-module` are no longer installed, in development either: the Symfony profiler stays, the Thelia panels it added (Smarty among them) go away.
