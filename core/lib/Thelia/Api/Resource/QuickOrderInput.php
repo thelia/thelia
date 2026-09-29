@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Api\Resource;
+
+use ApiPlatform\Metadata\ApiProperty;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+
+/**
+ * The lines a buyer typed or imported: a reference and a quantity each, and the
+ * sale element picked for a reference several of them share.
+ *
+ * Nothing else is taken. Titles, prices and stock come back from the shop, so a
+ * price sent here would be a price the buyer chose.
+ */
+final class QuickOrderInput
+{
+    /**
+     * @var list<array{reference: string, quantity: int, productSaleElementsId?: int|null}>
+     */
+    #[ApiProperty(
+        description: 'The lines to resolve, at most 500. A reference given twice for the same sale element is resolved once, quantities added up.',
+        required: true,
+        example: [
+            ['reference' => 'TSHIRT-01', 'quantity' => 3],
+            ['reference' => 'TSHIRT-01', 'quantity' => 2, 'productSaleElementsId' => 412],
+            ['reference' => '3760123450012', 'quantity' => 1],
+        ],
+    )]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1, max: ReferenceQuantityLines::MAX_LINES)]
+    #[Assert\All([
+        new Assert\Collection(
+            fields: [
+                'reference' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: ReferenceQuantityLines::MAX_REFERENCE_LENGTH)],
+                'quantity' => [new Assert\NotNull(), new Assert\Type('int'), new Assert\Positive()],
+                'productSaleElementsId' => new Assert\Optional([new Assert\Type('int'), new Assert\Positive()]),
+            ],
+        ),
+    ])]
+    #[Groups([QuickOrder::GROUP_FRONT_WRITE])]
+    public ?array $lines = null;
+}
