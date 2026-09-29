@@ -362,6 +362,9 @@
       <index-column name="promo" />
       <index-column name="is_default" />
     </index>
+    <index name="idx_product_sale_elements_ean_code">
+      <index-column name="ean_code" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="attribute_template" namespace="Thelia\Model">
