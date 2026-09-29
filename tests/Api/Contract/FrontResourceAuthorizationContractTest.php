@@ -69,6 +69,35 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
     }
 
     /**
+     * Ordering by reference answers with titles, prices and stock levels for up to five
+     * hundred lines: an anonymous caller must not reach either operation.
+     */
+    #[DataProvider('quickOrderOperations')]
+    public function testQuickOrderOperationsRejectAnonymousAccess(string $path): void
+    {
+        $factory = $this->createFixtureFactory();
+        $cart = $factory->cart($factory->customer($factory->customerTitle()));
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/quick-order/'.str_replace('{cartId}', (string) $cart->getId(), $path),
+            ['lines' => [['reference' => 'ANY', 'quantity' => 1]]],
+            format: 'json',
+        );
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('POST /front/account/quick-order/%s must demand an account.', $path));
+    }
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function quickOrderOperations(): iterable
+    {
+        yield 'resolution' => ['resolve'];
+        yield 'addition to the cart' => ['{cartId}/add'];
+    }
+
+    /**
      * @return iterable<string, array{0: string, 1: string}>
      */
     public static function checkoutOperations(): iterable
