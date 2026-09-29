@@ -828,6 +828,11 @@ DEALLOCATE PREPARE add_column_statement;
 
 SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_gift_wrapping_id');
 SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_gift_wrapping_id` (`gift_wrapping_id`)', 'DO 0');
+-- The quick order looks sale elements up by their EAN code as well as by their
+-- reference, for up to five hundred codes at once: without an index, each of
+-- those lookups reads the whole table.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `INDEX_NAME` = 'idx_product_sale_elements_ean_code');
+SET @statement := IF(@add_index, 'ALTER TABLE `product_sale_elements` ADD INDEX `idx_product_sale_elements_ean_code` (`ean_code`)', 'DO 0');
 PREPARE add_index_statement FROM @statement;
 EXECUTE add_index_statement;
 DEALLOCATE PREPARE add_index_statement;
