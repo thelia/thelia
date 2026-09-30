@@ -100,7 +100,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (89, 'image_quality_webp', '75', 0, 0, NOW(), NOW()),
 (90, 'image_quality_avif', '50', 0, 0, NOW(), NOW()),
 (91, 'header_menu_items', '', 0, 0, NOW(), NOW()),
-(92, 'admin_two_factor_required', '0', 0, 0, NOW(), NOW())
+(92, 'admin_two_factor_required', '0', 0, 1, NOW(), NOW())
 
 ;
 

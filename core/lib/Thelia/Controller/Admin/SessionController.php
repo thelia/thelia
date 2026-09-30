@@ -22,7 +22,6 @@ use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
-use Thelia\Core\Security\EventListener\AdminTwoFactorEnrolmentListener;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Admin\TwoFactor\AdminTwoFactorManager;
@@ -248,7 +247,6 @@ class SessionController extends BaseAdminController
         $this->getSecurityContext()->clearAdminUser();
         $this->twoFactorChallenge->clear($this->getSession());
         $this->getSession()->remove(self::TWO_FACTOR_PENDING_SECRET_SESSION_KEY);
-        $this->getSession()->remove(AdminTwoFactorEnrolmentListener::ENROLLED_SESSION_KEY);
 
         // Clear the remember me cookie, if any
         $this->clearRememberMeCookie($this->getRememberMeCookieName());

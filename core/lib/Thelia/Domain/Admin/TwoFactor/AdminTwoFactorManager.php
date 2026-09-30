@@ -138,7 +138,7 @@ final readonly class AdminTwoFactorManager
 
         $failureLimiter = $this->failureLimiterOf($admin);
 
-        if (0 === $failureLimiter->consume(0)->getRemainingTokens()) {
+        if (!$failureLimiter->consume()->isAccepted()) {
             $this->log($admin, 'Second factor verification refused: too many failures on this account');
 
             return TwoFactorVerification::Refused;
@@ -150,8 +150,9 @@ final readonly class AdminTwoFactorManager
             ? ($this->consumeBackupCode($admin, $code) ? TwoFactorVerification::BackupCode : TwoFactorVerification::Refused)
             : ($this->consumeTotpStep($admin, $twoFactor, $code) ? TwoFactorVerification::Totp : TwoFactorVerification::Refused);
 
-        if (!$verification->isAccepted()) {
-            $failureLimiter->consume();
+        if ($verification->isAccepted()) {
+            $failureLimiter->reset();
+        } else {
             $this->log($admin, 'Second factor verification failed');
         }
 
@@ -315,6 +316,7 @@ final readonly class AdminTwoFactorManager
         AdminTwoFactorBackupCodeQuery::create()->filterByAdminId($admin->getId())->delete();
         AdminTwoFactorQuery::create()->filterByAdminId($admin->getId())->delete();
         AdminTwoFactorTableMap::clearInstancePool();
+        $admin->setRememberMeToken(null)->save();
     }
 
     private function failureLimiterOf(Admin $admin): LimiterInterface

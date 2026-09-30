@@ -523,6 +523,6 @@ CREATE TABLE IF NOT EXISTS `admin_two_factor_backup_code`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-    ('admin_two_factor_required', '0', 0, 0, NOW(), NOW());
+    ('admin_two_factor_required', '0', 0, 1, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;

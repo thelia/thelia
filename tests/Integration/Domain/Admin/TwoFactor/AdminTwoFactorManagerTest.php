@@ -139,6 +139,24 @@ final class AdminTwoFactorManagerTest extends IntegrationTestCase
         self::assertSame(1, AdminLogQuery::create()->filterByAdminLogin($admin->getLogin())->filterByMessage('Second factor verification refused: too many failures on this account')->count());
     }
 
+    public function testASuccessfulCodeClearsTheFailuresOfTheAccount(): void
+    {
+        $admin = $this->createFixtureFactory()->admin();
+        $manager = $this->manager();
+        $backupCodes = $this->enableAndReturnBackupCodes($admin);
+        $secret = (string) AdminTwoFactorQuery::create()->findPk($admin->getId())?->getSecret();
+
+        for ($failure = 1; $failure <= 9; ++$failure) {
+            self::assertSame(TwoFactorVerification::Refused, $manager->verify($admin, $this->wrongCode($secret)));
+        }
+        self::assertSame(TwoFactorVerification::Totp, $manager->verify($admin, $this->nextCode($secret)));
+
+        for ($failure = 1; $failure <= 9; ++$failure) {
+            self::assertSame(TwoFactorVerification::Refused, $manager->verify($admin, $this->wrongCode($secret)));
+        }
+        self::assertSame(TwoFactorVerification::BackupCode, $manager->verify($admin, $backupCodes[0]));
+    }
+
     public function testTheEnrolmentMarkChangesWhenTheSecondFactorIsReplaced(): void
     {
         $admin = $this->createFixtureFactory()->admin();
@@ -220,6 +238,35 @@ final class AdminTwoFactorManagerTest extends IntegrationTestCase
         $admin->reload();
 
         self::assertNull($admin->getRememberMeToken());
+    }
+
+    /**
+     * @return iterable<string, array{callable(AdminTwoFactorManager, Admin, Admin): void}>
+     */
+    public static function removals(): iterable
+    {
+        yield 'disabled by the account' => [static fn (AdminTwoFactorManager $manager, Admin $admin): mixed => $manager->disable($admin)];
+        yield 'reset by a peer' => [static fn (AdminTwoFactorManager $manager, Admin $admin, Admin $peer): mixed => $manager->resetOnBehalfOf($admin, $peer)];
+        yield 'reset from the command line' => [static fn (AdminTwoFactorManager $manager, Admin $admin): mixed => $manager->resetFromCommandLine($admin)];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('removals')]
+    public function testRemovingTheSecondFactorRetiresTheRememberMeToken(callable $remove): void
+    {
+        $factory = $this->createFixtureFactory();
+        $admin = $factory->admin();
+        $this->enable($admin);
+        $admin->setRememberMeToken('a-token-issued-while-protected')->save($this->getPropelConnection());
+
+        $remove($this->manager(), $admin, $factory->admin());
+
+        $admin->reload();
+        self::assertNull($admin->getRememberMeToken());
+    }
+
+    public function testTheSettingIsHiddenFromTheConfigurationVariables(): void
+    {
+        self::assertSame(1, (int) ConfigQuery::create()->findOneByName(AdminTwoFactorManager::REQUIRED_CONFIG_KEY)?->getHidden());
     }
 
     public function testTheSettingMakesEnrolmentMandatoryOnlyWhenTurnedOn(): void
