@@ -20,7 +20,7 @@ use Thelia\Module\Exception\InvalidModuleDescriptorException;
  * Reads the parts of a module.xml descriptor that decide how the shop treats the module,
  * for the install steps that run with and without the kernel.
  */
-final class ModuleDescriptor
+final readonly class ModuleDescriptor
 {
     public const string ENABLED_BY_DEFAULT = 'enabled-by-default';
 

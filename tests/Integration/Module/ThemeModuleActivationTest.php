@@ -69,6 +69,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $this->filesystem = new Filesystem();
         $this->workDir = sys_get_temp_dir().'/thelia-theme-activation-'.bin2hex(random_bytes(4));
         $this->removeSampleModules();
+        // A run killed before its tearDown leaves the theme link behind.
+        $this->filesystem->remove($this->themeInstallDir());
     }
 
     protected function tearDown(): void
@@ -164,6 +166,29 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
+     * The theme lists the dependency before the module that requires it: the dependency is
+     * met inactive, then activated by the module the theme brings. What the loop reports and
+     * hands back is the state once every module has been handled, not the state met on the way.
+     */
+    public function testADependencyActivatedLaterInTheLoopIsReportedActive(): void
+    {
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::PARENT_CODE, self::PARENT_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $themeDir = $this->writeTheme([self::INACTIVE_CODE, self::PARENT_CODE]);
+
+        $output = new BufferedOutput();
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $modules = $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
+        $written = $output->fetch();
+
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'The dependency is activated by the module listed after it.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::INACTIVE_CODE] ?? null, 'The module handed back for the dependency carries the state the rest of the loop left it in.');
+        self::assertStringNotContainsString(self::INACTIVE_CODE.' is required by the theme but', $written, 'A dependency activated later in the loop is not reported inactive.');
+    }
+
+    /**
      * template:set sums up what ModuleManagement did, then enables the theme. The command
      * is built by hand so that the theme switch itself (bundle registration, configuration
      * row) is observed on a double instead of moving the test shop to a forged theme.
@@ -178,13 +203,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::once())->method('enableThemeAsBundle')->with($themePath);
         $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::THEME_NAME);
+        // The autoloader of the project is not regenerated from a test.
+        $composerHelper = $this->createMock(ComposerHelper::class);
+        $composerHelper->expects(self::once())->method('dumpAutoload');
 
-        $tester = new CommandTester($this->setTemplateCommand($templateHelper));
+        $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
         $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
 
         self::assertSame(SetTemplate::SUCCESS, $tester->getStatusCode(), $tester->getDisplay());
         self::assertStringContainsString(self::INACTIVE_CODE.' is required by the theme but ships inactive', $tester->getDisplay());
         self::assertStringContainsString('2 theme modules found, 1 active.', $tester->getDisplay());
+        self::assertStringContainsString('Autoload dump completed successfully', $tester->getDisplay());
         self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE));
     }
 
@@ -201,8 +230,10 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::never())->method('enableThemeAsBundle');
         $templateHelper->expects(self::never())->method('setConfigToTemplate');
+        $composerHelper = $this->createMock(ComposerHelper::class);
+        $composerHelper->expects(self::never())->method('dumpAutoload');
 
-        $tester = new CommandTester($this->setTemplateCommand($templateHelper));
+        $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
         $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
@@ -210,14 +241,14 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         self::assertStringNotContainsString('theme modules found', $tester->getDisplay());
     }
 
-    private function setTemplateCommand(TheliaTemplateHelper $templateHelper): SetTemplate
+    private function setTemplateCommand(TheliaTemplateHelper $templateHelper, ComposerHelper $composerHelper): SetTemplate
     {
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getService('event_dispatcher');
 
-        return new SetTemplate($moduleManagement, $templateHelper, $dispatcher, new ComposerHelper(), self::$kernel->getCacheDir());
+        return new SetTemplate($moduleManagement, $templateHelper, $dispatcher, $composerHelper, self::$kernel->getCacheDir());
     }
 
     /**
