@@ -19,6 +19,7 @@ use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -27,6 +28,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -357,6 +359,10 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
+        if (($response = $this->denyWithoutValidToken($request)) instanceof Response) {
+            return $response;
+        }
+
         try {
             $mode = $request->request->get('mode') ?? $request->query->get('mode');
 
@@ -399,6 +405,10 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
+        if (($response = $this->denyWithoutValidToken($request)) instanceof Response) {
+            return $response;
+        }
+
         if (null !== $object) {
             try {
                 $mode = $request->request->get('mode') ?? $request->query->get('mode');
@@ -437,6 +447,10 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
+        if (($response = $this->denyWithoutValidToken($this->getRequest())) instanceof Response) {
+            return $response;
+        }
+
         $changeEvent = $this->createToggleVisibilityEvent();
 
         try {
@@ -447,6 +461,21 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         return $this->nullResponse();
+    }
+
+    /**
+     * Refuse a state change whose request carries no valid session token. The token is read from
+     * the `_token` body field, then from the `X-CSRF-Token` header, then, deprecated, from the URL.
+     */
+    protected function denyWithoutValidToken(HttpFoundationRequest $request): ?Response
+    {
+        try {
+            $this->getTokenProvider()->checkRequestToken($request);
+        } catch (TokenAuthenticationException $exception) {
+            return $this->errorPage($exception, Response::HTTP_FORBIDDEN);
+        }
+
+        return null;
     }
 
     public function deleteAction(
@@ -461,10 +490,7 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         try {
-            // Check token
-            $tokenProvider->checkToken(
-                $request->query->get('_token'),
-            );
+            $tokenProvider->checkRequestToken($request);
 
             // Get the currency id, and dispatch the delete request
             $deleteEvent = $this->getDeleteEvent();

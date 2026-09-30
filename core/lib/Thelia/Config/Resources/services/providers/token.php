@@ -26,10 +26,14 @@ return static function (ContainerConfigurator $configurator): void {
             service('request_stack'),
             service('thelia.translator'),
             param('thelia.token_id'),
+            param('thelia.token.accept_query_string'),
         ]);
 
     $services->alias('thelia.token_provider', TokenProvider::class);
 
     $parameters->set('thelia.token_id', 'thelia.token_provider');
+    // A token read from the URL leaks through access logs, history and Referer headers. It is
+    // still accepted, with a deprecation, until the back offices send it in the body or a header.
+    $parameters->set('thelia.token.accept_query_string', true);
     $parameters->set('thelia.validator.translation_domain', 'validators');
 };
