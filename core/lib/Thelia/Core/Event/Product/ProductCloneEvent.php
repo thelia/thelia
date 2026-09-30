@@ -32,6 +32,18 @@ class ProductCloneEvent extends ActionEvent
     protected array $clonedDocumentIds = [];
 
     /**
+     * Images and videos copied for the clone, keyed by the id of the source medium:
+     * a cloned video takes the copy of its thumbnail, a cloned combination the
+     * copies of its videos, and the clone the order of the source gallery.
+     *
+     * @var array<int, int>
+     */
+    protected array $clonedImageIds = [];
+
+    /** @var array<int, int> */
+    protected array $clonedVideoIds = [];
+
+    /**
      * ProductCloneEvent constructor.
      *
      * @param string $lang the locale (such as fr_FR)
@@ -99,5 +111,25 @@ class ProductCloneEvent extends ActionEvent
     public function getClonedDocumentId(int $originalDocumentId): ?int
     {
         return $this->clonedDocumentIds[$originalDocumentId] ?? null;
+    }
+
+    public function addClonedImageId(int $originalImageId, int $clonedImageId): void
+    {
+        $this->clonedImageIds[$originalImageId] = $clonedImageId;
+    }
+
+    public function getClonedImageId(int $originalImageId): ?int
+    {
+        return $this->clonedImageIds[$originalImageId] ?? null;
+    }
+
+    public function addClonedVideoId(int $originalVideoId, int $clonedVideoId): void
+    {
+        $this->clonedVideoIds[$originalVideoId] = $clonedVideoId;
+    }
+
+    public function getClonedVideoId(int $originalVideoId): ?int
+    {
+        return $this->clonedVideoIds[$originalVideoId] ?? null;
     }
 }

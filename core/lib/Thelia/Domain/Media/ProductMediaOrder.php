@@ -121,6 +121,27 @@ final readonly class ProductMediaOrder
     }
 
     /**
+     * The media of the product in the order the sheet shows them.
+     *
+     * @return list<array{type: string, id: int}>
+     */
+    public function orderOf(int $productId): array
+    {
+        $order = [];
+
+        $this->transaction(function (ConnectionInterface $connection) use ($productId, &$order): void {
+            foreach ($this->media($productId, $connection) as $medium) {
+                $order[] = [
+                    'type' => $medium instanceof ProductVideo ? self::TYPE_VIDEO : self::TYPE_IMAGE,
+                    'id' => (int) $medium->getId(),
+                ];
+            }
+        });
+
+        return $order;
+    }
+
+    /**
      * Moves one medium a step up or down among the media of its product: it swaps
      * places with its immediate neighbour in the shared sequence, whichever table
      * that neighbour lives in. The first medium does not go up, nor the last down.
