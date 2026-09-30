@@ -16,7 +16,12 @@ namespace Thelia\Tests\Integration\Domain\Taxation;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Cart as CartAction;
+use Thelia\Action\Coupon as CouponAction;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Operators;
 use Thelia\Core\Event\Cart\CartCheckoutEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
@@ -29,14 +34,19 @@ use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\Map\CartAddressTableMap;
+use Thelia\Model\Map\OrderAddressTableMap;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTaxQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -281,6 +291,142 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
      * it was saved with: reading totals off it without reloading compares zero
      * to zero and proves nothing.
      */
+    public function testAnExemptOrderKeepsItsAmountsOnceTheNumberIsRevokedAndTheSettingTurnedOff(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $order = $this->checkout($fixtures);
+        $taxBefore = 0.0;
+        $totalBefore = $order->getTotalAmount($taxBefore);
+        $exemptedAmountBefore = $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount();
+
+        CartAddressQuery::create()->filterById($fixtures['invoiceAddressId'])->update(['VatVerifiedAt' => null]);
+        $this->configure(VatExemptionMode::DISABLED);
+        OrderTableMap::clearInstancePool();
+        OrderAddressTableMap::clearInstancePool();
+        CartAddressTableMap::clearInstancePool();
+
+        $reread = OrderQuery::create()->findPk($order->getId());
+        self::assertNotNull($reread);
+        $taxAfter = 0.0;
+        self::assertEqualsWithDelta($totalBefore, $reread->getTotalAmount($taxAfter), 0.0001);
+        self::assertEqualsWithDelta(0.0, $taxAfter, 0.0001);
+        self::assertEqualsWithDelta(0.0, $taxBefore, 0.0001);
+        self::assertSame(0, $this->taxLinesOf($reread));
+        self::assertSame(1, $reread->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
+        self::assertSame($exemptedAmountBefore, $reread->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount());
+        self::assertTrue($this->getService(VatExemptionResolver::class)->isExemptedForOrder($reread));
+    }
+
+    public function testMovingTheInvoiceAddressBackHomeTaxesTheOrderPostageIncluded(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $cart = $fixtures['cart'];
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+
+        $action->calculatePostage(new CartCheckoutEvent($cart), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $cart->reload();
+        self::assertEqualsWithDelta(0.0, (float) $cart->getPostageTax(), 0.0001, 'Control: the exempt cart must start with untaxed postage.');
+
+        $homeAddress = $this->createCartAddress(
+            $this->factory->customerTitle()->getId(),
+            $this->countryOf('FR')->getId(),
+            'FR40303265045',
+            new \DateTime('-10 days'),
+        );
+        $action->setInvoiceAddressManual((new CartCheckoutEvent($cart))->setCartAddress($homeAddress), TheliaEvents::CART_SET_INVOICE_ADDRESS_MANUAL, $dispatcher);
+        $cart->reload();
+        self::assertEqualsWithDelta(2.0, (float) $cart->getPostageTax(), 0.0001);
+
+        $fixtures['invoiceAddressId'] = $homeAddress->getId();
+        $order = $this->checkout($fixtures);
+
+        self::assertSame(0, $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
+        self::assertGreaterThan(0, $this->taxLinesOf($order));
+        self::assertEqualsWithDelta(2.0, (float) $order->getPostageTax(), 0.0001);
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+        self::assertEqualsWithDelta(2.0 + 2.0, $tax, 0.0001, 'VAT on the 10.00 line at 20% plus the VAT of the postage.');
+    }
+
+    public function testAPercentageCouponAndPostageOnAnExemptOrderAddUpWithoutTax(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $cart = $fixtures['cart'];
+
+        $session = $this->session();
+        $session->setCustomerUser($fixtures['customer']);
+        $session->setSessionCart($cart);
+        $session->setCurrency($fixtures['currency']);
+        $coupon = $this->factory->coupon([
+            'code' => 'TEN-PERCENT-'.uniqid(),
+            'type' => 'thelia.coupon.type.remove_x_percent',
+            'effects' => ['percentage' => 10.0],
+            'conditions' => $this->atLeastOneArticle(),
+        ]);
+        $session->setConsumedCoupons([$coupon->getCode()]);
+        $this->getService(CouponAction::class)->updateOrderDiscount(new Event(), 'test.recompute', $this->kernelDispatcher());
+        $cart->reload();
+        self::assertEqualsWithDelta(1.0, (float) $cart->getDiscount(), 0.0001, 'Ten percent of an untaxed 10.00, not of the 12.00 it would cost taxed.');
+
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+        $action->calculatePostage(new CartCheckoutEvent($cart), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $cart->reload();
+
+        $order = $this->checkout($fixtures);
+
+        self::assertSame(0, $this->taxLinesOf($order));
+        self::assertEqualsWithDelta(1.0, (float) $order->getDiscount(), 0.0001);
+        self::assertEqualsWithDelta(10.0, (float) $order->getPostage(), 0.0001, 'The 12.00 postage quote carries 2.00 of VAT the exempt buyer does not pay.');
+        self::assertEqualsWithDelta(0.0, (float) $order->getPostageTax(), 0.0001);
+        $tax = 0.0;
+        self::assertEqualsWithDelta(10.0 - 1.0 + 10.0, $order->getTotalAmount($tax), 0.0001);
+        self::assertEqualsWithDelta(0.0, $tax, 0.0001);
+    }
+
+    private function atLeastOneArticle(): string
+    {
+        $conditions = new ConditionCollection();
+        $conditions[] = $this->getService(ConditionFactory::class)->build(
+            'thelia.condition.match_for_x_articles',
+            ['quantity' => Operators::SUPERIOR_OR_EQUAL],
+            ['quantity' => 1],
+        );
+
+        return $this->getService(ConditionFactory::class)->serializeConditionCollection($conditions);
+    }
+
+    /**
+     * @return array{CartAction, EventDispatcher}
+     */
+    private function postageQuotedAt(OrderPostage $quote): array
+    {
+        $dispatcher = new EventDispatcher();
+        $action = new class($this->getService(VatExemptionResolver::class)) extends CartAction {
+            public OrderPostage $quote;
+
+            public function __construct(VatExemptionResolver $vatExemptionResolver)
+            {
+                $this->vatExemptionResolver = $vatExemptionResolver;
+            }
+
+            protected function getPostageByDeliveryModuleId(
+                Cart $cart,
+                EventDispatcherInterface $dispatcher,
+                int $moduleId,
+                int $deliveryAddressId,
+            ): OrderPostage {
+                return $this->quote;
+            }
+        };
+        $action->quote = $quote;
+        $dispatcher->addListener(TheliaEvents::CART_SET_POSTAGE, $action->calculatePostage(...));
+
+        return [$action, $dispatcher];
+    }
+
     private function cartWithItems(string $billingCountryCode, ?\DateTime $verifiedAt): Cart
     {
         $cart = $this->createCheckoutReadyCart($billingCountryCode, $verifiedAt)['cart'];

@@ -1,6 +1,6 @@
 # 3.2.0 (unreleased)
 
-The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules.
+The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and the VAT verification columns of the address, cart address and order address tables.
 
 ## Promotions and sales
 
@@ -59,6 +59,11 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - Known limit: the shared secret is stored in the database unencrypted, so a leaked database gives it away; encrypting it waits for a vault of the shop secrets.
 - The admin log no longer keeps the `Cookie` and `Authorization` headers of a request, which carried the session, remember-me and API credentials of whoever made it, and a failed back-office sign-in or password creation no longer keeps the request body, which held the password that was typed.
 - A remember-me cookie that does not decode, for an administrator or a customer, is ignored instead of failing every page of the shop for the browser that carries it.
+## Intra-community VAT exemption
+
+- A shop liable for VAT invoices without VAT an order billed to a verified VAT number of another member state, once `vat_exemption_mode` is set to `verified_vat_number`. The setting arrives disabled, so an upgraded shop changes no price. Thelia does not call VIES itself: a module implements `Thelia\Domain\Legal\Service\VatNumberVerifierInterface` and reports its answer through `VAT_NUMBER_VERIFIED`. The shipped `NullVatNumberVerifier` answers "undetermined", so a shop without such a module exempts nobody. A verification stays valid for `vat_verification_lifetime_days`, 90 by default.
+- The verification is recorded on the address (`vat_verified_at`, `vat_verified_name`), copied to the cart address and frozen on the order address, next to `vat_exempted` and `vat_exempted_amount`. Changing the number or the country of an address drops it, whatever writes the address: the forms, the admin and front API, a profile update. An answer is recorded only while the address still carries the number and the country that were checked, and it reaches the cart copies of that address, so a refusal that arrives after the invoice address was chosen taxes the cart again. On an order address, only a new number drops it.
+- An exempt cart pays no VAT on its lines or on its postage, and a percentage discount is taken on the untaxed amount. An exempt order keeps its amounts after the number is revoked or the setting turned off. The front API exposes the state read only, as `Address.vatVerifiedAt`, `Address.vatVerificationValid`, `Cart.isVatExempted` and `Order.vatExempted`. #3988
 
 ## Modules
 
@@ -111,6 +116,8 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 
 - GHSA-gvcv-hvpp-89gx — an SVG store logo or banner reached the web space as it was uploaded: the image cache linked to it or copied it into `public/cache/images/`, so a script or an event handler it carried ran on the shop origin for anyone opening its URL, which every front page advertises in `og:image`. The image cache now publishes an SVG only as a copy stripped of its active content, whatever `original_image_delivery_mode` says, replaces the links earlier versions left there and publishes nothing for an SVG it cannot read. The SVG sanitizer applied to uploads also drops processing instructions, the document type declaration and its entities, XHTML elements, and javascript: or data: URIs behind any attribute prefix, and refuses a file whose root is not an SVG element; a raster image embedded as base64 is kept. Run `php bin/console image-cache:clear` after the update to drop resized copies made from an unsanitized SVG.
 - In the `default-twig` back-office theme, `BackOfficeDefaultTwigBundle\Service\Dashboard\DashboardStatsProvider::__construct()` takes `PeriodOptions`, which now builds the period presets the dashboard and the reports share. A module instantiating the provider itself has to pass it.
+- `Thelia\Action\Cart`, `Thelia\Action\Tax`, `Thelia\Api\Bridge\Propel\Serializer\CartNormalizer` and `Thelia\Api\Service\DataAccess\AttributeAccessService` take `VatExemptionResolver`, and `Thelia\Domain\Order\OrderFacade` takes `VatExemptionResolver` and `ExemptedVatCalculator`. `Thelia\Domain\Order\Service\OrderAddressPersister::prepareOrderAddresses()` takes `bool $vatExempted` before the connection. A module instantiating one of them itself has to follow; a module reading it from the container has nothing to do. In the back-office theme, `BackOfficeDefaultTwigBundle\Controller\Customer\AddressController` takes `VatVerificationAvailability`.
+- Saving an `Address` whose VAT number or country changed clears `vat_verified_at` and `vat_verified_name`, unless the same save writes the verification. Saving an `OrderAddress` with a new VAT number does the same.
 
 # 3.1.0
 
