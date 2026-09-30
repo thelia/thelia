@@ -436,19 +436,14 @@ foreach ($commands as $cmd) {
 
     echo "  {$cmd['label']}\n";
 
-    $exitCodeRecorder = new Thelia\Install\Standalone\CommandExitCodeRecorder();
-    $exitCodeRecorder->listenOn($kernel->getContainer()->get('event_dispatcher'));
-
     try {
-        $exitCode = $app->run(new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output);
+        // A console.terminate listener dying on a container file the command deleted does
+        // not decide the result: the exit code the command returned does.
+        $exitCode = (new Thelia\Install\Standalone\CommandExitCodeRecorder())->run($app, new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output, $kernel->getContainer()->get('event_dispatcher'));
     } catch (\Error $e) {
-        // Cache file deleted mid-process by the command: a console.terminate listener died
-        // after the command returned. The command's own exit code decides, not the listener.
-        $exitCode = str_contains($e->getMessage(), 'Failed opening required') ? ($exitCodeRecorder->exitCode() ?? 0) : 1;
-        if (0 !== $exitCode) {
-            fwrite(STDERR, "  ERROR: {$cmd['label']} — {$e->getMessage()}\n");
-            ++$errors;
-        }
+        // Counted once, below, with the other failures.
+        $exitCode = 1;
+        fwrite(STDERR, "  ERROR: {$cmd['label']} — ".Thelia\Tools\TerminalText::withoutControlCharacters($e->getMessage())."\n");
     }
 
     if (0 !== $exitCode) {

@@ -20,6 +20,7 @@ use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptor;
 use Thelia\Module\ModuleDescriptorValidator;
+use Thelia\Tools\TerminalText;
 use Thelia\Tools\Version\Version;
 
 final class DatabaseSetup
@@ -172,21 +173,47 @@ final class DatabaseSetup
 
         // The state written is read back once: on a populated database the row keeps the
         // activation the merchant chose, not the one the descriptor ships.
-        $activation = array_map(intval(...), $this->pdo->query('SELECT `code`, `activate` FROM `module`')->fetchAll(\PDO::FETCH_KEY_PAIR));
-        $this->warnAboutMandatoryModulesLeftInactive($modules, $activation);
-        $this->warnAboutRequiredModulesLeftInactive($modules, $activation);
-        // A module found in both module directories is read twice: say it once.
+        // The mandatory flag is read back too: a replay does not refresh it from the descriptor.
+        $registered = $this->pdo->query('SELECT `code`, `activate`, `mandatory` FROM `module`')->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+        $activation = array_map(static fn (array $row): int => (int) $row['activate'], $registered);
+        $mandatory = array_map(static fn (array $row): int => (int) $row['mandatory'], $registered);
+        $writtenModules = $this->firstCopyOfEachModule($modules);
+        $this->warnAboutMandatoryModulesLeftInactive($writtenModules, $activation, $mandatory);
+        $this->warnAboutRequiredModulesLeftInactive($writtenModules, $activation);
+        // Both copies of a module apply the same SQL files: say a failure once.
         $this->warnings = array_values(array_unique($this->warnings));
 
         return \count($modules);
     }
 
     /**
+     * A module found in both vendor/thelia/modules and local/modules is read, and its SQL
+     * applied, from each copy, in the order the directories are given: the first copy creates
+     * the row and decides its activation and its mandatory flag, the second only refreshes the
+     * namespace and the version. The warnings describe the row, so they read the first copy.
+     * No copy is the one that runs everywhere: Model\Module::getModuleDir() prefers
+     * local/modules, BaseModule::getModuleDir() and module:activate prefer vendor/thelia/modules.
+     *
+     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
+     *
+     * @return list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}>
+     */
+    private function firstCopyOfEachModule(array $modules): array
+    {
+        $firstCopies = [];
+        foreach ($modules as $module) {
+            $firstCopies[$module['code']] ??= $module;
+        }
+
+        return array_values($firstCopies);
+    }
+
+    /**
      * Registering writes each module on its own: an active module whose <required> module
      * ships inactive, or was switched off before this run, is registered active next to an
      * inactive dependency. Activating it from the back-office would have activated the
-     * dependency with it; nothing does it here, so the state written is read back and the
-     * operator told.
+     * dependency with it; the install does not, so that a module shipped inactive is never
+     * switched on without the merchant: the state written is read back and the operator told.
      *
      * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
      * @param array<string, int>                                                                              $activation by module code
@@ -216,11 +243,12 @@ final class DatabaseSetup
      *
      * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
      * @param array<string, int>                                                                              $activation by module code
+     * @param array<string, int>                                                                              $mandatory  by module code
      */
-    private function warnAboutMandatoryModulesLeftInactive(array $modules, array $activation): void
+    private function warnAboutMandatoryModulesLeftInactive(array $modules, array $activation, array $mandatory): void
     {
         foreach ($modules as $module) {
-            if (1 === $module['row']['mandatory'] && 0 === ($activation[$module['code']] ?? null)) {
+            if (1 === ($mandatory[$module['code']] ?? null) && 0 === ($activation[$module['code']] ?? null)) {
                 $this->warn(\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $module['code']));
             }
         }
@@ -232,7 +260,7 @@ final class DatabaseSetup
      */
     private function warn(string $warning): void
     {
-        $this->warnings[] = InvalidModuleDescriptorException::terminalSafe($warning);
+        $this->warnings[] = TerminalText::withoutControlCharacters($warning);
     }
 
     /**

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Module\Exception;
 
+use Thelia\Tools\TerminalText;
+
 /**
  * A module.xml declares something the shop refuses to act on: a value it cannot read, an
  * element the module schema rejects. The install entry points catch it to stop with a
@@ -25,15 +27,6 @@ final class InvalidModuleDescriptorException extends \InvalidArgumentException
     {
         // The message quotes a module.xml and its directory name: whoever prints it, no
         // control character of theirs reaches the operator's terminal.
-        parent::__construct(self::terminalSafe($message), $code, $previous);
-    }
-
-    /**
-     * The text with every control character but the tab and the line feed replaced, for a
-     * message built from a module.xml or a module directory name.
-     */
-    public static function terminalSafe(string $text): string
-    {
-        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]/', '?', $text) ?? '';
+        parent::__construct(TerminalText::withoutControlCharacters($message), $code, $previous);
     }
 }

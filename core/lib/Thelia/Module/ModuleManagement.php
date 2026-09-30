@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,6 +36,7 @@ use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\Validator\ModuleValidator;
+use Thelia\Tools\TerminalText;
 
 class ModuleManagement
 {
@@ -244,13 +246,16 @@ class ModuleManagement
     }
 
     /**
-     * The row the module table already holds for the module the validator describes.
+     * The row the module table already holds for the module the validator describes. The
+     * install event matches a row by namespace but updateModule() by code: a module whose
+     * namespace changed between two releases is still the merchant's row, found by its code.
      */
     private function findRegistered(ModuleValidator $moduleValidator): ?Module
     {
-        return ModuleQuery::create()->findOneByFullNamespace(
-            $moduleValidator->getModuleDefinition()?->getNamespace() ?? '',
-        );
+        $moduleDefinition = $moduleValidator->getModuleDefinition();
+
+        return ModuleQuery::create()->findOneByFullNamespace($moduleDefinition?->getNamespace() ?? '')
+            ?? ModuleQuery::create()->findOneByCode($moduleDefinition?->getCode() ?? '');
     }
 
     /**
@@ -283,42 +288,13 @@ class ModuleManagement
         $toggleEvent->setNoCheck(false);
         $toggleEvent->setRecursive(true);
 
-        try {
-            $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
-        } catch (\Throwable $exception) {
-            $this->forgetAModuleLeftInactive($module);
-
-            throw $exception;
-        }
+        $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
         // The activation wrote the row through another instance: read it back so the caller
         // never decides on a stale state.
         $module->reload();
 
         return $module;
-    }
-
-    /**
-     * The row was written by this run, a moment before an activation that failed: nothing
-     * but the install refers to it. Removing it leaves the module unknown, so the next run
-     * installs and activates it again instead of taking it for a module the merchant keeps
-     * inactive. A row the activation got to switch on is kept: the module is running.
-     */
-    private function forgetAModuleLeftInactive(Module $module): void
-    {
-        try {
-            $module->reload();
-        } catch (PropelException) {
-            // The row is gone already: nothing to forget, and the activation failure is
-            // what the caller has to see, not this.
-            return;
-        }
-
-        if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-            return;
-        }
-
-        ModuleQuery::create()->filterById($module->getId())->delete();
     }
 
     /**
@@ -418,10 +394,12 @@ class ModuleManagement
         foreach ($outcomes as $outcome) {
             $module = $outcome->module;
             $module->reload();
+            // The code comes from the descriptor a theme ships: printed as text, never as markup.
+            $code = OutputFormatter::escape(TerminalText::withoutControlCharacters($module->getCode()));
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                 if ($outcome->installedNow) {
-                    $output?->writeln(\sprintf('<fg=gray>Module %s successfully installed and activated.</>', $module->getCode()));
+                    $output?->writeln(\sprintf('<fg=gray>Module %s successfully installed and activated.</>', $code));
                 }
 
                 continue;
@@ -437,12 +415,12 @@ class ModuleManagement
                 $outcome->shipsInactive
                     ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
                     : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
-                $module->getCode(),
+                $code,
             ));
 
             // The install warns about a mandatory module it leaves inactive; so does a theme.
             if (BaseModule::IS_MANDATORY === $module->getMandatory()) {
-                $output?->writeln('<comment>Module '.\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $module->getCode()).'</comment>');
+                $output?->writeln('<comment>Module '.\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $code).'</comment>');
             }
         }
     }

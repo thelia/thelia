@@ -242,6 +242,104 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
+     * Two copies of a module that disagree: the first copy creates the row, and the warnings
+     * describe that row. A local copy declaring the module mandatory does not make the install
+     * warn about a row the vendor copy registered as not mandatory.
+     */
+    public function testTheFirstCopyOfAModuleDecidesItsRowAndItsWarnings(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $vendorDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML);
+        $localDir = $this->writeMandatoryModule('');
+
+        $setup->registerAndApplyModules([$vendorDir, $localDir]);
+
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame([], $setup->getWarnings());
+    }
+
+    /**
+     * Only the first copy of a module is read for its warnings: a local copy that requires a
+     * module shipped inactive does not make the install warn about the row the vendor copy,
+     * which requires nothing, created.
+     */
+    public function testTheRequiredModulesOfAModuleAreReadOnItsFirstCopy(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $dependencyDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML, self::SHIPPED_INACTIVE_CODE);
+        $vendorDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            XML, self::SHIPPED_ACTIVE_CODE);
+        $localDir = $this->writeSingleModule(\sprintf(<<<XML
+            <type>classic</type>
+            <required>
+                <module version="&gt;=1.0.0">%s</module>
+            </required>
+            <stability>prod</stability>
+            XML, self::SHIPPED_INACTIVE_CODE), self::SHIPPED_ACTIVE_CODE);
+
+        $setup->registerAndApplyModules([$dependencyDir, $vendorDir, $localDir]);
+
+        self::assertSame([], $setup->getWarnings());
+    }
+
+    /**
+     * A replay does not refresh the mandatory flag of a row the database knows: a descriptor
+     * that turned mandatory since does not make the install warn about a row that is not.
+     */
+    public function testTheMandatoryWarningReadsTheFlagTheRowCarries(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $setup->registerAndApplyModules([$this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML)]);
+
+        $replay = $this->createDatabaseSetup();
+        $replay->connect();
+        $replay->registerAndApplyModules([$this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>')]);
+
+        self::assertSame([], $replay->getWarnings());
+    }
+
+    /**
+     * Both copies of a module apply the same SQL files: a statement both refuse is reported once.
+     */
+    public function testAnSqlFailureOfAModuleInBothDirectoriesIsReportedOnce(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $vendorDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            XML, self::SHIPPED_ACTIVE_CODE);
+        $localDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            XML, self::SHIPPED_ACTIVE_CODE);
+        foreach ([$vendorDir, $localDir] as $moduleDir) {
+            (new Filesystem())->dumpFile($moduleDir.self::SHIPPED_ACTIVE_CODE.'/Config/TheliaMain.sql', "THIS IS NOT SQL;\n");
+        }
+
+        $setup->registerAndApplyModules([$vendorDir, $localDir]);
+
+        self::assertCount(1, array_filter($setup->getWarnings(), static fn (string $warning): bool => str_contains($warning, 'TheliaMain.sql')));
+    }
+
+    /**
      * The warnings describe the registration that just ran: registering twice with the same
      * setup reports a mandatory module left inactive once, not once per run.
      */

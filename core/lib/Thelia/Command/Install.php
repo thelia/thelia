@@ -650,19 +650,18 @@ class Install extends ContainerAwareCommand
                 $kernel = new AppKernel($_SERVER['APP_ENV'], (bool) ($_SERVER['APP_DEBUG'] ?? false));
                 $kernel->boot();
 
-                $exitCodeRecorder = new CommandExitCodeRecorder();
-                $exitCodeRecorder->listenOn($kernel->getContainer()->get('event_dispatcher'));
-
                 try {
-                    $application = new FrameworkConsoleApplication($kernel);
-                    $application->setAutoExit(false);
-                    $exitCode = $application->run(
+                    // A console.terminate listener dying on a container file template:set
+                    // deleted does not decide the result: the exit code it returned does.
+                    $exitCode = (new CommandExitCodeRecorder())->run(
+                        new FrameworkConsoleApplication($kernel),
                         new ArrayInput([
                             'command' => 'template:set',
                             'type' => $type,
                             'name' => $name,
                         ]),
                         $output,
+                        $kernel->getContainer()->get('event_dispatcher'),
                     );
 
                     if (Command::SUCCESS !== $exitCode) {
@@ -674,17 +673,6 @@ class Install extends ContainerAwareCommand
                                 $type
                             )
                         );
-                    }
-                } catch (\Error $error) {
-                    // Cache file deleted mid-process by cache:clear: a console.terminate
-                    // listener died after template:set returned. Its own exit code decides.
-                    if (!str_contains($error->getMessage(), 'Failed opening required')) {
-                        throw $error;
-                    }
-
-                    if (Command::SUCCESS !== ($exitCodeRecorder->exitCode() ?? Command::SUCCESS)) {
-                        $applied = false;
-                        $output->writeln(\sprintf('<error>Post-install step failed while applying template "%s" for type "%s".</error>', $name, $type));
                     }
                 } finally {
                     try {
