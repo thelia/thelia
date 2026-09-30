@@ -19,6 +19,69 @@ use Thelia\Tools\Password;
 
 final class PasswordTest extends TestCase
 {
+    private const string COST_VARIABLE = 'THELIA_PASSWORD_HASH_COST';
+
+    private mixed $serverCost;
+
+    private mixed $envCost;
+
+    protected function setUp(): void
+    {
+        $this->serverCost = $_SERVER[self::COST_VARIABLE] ?? null;
+        $this->envCost = $_ENV[self::COST_VARIABLE] ?? null;
+        unset($_SERVER[self::COST_VARIABLE], $_ENV[self::COST_VARIABLE]);
+    }
+
+    protected function tearDown(): void
+    {
+        unset($_SERVER[self::COST_VARIABLE], $_ENV[self::COST_VARIABLE]);
+
+        if (null !== $this->serverCost) {
+            $_SERVER[self::COST_VARIABLE] = $this->serverCost;
+        }
+
+        if (null !== $this->envCost) {
+            $_ENV[self::COST_VARIABLE] = $this->envCost;
+        }
+    }
+
+    public function testHashUsesPhpDefaultCostWhenNoneIsConfigured(): void
+    {
+        $defaultCost = password_get_info(password_hash('reference', \PASSWORD_BCRYPT))['options']['cost'];
+
+        $hash = Password::hash('secret');
+
+        self::assertSame('2y', password_get_info($hash)['algo']);
+        self::assertSame($defaultCost, password_get_info($hash)['options']['cost']);
+        self::assertTrue(password_verify('secret', $hash));
+    }
+
+    public function testHashUsesTheConfiguredCost(): void
+    {
+        $_SERVER[self::COST_VARIABLE] = '5';
+
+        $hash = Password::hash('secret');
+
+        self::assertSame(5, password_get_info($hash)['options']['cost']);
+        self::assertTrue(password_verify('secret', $hash));
+    }
+
+    public function testHashReadsTheCostFromEnvWhenServerHasNone(): void
+    {
+        $_ENV[self::COST_VARIABLE] = '6';
+
+        self::assertSame(6, password_get_info(Password::hash('secret'))['options']['cost']);
+    }
+
+    public function testHashRejectsACostThatIsNotAnInteger(): void
+    {
+        $_SERVER[self::COST_VARIABLE] = 'low';
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        Password::hash('secret');
+    }
+
     public function testGenerateRandomHasTheRequestedLength(): void
     {
         self::assertSame(8, \strlen(Password::generateRandom()));
