@@ -4,7 +4,7 @@ import { ConfigStorePage } from '../../poms/backoffice/config-store-page';
 
 test.describe('Back-office — Store configuration (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

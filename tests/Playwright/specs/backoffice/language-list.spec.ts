@@ -6,7 +6,7 @@ test.describe('Back-office — language list (BO Twig)', () => {
   // Active back-office template is set via `bin/console template:set backOffice <name>`.
   // Pass `BO_TEMPLATE=default-twig` when running Playwright against the new template; default skips this suite.
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only — switch the back-office template to default-twig and re-run with BO_TEMPLATE=default-twig.',
   );
 

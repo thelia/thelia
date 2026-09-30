@@ -8,7 +8,7 @@ test.describe.configure({ mode: 'serial' });
 
 test.describe('Visual audit — BO Twig screens', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

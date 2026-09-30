@@ -4,7 +4,7 @@ import { CurrencyListPage } from '../../poms/backoffice/currency-list-page';
 
 test.describe('Back-office — currency list (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only — switch the back-office template to default-twig and re-run with BO_TEMPLATE=default-twig.',
   );
 

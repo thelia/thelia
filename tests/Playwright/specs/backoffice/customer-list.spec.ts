@@ -4,7 +4,7 @@ import { CustomerListPage } from '../../poms/backoffice/customer-list-page';
 
 test.describe('Back-office — customer list', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default',
     'Legacy Smarty markup; BO Twig has its own customer-list-twig.spec.ts.',
   );
 

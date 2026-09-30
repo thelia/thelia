@@ -4,7 +4,7 @@ import { ProfileListPage } from '../../poms/backoffice/profile-list-page';
 
 test.describe('Back-office — profiles list (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

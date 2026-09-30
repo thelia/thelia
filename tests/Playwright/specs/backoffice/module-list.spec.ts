@@ -4,7 +4,7 @@ import { ModuleListPage } from '../../poms/backoffice/module-list-page';
 
 test.describe('Back-office — module list', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default',
     'Legacy Smarty markup; not applicable under default-twig.',
   );
 

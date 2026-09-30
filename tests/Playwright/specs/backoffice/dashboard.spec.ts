@@ -4,7 +4,7 @@ import { DashboardPage } from '../../poms/backoffice/dashboard-page';
 
 test.describe('Back-office — dashboard', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default',
     'Legacy Smarty markup; not applicable under default-twig.',
   );
 
