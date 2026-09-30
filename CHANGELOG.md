@@ -66,6 +66,7 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 ## Behaviour changes
 
 - `template:set` (phase 7 of the install) only activates the modules the theme brings to the shop. A module the shop already knows keeps its state, whether its descriptor ships it inactive, the merchant switched it off or `module:refresh` registered it inactive, and the install output names the module the theme is missing. Before, applying a theme switched every inactive dependency back on. `ModuleManagement::installModule()` follows the same rule: a module declaring `<enabled-by-default>0</enabled-by-default>` is installed and registered, not activated.
+- `template:set` stops with a non-zero exit code when a module the theme brings cannot be activated: the error is printed, the trace in verbose mode, and the theme is not enabled. Before, the failure was printed in red and the command carried on. The install also warns when a module declares `<mandatory>1</mandatory>` together with `<enabled-by-default>0</enabled-by-default>`: the module is registered inactive as asked, and the mandatory flag only keeps it from being deactivated once active.
 
 ## Breaking changes
 
