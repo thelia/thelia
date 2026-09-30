@@ -128,6 +128,36 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'The dependency of an activated module is activated with it, even though it ships inactive.');
     }
 
+    /**
+     * The theme lists a module it brings before the dependency that module requires, and
+     * the dependency ships inactive: activating the first activates the second on the way.
+     * Reached in its turn, the dependency is read in its current state, active, not in the
+     * state the loop started with, so it is neither reported missing nor counted inactive.
+     */
+    public function testADependencyActivatedEarlierInTheLoopIsReadActiveInItsTurn(): void
+    {
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::PARENT_CODE, self::PARENT_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $themeDir = $this->writeTheme([self::PARENT_CODE, self::INACTIVE_CODE]);
+
+        $output = new BufferedOutput();
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $modules = $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
+        $written = $output->fetch();
+
+        $states = [];
+        foreach ($modules as $module) {
+            $states[$module->getCode()] = $module->getActivate();
+        }
+
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::PARENT_CODE), 'The module the theme brings is activated.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'Its dependency is activated with it, even though it ships inactive.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $states[self::INACTIVE_CODE] ?? null, 'The module handed back for the dependency carries its current state.');
+        self::assertStringNotContainsString(self::INACTIVE_CODE.' is required by the theme but', $written, 'A dependency activated earlier in the loop is not reported missing in its turn.');
+    }
+
     private function activationOf(string $code): int
     {
         $module = ModuleQuery::create()->findOneByCode($code);

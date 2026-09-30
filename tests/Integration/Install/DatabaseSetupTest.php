@@ -34,20 +34,23 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
     private const string UNDECLARED_CODE = 'InstallSampleUndeclared';
 
-    private ?string $moduleDir = null;
+    private const string REFUSED_CODE = 'InstallSampleRefused';
+
+    /** @var string[] */
+    private array $moduleDirs = [];
 
     protected function tearDown(): void
     {
-        if (null !== $this->moduleDir) {
+        if ([] !== $this->moduleDirs) {
             $setup = $this->createDatabaseSetup();
             $setup->connect();
-            $codes = [self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE];
+            $codes = [self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE, self::REFUSED_CODE];
             $placeholders = implode(',', array_fill(0, \count($codes), '?'));
             $setup->getPdo()->prepare("DELETE FROM `module_i18n` WHERE `id` IN (SELECT `id` FROM `module` WHERE `code` IN ($placeholders))")->execute($codes);
             $setup->getPdo()->prepare("DELETE FROM `module` WHERE `code` IN ($placeholders)")->execute($codes);
 
-            (new Filesystem())->remove($this->moduleDir);
-            $this->moduleDir = null;
+            (new Filesystem())->remove($this->moduleDirs);
+            $this->moduleDirs = [];
         }
 
         parent::tearDown();
@@ -208,22 +211,31 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
     /**
      * The descriptors are all read before anything is written: a refused value must not
-     * leave the modules iterated before it registered, whatever order the disk lists them.
+     * leave the modules read before it registered. The disk lists a directory in no fixed
+     * order, so the refused descriptor sits alone in a second directory: the directories
+     * are walked in the order given, the three valid modules are read first, and none of
+     * them may have been written.
      */
     public function testAnInvalidActivationValueRegistersNoModuleAtAll(): void
     {
         $setup = $this->createDatabaseSetup();
         $setup->connect();
-        $moduleDir = $this->writeSampleModules(undeclaredDeclaration: '<enabled-by-default>maybe</enabled-by-default>');
+        $validDir = $this->writeSampleModules();
+        $refusedDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>maybe</enabled-by-default>
+            XML, self::REFUSED_CODE);
 
         try {
-            $setup->registerAndApplyModules([$moduleDir]);
+            $setup->registerAndApplyModules([$validDir, $refusedDir]);
             self::fail('An invalid value must stop the registration.');
-        } catch (\InvalidArgumentException) {
+        } catch (\InvalidArgumentException $exception) {
+            self::assertStringContainsString(self::REFUSED_CODE, $exception->getMessage());
         }
 
-        $statement = $setup->getPdo()->prepare('SELECT COUNT(*) FROM `module` WHERE `code` IN (?, ?, ?)');
-        $statement->execute([self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE]);
+        $statement = $setup->getPdo()->prepare('SELECT COUNT(*) FROM `module` WHERE `code` IN (?, ?, ?, ?)');
+        $statement->execute([self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE, self::UNDECLARED_CODE, self::REFUSED_CODE]);
 
         self::assertSame(0, (int) $statement->fetchColumn());
     }
@@ -305,7 +317,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
      */
     private function writeSampleModules(string $activeDeclaration = '<enabled-by-default>1</enabled-by-default>', string $undeclaredDeclaration = ''): string
     {
-        $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
+        $moduleDir = $this->newModuleDir();
         $filesystem = new Filesystem();
 
         $declarations = [
@@ -315,8 +327,8 @@ final class DatabaseSetupTest extends IntegrationTestCase
         ];
 
         foreach ($declarations as $code => $declaration) {
-            $filesystem->mkdir($this->moduleDir.$code.'/Config');
-            $filesystem->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+            $filesystem->mkdir($moduleDir.$code.'/Config');
+            $filesystem->dumpFile($moduleDir.$code.'/Config/module.xml', <<<XML
                 <?xml version="1.0" encoding="UTF-8"?>
                 <module xmlns="http://thelia.net/schema/dic/module">
                     <fullnamespace>{$code}\\{$code}</fullnamespace>
@@ -334,19 +346,18 @@ final class DatabaseSetupTest extends IntegrationTestCase
                 XML);
         }
 
-        return $this->moduleDir;
+        return $moduleDir;
     }
 
     /**
      * One descriptor whose tail (from `<type>` on) is given verbatim, to exercise the
-     * element order and the descriptor format.
+     * element order, the descriptor format and a refused value.
      */
-    private function writeSingleModule(string $tail): string
+    private function writeSingleModule(string $tail, string $code = self::SHIPPED_INACTIVE_CODE): string
     {
-        $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
-        $code = self::SHIPPED_INACTIVE_CODE;
+        $moduleDir = $this->newModuleDir();
 
-        (new Filesystem())->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+        (new Filesystem())->dumpFile($moduleDir.$code.'/Config/module.xml', <<<XML
             <?xml version="1.0" encoding="UTF-8"?>
             <module xmlns="http://thelia.net/schema/dic/module">
                 <fullnamespace>{$code}\\{$code}</fullnamespace>
@@ -361,7 +372,19 @@ final class DatabaseSetupTest extends IntegrationTestCase
             </module>
             XML);
 
-        return $this->moduleDir;
+        return $moduleDir;
+    }
+
+    /**
+     * A throwaway module directory, remembered so tearDown removes it and the rows its
+     * modules may have left.
+     */
+    private function newModuleDir(): string
+    {
+        $moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
+        $this->moduleDirs[] = $moduleDir;
+
+        return $moduleDir;
     }
 
     /**
