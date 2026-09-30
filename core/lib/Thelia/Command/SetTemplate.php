@@ -110,9 +110,10 @@ class SetTemplate extends ContainerAwareCommand
         // its modules are not yet available in the container.
         try {
             $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
-        } catch (\Exception $exception) {
-            // addError() writes the message and the trace of an exception it is handed.
-            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $exception);
+        } catch (\Throwable $exception) {
+            // The trace goes to the log as text: Tlog only expands an \Exception, and an \Error
+            // (a module class that does not load) would otherwise be dumped as an object.
+            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $exception->getMessage()."\n".$exception->getTraceAsString());
             $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($exception->getMessage())));
             if ($output->isVerbose()) {
                 $output->writeln(OutputFormatter::escape($exception->getTraceAsString()));

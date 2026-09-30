@@ -200,8 +200,7 @@ echo "Registering modules...\n";
 try {
     $count = $setup->registerAndApplyModules();
 } catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
-    // The message quotes a module.xml: no control character of it reaches the terminal.
-    fwrite(STDERR, 'ERROR: '.preg_replace('/[\x00-\x08\x0B-\x1F\x7F]/', '?', $e->getMessage())."\n");
+    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
     exit(1);
 }
 echo "  {$count} module(s) registered\n";
@@ -437,11 +436,15 @@ foreach ($commands as $cmd) {
 
     echo "  {$cmd['label']}\n";
 
+    $exitCodeRecorder = new Thelia\Install\Standalone\CommandExitCodeRecorder();
+    $exitCodeRecorder->listenOn($kernel->getContainer()->get('event_dispatcher'));
+
     try {
         $exitCode = $app->run(new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output);
     } catch (\Error $e) {
-        // Cache file deleted mid-process — command had already succeeded
-        $exitCode = str_contains($e->getMessage(), 'Failed opening required') ? 0 : 1;
+        // Cache file deleted mid-process by the command: a console.terminate listener died
+        // after the command returned. The command's own exit code decides, not the listener.
+        $exitCode = str_contains($e->getMessage(), 'Failed opening required') ? ($exitCodeRecorder->exitCode() ?? 0) : 1;
         if (0 !== $exitCode) {
             fwrite(STDERR, "  ERROR: {$cmd['label']} — {$e->getMessage()}\n");
             ++$errors;

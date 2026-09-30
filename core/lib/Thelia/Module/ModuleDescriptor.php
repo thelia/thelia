@@ -24,6 +24,9 @@ final readonly class ModuleDescriptor
 {
     public const string ENABLED_BY_DEFAULT = 'enabled-by-default';
 
+    /** What the install and template:set print about a mandatory module left inactive, given its code. */
+    public const string MANDATORY_INACTIVE_WARNING = '%s is mandatory but is registered inactive: activate it from the back-office.';
+
     /**
      * Whether the module is active right after the shop is installed. A descriptor that
      * says nothing keeps the historical behaviour: active. A value other than 0 or 1, or

@@ -239,7 +239,8 @@ class ModuleManagement
         // The validator loads and validates the descriptor and its definition when it is built.
         $moduleValidator = new ModuleValidator($absolutePathToModule);
 
-        return $this->findRegistered($moduleValidator) ?? $this->install($moduleValidator, $absolutePathToModule);
+        return $this->findRegistered($moduleValidator)
+            ?? $this->install($moduleValidator, $absolutePathToModule, $this->shipsInactive($moduleValidator, $absolutePathToModule));
     }
 
     /**
@@ -258,7 +259,7 @@ class ModuleManagement
      * descriptor: every decision below reads it from there instead of parsing module.xml
      * again.
      */
-    private function install(ModuleValidator $moduleValidator, string $absolutePathToModule): Module
+    private function install(ModuleValidator $moduleValidator, string $absolutePathToModule, bool $shipsInactive): Module
     {
         $moduleDefinition = $moduleValidator->getModuleDefinition();
         if (null === $moduleDefinition) {
@@ -274,7 +275,7 @@ class ModuleManagement
 
         $module = $moduleInstallEvent->getModule();
 
-        if ($this->shipsInactive($moduleValidator, $absolutePathToModule)) {
+        if ($shipsInactive) {
             return $module;
         }
 
@@ -305,7 +306,13 @@ class ModuleManagement
      */
     private function forgetAModuleLeftInactive(Module $module): void
     {
-        $module->reload();
+        try {
+            $module->reload();
+        } catch (PropelException) {
+            // The row is gone already: nothing to forget, and the activation failure is
+            // what the caller has to see, not this.
+            return;
+        }
 
         if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
             return;
@@ -385,11 +392,12 @@ class ModuleManagement
         foreach ($this->listModulesFromTemplatePath($path) as $composerModuleDTO) {
             $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
             $registered = $this->findRegistered($moduleValidator);
-            $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath());
+            $shipsInactive = $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath());
+            $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath(), $shipsInactive);
             $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
 
             $modulesInstalled[] = $module;
-            $outcomes[] = new ThemeModuleOutcome($module, null === $registered, $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath()));
+            $outcomes[] = new ThemeModuleOutcome($module, null === $registered, $shipsInactive);
         }
 
         $this->reportThemeModules($outcomes, $output);
@@ -434,7 +442,7 @@ class ModuleManagement
 
             // The install warns about a mandatory module it leaves inactive; so does a theme.
             if (BaseModule::IS_MANDATORY === $module->getMandatory()) {
-                $output?->writeln(\sprintf('<comment>Module %s is mandatory but is registered inactive: activate it from the back-office.</comment>', $module->getCode()));
+                $output?->writeln('<comment>Module '.\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $module->getCode()).'</comment>');
             }
         }
     }

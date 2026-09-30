@@ -162,17 +162,21 @@ final class DatabaseSetup
              ON DUPLICATE KEY UPDATE `title` = VALUES(`title`)'
         );
         $selectModuleId = $this->pdo->prepare('SELECT `id` FROM `module` WHERE `code` = :code');
-        $selectActivation = $this->pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = :code');
 
         foreach ($modules as $position => $module) {
             $insertModule->execute([...$module['row'], 'position' => $position + 1]);
 
             $this->insertModuleDescriptions($module['xml'], $module['code'], $upsertModuleI18n, $selectModuleId);
             $this->applyModuleSchema($module['path'], $module['code']);
-            $this->warnAboutAMandatoryModuleLeftInactive($module['row'], $module['code'], $selectActivation);
         }
 
-        $this->warnAboutARequiredModuleLeftInactive($modules, $selectActivation);
+        // The state written is read back once: on a populated database the row keeps the
+        // activation the merchant chose, not the one the descriptor ships.
+        $activation = array_map(intval(...), $this->pdo->query('SELECT `code`, `activate` FROM `module`')->fetchAll(\PDO::FETCH_KEY_PAIR));
+        $this->warnAboutMandatoryModulesLeftInactive($modules, $activation);
+        $this->warnAboutRequiredModulesLeftInactive($modules, $activation);
+        // A module found in both module directories is read twice: say it once.
+        $this->warnings = array_values(array_unique($this->warnings));
 
         return \count($modules);
     }
@@ -185,17 +189,12 @@ final class DatabaseSetup
      * operator told.
      *
      * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
+     * @param array<string, int>                                                                              $activation by module code
      */
-    private function warnAboutARequiredModuleLeftInactive(array $modules, \PDOStatement $selectActivation): void
+    private function warnAboutRequiredModulesLeftInactive(array $modules, array $activation): void
     {
-        $activation = [];
         foreach ($modules as $module) {
-            $selectActivation->execute(['code' => $module['code']]);
-            $activation[$module['code']] = (int) $selectActivation->fetchColumn();
-        }
-
-        foreach ($modules as $module) {
-            if (1 !== $activation[$module['code']]) {
+            if (1 !== ($activation[$module['code']] ?? null)) {
                 continue;
             }
 
@@ -203,7 +202,7 @@ final class DatabaseSetup
                 $requiredCode = trim((string) $requiredModule);
 
                 if (0 === ($activation[$requiredCode] ?? null)) {
-                    $this->warnings[] = \sprintf('%s is registered active but requires %s, which is registered inactive: activate %s from the back-office.', $module['code'], $requiredCode, $requiredCode);
+                    $this->warn(\sprintf('%s is registered active but requires %s, which is registered inactive: activate %s from the back-office.', $module['code'], $requiredCode, $requiredCode));
                 }
             }
         }
@@ -215,19 +214,25 @@ final class DatabaseSetup
      * switched it off before this run. Either way nothing else would say that a module the
      * shop cannot do without is off, so the state is read back after the write and reported.
      *
-     * @param array<string, int|string> $row
+     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
+     * @param array<string, int>                                                                              $activation by module code
      */
-    private function warnAboutAMandatoryModuleLeftInactive(array $row, string $code, \PDOStatement $selectActivation): void
+    private function warnAboutMandatoryModulesLeftInactive(array $modules, array $activation): void
     {
-        if (1 !== $row['mandatory']) {
-            return;
+        foreach ($modules as $module) {
+            if (1 === $module['row']['mandatory'] && 0 === ($activation[$module['code']] ?? null)) {
+                $this->warn(\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $module['code']));
+            }
         }
+    }
 
-        $selectActivation->execute(['code' => $code]);
-
-        if (0 === (int) $selectActivation->fetchColumn()) {
-            $this->warnings[] = \sprintf('%s is mandatory but is registered inactive: activate it from the back-office.', $code);
-        }
+    /**
+     * A warning names a module by its directory and may quote an SQL error: no control
+     * character of either reaches the terminal of the entry point that prints it.
+     */
+    private function warn(string $warning): void
+    {
+        $this->warnings[] = InvalidModuleDescriptorException::terminalSafe($warning);
     }
 
     /**
@@ -269,9 +274,7 @@ final class DatabaseSetup
                     'hidden' => (int) ($xml->hidden ?? 0),
                 ];
 
-                // A module found in both directories is read from the last one, local/modules:
-                // that is the copy Module::getModuleDir() runs, so its descriptor decides.
-                $modules[$code] = [
+                $modules[] = [
                     'code' => $code,
                     'path' => $entry->getPathname(),
                     'xml' => $xml,
@@ -280,7 +283,7 @@ final class DatabaseSetup
             }
         }
 
-        return array_values($modules);
+        return $modules;
     }
 
     /**
@@ -397,7 +400,7 @@ final class DatabaseSetup
                         continue;
                     }
 
-                    $this->warnings[] = "{$moduleName}/".basename($file).": {$e->getMessage()}";
+                    $this->warn("{$moduleName}/".basename($file).": {$e->getMessage()}");
                 }
             }
         }

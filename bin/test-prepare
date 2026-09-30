@@ -123,8 +123,7 @@ try {
     fwrite(STDERR, "ERROR: Database connection failed — {$e->getMessage()}\n");
     exit(1);
 } catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
-    // The message quotes a module.xml: no control character of it reaches the terminal.
-    fwrite(STDERR, 'ERROR: '.preg_replace('/[\x00-\x08\x0B-\x1F\x7F]/', '?', $e->getMessage())."\n");
+    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
     exit(1);
 }
 

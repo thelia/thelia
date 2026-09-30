@@ -260,6 +260,29 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
+     * The theme brings two modules and the second cannot be activated: the command stops,
+     * the first stays installed and active, the second is not left registered.
+     */
+    public function testAFailureAfterAModuleWasActivatedStopsTheCommand(): void
+    {
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
+        $this->installTheme([self::NEW_CODE, self::FAILING_CODE]);
+
+        $templateHelper = $this->createMock(TheliaTemplateHelper::class);
+        $templateHelper->expects(self::never())->method('enableThemeAsBundle');
+        $composerHelper = $this->createMock(ComposerHelper::class);
+        $composerHelper->expects(self::never())->method('dumpAutoload');
+
+        $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
+        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+
+        self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE));
+        self::assertNull(ModuleQuery::create()->findOneByCode(self::FAILING_CODE));
+    }
+
+    /**
      * A mandatory module the theme requires and finds inactive is named as mandatory, as the
      * install does: nothing else would say that a module the shop cannot do without is off.
      */
