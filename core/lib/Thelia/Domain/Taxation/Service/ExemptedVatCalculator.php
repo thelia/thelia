@@ -21,6 +21,7 @@ use Thelia\Model\Country;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\State;
 use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\AbstractDeliveryModuleWithState;
 
 /**
  * The VAT a cart would have carried had it not been exempted.
@@ -96,11 +97,11 @@ readonly class ExemptedVatCalculator
 
         $module = ModuleQuery::create()->findPk($deliveryModuleId)?->createInstance();
 
-        // Only a module built on the shipped base class exposes the rule it
+        // Only a module built on one of the shipped base classes exposes the rule it
         // taxes its carriage with. Another one quoted a postage Thelia cannot
         // re-quote without it, so the carriage is left out rather than taxed
         // under a rule it never used.
-        if (!$module instanceof AbstractDeliveryModule) {
+        if (!$module instanceof AbstractDeliveryModule && !$module instanceof AbstractDeliveryModuleWithState) {
             return 0.0;
         }
 
