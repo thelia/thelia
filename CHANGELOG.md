@@ -61,7 +61,7 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 
 ## Modules
 
-- A module declares in its `module.xml` whether it is active right after the shop is installed, through the optional `<enabled-by-default>0|1</enabled-by-default>` element of the 2.2 descriptor format. A module that says nothing, or says 1, is registered active as before; a module that says 0 is registered inactive, stays listed in the back-office and waits for the merchant to activate it. The install reads the element without the kernel (`bin/install`, `bin/test-prepare`, `thelia:install`) and stops with a readable error, nothing written in the module table, on a value that is neither 0 nor 1. Registering again a module the database already knows only refreshes its namespace and version: the activation the merchant chose is never rewritten.
+- A module declares in its `module.xml` whether it is active right after the shop is installed, through the optional `<enabled-by-default>0|1</enabled-by-default>` element of the 2.2 descriptor format. A module that says nothing, or says 1, is registered active as before; a module that says 0 is registered inactive, stays listed in the back-office and waits for the merchant to activate it. The install reads the element without the kernel (`bin/install`, `bin/test-prepare`, `thelia:install`) and stops with a readable error, nothing written in the module table, on a value that is neither 0 nor 1 or on a descriptor the module schema refuses (the element out of its last place, or a descriptor still in the 2.1 format, which does not know it). Registering again a module the database already knows only refreshes its namespace and version: the activation the merchant chose is never rewritten.
 
 ## Behaviour changes
 
