@@ -118,8 +118,15 @@ class SetTemplate extends ContainerAwareCommand
 
             return self::FAILURE;
         }
-        $activeCount = \count(array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED === $module->getActivate()));
-        $output->writeln(\sprintf('<fg=blue>%d theme modules installed, %d active.</>', \count($modulesInstalled), $activeCount));
+        $inactiveModules = array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED !== $module->getActivate());
+        $output->writeln(\sprintf('<fg=blue>%d theme modules found, %d active.</>', \count($modulesInstalled), \count($modulesInstalled) - \count($inactiveModules)));
+        if ([] !== $inactiveModules) {
+            $output->writeln(\sprintf(
+                '<comment>The theme requires %d inactive module(s): %s. Activate them from the back-office if the theme needs them.</comment>',
+                \count($inactiveModules),
+                implode(', ', array_map(static fn (Module $module): string => $module->getCode(), $inactiveModules)),
+            ));
+        }
 
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
         $this->execDumpAutoload($output);
