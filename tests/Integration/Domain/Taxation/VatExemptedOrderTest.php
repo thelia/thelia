@@ -48,6 +48,7 @@ use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Module\AbstractDeliveryModuleWithState;
 use Thelia\Test\ActionIntegrationTestCase;
 
 /**
@@ -125,6 +126,29 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
      * whole way: an order placed under reverse charge, the order address that
      * froze it, and the invoice that states it next to the number it rests on.
      */
+    public function testTheExemptedVatCountsThePostageOfADeliveryModuleWithState(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        ConfigQuery::write('taxrule_id_delivery_module', (string) $this->taxRuleTaxingAt($this->countryOf('FR'), '20')->getId());
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+        $action->calculatePostage(new CartCheckoutEvent($fixtures['cart']), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $fixtures['cart']->reload();
+
+        $deliveryModule = $fixtures['deliveryModule']->createInstance();
+        self::assertInstanceOf(AbstractDeliveryModuleWithState::class, $deliveryModule, 'Control: the shipped CustomDelivery is a module with state.');
+        $postageVat = (float) $deliveryModule->buildOrderPostage(10.0, $this->countryOf('FR'), 'en_US')->getAmountTax();
+        self::assertGreaterThan(0.0, $postageVat, 'Control: the module must tax its carriage, or the test proves nothing.');
+
+        $order = $this->checkout($fixtures);
+
+        self::assertEqualsWithDelta(
+            2.0 + $postageVat,
+            (float) $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount(),
+            0.0001,
+        );
+    }
+
     public function testTheInvoiceOfAnExemptOrderStatesTheReverseCharge(): void
     {
         $this->skipUnlessThePdfTemplateStatesTheReverseCharge();
