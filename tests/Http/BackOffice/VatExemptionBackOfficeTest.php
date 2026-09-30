@@ -18,6 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\Legal\Service\VatNumberVerifierInterface;
 use Thelia\Domain\Legal\VatVerificationResult;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Admin;
 use Thelia\Model\ConfigQuery;
@@ -37,9 +38,13 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
 {
     private const CUSTOMER_LIST_URL = '/admin/customers';
     private const FILTERS_CLASS = 'BackOfficeDefaultTwigBundle\\Service\\Customer\\CustomerFilters';
+    private const REVERIFICATION_LIMIT = 30;
+
     private const VERIFICATION_CONTROLLER_CLASS = 'BackOfficeDefaultTwigBundle\\Controller\\Customer\\AddressVatVerificationController';
 
     private ?AdminSessionInjector $injector = null;
+
+    private ?Admin $signedInAdmin = null;
 
     protected function setUp(): void
     {
@@ -230,13 +235,99 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
     {
         $this->skipUnlessTheReverificationSparesAnUnansweredCheck();
 
-        static::getContainer()->set(VatNumberVerifierInterface::class, new class implements VatNumberVerifierInterface {
+        $this->installVerifierAnswering(VatVerificationResult::undetermined());
+        $address = $this->verifiedAddressOnItsSheet();
+
+        $this->postReverification($address, $this->reverificationToken());
+
+        $reloaded = $this->reloaded($address);
+        self::assertNotNull($reloaded->getVatVerifiedAt());
+        self::assertSame('ACME SPRL', $reloaded->getVatVerifiedName());
+    }
+
+    public function testAReverificationWithoutItsTokenNeverReachesTheVerifier(): void
+    {
+        $this->skipUnlessTheThemeShowsTheVerificationState();
+
+        $verifier = $this->installVerifierAnswering(VatVerificationResult::refused(new \DateTimeImmutable()));
+        $address = $this->verifiedAddressOnItsSheet();
+
+        $this->postReverification($address, 'forged-token');
+
+        self::assertSame(0, $verifier->calls);
+        self::assertSame('ACME SPRL', $this->reloaded($address)->getVatVerifiedName());
+    }
+
+    public function testReverificationsBeyondTheLimitNeverReachTheVerifier(): void
+    {
+        $this->skipUnlessTheThemeShowsTheVerificationState();
+
+        $verifier = $this->installVerifierAnswering(VatVerificationResult::verified(new \DateTimeImmutable(), 'ACME SPRL'));
+        $address = $this->verifiedAddressOnItsSheet();
+        $token = $this->reverificationToken();
+        $this->getService('limiter.vat_reverification')->create($this->signedInAdmin?->getUsername())->reset();
+
+        for ($attempt = 0; $attempt < self::REVERIFICATION_LIMIT + 5; ++$attempt) {
+            $this->postReverification($address, $token);
+        }
+
+        self::assertSame(self::REVERIFICATION_LIMIT, $verifier->calls);
+    }
+
+    public function testAStoreOutOfTheVatScopeCannotExemptItsBuyers(): void
+    {
+        $this->skipUnlessTheThemeOffersTheSetting();
+
+        ConfigQuery::write(VatExemptionMode::CONFIG_KEY, VatExemptionMode::DISABLED->value);
+        ConfigQuery::write('store_vat_exempt', '0');
+
+        $this->loginAs($this->factory()->admin());
+        $this->assertPageRenders('/admin/configuration/store');
+        $button = $this->client->getCrawler()->filter('[data-testid="config-store-save-stay"]');
+        self::assertGreaterThan(0, $button->count(), 'The store configuration form must expose its Save button.');
+
+        $form = $button->form([
+            'thelia_configuration_store[store_name]' => 'Test Store',
+            'thelia_configuration_store[store_email]' => 'store@test.com',
+            'thelia_configuration_store[store_notification_emails]' => 'store@test.com',
+            'thelia_configuration_store[store_address1]' => '1 Main Street',
+            'thelia_configuration_store[store_zipcode]' => '75001',
+            'thelia_configuration_store[store_city]' => 'Paris',
+            'thelia_configuration_store[vat_exemption_mode]' => VatExemptionMode::VERIFIED_VAT_NUMBER->value,
+        ]);
+        $form['thelia_configuration_store[store_vat_exempt]']->tick();
+        $this->client->submit($form);
+
+        self::assertNotSame(302, $this->client->getResponse()->getStatusCode(), 'A store out of the VAT scope must not save an exemption of its buyers.');
+        self::assertStringContainsString('A store that charges no VAT has none to reverse onto its buyers.', (string) $this->client->getResponse()->getContent());
+
+        self::assertSame('0', ConfigQuery::create()->findOneByName('store_vat_exempt')?->getValue());
+        self::assertSame(VatExemptionMode::DISABLED->value, ConfigQuery::create()->findOneByName(VatExemptionMode::CONFIG_KEY)?->getValue());
+    }
+
+    private function installVerifierAnswering(VatVerificationResult $answer): object
+    {
+        $verifier = new class($answer) implements VatNumberVerifierInterface {
+            public int $calls = 0;
+
+            public function __construct(private readonly VatVerificationResult $answer)
+            {
+            }
+
             public function verify(string $vatNumber, string $countryIsoAlpha2): VatVerificationResult
             {
-                return VatVerificationResult::undetermined();
-            }
-        });
+                ++$this->calls;
 
+                return $this->answer;
+            }
+        };
+        static::getContainer()->set(VatNumberVerifierInterface::class, $verifier);
+
+        return $verifier;
+    }
+
+    private function verifiedAddressOnItsSheet(): Address
+    {
         $factory = $this->factory();
         $customer = $factory->customer($factory->customerTitle());
         $address = $factory->address($customer);
@@ -246,22 +337,36 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
             ->setVatVerifiedName('ACME SPRL')
             ->save($this->getPropelConnection());
 
-        $this->loginAs($factory->admin());
+        $this->signedInAdmin = $factory->admin();
+        $this->loginAs($this->signedInAdmin);
         $this->assertPageRenders('/admin/address/update?address_id='.$address->getId());
 
+        return $address;
+    }
+
+    private function reverificationToken(): string
+    {
         $token = $this->client->getCrawler()->filter('form[data-testid="address-vat-verify-form"] input[name="_token"]');
         self::assertGreaterThan(0, $token->count(), 'The address sheet offers the re-verification once a verifier is installed.');
 
+        return (string) $token->attr('value');
+    }
+
+    private function postReverification(Address $address, string $token): void
+    {
         $this->client->request('POST', '/admin/address/vat/verify', [
             'address_id' => (string) $address->getId(),
-            '_token' => (string) $token->attr('value'),
+            '_token' => $token,
         ]);
+    }
 
+    private function reloaded(Address $address): Address
+    {
         AddressTableMap::clearInstancePool();
         $reloaded = AddressQuery::create()->findPk($address->getId());
         self::assertNotNull($reloaded);
-        self::assertNotNull($reloaded->getVatVerifiedAt());
-        self::assertSame('ACME SPRL', $reloaded->getVatVerifiedName());
+
+        return $reloaded;
     }
 
     private function skipUnlessTheReverificationSparesAnUnansweredCheck(): void
