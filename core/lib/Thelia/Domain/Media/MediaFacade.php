@@ -50,7 +50,7 @@ final readonly class MediaFacade
         $model = $this->fileManager->getModelInstance('image', $dto->parentType);
         $model->setParentId($dto->parentId);
         $model->setLocale($dto->locale);
-        $model->setVisible($dto->visible);
+        $model->setVisible($dto->visible ? 1 : 0);
 
         if (null !== $dto->title) {
             $model->setTitle($dto->title);
@@ -96,7 +96,7 @@ final readonly class MediaFacade
             $image->setPostscriptum($dto->postscriptum);
         }
         if (null !== $dto->visible) {
-            $image->setVisible($dto->visible);
+            $image->setVisible($dto->visible ? 1 : 0);
         }
         if (null !== $dto->alt) {
             $image->setAlt($dto->alt);
@@ -189,7 +189,7 @@ final readonly class MediaFacade
         $model = $this->fileManager->getModelInstance('document', $dto->parentType);
         $model->setParentId($dto->parentId);
         $model->setLocale($dto->locale);
-        $model->setVisible($dto->visible);
+        $model->setVisible($dto->visible ? 1 : 0);
 
         if (null !== $dto->title) {
             $model->setTitle($dto->title);
