@@ -16,7 +16,9 @@ namespace Thelia\Install\Standalone;
 
 use Thelia\Core\Install\Database;
 use Thelia\Core\TheliaKernel;
+use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptor;
+use Thelia\Module\ModuleDescriptorValidator;
 use Thelia\Tools\Version\Version;
 
 final class DatabaseSetup
@@ -205,7 +207,7 @@ final class DatabaseSetup
                         'version' => (string) ($xml->version ?? '0.0.1'),
                         'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
                         'category' => $xmlType,
-                        'activate' => ModuleDescriptor::enabledByDefault($xml, $moduleXml) ? 1 : 0,
+                        'activate' => $this->enabledByDefault($xml, $moduleXml) ? 1 : 0,
                         'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
                         'mandatory' => (int) ($xml->mandatory ?? 0),
                         'hidden' => (int) ($xml->hidden ?? 0),
@@ -215,6 +217,31 @@ final class DatabaseSetup
         }
 
         return $modules;
+    }
+
+    /**
+     * The install reads the descriptor without the kernel, so it checks the schema itself
+     * when the descriptor carries `<enabled-by-default>`: only the 2.2 format knows the
+     * element, as the last one of `<module>`. Every later step (module:refresh, template:set,
+     * the activation from the back-office) validates the descriptor before reading it, so a
+     * descriptor refused there has to be refused here too, or the module would be registered
+     * and impossible to activate.
+     */
+    private function enabledByDefault(\SimpleXMLElement $xml, string $moduleXml): bool
+    {
+        $enabledByDefault = ModuleDescriptor::enabledByDefault($xml, $moduleXml);
+
+        if (0 === \count($xml->{ModuleDescriptor::ENABLED_BY_DEFAULT})) {
+            return $enabledByDefault;
+        }
+
+        try {
+            (new ModuleDescriptorValidator())->validate($moduleXml);
+        } catch (InvalidXmlDocumentException $exception) {
+            throw new \InvalidArgumentException(\sprintf('<%s> in %s is refused by the module schema: only the 2.2 descriptor format knows it, as the last element of <module>. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
+        }
+
+        return $enabledByDefault;
     }
 
     /**

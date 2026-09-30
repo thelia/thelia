@@ -228,6 +228,65 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame(0, (int) $statement->fetchColumn());
     }
 
+    /**
+     * Only the 2.2 descriptor format knows `<enabled-by-default>`, as the last element of
+     * `<module>`. Every step after the install (module:refresh, template:set, the activation
+     * from the back-office) validates the descriptor against the schema before reading it:
+     * a descriptor the schema refuses must be refused here too, or the module ends up
+     * registered but impossible to activate.
+     */
+    public function testAnElementOutOfPlaceStopsTheRegistration(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <enabled-by-default>0</enabled-by-default>
+            <stability>prod</stability>
+            XML);
+
+        try {
+            $setup->registerAndApplyModules([$moduleDir]);
+            self::fail('An element the schema refuses must stop the registration.');
+        } catch (\InvalidArgumentException $exception) {
+            self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
+        }
+
+        self::assertFalse($this->isRegistered($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+    }
+
+    public function testADescriptorInTheFormerFormatCannotDeclareTheElement(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSingleModule(<<<XML
+            <author>
+                <name>Former format</name>
+                <email>former@example.com</email>
+            </author>
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML);
+
+        try {
+            $setup->registerAndApplyModules([$moduleDir]);
+            self::fail('A 2.1 descriptor declaring the element must stop the registration.');
+        } catch (\InvalidArgumentException $exception) {
+            self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
+        }
+
+        self::assertFalse($this->isRegistered($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+    }
+
+    private function isRegistered(\PDO $pdo, string $code): bool
+    {
+        $statement = $pdo->prepare('SELECT COUNT(*) FROM `module` WHERE `code` = ?');
+        $statement->execute([$code]);
+
+        return 0 < (int) $statement->fetchColumn();
+    }
+
     private function activationOf(\PDO $pdo, string $code): int
     {
         $statement = $pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = ?');
@@ -274,6 +333,33 @@ final class DatabaseSetupTest extends IntegrationTestCase
                 </module>
                 XML);
         }
+
+        return $this->moduleDir;
+    }
+
+    /**
+     * One descriptor whose tail (from `<type>` on) is given verbatim, to exercise the
+     * element order and the descriptor format.
+     */
+    private function writeSingleModule(string $tail): string
+    {
+        $this->moduleDir = sys_get_temp_dir().'/thelia-install-modules-'.bin2hex(random_bytes(4)).'/';
+        $code = self::SHIPPED_INACTIVE_CODE;
+
+        (new Filesystem())->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <module xmlns="http://thelia.net/schema/dic/module">
+                <fullnamespace>{$code}\\{$code}</fullnamespace>
+                <descriptive locale="en_US">
+                    <title>{$code}</title>
+                </descriptive>
+                <languages>
+                    <language>en_US</language>
+                </languages>
+                <version>1.0.0</version>
+                {$tail}
+            </module>
+            XML);
 
         return $this->moduleDir;
     }
