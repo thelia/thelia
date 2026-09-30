@@ -29,6 +29,7 @@ use Thelia\Model\ProductDocumentI18n;
 use Thelia\Model\ProductDocumentI18nQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageI18n;
 use Thelia\Model\ProductImageI18nQuery;
 use Thelia\Model\ProductImageQuery;
 
@@ -92,6 +93,7 @@ class File extends BaseAction implements EventSubscriberInterface
                         case 'images':
                             $fileName = $clonedProduct->getRef().'.'.$ext;
                             $clonedProductFile = new ProductImage();
+                            $clonedProductFile->setDecorative((int) $originalProductFile->getDecorative());
                             break;
                         case 'documents':
                             $fileName = pathinfo($originalProductFile->getFile(), \PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
@@ -133,6 +135,10 @@ class File extends BaseAction implements EventSubscriberInterface
                     switch ($type) {
                         case 'images':
                             $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::IMAGE_SAVE);
+
+                            // A cloned video takes the copy of its thumbnail, and the clone
+                            // the order of the source gallery.
+                            $event->addClonedImageId((int) $originalProductFile->getId(), (int) $clonedProductFile->getId());
 
                             // Get original product image I18n
                             $originalProductFileI18ns = ProductImageI18nQuery::create()
@@ -180,9 +186,15 @@ class File extends BaseAction implements EventSubscriberInterface
                 ->setChapo($originalProductFileI18n->getChapo())
                 ->setPostscriptum($originalProductFileI18n->getPostscriptum());
 
+            if ($clonedProductFile instanceof ProductImage && $originalProductFileI18n instanceof ProductImageI18n) {
+                $clonedProductFile->setAlt($originalProductFileI18n->getAlt());
+            }
+
             // Create and dispatch event
+            // The update listener saves nothing without the model as it was before.
             $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($event->getClonedProduct()->getId());
             $clonedProductUpdateFileEvent->setModel($clonedProductFile);
+            $clonedProductUpdateFileEvent->setOldModel(clone $clonedProductFile);
 
             switch ($type) {
                 case 'images':

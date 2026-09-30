@@ -17,17 +17,23 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\Exception\FileException;
+use Thelia\Domain\Media\ProductMediaOrder;
 use Thelia\Domain\Media\Video\IncompleteVideoException;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Exception\DocumentException;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductVideoTableMap;
 use Thelia\Model\ProductVideo as ProductVideoModel;
+use Thelia\Model\ProductVideoI18nQuery;
+use Thelia\Model\ProductVideoQuery;
 use Thelia\Tools\URL;
 
 /**
@@ -246,6 +252,100 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
         @unlink($model->getUploadDir().DS.basename($model->getFile()));
     }
 
+    /**
+     * Gives the clone the videos of its source: a platform video is the same
+     * platform and identifier, a hosted one gets its own copy of the file, so
+     * deleting one product never takes the file the other serves. Each copy
+     * keeps its wording, its visibility and the copy of its thumbnail, and the
+     * clone takes the order of the source gallery once images and videos are in.
+     *
+     * Runs after the images are cloned, whose copies it reads from the event.
+     */
+    public function cloneVideos(ProductCloneEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $clonedProductId = (int) $event->getClonedProduct()->getId();
+        $originalVideos = ProductVideoQuery::create()
+            ->filterByProductId($event->getOriginalProduct()->getId())
+            ->orderByPosition()
+            ->find();
+
+        foreach ($originalVideos as $originalVideo) {
+            $clonedVideo = new ProductVideoModel();
+            $clonedVideo
+                ->setProductId($clonedProductId)
+                ->setProvider($originalVideo->getProvider())
+                ->setExternalId($originalVideo->getExternalId())
+                ->setVisible($originalVideo->getVisible());
+
+            $thumbnailImageId = $originalVideo->getThumbnailImageId();
+            $clonedVideo->setThumbnailImageId(null === $thumbnailImageId ? null : $event->getClonedImageId($thumbnailImageId));
+
+            foreach (ProductVideoI18nQuery::create()->findById($originalVideo->getId()) as $i18n) {
+                $clonedVideo
+                    ->setLocale($i18n->getLocale())
+                    ->setTitle($i18n->getTitle())
+                    ->setAlt($i18n->getAlt())
+                    ->setDescription($i18n->getDescription())
+                    ->setChapo($i18n->getChapo())
+                    ->setPostscriptum($i18n->getPostscriptum());
+            }
+
+            $copiedFile = null;
+
+            if ($originalVideo->isHostedFile()) {
+                $sourcePath = $originalVideo->getUploadDir().DS.$originalVideo->getFile();
+
+                if (!is_file($sourcePath)) {
+                    Tlog::getInstance()->addWarning('Failed to find video file '.$sourcePath);
+
+                    continue;
+                }
+
+                // The upload path moves the file it is handed: it gets a copy.
+                $copyPath = $sourcePath.'.clone';
+                copy($sourcePath, $copyPath);
+                $copiedFile = new UploadedFile($copyPath, $originalVideo->getFile(), null, null, true);
+            }
+
+            $createEvent = new FileCreateOrUpdateEvent($clonedProductId);
+            $createEvent
+                ->setModel($clonedVideo)
+                ->setUploadedFile($copiedFile)
+                ->setParentName('product');
+
+            $dispatcher->dispatch($createEvent, TheliaEvents::PRODUCT_VIDEO_CREATE);
+
+            $event->addClonedVideoId((int) $originalVideo->getId(), (int) $clonedVideo->getId());
+        }
+
+        $this->giveTheCloneTheOrderOfItsSource($event);
+    }
+
+    /**
+     * A new medium goes after every medium already there, so the clone would show
+     * its images first and its videos after them. The source order is replayed on
+     * the copies, leaving out a medium whose file could not be copied.
+     */
+    private function giveTheCloneTheOrderOfItsSource(ProductCloneEvent $event): void
+    {
+        $mediaOrder = new ProductMediaOrder();
+        $order = [];
+
+        foreach ($mediaOrder->orderOf((int) $event->getOriginalProduct()->getId()) as $entry) {
+            $clonedId = ProductMediaOrder::TYPE_VIDEO === $entry['type']
+                ? $event->getClonedVideoId($entry['id'])
+                : $event->getClonedImageId($entry['id']);
+
+            if (null !== $clonedId) {
+                $order[] = ['type' => $entry['type'], 'id' => $clonedId];
+            }
+        }
+
+        if ([] !== $order) {
+            $mediaOrder->reorder((int) $event->getClonedProduct()->getId(), $order);
+        }
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -253,6 +353,9 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
             TheliaEvents::PRODUCT_VIDEO_UPDATE => ['updateVideo', 128],
             TheliaEvents::PRODUCT_VIDEO_DELETE => ['deleteVideo', 128],
             TheliaEvents::PRODUCT_VIDEO_PROCESS => ['processVideo', 128],
+
+            // After the images (File::cloneFile, 128), whose copies it reads.
+            TheliaEvents::FILE_CLONE => ['cloneVideos', 64],
 
             // Implemented in parent class BaseCachedFile
             TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION => ['updatePosition', 128],

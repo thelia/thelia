@@ -46,6 +46,8 @@ use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
+use Thelia\Model\ProductSaleElementsProductVideo;
+use Thelia\Model\ProductSaleElementsProductVideoQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
@@ -389,6 +391,31 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             }
 
             $this->cloneVirtualDocumentAssociation($event, $originalProductPSE, $clonedProductPSEId);
+
+            $this->cloneVideoAssociations($event, $originalProductPSE, $clonedProductPSEId);
+        }
+    }
+
+    /**
+     * Binds the cloned sale element to the copies of the videos its source was
+     * bound to. The copies are the clone's own, read from the event: a video left
+     * behind by the cloning of the files is left out of the binding too.
+     */
+    private function cloneVideoAssociations(ProductCloneEvent $event, ProductSaleElements $originalPse, int $clonedPseId): void
+    {
+        $links = ProductSaleElementsProductVideoQuery::create()->findByProductSaleElementsId($originalPse->getId());
+
+        foreach ($links as $link) {
+            $clonedVideoId = $event->getClonedVideoId((int) $link->getProductVideoId());
+
+            if (null === $clonedVideoId) {
+                continue;
+            }
+
+            (new ProductSaleElementsProductVideo())
+                ->setProductSaleElementsId($clonedPseId)
+                ->setProductVideoId($clonedVideoId)
+                ->save();
         }
     }
 
