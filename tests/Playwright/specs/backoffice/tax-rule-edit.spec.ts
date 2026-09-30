@@ -4,7 +4,7 @@ import { TaxRuleEditPage } from '../../poms/backoffice/tax-rule-edit-page';
 
 test.describe('Back-office — Tax rule edition (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

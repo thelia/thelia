@@ -3,7 +3,7 @@ import { loginAdmin } from '../../helpers/admin';
 
 test.describe('Back-office — feature list (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

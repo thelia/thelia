@@ -4,7 +4,7 @@ import { AdminLogsPage } from '../../poms/backoffice/admin-logs-page';
 
 test.describe('Back-office — admin logs (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only — switch the back-office template to default-twig and re-run with BO_TEMPLATE=default-twig.',
   );
 

@@ -4,7 +4,7 @@ import { DEFAULT_ADMIN } from '../../helpers/admin';
 
 test.describe('Back-office — login', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default',
     'Legacy Smarty markup; not applicable under default-twig.',
   );
 

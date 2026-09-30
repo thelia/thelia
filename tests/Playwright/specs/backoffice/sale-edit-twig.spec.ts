@@ -10,7 +10,7 @@ import { ddevMysql } from '../../helpers/db';
  */
 test.describe('Back-office — reserved sale and countdown (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 
@@ -190,7 +190,7 @@ test.describe('Back-office — reserved sale and countdown (BO Twig)', () => {
  */
 test.describe('Back-office — sale product selection (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 

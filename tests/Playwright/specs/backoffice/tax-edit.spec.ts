@@ -7,7 +7,7 @@ const FIX_AMOUNT = 'Thelia-Domain-Taxation-TaxEngine-TaxType-FixAmountTaxType';
 
 test.describe('Back-office — Tax edition (BO Twig)', () => {
   test.skip(
-    (process.env.BO_TEMPLATE ?? 'default') !== 'default-twig',
+    (process.env.BO_TEMPLATE ?? 'default-twig') !== 'default-twig',
     'BO Twig only.',
   );
 
