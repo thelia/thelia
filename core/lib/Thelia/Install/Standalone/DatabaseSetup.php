@@ -135,7 +135,8 @@ final class DatabaseSetup
      * distribution but waits for the merchant to activate it from the back-office, and
      * template:set leaves it alone too (see ModuleManagement). On a database that
      * already knows the module, only the namespace and the version are refreshed: the
-     * activation the merchant chose is never rewritten.
+     * activation the merchant chose is never rewritten. A mandatory module that ships
+     * inactive is registered as asked and reported in the warnings.
      *
      * Every descriptor is read before anything is written: a refused declaration stops
      * the registration with the module table untouched, whatever order the disk lists
@@ -198,20 +199,29 @@ final class DatabaseSetup
                 $code = $entry->getFilename();
                 $xmlType = (string) ($xml->type ?? 'classic');
 
+                $row = [
+                    'code' => $code,
+                    'version' => (string) ($xml->version ?? '0.0.1'),
+                    'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
+                    'category' => $xmlType,
+                    'activate' => $this->enabledByDefault($xml, $moduleXml) ? 1 : 0,
+                    'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
+                    'mandatory' => (int) ($xml->mandatory ?? 0),
+                    'hidden' => (int) ($xml->hidden ?? 0),
+                ];
+
+                // <mandatory> only keeps an active module from being deactivated: a mandatory
+                // module that ships inactive is registered inactive as asked, and the operator
+                // is told, or nothing would say that a module the shop cannot do without is off.
+                if (1 === $row['mandatory'] && 0 === $row['activate']) {
+                    $this->warnings[] = \sprintf('%s is mandatory but ships inactive: registered inactive as its descriptor asks, activate it from the back-office.', $code);
+                }
+
                 $modules[] = [
                     'code' => $code,
                     'path' => $entry->getPathname(),
                     'xml' => $xml,
-                    'row' => [
-                        'code' => $code,
-                        'version' => (string) ($xml->version ?? '0.0.1'),
-                        'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
-                        'category' => $xmlType,
-                        'activate' => $this->enabledByDefault($xml, $moduleXml) ? 1 : 0,
-                        'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
-                        'mandatory' => (int) ($xml->mandatory ?? 0),
-                        'hidden' => (int) ($xml->hidden ?? 0),
-                    ],
+                    'row' => $row,
                 ];
             }
         }
