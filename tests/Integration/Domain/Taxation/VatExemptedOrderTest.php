@@ -166,6 +166,20 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testTheInvoiceOfAnExemptOrderStatesNoTaxRateOnItsPostage(): void
+    {
+        $this->skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder();
+
+        self::assertSame('0 %', $this->postageTaxRateOnTheInvoiceOf($this->orderWithPostageBilledTo('BE', new \DateTime('-10 days'))));
+    }
+
+    public function testTheInvoiceOfATaxedOrderStatesThePostageTaxRateItWasCharged(): void
+    {
+        $this->skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder();
+
+        self::assertSame('20 %', $this->postageTaxRateOnTheInvoiceOf($this->orderWithPostageBilledTo('BE', null)));
+    }
+
     public function testTheInvoiceOfATaxedOrderSaysNothingOfTheSort(): void
     {
         $this->skipUnlessThePdfTemplateStatesTheReverseCharge();
@@ -671,6 +685,36 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
 
         if (!file_exists($invoicePage) || !str_contains((string) file_get_contents($invoicePage), self::REVERSE_CHARGE_MENTION)) {
             self::markTestSkipped('The installed PDF template does not state the reverse charge yet.');
+        }
+    }
+
+    private function orderWithPostageBilledTo(string $billingCountryCode, ?\DateTime $verifiedAt): Order
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart($billingCountryCode, $verifiedAt);
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+        $action->calculatePostage(new CartCheckoutEvent($fixtures['cart']), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $fixtures['cart']->reload();
+
+        return $this->checkout($fixtures);
+    }
+
+    private function postageTaxRateOnTheInvoiceOf(Order $order): string
+    {
+        $invoice = $this->renderInvoice($order);
+
+        self::assertMatchesRegularExpression('#(Tax rate|Taux de taxe)</p>\s*</td>\s*<td[^>]*>\s*<p>([^<]*)</p>#', $invoice);
+        preg_match('#(Tax rate|Taux de taxe)</p>\s*</td>\s*<td[^>]*>\s*<p>([^<]*)</p>#', $invoice, $cell);
+
+        return trim(html_entity_decode($cell[2]));
+    }
+
+    private function skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder(): void
+    {
+        $invoicePage = $this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.self::INVOICE_DOCUMENT.'.html.twig';
+
+        if (!file_exists($invoicePage) || !str_contains((string) file_get_contents($invoicePage), 'postageTax / untaxedPostage')) {
+            self::markTestSkipped('The installed PDF template still prints a fixed postage tax rate.');
         }
     }
 
