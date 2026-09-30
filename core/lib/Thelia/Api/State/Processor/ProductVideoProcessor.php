@@ -98,7 +98,7 @@ final readonly class ProductVideoProcessor implements ProcessorInterface
         $locale = $this->firstLocale($data);
         $wording = $this->wording($data, $locale);
 
-        $video = $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
+        $video = $this->write(fn (): ProductVideoModel => $this->mediaFacade->updateVideo($video, new ProductVideoUpdateDTO(
             locale: $locale,
             provider: $resolved?->provider,
             externalId: $resolved?->externalId,
@@ -109,7 +109,7 @@ final readonly class ProductVideoProcessor implements ProcessorInterface
             chapo: $wording['chapo'],
             postscriptum: $wording['postscriptum'],
             visible: $data->isVisible(),
-        ));
+        )));
 
         $this->writeRemainingLocales($video, $data, $locale);
 
