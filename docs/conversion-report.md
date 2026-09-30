@@ -5,7 +5,8 @@ drop off". The back office answers with a checkout funnel: `admin.reports.conver
 `/admin/reports/conversion`. It reads the `cart`, `cart_item` and `order` tables
 of a period and counts, nothing more: no tag, no cookie, no page view. A shop
 that wants "how many visits reached the cart page" still needs a web analytics
-tool; this screen starts at the first cart row.
+tool, plugged in for instance with the GoogleTagManager module; this screen
+starts at the first cart row.
 
 The screen needs the `admin.order` resource. A second tab, "Searches without
 result", needs `admin.product` and is hidden without it. The export link needs
@@ -73,17 +74,27 @@ flowchart LR
 `maintenance:purge` deletes anonymous carts older than
 `purification_cart_anonymous_days` (default 30) and customer carts without an
 order older than `purification_cart_no_order_days` (default 60), both counted
-from the creation date. `Thelia\Domain\Cart\Service\CartPurgeHorizon` exposes
-that horizon (`earliestSurvivingCartDate()`, `mayHavePurged()`), taking the
-shorter of the two settings.
+from the creation date, to the second. `Thelia\Domain\Cart\Service\CartPurgeHorizon`
+exposes that horizon (`earliestSurvivingCartDate()`, `mayHavePurged()`), taking
+the shorter of the two settings and the same threshold as the purge: now minus
+the retention, not rounded to midnight.
 
-When the requested period starts before that horizon, the screen warns that
-the four cart steps are a lower bound for the part of the period the purge may
-have reached. The deleted carts never placed an order, so the two order steps
-are unaffected and are never purged. Nothing runs `maintenance:purge`
-automatically: a shop that never schedules it keeps its whole cart history, and
-the warning then overstates the risk, because it only reads the configured
-retention, not whether the command ever ran.
+Orders and the carts that led to one are never purged, so a period that reaches
+before the horizon would compare orders to carts that no longer exist, and the
+rate would climb above what the shop really converts. The screen therefore
+computes the funnel and the rate from the horizon when the period starts
+earlier, prints the effective dates next to the period pills, and says so in a
+notice. The oldest cart in base is not a reliable bound: a cart with an order
+can be years old while every cart without order of the same weeks is gone.
+
+Nothing runs `maintenance:purge` automatically: a shop that never schedules it
+keeps its whole cart history, and the screen still cuts the period at the
+horizon, because it only reads the configured retention, not whether the
+command ever ran.
+
+When the period holds more orders than carts still carrying a payment module,
+the screen adds a note under the table: steps 3 and 4 only count the carts that
+still hold the choice, and the checkout clears it on a return to the cart page.
 
 ## Searches without result
 
@@ -133,8 +144,9 @@ period, the export covers the last twelve months up to today.
 
 ## Limits
 
-- Steps 3 and 4 are a lower bound wherever the period reaches into purged
-  history (see above).
+- Steps 3 and 4 are a lower bound: the checkout clears the choices they read.
+- A period that reaches before the cart purge horizon is computed from the
+  horizon (see above).
 - Step 1 counts empty carts: a bot or a visitor who never added a line still
   creates a row.
 - A cart emptied after having had a line looks, at read time, like it never
