@@ -81,6 +81,9 @@ if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $dbName)) {
 try {
     $setup = new DatabaseSetup($host, $port, $dbName, $user, $password);
 
+    // A descriptor the install refuses stops it before the database is created.
+    (new \Thelia\Install\Standalone\ModuleDescriptorReader())->read();
+
     echo "Creating database \"{$dbName}\"...\n";
     $setup->createDatabase();
 
@@ -110,7 +113,7 @@ try {
     // for the previous one. They are emptied before any command can read them.
     runCachePoolClear($projectRoot);
 
-    // Run postActivation() for all modules — some modules create their
+    // Run postActivation() for all active modules — some modules create their
     // tables in postActivation() (e.g. CustomDelivery, ShortCode) rather
     // than via TheliaMain.sql. Without this step, module-specific tables
     // are missing in the test database.

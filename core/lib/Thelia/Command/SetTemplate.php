@@ -112,20 +112,9 @@ class SetTemplate extends ContainerAwareCommand
         try {
             $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         } catch (\Throwable $exception) {
-            // The message quotes a module directory, a namespace or a descriptor value.
-            $message = TerminalText::withoutControlCharacters($exception->getMessage());
-            $trace = self::traceWithoutArguments($exception);
-            // The trace goes to the log without its arguments: getTraceAsString() would print
-            // them, and one of them may be a connection password.
-            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $message."\n".$trace);
-            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($message)));
-            if ($output->isVerbose()) {
-                $output->writeln(OutputFormatter::escape($trace));
-            }
-
-            return self::FAILURE;
+            return $this->reportModuleInstallFailure($exception, $name, $output);
         }
-        // Each inactive module was named above, as ModuleManagement met it: the summary only counts.
+        // Each inactive module was named above, once ModuleManagement had handled them all: the summary only counts.
         $activeModules = array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED === $module->getActivate());
         $output->writeln(\sprintf('<fg=blue>%d theme modules found, %d active.</>', \count($modulesInstalled), \count($activeModules)));
 
@@ -139,6 +128,27 @@ class SetTemplate extends ContainerAwareCommand
         $output->writeln('<fg=green>Theme ready !</>');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * A module of the theme could not be installed or activated: the command says so, logs
+     * it, and stops before the theme is enabled.
+     */
+    private function reportModuleInstallFailure(\Throwable $exception, string $name, OutputInterface $output): int
+    {
+        // The message quotes a module directory, a namespace or a descriptor value.
+        $message = TerminalText::withoutControlCharacters($exception->getMessage());
+        $trace = self::traceWithoutArguments($exception);
+        // The trace goes to the log without its arguments: getTraceAsString() would print
+        // them, and one of them may be a connection password. The message stays on one line
+        // there, so that a value it quotes cannot forge a log entry of its own.
+        Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', TerminalText::singleLine($name)), TerminalText::singleLine($message)."\n".$trace);
+        $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($message)));
+        if ($output->isVerbose()) {
+            $output->writeln(OutputFormatter::escape($trace));
+        }
+
+        return self::FAILURE;
     }
 
     /**

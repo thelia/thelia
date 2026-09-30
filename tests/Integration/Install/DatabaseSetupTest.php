@@ -17,6 +17,8 @@ namespace Thelia\Tests\Integration\Install;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\TheliaKernel;
 use Thelia\Install\Standalone\DatabaseSetup;
+use Thelia\Install\Standalone\ModuleDescriptorReader;
+use Thelia\Install\Standalone\ModuleRegistrationWarnings;
 use Thelia\Model\ConfigQuery;
 use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Test\IntegrationTestCase;
@@ -180,8 +182,9 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * `<mandatory>1</mandatory>` only keeps an active module from being deactivated: a
-     * mandatory module that ships inactive is registered inactive like any other, and
+     * In the back-office, `<mandatory>1</mandatory>` hides the deactivation switch of an
+     * active module and forbids deleting the module: a mandatory module that ships inactive
+     * is registered inactive like any other, and
      * nothing would tell the operator that a module the shop cannot do without is off.
      * The install registers it as asked and says so in its warnings.
      */
@@ -225,6 +228,56 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame([\sprintf('%1$s is registered active but requires %2$s, which is registered inactive: activate %2$s from the back-office.', self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE)], $setup->getWarnings());
     }
 
+    public function testAnActiveModuleWhoseRequiredModuleIsActiveIsNotReported(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $dependencyDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            XML, self::UNDECLARED_CODE);
+        $dependentDir = $this->writeSingleModule(\sprintf(<<<XML
+            <type>classic</type>
+            <required>
+                <module version="&gt;=1.0.0">%s</module>
+            </required>
+            <stability>prod</stability>
+            XML, self::UNDECLARED_CODE), self::SHIPPED_ACTIVE_CODE);
+
+        $setup->registerAndApplyModules([$dependencyDir, $dependentDir]);
+
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::UNDECLARED_CODE));
+        self::assertSame([], $setup->getWarnings());
+    }
+
+    /**
+     * A module registered inactive does not run: its inactive dependency is not worth a
+     * warning, the merchant activates both or neither.
+     */
+    public function testAnInactiveModuleWhoseRequiredModuleIsInactiveIsNotReported(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $dependencyDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML, self::UNDECLARED_CODE);
+        $dependentDir = $this->writeSingleModule(\sprintf(<<<XML
+            <type>classic</type>
+            <required>
+                <module version="&gt;=1.0.0">%s</module>
+            </required>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML, self::UNDECLARED_CODE), self::SHIPPED_INACTIVE_CODE);
+
+        $setup->registerAndApplyModules([$dependencyDir, $dependentDir]);
+
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame([], $setup->getWarnings());
+    }
+
     /**
      * A module found in both module directories is read, and its SQL applied, from each: the
      * first copy written decides its row. A mandatory module left inactive is reported once.
@@ -239,6 +292,12 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame(2, $setup->registerAndApplyModules([$vendorDir, $localDir]));
         self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
         self::assertSame([self::SHIPPED_INACTIVE_CODE.' is mandatory but is registered inactive: activate it from the back-office.'], $setup->getWarnings());
+        // The registration drops identical lines too: the warnings are read on one copy
+        // before that.
+        self::assertCount(1, ModuleRegistrationWarnings::describe(
+            (new ModuleDescriptorReader())->read([$vendorDir, $localDir]),
+            [self::SHIPPED_INACTIVE_CODE => ['activate' => 0, 'mandatory' => 1]],
+        ));
     }
 
     /**
@@ -340,8 +399,8 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * The warnings describe the registration that just ran: registering twice with the same
-     * setup reports a mandatory module left inactive once, not once per run.
+     * The warnings describe the registration that just ran: a second registration that has
+     * nothing to report does not hand back the warnings of the first.
      */
     public function testTheWarningsDescribeTheLastRegistrationOnly(): void
     {
@@ -350,9 +409,10 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $moduleDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
 
         $setup->registerAndApplyModules([$moduleDir]);
-        $setup->registerAndApplyModules([$moduleDir]);
-
         self::assertCount(1, $setup->getWarnings());
+
+        $setup->registerAndApplyModules([$this->newModuleDir()]);
+        self::assertSame([], $setup->getWarnings());
     }
 
     /**
@@ -396,6 +456,38 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
         self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
         self::assertSame(0, $this->activationOf($setup->getPdo(), self::UNDECLARED_CODE));
+    }
+
+    /**
+     * The installers check the descriptors before creating the database: the check needs
+     * no connection, and refuses what the registration would refuse.
+     */
+    public function testTheDescriptorsAreValidatedWithoutADatabase(): void
+    {
+        $refusedDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>maybe</enabled-by-default>
+            XML, self::REFUSED_CODE);
+
+        $this->expectException(InvalidModuleDescriptorException::class);
+        $this->expectExceptionMessage(self::REFUSED_CODE);
+
+        (new ModuleDescriptorReader())->read([$this->writeSampleModules(), $refusedDir]);
+    }
+
+    public function testValidDescriptorsPassTheCheckWithoutADatabase(): void
+    {
+        $records = (new ModuleDescriptorReader())->read([$this->writeSampleModules()]);
+
+        $activation = [];
+        foreach ($records as $record) {
+            $activation[$record->code] = $record->row['activate'];
+        }
+        ksort($activation);
+
+        // The disk lists a directory in no fixed order: the codes are compared sorted.
+        self::assertSame([self::SHIPPED_ACTIVE_CODE => 1, self::SHIPPED_INACTIVE_CODE => 0, self::UNDECLARED_CODE => 1], $activation);
     }
 
     public function testAnInvalidActivationValueStopsTheRegistration(): void
@@ -443,10 +535,10 @@ final class DatabaseSetupTest extends IntegrationTestCase
 
     /**
      * Only the 2.2 descriptor format knows `<enabled-by-default>`, as the last element of
-     * `<module>`. Every step after the install (module:refresh, template:set, the activation
-     * from the back-office) validates the descriptor against the schema before reading it:
-     * a descriptor the schema refuses must be refused here too, or the module ends up
-     * registered but impossible to activate.
+     * `<module>`. The steps after the install that read the descriptor (module:refresh,
+     * template:set) validate it against the schema first: a descriptor the schema refuses
+     * must be refused here too, or the module ends up registered and then fails to refresh
+     * or to be installed by a theme.
      */
     public function testAnElementOutOfPlaceStopsTheRegistration(): void
     {

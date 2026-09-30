@@ -16,10 +16,6 @@ namespace Thelia\Install\Standalone;
 
 use Thelia\Core\Install\Database;
 use Thelia\Core\TheliaKernel;
-use Thelia\Module\Exception\InvalidModuleDescriptorException;
-use Thelia\Module\Exception\InvalidXmlDocumentException;
-use Thelia\Module\ModuleDescriptor;
-use Thelia\Module\ModuleDescriptorValidator;
 use Thelia\Tools\TerminalText;
 use Thelia\Tools\Version\Version;
 
@@ -32,12 +28,6 @@ final class DatabaseSetup
      * 1060, 1061, 1068, 1826), a column or key it drops is already gone (1091).
      */
     private const IGNORABLE_MYSQL_CODES = [1050, 1060, 1061, 1068, 1091, 1826];
-
-    private const MODULE_TYPE_MAP = [
-        'classic' => 1,
-        'payment' => 3,
-        'delivery' => 2,
-    ];
 
     private \PDO $pdo;
 
@@ -135,10 +125,12 @@ final class DatabaseSetup
      * A module is registered active unless its descriptor declares
      * `<enabled-by-default>0</enabled-by-default>`: such a module ships with the
      * distribution but waits for the merchant to activate it from the back-office, and
-     * template:set leaves it alone too (see ModuleManagement). On a database that
+     * template:set does not activate it either, unless a module the theme brings and
+     * activates lists it under <required> (see ModuleManagement::install()). On a database that
      * already knows the module, only the namespace and the version are refreshed: the
      * activation the merchant chose is never rewritten. A mandatory module found inactive
-     * once registered is reported in the warnings.
+     * once registered, and an active module whose <required> module is registered inactive,
+     * are reported in the warnings.
      *
      * Every descriptor is read before anything is written: a refused declaration stops
      * the registration with the module table untouched, whatever order the disk lists
@@ -149,7 +141,7 @@ final class DatabaseSetup
     public function registerAndApplyModules(array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): int
     {
         $this->warnings = [];
-        $modules = $this->readModuleDescriptors(array_filter($moduleDirectories, 'is_dir'));
+        $modules = (new ModuleDescriptorReader())->read($moduleDirectories);
 
         $insertModule = $this->pdo->prepare(
             'INSERT INTO `module` (`code`, `version`, `type`, `category`, `activate`, `position`, `full_namespace`, `mandatory`, `hidden`, `created_at`)
@@ -165,21 +157,21 @@ final class DatabaseSetup
         $selectModuleId = $this->pdo->prepare('SELECT `id` FROM `module` WHERE `code` = :code');
 
         foreach ($modules as $position => $module) {
-            $insertModule->execute([...$module['row'], 'position' => $position + 1]);
+            $insertModule->execute([...$module->row, 'position' => $position + 1]);
 
-            $this->insertModuleDescriptions($module['xml'], $module['code'], $upsertModuleI18n, $selectModuleId);
-            $this->applyModuleSchema($module['path'], $module['code']);
+            $this->insertModuleDescriptions($module->descriptor, $module->code, $upsertModuleI18n, $selectModuleId);
+            $this->applyModuleSchema($module->path, $module->code);
         }
 
-        // The state written is read back once: on a populated database the row keeps the
-        // activation the merchant chose, not the one the descriptor ships.
-        // The mandatory flag is read back too: a replay does not refresh it from the descriptor.
-        $registered = $this->pdo->query('SELECT `code`, `activate`, `mandatory` FROM `module`')->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
-        $activation = array_map(static fn (array $row): int => (int) $row['activate'], $registered);
-        $mandatory = array_map(static fn (array $row): int => (int) $row['mandatory'], $registered);
-        $writtenModules = $this->firstCopyOfEachModule($modules);
-        $this->warnAboutMandatoryModulesLeftInactive($writtenModules, $activation, $mandatory);
-        $this->warnAboutRequiredModulesLeftInactive($writtenModules, $activation);
+        // The state written is read back: on a populated database the row keeps the
+        // activation and the mandatory flag the merchant's shop already had.
+        $registered = array_map(
+            static fn (array $row): array => ['activate' => (int) $row['activate'], 'mandatory' => (int) $row['mandatory']],
+            $this->pdo->query('SELECT `code`, `activate`, `mandatory` FROM `module`')->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC),
+        );
+        foreach (ModuleRegistrationWarnings::describe($modules, $registered) as $warning) {
+            $this->warnings[] = $warning;
+        }
         // Both copies of a module apply the same SQL files: say a failure once.
         $this->warnings = array_values(array_unique($this->warnings));
 
@@ -187,155 +179,13 @@ final class DatabaseSetup
     }
 
     /**
-     * A module found in both vendor/thelia/modules and local/modules is read, and its SQL
-     * applied, from each copy, in the order the directories are given: the first copy creates
-     * the row and decides its activation and its mandatory flag, the second only refreshes the
-     * namespace and the version. The warnings describe the row, so they read the first copy.
-     * No copy is the one that runs everywhere: Model\Module::getModuleDir() prefers
-     * local/modules, BaseModule::getModuleDir() and module:activate prefer vendor/thelia/modules.
-     *
-     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
-     *
-     * @return list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}>
-     */
-    private function firstCopyOfEachModule(array $modules): array
-    {
-        $firstCopies = [];
-        foreach ($modules as $module) {
-            $firstCopies[$module['code']] ??= $module;
-        }
-
-        return array_values($firstCopies);
-    }
-
-    /**
-     * Registering writes each module on its own: an active module whose <required> module
-     * ships inactive, or was switched off before this run, is registered active next to an
-     * inactive dependency. Activating it from the back-office would have activated the
-     * dependency with it; the install does not, so that a module shipped inactive is never
-     * switched on without the merchant: the state written is read back and the operator told.
-     *
-     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
-     * @param array<string, int>                                                                              $activation by module code
-     */
-    private function warnAboutRequiredModulesLeftInactive(array $modules, array $activation): void
-    {
-        foreach ($modules as $module) {
-            if (1 !== ($activation[$module['code']] ?? null)) {
-                continue;
-            }
-
-            foreach ($module['xml']->required->module ?? [] as $requiredModule) {
-                $requiredCode = trim((string) $requiredModule);
-
-                if (0 === ($activation[$requiredCode] ?? null)) {
-                    $this->warn(\sprintf('%s is registered active but requires %s, which is registered inactive: activate %s from the back-office.', $module['code'], $requiredCode, $requiredCode));
-                }
-            }
-        }
-    }
-
-    /**
-     * <mandatory> only keeps an active module from being deactivated: a mandatory module
-     * can be registered inactive, because its descriptor ships it so or because the merchant
-     * switched it off before this run. Either way nothing else would say that a module the
-     * shop cannot do without is off, so the state is read back after the write and reported.
-     *
-     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
-     * @param array<string, int>                                                                              $activation by module code
-     * @param array<string, int>                                                                              $mandatory  by module code
-     */
-    private function warnAboutMandatoryModulesLeftInactive(array $modules, array $activation, array $mandatory): void
-    {
-        foreach ($modules as $module) {
-            if (1 === ($mandatory[$module['code']] ?? null) && 0 === ($activation[$module['code']] ?? null)) {
-                $this->warn(\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $module['code']));
-            }
-        }
-    }
-
-    /**
-     * A warning names a module by its directory and may quote an SQL error: no control
-     * character of either reaches the terminal of the entry point that prints it.
+     * A warning names a module by its directory and may quote an SQL error: the names come
+     * on one line, and no control character but the line feed and the tab of an SQL error
+     * reaches the terminal of the entry point that prints it.
      */
     private function warn(string $warning): void
     {
         $this->warnings[] = TerminalText::withoutControlCharacters($warning);
-    }
-
-    /**
-     * @param string[] $moduleDirs
-     *
-     * @return list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}>
-     */
-    private function readModuleDescriptors(array $moduleDirs): array
-    {
-        $modules = [];
-
-        foreach ($moduleDirs as $baseDir) {
-            foreach (new \DirectoryIterator($baseDir) as $entry) {
-                if (!$entry->isDir() || $entry->isDot()) {
-                    continue;
-                }
-
-                $moduleXml = $entry->getPathname().'/Config/module.xml';
-                if (!file_exists($moduleXml)) {
-                    continue;
-                }
-
-                $xml = @simplexml_load_file($moduleXml);
-                if (false === $xml) {
-                    continue;
-                }
-
-                $code = $entry->getFilename();
-                $xmlType = (string) ($xml->type ?? 'classic');
-
-                $row = [
-                    'code' => $code,
-                    'version' => (string) ($xml->version ?? '0.0.1'),
-                    'type' => self::MODULE_TYPE_MAP[$xmlType] ?? 1,
-                    'category' => $xmlType,
-                    'activate' => $this->enabledByDefault($xml, $moduleXml) ? 1 : 0,
-                    'namespace' => (string) ($xml->fullnamespace ?? $code.'\\'.$code),
-                    'mandatory' => (int) ($xml->mandatory ?? 0),
-                    'hidden' => (int) ($xml->hidden ?? 0),
-                ];
-
-                $modules[] = [
-                    'code' => $code,
-                    'path' => $entry->getPathname(),
-                    'xml' => $xml,
-                    'row' => $row,
-                ];
-            }
-        }
-
-        return $modules;
-    }
-
-    /**
-     * The install reads the descriptor without the kernel, so it checks the schema itself
-     * when the descriptor carries `<enabled-by-default>`: only the 2.2 format knows the
-     * element, as the last one of `<module>`. Every later step (module:refresh, template:set,
-     * the activation from the back-office) validates the descriptor before reading it, so a
-     * descriptor refused there has to be refused here too, or the module would be registered
-     * and impossible to activate.
-     */
-    private function enabledByDefault(\SimpleXMLElement $xml, string $moduleXml): bool
-    {
-        // The schema rules first, so that a refused value comes back with the message every
-        // later step would give; the reader turns what the schema accepted, or the absence of
-        // the element, into a boolean.
-        if (0 !== \count($xml->{ModuleDescriptor::ENABLED_BY_DEFAULT})) {
-            try {
-                (new ModuleDescriptorValidator())->validate($moduleXml);
-            } catch (InvalidXmlDocumentException $exception) {
-                throw new InvalidModuleDescriptorException(\sprintf('The descriptor %s declares <%s> and is refused by the module schema, which accepts the element once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', $moduleXml, ModuleDescriptor::ENABLED_BY_DEFAULT, $exception->getMessage()), 0, $exception);
-            }
-        }
-
-        return ModuleDescriptor::enabledByDefault($xml, $moduleXml);
     }
 
     /**
@@ -428,7 +278,7 @@ final class DatabaseSetup
                         continue;
                     }
 
-                    $this->warn("{$moduleName}/".basename($file).": {$e->getMessage()}");
+                    $this->warn(\sprintf('%s/%s: %s', TerminalText::singleLine($moduleName), TerminalText::singleLine(basename($file)), $e->getMessage()));
                 }
             }
         }

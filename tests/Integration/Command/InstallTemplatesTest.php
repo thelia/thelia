@@ -14,18 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Command\Install;
-use Thelia\Model\ModuleQuery;
+use Thelia\Install\TemplateApplier;
 use Thelia\Test\IntegrationTestCase;
 
 /**
  * thelia:install applies the chosen templates through template:set, in a kernel of its
  * own, then runs the remaining steps. A template that cannot be applied has to reach the
  * exit code of the install, as it does in bin/install. The whole command writes the
- * environment file and rebuilds the database, so the template step is driven alone.
+ * environment file and rebuilds the database, so the template step (TemplateApplier) is
+ * driven alone.
  */
 final class InstallTemplatesTest extends IntegrationTestCase
 {
@@ -34,8 +32,6 @@ final class InstallTemplatesTest extends IntegrationTestCase
     protected bool $useTransaction = false;
 
     private const string MISSING_THEME = 'InstallSampleMissingTheme';
-
-    private const string REFUSED_MODULE = 'InstallSampleRefusedModule';
 
     private const array PROCESS_VARIABLES = ['DATABASE_HOST', 'DATABASE_PORT', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD', 'SHELL_VERBOSITY'];
 
@@ -47,8 +43,6 @@ final class InstallTemplatesTest extends IntegrationTestCase
 
     /** @var array<string, false|string> */
     private array $processVariables = [];
-
-    private ?string $moduleDir = null;
 
     protected function setUp(): void
     {
@@ -75,10 +69,6 @@ final class InstallTemplatesTest extends IntegrationTestCase
             putenv(false === $value ? $name : $name.'='.$value);
         }
 
-        if (null !== $this->moduleDir) {
-            (new Filesystem())->remove($this->moduleDir);
-        }
-
         parent::tearDown();
     }
 
@@ -88,61 +78,15 @@ final class InstallTemplatesTest extends IntegrationTestCase
 
         $applied = $this->applyTemplates($output, ['backOffice' => self::MISSING_THEME]);
 
+        $written = $output->fetch();
         self::assertFalse($applied, 'A template:set that fails makes the template step fail.');
-        self::assertStringContainsString(\sprintf('Post-install step failed while applying template "%s" for type "backOffice".', self::MISSING_THEME), $output->fetch());
+        self::assertStringContainsString(\sprintf('Template "%s" not found.', self::MISSING_THEME), $written, 'The step fails for the reason the test sets up.');
+        self::assertStringContainsString(\sprintf('Post-install step failed while applying template "%s" for type "backOffice".', self::MISSING_THEME), $written);
     }
 
     public function testNoTemplateToApplyIsNotAFailure(): void
     {
         self::assertTrue($this->applyTemplates(new BufferedOutput(), ['backOffice' => ' ']));
-    }
-
-    public function testATemplateThatCouldNotBeAppliedMakesTheInstallFail(): void
-    {
-        $output = new BufferedOutput();
-
-        self::assertSame(Command::FAILURE, $this->installResult(false, $output));
-        self::assertStringContainsString('Thelia installed with errors: a template could not be applied. Check messages above.', $output->fetch());
-        self::assertSame(Command::SUCCESS, $this->installResult(true, new BufferedOutput()));
-    }
-
-    /**
-     * A descriptor the module schema refuses stops the registration with a readable line and
-     * makes the install fail, with nothing written.
-     */
-    public function testARefusedDescriptorStopsTheModuleRegistration(): void
-    {
-        $this->moduleDir = sys_get_temp_dir().'/thelia-install-refused-'.bin2hex(random_bytes(4)).'/';
-        $code = self::REFUSED_MODULE;
-        (new Filesystem())->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
-            <?xml version="1.0" encoding="UTF-8"?>
-            <module xmlns="http://thelia.net/schema/dic/module">
-                <fullnamespace>{$code}\\{$code}</fullnamespace>
-                <descriptive locale="en_US">
-                    <title>{$code}</title>
-                </descriptive>
-                <languages>
-                    <language>en_US</language>
-                </languages>
-                <version>1.0.0</version>
-                <type>classic</type>
-                <stability>prod</stability>
-                <enabled-by-default>maybe</enabled-by-default>
-            </module>
-            XML);
-        $output = new BufferedOutput();
-
-        $registerModules = new \ReflectionMethod(Install::class, 'registerModules');
-        $registered = $registerModules->invoke(new Install('test'), $output, $this->connectionInfo(), [$this->moduleDir]);
-
-        self::assertFalse($registered);
-        self::assertStringContainsString('ERROR: The descriptor '.$this->moduleDir.$code, $output->fetch());
-        self::assertNull(ModuleQuery::create()->findOneByCode($code));
-    }
-
-    private function installResult(bool $templatesApplied, BufferedOutput $output): int
-    {
-        return (new \ReflectionMethod(Install::class, 'installResult'))->invoke(new Install('test'), $templatesApplied, $output);
     }
 
     /**
@@ -164,8 +108,6 @@ final class InstallTemplatesTest extends IntegrationTestCase
      */
     private function applyTemplates(BufferedOutput $output, array $themes): bool
     {
-        $applyTemplates = new \ReflectionMethod(Install::class, 'applyTemplatesInSameCommandProcess');
-
-        return $applyTemplates->invoke(new Install('test'), $output, $this->connectionInfo(), $themes);
+        return (new TemplateApplier())->apply($output, $this->connectionInfo(), $themes);
     }
 }

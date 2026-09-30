@@ -27,17 +27,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * clear: a console.terminate listener can then die loading a service whose file is gone,
  * after the command returned but before the console hands its exit code back. Listening
  * first on console.terminate keeps that exit code, so a failed command is never read as
- * one that succeeded because a listener broke afterwards.
+ * one that succeeded because a listener broke afterwards. That holds for the plain event
+ * dispatcher of a kernel booted without debug, which resolves a lazy listener when it
+ * calls it: the traceable dispatcher of a debug kernel resolves them all first, and the
+ * command is then read as failed. Both installers boot their kernels without debug.
  *
  * bin/install runs every command of its post-install phase through run(); thelia:install
  * runs template:set through it, its other steps being processes of their own.
  *
  * @internal
  */
-final class CommandExitCodeRecorder
+final readonly class CommandExitCodeRecorder
 {
-    private ?int $exitCode = null;
-
     /**
      * Run one command of the console and return its exit code. The error a console.terminate
      * listener raises on a container file the command deleted is not the command's: the exit
@@ -49,9 +50,12 @@ final class CommandExitCodeRecorder
      */
     public function run(Application $application, InputInterface $input, OutputInterface $output, EventDispatcherInterface $dispatcher): int
     {
-        $this->exitCode = null;
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event): void {
-            $this->exitCode = $event->getExitCode();
+        $exitCode = null;
+        // The listener is not removed: removing one resolves every lazy listener of the
+        // event again, the one that died on the deleted container file included, and each
+        // caller discards the kernel, and its dispatcher, once the command is over.
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function (ConsoleTerminateEvent $event) use (&$exitCode): void {
+            $exitCode = $event->getExitCode();
         }, \PHP_INT_MAX);
         $application->setAutoExit(false);
 
@@ -62,7 +66,7 @@ final class CommandExitCodeRecorder
                 throw $error;
             }
 
-            return $this->exitCode ?? Command::FAILURE;
+            return $exitCode ?? Command::FAILURE;
         }
     }
 }

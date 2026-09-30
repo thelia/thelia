@@ -20,7 +20,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Thelia\Install\Standalone\CommandExitCodeRecorder;
 
 /**
@@ -42,6 +45,39 @@ final class CommandExitCodeRecorderTest extends TestCase
         $dispatcher = $this->dispatcherWhoseTerminateListenerThrows('Failed opening required \'var/cache/dev/ContainerAbc/getSomeService.php\'');
 
         self::assertSame(Command::SUCCESS, $this->runCommand(static fn (): int => Command::SUCCESS, $dispatcher));
+    }
+
+    /**
+     * The listeners of a compiled container are lazy: `[closure, method]`, resolved when the
+     * event is dispatched. The one that dies on the deleted container file stays unresolved,
+     * and anything that resolves it again (removing a listener does) dies again: the exit
+     * code the command returned is kept all the same.
+     */
+    public function testTheExitCodeIsKeptWhenALazyTerminateListenerDiesOnTheClearedCache(): void
+    {
+        foreach ([Command::FAILURE, Command::SUCCESS] as $returned) {
+            $dispatcher = new EventDispatcher();
+            $dispatcher->addListener(ConsoleEvents::TERMINATE, [static function (): never {
+                throw new \Error('Failed opening required \'var/cache/dev/ContainerAbc/getSomeListenerService.php\'');
+            }, 'onConsoleTerminate']);
+
+            self::assertSame($returned, $this->runCommand(static fn (): int => $returned, $dispatcher));
+        }
+    }
+
+    /**
+     * The traceable dispatcher of a debug kernel resolves every listener before calling the
+     * first: the lazy listener dies before the exit code is recorded, and a command whose
+     * result cannot be read is a failure. The installers boot their kernels without debug.
+     */
+    public function testATraceableDispatcherThatDiesBeforeTheRecorderReadsAFailure(): void
+    {
+        $inner = new EventDispatcher();
+        $inner->addListener(ConsoleEvents::TERMINATE, [static function (): never {
+            throw new \Error('Failed opening required \'var/cache/dev/ContainerAbc/getSomeListenerService.php\'');
+        }, 'onConsoleTerminate']);
+
+        self::assertSame(Command::FAILURE, $this->runCommand(static fn (): int => Command::SUCCESS, new TraceableEventDispatcher($inner, new Stopwatch())));
     }
 
     public function testACommandThatTerminatesNormallyReturnsItsExitCode(): void
@@ -82,7 +118,7 @@ final class CommandExitCodeRecorderTest extends TestCase
         return $dispatcher;
     }
 
-    private function runCommand(callable $code, EventDispatcher $dispatcher): int
+    private function runCommand(callable $code, EventDispatcherInterface $dispatcher): int
     {
         $application = new Application();
         $application->setDispatcher($dispatcher);
