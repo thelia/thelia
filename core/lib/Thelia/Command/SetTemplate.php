@@ -30,6 +30,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
+use Thelia\Tools\TerminalText;
 
 #[AsCommand(name: 'template:set', description: 'set template')]
 class SetTemplate extends ContainerAwareCommand
@@ -111,12 +112,15 @@ class SetTemplate extends ContainerAwareCommand
         try {
             $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         } catch (\Throwable $exception) {
+            // The message quotes a module directory, a namespace or a descriptor value.
+            $message = TerminalText::withoutControlCharacters($exception->getMessage());
+            $trace = self::traceWithoutArguments($exception);
             // The trace goes to the log as text: Tlog only expands an \Exception, and an \Error
             // (a module class that does not load) would otherwise be dumped as an object.
-            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $exception->getMessage()."\n".$exception->getTraceAsString());
-            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($exception->getMessage())));
+            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $message."\n".$trace);
+            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($message)));
             if ($output->isVerbose()) {
-                $output->writeln(OutputFormatter::escape($exception->getTraceAsString()));
+                $output->writeln(OutputFormatter::escape($trace));
             }
 
             return self::FAILURE;
@@ -137,12 +141,26 @@ class SetTemplate extends ContainerAwareCommand
         return self::SUCCESS;
     }
 
+    /**
+     * The frames of the trace without their arguments: getTraceAsString() prints them unless
+     * zend.exception_ignore_args is on, and one of them may be a connection password.
+     */
+    private static function traceWithoutArguments(\Throwable $throwable): string
+    {
+        $frames = [];
+        foreach ($throwable->getTrace() as $index => $frame) {
+            $frames[] = \sprintf('#%d %s(%d): %s%s%s()', $index, $frame['file'] ?? '[internal function]', $frame['line'] ?? 0, $frame['class'] ?? '', $frame['type'] ?? '', $frame['function']);
+        }
+
+        return TerminalText::withoutControlCharacters(implode("\n", $frames));
+    }
+
     private function dumpAutoload(OutputInterface $output): void
     {
         try {
             $this->composerHelper->dumpAutoload();
         } catch (\RuntimeException $exception) {
-            $output->writeln(\sprintf('<error>Composer dump-autoload failed: %s</error>', OutputFormatter::escape($exception->getMessage())));
+            $output->writeln(\sprintf('<error>Composer dump-autoload failed: %s</error>', OutputFormatter::escape(TerminalText::withoutControlCharacters($exception->getMessage()))));
 
             return;
         }
