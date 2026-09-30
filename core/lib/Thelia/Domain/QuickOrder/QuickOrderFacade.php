@@ -18,9 +18,12 @@ use Propel\Runtime\Propel;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
 use Thelia\Domain\QuickOrder\Enum\LineStatus;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
+use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
+use Thelia\Domain\QuickOrder\Service\QuickOrderLimiter;
 use Thelia\Domain\QuickOrder\Service\ReferenceResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -36,6 +39,10 @@ use Thelia\Model\Map\CartTableMap;
  * way a product page does, in one transaction: either every resolved line is in
  * the cart, or none is.
  *
+ * Every entry point spends the account's quick order budget before it reads
+ * anything, so the API and the theme share one limit and a list of another account
+ * costs the same as a list of one's own.
+ *
  * Products hidden by a reserved sale follow the customer signed in to the current
  * request, not the customer given here (see ReferenceResolver). Both are the same
  * for the API and the theme.
@@ -45,16 +52,46 @@ final readonly class QuickOrderFacade
     public function __construct(
         private ReferenceResolver $resolver,
         private CartFacade $cartFacade,
+        private PurchaseListFacade $purchaseListFacade,
+        private QuickOrderLimiter $limiter,
     ) {
     }
 
+    /**
+     * @throws QuickOrderRateLimitedException
+     */
     public function resolve(Customer $customer, ReferenceQuantityLines $lines, Currency $currency): QuickOrderTable
     {
+        $this->spendBudget($customer);
+
         return $this->resolver->resolve($customer, $lines, $currency);
     }
 
+    /**
+     * Loads a purchase list into the control table, in the format resolve() answers.
+     *
+     * @throws QuickOrderRateLimitedException
+     * @throws \Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException
+     */
+    public function resolvePurchaseList(Customer $customer, int $listId, Currency $currency): QuickOrderTable
+    {
+        $this->spendBudget($customer);
+
+        return $this->resolver->resolve(
+            $customer,
+            new ReferenceQuantityLines($this->purchaseListFacade->linesToLoad($customer, $listId)),
+            $currency,
+        );
+    }
+
+    /**
+     * @throws QuickOrderRateLimitedException
+     * @throws QuickOrderCartNotFoundException
+     */
     public function addToCart(Customer $customer, Cart $cart, ReferenceQuantityLines $lines): QuickOrderTable
     {
+        $this->spendBudget($customer);
+
         if ((int) $cart->getCustomerId() !== (int) $customer->getId()) {
             throw new QuickOrderCartNotFoundException('Cart not found.');
         }
@@ -90,5 +127,12 @@ final readonly class QuickOrderFacade
         }
 
         return new QuickOrderTable($tableLines);
+    }
+
+    private function spendBudget(Customer $customer): void
+    {
+        if (!$this->limiter->allows($customer)) {
+            throw new QuickOrderRateLimitedException('Too many quick order requests, please try again in a minute.');
+        }
     }
 }

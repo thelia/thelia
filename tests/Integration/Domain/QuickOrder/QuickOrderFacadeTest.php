@@ -16,8 +16,11 @@ namespace Thelia\Tests\Integration\Domain\QuickOrder;
 
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException;
+use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
+use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
@@ -95,6 +98,62 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         $this->expectException(QuickOrderCartNotFoundException::class);
 
         $this->facade->addToCart($this->customer, $cart, self::lines([(string) $this->saleElements()->getRef() => 1]));
+    }
+
+    public function testALoadedListAnswersInTheFormatOfTheResolution(): void
+    {
+        $saleElements = $this->saleElements();
+        $list = $this->getService(PurchaseListFacade::class)->create($this->customer, 'Restock', self::lines([(string) $saleElements->getRef() => 3]));
+
+        $table = $this->facade->resolvePurchaseList($this->customer, (int) $list->getId(), $this->currency);
+
+        self::assertCount(1, $table->lines);
+        self::assertSame((int) $saleElements->getId(), $table->lines[0]->productSaleElementsId);
+        self::assertSame(3, $table->lines[0]->quantity);
+    }
+
+    public function testTheListOfAnotherAccountIsNotLoaded(): void
+    {
+        $list = $this->getService(PurchaseListFacade::class)->create($this->factory->customer($this->factory->customerTitle()), 'Not yours');
+
+        $this->expectException(PurchaseListNotFoundException::class);
+
+        $this->facade->resolvePurchaseList($this->customer, (int) $list->getId(), $this->currency);
+    }
+
+    public function testEveryEntryPointSpendsTheSameBudget(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $lines = self::lines(['ANY' => 1]);
+
+        for ($n = 1; $n <= 10; ++$n) {
+            $this->facade->resolve($this->customer, $lines, $this->currency);
+            $this->facade->addToCart($this->customer, $cart, $lines);
+            $this->spendOnAForeignList();
+        }
+
+        $this->expectException(QuickOrderRateLimitedException::class);
+
+        $this->facade->resolve($this->customer, $lines, $this->currency);
+    }
+
+    public function testAListOfAnotherAccountCostsTheSameAsOneOfOnesOwn(): void
+    {
+        for ($n = 1; $n <= 30; ++$n) {
+            $this->spendOnAForeignList();
+        }
+
+        $this->expectException(QuickOrderRateLimitedException::class);
+
+        $this->facade->resolve($this->customer, self::lines(['ANY' => 1]), $this->currency);
+    }
+
+    private function spendOnAForeignList(): void
+    {
+        try {
+            $this->facade->resolvePurchaseList($this->customer, \PHP_INT_MAX, $this->currency);
+        } catch (PurchaseListNotFoundException) {
+        }
     }
 
     /**

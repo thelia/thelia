@@ -33,9 +33,12 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 final class PurchaseListFacadeTest extends IntegrationTestCase
 {
+    use RecordsSqlQueries;
+
     private FixtureFactory $factory;
 
     private PurchaseListFacade $facade;
@@ -45,6 +48,26 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
         $this->facade = $this->getService(PurchaseListFacade::class);
+    }
+
+    public function testTheLinesOfEveryListAreCountedInOneQuery(): void
+    {
+        $customer = $this->customer();
+        $full = $this->facade->create($customer, 'Full', self::lines(['A-1' => 1, 'B-2' => 2, 'C-3' => 3]));
+        $empty = $this->facade->create($customer, 'Empty');
+        $few = [$full, $empty];
+        $many = [$full, $empty];
+
+        for ($n = 1; $n <= 20; ++$n) {
+            $many[] = $this->facade->create($customer, 'List '.$n, self::lines(['REF-'.$n => 1]));
+        }
+
+        $counts = $this->facade->countItemsOf($few);
+
+        self::assertSame([(int) $full->getId() => 3], $counts);
+        self::assertCount(1, $this->recordSqlQueries(fn () => $this->facade->countItemsOf($few)));
+        self::assertCount(1, $this->recordSqlQueries(fn () => $this->facade->countItemsOf($many)));
+        self::assertSame([], $this->facade->countItemsOf([]));
     }
 
     public function testACreatedListKeepsItsLinesInOrderAndIsPersonal(): void

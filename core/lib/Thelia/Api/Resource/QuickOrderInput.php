@@ -17,7 +17,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Api\Validator\ReferenceQuantityRows;
 
 /**
  * The lines a buyer typed or imported: a reference and a quantity each, and the
@@ -41,16 +41,8 @@ final class QuickOrderInput
         ],
     )]
     #[Assert\NotNull]
-    #[Assert\Count(min: 1, max: ReferenceQuantityLines::MAX_LINES)]
-    #[Assert\All([
-        new Assert\Collection(
-            fields: [
-                'reference' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: ReferenceQuantityLines::MAX_REFERENCE_LENGTH)],
-                'quantity' => [new Assert\NotNull(), new Assert\Type('int'), new Assert\Positive()],
-                'productSaleElementsId' => new Assert\Optional([new Assert\Type('int'), new Assert\Positive()]),
-            ],
-        ),
-    ])]
-    #[Groups([QuickOrder::GROUP_FRONT_WRITE])]
+    #[Assert\Count(min: 1)]
+    #[ReferenceQuantityRows]
+    #[Groups([QuickOrder::GROUP_FRONT_WRITE, PurchaseList::GROUP_FRONT_ITEMS_WRITE])]
     public ?array $lines = null;
 }
