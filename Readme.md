@@ -19,7 +19,7 @@ Thelia is an open source framework for building online stores and managing web c
 - A Twig front office (the Flexy theme) and a Twig back office (the default-twig theme)
 - Lexik JWT for API authentication
 
-The back office and front office are built with Twig, Symfony UX (Stimulus, Twig Components and Live Components) and Bootstrap 5. The Smarty back office from Thelia 2 is still available for projects that need it while they migrate. See "Back-office templates" below.
+The back office and front office are built with Twig, Symfony UX (Stimulus, Twig Components and Live Components) and Bootstrap 5.
 
 Thelia is open source software. See the [LICENSE](LICENSE) file for details.
 
@@ -75,11 +75,7 @@ The storefront is then at `https://<project>.ddev.site` and the admin at `https:
 
 ## Back-office templates
 
-Thelia 3 installs the Twig back office (`default-twig`) by default. The Smarty back office (`templates/backOffice/default/`) stays available so projects migrating from Thelia 2 can keep modules that target it. You can install both at once and switch the active one:
-
-```bash
-ddev exec bin/console template:set backOffice default-twig   # or: default
-```
+Thelia 3 installs one back office, the Twig one (`default-twig`). The Smarty back office of Thelia 2 (`thelia/backoffice-default-template`) is no longer installed nor maintained in 3.x.
 
 If you maintain a module, the migration guide is at <https://doc.thelia.net/docs/upgrading/migrate>.
 
