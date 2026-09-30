@@ -198,6 +198,22 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
+     * The warnings describe the registration that just ran: registering twice with the same
+     * setup reports a mandatory module left inactive once, not once per run.
+     */
+    public function testTheWarningsDescribeTheLastRegistrationOnly(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
+
+        $setup->registerAndApplyModules([$moduleDir]);
+        $setup->registerAndApplyModules([$moduleDir]);
+
+        self::assertCount(1, $setup->getWarnings());
+    }
+
+    /**
      * On a populated database the row keeps the state the merchant chose, so the warning
      * has to describe that state, not the descriptor: a mandatory module the merchant
      * activated since is not reported, one the merchant switched off is.

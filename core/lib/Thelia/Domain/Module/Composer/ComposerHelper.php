@@ -218,4 +218,19 @@ class ComposerHelper
 
         return implode('', $lines);
     }
+
+    /**
+     * Regenerate the Composer autoloader of the project, so that a theme bundle or a module
+     * copied on disk is autoloadable.
+     *
+     * @throws \RuntimeException with the Composer output when the dump fails
+     */
+    public function dumpAutoload(): void
+    {
+        exec(THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1', $composerOutput, $returnCode);
+
+        if (0 !== $returnCode) {
+            throw new \RuntimeException(implode("\n", $composerOutput));
+        }
+    }
 }

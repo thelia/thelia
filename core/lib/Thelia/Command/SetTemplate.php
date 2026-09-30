@@ -114,7 +114,7 @@ class SetTemplate extends ContainerAwareCommand
             Tlog::getInstance()->error(\sprintf('template:set could not install the modules of theme "%s": %s', $name, $exception->getMessage()), ['exception' => $exception]);
             $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($exception->getMessage())));
             if ($output->isVerbose()) {
-                $output->writeln($exception->getTraceAsString());
+                $output->writeln(OutputFormatter::escape($exception->getTraceAsString()));
             }
 
             return self::FAILURE;
@@ -124,7 +124,7 @@ class SetTemplate extends ContainerAwareCommand
         $output->writeln(\sprintf('<fg=blue>%d theme modules found, %d active.</>', \count($modulesInstalled), \count($activeModules)));
 
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
-        $this->execDumpAutoload($output);
+        $this->dumpAutoload($output);
 
         $this->theliaTemplateHelper->setConfigToTemplate(TemplateDefinition::CONFIG_NAMES[$type], $name);
         $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
@@ -135,24 +135,17 @@ class SetTemplate extends ContainerAwareCommand
         return self::SUCCESS;
     }
 
-    private function execDumpAutoload(
-        OutputInterface $output,
-    ): ?int {
-        $command = THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1';
-        $returnCode = 0;
+    private function dumpAutoload(OutputInterface $output): void
+    {
+        try {
+            $this->composerHelper->dumpAutoload();
+        } catch (\RuntimeException $exception) {
+            $output->writeln(\sprintf('<error>Composer dump-autoload failed: %s</error>', OutputFormatter::escape($exception->getMessage())));
 
-        exec($command, $outputExec, $returnCode);
-
-        if (0 !== $returnCode) {
-            $errors = implode("\n", $outputExec);
-            $output->writeln(\sprintf('<error>Composer dump-autoload failed: %s</error>', $errors));
-
-            return self::FAILURE;
+            return;
         }
 
         $output->writeln('<fg=green>Autoload dump completed successfully</>');
-
-        return null;
     }
 
     private function getComposerPackageTypeForTemplateType(string $type): string

@@ -236,21 +236,10 @@ class ModuleManagement
 
     public function installModule(string $absolutePathToModule): Module
     {
-        $moduleValidator = $this->describe($absolutePathToModule);
+        // The validator loads and validates the descriptor and its definition when it is built.
+        $moduleValidator = new ModuleValidator($absolutePathToModule);
 
         return $this->findRegistered($moduleValidator) ?? $this->install($moduleValidator, $absolutePathToModule);
-    }
-
-    /**
-     * The validated descriptor of the module at this path, with its definition loaded: what
-     * findRegistered() and install() both read.
-     */
-    private function describe(string $absolutePathToModule): ModuleValidator
-    {
-        $moduleValidator = new ModuleValidator($absolutePathToModule);
-        $moduleValidator->loadModuleDefinition();
-
-        return $moduleValidator;
     }
 
     /**
@@ -368,18 +357,27 @@ class ModuleManagement
         }
 
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
+        $outcomes = [];
 
         foreach ($composerModuleDTOS as $composerModuleDTO) {
-            $moduleValidator = $this->describe($composerModuleDTO->getPath());
+            $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
             $registered = $this->findRegistered($moduleValidator);
             $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath());
             $cacheEvent = new CacheEvent($this->kernelCacheDir);
             $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
 
             $modulesInstalled[] = $module;
+            $outcomes[] = [$module, null === $registered, $moduleValidator, $composerModuleDTO->getPath()];
+        }
+
+        // Activating a module activates its <required> modules too, and the theme lists its
+        // modules in no dependency order: a module met inactive early in the loop may have been
+        // activated by a later one. The states are read and reported once the loop is over.
+        foreach ($outcomes as [$module, $installedNow, $moduleValidator, $modulePath]) {
+            $module->reload();
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-                if (null === $registered) {
+                if ($installedNow) {
                     $output?->writeln(\sprintf('<fg=gray>Module %s successfully installed and activated.</>', $module->getCode()));
                 }
 
@@ -394,7 +392,7 @@ class ModuleManagement
             // says which module the theme is missing.
             $output?->writeln(
                 \sprintf(
-                    $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath())
+                    $this->shipsInactive($moduleValidator, $modulePath)
                         ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
                         : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
                     $module->getCode()

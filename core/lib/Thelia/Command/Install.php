@@ -245,7 +245,7 @@ class Install extends ContainerAwareCommand
         $output->writeln(\sprintf('<info>%d module(s) registered</info>', $count));
 
         foreach ($setup->getWarnings() as $warning) {
-            $output->writeln(\sprintf('<comment>WARN %s</comment>', $warning));
+            $output->writeln(\sprintf('<comment>WARN %s</comment>', OutputFormatter::escape($warning)));
         }
 
         return true;

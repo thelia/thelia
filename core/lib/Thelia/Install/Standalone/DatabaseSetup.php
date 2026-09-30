@@ -141,12 +141,13 @@ final class DatabaseSetup
      *
      * Every descriptor is read before anything is written: a refused declaration stops
      * the registration with the module table untouched, whatever order the disk lists
-     * the modules in.
+     * the modules in. getWarnings() describes the last registration only.
      *
      * @param string[] $moduleDirectories
      */
     public function registerAndApplyModules(array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): int
     {
+        $this->warnings = [];
         $modules = $this->readModuleDescriptors(array_filter($moduleDirectories, 'is_dir'));
 
         $insertModule = $this->pdo->prepare(
@@ -256,16 +257,15 @@ final class DatabaseSetup
      */
     private function enabledByDefault(\SimpleXMLElement $xml, string $moduleXml): bool
     {
-        if (0 === \count($xml->{ModuleDescriptor::ENABLED_BY_DEFAULT})) {
-            return true;
-        }
-
         // The schema rules first, so that a refused value comes back with the message every
-        // later step would give; the reader only turns an accepted value into a boolean.
-        try {
-            (new ModuleDescriptorValidator())->validate($moduleXml);
-        } catch (InvalidXmlDocumentException $exception) {
-            throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is refused by the module schema: only the 2.2 descriptor format knows it, as the last element of <module>. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
+        // later step would give; the reader turns what the schema accepted, or the absence of
+        // the element, into a boolean.
+        if (0 !== \count($xml->{ModuleDescriptor::ENABLED_BY_DEFAULT})) {
+            try {
+                (new ModuleDescriptorValidator())->validate($moduleXml);
+            } catch (InvalidXmlDocumentException $exception) {
+                throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is refused by the module schema, which accepts it once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
+            }
         }
 
         return ModuleDescriptor::enabledByDefault($xml, $moduleXml);
