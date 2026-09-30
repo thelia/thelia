@@ -34,14 +34,25 @@ final class CartPurgeHorizonTest extends TestCase
         yield 'anonymous days is smaller' => [10, 60, 10];
     }
 
-    public function testEarliestSurvivingCartDateIsMidnightRetentionDaysBeforeNow(): void
+    public function testEarliestSurvivingCartDateIsRetentionDaysBeforeNowToTheSecond(): void
     {
         $horizon = new CartPurgeHorizon(60, 30);
         $now = new \DateTimeImmutable('2026-09-24 15:00:00');
 
         self::assertEquals(
-            new \DateTimeImmutable('2026-08-25 00:00:00'),
+            new \DateTimeImmutable('2026-08-25 15:00:00'),
             $horizon->earliestSurvivingCartDate($now)
+        );
+    }
+
+    public function testAPeriodStartingAtMidnightOnTheHorizonDayMayHaveLostCarts(): void
+    {
+        $horizon = new CartPurgeHorizon(60, 30);
+        $now = new \DateTimeImmutable('2026-09-24 15:00:00');
+
+        self::assertTrue(
+            $horizon->mayHavePurged(new \DateTimeImmutable('2026-08-25 00:00:00'), $now),
+            'The purge deletes the carts created before now - 30 days: those of 2026-08-25 00:00 to 15:00 are gone.',
         );
     }
 
