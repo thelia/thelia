@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Customer;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface as ListenableEventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerPersonalDataExportEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -49,7 +50,7 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         $personalData = $event->getPersonalData();
 
-        self::assertSame(CustomerPersonalDataExporter::CORE_SECTION_NAMES, array_keys($personalData));
+        self::assertCoreSectionsComeFirst($personalData);
 
         self::assertSame('Exported', $personalData['customer']['firstname']);
         self::assertSame('exporter-subject@test.com', $personalData['customer']['email']);
@@ -104,7 +105,33 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         $personalData = (new CustomerPersonalDataExporter([$provider]))->export($customer);
 
-        self::assertArrayHasKey('loyalty', $personalData);
+        self::assertCoreSectionsComeFirst($personalData);
+        self::assertSame(['points' => 120], $personalData['loyalty']);
+    }
+
+    /**
+     * A module adds its section through CustomerPersonalDataProviderInterface
+     * or by listening to the event after core: the core sections stay, in
+     * their order, and the module section comes on top of them.
+     */
+    public function testExportKeepsTheCoreSectionsWhenAModuleAddsOne(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        self::assertInstanceOf(ListenableEventDispatcherInterface::class, $dispatcher);
+        $dispatcher->addListener(
+            TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT,
+            static fn (CustomerPersonalDataExportEvent $event) => $event->addSection('loyalty', ['points' => 120]),
+            64,
+        );
+
+        $event = new CustomerPersonalDataExportEvent($customer);
+        $dispatcher->dispatch($event, TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT);
+
+        $personalData = $event->getPersonalData();
+
+        self::assertCoreSectionsComeFirst($personalData);
         self::assertSame(['points' => 120], $personalData['loyalty']);
     }
 
@@ -154,11 +181,30 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 
         $personalData = $event->getPersonalData();
 
-        self::assertSame(CustomerPersonalDataExporter::CORE_SECTION_NAMES, array_keys($personalData));
+        self::assertCoreSectionsComeFirst($personalData);
+        self::assertSame([], array_filter(
+            array_keys($personalData),
+            static fn (string $sectionName): bool => str_contains($sectionName, 'tag'),
+        ));
 
         // The label itself, wherever it might have slipped in. Not a naive search
         // for "tag": "postage" contains it.
         self::assertStringNotContainsString('Bad payer', json_encode($personalData, \JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Modules add sections through CustomerPersonalDataProviderInterface, so the
+     * export holds the core sections, in their order, and possibly more.
+     *
+     * @param array<string, mixed> $personalData
+     */
+    private static function assertCoreSectionsComeFirst(array $personalData): void
+    {
+        self::assertSame(
+            CustomerPersonalDataExporter::CORE_SECTION_NAMES,
+            \array_slice(array_keys($personalData), 0, \count(CustomerPersonalDataExporter::CORE_SECTION_NAMES)),
+            'The core sections must all be exported, in their order, before any module section.',
+        );
     }
 
     private function createCustomerWithHistory(): Customer
