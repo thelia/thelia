@@ -11,7 +11,7 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (1, 'check-available-stock', '1', 0, 0, NOW(), NOW()),
 (2, 'active-front-template', 'flexy', 0, 0, NOW(), NOW()),
-(3, 'active-admin-template', 'default', 0, 0, NOW(), NOW()),
+(3, 'active-admin-template', 'default-twig', 0, 0, NOW(), NOW()),
 (4, 'active-pdf-template', 'default', 0, 0, NOW(), NOW()),
 (5, 'active-mail-template', 'default', 0, 0, NOW(), NOW()),
 (6, 'rewriting_enable', '1', 0, 0, NOW(), NOW()),

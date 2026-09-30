@@ -419,4 +419,20 @@ DEALLOCATE PREPARE image_file_statement;
 
 UPDATE `module_image_i18n` SET `file` = NULL WHERE `file` = '';
 
+-- ---------------------------------------------------------------------
+-- The Smarty back office left the default install
+--
+-- `default-twig` is the only back office the core installs. A shop still
+-- running the Smarty one (`default`, left over from Thelia 2) is switched to
+-- it, and the two modules that only came with the Smarty back office are
+-- turned off: after a composer update their code is gone from vendor, and a
+-- module row that stays active without code on disk aborts the boot in debug
+-- environments. A shop that requires the Smarty back office itself sets the
+-- template back and activates TheliaSmarty again.
+-- ---------------------------------------------------------------------
+
+UPDATE `config` SET `value` = 'default-twig' WHERE `name` = 'active-admin-template' AND `value` = 'default';
+
+UPDATE `module` SET `activate` = 0 WHERE `code` IN ('TheliaSmarty', 'VirtualProductControl');
+
 SET FOREIGN_KEY_CHECKS = 1;
