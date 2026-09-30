@@ -226,25 +226,19 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * A module found in vendor/thelia/modules and in local/modules runs from the local copy
-     * (Module::getModuleDir()): the local descriptor decides how it is registered.
+     * A module found in both module directories is read, and its SQL applied, from each: the
+     * first copy written decides its row. A mandatory module left inactive is reported once.
      */
-    public function testAModuleFoundInBothDirectoriesIsRegisteredFromTheLastOne(): void
+    public function testAModuleFoundInBothDirectoriesIsReportedOnce(): void
     {
         $setup = $this->createDatabaseSetup();
         $setup->connect();
-        $vendorDir = $this->writeSingleModule(<<<XML
-            <type>classic</type>
-            <stability>prod</stability>
-            XML, self::SHIPPED_ACTIVE_CODE);
-        $localDir = $this->writeSingleModule(<<<XML
-            <type>classic</type>
-            <stability>prod</stability>
-            <enabled-by-default>0</enabled-by-default>
-            XML, self::SHIPPED_ACTIVE_CODE);
+        $vendorDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
+        $localDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
 
-        self::assertSame(1, $setup->registerAndApplyModules([$vendorDir, $localDir]));
-        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+        self::assertSame(2, $setup->registerAndApplyModules([$vendorDir, $localDir]));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame([self::SHIPPED_INACTIVE_CODE.' is mandatory but is registered inactive: activate it from the back-office.'], $setup->getWarnings());
     }
 
     /**

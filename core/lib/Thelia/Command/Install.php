@@ -31,6 +31,7 @@ use Symfony\Component\Process\Process;
 use Thelia\Core\Install\CheckPermission;
 use Thelia\Core\Install\Database;
 use Thelia\Domain\Module\Composer\ComposerHelper;
+use Thelia\Install\Standalone\CommandExitCodeRecorder;
 use Thelia\Install\Standalone\DatabaseSetup;
 use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Tools\TokenProvider;
@@ -649,6 +650,9 @@ class Install extends ContainerAwareCommand
                 $kernel = new AppKernel($_SERVER['APP_ENV'], (bool) ($_SERVER['APP_DEBUG'] ?? false));
                 $kernel->boot();
 
+                $exitCodeRecorder = new CommandExitCodeRecorder();
+                $exitCodeRecorder->listenOn($kernel->getContainer()->get('event_dispatcher'));
+
                 try {
                     $application = new FrameworkConsoleApplication($kernel);
                     $application->setAutoExit(false);
@@ -672,10 +676,15 @@ class Install extends ContainerAwareCommand
                         );
                     }
                 } catch (\Error $error) {
-                    // Cache file deleted mid-process by cache:clear — the command
-                    // itself had already succeeded when console.terminate fired.
+                    // Cache file deleted mid-process by cache:clear: a console.terminate
+                    // listener died after template:set returned. Its own exit code decides.
                     if (!str_contains($error->getMessage(), 'Failed opening required')) {
                         throw $error;
+                    }
+
+                    if (Command::SUCCESS !== ($exitCodeRecorder->exitCode() ?? Command::SUCCESS)) {
+                        $applied = false;
+                        $output->writeln(\sprintf('<error>Post-install step failed while applying template "%s" for type "%s".</error>', $name, $type));
                     }
                 } finally {
                     try {
