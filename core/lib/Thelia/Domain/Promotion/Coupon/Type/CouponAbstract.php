@@ -23,7 +23,6 @@ use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
-use Thelia\Form\CouponCreationForm;
 use Thelia\Model\CouponModule;
 
 /**
@@ -33,6 +32,12 @@ use Thelia\Model\CouponModule;
  */
 abstract class CouponAbstract implements CouponInterface
 {
+    /**
+     * The name of the form the back office creates and edits coupons with: the coupon
+     * specific fields are posted under it.
+     */
+    public const COUPON_FORM_NAME = 'thelia_coupon_creation';
+
     /**
      * The dataset name for all coupon specific input fields, that do not appear in the CouPonCreationForm form.
      *
@@ -375,7 +380,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     protected function makeCouponFieldName(string $fieldName): string
     {
-        return \sprintf('%s[%s][%s]', CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
+        return \sprintf('%s[%s][%s]', self::COUPON_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
     }
 
     /**
