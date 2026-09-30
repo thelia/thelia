@@ -25,13 +25,15 @@ final class TerminalText
      * and the formatting characters that reorder or hide text on screen: the bidirectional
      * embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the zero-width
      * and directional marks (U+200B to U+200F, U+061C), the invisible operators and word
-     * joiner (U+2060 to U+2064), the soft hyphen (U+00AD), the line and paragraph separators
+     * joiner (U+2060 to U+2064), the deprecated format controls (U+206A to U+206F), the
+     * interlinear annotation marks (U+FFF9 to U+FFFB), the tag characters (U+E0000 to
+     * U+E007F), the soft hyphen (U+00AD), the line and paragraph separators
      * (U+2028, U+2029) and the byte order mark (U+FEFF). The line feed is kept: messages span
      * lines, so a module directory named with one can still start a line of its own. Each range is matched as its UTF-8 encoding,
      * byte by byte, so a text that is not valid UTF-8 is still cleaned instead of dropped.
      */
     public static function withoutControlCharacters(string $text): string
     {
-        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9]|\xEF\xBB\xBF/', '?', $text) ?? '';
+        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xF3\xA0[\x80\x81][\x80-\xBF]/', '?', $text) ?? '';
     }
 }

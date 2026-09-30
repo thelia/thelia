@@ -462,7 +462,8 @@ final class DatabaseSetupTest extends IntegrationTestCase
             $setup->registerAndApplyModules([$moduleDir]);
             self::fail('An element the schema refuses must stop the registration.');
         } catch (InvalidModuleDescriptorException $exception) {
-            self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
+            self::assertStringContainsString('The descriptor '.$moduleDir, $exception->getMessage());
+            self::assertStringContainsString('declares <enabled-by-default> and is refused by the module schema', $exception->getMessage());
         }
 
         self::assertFalse($this->isRegistered($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
@@ -486,7 +487,8 @@ final class DatabaseSetupTest extends IntegrationTestCase
             $setup->registerAndApplyModules([$moduleDir]);
             self::fail('A 2.1 descriptor declaring the element must stop the registration.');
         } catch (InvalidModuleDescriptorException $exception) {
-            self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
+            self::assertStringContainsString('The descriptor '.$moduleDir, $exception->getMessage());
+            self::assertStringContainsString('declares <enabled-by-default> and is refused by the module schema', $exception->getMessage());
         }
 
         self::assertFalse($this->isRegistered($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));

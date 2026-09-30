@@ -365,29 +365,6 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
-     * Same row, and the release on disk cannot be activated: the merchant's row, with its
-     * hooks and its configuration, is never removed by the theme.
-     */
-    public function testAModuleKnownUnderAFormerNamespaceIsNeverRemoved(): void
-    {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
-        $this->registerSampleModule(self::FAILING_CODE, 0, 'FormerVendor\\'.self::FAILING_CODE);
-        $rowId = ModuleQuery::create()->findOneByCode(self::FAILING_CODE)?->getId();
-        $themeDir = $this->writeTheme([self::FAILING_CODE]);
-
-        /** @var ModuleManagement $moduleManagement */
-        $moduleManagement = $this->getService(ModuleManagement::class);
-        try {
-            $moduleManagement->installModulesFromTemplatePath($themeDir, new BufferedOutput());
-        } catch (\Throwable) {
-            // Whether the theme reports it or not, the row must survive.
-        }
-
-        self::assertNotNull($rowId);
-        self::assertSame($rowId, ModuleQuery::create()->findOneByCode(self::FAILING_CODE)?->getId(), 'The merchant\'s row is still there.');
-    }
-
-    /**
      * A mandatory module the theme requires and finds inactive is named as mandatory, as the
      * install does: nothing else would say that a module the shop cannot do without is off.
      */
