@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\Exception\ProcessFileException;
 use Thelia\Core\File\FileConfiguration;
 use Thelia\Core\File\FileManager;
+use Thelia\Core\File\SvgSanitizer;
 use Thelia\Model\Lang;
 
 readonly class FileProcessorService
@@ -182,17 +183,14 @@ readonly class FileProcessorService
     }
 
     /**
-     * Removes active content (scripts, event handlers, javascript:/data: URIs and
-     * foreignObject nodes) from an uploaded SVG, rewriting the temporary file in place.
+     * Removes the active content of an uploaded SVG (see SvgSanitizer), rewriting the
+     * temporary file in place.
      *
-     * @throws ProcessFileException when the file is declared as SVG but cannot be parsed
+     * @throws ProcessFileException when the file is declared as SVG but is not an SVG document
      */
     private function sanitizeSvgUpload(UploadedFile $file): void
     {
-        $isSvg = 'svg' === strtolower($file->getClientOriginalExtension())
-            || 'image/svg+xml' === $file->getMimeType();
-
-        if (!$isSvg) {
+        if (!SvgSanitizer::isSvg($file->getClientOriginalName(), $file->getMimeType())) {
             return;
         }
 
@@ -203,53 +201,14 @@ readonly class FileProcessorService
             return;
         }
 
-        $previousErrorState = libxml_use_internal_errors(true);
-        $document = new \DOMDocument();
-        // LIBXML_NONET blocks network access; external entities stay disabled (no XXE).
-        $loaded = $document->loadXML($content, \LIBXML_NONET);
-        libxml_use_internal_errors($previousErrorState);
+        $sanitized = (new SvgSanitizer())->sanitize($content);
 
-        if (!$loaded) {
+        if (null === $sanitized) {
             throw new ProcessFileException($this->translator->trans('The uploaded SVG file is not a valid image.'), 415);
         }
 
-        $xpath = new \DOMXPath($document);
-
-        foreach (['//*[local-name()="script"]', '//*[local-name()="foreignObject"]'] as $query) {
-            $nodes = $xpath->query($query);
-
-            if (false !== $nodes) {
-                foreach (iterator_to_array($nodes) as $node) {
-                    $node->parentNode?->removeChild($node);
-                }
-            }
-        }
-
-        $attributes = $xpath->query('//@*');
-
-        if (false !== $attributes) {
-            foreach (iterator_to_array($attributes) as $attribute) {
-                if (!$attribute instanceof \DOMAttr) {
-                    continue;
-                }
-
-                $name = strtolower($attribute->nodeName);
-                $value = strtolower((string) preg_replace('/\s+/', '', (string) $attribute->nodeValue));
-
-                $isEventHandler = str_starts_with($name, 'on');
-                $isActiveUri = \in_array($name, ['href', 'xlink:href', 'from', 'to', 'values', 'begin'], true)
-                    && (str_starts_with($value, 'javascript:') || str_starts_with($value, 'data:'));
-
-                if ($isEventHandler || $isActiveUri) {
-                    $attribute->ownerElement?->removeAttributeNode($attribute);
-                }
-            }
-        }
-
-        $sanitized = $document->saveXML();
-
-        if (false !== $sanitized) {
-            @file_put_contents($path, $sanitized);
+        if (false === @file_put_contents($path, $sanitized)) {
+            throw new ProcessFileException($this->translator->trans('The uploaded SVG file is not a valid image.'), 415);
         }
     }
 }

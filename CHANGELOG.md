@@ -33,6 +33,10 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - The API persist and remove processors dispatch `Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent` after a write, and the collection provider dispatches `CollectionModelsLoadedEvent` before transforming a page. Nothing listens to them but the core; a module may.
 - The front `ProductSaleElements` resource carries `displayInitialPrice`, null unless a rule or a reserved operation priced the sale element on that read.
 
+## Security
+
+- GHSA-gvcv-hvpp-89gx — an SVG store logo or banner reached the web space as it was uploaded: the image cache linked to it or copied it into `public/cache/images/`, so a script or an event handler it carried ran on the shop origin for anyone opening its URL, which every front page advertises in `og:image`. The image cache now publishes an SVG only as a copy stripped of its active content, whatever `original_image_delivery_mode` says, replaces the links earlier versions left there and publishes nothing for an SVG it cannot read. The SVG sanitizer applied to uploads also drops processing instructions, the document type declaration and its entities, XHTML elements, and javascript: or data: URIs behind any attribute prefix, and refuses a file whose root is not an SVG element; a raster image embedded as base64 is kept. Run `php bin/console image-cache:clear` after the update to drop resized copies made from an unsanitized SVG.
+
 # 3.1.0
 
 First minor of the 3.x line. 88 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
