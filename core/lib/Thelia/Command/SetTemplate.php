@@ -111,7 +111,8 @@ class SetTemplate extends ContainerAwareCommand
         try {
             $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         } catch (\Exception $exception) {
-            Tlog::getInstance()->error(\sprintf('template:set could not install the modules of theme "%s": %s', $name, $exception->getMessage()), ['exception' => $exception]);
+            // addError() writes the message and the trace of an exception it is handed.
+            Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $exception);
             $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($exception->getMessage())));
             if ($output->isVerbose()) {
                 $output->writeln(OutputFormatter::escape($exception->getTraceAsString()));

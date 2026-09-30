@@ -172,7 +172,41 @@ final class DatabaseSetup
             $this->warnAboutAMandatoryModuleLeftInactive($module['row'], $module['code'], $selectActivation);
         }
 
+        $this->warnAboutARequiredModuleLeftInactive($modules, $selectActivation);
+
         return \count($modules);
+    }
+
+    /**
+     * Registering writes each module on its own: an active module whose <required> module
+     * ships inactive, or was switched off before this run, is registered active next to an
+     * inactive dependency. Activating it from the back-office would have activated the
+     * dependency with it; nothing does it here, so the state written is read back and the
+     * operator told.
+     *
+     * @param list<array{code: string, path: string, xml: \SimpleXMLElement, row: array<string, int|string>}> $modules
+     */
+    private function warnAboutARequiredModuleLeftInactive(array $modules, \PDOStatement $selectActivation): void
+    {
+        $activation = [];
+        foreach ($modules as $module) {
+            $selectActivation->execute(['code' => $module['code']]);
+            $activation[$module['code']] = (int) $selectActivation->fetchColumn();
+        }
+
+        foreach ($modules as $module) {
+            if (1 !== $activation[$module['code']]) {
+                continue;
+            }
+
+            foreach ($module['xml']->required->module ?? [] as $requiredModule) {
+                $requiredCode = trim((string) $requiredModule);
+
+                if (0 === ($activation[$requiredCode] ?? null)) {
+                    $this->warnings[] = \sprintf('%s is registered active but requires %s, which is registered inactive: activate %s from the back-office.', $module['code'], $requiredCode, $requiredCode);
+                }
+            }
+        }
     }
 
     /**
@@ -235,7 +269,9 @@ final class DatabaseSetup
                     'hidden' => (int) ($xml->hidden ?? 0),
                 ];
 
-                $modules[] = [
+                // A module found in both directories is read from the last one, local/modules:
+                // that is the copy Module::getModuleDir() runs, so its descriptor decides.
+                $modules[$code] = [
                     'code' => $code,
                     'path' => $entry->getPathname(),
                     'xml' => $xml,
@@ -244,7 +280,7 @@ final class DatabaseSetup
             }
         }
 
-        return $modules;
+        return array_values($modules);
     }
 
     /**
