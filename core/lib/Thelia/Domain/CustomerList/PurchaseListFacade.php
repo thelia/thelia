@@ -60,6 +60,16 @@ final readonly class PurchaseListFacade
         return $this->repository->findReadableBy($customer);
     }
 
+    /**
+     * @param list<CustomerList> $lists
+     *
+     * @return array<int, int> the number of lines of each list, keyed by list id; a list without lines is absent
+     */
+    public function countItemsOf(array $lists): array
+    {
+        return $this->repository->countItemsOf($lists);
+    }
+
     public function getVisible(Customer $customer, int $listId): CustomerList
     {
         return $this->repository->findOneReadableBy($customer, $listId)

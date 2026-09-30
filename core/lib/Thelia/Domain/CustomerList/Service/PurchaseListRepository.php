@@ -66,6 +66,37 @@ final readonly class PurchaseListRepository
             ->count();
     }
 
+    /**
+     * How many lines each list holds, in one query whatever the number of lists.
+     * A list without lines is absent from the answer.
+     *
+     * @param list<CustomerList> $lists
+     *
+     * @return array<int, int> keyed by list id
+     */
+    public function countItemsOf(array $lists): array
+    {
+        if ([] === $lists) {
+            return [];
+        }
+
+        $rows = CustomerListItemQuery::create()
+            ->filterByCustomerListId(array_map(static fn (CustomerList $list): int => (int) $list->getId(), $lists))
+            ->groupByCustomerListId()
+            ->withColumn('COUNT(*)', 'ItemCount')
+            ->select(['CustomerListId', 'ItemCount'])
+            ->find()
+            ->toArray();
+
+        $counts = [];
+
+        foreach ($rows as $row) {
+            $counts[(int) $row['CustomerListId']] = (int) $row['ItemCount'];
+        }
+
+        return $counts;
+    }
+
     public function linesOf(CustomerList $list): ReferenceQuantityLines
     {
         $items = CustomerListItemQuery::create()

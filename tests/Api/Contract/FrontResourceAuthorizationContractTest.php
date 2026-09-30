@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Contract;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Model\CustomerList;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -86,6 +87,49 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
         );
 
         self::assertSame(401, $response->getStatusCode(), \sprintf('POST /front/account/quick-order/%s must demand an account.', $path));
+    }
+
+    /**
+     * A purchase list holds what an account buys and in what quantities, and loading one
+     * answers with prices and stock levels: every operation demands an account, stated
+     * on the operation rather than left to the path prefix.
+     */
+    #[DataProvider('purchaseListOperations')]
+    public function testPurchaseListOperationsRejectAnonymousAccess(string $method, string $path, string $format): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $cart = $factory->cart($customer);
+        $order = $factory->order($customer);
+        $list = (new CustomerList())->setCustomerId($customer->getId())->setTitle('Somebody\'s list');
+        $list->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            $method,
+            '/api/front/account/purchase-lists'.strtr($path, ['{id}' => (string) $list->getId(), '{cartId}' => (string) $cart->getId(), '{orderId}' => (string) $order->getId()]),
+            ['title' => 'Anonymous', 'lines' => [['reference' => 'ANY', 'quantity' => 1]]],
+            format: $format,
+        );
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('%s /front/account/purchase-lists%s must demand an account.', $method, $path));
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function purchaseListOperations(): iterable
+    {
+        yield 'collection' => ['GET', '', 'json'];
+        yield 'read' => ['GET', '/{id}', 'json'];
+        yield 'control table' => ['GET', '/{id}/table', 'json'];
+        yield 'creation' => ['POST', '', 'json'];
+        yield 'creation from a cart' => ['POST', '/from-cart/{cartId}', 'json'];
+        yield 'creation from an order' => ['POST', '/from-order/{orderId}', 'json'];
+        yield 'rename' => ['PATCH', '/{id}', 'merge-patch+json'];
+        yield 'deletion' => ['DELETE', '/{id}', 'json'];
+        yield 'copy' => ['POST', '/{id}/duplicate', 'json'];
+        yield 'lines added' => ['POST', '/{id}/items', 'json'];
+        yield 'lines replaced' => ['PUT', '/{id}/items', 'json'];
     }
 
     /**

@@ -24,12 +24,10 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Thelia\Api\Resource\QuickOrderInput;
 use Thelia\Api\Security\CheckoutCartLocator;
-use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
-use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
-use Thelia\Domain\Catalog\Exception\InvalidReferenceQuantityException;
+use Thelia\Api\Service\ReferenceQuantityRows;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
+use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
-use Thelia\Domain\QuickOrder\Service\QuickOrderLimiter;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 
@@ -44,7 +42,6 @@ final readonly class QuickOrderProcessor implements ProcessorInterface
 {
     public function __construct(
         private QuickOrderFacade $quickOrderFacade,
-        private QuickOrderLimiter $limiter,
         private CheckoutCartLocator $cartLocator,
         private TokenStorageInterface $tokenStorage,
     ) {
@@ -66,43 +63,20 @@ final readonly class QuickOrderProcessor implements ProcessorInterface
             throw new AccessDeniedHttpException('A customer must be authenticated to order by reference.');
         }
 
-        if (!$this->limiter->allows($customer)) {
-            throw new TooManyRequestsHttpException(message: 'Too many quick order requests, please try again in a minute.');
-        }
-
-        $lines = self::linesOf($data);
-
-        if (!\array_key_exists('cartId', $uriVariables)) {
-            return new JsonResponse($this->quickOrderFacade->resolve($customer, $lines, Currency::getDefaultCurrency())->toArray());
-        }
-
-        $cart = $this->cartLocator->ownedCart($uriVariables);
+        $lines = ReferenceQuantityRows::toLines($data->lines ?? []);
 
         try {
-            $table = $this->quickOrderFacade->addToCart($customer, $cart, $lines);
+            if (!\array_key_exists('cartId', $uriVariables)) {
+                return new JsonResponse($this->quickOrderFacade->resolve($customer, $lines, Currency::getDefaultCurrency())->toArray());
+            }
+
+            $table = $this->quickOrderFacade->addToCart($customer, $this->cartLocator->ownedCart($uriVariables), $lines);
+        } catch (QuickOrderRateLimitedException $exception) {
+            throw new TooManyRequestsHttpException(message: $exception->getMessage(), previous: $exception);
         } catch (QuickOrderCartNotFoundException $exception) {
             throw new NotFoundHttpException('No such cart.', $exception);
         }
 
         return new JsonResponse($table->toArray());
-    }
-
-    private static function linesOf(QuickOrderInput $data): ReferenceQuantityLines
-    {
-        $lines = [];
-
-        foreach ($data->lines ?? [] as $line) {
-            $lines[] = new ReferenceQuantity(
-                (string) $line['reference'],
-                (int) $line['quantity'],
-                isset($line['productSaleElementsId']) ? (int) $line['productSaleElementsId'] : null,
-            );
-        }
-
-        try {
-            return new ReferenceQuantityLines($lines);
-        } catch (InvalidReferenceQuantityException $exception) {
-            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        }
     }
 }
