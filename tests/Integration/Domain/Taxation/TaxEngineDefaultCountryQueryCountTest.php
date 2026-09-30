@@ -29,6 +29,17 @@ final class TaxEngineDefaultCountryQueryCountTest extends IntegrationTestCase
 {
     use RecordsSqlQueries;
 
+    /**
+     * The rollback removes the country a test made the default, not the memo that
+     * still points at it: the next test would look that country up and miss.
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Country::resetDefaultCountryCache();
+    }
+
     public function testRepeatedFallbackToTheDefaultCountryCostsAtMostOneQuery(): void
     {
         Country::resetDefaultCountryCache();
