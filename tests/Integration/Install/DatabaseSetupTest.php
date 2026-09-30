@@ -175,6 +175,31 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
         self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
         self::assertSame(1, $this->activationOf($setup->getPdo(), self::UNDECLARED_CODE));
+        self::assertSame([], $setup->getWarnings());
+    }
+
+    /**
+     * `<mandatory>1</mandatory>` only keeps an active module from being deactivated: a
+     * mandatory module that ships inactive is registered inactive like any other, and
+     * nothing would tell the operator that a module the shop cannot do without is off.
+     * The install registers it as asked and says so in its warnings.
+     */
+    public function testAMandatoryModuleShippedInactiveIsRegisteredInactiveWithAWarning(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $moduleDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <mandatory>1</mandatory>
+            <enabled-by-default>0</enabled-by-default>
+            XML);
+
+        $setup->registerAndApplyModules([$moduleDir]);
+
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertCount(1, $setup->getWarnings());
+        self::assertStringContainsString(self::SHIPPED_INACTIVE_CODE.' is mandatory but ships inactive', $setup->getWarnings()[0]);
     }
 
     /**
