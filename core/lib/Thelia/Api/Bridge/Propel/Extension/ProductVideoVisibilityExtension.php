@@ -78,7 +78,7 @@ final readonly class ProductVideoVisibilityExtension implements QueryCollectionE
         }
 
         if (ProductSaleElementsProductVideo::class === $resourceClass && $query instanceof ProductSaleElementsProductVideoQuery) {
-            // The link carries no product of its own, so both rules are asked of
+            // The link carries no product of its own, so every rule is asked of
             // the video it points at, in one subquery each.
             $query->where(\sprintf(
                 '%s IN (SELECT %s FROM %s WHERE %s = 1)',
@@ -95,6 +95,18 @@ final readonly class ProductVideoVisibilityExtension implements QueryCollectionE
                 ProductVideoTableMap::TABLE_NAME,
                 $this->onAVisibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID),
             ));
+
+            $reservedSaleClause = $this->reservedSaleVisibility->visibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID);
+
+            if (null !== $reservedSaleClause) {
+                $query->where(\sprintf(
+                    '%s IN (SELECT %s FROM %s WHERE %s)',
+                    ProductSaleElementsProductVideoTableMap::COL_PRODUCT_VIDEO_ID,
+                    ProductVideoTableMap::COL_ID,
+                    ProductVideoTableMap::TABLE_NAME,
+                    $reservedSaleClause,
+                ));
+            }
         }
     }
 
