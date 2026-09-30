@@ -164,9 +164,8 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
         self::assertCount(0, $crawler->filter('[data-testid="order-status-force"]'), 'Without the right, the force control is not rendered.');
 
-        $token = $crawler->filter('[data-testid="order-status-form"]')->attr('action');
-        $token = substr((string) $token, strpos((string) $token, '_token=') + 7);
-        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status?_token='.$token, ['status_id' => $notPaid->getId(), 'force' => '1']);
+        $token = (string) $crawler->filter('[data-testid="order-status-form"] input[name="_token"]')->attr('value');
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status', ['_token' => $token, 'status_id' => $notPaid->getId(), 'force' => '1']);
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
         self::assertSame(OrderStatus::CODE_SENT, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
     }
@@ -378,10 +377,10 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
         $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW]]));
 
-        $this->client->request('GET', '/admin/order/update/'.$order->getId().'/status?status_id='.$this->orderStatus(OrderStatus::CODE_NOT_PAID)->getId());
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status', ['status_id' => $this->orderStatus(OrderStatus::CODE_NOT_PAID)->getId()]);
         self::assertSame(403, $this->client->getResponse()->getStatusCode(), 'The right is checked before anything about the order is said.');
 
-        $this->client->request('GET', '/admin/order/list/cancel/'.$order->getId());
+        $this->client->request('POST', '/admin/order/list/cancel/'.$order->getId());
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
     }
 
@@ -393,7 +392,7 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
 
         // Prime the session token, as any page does, then present another one.
         $this->client->request('GET', '/admin/configuration/order-status/update/'.$sent->getId());
-        $this->client->request('GET', '/admin/configuration/order-status/actions/'.$action->getId().'/toggle?_token=not-the-token');
+        $this->client->request('POST', '/admin/configuration/order-status/actions/'.$action->getId().'/toggle', ['_token' => 'not-the-token']);
         self::assertSame(302, $this->client->getResponse()->getStatusCode());
         $crawler = $this->client->followRedirect();
 
@@ -419,11 +418,11 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         $crawler = $this->client->request('GET', '/admin/configuration/order-status/update/'.$sent->getId().'?tab=actions');
         $token = (string) $crawler->filter('[data-testid="order-status-action-create-form"] input[name="_token"]')->attr('value');
 
-        $this->client->request('GET', '/admin/configuration/order-status/actions/'.$first->getId().'/toggle?_token='.$token);
+        $this->client->request('POST', '/admin/configuration/order-status/actions/'.$first->getId().'/toggle', ['_token' => $token]);
         self::assertSame(302, $this->client->getResponse()->getStatusCode());
         self::assertFalse((bool) OrderStatusActionQuery::create()->findPk($first->getId())->getActive());
 
-        $this->client->request('GET', '/admin/configuration/order-status/actions/move?action_id='.$second->getId().'&position=1&_token='.$token);
+        $this->client->request('POST', '/admin/configuration/order-status/actions/move?action_id='.$second->getId().'&position=1', ['_token' => $token]);
         self::assertSame(302, $this->client->getResponse()->getStatusCode());
         self::assertSame(1, (int) OrderStatusActionQuery::create()->findPk($second->getId())->getPosition());
         self::assertSame(2, (int) OrderStatusActionQuery::create()->findPk($first->getId())->getPosition(), 'Positions stay dense after a move.');

@@ -315,7 +315,7 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
         $tagId = (int) $tag->getId();
         $this->loginAs($factory->admin());
 
-        $this->client->request('GET', self::URL.'/delete?tag_id='.$tagId);
+        $this->client->request('POST', self::URL.'/delete?tag_id='.$tagId);
 
         self::assertNotNull(TagQuery::create()->findPk($tagId), 'A request with no token must not delete anything.');
     }
@@ -332,7 +332,7 @@ final class TagConfigurationScreenTest extends WebIntegrationTestCase
             AdminResources::CUSTOMER => [AccessManager::VIEW, AccessManager::UPDATE, AccessManager::DELETE],
         ]));
 
-        $this->client->request('GET', self::URL.'/delete?tag_id='.$tagId);
+        $this->client->request('POST', self::URL.'/delete?tag_id='.$tagId);
 
         // 403 and not merely "the tag survived": a missing token also spares the
         // tag, but answers a redirect. Asserting the status is what tells the two

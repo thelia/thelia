@@ -247,7 +247,7 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
             'The switch of an active step must ask for it to be turned off, not for it to be flipped.',
         );
 
-        $this->client->request('GET', $toggleUrl);
+        $this->client->request('POST', $toggleUrl, ['_token' => $this->pageToken()]);
 
         self::assertSame(
             302,
@@ -270,7 +270,7 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
 
         $this->assertPageRenders(self::SCREEN_URL);
 
-        $this->client->request('GET', self::SCREEN_URL.'/toggle-active?'.http_build_query([
+        $this->client->request('POST', self::SCREEN_URL.'/toggle-active?'.http_build_query([
             'checkout_step_code' => CheckoutStep::CODE_DELIVERY,
             'active' => 0,
         ]));
@@ -290,12 +290,12 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
         // The payment row carries no switch, so the URL is forged from the token
         // the page did hand out: the refusal has to come from the server, not
         // only from a link the template chose not to render.
-        $forged = $this->tokenizedUrl('/toggle-active', [
+        $forged = self::SCREEN_URL.'/toggle-active?'.http_build_query([
             'checkout_step_code' => CheckoutStep::CODE_PAYMENT,
             'active' => 0,
         ]);
 
-        $this->client->request('GET', $forged);
+        $this->client->request('POST', $forged, ['_token' => $this->pageToken()]);
 
         self::assertTrue(
             $this->stepAsStored(CheckoutStep::CODE_PAYMENT)->isActive(),
@@ -313,10 +313,10 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
 
         $this->assertPageRenders(self::SCREEN_URL);
 
-        $this->client->request('POST', $this->tokenizedUrl('/update-position', [
+        $this->client->request('POST', self::SCREEN_URL.'/update-position?'.http_build_query([
             'checkout_step_code' => 'test_gift_message',
             'position' => 2,
-        ]));
+        ]), ['_token' => $this->pageToken()]);
 
         self::assertSame(302, $this->client->getResponse()->getStatusCode());
         self::assertSame(
@@ -338,10 +338,10 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
 
         $this->assertPageRenders(self::SCREEN_URL);
 
-        $this->client->request('POST', $this->tokenizedUrl('/update-position', [
+        $this->client->request('POST', self::SCREEN_URL.'/update-position?'.http_build_query([
             'checkout_step_code' => CheckoutStep::CODE_CART,
             'position' => 2,
-        ]));
+        ]), ['_token' => $this->pageToken()]);
 
         self::assertSame(
             self::SHIPPED_POSITIONS,
@@ -452,20 +452,15 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
     }
 
     /**
-     * An URL of the screen carrying the CSRF token the rendered page handed out.
-     * TokenProvider answers with one token per session, so the token the sortable
-     * table was given is the one every other tokenized action of the page accepts.
-     *
-     * @param array<string, scalar> $parameters
+     * The back-office token the rendered page handed out, which its links and
+     * scripts post back in the request body.
      */
-    private function tokenizedUrl(string $path, array $parameters): string
+    private function pageToken(): string
     {
-        $token = $this->client->getCrawler()
-            ->filter('tbody[data-controller="bo-sortable"]')
-            ->attr('data-bo-sortable-token-value');
-        self::assertIsString($token, 'The sortable table must carry the CSRF token its fetch posts back.');
+        $token = $this->client->getCrawler()->filter('meta[name="bo-token"]')->attr('content');
+        self::assertIsString($token, 'The page must carry the token its forms and scripts post back.');
 
-        return self::SCREEN_URL.$path.'?'.http_build_query($parameters + ['_token' => $token]);
+        return $token;
     }
 
     /**

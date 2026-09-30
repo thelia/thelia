@@ -150,7 +150,7 @@ final class AdminFormActionTest extends TestCase
         $urls = $this->createMock(UrlGeneratorInterface::class);
         $urls->expects(self::once())->method('generate')->with('admin.lang.default', [])->willReturn('/admin/lang');
 
-        $request = new Request(['_token' => 'abc']);
+        $request = new Request([], ['_token' => 'abc']);
 
         $action = new AdminFormAction(
             $access,
@@ -212,7 +212,7 @@ final class AdminFormActionTest extends TestCase
         $response = $action->tokenAction(
             resource: 'admin.lang',
             access: 'UPDATE',
-            request: new Request(['_token' => 'bad']),
+            request: new Request([], ['_token' => 'bad']),
             event: new LangCreateEvent(),
             eventName: 'lang.toggle',
             actionLabel: 'Language toggle',
