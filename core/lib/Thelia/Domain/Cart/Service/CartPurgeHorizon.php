@@ -53,9 +53,7 @@ final readonly class CartPurgeHorizon
     {
         $now ??= new \DateTimeImmutable();
 
-        return $now
-            ->modify(\sprintf('-%d days', $this->retentionDays()))
-            ->setTime(0, 0, 0);
+        return $now->modify(\sprintf('-%d days', $this->retentionDays()));
     }
 
     public function mayHavePurged(\DateTimeInterface $from, ?\DateTimeImmutable $now = null): bool
