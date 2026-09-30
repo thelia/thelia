@@ -123,6 +123,10 @@ final class AdminTwoFactorLoginTest extends WebIntegrationTestCase
         $this->submitCode($backupCodes[0]);
 
         self::assertSame($admin->getId(), $this->lastSession?->getAdminUser()?->getId());
+        self::assertSame(1, AdminLogQuery::create()
+            ->filterByAdminLogin($admin->getLogin())
+            ->filterByMessage(\sprintf('Second factor backup code used, %d left', AdminTwoFactorManager::BACKUP_CODE_COUNT - 1))
+            ->count());
     }
 
     public function testAWrongCodeShowsTheSameMessageAsAWrongPassword(): void
@@ -148,6 +152,7 @@ final class AdminTwoFactorLoginTest extends WebIntegrationTestCase
         self::assertNotSame('', $wrongPasswordMessage);
         self::assertSame($wrongPasswordMessage, trim($wrongCodePage->filter('[data-testid="two-factor-error"]')->text()));
         self::assertNull($this->lastSession?->getAdminUser());
+        self::assertSame(1, AdminLogQuery::create()->filterByAdminLogin($admin->getLogin())->filterByMessage('Second factor verification failed')->count());
     }
 
     public function testFiveWrongCodesSendTheAdministratorBackToThePassword(): void
@@ -355,13 +360,15 @@ final class AdminTwoFactorLoginTest extends WebIntegrationTestCase
                 'success_url' => '/admin/configuration',
                 '_token' => (string) $crawler->filter('input[name="thelia_admin_login[_token]"]')->attr('value'),
             ],
-        ], [], ['HTTP_COOKIE' => 'armcn=a-remember-me-cookie-value']);
+        ], [], ['HTTP_COOKIE' => 'armcn=a-remember-me-cookie-value', 'PHP_AUTH_USER' => 'staging', 'PHP_AUTH_PW' => 'a-basic-auth-password']);
 
         $entry = AdminLogQuery::create()->filterByAdminLogin($admin->getLogin())->filterByMessage('Password accepted, second factor required')->findOne();
 
         self::assertNotNull($entry);
         self::assertStringNotContainsStringIgnoringCase('cookie:', (string) $entry->getRequest());
         self::assertStringNotContainsString('a-remember-me-cookie-value', (string) $entry->getRequest());
+        self::assertStringNotContainsString('a-basic-auth-password', (string) $entry->getRequest());
+        self::assertStringNotContainsStringIgnoringCase('php-auth-user:', (string) $entry->getRequest());
     }
 
     public function testAFailedLoginDoesNotJournalThePasswordThatWasTyped(): void

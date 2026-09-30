@@ -103,6 +103,7 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
 
         $status = $this->request('GET', '/admin/account/two-factor');
         self::assertSame('Turned on', trim($status->filter('[data-testid="account-two-factor-status"]')->text()));
+        self::assertSame(1, AdminLogQuery::create()->filterByAdminLogin($admin->getLogin())->filterByMessage('Second factor enabled')->count());
     }
 
     public function testRegeneratingTheBackupCodesShowsNewOnesAndRetiresTheOldOnes(): void
@@ -167,7 +168,10 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
 
     public function testAnAdministratorAllowedToUpdateAdministratorsResetsTheSecondFactorOfAnother(): void
     {
-        $locked = $this->admin();
+        $locked = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::PRODUCT => [AccessManager::VIEW]],
+            ['password' => self::PASSWORD],
+        );
         $this->enableSecondFactor($locked);
         $helper = $this->createFixtureFactory()->restrictedAdmin(
             [AdminResources::ADMINISTRATOR => [AccessManager::VIEW, AccessManager::UPDATE]],
@@ -182,13 +186,127 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
 
         $this->request('POST', (string) $list->filter('[data-testid="administrator-two-factor-reset-form"]')->attr('action'), [
             'administrator_id' => $locked->getId(),
+            '_token' => $this->tokenOf($list, 'administrator-two-factor-reset-form'),
         ]);
 
         self::assertResponseRedirects('/admin/configuration/administrators');
         self::assertFalse($this->getService(AdminTwoFactorManager::class)->isEnabledFor($locked));
+        self::assertSame(1, AdminLogQuery::create()
+            ->filterByAdminLogin($helper->getLogin())
+            ->filterByResourceId($locked->getId())
+            ->filterByMessage(\sprintf("Second factor of administrator '%s' reset by administrator '%s'", $locked->getLogin(), $helper->getLogin()))
+            ->count());
 
         $afterReset = $this->request('GET', '/admin/configuration/administrators');
         self::assertStringContainsString($locked->getLogin(), $afterReset->filter('.alert-success')->text(''));
+    }
+
+    public function testARestrictedAdministratorCannotResetTheSecondFactorOfASuperadministrator(): void
+    {
+        $superadministrator = $this->admin();
+        self::assertNull($superadministrator->getProfileId());
+        $this->enableSecondFactor($superadministrator);
+        $restricted = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::ADMINISTRATOR => [AccessManager::VIEW, AccessManager::UPDATE]],
+            ['password' => self::PASSWORD],
+        );
+        $this->signInWithPassword($restricted);
+
+        $list = $this->request('GET', '/admin/configuration/administrators');
+        self::assertCount(0, $list->filter('[data-administrator-id="'.$superadministrator->getId().'"][data-bs-target="#administrator-two-factor-reset-modal"]'));
+
+        $this->request('POST', (string) $list->filter('[data-testid="administrator-two-factor-reset-form"]')->attr('action'), [
+            'administrator_id' => $superadministrator->getId(),
+            '_token' => $this->tokenOf($list, 'administrator-two-factor-reset-form'),
+        ]);
+
+        self::assertResponseRedirects('/admin/configuration/administrators');
+        self::assertTrue($this->getService(AdminTwoFactorManager::class)->isEnabledFor($superadministrator));
+
+        $afterRefusal = $this->request('GET', '/admin/configuration/administrators');
+        self::assertStringContainsString('Only a superadministrator can edit a superadministrator account.', $afterRefusal->filter('.alert-danger')->text(''));
+    }
+
+    public function testDisablingTheSecondFactorOnAShopThatRequiresItAsksToEnableItAgainRightAway(): void
+    {
+        $admin = $this->admin();
+        $this->enableSecondFactor($admin);
+        ConfigQuery::write(AdminTwoFactorManager::REQUIRED_CONFIG_KEY, '1');
+        $this->signInFully($admin);
+
+        $account = $this->request('GET', '/admin/account/two-factor');
+        self::assertResponseIsSuccessful();
+        $this->request('POST', '/admin/account/two-factor/disable', [
+            '_token' => $this->tokenOf($account, 'account-two-factor-disable-form'),
+            'password' => self::PASSWORD,
+        ]);
+        self::assertFalse($this->getService(AdminTwoFactorManager::class)->isEnabledFor($admin));
+
+        $this->request('GET', '/admin/account/two-factor');
+        self::assertResponseRedirects('/admin/two-factor/setup');
+    }
+
+    public function testAnAdministratorWhoMayNotViewAdministratorsStillReachesTheirAccountSecurity(): void
+    {
+        $admin = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::PRODUCT => [AccessManager::VIEW]],
+            ['password' => self::PASSWORD],
+        );
+        $this->signInWithPassword($admin);
+
+        $this->request('GET', '/admin/configuration/administrators');
+        self::assertResponseStatusCodeSame(403);
+
+        $account = $this->request('GET', '/admin/account/two-factor');
+        self::assertResponseIsSuccessful();
+        self::assertSame('/admin/two-factor/setup', $account->filter('[data-testid="account-two-factor-enable"]')->attr('href'));
+    }
+
+    public function testAnAdministratorWhoseSecondFactorAPeerResetsOnAShopThatRequiresItIsSentToTheActivation(): void
+    {
+        $admin = $this->admin();
+        $this->enableSecondFactor($admin);
+        ConfigQuery::write(AdminTwoFactorManager::REQUIRED_CONFIG_KEY, '1');
+        $this->signInFully($admin);
+
+        $this->request('GET', '/admin/account/two-factor');
+        self::assertResponseIsSuccessful();
+
+        $this->getService(AdminTwoFactorManager::class)->resetOnBehalfOf($admin, $this->admin());
+
+        $this->request('GET', '/admin/account/two-factor');
+        self::assertResponseRedirects('/admin/two-factor/setup');
+    }
+
+    public function testATokenInTheUrlDoesNotDisableTheSecondFactor(): void
+    {
+        $admin = $this->admin();
+        $this->enableSecondFactor($admin);
+        $this->signInFully($admin);
+
+        $account = $this->request('GET', '/admin/account/two-factor');
+        $this->request('POST', '/admin/account/two-factor/disable?_token='.$this->tokenOf($account, 'account-two-factor-disable-form'), [
+            'password' => self::PASSWORD,
+        ]);
+
+        self::assertTrue($this->getService(AdminTwoFactorManager::class)->isEnabledFor($admin));
+    }
+
+    public function testATokenInTheUrlDoesNotResetTheSecondFactorOfAnother(): void
+    {
+        $locked = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::PRODUCT => [AccessManager::VIEW]],
+            ['password' => self::PASSWORD],
+        );
+        $this->enableSecondFactor($locked);
+        $this->signInWithPassword($this->admin());
+
+        $list = $this->request('GET', '/admin/configuration/administrators');
+        $this->request('POST', '/admin/configuration/administrators/two-factor-reset?_token='.$this->tokenOf($list, 'administrator-two-factor-reset-form'), [
+            'administrator_id' => $locked->getId(),
+        ]);
+
+        self::assertTrue($this->getService(AdminTwoFactorManager::class)->isEnabledFor($locked));
     }
 
     public function testTheOwnRowOfTheListLeadsToTheAccountSecurityPage(): void
@@ -211,8 +329,9 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
         $this->enableSecondFactor($locked);
         $this->signInWithPassword($this->admin());
 
-        $this->request('POST', '/admin/configuration/administrators/two-factor-reset?_token=forged', [
+        $this->request('POST', '/admin/configuration/administrators/two-factor-reset', [
             'administrator_id' => $locked->getId(),
+            '_token' => 'forged',
         ]);
 
         self::assertResponseRedirects('/admin/configuration/administrators');

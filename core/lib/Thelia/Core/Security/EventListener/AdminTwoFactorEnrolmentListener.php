@@ -17,7 +17,6 @@ namespace Thelia\Core\Security\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -33,7 +32,6 @@ use Thelia\Model\Admin;
 final readonly class AdminTwoFactorEnrolmentListener
 {
     public const SETUP_ROUTE = 'admin.two-factor.setup';
-    public const ENROLLED_SESSION_KEY = 'thelia.admin_two_factor_enrolled';
 
     private const ROUTES_OPEN_BEFORE_ENROLMENT = [
         self::SETUP_ROUTE,
@@ -82,13 +80,7 @@ final readonly class AdminTwoFactorEnrolmentListener
 
         $admin = $this->securityContext->getAdminUser();
 
-        if (!$admin instanceof Admin || $this->isKnownToBeEnrolled($request, $admin)) {
-            return;
-        }
-
-        if (!$this->twoFactorManager->mustEnrol($admin)) {
-            $this->rememberEnrolled($request, $admin);
-
+        if (!$admin instanceof Admin || !$this->twoFactorManager->mustEnrol($admin)) {
             return;
         }
 
@@ -105,17 +97,5 @@ final readonly class AdminTwoFactorEnrolmentListener
         $controllerObject = \is_array($controller) ? $controller[0] : $controller;
 
         return $controllerObject instanceof BaseAdminController;
-    }
-
-    private function isKnownToBeEnrolled(Request $request, Admin $admin): bool
-    {
-        return $request->hasSession() && $request->getSession()->get(self::ENROLLED_SESSION_KEY) === (int) $admin->getId();
-    }
-
-    private function rememberEnrolled(Request $request, Admin $admin): void
-    {
-        if ($request->hasSession()) {
-            $request->getSession()->set(self::ENROLLED_SESSION_KEY, (int) $admin->getId());
-        }
     }
 }

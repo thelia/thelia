@@ -88,6 +88,9 @@ class Request extends BaseRequest
         $headers = clone $this->headers;
         $headers->remove('cookie');
         $headers->remove('authorization');
+        $headers->remove('php-auth-user');
+        $headers->remove('php-auth-pw');
+        $headers->remove('php-auth-digest');
 
         $string =
             \sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
