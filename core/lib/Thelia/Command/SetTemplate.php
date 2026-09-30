@@ -115,8 +115,8 @@ class SetTemplate extends ContainerAwareCommand
             // The message quotes a module directory, a namespace or a descriptor value.
             $message = TerminalText::withoutControlCharacters($exception->getMessage());
             $trace = self::traceWithoutArguments($exception);
-            // The trace goes to the log as text: Tlog only expands an \Exception, and an \Error
-            // (a module class that does not load) would otherwise be dumped as an object.
+            // The trace goes to the log without its arguments: getTraceAsString() would print
+            // them, and one of them may be a connection password.
             Tlog::getInstance()->addError(\sprintf('template:set could not install the modules of theme "%s"', $name), $message."\n".$trace);
             $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($message)));
             if ($output->isVerbose()) {

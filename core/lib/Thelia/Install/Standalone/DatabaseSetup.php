@@ -331,7 +331,7 @@ final class DatabaseSetup
             try {
                 (new ModuleDescriptorValidator())->validate($moduleXml);
             } catch (InvalidXmlDocumentException $exception) {
-                throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is refused by the module schema, which accepts it once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
+                throw new InvalidModuleDescriptorException(\sprintf('The descriptor %s declares <%s> and is refused by the module schema, which accepts the element once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', $moduleXml, ModuleDescriptor::ENABLED_BY_DEFAULT, $exception->getMessage()), 0, $exception);
             }
         }
 

@@ -136,7 +136,7 @@ final class InstallTemplatesTest extends IntegrationTestCase
         $registered = $registerModules->invoke(new Install('test'), $output, $this->connectionInfo(), [$this->moduleDir]);
 
         self::assertFalse($registered);
-        self::assertStringContainsString('ERROR: <enabled-by-default> in '.$this->moduleDir.$code, $output->fetch());
+        self::assertStringContainsString('ERROR: The descriptor '.$this->moduleDir.$code, $output->fetch());
         self::assertNull(ModuleQuery::create()->findOneByCode($code));
     }
 
