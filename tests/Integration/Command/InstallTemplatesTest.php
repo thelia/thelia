@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\Install;
+use Thelia\Model\ModuleQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -32,11 +35,20 @@ final class InstallTemplatesTest extends IntegrationTestCase
 
     private const string MISSING_THEME = 'InstallSampleMissingTheme';
 
+    private const string REFUSED_MODULE = 'InstallSampleRefusedModule';
+
+    private const array PROCESS_VARIABLES = ['DATABASE_HOST', 'DATABASE_PORT', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD', 'SHELL_VERBOSITY'];
+
     /** @var array<string, mixed> */
     private array $server = [];
 
     /** @var array<string, mixed> */
     private array $environment = [];
+
+    /** @var array<string, false|string> */
+    private array $processVariables = [];
+
+    private ?string $moduleDir = null;
 
     protected function setUp(): void
     {
@@ -44,6 +56,9 @@ final class InstallTemplatesTest extends IntegrationTestCase
 
         $this->server = $_SERVER;
         $this->environment = $_ENV;
+        foreach (self::PROCESS_VARIABLES as $name) {
+            $this->processVariables[$name] = getenv($name);
+        }
         // phpunit.xml.dist runs the suites quiet, and the console application that runs
         // template:set applies that verbosity to the output it is handed: the output the
         // install writes afterwards would be dropped.
@@ -52,9 +67,17 @@ final class InstallTemplatesTest extends IntegrationTestCase
 
     protected function tearDown(): void
     {
-        // The step publishes the connection it is given into the process environment.
+        // The step publishes the connection it is given into the process environment, and
+        // the console application its verbosity.
         $_SERVER = $this->server;
         $_ENV = $this->environment;
+        foreach ($this->processVariables as $name => $value) {
+            putenv(false === $value ? $name : $name.'='.$value);
+        }
+
+        if (null !== $this->moduleDir) {
+            (new Filesystem())->remove($this->moduleDir);
+        }
 
         parent::tearDown();
     }
@@ -74,21 +97,75 @@ final class InstallTemplatesTest extends IntegrationTestCase
         self::assertTrue($this->applyTemplates(new BufferedOutput(), ['backOffice' => ' ']));
     }
 
-    /**
-     * @param array<string, string> $themes
-     */
-    private function applyTemplates(BufferedOutput $output, array $themes): bool
+    public function testATemplateThatCouldNotBeAppliedMakesTheInstallFail(): void
     {
-        $connectionInfo = [
+        $output = new BufferedOutput();
+
+        self::assertSame(Command::FAILURE, $this->installResult(false, $output));
+        self::assertStringContainsString('Thelia installed with errors: a template could not be applied. Check messages above.', $output->fetch());
+        self::assertSame(Command::SUCCESS, $this->installResult(true, new BufferedOutput()));
+    }
+
+    /**
+     * A descriptor the module schema refuses stops the registration with a readable line and
+     * makes the install fail, with nothing written.
+     */
+    public function testARefusedDescriptorStopsTheModuleRegistration(): void
+    {
+        $this->moduleDir = sys_get_temp_dir().'/thelia-install-refused-'.bin2hex(random_bytes(4)).'/';
+        $code = self::REFUSED_MODULE;
+        (new Filesystem())->dumpFile($this->moduleDir.$code.'/Config/module.xml', <<<XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <module xmlns="http://thelia.net/schema/dic/module">
+                <fullnamespace>{$code}\\{$code}</fullnamespace>
+                <descriptive locale="en_US">
+                    <title>{$code}</title>
+                </descriptive>
+                <languages>
+                    <language>en_US</language>
+                </languages>
+                <version>1.0.0</version>
+                <type>classic</type>
+                <stability>prod</stability>
+                <enabled-by-default>maybe</enabled-by-default>
+            </module>
+            XML);
+        $output = new BufferedOutput();
+
+        $registerModules = new \ReflectionMethod(Install::class, 'registerModules');
+        $registered = $registerModules->invoke(new Install('test'), $output, $this->connectionInfo(), [$this->moduleDir]);
+
+        self::assertFalse($registered);
+        self::assertStringContainsString('ERROR: <enabled-by-default> in '.$this->moduleDir.$code, $output->fetch());
+        self::assertNull(ModuleQuery::create()->findOneByCode($code));
+    }
+
+    private function installResult(bool $templatesApplied, BufferedOutput $output): int
+    {
+        return (new \ReflectionMethod(Install::class, 'installResult'))->invoke(new Install('test'), $templatesApplied, $output);
+    }
+
+    /**
+     * @return array{host: string, port: string, dbName: string, username: string, password: string}
+     */
+    private function connectionInfo(): array
+    {
+        return [
             'host' => (string) ($_SERVER['DATABASE_HOST'] ?? 'db'),
             'port' => (string) ($_SERVER['DATABASE_PORT'] ?? '3306'),
             'dbName' => (string) ($_SERVER['DATABASE_NAME'] ?? 'test'),
             'username' => (string) ($_SERVER['DATABASE_USER'] ?? 'db'),
             'password' => (string) ($_SERVER['DATABASE_PASSWORD'] ?? 'db'),
         ];
+    }
 
+    /**
+     * @param array<string, string> $themes
+     */
+    private function applyTemplates(BufferedOutput $output, array $themes): bool
+    {
         $applyTemplates = new \ReflectionMethod(Install::class, 'applyTemplatesInSameCommandProcess');
 
-        return $applyTemplates->invoke(new Install('test'), $output, $connectionInfo, $themes);
+        return $applyTemplates->invoke(new Install('test'), $output, $this->connectionInfo(), $themes);
     }
 }

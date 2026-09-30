@@ -62,6 +62,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
     private string $workDir;
 
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        // A run that dies before its tearDown leaves sample modules in vendor/thelia/modules,
+        // where bin/test-prepare would register them. They are removed before the class
+        // runs, and when the process ends however it ends short of a kill.
+        self::removeSampleFiles();
+        register_shutdown_function(self::removeSampleFiles(...));
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -69,14 +80,12 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $this->filesystem = new Filesystem();
         $this->workDir = sys_get_temp_dir().'/thelia-theme-activation-'.bin2hex(random_bytes(4));
         $this->removeSampleModules();
-        // A run killed before its tearDown leaves the theme link behind.
-        $this->filesystem->remove($this->themeInstallDir());
     }
 
     protected function tearDown(): void
     {
         $this->removeSampleModules();
-        $this->filesystem->remove([$this->workDir, $this->themeInstallDir()]);
+        $this->filesystem->remove($this->workDir);
 
         parent::tearDown();
     }
@@ -239,6 +248,37 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
         self::assertStringContainsString('ERROR: The module '.self::FAILING_CODE.' requires Thelia 99.0.0 or newer', $tester->getDisplay());
         self::assertStringNotContainsString('theme modules found', $tester->getDisplay());
+        self::assertNull(ModuleQuery::create()->findOneByCode(self::FAILING_CODE), 'A module this run registered and could not activate is not left behind as a module the shop knows.');
+
+        // Run again, the module is still one the theme brings: its activation is tried and
+        // fails again, instead of the theme being enabled next to a module left inactive.
+        $replayTester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
+        $replayTester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+
+        self::assertSame(SetTemplate::FAILURE, $replayTester->getStatusCode(), $replayTester->getDisplay());
+        self::assertStringContainsString('ERROR: The module '.self::FAILING_CODE.' requires Thelia 99.0.0 or newer', $replayTester->getDisplay());
+    }
+
+    /**
+     * A mandatory module the theme requires and finds inactive is named as mandatory, as the
+     * install does: nothing else would say that a module the shop cannot do without is off.
+     */
+    public function testAMandatoryModuleLeftInactiveIsReportedAsMandatory(): void
+    {
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::SWITCHED_OFF_CODE, self::SWITCHED_OFF_CODE, '');
+        $this->registerSampleModule(self::SWITCHED_OFF_CODE, BaseModule::IS_MANDATORY);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $themeDir = $this->writeTheme([self::SWITCHED_OFF_CODE, self::INACTIVE_CODE]);
+
+        $output = new BufferedOutput();
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
+        $written = $output->fetch();
+
+        self::assertStringContainsString('Module '.self::SWITCHED_OFF_CODE.' is mandatory but is registered inactive: activate it from the back-office.', $written);
+        self::assertStringNotContainsString('Module '.self::INACTIVE_CODE.' is mandatory', $written);
     }
 
     private function setTemplateCommand(TheliaTemplateHelper $templateHelper, ComposerHelper $composerHelper): SetTemplate
@@ -332,11 +372,12 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      * The row a fresh install writes for the module before any theme is applied, here
      * left inactive: either the descriptor asked for it, or the merchant switched it off.
      */
-    private function registerSampleModule(string $code): void
+    private function registerSampleModule(string $code, int $mandatory = 0): void
     {
         $module = new Module();
         $module
             ->setCode($code)
+            ->setMandatory($mandatory)
             ->setVersion('1.0.0')
             ->setType(BaseModule::CLASSIC_MODULE_TYPE)
             ->setCategory('classic')
@@ -357,7 +398,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     private function themeInstallDir(): string
     {
+        return self::themeLink();
+    }
+
+    private static function themeLink(): string
+    {
         return THELIA_TEMPLATE_DIR.'backOffice'.DS.self::THEME_NAME;
+    }
+
+    private static function removeSampleFiles(): void
+    {
+        (new Filesystem())->remove([...(glob(THELIA_MODULE_DIR.self::SAMPLE_PREFIX.'*') ?: []), self::themeLink()]);
     }
 
     /**
@@ -419,6 +470,6 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         ModuleQuery::create()->filterByCode(self::SAMPLE_PREFIX.'%', Criteria::LIKE)->delete();
         ModuleQuery::resetActivated();
 
-        $this->filesystem->remove(glob(THELIA_MODULE_DIR.self::SAMPLE_PREFIX.'*') ?: []);
+        self::removeSampleFiles();
     }
 }

@@ -200,7 +200,8 @@ echo "Registering modules...\n";
 try {
     $count = $setup->registerAndApplyModules();
 } catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
-    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
+    // The message quotes a module.xml: no control character of it reaches the terminal.
+    fwrite(STDERR, 'ERROR: '.preg_replace('/[\x00-\x08\x0B-\x1F\x7F]/', '?', $e->getMessage())."\n");
     exit(1);
 }
 echo "  {$count} module(s) registered\n";

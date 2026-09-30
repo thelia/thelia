@@ -281,13 +281,37 @@ class ModuleManagement
         $toggleEvent = new ModuleToggleActivationEvent($module->getId());
         $toggleEvent->setNoCheck(false);
         $toggleEvent->setRecursive(true);
-        $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+
+        try {
+            $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+        } catch (\Throwable $exception) {
+            $this->forgetAModuleLeftInactive($module);
+
+            throw $exception;
+        }
 
         // The activation wrote the row through another instance: read it back so the caller
         // never decides on a stale state.
         $module->reload();
 
         return $module;
+    }
+
+    /**
+     * The row was written by this run, a moment before an activation that failed: nothing
+     * but the install refers to it. Removing it leaves the module unknown, so the next run
+     * installs and activates it again instead of taking it for a module the merchant keeps
+     * inactive. A row the activation got to switch on is kept: the module is running.
+     */
+    private function forgetAModuleLeftInactive(Module $module): void
+    {
+        $module->reload();
+
+        if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
+            return;
+        }
+
+        ModuleQuery::create()->filterById($module->getId())->delete();
     }
 
     /**
@@ -356,50 +380,62 @@ class ModuleManagement
             return [];
         }
 
-        $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
         $outcomes = [];
 
-        foreach ($composerModuleDTOS as $composerModuleDTO) {
+        foreach ($this->listModulesFromTemplatePath($path) as $composerModuleDTO) {
             $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
             $registered = $this->findRegistered($moduleValidator);
             $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath());
-            $cacheEvent = new CacheEvent($this->kernelCacheDir);
-            $this->eventDispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+            $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
 
             $modulesInstalled[] = $module;
-            $outcomes[] = [$module, null === $registered, $moduleValidator, $composerModuleDTO->getPath()];
+            $outcomes[] = new ThemeModuleOutcome($module, null === $registered, $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath()));
         }
 
-        // Activating a module activates its <required> modules too, and the theme lists its
-        // modules in no dependency order: a module met inactive early in the loop may have been
-        // activated by a later one. The states are read and reported once the loop is over.
-        foreach ($outcomes as [$module, $installedNow, $moduleValidator, $modulePath]) {
+        $this->reportThemeModules($outcomes, $output);
+
+        return $modulesInstalled;
+    }
+
+    /**
+     * Activating a module activates its <required> modules too, and the theme lists its
+     * modules in no dependency order: a module met inactive early in the loop may have been
+     * activated by a later one. The states are read and reported once every module has been
+     * handled, on the modules handed back to the caller.
+     *
+     * @param ThemeModuleOutcome[] $outcomes
+     */
+    private function reportThemeModules(array $outcomes, ?OutputInterface $output): void
+    {
+        foreach ($outcomes as $outcome) {
+            $module = $outcome->module;
             $module->reload();
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
-                if ($installedNow) {
+                if ($outcome->installedNow) {
                     $output?->writeln(\sprintf('<fg=gray>Module %s successfully installed and activated.</>', $module->getCode()));
                 }
 
                 continue;
             }
 
-            // Only a module the theme brings is activated on its behalf, above. A module the
-            // shop already knows keeps its state: the descriptor asked for it, the merchant
-            // switched it off, or module:refresh registered it inactive, and applying a
-            // theme is not the moment to overrule any of them. Nothing in the module table
-            // tells the last two apart, so the output states the fact, not its author, and
-            // says which module the theme is missing.
-            $output?->writeln(
-                \sprintf(
-                    $this->shipsInactive($moduleValidator, $modulePath)
-                        ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
-                        : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
-                    $module->getCode()
-                )
-            );
-        }
+            // Only a module the theme brings is activated on its behalf. A module the shop
+            // already knows keeps its state: the descriptor asked for it, the merchant switched
+            // it off, or module:refresh registered it inactive, and applying a theme is not the
+            // moment to overrule any of them. Nothing in the module table tells the last two
+            // apart, so the output states the fact, not its author, and says which module the
+            // theme is missing.
+            $output?->writeln(\sprintf(
+                $outcome->shipsInactive
+                    ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
+                    : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
+                $module->getCode(),
+            ));
 
-        return $modulesInstalled;
+            // The install warns about a mandatory module it leaves inactive; so does a theme.
+            if (BaseModule::IS_MANDATORY === $module->getMandatory()) {
+                $output?->writeln(\sprintf('<comment>Module %s is mandatory but is registered inactive: activate it from the back-office.</comment>', $module->getCode()));
+            }
+        }
     }
 }

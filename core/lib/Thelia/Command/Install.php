@@ -205,6 +205,11 @@ class Install extends ContainerAwareCommand
         $this->maybeImportDemoData($input, $output, $connectionInfo);
         $this->maybeCreateAdminUser($input, $output, $connectionInfo);
 
+        return $this->installResult($templatesApplied, $output);
+    }
+
+    private function installResult(bool $templatesApplied, OutputInterface $output): int
+    {
         if (!$templatesApplied) {
             $output->writeln('<error>Thelia installed with errors: a template could not be applied. Check messages above.</error>');
 
@@ -220,8 +225,10 @@ class Install extends ContainerAwareCommand
      * Without this step the module table stays empty after installation:
      * PropelInitService would then fall back to a full filesystem scan on every boot,
      * and the shop would run with no active module.
+     *
+     * @param string[] $moduleDirectories
      */
-    private function registerModules(OutputInterface $output, array $connectionInfo): bool
+    private function registerModules(OutputInterface $output, array $connectionInfo, array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): bool
     {
         $output->writeln('<info>Registering modules...</info>');
 
@@ -235,7 +242,7 @@ class Install extends ContainerAwareCommand
         $setup->connect();
 
         try {
-            $count = $setup->registerAndApplyModules();
+            $count = $setup->registerAndApplyModules($moduleDirectories);
         } catch (InvalidModuleDescriptorException $e) {
             $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($e->getMessage())));
 

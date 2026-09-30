@@ -198,6 +198,56 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
+     * Registering writes each module on its own: an active module whose <required> module
+     * ships inactive lands next to an inactive dependency, which the install says.
+     */
+    public function testAnActiveModuleWhoseRequiredModuleShipsInactiveIsReported(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $dependencyDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML, self::SHIPPED_INACTIVE_CODE);
+        $dependentDir = $this->writeSingleModule(\sprintf(<<<XML
+            <type>classic</type>
+            <required>
+                <module version="&gt;=1.0.0">%s</module>
+            </required>
+            <stability>prod</stability>
+            XML, self::SHIPPED_INACTIVE_CODE), self::SHIPPED_ACTIVE_CODE);
+
+        $setup->registerAndApplyModules([$dependencyDir, $dependentDir]);
+
+        self::assertSame(1, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
+        self::assertSame([\sprintf('%1$s is registered active but requires %2$s, which is registered inactive: activate %2$s from the back-office.', self::SHIPPED_ACTIVE_CODE, self::SHIPPED_INACTIVE_CODE)], $setup->getWarnings());
+    }
+
+    /**
+     * A module found in vendor/thelia/modules and in local/modules runs from the local copy
+     * (Module::getModuleDir()): the local descriptor decides how it is registered.
+     */
+    public function testAModuleFoundInBothDirectoriesIsRegisteredFromTheLastOne(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $vendorDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            XML, self::SHIPPED_ACTIVE_CODE);
+        $localDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>0</enabled-by-default>
+            XML, self::SHIPPED_ACTIVE_CODE);
+
+        self::assertSame(1, $setup->registerAndApplyModules([$vendorDir, $localDir]));
+        self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_ACTIVE_CODE));
+    }
+
+    /**
      * The warnings describe the registration that just ran: registering twice with the same
      * setup reports a mandatory module left inactive once, not once per run.
      */
