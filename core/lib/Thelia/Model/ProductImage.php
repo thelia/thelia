@@ -86,13 +86,27 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, Loca
         (new ProductMediaOrder())->moveTo($this, (int) $newPosition);
     }
 
-    public function postDelete(?ConnectionInterface $con = null): void
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
-        parent::postDelete($con);
+        if (!parent::preDelete($con)) {
+            return false;
+        }
 
         // Closes the gap in the sequence the images and the videos of the product
         // share; the trait's reorderBeforeDelete() would only close it in this table.
-        (new ProductMediaOrder())->compact((int) $this->getProductId());
+        (new ProductMediaOrder())->closeGapLeftBy($this);
+
+        return true;
+    }
+
+    /**
+     * Swaps this medium with its immediate neighbour among the images and the
+     * videos of its product: the trait's one-table search would skip a medium of
+     * the other kind.
+     */
+    protected function movePositionUpOrDown(bool $up = true): void
+    {
+        (new ProductMediaOrder())->step($this, $up);
     }
 
     public function getBreadcrumb(Router $router, $tab, $locale): array
