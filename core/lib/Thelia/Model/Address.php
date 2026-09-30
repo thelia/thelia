@@ -16,6 +16,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Address as BaseAddress;
+use Thelia\Model\Map\AddressTableMap;
 
 class Address extends BaseAddress
 {
@@ -41,6 +42,13 @@ class Address extends BaseAddress
         return !$this->getIsDefault();
     }
 
+    public function preUpdate(?ConnectionInterface $con = null): bool
+    {
+        $this->dropVatVerificationWhenItsSubjectChanges();
+
+        return parent::preUpdate($con);
+    }
+
     public function getVatVerificationValid(): bool
     {
         $verifiedAt = $this->getVatVerifiedAt();
@@ -53,5 +61,19 @@ class Address extends BaseAddress
             ->modify(\sprintf('+%d days', ConfigQuery::getVatVerificationLifetimeDays()));
 
         return $expiresAt >= new \DateTimeImmutable();
+    }
+
+    private function dropVatVerificationWhenItsSubjectChanges(): void
+    {
+        $subjectChanged = $this->isColumnModified(AddressTableMap::COL_VAT_NUMBER)
+            || $this->isColumnModified(AddressTableMap::COL_COUNTRY_ID);
+
+        if (!$subjectChanged || $this->isColumnModified(AddressTableMap::COL_VAT_VERIFIED_AT)) {
+            return;
+        }
+
+        $this
+            ->setVatVerifiedAt(null)
+            ->setVatVerifiedName(null);
     }
 }

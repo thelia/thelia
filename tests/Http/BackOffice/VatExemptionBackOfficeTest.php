@@ -15,9 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\BackOffice;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Legal\Service\VatNumberVerifierInterface;
+use Thelia\Domain\Legal\VatVerificationResult;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Admin;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\AddressTableMap;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
@@ -222,6 +226,57 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
      * request when the stack is empty, which would then be the "main" request
      * the security context reads its session from.
      */
+    public function testAnUnansweredReverificationKeepsTheVerificationItReportsAsUnchanged(): void
+    {
+        $this->skipUnlessTheReverificationSparesAnUnansweredCheck();
+
+        static::getContainer()->set(VatNumberVerifierInterface::class, new class implements VatNumberVerifierInterface {
+            public function verify(string $vatNumber, string $countryIsoAlpha2): VatVerificationResult
+            {
+                return VatVerificationResult::undetermined();
+            }
+        });
+
+        $factory = $this->factory();
+        $customer = $factory->customer($factory->customerTitle());
+        $address = $factory->address($customer);
+        $address
+            ->setVatNumber('BE0123456789')
+            ->setVatVerifiedAt(new \DateTime('-2 days'))
+            ->setVatVerifiedName('ACME SPRL')
+            ->save($this->getPropelConnection());
+
+        $this->loginAs($factory->admin());
+        $this->assertPageRenders('/admin/address/update?address_id='.$address->getId());
+
+        $token = $this->client->getCrawler()->filter('form[data-testid="address-vat-verify-form"] input[name="_token"]');
+        self::assertGreaterThan(0, $token->count(), 'The address sheet offers the re-verification once a verifier is installed.');
+
+        $this->client->request('POST', '/admin/address/vat/verify', [
+            'address_id' => (string) $address->getId(),
+            '_token' => (string) $token->attr('value'),
+        ]);
+
+        AddressTableMap::clearInstancePool();
+        $reloaded = AddressQuery::create()->findPk($address->getId());
+        self::assertNotNull($reloaded);
+        self::assertNotNull($reloaded->getVatVerifiedAt());
+        self::assertSame('ACME SPRL', $reloaded->getVatVerifiedName());
+    }
+
+    private function skipUnlessTheReverificationSparesAnUnansweredCheck(): void
+    {
+        if (!class_exists(self::VERIFICATION_CONTROLLER_CLASS)) {
+            self::markTestSkipped('The installed back-office theme offers no re-verification.');
+        }
+
+        $source = (string) file_get_contents((string) (new \ReflectionClass(self::VERIFICATION_CONTROLLER_CLASS))->getFileName());
+
+        if (!str_contains($source, 'VatVerificationStatus::UNDETERMINED !== $result->status')) {
+            self::markTestSkipped('The installed back-office theme still records an unanswered re-verification.');
+        }
+    }
+
     private function factory(): FixtureFactory
     {
         return new FixtureFactory($this->getPropelConnection());

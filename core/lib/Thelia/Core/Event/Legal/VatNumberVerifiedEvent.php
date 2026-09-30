@@ -25,16 +25,29 @@ use Thelia\Model\Address;
  * module never writes the columns itself, so the rule that only a verification
  * may set them lives in one place, and so a shop can listen for the answer to
  * tell its accounting or its CRM.
- *
- * The number is deliberately absent - it is read from the address, and the core
- * never logs it in clear.
  */
 class VatNumberVerifiedEvent extends ActionEvent
 {
+    private readonly ?string $verifiedVatNumber;
+
+    private readonly ?int $verifiedCountryId;
+
     public function __construct(
         private readonly Address $address,
         private readonly VatVerificationResult $result,
     ) {
+        $this->verifiedVatNumber = $address->getVatNumber();
+        $this->verifiedCountryId = $address->getCountryId();
+    }
+
+    public function getVerifiedVatNumber(): ?string
+    {
+        return $this->verifiedVatNumber;
+    }
+
+    public function getVerifiedCountryId(): ?int
+    {
+        return $this->verifiedCountryId;
     }
 
     public function getAddress(): Address
