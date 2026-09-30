@@ -298,15 +298,16 @@ class ModuleManagement
     private function shipsInactive(ModuleValidator $moduleValidator, string $absolutePathToModule): bool
     {
         $descriptor = $moduleValidator->getModuleDescriptor();
+        $descriptorPath = rtrim($absolutePathToModule, DS).DS.'Config'.DS.'module.xml';
 
         // The validator parsed and validated module.xml when it was built, and an invalid
-        // file already threw there. Anything but a document here means there is nothing to
-        // read, so the historical default, active, applies.
+        // file already threw there. Anything but a document here is a validator that no
+        // longer loads what it validates: refuse rather than activate on a guess.
         if (!$descriptor instanceof \SimpleXMLElement) {
-            return false;
+            throw new \LogicException(\sprintf('The descriptor %s was validated but not loaded: its activation cannot be read.', $descriptorPath));
         }
 
-        return !ModuleDescriptor::enabledByDefault($descriptor, rtrim($absolutePathToModule, DS).DS.'Config'.DS.'module.xml');
+        return !ModuleDescriptor::enabledByDefault($descriptor, $descriptorPath);
     }
 
     /**
