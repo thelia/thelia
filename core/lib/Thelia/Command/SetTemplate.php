@@ -16,6 +16,7 @@ namespace Thelia\Command;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -111,22 +112,16 @@ class SetTemplate extends ContainerAwareCommand
             $modulesInstalled = $this->moduleManager->installModulesFromTemplatePath($path, $output);
         } catch (\Exception $exception) {
             Tlog::getInstance()->error(\sprintf('template:set could not install the modules of theme "%s": %s', $name, $exception->getMessage()), ['exception' => $exception]);
-            $output->writeln(\sprintf('<error>%s</error>', $exception->getMessage()));
+            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($exception->getMessage())));
             if ($output->isVerbose()) {
                 $output->writeln($exception->getTraceAsString());
             }
 
             return self::FAILURE;
         }
-        $inactiveModules = array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED !== $module->getActivate());
-        $output->writeln(\sprintf('<fg=blue>%d theme modules found, %d active.</>', \count($modulesInstalled), \count($modulesInstalled) - \count($inactiveModules)));
-        if ([] !== $inactiveModules) {
-            $output->writeln(\sprintf(
-                '<comment>The theme requires %d inactive module(s): %s. Activate them from the back-office if the theme needs them.</comment>',
-                \count($inactiveModules),
-                implode(', ', array_map(static fn (Module $module): string => $module->getCode(), $inactiveModules)),
-            ));
-        }
+        // Each inactive module was named above, as ModuleManagement met it: the summary only counts.
+        $activeModules = array_filter($modulesInstalled, static fn (Module $module): bool => BaseModule::IS_ACTIVATED === $module->getActivate());
+        $output->writeln(\sprintf('<fg=blue>%d theme modules found, %d active.</>', \count($modulesInstalled), \count($activeModules)));
 
         $this->theliaTemplateHelper->enableThemeAsBundle($path);
         $this->execDumpAutoload($output);

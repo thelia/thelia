@@ -199,7 +199,7 @@ foreach (['DATABASE_HOST' => $host, 'DATABASE_PORT' => $port, 'DATABASE_NAME' =>
 echo "Registering modules...\n";
 try {
     $count = $setup->registerAndApplyModules();
-} catch (\InvalidArgumentException $e) {
+} catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
     fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
     exit(1);
 }

@@ -122,7 +122,7 @@ try {
 } catch (\PDOException $e) {
     fwrite(STDERR, "ERROR: Database connection failed — {$e->getMessage()}\n");
     exit(1);
-} catch (\InvalidArgumentException $e) {
+} catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
     fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
     exit(1);
 }

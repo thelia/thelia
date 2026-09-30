@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Module;
 
+use Thelia\Module\Exception\InvalidModuleDescriptorException;
+
 /**
  * Reads the parts of a module.xml descriptor that decide how the shop treats the module,
  * for the install steps that run with and without the kernel.
  */
-final readonly class ModuleDescriptor
+final class ModuleDescriptor
 {
     public const string ENABLED_BY_DEFAULT = 'enabled-by-default';
 
@@ -40,13 +42,13 @@ final readonly class ModuleDescriptor
         }
 
         if ($occurrences > 1) {
-            throw new \InvalidArgumentException(\sprintf('<%s> in %s is declared %d times, expected once.', self::ENABLED_BY_DEFAULT, $descriptorPath, $occurrences));
+            throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is declared %d times, expected once.', self::ENABLED_BY_DEFAULT, $descriptorPath, $occurrences));
         }
 
         return match (trim((string) $element)) {
             '1' => true,
             '0' => false,
-            default => throw new \InvalidArgumentException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, $descriptorPath, trim((string) $element))),
+            default => throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, $descriptorPath, trim((string) $element))),
         };
     }
 }
