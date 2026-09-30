@@ -130,6 +130,10 @@ final class FileProcessorServiceTest extends IntegrationTestCase
             '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY payload "&#60;script&#62;alert(1)&#60;/script&#62;">]><svg xmlns="http://www.w3.org/2000/svg"><text>&payload;</text></svg>',
             'payload',
         ];
+        yield 'entity referenced in an attribute value' => [
+            '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY link "javascript:alert(1)">]><svg xmlns="http://www.w3.org/2000/svg"><text class="a&link;b">x</text></svg>',
+            '&link;',
+        ];
         yield 'xhtml element' => [
             '<svg xmlns="http://www.w3.org/2000/svg"><h:iframe xmlns:h="http://www.w3.org/1999/xhtml" src="https://example.com"/><rect width="1" height="1"/></svg>',
             'iframe',
