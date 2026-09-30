@@ -14,12 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Taxation\Service;
 
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Domain\Localization\Service\EuropeanUnionCountries;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Order;
 
 /**
@@ -36,11 +38,23 @@ use Thelia\Model\Order;
  * than the default taxation country, because the rule is about where the seller
  * is established.
  */
-final readonly class VatExemptionResolver
+final class VatExemptionResolver implements ResetInterface
 {
+    /** @var array<int, ?string> */
+    private array $isoCodeByCountryId = [];
+
+    /** @var array<string, ?string> */
+    private array $shopIsoCodeByStoreCountry = [];
+
     public function __construct(
-        private EuropeanUnionCountries $europeanUnionCountries,
+        private readonly EuropeanUnionCountries $europeanUnionCountries,
     ) {
+    }
+
+    public function reset(): void
+    {
+        $this->isoCodeByCountryId = [];
+        $this->shopIsoCodeByStoreCountry = [];
     }
 
     public function isExemptedForCart(Cart $cart): bool
@@ -61,7 +75,7 @@ final readonly class VatExemptionResolver
             return false;
         }
 
-        return $this->qualifies($invoiceAddress->getVatVerifiedAt(), $invoiceAddress->getCountry());
+        return $this->qualifies($invoiceAddress->getVatVerifiedAt(), $this->isoCodeOf($invoiceAddress->getCountryId()));
     }
 
     /**
@@ -75,24 +89,46 @@ final readonly class VatExemptionResolver
         return $order->getVatExempted();
     }
 
-    private function qualifies(?\DateTimeInterface $verifiedAt, ?Country $country): bool
+    private function qualifies(?\DateTimeInterface $verifiedAt, ?string $buyerCountryCode): bool
     {
         if (null === $verifiedAt || $this->hasExpired($verifiedAt)) {
             return false;
         }
 
-        $buyerCountryCode = $country?->getIsoalpha2();
-
         if (null === $buyerCountryCode || !$this->europeanUnionCountries->isMember($buyerCountryCode)) {
             return false;
         }
 
-        $shopCountryCode = Country::getShopLocation()->getIsoalpha2();
+        $shopCountryCode = $this->shopIsoCode();
 
         // A buyer established in the shop's own country pays its VAT like anyone
         // else: reverse charge only crosses a border.
         return null !== $shopCountryCode
             && strtoupper($shopCountryCode) !== strtoupper($buyerCountryCode);
+    }
+
+    private function isoCodeOf(?int $countryId): ?string
+    {
+        if (null === $countryId) {
+            return null;
+        }
+
+        if (!\array_key_exists($countryId, $this->isoCodeByCountryId)) {
+            $this->isoCodeByCountryId[$countryId] = CountryQuery::create()->findPk($countryId)?->getIsoalpha2();
+        }
+
+        return $this->isoCodeByCountryId[$countryId];
+    }
+
+    private function shopIsoCode(): ?string
+    {
+        $storeCountry = (string) ConfigQuery::getStoreCountry();
+
+        if (!\array_key_exists($storeCountry, $this->shopIsoCodeByStoreCountry)) {
+            $this->shopIsoCodeByStoreCountry[$storeCountry] = Country::getShopLocation()->getIsoalpha2();
+        }
+
+        return $this->shopIsoCodeByStoreCountry[$storeCountry];
     }
 
     private function hasExpired(\DateTimeInterface $verifiedAt): bool

@@ -30,6 +30,7 @@ use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
@@ -226,7 +227,19 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             return false;
         }
 
+        if ($this->awaitsAVatVerification($address)) {
+            return false;
+        }
+
         return $this->copiedFieldsOf($copy) === $this->copiedFieldsOf($address);
+    }
+
+    private function awaitsAVatVerification(Address $address): bool
+    {
+        return VatExemptionMode::VERIFIED_VAT_NUMBER === VatExemptionMode::fromShopConfiguration()
+            && null !== $address->getVatNumber()
+            && '' !== $address->getVatNumber()
+            && !$address->getVatVerificationValid();
     }
 
     /**
@@ -247,6 +260,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             'company' => $address->getCompany(),
             'siret' => $address->getSiret(),
             'vatNumber' => $address->getVatNumber(),
+            'vatVerifiedAt' => $address->getVatVerifiedAt(\DateTimeInterface::ATOM),
+            'vatVerifiedName' => $address->getVatVerifiedName(),
             'firstname' => $address->getFirstname(),
             'lastname' => $address->getLastname(),
             'address1' => $address->getAddress1(),
