@@ -71,8 +71,11 @@ final readonly class SvgSanitizer
             $instruction->parentNode?->removeChild($instruction);
         }
 
-        if ($document->doctype instanceof \DOMDocumentType) {
-            $document->removeChild($document->doctype);
+        // An entity reference left in the tree would be resolved again by the next parser.
+        // They go before the document type: each one points to a declaration of the document
+        // type, and freeing the declarations first leaves them pointing to freed memory.
+        foreach ($this->entityReferences($document->documentElement) as $reference) {
+            $reference->parentNode?->removeChild($reference);
         }
 
         foreach ($this->query($xpath, '//*') as $element) {
@@ -92,9 +95,8 @@ final readonly class SvgSanitizer
             }
         }
 
-        // An entity reference left in the tree would be resolved again by the next parser.
-        foreach ($this->entityReferences($document->documentElement) as $reference) {
-            $reference->parentNode?->removeChild($reference);
+        if ($document->doctype instanceof \DOMDocumentType) {
+            $document->removeChild($document->doctype);
         }
 
         $sanitized = $document->saveXML($document->documentElement);
@@ -149,17 +151,32 @@ final readonly class SvgSanitizer
     }
 
     /**
+     * The entity references of the element content and of the attribute values, walked
+     * without recursion so that a deeply nested drawing cannot exhaust the stack.
+     *
      * @return list<\DOMEntityReference>
      */
-    private function entityReferences(\DOMNode $node): array
+    private function entityReferences(\DOMElement $root): array
     {
         $references = [];
+        $pending = [$root];
 
-        foreach ($node->childNodes as $child) {
-            if ($child instanceof \DOMEntityReference) {
-                $references[] = $child;
-            } elseif ($child->hasChildNodes()) {
-                array_push($references, ...$this->entityReferences($child));
+        while (null !== ($node = array_pop($pending))) {
+            if ($node instanceof \DOMEntityReference) {
+                $references[] = $node;
+
+                // Its children are the declaration of the entity, not part of the document.
+                continue;
+            }
+
+            if ($node instanceof \DOMElement) {
+                foreach ($node->attributes ?? [] as $attribute) {
+                    $pending[] = $attribute;
+                }
+            }
+
+            foreach ($node->childNodes ?? [] as $child) {
+                $pending[] = $child;
             }
         }
 
