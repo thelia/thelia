@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductImageTableMap;
+use Thelia\Model\Map\ProductVideoTableMap;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductVideo;
@@ -120,13 +121,63 @@ final readonly class ProductMediaOrder
     }
 
     /**
-     * Closes the gap a deleted medium leaves: the remaining media are renumbered
-     * from 1 in the order they already have.
+     * Moves one medium a step up or down among the media of its product: it swaps
+     * places with its immediate neighbour in the shared sequence, whichever table
+     * that neighbour lives in. The first medium does not go up, nor the last down.
      */
-    public function compact(int $productId): void
+    public function step(ProductImage|ProductVideo $medium, bool $up): void
     {
-        $this->transaction(function (ConnectionInterface $connection) use ($productId): void {
-            $this->write($this->media($productId, $connection), $connection);
+        $this->transaction(function (ConnectionInterface $connection) use ($medium, $up): void {
+            $media = $this->media((int) $medium->getProductId(), $connection);
+
+            $index = null;
+            foreach ($media as $candidateIndex => $candidate) {
+                if (self::keyOf($candidate) === self::keyOf($medium)) {
+                    $index = $candidateIndex;
+                    break;
+                }
+            }
+
+            $neighbourIndex = null === $index ? null : ($up ? $index - 1 : $index + 1);
+
+            if (null === $neighbourIndex || !isset($media[$neighbourIndex])) {
+                return;
+            }
+
+            [$media[$index], $media[$neighbourIndex]] = [$media[$neighbourIndex], $media[$index]];
+            $this->write($media, $connection);
+        });
+    }
+
+    /**
+     * Closes the gap a medium about to be deleted leaves: every medium after it,
+     * in either table, moves one step up. One statement per table, whatever the
+     * number of media, and the remaining media keep the order they have.
+     *
+     * The position is read from the database rather than from the model: a model
+     * loaded before an earlier deletion of the same batch still holds the
+     * position it had then.
+     */
+    public function closeGapLeftBy(ProductImage|ProductVideo $medium): void
+    {
+        $this->transaction(static function (ConnectionInterface $connection) use ($medium): void {
+            $table = $medium instanceof ProductVideo ? ProductVideoTableMap::TABLE_NAME : ProductImageTableMap::TABLE_NAME;
+
+            $read = $connection->prepare(\sprintf('SELECT `position` FROM `%s` WHERE `id` = :id', $table));
+            $read->execute(['id' => $medium->getId()]);
+            $position = $read->fetchColumn();
+
+            if (false === $position || null === $position) {
+                return;
+            }
+
+            foreach ([ProductImageTableMap::TABLE_NAME, ProductVideoTableMap::TABLE_NAME] as $mediaTable) {
+                $statement = $connection->prepare(\sprintf(
+                    'UPDATE `%s` SET `position` = `position` - 1 WHERE `product_id` = :product_id AND `position` > :position',
+                    $mediaTable,
+                ));
+                $statement->execute(['product_id' => $medium->getProductId(), 'position' => (int) $position]);
+            }
         });
     }
 
