@@ -139,6 +139,20 @@ jobs:
         if: matrix.group == 'static'
         run: composer phpstan
 
+      - name: Restore the Sass and Tailwind binaries
+        if: matrix.group != 'static'
+        # sass:build and tailwind:build download their binary from the GitHub releases
+        # when it is missing: a 500 from github.com failed a whole integration job
+        # (30/09/2026). The versions come from the locked bundles and the theme config,
+        # so the lock file keys the cache; a stale entry only costs a new download.
+        uses: actions/cache@v4
+        with:
+          path: |
+            var/dart-sass
+            var/tailwind/v*
+          key: asset-binaries-${{ runner.os }}-${{ hashFiles('composer.lock', 'templates/frontOffice/*/config/**') }}
+          restore-keys: asset-binaries-${{ runner.os }}-
+
       - name: Build the theme assets and warm the test container
         if: matrix.group != 'static'
         # Every HTTP test renders a page, and a page whose theme assets are missing
