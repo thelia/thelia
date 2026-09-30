@@ -33,6 +33,7 @@ use Thelia\Domain\Media\DTO\ImageUploadDTO;
 use Thelia\Domain\Media\DTO\ProductVideoCreateDTO;
 use Thelia\Domain\Media\DTO\ProductVideoUpdateDTO;
 use Thelia\Domain\Media\Video\VideoProvider;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductVideo;
 
 final readonly class MediaFacade
@@ -254,6 +255,7 @@ final readonly class MediaFacade
     public function createVideo(ProductVideoCreateDTO $dto): ProductVideo
     {
         $this->guardUploadedVideo($dto->uploadedFile);
+        $this->guardThumbnail($dto->productId, $dto->thumbnailImageId);
 
         $video = new ProductVideo();
         $video->setParentId($dto->productId);
@@ -300,6 +302,7 @@ final readonly class MediaFacade
             $video->setExternalId($dto->externalId);
         }
         if (null !== $dto->thumbnailImageId) {
+            $this->guardThumbnail((int) $video->getProductId(), false === $dto->thumbnailImageId ? null : $dto->thumbnailImageId);
             $video->setThumbnailImageId(false === $dto->thumbnailImageId ? null : $dto->thumbnailImageId);
         }
         if (null !== $dto->visible) {
@@ -381,6 +384,24 @@ final readonly class MediaFacade
 
         $this->fileProcessorService->validateUpload($uploadedFile, 'video');
         $this->fileProcessorService->sanitizeUpload($uploadedFile);
+    }
+
+    /**
+     * The thumbnail of a video is one of the images of its own product, the only
+     * ones the back office offers: another product's picture would stand in front
+     * of the video on the sheet.
+     *
+     * @throws \InvalidArgumentException when the image is not one of the product
+     */
+    private function guardThumbnail(int $productId, ?int $thumbnailImageId): void
+    {
+        if (null === $thumbnailImageId) {
+            return;
+        }
+
+        if (null === ProductImageQuery::create()->filterByProductId($productId)->findPk($thumbnailImageId)) {
+            throw new \InvalidArgumentException(\sprintf('The thumbnail of a video is an image of product #%d, image #%d is not.', $productId, $thumbnailImageId));
+        }
     }
 
     /**
