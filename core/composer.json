@@ -88,8 +88,7 @@
         "phpstan/extension-installer": "^1.1",
         "symfony/css-selector": "7.4.*",
         "friendsofphp/php-cs-fixer": "^3.41",
-        "symfony/debug-bundle": "7.4.*",
-        "thelia/web-profiler-module": "^3.0"
+        "symfony/debug-bundle": "7.4.*"
     },
     "conflict": {
         "api-platform/symfony": ">=4.4.0 <5.0"
