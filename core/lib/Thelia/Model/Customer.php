@@ -27,6 +27,7 @@ use Thelia\Domain\Legal\CompanyIdentifier;
 use Thelia\Model\Base\Customer as BaseCustomer;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Tools\Password;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -268,7 +269,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
             // A new password retires every remember-me cookie issued under the old one.
             $this->setRememberMeToken(null);
 
-            parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
+            parent::setPassword(Password::hash($password));
         }
 
         return $this;

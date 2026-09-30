@@ -51,4 +51,27 @@ class Password
 
         return self::randgen($letter, $length);
     }
+
+    /**
+     * bcrypt hash at PHP's default cost, unless THELIA_PASSWORD_HASH_COST sets one.
+     *
+     * The default cost went from 10 to 12 in PHP 8.4, four times the work per hash.
+     * A test suite that creates and logs in accounts by the hundred lowers it.
+     */
+    public static function hash(string $password): string
+    {
+        $cost = $_SERVER['THELIA_PASSWORD_HASH_COST'] ?? $_ENV['THELIA_PASSWORD_HASH_COST'] ?? '';
+
+        if ('' === $cost) {
+            return password_hash($password, \PASSWORD_BCRYPT);
+        }
+
+        $cost = filter_var($cost, \FILTER_VALIDATE_INT);
+
+        if (false === $cost) {
+            throw new \InvalidArgumentException('THELIA_PASSWORD_HASH_COST must be an integer.');
+        }
+
+        return password_hash($password, \PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
 }

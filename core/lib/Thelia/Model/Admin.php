@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
+use Thelia\Tools\Password;
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -54,7 +55,7 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
             // A new password retires every remember-me cookie issued under the old one.
             $this->setRememberMeToken(null);
 
-            return parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
+            return parent::setPassword(Password::hash($password));
         }
 
         return $this;
