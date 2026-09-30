@@ -183,14 +183,15 @@ final class CatalogPriceRuleScreensTest extends WebIntegrationTestCase
 
         $this->assertPageRenders(self::LIST_URL);
         $toggleUrl = $this->client->getCrawler()->filter('[data-testid="catalog-price-rule-toggle-'.$rule->getId().'"]')->attr('href');
-        $this->client->request('GET', $toggleUrl);
+        $token = $this->client->getCrawler()->filter('meta[name="bo-token"]')->attr('content');
+        $this->client->request('POST', $toggleUrl, ['_token' => $token]);
         self::assertResponseRedirects();
         self::assertFalse((bool) CatalogPriceRuleQuery::create()->findPk($rule->getId())->getActive());
         self::assertSame([], $reader->currentPrices([$pse->getId()], $this->currency), 'turning the rule off gives the product its price back at once');
 
         $this->assertPageRenders(self::LIST_URL);
-        $deleteAction = $this->client->getCrawler()->filter('#catalog-price-rule-delete-modal form')->attr('action');
-        $this->client->request('POST', $deleteAction, ['rule_id' => $rule->getId()]);
+        $deleteForm = $this->client->getCrawler()->filter('#catalog-price-rule-delete-modal form');
+        $this->client->request('POST', $deleteForm->attr('action'), ['rule_id' => $rule->getId(), '_token' => $deleteForm->filter('input[name="_token"]')->attr('value')]);
         self::assertResponseRedirects();
         self::assertNull(CatalogPriceRuleQuery::create()->findPk($rule->getId()));
     }
