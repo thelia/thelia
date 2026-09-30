@@ -78,10 +78,26 @@ class ReservedSaleVisibility implements ResetInterface
      */
     public function applyTo(ModelCriteria $query, string $productIdColumn): void
     {
+        $clause = $this->visibleProductClause($productIdColumn);
+
+        if (null !== $clause) {
+            $query->where($clause);
+        }
+    }
+
+    /**
+     * The rule of {@see applyTo()} as a fragment, for a query that reaches the
+     * product through a subquery of its own: the combination links of a video
+     * carry no product column, the video they point at does.
+     *
+     * @return string|null null when no running operation hides anything from the visitor
+     */
+    public function visibleProductClause(string $productIdColumn): ?string
+    {
         $hiddenSaleIds = $this->hiddenSaleIds();
 
         if ([] === $hiddenSaleIds) {
-            return;
+            return null;
         }
 
         $clause = \sprintf(
@@ -99,7 +115,7 @@ class ReservedSaleVisibility implements ResetInterface
             );
         }
 
-        $query->where($clause);
+        return $clause;
     }
 
     /**
