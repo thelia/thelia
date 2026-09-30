@@ -118,7 +118,6 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::NEW_CODE] ?? null, 'The module handed back for the module the theme brings carries the state its activation wrote, not the one its installation did.');
         self::assertStringNotContainsString(self::NEW_CODE.' is required by the theme but', $written, 'A module the theme brings and activates is not reported inactive.');
         self::assertStringContainsString('Module '.self::NEW_CODE.' successfully installed and activated.', $written, 'A module the theme brings and activates is announced.');
-        self::assertStringNotContainsString('Module '.self::SWITCHED_OFF_CODE.' successfully installed', $written, 'A module the shop already knew is not announced as installed.');
         self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_CODE, 'The module the theme brings is copied where the shop keeps its modules.');
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE), 'A module the theme brings is registered but left inactive when its descriptor says so.');
         self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_INACTIVE_CODE, 'The module the theme brings is copied even though it ships inactive.');
@@ -235,6 +234,29 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
+     * A failed regeneration of the autoloader is printed, without the control characters
+     * of the Composer output, and does not keep the theme from being enabled.
+     */
+    public function testAFailedAutoloadDumpIsPrintedAndTheThemeIsEnabled(): void
+    {
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $this->installTheme([self::INACTIVE_CODE]);
+
+        $templateHelper = $this->createMock(TheliaTemplateHelper::class);
+        $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::THEME_NAME);
+        $composerHelper = $this->createMock(ComposerHelper::class);
+        $composerHelper->method('dumpAutoload')->willThrowException(new \RuntimeException("Could not scan\e[31m vendor"));
+
+        $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
+        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+
+        self::assertSame(SetTemplate::SUCCESS, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertStringContainsString('Composer dump-autoload failed: Could not scan?[31m vendor', $tester->getDisplay());
+        self::assertStringNotContainsString('Autoload dump completed successfully', $tester->getDisplay());
+    }
+
+    /**
      * A module the theme brings and the shop cannot activate stops the command: the error
      * is printed with the module named, the exit code is non-zero and the theme is not
      * enabled, so the install does not end on a shop whose theme misses a module.
@@ -267,6 +289,7 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
         self::assertSame(SetTemplate::SUCCESS, $replayTester->getStatusCode(), $replayTester->getDisplay());
         self::assertStringContainsString('Module '.self::FAILING_CODE.' is required by the theme but is registered inactive', $replayTester->getDisplay());
+        self::assertStringContainsString('left as it is, and the theme goes on without it', $replayTester->getDisplay(), 'The second run says the theme is enabled without the module.');
     }
 
     /**

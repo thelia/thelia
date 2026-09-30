@@ -247,15 +247,18 @@ class ModuleManagement
 
     /**
      * The row the module table already holds for the module the validator describes. The
-     * install event matches a row by namespace but updateModule() by code: a module whose
-     * namespace changed between two releases is still the merchant's row, found by its code.
+     * install event matches a row by namespace and installs under the code the namespace
+     * starts with; updateModule() and DatabaseSetup's upsert match by code, the name of the
+     * module directory. A module whose namespace changed between two releases is still the
+     * merchant's row: it is looked up by namespace, then by either code.
      */
     private function findRegistered(ModuleValidator $moduleValidator): ?Module
     {
         $moduleDefinition = $moduleValidator->getModuleDefinition();
 
         return ModuleQuery::create()->findOneByFullNamespace($moduleDefinition?->getNamespace() ?? '')
-            ?? ModuleQuery::create()->findOneByCode($moduleDefinition?->getCode() ?? '');
+            ?? ModuleQuery::create()->findOneByCode($moduleDefinition?->getCode() ?? '')
+            ?? ModuleQuery::create()->findOneByCode(basename(rtrim((string) $moduleValidator->getModulePath(), DS)));
     }
 
     /**
@@ -382,10 +385,11 @@ class ModuleManagement
     }
 
     /**
-     * Activating a module activates its <required> modules too, and the theme lists its
-     * modules in no dependency order: a module met inactive early in the loop may have been
-     * activated by a later one. The states are read and reported once every module has been
-     * handled, on the modules handed back to the caller.
+     * Activating a module through install() activates its <required> modules too (one level
+     * deep, not for a module that ships inactive; the back-office and module:activate do
+     * not), and the theme lists its modules in no dependency order: a module met inactive
+     * early in the loop may have been activated by a later one. The states are read and
+     * reported once every module has been handled, on the modules handed back to the caller.
      *
      * @param ThemeModuleOutcome[] $outcomes
      */
@@ -394,8 +398,8 @@ class ModuleManagement
         foreach ($outcomes as $outcome) {
             $module = $outcome->module;
             $module->reload();
-            // The code comes from the descriptor a theme ships: printed as text, never as markup.
-            $code = OutputFormatter::escape(TerminalText::withoutControlCharacters($module->getCode()));
+            // The code is the name of a module directory the theme ships: printed as text, never as markup.
+            $code = OutputFormatter::escape(TerminalText::singleLine($module->getCode()));
 
             if (BaseModule::IS_ACTIVATED === $module->getActivate()) {
                 if ($outcome->installedNow) {
@@ -414,7 +418,7 @@ class ModuleManagement
             $output?->writeln(\sprintf(
                 $outcome->shipsInactive
                     ? '<comment>Module %s is required by the theme but ships inactive: left for the merchant to activate it from the back-office.</comment>'
-                    : '<comment>Module %s is required by the theme but is registered inactive: left as it is, activate it from the back-office if the theme needs it.</comment>',
+                    : '<comment>Module %s is required by the theme but is registered inactive: left as it is, and the theme goes on without it; activate it from the back-office if the theme needs it.</comment>',
                 $code,
             ));
 

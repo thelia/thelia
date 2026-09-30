@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Thelia\Module\Exception\InvalidModuleDescriptorException;
+use Thelia\Tools\TerminalText;
 
 /**
  * Reads the parts of a module.xml descriptor that decide how the shop treats the module,
@@ -24,7 +25,7 @@ final readonly class ModuleDescriptor
 {
     public const string ENABLED_BY_DEFAULT = 'enabled-by-default';
 
-    /** What the install and template:set print about a mandatory module left inactive, given its code. */
+    /** What the install prints about a mandatory module left inactive, given its code; template:set prefixes it with "Module ". */
     public const string MANDATORY_INACTIVE_WARNING = '%s is mandatory but is registered inactive: activate it from the back-office.';
 
     /**
@@ -51,7 +52,7 @@ final readonly class ModuleDescriptor
         return match (trim((string) $element)) {
             '1' => true,
             '0' => false,
-            default => throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, $descriptorPath, trim((string) $element))),
+            default => throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, $descriptorPath, TerminalText::singleLine(trim((string) $element)))),
         };
     }
 }

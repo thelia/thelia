@@ -7,8 +7,8 @@ declare(strict_types=1);
  * Installs Thelia without booting the Symfony kernel.
  *
  * Phases 1-6 run standalone (PDO + filesystem only).
- * Phase 7+ delegates to bin/console in subprocesses — by that point the
- * database is populated, modules are registered, and the kernel can boot.
+ * Phase 7+ boots a fresh kernel per command, in this process: by that point
+ * the database is populated, modules are registered, and the kernel can boot.
  *
  * Usage:
  *   php bin/install --help                                                                          (options, changes nothing)
@@ -133,6 +133,18 @@ if (!$check->exec()) {
 }
 
 echo "  OK\n";
+
+// ── Phase 1b: Check module descriptors ───────────────────────────────
+
+// A descriptor the install refuses stops it here, before the database, the schema and
+// the environment file exist: phase 6 would only meet it once they are.
+echo "Checking module descriptors...\n";
+try {
+    (new Thelia\Install\Standalone\ModuleDescriptorReader())->read();
+} catch (\Thelia\Module\Exception\InvalidModuleDescriptorException $e) {
+    fwrite(STDERR, "ERROR: {$e->getMessage()}\n");
+    exit(1);
+}
 
 // ── Phase 2-4: Database, schema, secret ──────────────────────────────
 
@@ -288,7 +300,7 @@ foreach ($themes as $type => $name) {
 
 // Phases 7-9 need the Symfony kernel. Each template:set triggers
 // a cache:clear, so we must boot a fresh kernel per command
-// (same approach as Install.php::applyTemplatesInSameCommandProcess).
+// (same approach as Thelia\Install\TemplateApplier::apply()).
 
 $commands = [];
 
@@ -425,7 +437,6 @@ foreach ($commands as $cmd) {
     $kernel->boot();
 
     $app = new Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
-    $app->setAutoExit(false);
 
     // An optional command belongs to a package the active theme may not require.
     if (($cmd['optional'] ?? false) && !$app->has($cmd['input']['command'])) {

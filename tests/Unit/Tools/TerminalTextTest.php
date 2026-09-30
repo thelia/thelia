@@ -26,6 +26,12 @@ final class TerminalTextTest extends TestCase
         self::assertSame($expected, TerminalText::withoutControlCharacters($text));
     }
 
+    public function testAnIdentifierStaysOnOneLine(): void
+    {
+        self::assertSame("Acme?OK: install complete?\u{A0}", TerminalText::singleLine("Acme\nOK: install complete\t\u{A0}"));
+        self::assertSame('Acme?', TerminalText::singleLine("Acme\e"));
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function texts(): iterable
     {
@@ -45,6 +51,12 @@ final class TerminalTextTest extends TestCase
         yield 'a deprecated format control' => ["Acme\u{206B}Module", 'Acme?Module'];
         yield 'an interlinear annotation anchor' => ["Acme\u{FFF9}Module", 'Acme?Module'];
         yield 'a tag character' => ["Acme\u{E0041}Module", 'Acme?Module'];
+        yield 'a mongolian vowel separator' => ["Ac\u{180E}me", 'Ac?me'];
+        yield 'a combining grapheme joiner' => ["Ac\u{34F}me", 'Ac?me'];
+        yield 'a variation selector' => ["Acme\u{FE0F}", 'Acme?'];
+        yield 'a hangul filler' => ["Acme\u{3164}Module", 'Acme?Module'];
+        yield 'a braille blank' => ["Acme\u{2800}Module", 'Acme?Module'];
+        yield 'a braille dot is kept' => ["Acme\u{2801}", "Acme\u{2801}"];
         yield 'the replacement character is kept' => ["Acme\u{FFFD}", "Acme\u{FFFD}"];
         yield 'an emoji is kept' => ["Acme \u{1F600}", "Acme \u{1F600}"];
         yield 'a no-break space is kept' => ["Acme\u{A0}Module", "Acme\u{A0}Module"];

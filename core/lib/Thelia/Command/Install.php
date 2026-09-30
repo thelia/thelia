@@ -14,13 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Command;
 
-use App\Kernel as AppKernel;
-use Symfony\Bundle\FrameworkBundle\Console\Application as FrameworkConsoleApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,9 +27,9 @@ use Symfony\Component\Process\Process;
 use Thelia\Core\Install\CheckPermission;
 use Thelia\Core\Install\Database;
 use Thelia\Domain\Module\Composer\ComposerHelper;
-use Thelia\Install\Standalone\CommandExitCodeRecorder;
 use Thelia\Install\Standalone\DatabaseSetup;
-use Thelia\Module\Exception\InvalidModuleDescriptorException;
+use Thelia\Install\Standalone\ModuleRegistrationStep;
+use Thelia\Install\TemplateApplier;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -44,6 +40,8 @@ class Install extends ContainerAwareCommand
 {
     public function __construct(
         private readonly string $environment,
+        private readonly ModuleRegistrationStep $moduleRegistrationStep = new ModuleRegistrationStep(),
+        private readonly TemplateApplier $templateApplier = new TemplateApplier(),
     ) {
         parent::__construct();
     }
@@ -146,6 +144,11 @@ class Install extends ContainerAwareCommand
 
         $this->checkPermission($output);
 
+        // A descriptor the install refuses stops it before anything is asked or created.
+        if (!$this->moduleRegistrationStep->check($output)) {
+            return Command::FAILURE;
+        }
+
         $connectionInfo = [
             'host' => $input->getOption('database_host'),
             'dbName' => $input->getOption('database_name'),
@@ -198,19 +201,15 @@ class Install extends ContainerAwareCommand
 
         // Like bin/install: a template that cannot be applied does not stop the remaining
         // steps, but the install says so and exits non-zero, so a script does not read a
-        // shop without its theme as an installed shop.
-        $templatesApplied = $this->applyTemplatesInSameCommandProcess($output, $connectionInfo, $themes);
+        // shop without its theme as an installed shop. Unlike bin/install, a PHP \Error
+        // template:set raises outside its module step stops the install here.
+        $templatesApplied = $this->templateApplier->apply($output, $connectionInfo, $themes);
 
         $this->runModulesPostActivation($output, $connectionInfo);
 
         $this->maybeImportDemoData($input, $output, $connectionInfo);
         $this->maybeCreateAdminUser($input, $output, $connectionInfo);
 
-        return $this->installResult($templatesApplied, $output);
-    }
-
-    private function installResult(bool $templatesApplied, OutputInterface $output): int
-    {
         if (!$templatesApplied) {
             $output->writeln('<error>Thelia installed with errors: a template could not be applied. Check messages above.</error>');
 
@@ -221,18 +220,10 @@ class Install extends ContainerAwareCommand
     }
 
     /**
-     * Register every module found on disk into the module table, active unless its
-     * descriptor says otherwise, and apply their SQL schemas.
-     * Without this step the module table stays empty after installation:
-     * PropelInitService would then fall back to a full filesystem scan on every boot,
-     * and the shop would run with no active module.
-     *
-     * @param string[] $moduleDirectories
+     * Register every module found on disk into the module table, once the core schema exists.
      */
-    private function registerModules(OutputInterface $output, array $connectionInfo, array $moduleDirectories = [THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR]): bool
+    private function registerModules(OutputInterface $output, array $connectionInfo): bool
     {
-        $output->writeln('<info>Registering modules...</info>');
-
         $setup = new DatabaseSetup(
             (string) $connectionInfo['host'],
             (string) $connectionInfo['port'],
@@ -242,21 +233,7 @@ class Install extends ContainerAwareCommand
         );
         $setup->connect();
 
-        try {
-            $count = $setup->registerAndApplyModules($moduleDirectories);
-        } catch (InvalidModuleDescriptorException $e) {
-            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($e->getMessage())));
-
-            return false;
-        }
-
-        $output->writeln(\sprintf('<info>%d module(s) registered</info>', $count));
-
-        foreach ($setup->getWarnings() as $warning) {
-            $output->writeln(\sprintf('<comment>WARN %s</comment>', OutputFormatter::escape($warning)));
-        }
-
-        return true;
+        return $this->moduleRegistrationStep->register($setup, $output);
     }
 
     /**
@@ -610,99 +587,6 @@ class Install extends ContainerAwareCommand
         }
 
         return $themes;
-    }
-
-    /**
-     * @return bool false when at least one template:set did not succeed
-     */
-    private function applyTemplatesInSameCommandProcess(
-        OutputInterface $output,
-        array $connectionInfo,
-        array $themes,
-    ): bool {
-        $this->publishDatabaseEnvironmentForCurrentProcess($connectionInfo);
-        $applied = true;
-
-        if (!class_exists(AppKernel::class)) {
-            throw new \RuntimeException('App\\Kernel is missing. Post-install steps require the application kernel.');
-        }
-
-        // template:set triggers cache:clear, which deletes container files
-        // mid-process. This causes harmless PHP warnings ("Failed to open
-        // stream") when the console.terminate event tries to load deleted
-        // services. We suppress them — same approach as bin/install.
-        set_error_handler(static fn (int $errno, string $errstr): bool => str_contains($errstr, 'Failed to open stream') || str_contains($errstr, 'Failed opening required'), \E_WARNING);
-
-        try {
-            foreach ($themes as $type => $name) {
-                $name = trim((string) $name);
-
-                if ('' === $name) {
-                    continue;
-                }
-
-                $output->writeln(\sprintf(
-                    '<info>Applying template "%s" for type "%s"...</info>',
-                    $name,
-                    $type,
-                ));
-
-                $kernel = new AppKernel($_SERVER['APP_ENV'], (bool) ($_SERVER['APP_DEBUG'] ?? false));
-                $kernel->boot();
-
-                try {
-                    // A console.terminate listener dying on a container file template:set
-                    // deleted does not decide the result: the exit code it returned does.
-                    $exitCode = (new CommandExitCodeRecorder())->run(
-                        new FrameworkConsoleApplication($kernel),
-                        new ArrayInput([
-                            'command' => 'template:set',
-                            'type' => $type,
-                            'name' => $name,
-                        ]),
-                        $output,
-                        $kernel->getContainer()->get('event_dispatcher'),
-                    );
-
-                    if (Command::SUCCESS !== $exitCode) {
-                        $applied = false;
-                        $output->writeln(
-                            \sprintf(
-                                '<error>Post-install step failed while applying template "%s" for type "%s".</error>',
-                                $name,
-                                $type
-                            )
-                        );
-                    }
-                } finally {
-                    try {
-                        $kernel->shutdown();
-                    } catch (\Throwable) {
-                    }
-                }
-            }
-        } finally {
-            restore_error_handler();
-        }
-
-        return $applied;
-    }
-
-    private function publishDatabaseEnvironmentForCurrentProcess(array $connectionInfo): void
-    {
-        $values = [
-            'DATABASE_HOST' => (string) $connectionInfo['host'],
-            'DATABASE_PORT' => (string) $connectionInfo['port'],
-            'DATABASE_NAME' => (string) $connectionInfo['dbName'],
-            'DATABASE_USER' => (string) $connectionInfo['username'],
-            'DATABASE_PASSWORD' => (string) $connectionInfo['password'],
-        ];
-
-        foreach ($values as $name => $value) {
-            $_SERVER[$name] = $value;
-            $_ENV[$name] = $value;
-            putenv($name.'='.$value);
-        }
     }
 
     private function maybeImportDemoData(InputInterface $input, OutputInterface $output, array $connectionInfo): void

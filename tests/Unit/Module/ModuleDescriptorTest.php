@@ -53,6 +53,14 @@ final class ModuleDescriptorTest extends TestCase
         ModuleDescriptor::enabledByDefault($this->descriptor('<enabled-by-default>maybe</enabled-by-default>'), 'vendor/acme/modules/Acme/Config/module.xml');
     }
 
+    public function testTheQuotedValueStaysOnTheLineOfTheError(): void
+    {
+        $this->expectException(InvalidModuleDescriptorException::class);
+        $this->expectExceptionMessage('must be 0 or 1, "maybe?OK: 12 module(s) registered" given.');
+
+        ModuleDescriptor::enabledByDefault($this->descriptor("<enabled-by-default>maybe\nOK: 12 module(s) registered</enabled-by-default>"), 'module.xml');
+    }
+
     public function testADuplicateElementIsRefusedRatherThanReadFirst(): void
     {
         $this->expectException(InvalidModuleDescriptorException::class);
