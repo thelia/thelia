@@ -236,9 +236,21 @@ class ModuleManagement
 
     public function installModule(string $absolutePathToModule): Module
     {
-        $moduleValidator = new ModuleValidator($absolutePathToModule);
+        $moduleValidator = $this->describe($absolutePathToModule);
 
         return $this->findRegistered($moduleValidator) ?? $this->install($moduleValidator, $absolutePathToModule);
+    }
+
+    /**
+     * The validated descriptor of the module at this path, with its definition loaded: what
+     * findRegistered() and install() both read.
+     */
+    private function describe(string $absolutePathToModule): ModuleValidator
+    {
+        $moduleValidator = new ModuleValidator($absolutePathToModule);
+        $moduleValidator->loadModuleDefinition();
+
+        return $moduleValidator;
     }
 
     /**
@@ -246,8 +258,6 @@ class ModuleManagement
      */
     private function findRegistered(ModuleValidator $moduleValidator): ?Module
     {
-        $moduleValidator->loadModuleDefinition();
-
         return ModuleQuery::create()->findOneByFullNamespace(
             $moduleValidator->getModuleDefinition()?->getNamespace() ?? '',
         );
@@ -360,7 +370,7 @@ class ModuleManagement
         $composerModuleDTOS = $this->listModulesFromTemplatePath($path);
 
         foreach ($composerModuleDTOS as $composerModuleDTO) {
-            $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
+            $moduleValidator = $this->describe($composerModuleDTO->getPath());
             $registered = $this->findRegistered($moduleValidator);
             $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath());
             $cacheEvent = new CacheEvent($this->kernelCacheDir);

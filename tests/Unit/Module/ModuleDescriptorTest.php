@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Module;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Module\ModuleDescriptor;
 
 /**
@@ -46,7 +47,7 @@ final class ModuleDescriptorTest extends TestCase
 
     public function testAnotherValueIsRefusedAndNamesTheDescriptor(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidModuleDescriptorException::class);
         $this->expectExceptionMessage('<enabled-by-default> in vendor/acme/modules/Acme/Config/module.xml must be 0 or 1, "maybe" given.');
 
         ModuleDescriptor::enabledByDefault($this->descriptor('<enabled-by-default>maybe</enabled-by-default>'), 'vendor/acme/modules/Acme/Config/module.xml');
@@ -54,7 +55,7 @@ final class ModuleDescriptorTest extends TestCase
 
     public function testADuplicateElementIsRefusedRatherThanReadFirst(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidModuleDescriptorException::class);
         $this->expectExceptionMessage('<enabled-by-default> in module.xml is declared 2 times, expected once.');
 
         ModuleDescriptor::enabledByDefault($this->descriptor('<enabled-by-default>0</enabled-by-default><enabled-by-default>1</enabled-by-default>'), 'module.xml');

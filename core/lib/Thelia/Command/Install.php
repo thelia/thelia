@@ -18,6 +18,7 @@ use App\Kernel as AppKernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application as FrameworkConsoleApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,6 +32,7 @@ use Thelia\Core\Install\CheckPermission;
 use Thelia\Core\Install\Database;
 use Thelia\Domain\Module\Composer\ComposerHelper;
 use Thelia\Install\Standalone\DatabaseSetup;
+use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -193,12 +195,21 @@ class Install extends ContainerAwareCommand
 
         $this->handleThemesBundle($input, $output);
 
-        $this->applyTemplatesInSameCommandProcess($output, $connectionInfo, $themes);
+        // Like bin/install: a template that cannot be applied does not stop the remaining
+        // steps, but the install says so and exits non-zero, so a script does not read a
+        // shop without its theme as an installed shop.
+        $templatesApplied = $this->applyTemplatesInSameCommandProcess($output, $connectionInfo, $themes);
 
         $this->runModulesPostActivation($output, $connectionInfo);
 
         $this->maybeImportDemoData($input, $output, $connectionInfo);
         $this->maybeCreateAdminUser($input, $output, $connectionInfo);
+
+        if (!$templatesApplied) {
+            $output->writeln('<error>Thelia installed with errors: a template could not be applied. Check messages above.</error>');
+
+            return Command::FAILURE;
+        }
 
         return Command::SUCCESS;
     }
@@ -225,8 +236,8 @@ class Install extends ContainerAwareCommand
 
         try {
             $count = $setup->registerAndApplyModules();
-        } catch (\InvalidArgumentException $e) {
-            $output->writeln(\sprintf('<error>ERROR: %s</error>', $e->getMessage()));
+        } catch (InvalidModuleDescriptorException $e) {
+            $output->writeln(\sprintf('<error>ERROR: %s</error>', OutputFormatter::escape($e->getMessage())));
 
             return false;
         }
@@ -593,12 +604,16 @@ class Install extends ContainerAwareCommand
         return $themes;
     }
 
+    /**
+     * @return bool false when at least one template:set did not succeed
+     */
     private function applyTemplatesInSameCommandProcess(
         OutputInterface $output,
         array $connectionInfo,
         array $themes,
-    ): void {
+    ): bool {
         $this->publishDatabaseEnvironmentForCurrentProcess($connectionInfo);
+        $applied = true;
 
         if (!class_exists(AppKernel::class)) {
             throw new \RuntimeException('App\\Kernel is missing. Post-install steps require the application kernel.');
@@ -640,6 +655,7 @@ class Install extends ContainerAwareCommand
                     );
 
                     if (Command::SUCCESS !== $exitCode) {
+                        $applied = false;
                         $output->writeln(
                             \sprintf(
                                 '<error>Post-install step failed while applying template "%s" for type "%s".</error>',
@@ -664,6 +680,8 @@ class Install extends ContainerAwareCommand
         } finally {
             restore_error_handler();
         }
+
+        return $applied;
     }
 
     private function publishDatabaseEnvironmentForCurrentProcess(array $connectionInfo): void

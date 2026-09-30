@@ -16,6 +16,7 @@ namespace Thelia\Install\Standalone;
 
 use Thelia\Core\Install\Database;
 use Thelia\Core\TheliaKernel;
+use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptor;
 use Thelia\Module\ModuleDescriptorValidator;
@@ -135,8 +136,8 @@ final class DatabaseSetup
      * distribution but waits for the merchant to activate it from the back-office, and
      * template:set leaves it alone too (see ModuleManagement). On a database that
      * already knows the module, only the namespace and the version are refreshed: the
-     * activation the merchant chose is never rewritten. A mandatory module that ships
-     * inactive is registered as asked and reported in the warnings.
+     * activation the merchant chose is never rewritten. A mandatory module found inactive
+     * once registered is reported in the warnings.
      *
      * Every descriptor is read before anything is written: a refused declaration stops
      * the registration with the module table untouched, whatever order the disk lists
@@ -160,15 +161,38 @@ final class DatabaseSetup
              ON DUPLICATE KEY UPDATE `title` = VALUES(`title`)'
         );
         $selectModuleId = $this->pdo->prepare('SELECT `id` FROM `module` WHERE `code` = :code');
+        $selectActivation = $this->pdo->prepare('SELECT `activate` FROM `module` WHERE `code` = :code');
 
         foreach ($modules as $position => $module) {
             $insertModule->execute([...$module['row'], 'position' => $position + 1]);
 
             $this->insertModuleDescriptions($module['xml'], $module['code'], $upsertModuleI18n, $selectModuleId);
             $this->applyModuleSchema($module['path'], $module['code']);
+            $this->warnAboutAMandatoryModuleLeftInactive($module['row'], $module['code'], $selectActivation);
         }
 
         return \count($modules);
+    }
+
+    /**
+     * <mandatory> only keeps an active module from being deactivated: a mandatory module
+     * can be registered inactive, because its descriptor ships it so or because the merchant
+     * switched it off before this run. Either way nothing else would say that a module the
+     * shop cannot do without is off, so the state is read back after the write and reported.
+     *
+     * @param array<string, int|string> $row
+     */
+    private function warnAboutAMandatoryModuleLeftInactive(array $row, string $code, \PDOStatement $selectActivation): void
+    {
+        if (1 !== $row['mandatory']) {
+            return;
+        }
+
+        $selectActivation->execute(['code' => $code]);
+
+        if (0 === (int) $selectActivation->fetchColumn()) {
+            $this->warnings[] = \sprintf('%s is mandatory but is registered inactive: activate it from the back-office.', $code);
+        }
     }
 
     /**
@@ -210,13 +234,6 @@ final class DatabaseSetup
                     'hidden' => (int) ($xml->hidden ?? 0),
                 ];
 
-                // <mandatory> only keeps an active module from being deactivated: a mandatory
-                // module that ships inactive is registered inactive as asked, and the operator
-                // is told, or nothing would say that a module the shop cannot do without is off.
-                if (1 === $row['mandatory'] && 0 === $row['activate']) {
-                    $this->warnings[] = \sprintf('%s is mandatory but ships inactive: registered inactive as its descriptor asks, activate it from the back-office.', $code);
-                }
-
                 $modules[] = [
                     'code' => $code,
                     'path' => $entry->getPathname(),
@@ -239,19 +256,19 @@ final class DatabaseSetup
      */
     private function enabledByDefault(\SimpleXMLElement $xml, string $moduleXml): bool
     {
-        $enabledByDefault = ModuleDescriptor::enabledByDefault($xml, $moduleXml);
-
         if (0 === \count($xml->{ModuleDescriptor::ENABLED_BY_DEFAULT})) {
-            return $enabledByDefault;
+            return true;
         }
 
+        // The schema rules first, so that a refused value comes back with the message every
+        // later step would give; the reader only turns an accepted value into a boolean.
         try {
             (new ModuleDescriptorValidator())->validate($moduleXml);
         } catch (InvalidXmlDocumentException $exception) {
-            throw new \InvalidArgumentException(\sprintf('<%s> in %s is refused by the module schema: only the 2.2 descriptor format knows it, as the last element of <module>. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
+            throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is refused by the module schema: only the 2.2 descriptor format knows it, as the last element of <module>. %s', ModuleDescriptor::ENABLED_BY_DEFAULT, $moduleXml, $exception->getMessage()), 0, $exception);
         }
 
-        return $enabledByDefault;
+        return ModuleDescriptor::enabledByDefault($xml, $moduleXml);
     }
 
     /**

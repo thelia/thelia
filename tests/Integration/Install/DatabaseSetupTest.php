@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\TheliaKernel;
 use Thelia\Install\Standalone\DatabaseSetup;
 use Thelia\Model\ConfigQuery;
+use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tools\Version\Version;
 
@@ -188,18 +189,35 @@ final class DatabaseSetupTest extends IntegrationTestCase
     {
         $setup = $this->createDatabaseSetup();
         $setup->connect();
-        $moduleDir = $this->writeSingleModule(<<<XML
-            <type>classic</type>
-            <stability>prod</stability>
-            <mandatory>1</mandatory>
-            <enabled-by-default>0</enabled-by-default>
-            XML);
+        $moduleDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
 
         $setup->registerAndApplyModules([$moduleDir]);
 
         self::assertSame(0, $this->activationOf($setup->getPdo(), self::SHIPPED_INACTIVE_CODE));
-        self::assertCount(1, $setup->getWarnings());
-        self::assertStringContainsString(self::SHIPPED_INACTIVE_CODE.' is mandatory but ships inactive', $setup->getWarnings()[0]);
+        self::assertSame([self::SHIPPED_INACTIVE_CODE.' is mandatory but is registered inactive: activate it from the back-office.'], $setup->getWarnings());
+    }
+
+    /**
+     * On a populated database the row keeps the state the merchant chose, so the warning
+     * has to describe that state, not the descriptor: a mandatory module the merchant
+     * activated since is not reported, one the merchant switched off is.
+     */
+    public function testTheMandatoryWarningDescribesTheRegisteredStateNotTheDescriptor(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+        $shippedInactiveDir = $this->writeMandatoryModule('<enabled-by-default>0</enabled-by-default>');
+        $shippedActiveDir = $this->writeMandatoryModule('', self::SHIPPED_ACTIVE_CODE);
+        $setup->registerAndApplyModules([$shippedInactiveDir, $shippedActiveDir]);
+
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 1 WHERE `code` = ?')->execute([self::SHIPPED_INACTIVE_CODE]);
+        $setup->getPdo()->prepare('UPDATE `module` SET `activate` = 0 WHERE `code` = ?')->execute([self::SHIPPED_ACTIVE_CODE]);
+
+        $replay = $this->createDatabaseSetup();
+        $replay->connect();
+        $replay->registerAndApplyModules([$shippedInactiveDir, $shippedActiveDir]);
+
+        self::assertSame([self::SHIPPED_ACTIVE_CODE.' is mandatory but is registered inactive: activate it from the back-office.'], $replay->getWarnings());
     }
 
     /**
@@ -228,7 +246,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $setup->connect();
         $moduleDir = $this->writeSampleModules('<enabled-by-default>maybe</enabled-by-default>');
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidModuleDescriptorException::class);
         $this->expectExceptionMessage('enabled-by-default');
 
         $setup->registerAndApplyModules([$moduleDir]);
@@ -255,7 +273,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
         try {
             $setup->registerAndApplyModules([$validDir, $refusedDir]);
             self::fail('An invalid value must stop the registration.');
-        } catch (\InvalidArgumentException $exception) {
+        } catch (InvalidModuleDescriptorException $exception) {
             self::assertStringContainsString(self::REFUSED_CODE, $exception->getMessage());
         }
 
@@ -285,7 +303,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
         try {
             $setup->registerAndApplyModules([$moduleDir]);
             self::fail('An element the schema refuses must stop the registration.');
-        } catch (\InvalidArgumentException $exception) {
+        } catch (InvalidModuleDescriptorException $exception) {
             self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
         }
 
@@ -309,7 +327,7 @@ final class DatabaseSetupTest extends IntegrationTestCase
         try {
             $setup->registerAndApplyModules([$moduleDir]);
             self::fail('A 2.1 descriptor declaring the element must stop the registration.');
-        } catch (\InvalidArgumentException $exception) {
+        } catch (InvalidModuleDescriptorException $exception) {
             self::assertStringContainsString('<enabled-by-default> in '.$moduleDir, $exception->getMessage());
         }
 
@@ -372,6 +390,16 @@ final class DatabaseSetupTest extends IntegrationTestCase
         }
 
         return $moduleDir;
+    }
+
+    private function writeMandatoryModule(string $declaration, string $code = self::SHIPPED_INACTIVE_CODE): string
+    {
+        return $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <mandatory>1</mandatory>
+            {$declaration}
+            XML, $code);
     }
 
     /**
