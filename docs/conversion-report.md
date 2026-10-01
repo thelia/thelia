@@ -75,16 +75,18 @@ flowchart LR
 `purification_cart_anonymous_days` (default 30) and customer carts without an
 order older than `purification_cart_no_order_days` (default 60), both counted
 from the creation date, to the second. `Thelia\Domain\Cart\Service\CartPurgeHorizon`
-exposes that horizon (`earliestSurvivingCartDate()`, `mayHavePurged()`), taking
-the shorter of the two settings and the same threshold as the purge: now minus
-the retention, not rounded to midnight.
+reads both settings for the purge and for the reports alike, and exposes that
+horizon (`earliestSurvivingCartDate()`, `mayHavePurged()`, `boundedStart()`),
+taking the shorter of the two settings and the same threshold as the purge: now
+minus the retention, not rounded to midnight. A negative setting is read as 0:
+the purge then deletes every cart without order, and the reports start now.
 
 Orders and the carts that led to one are never purged, so a period that reaches
 before the horizon would compare orders to carts that no longer exist, and the
-rate would climb above what the shop really converts. The screen therefore
-computes the funnel and the rate from the horizon when the period starts
-earlier, prints the effective dates next to the period pills, and says so in a
-notice. The oldest cart in base is not a reliable bound: a cart with an order
+rate would climb above what the shop really converts. The screen and the
+export therefore start the period on the horizon when it starts earlier
+(`boundedStart()`); the screen prints the effective dates next to the period
+pills and says so in a notice. The oldest cart in base is not a reliable bound: a cart with an order
 can be years old while every cart without order of the same weeks is gone.
 
 Nothing runs `maintenance:purge` automatically: a shop that never schedules it
@@ -115,6 +117,17 @@ searches and a second table lists the most searched terms overall
 (`topSearchedTerms()`). `SearchLogAvailability` tells the template which case
 it is in.
 
+The log holds the searches the module runs itself and, from TntSearch 4.1, the
+searches a front theme announces with `Thelia\Core\Event\Product\ProductSearchedEvent`
+(term, locale, number of products found), dispatched under its class name.
+Flexy queries the catalogue through the front API, not through the module: it
+raises the event once per submitted search, on the first page of results, and
+not for the suggestions shown while typing nor for the further pages of the
+same results. The module logs it on the product index, one line per term and
+locale, its count increased at each search. TntSearch 4.0 does not listen to
+the event, and a theme that searches through the module does not need to raise
+it.
+
 When the module is missing or inactive, the tab explains what to install
 instead of showing an empty table. A button opens the module's synonyms
 screen, `/admin/module/TntSearch/synonym`, so a merchant can turn a
@@ -139,14 +152,18 @@ date, carts_created, carts_with_items, carts_with_delivery_module, carts_with_pa
 ```
 
 No daily conversion rate: the orders of a given day can come from carts
-created on other days, so a per-day ratio would mislead. Without an explicit
-period, the export covers the last twelve months up to today.
+created on other days, so a per-day ratio would mislead. The period starts on
+the cart purge horizon at the earliest, as on the screen: without a start, the
+export runs from the horizon up to today, and a period that ends before the
+horizon has no data.
 
 ## Limits
 
 - Steps 3 and 4 are a lower bound: the checkout clears the choices they read.
 - A period that reaches before the cart purge horizon is computed from the
-  horizon (see above).
+  horizon, on the screen as in the export (see above).
+- The searches of the shop reach the log only with TntSearch 4.1 or later, and
+  only from a theme that raises `ProductSearchedEvent` (Flexy does).
 - Step 1 counts empty carts: a bot or a visitor who never added a line still
   creates a row.
 - A cart emptied after having had a line looks, at read time, like it never
@@ -165,6 +182,8 @@ period, the export covers the last twelve months up to today.
 | Cart purge horizon | `core/lib/Thelia/Domain/Cart/Service/CartPurgeHorizon.php` |
 | Export | `core/lib/Thelia/Domain/DataTransfer/Export/Type/ConversionFunnelExport.php` |
 | Search log reading | `default-twig` theme, `src/Service/Report/SearchLog/` |
+| Shop search event | `core/lib/Thelia/Core/Event/Product/ProductSearchedEvent.php`, raised by Flexy's `ProductSearch::countSubmitted()` |
+| Shop search logging | TntSearch module, `EventListener/LogSearchResultListener.php` |
 | Back-office screen | `default-twig` theme, `/admin/reports/conversion` |
 
 ## Test suites
@@ -172,5 +191,9 @@ period, the export covers the last twelve months up to today.
 - `tests/Integration/Domain/Report/ConversionFunnel/ConversionFunnelCalculatorTest.php`
 - `tests/Unit/Domain/Cart/CartPurgeHorizonTest.php`
 - `tests/Integration/Domain/DataTransfer/ConversionFunnelExportTest.php`
+- `tests/Integration/Command/MaintenancePurgeCommandTest.php`
+- `templates/backOffice/default-twig/tests/Service/Report/ConversionReportProviderTest.php`
 - `templates/backOffice/default-twig/tests/Service/Report/SearchLog/TntSearchSchemaProbeTest.php`
 - `templates/backOffice/default-twig/tests/Service/Report/SearchLog/TntSearchLogReaderTest.php`
+- `templates/frontOffice/flexy/tests/Unit/SubmittedSearchEventTest.php`
+- `local/modules/TntSearch/Tests/Integration/LogShopSearchTest.php` (TntSearch module)
