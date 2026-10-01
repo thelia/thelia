@@ -126,9 +126,12 @@ final class DatabaseSetup
      * `<enabled-by-default>0</enabled-by-default>`: such a module ships with the
      * distribution but waits for the merchant to activate it from the back-office, and
      * template:set does not activate it either, unless a module the theme brings and
-     * activates lists it under <required> (see ModuleManagement::install()). On a database that
-     * already knows the module, only the namespace and the version are refreshed: the
-     * activation the merchant chose is never rewritten. A mandatory module found inactive
+     * activates lists it under <required> (see ModuleManagement::install()). A row the module
+     * table already holds keeps its activation and its mandatory flag: only the namespace and
+     * the version are refreshed. The installers recreate the table before they register, so
+     * there that row is the first copy of a module found in two directories; a caller that
+     * registers on a table it did not recreate keeps the state of every row it finds. A
+     * mandatory module found inactive
      * once registered, and an active module whose <required> module is registered inactive,
      * are reported in the warnings.
      *
@@ -163,8 +166,8 @@ final class DatabaseSetup
             $this->applyModuleSchema($module->path, $module->code);
         }
 
-        // The state written is read back: on a populated database the row keeps the
-        // activation and the mandatory flag the merchant's shop already had.
+        // The state written is read back: a row the table already held, the first copy of
+        // a module found twice included, keeps the activation and the mandatory flag it had.
         $registered = array_map(
             static fn (array $row): array => ['activate' => (int) $row['activate'], 'mandatory' => (int) $row['mandatory']],
             $this->pdo->query('SELECT `code`, `activate`, `mandatory` FROM `module`')->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC),

@@ -42,9 +42,12 @@ final readonly class CommandExitCodeRecorder
     /**
      * Run one command of the console and return its exit code. The error a console.terminate
      * listener raises on a container file the command deleted is not the command's: the exit
-     * code the command returned is kept. The same error raised before the command returned is
-     * a command that did not finish: failure. Any other error is thrown; bin/install counts
-     * it as a failed step, thelia:install lets it stop the install.
+     * code the command returned is kept. The same error raised by the command itself is a
+     * failure: the console dispatches console.terminate with a non-zero exit code (the code of
+     * the error, 1 by default) before it throws the error again, and that code is recorded.
+     * The fallback to failure only serves when no exit code reached the recorder: a dispatcher
+     * that dies before it calls the recorder's listener. Any other error is thrown; bin/install
+     * counts it as a failed step, thelia:install lets it stop the install.
      *
      * @param EventDispatcherInterface $dispatcher the dispatcher the console dispatches its events on
      */

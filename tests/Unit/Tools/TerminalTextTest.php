@@ -33,6 +33,11 @@ final class TerminalTextTest extends TestCase
     }
 
     /** @return iterable<string, array{string, string}> */
+    public function testAMessageSpreadOverLinesIsPrintedOnOne(): void
+    {
+        self::assertSame('first error. second error.?OK', TerminalText::onOneLine("first error.\n  \r\nsecond error.\tOK\n"));
+    }
+
     public static function texts(): iterable
     {
         yield 'an escape sequence' => ["Acme\e[31m", 'Acme?[31m'];
@@ -63,6 +68,13 @@ final class TerminalTextTest extends TestCase
         yield 'punctuation of the same block is kept' => ['Acme – Module…', 'Acme – Module…'];
         yield 'tabs and line feeds are kept' => ["Acme\n\tModule", "Acme\n\tModule"];
         yield 'accented letters are kept' => ['Modulé', 'Modulé'];
-        yield 'invalid UTF-8 is cleaned, not dropped' => ["Acme\xFF\e", "Acme\xFF?"];
+        yield 'invalid UTF-8 is cleaned, not dropped' => ["Acme\xFF\e", 'Acme??'];
+        yield 'a raw C1 byte' => ["Acme\x9B31m", 'Acme?31m'];
+        yield 'a raw C1 byte after an accented letter' => ["Modulé\x9B31m", 'Modulé?31m'];
+        yield 'a truncated sequence is replaced byte by byte' => ["Acme\xE2\x80Module", 'Acme??Module'];
+        yield 'an encoded surrogate is replaced' => ["Acme\xED\xA0\x80", 'Acme???'];
+        yield 'a mongolian free variation selector' => ["Ac\u{180B}me", 'Ac?me'];
+        yield 'a supplementary variation selector' => ["Acme\u{E0100}", 'Acme?'];
+        yield 'a musical format control' => ["Ac\u{1D173}me", 'Ac?me'];
     }
 }

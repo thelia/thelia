@@ -17,8 +17,10 @@ namespace Thelia\Module;
 use Thelia\Model\Module;
 
 /**
- * What applying a theme did to one of the modules it requires, kept until every module has
- * been handled so the state reported is the final one.
+ * What the shop did with a module a theme requires: found its row, or installed it, and
+ * whether its descriptor ships it inactive. Applying a theme keeps one per module until every
+ * module has been handled, so the state reported is the final one; installModule() follows
+ * the same rule and only keeps the module.
  *
  * @internal
  */

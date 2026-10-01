@@ -18,6 +18,7 @@ use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptor;
 use Thelia\Module\ModuleDescriptorValidator;
+use Thelia\Tools\TerminalText;
 
 /**
  * Reads the module descriptors of the module directories without the kernel and without a
@@ -106,7 +107,7 @@ final readonly class ModuleDescriptorReader
             try {
                 $this->validator->validate($moduleXml);
             } catch (InvalidXmlDocumentException $exception) {
-                throw new InvalidModuleDescriptorException(\sprintf('The descriptor %s declares <%s> and is refused by the module schema, which accepts the element once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', $moduleXml, ModuleDescriptor::ENABLED_BY_DEFAULT, $exception->getMessage()), 0, $exception);
+                throw new InvalidModuleDescriptorException(\sprintf('The descriptor %s declares <%s> and is refused by the module schema, which accepts the element once, as the last element of a 2.2 descriptor, with the value 0 or 1. %s', TerminalText::singleLine($moduleXml), ModuleDescriptor::ENABLED_BY_DEFAULT, TerminalText::onOneLine($exception->getMessage())), 0, $exception);
             }
         }
 
