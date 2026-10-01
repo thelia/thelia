@@ -1185,8 +1185,6 @@ final class FixtureFactory
             mkdir($directory, 0o775, true);
         }
 
-        $image = imagecreatetruecolor(1, 1);
-        imagepng($image, $path);
-        imagedestroy($image);
+        imagepng(imagecreatetruecolor(1, 1), $path);
     }
 }
