@@ -57,6 +57,8 @@ use Thelia\Model\OrderCouponModule;
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
+    private const DISCOUNT_PRICED_FOR = 'thelia.coupon.discount_priced_for';
+
     public function __construct(
         protected RequestStack $requestStack,
         protected CouponFactory $couponFactory,
@@ -180,12 +182,35 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         $discount = $this->couponManager->getDiscount();
 
-        $session->getSessionCart($dispatcher)
+        $pricedCart = $session->getSessionCart($dispatcher);
+        $pricedCart
             ->setDiscount((string) $discount)
             ->save();
+        $session->set(self::DISCOUNT_PRICED_FOR, [$pricedCart->getId(), $pricedCart->isVatExempted()]);
 
         $session->getOrder()
             ->setDiscount((string) $discount);
+    }
+
+    public function reconcileWithVatExemption(): void
+    {
+        $session = $this->getSession();
+
+        if (!$session instanceof Session || !$session->isStarted()) {
+            return;
+        }
+
+        $cart = $session->getSessionCart($this->dispatcher);
+
+        if (null === $cart || !$this->couponsCanExplainTheDiscount($cart)) {
+            return;
+        }
+
+        if ($session->get(self::DISCOUNT_PRICED_FOR) === [$cart->getId(), $cart->isVatExempted()]) {
+            return;
+        }
+
+        $this->updateOrderDiscount(new Event(), 'thelia.coupon.reconcile_with_vat_exemption', $this->dispatcher);
     }
 
     /**
