@@ -87,7 +87,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
      */
     public function applyOrderAndAliases(array $data): array
     {
-        if (null === $this->orderAndAliases) {
+        if (null === $this->orderAndAliases || [] === $this->orderAndAliases) {
             return $data;
         }
 
