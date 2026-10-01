@@ -33,8 +33,15 @@ return static function (ContainerConfigurator $container): void {
             service('thelia.parser.resolver'),
         ]);
 
-    // Request context
+    // Request context. The chain router hands it to every router it holds, the
+    // Symfony one included, so it has to carry what route conditions read from
+    // it: the functions they call, service() and env(), are looked up in its
+    // "_functions" parameter, as on the context FrameworkBundle builds for itself.
     $services->set('request.context', (string) param('router.request_context.class'))
+        ->call('setParameter', [
+            '_functions',
+            service('router.expression_language_provider')->ignoreOnInvalid(),
+        ])
         ->public();
 
     // Module file locator
