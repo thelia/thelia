@@ -18,6 +18,7 @@ use Thelia\Domain\Report\ConversionFunnel\ConversionFunnel;
 use Thelia\Domain\Report\ConversionFunnel\ConversionFunnelCalculator;
 use Thelia\Domain\Report\ConversionFunnel\FunnelStep;
 use Thelia\Model\Cart;
+use Thelia\Model\CartQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Test\FixtureFactory;
@@ -134,6 +135,16 @@ final class ConversionFunnelCalculatorTest extends IntegrationTestCase
         $this->factory->order(null, ['statusCode' => (string) $status->getCode()]);
 
         $this->assertDelta($baseline, [1, 0, 0, 0, 1, 1]);
+    }
+
+    public function testAnOrderWhoseCartWasDeletedStaysCounted(): void
+    {
+        $baseline = $this->counts();
+
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        CartQuery::create()->filterById($order->getCartId())->delete($this->getPropelConnection());
+
+        $this->assertDelta($baseline, [0, 0, 0, 0, 1, 1]);
     }
 
     public function testACartCreatedBeforeTheWindowIsLeftOut(): void
