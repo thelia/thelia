@@ -4,6 +4,8 @@ The version number follows the update script this release ships, `setup/update/s
 
 ## Promotions and sales
 
+- `TheliaEvents::SALE_PRODUCTS_QUERY` (`Thelia\Core\Event\Sale\SaleProductsQueryEvent`) is raised by `Thelia\Action\Sale::updateProductsSaleStatus()` with the query that selects the products of a sale, before it is read, so a module can exclude products with a SQL condition. The promo status is still reset on every product of the sale, so a product a listener excludes loses the status it had. Nothing changes without a listener.
+
 - Catalog price rules: a named, dated rule with a priority prices a slice of the catalog - categories with or without their descendants, brands, templates, feature values, attribute values, named products, combined with AND - for everyone or for named customers, by a percentage, an amount per currency or a fixed price per currency. The price replaces the promo price in the loops, on the product page, in the cart, on the order and through the front API, without writing anything into `product_price`; it is stored as dated segments in a table of its own, so an opening or a closing takes effect at the second, and follows the catalog when a product, a category or a price changes. `catalog-price-rule:recompute` catches up whatever a change too large for its request left over. A flash sale converts into turned-off rules. See `docs/catalog-price-rules.md`.
 
 ## Checkout and payment
