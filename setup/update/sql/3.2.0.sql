@@ -435,4 +435,47 @@ UPDATE `config` SET `value` = 'default-twig' WHERE `name` = 'active-admin-templa
 
 UPDATE `module` SET `activate` = 0 WHERE `code` IN ('TheliaSmarty', 'VirtualProductControl');
 
+-- ---------------------------------------------------------------------
+-- Content slots
+--
+-- A theme asks the core for the links of a slot (the header, the footer,
+-- the page of a consent) instead of naming contents by their id.
+--
+-- The header reads `header_menu_items`, an ordered list of references written
+-- `folder:<id>,content:<id>`. The theme used to show folder 2 and content 1
+-- whatever the shop held, so an updated shop gets those two, for the ones that
+-- exist: it keeps the header it had, and can change it from now on. A fresh
+-- install starts empty. INSERT IGNORE leaves alone a shop that already set it.
+--
+-- The terms and conditions get a single source, the content of the
+-- `terms_and_conditions` consent; `terms_conditions_content_id` is deprecated.
+-- A consent that names no content takes the one the setting names, under the
+-- conditions 3.1.0 applied: digits only, above zero, and a `content` row that
+-- still exists. A consent that already names one keeps it.
+-- ---------------------------------------------------------------------
+
+SET @header_menu_items := CONCAT_WS(
+    ',',
+    (SELECT 'folder:2' FROM `folder` WHERE `folder`.`id` = 2),
+    (SELECT 'content:1' FROM `content` WHERE `content`.`id` = 1)
+);
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('header_menu_items', @header_menu_items, 0, 0, NOW(), NOW());
+
+SET @terms_content_id := (
+    SELECT CAST(`config`.`value` AS UNSIGNED)
+    FROM `config`
+    WHERE `config`.`name` = 'terms_conditions_content_id'
+      AND `config`.`value` REGEXP '^[0-9]+$'
+      AND CAST(`config`.`value` AS UNSIGNED) > 0
+      AND EXISTS (SELECT 1 FROM `content` WHERE `content`.`id` = CAST(`config`.`value` AS UNSIGNED))
+);
+
+UPDATE `consent`
+SET `content_id` = @terms_content_id, `updated_at` = NOW()
+WHERE `code` = 'terms_and_conditions'
+  AND `content_id` IS NULL
+  AND @terms_content_id IS NOT NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
