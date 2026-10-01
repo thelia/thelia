@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\File;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\File\Exception\ProcessFileException;
@@ -102,6 +103,89 @@ final class FileProcessorServiceTest extends IntegrationTestCase
         );
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function activeSvgProvider(): iterable
+    {
+        yield 'onload handler' => [
+            '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><rect width="1" height="1"/></svg>',
+            'onload',
+        ];
+        yield 'script element' => [
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><rect width="1" height="1"/></svg>',
+            'alert',
+        ];
+        yield 'xlink href under another prefix' => [
+            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"><a x:href="javascript:alert(1)"><rect width="1" height="1"/></a></svg>',
+            'javascript',
+        ];
+        yield 'xml-stylesheet processing instruction' => [
+            '<?xml version="1.0"?><?xml-stylesheet type="text/xsl" href="https://example.com/x.xsl"?><svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>',
+            'xml-stylesheet',
+        ];
+        yield 'entity declared in the document type' => [
+            '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY payload "&#60;script&#62;alert(1)&#60;/script&#62;">]><svg xmlns="http://www.w3.org/2000/svg"><text>&payload;</text></svg>',
+            'payload',
+        ];
+        yield 'entity referenced in an attribute value' => [
+            '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY link "javascript:alert(1)">]><svg xmlns="http://www.w3.org/2000/svg"><text class="a&link;b">x</text></svg>',
+            '&link;',
+        ];
+        yield 'xhtml element' => [
+            '<svg xmlns="http://www.w3.org/2000/svg"><h:iframe xmlns:h="http://www.w3.org/1999/xhtml" src="https://example.com"/><rect width="1" height="1"/></svg>',
+            'iframe',
+        ];
+        yield 'svg document embedded as a data uri' => [
+            '<svg xmlns="http://www.w3.org/2000/svg"><use href="data:image/svg+xml;base64,PHN2Zy8+"/></svg>',
+            'data:',
+        ];
+        yield 'javascript uri hidden among animation values' => [
+            '<svg xmlns="http://www.w3.org/2000/svg"><a><animate attributeName="href" values="#;javascript:alert(1)"/><rect width="1" height="1"/></a></svg>',
+            'javascript',
+        ];
+    }
+
+    #[DataProvider('activeSvgProvider')]
+    public function testSanitizeUploadStripsTheActiveContentOfAnSvg(string $svg, string $forbidden): void
+    {
+        $upload = $this->upload('logo.svg', $svg);
+
+        $this->getService(FileProcessorService::class)->sanitizeUpload($upload);
+
+        $sanitized = (string) file_get_contents($upload->getPathname());
+        self::assertStringNotContainsStringIgnoringCase($forbidden, $sanitized);
+        self::assertStringContainsString('<svg', $sanitized, 'The drawing itself is kept.');
+    }
+
+    public function testSanitizeUploadKeepsAPlainSvgDrawing(): void
+    {
+        $upload = $this->upload('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>');
+
+        $this->getService(FileProcessorService::class)->sanitizeUpload($upload);
+
+        self::assertStringContainsString('<rect width="10" height="10" fill="red"/>', (string) file_get_contents($upload->getPathname()));
+    }
+
+    public function testSanitizeUploadKeepsARasterImageEmbeddedInAnSvg(): void
+    {
+        $embedded = 'data:image/png;base64,'.base64_encode($this->pngBytes());
+        $upload = $this->upload('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image xlink:href="'.$embedded.'" width="1" height="1"/></svg>');
+
+        $this->getService(FileProcessorService::class)->sanitizeUpload($upload);
+
+        self::assertStringContainsString($embedded, (string) file_get_contents($upload->getPathname()));
+    }
+
+    public function testSanitizeUploadRefusesAnSvgThatIsNotAnSvgDocument(): void
+    {
+        $this->expectException(ProcessFileException::class);
+
+        $this->getService(FileProcessorService::class)->sanitizeUpload(
+            $this->upload('logo.svg', '<html xmlns="http://www.w3.org/1999/xhtml"><script>alert(1)</script></html>'),
+        );
     }
 
     /**

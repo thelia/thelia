@@ -18,6 +18,7 @@ use Imagine\Gd\Imagine as GdImagine;
 use Imagine\Gmagick\Imagine as GmagickImagine;
 use Imagine\Image\ImageInterface;
 use Imagine\Imagick\Imagine as ImagickImagine;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Action\Image as ImageAction;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
@@ -26,6 +27,8 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileManager;
+use Thelia\Exception\ImageException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -40,6 +43,8 @@ final class ImageActionTest extends ActionIntegrationTestCase
     protected function tearDown(): void
     {
         $this->cleanUpTestFiles();
+        // The database changes are rolled back, the static config cache is not.
+        ConfigQuery::resetCache();
         parent::tearDown();
     }
 
@@ -192,6 +197,144 @@ final class ImageActionTest extends ActionIntegrationTestCase
 
         self::assertStringContainsString('width="64"', (string) file_get_contents($cacheFilePath));
         self::assertNull($event->getImageObject(), 'A vector image must never be handed to the raster pipeline.');
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function originalDeliveryProvider(): iterable
+    {
+        yield 'symlink, original size' => ['symlink', true];
+        yield 'copy, original size' => ['copy', true];
+        yield 'symlink, resized' => ['symlink', false];
+        yield 'copy, resized' => ['copy', false];
+    }
+
+    #[DataProvider('originalDeliveryProvider')]
+    public function testProcessImageNeverPublishesTheActiveContentOfAnSvg(string $deliveryMode, bool $originalSize): void
+    {
+        ConfigQuery::write('original_image_delivery_mode', $deliveryMode);
+        $sourceFile = $this->createActiveSvg();
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        if (!$originalSize) {
+            $event->setWidth(64);
+        }
+
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        $this->trackFileForCleanup((string) $event->getCacheFilepath());
+        $this->trackFileForCleanup($event->getCacheOriginalFilepath());
+
+        foreach ([(string) $event->getCacheFilepath(), $event->getCacheOriginalFilepath()] as $published) {
+            self::assertFileExists($published);
+            self::assertFalse(is_link($published), 'An SVG is never published as a link to its source.');
+
+            $content = (string) file_get_contents($published);
+            self::assertStringNotContainsStringIgnoringCase('onload', $content);
+            self::assertStringNotContainsStringIgnoringCase('<script', $content);
+            self::assertStringContainsString('<rect', $content, 'The drawing itself is published.');
+        }
+
+        self::assertStringContainsString('onload', (string) file_get_contents($sourceFile), 'The source file is left as it is.');
+    }
+
+    public function testProcessImageReplacesALinkPublishedBeforeForAnSvg(): void
+    {
+        $sourceFile = $this->createActiveSvg();
+        $legacyLink = $this->cacheDirectory().DS.basename($sourceFile);
+        symlink($sourceFile, $legacyLink);
+        $this->trackFileForCleanup($legacyLink);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        self::assertSame($legacyLink, $event->getCacheOriginalFilepath(), 'sanity: the link sits where the original is published.');
+        self::assertFalse(is_link($legacyLink));
+        self::assertStringNotContainsStringIgnoringCase('onload', (string) file_get_contents($legacyLink));
+    }
+
+    public function testProcessImageReplacesALinkPublishedBeforeForAnSvgWhenOnlyAResizedCopyIsAskedFor(): void
+    {
+        $sourceFile = $this->createActiveSvg();
+        $resize = function () use ($sourceFile): ImageEvent {
+            $event = (new ImageEvent())
+                ->setSourceFilepath($sourceFile)
+                ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY)
+                ->setWidth(32);
+            $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+            return $event;
+        };
+
+        // The resized copy is in the cache already; only the original is a link left by an earlier version.
+        $event = $resize();
+        $this->trackFileForCleanup((string) $event->getCacheFilepath());
+        $legacyLink = $event->getCacheOriginalFilepath();
+        $this->trackFileForCleanup($legacyLink);
+        unlink($legacyLink);
+        symlink($sourceFile, $legacyLink);
+
+        $resize();
+
+        self::assertFalse(is_link($legacyLink));
+        self::assertFileExists($legacyLink, 'The original stays published, sanitized.');
+        self::assertStringNotContainsStringIgnoringCase('onload', (string) file_get_contents($legacyLink));
+    }
+
+    public function testProcessImagePublishesNothingForAnSvgItCannotRead(): void
+    {
+        $sourceFile = sys_get_temp_dir().DS.uniqid('thelia_test_svg_').'.svg';
+        file_put_contents($sourceFile, '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><rect');
+        $this->trackFileForCleanup($sourceFile);
+        $published = $this->cacheDirectory().DS.basename($sourceFile);
+        $this->trackFileForCleanup($published);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        try {
+            $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+            self::fail('A malformed SVG must not be published.');
+        } catch (ImageException) {
+        }
+
+        self::assertFalse(is_link($published) || file_exists($published), 'Nothing is published for a malformed SVG.');
+    }
+
+    /**
+     * The web space directory the test images are published to, created on the way.
+     */
+    private function cacheDirectory(): string
+    {
+        $probe = (new ImageEvent())
+            ->setSourceFilepath($this->createTestSvg())
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+        $this->dispatch($probe, TheliaEvents::IMAGE_PROCESS);
+        $this->trackFileForCleanup($probe->getCacheOriginalFilepath());
+        $this->trackFileForCleanup((string) $probe->getSourceFilepath());
+
+        return \dirname($probe->getCacheOriginalFilepath());
+    }
+
+    private function createActiveSvg(): string
+    {
+        $path = sys_get_temp_dir().DS.uniqid('thelia_test_svg_').'.svg';
+        file_put_contents(
+            $path,
+            '<?xml version="1.0" encoding="utf-8"?>'
+            .'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40" onload="alert(document.domain)">'
+            .'<script>alert(1)</script><rect width="120" height="40" fill="#000000"/></svg>',
+        );
+        $this->trackFileForCleanup($path);
+
+        return $path;
     }
 
     public function testProcessImageStillAttachesAnImageObjectForRasterImages(): void
