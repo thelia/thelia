@@ -91,6 +91,9 @@
         "symfony/debug-bundle": "7.4.*",
         "thelia/web-profiler-module": "^3.0"
     },
+    "conflict": {
+        "thelia/thelia-library-module": "2.0.10"
+    },
     "extra": {
         "branch-alias": {
             "dev-main": "3.1.x-dev"
