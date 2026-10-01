@@ -17,7 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 return static function (ContainerConfigurator $container): void {
     $container->extension('api_platform', [
         'title' => 'Thelia API',
-        'version' => '3.1.0',
+        'version' => '3.1.1',
         'show_webby' => false,
         'serializer' => [
             'hydra_prefix' => true,
