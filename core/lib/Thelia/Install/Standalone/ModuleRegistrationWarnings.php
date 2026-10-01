@@ -19,8 +19,8 @@ use Thelia\Tools\TerminalText;
 
 /**
  * What the install tells the operator once the module table is written: the state it reads
- * back, not the one the descriptors ship, since on a populated database a row keeps the
- * activation and the mandatory flag it already had.
+ * back, not the one the descriptors ship, since a row the table already held (the first copy
+ * of a module found in two directories) keeps the activation and the mandatory flag it had.
  *
  * @internal
  */
@@ -67,9 +67,9 @@ final class ModuleRegistrationWarnings
 
     /**
      * In the back-office, <mandatory> hides the deactivation switch of an active module and
-     * forbids deleting the module; it does not keep a module from being registered inactive,
-     * because its descriptor ships it so or because the merchant switched it off before this
-     * run. Either way nothing else would say that a module the shop cannot do without is off.
+     * forbids deleting the module; it does not keep a module from being registered inactive
+     * when its descriptor ships it so, or when the row the table already held is inactive.
+     * Either way nothing else would say that a module the shop cannot do without is off.
      *
      * @param list<ModuleDescriptorRecord>                        $records
      * @param array<string, array{activate: int, mandatory: int}> $registered
@@ -92,8 +92,8 @@ final class ModuleRegistrationWarnings
 
     /**
      * Registering writes each module on its own: an active module whose <required> module
-     * ships inactive, or was switched off before this run, is registered active next to an
-     * inactive dependency. Only a theme activates the required modules of a module it brings
+     * ships inactive, or is held inactive by the row the table already had, is registered
+     * active next to an inactive dependency. Only a theme activates the required modules of a module it brings
      * and activates (ModuleManagement::install()); the install does not, so that a module
      * shipped inactive is never switched on without the merchant, and it does not check that
      * the active module runs without the inactive one.

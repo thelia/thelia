@@ -61,6 +61,14 @@ final class ModuleDescriptorTest extends TestCase
         ModuleDescriptor::enabledByDefault($this->descriptor("<enabled-by-default>maybe\nOK: 12 module(s) registered</enabled-by-default>"), 'module.xml');
     }
 
+    public function testTheDescriptorPathStaysOnTheLineOfTheError(): void
+    {
+        $this->expectException(InvalidModuleDescriptorException::class);
+        $this->expectExceptionMessage('<enabled-by-default> in vendor/Acme?OK: 12 module(s) registered/module.xml is declared 2 times, expected once.');
+
+        ModuleDescriptor::enabledByDefault($this->descriptor('<enabled-by-default>0</enabled-by-default><enabled-by-default>1</enabled-by-default>'), "vendor/Acme\nOK: 12 module(s) registered/module.xml");
+    }
+
     public function testADuplicateElementIsRefusedRatherThanReadFirst(): void
     {
         $this->expectException(InvalidModuleDescriptorException::class);

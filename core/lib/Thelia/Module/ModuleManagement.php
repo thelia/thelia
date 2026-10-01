@@ -42,6 +42,9 @@ class ModuleManagement
 {
     public const COMPOSER_TYPE_MODULE = 'thelia-module';
 
+    /** template:set names a module the way the rest of its output does: "Module <code> ...". */
+    private const string THEME_MANDATORY_INACTIVE_WARNING = 'Module '.ModuleDescriptor::MANDATORY_INACTIVE_WARNING;
+
     protected ?ModuleDescriptorValidator $descriptorValidator = null;
 
     public function __construct(
@@ -238,11 +241,25 @@ class ModuleManagement
 
     public function installModule(string $absolutePathToModule): Module
     {
+        return $this->findOrInstall($absolutePathToModule)->module;
+    }
+
+    /**
+     * The one rule for a module met on disk: the row the shop already holds keeps its state,
+     * a module the shop does not know is installed, and activated unless it ships inactive.
+     */
+    private function findOrInstall(string $absolutePathToModule): ThemeModuleOutcome
+    {
         // The validator loads and validates the descriptor and its definition when it is built.
         $moduleValidator = new ModuleValidator($absolutePathToModule);
+        $registered = $this->findRegistered($moduleValidator);
+        $shipsInactive = $this->shipsInactive($moduleValidator, $absolutePathToModule);
 
-        return $this->findRegistered($moduleValidator)
-            ?? $this->install($moduleValidator, $absolutePathToModule, $this->shipsInactive($moduleValidator, $absolutePathToModule));
+        return new ThemeModuleOutcome(
+            $registered ?? $this->install($moduleValidator, $absolutePathToModule, $shipsInactive),
+            null === $registered,
+            $shipsInactive,
+        );
     }
 
     /**
@@ -369,14 +386,11 @@ class ModuleManagement
         $outcomes = [];
 
         foreach ($this->listModulesFromTemplatePath($path) as $composerModuleDTO) {
-            $moduleValidator = new ModuleValidator($composerModuleDTO->getPath());
-            $registered = $this->findRegistered($moduleValidator);
-            $shipsInactive = $this->shipsInactive($moduleValidator, $composerModuleDTO->getPath());
-            $module = $registered ?? $this->install($moduleValidator, $composerModuleDTO->getPath(), $shipsInactive);
+            $outcome = $this->findOrInstall($composerModuleDTO->getPath());
             $this->eventDispatcher->dispatch(new CacheEvent($this->kernelCacheDir), TheliaEvents::CACHE_CLEAR);
 
-            $modulesInstalled[] = $module;
-            $outcomes[] = new ThemeModuleOutcome($module, null === $registered, $shipsInactive);
+            $modulesInstalled[] = $outcome->module;
+            $outcomes[] = $outcome;
         }
 
         $this->reportThemeModules($outcomes, $output);
@@ -424,7 +438,7 @@ class ModuleManagement
 
             // The install warns about a mandatory module it leaves inactive; so does a theme.
             if (BaseModule::IS_MANDATORY === $module->getMandatory()) {
-                $output?->writeln('<comment>Module '.\sprintf(ModuleDescriptor::MANDATORY_INACTIVE_WARNING, $code).'</comment>');
+                $output?->writeln(\sprintf('<comment>'.self::THEME_MANDATORY_INACTIVE_WARNING.'</comment>', $code));
             }
         }
     }

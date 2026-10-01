@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Module;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -234,6 +235,39 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
+     * The schema reports each of its errors on a line of its own: template:set prints the
+     * refusal on the ERROR line, as the install does, so that nothing a descriptor quotes
+     * reads as a line of the command.
+     */
+    public function testARefusedDescriptorIsReportedOnTheErrorLine(): void
+    {
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '<enabled-by-default>maybe</enabled-by-default>');
+        $this->installTheme([self::FAILING_CODE]);
+
+        $tester = new CommandTester($this->setTemplateCommand($this->createMock(TheliaTemplateHelper::class), $this->createMock(ComposerHelper::class)));
+        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+
+        self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertMatchesRegularExpression('/^ERROR: .*not a valid file.*\(Code \d+\).*$/m', $tester->getDisplay());
+    }
+
+    /**
+     * In verbose mode the failure is followed by its trace, frame by frame and without the
+     * arguments of the frames.
+     */
+    public function testTheTraceOfAFailedModuleIsPrintedInVerboseMode(): void
+    {
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
+        $this->installTheme([self::FAILING_CODE]);
+
+        $tester = new CommandTester($this->setTemplateCommand($this->createMock(TheliaTemplateHelper::class), $this->createMock(ComposerHelper::class)));
+        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertMatchesRegularExpression('/^#0 \S+\(\d+\): \S+\(\)$/m', $tester->getDisplay());
+    }
+
+    /**
      * A failed regeneration of the autoloader is printed, without the control characters
      * of the Composer output, and does not keep the theme from being enabled.
      */
@@ -385,6 +419,26 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
         self::assertSame($rowId, ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE)?->getId(), 'The merchant\'s row is the one kept.');
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE), 'A module the merchant switched off is not switched back on because its namespace changed.');
+    }
+
+    /**
+     * module:refresh registers a module under the name of its directory, which need not be the
+     * code its namespace starts with: the row is found by that name, and kept.
+     */
+    public function testAModuleRegisteredUnderItsDirectoryNameKeepsItsRow(): void
+    {
+        $directoryName = 'ThemeShipSampleDirectory';
+        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::SWITCHED_OFF_CODE, '');
+        $this->registerSampleModule($directoryName, 0, 'FormerVendor\\'.$directoryName);
+        $rowId = ModuleQuery::create()->findOneByCode($directoryName)?->getId();
+
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $module = $moduleManagement->installModule(THELIA_MODULE_DIR.$directoryName);
+
+        self::assertSame($rowId, $module->getId(), 'The row registered under the directory name is the one handed back.');
+        self::assertNull(ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE), 'No second row is installed under the code of the namespace.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf($directoryName));
     }
 
     /**

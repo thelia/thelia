@@ -50,7 +50,8 @@ class ModuleDescriptorValidator
         $dom = new \DOMDocument();
         $errors = [];
 
-        if ($dom->load($xml_file)) {
+        // No network access for an entity or a DTD a descriptor would point at.
+        if ($dom->load($xml_file, \LIBXML_NONET)) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
@@ -117,6 +118,6 @@ class ModuleDescriptorValidator
     {
         $this->validate($xml_file);
 
-        return @simplexml_load_file($xml_file);
+        return @simplexml_load_file($xml_file, \SimpleXMLElement::class, \LIBXML_NONET);
     }
 }

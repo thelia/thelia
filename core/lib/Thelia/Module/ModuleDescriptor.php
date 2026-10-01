@@ -46,13 +46,13 @@ final readonly class ModuleDescriptor
         }
 
         if ($occurrences > 1) {
-            throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is declared %d times, expected once.', self::ENABLED_BY_DEFAULT, $descriptorPath, $occurrences));
+            throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s is declared %d times, expected once.', self::ENABLED_BY_DEFAULT, TerminalText::singleLine($descriptorPath), $occurrences));
         }
 
         return match (trim((string) $element)) {
             '1' => true,
             '0' => false,
-            default => throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, $descriptorPath, TerminalText::singleLine(trim((string) $element)))),
+            default => throw new InvalidModuleDescriptorException(\sprintf('<%s> in %s must be 0 or 1, "%s" given.', self::ENABLED_BY_DEFAULT, TerminalText::singleLine($descriptorPath), TerminalText::singleLine(trim((string) $element)))),
         };
     }
 }

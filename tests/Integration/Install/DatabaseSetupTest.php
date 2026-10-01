@@ -354,8 +354,9 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * A replay does not refresh the mandatory flag of a row the database knows: a descriptor
-     * that turned mandatory since does not make the install warn about a row that is not.
+     * Registering on a table that knows the module does not refresh the mandatory flag of its
+     * row: a descriptor that turned mandatory since does not make the install warn about a
+     * row that is not. The installers recreate the table first; this is the method's contract.
      */
     public function testTheMandatoryWarningReadsTheFlagTheRowCarries(): void
     {
@@ -416,9 +417,10 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * On a populated database the row keeps the state the merchant chose, so the warning
-     * has to describe that state, not the descriptor: a mandatory module the merchant
-     * activated since is not reported, one the merchant switched off is.
+     * A row the table already holds keeps its state, so the warning has to describe that
+     * state, not the descriptor: a mandatory module whose row was activated since is not
+     * reported, one whose row was switched off is. The installers recreate the table before
+     * they register; a caller that does not gets the state of the rows it finds.
      */
     public function testTheMandatoryWarningDescribesTheRegisteredStateNotTheDescriptor(): void
     {
@@ -439,8 +441,9 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
-     * Registering again on a populated database (a module table that already knows the
-     * module) must never rewrite the activation the merchant chose, in either direction.
+     * Registering on a module table that already knows the module never rewrites the
+     * activation of its row, in either direction. The installers recreate the table first:
+     * this is the contract of the method, which the second copy of a module relies on.
      */
     public function testRegisteringAgainKeepsTheActivationTheMerchantChose(): void
     {
@@ -474,6 +477,27 @@ final class DatabaseSetupTest extends IntegrationTestCase
         $this->expectExceptionMessage(self::REFUSED_CODE);
 
         (new ModuleDescriptorReader())->read([$this->writeSampleModules(), $refusedDir]);
+    }
+
+    /**
+     * The schema reports each of its errors on a line of its own: the install prints the
+     * refusal on one line, so that nothing a descriptor quotes reads as a line of the install.
+     */
+    public function testASchemaRefusalIsReportedOnOneLine(): void
+    {
+        $refusedDir = $this->writeSingleModule(<<<XML
+            <type>classic</type>
+            <stability>prod</stability>
+            <enabled-by-default>maybe</enabled-by-default>
+            XML, self::REFUSED_CODE);
+
+        try {
+            (new ModuleDescriptorReader())->read([$refusedDir]);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidModuleDescriptorException $exception) {
+            self::assertStringContainsString('is refused by the module schema', $exception->getMessage());
+            self::assertStringNotContainsString("\n", $exception->getMessage());
+        }
     }
 
     public function testValidDescriptorsPassTheCheckWithoutADatabase(): void
