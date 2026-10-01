@@ -66,10 +66,8 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
             : '<info>Starting maintenance purge...</info>');
 
         try {
-            $cartNoOrderDays = (int) ConfigQuery::read(
-                CartPurgeHorizon::CONFIG_KEY_CART_NO_ORDER_DAYS,
-                CartPurgeHorizon::DEFAULT_CART_NO_ORDER_DAYS
-            );
+            $cartPurgeHorizon = CartPurgeHorizon::fromConfig();
+            $cartNoOrderDays = $cartPurgeHorizon->cartNoOrderDays();
 
             $deletedCartNoOrder = $dryRun
                 ? $this->cartPurger->countCartsWithoutOrder($cartNoOrderDays)
@@ -82,10 +80,7 @@ class MaintenancePurgeCommand extends ContainerAwareCommand
                 $dryRun ? 'to delete' : 'deleted'
             ));
 
-            $cartAnonymousDays = (int) ConfigQuery::read(
-                CartPurgeHorizon::CONFIG_KEY_CART_ANONYMOUS_DAYS,
-                CartPurgeHorizon::DEFAULT_CART_ANONYMOUS_DAYS
-            );
+            $cartAnonymousDays = $cartPurgeHorizon->cartAnonymousDays();
 
             $deletedAnonymousCarts = $dryRun
                 ? $this->cartPurger->countAnonymousCarts($cartAnonymousDays)

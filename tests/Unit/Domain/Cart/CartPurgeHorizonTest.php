@@ -17,6 +17,7 @@ namespace Thelia\Tests\Unit\Domain\Cart;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Cart\Service\CartPurgeHorizon;
+use Thelia\Model\ConfigQuery;
 
 final class CartPurgeHorizonTest extends TestCase
 {
@@ -28,6 +29,9 @@ final class CartPurgeHorizonTest extends TestCase
         self::assertSame($expected, $horizon->retentionDays());
     }
 
+    /**
+     * @return iterable<string, array{int, int, int}>
+     */
     public static function retentionDaysCases(): iterable
     {
         yield 'no order days is smaller' => [30, 60, 30];
@@ -94,6 +98,61 @@ final class CartPurgeHorizonTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         new CartPurgeHorizon(30, -1);
+    }
+
+    public function testFromConfigReadsANegativeRetentionAsZero(): void
+    {
+        ConfigQuery::initCache([
+            CartPurgeHorizon::CONFIG_KEY_CART_NO_ORDER_DAYS => '-5',
+            CartPurgeHorizon::CONFIG_KEY_CART_ANONYMOUS_DAYS => '-1',
+        ]);
+
+        try {
+            $horizon = CartPurgeHorizon::fromConfig();
+        } finally {
+            ConfigQuery::resetCache();
+        }
+
+        self::assertSame(0, $horizon->cartNoOrderDays());
+        self::assertSame(0, $horizon->cartAnonymousDays());
+        self::assertSame(0, $horizon->retentionDays());
+    }
+
+    public function testFromConfigKeepsBothRetentions(): void
+    {
+        ConfigQuery::initCache([
+            CartPurgeHorizon::CONFIG_KEY_CART_NO_ORDER_DAYS => '90',
+            CartPurgeHorizon::CONFIG_KEY_CART_ANONYMOUS_DAYS => '15',
+        ]);
+
+        try {
+            $horizon = CartPurgeHorizon::fromConfig();
+        } finally {
+            ConfigQuery::resetCache();
+        }
+
+        self::assertSame(90, $horizon->cartNoOrderDays());
+        self::assertSame(15, $horizon->cartAnonymousDays());
+    }
+
+    public function testAStartBeforeTheHorizonIsMovedToTheHorizon(): void
+    {
+        $horizon = new CartPurgeHorizon(60, 30);
+        $now = new \DateTimeImmutable('2026-09-24 15:00:00');
+
+        self::assertEquals(
+            new \DateTimeImmutable('2026-08-25 15:00:00'),
+            $horizon->boundedStart(new \DateTimeImmutable('2026-01-01 00:00:00'), $now),
+        );
+    }
+
+    public function testAStartInsideTheRetentionIsKept(): void
+    {
+        $horizon = new CartPurgeHorizon(60, 30);
+        $now = new \DateTimeImmutable('2026-09-24 15:00:00');
+        $from = new \DateTimeImmutable('2026-09-20 00:00:00');
+
+        self::assertEquals($from, $horizon->boundedStart($from, $now));
     }
 
     public function testConstantsMatchTheLiteralConfigKeys(): void
