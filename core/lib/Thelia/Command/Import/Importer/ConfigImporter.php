@@ -16,6 +16,7 @@ namespace Thelia\Command\Import\Importer;
 
 use Thelia\Command\Import\AbstractDemoImporter;
 use Thelia\Command\Import\DemoImportContext;
+use Thelia\Core\Content\Slot\NativeContentSlotResolver;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
@@ -42,7 +43,20 @@ final class ConfigImporter extends AbstractDemoImporter
         ConfigQuery::write('store_phone', '+(33)444053102');
         ConfigQuery::write('information_folder_id', $context->foldersByTitle['Information']->getId());
 
+        // The header of the demo shop: the blog folder, then the about page.
+        ConfigQuery::write(
+            NativeContentSlotResolver::HEADER_MENU_ITEMS_CONFIG,
+            \sprintf(
+                'folder:%d,content:%d',
+                $context->foldersByTitle['Blog']->getId(),
+                $context->contentsByTitle['About us']->getId(),
+            ),
+        );
+
         $termsContentId = $context->contentsByTitle['Terms and Conditions']->getId();
+
+        // Deprecated: the consent below is where the terms are read from. Still written
+        // for the themes that read the setting itself.
         ConfigQuery::write('terms_conditions_content_id', $termsContentId);
 
         // The box the buyer ticks at the payment step points at the terms the demo shop

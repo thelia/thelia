@@ -98,7 +98,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW()),
 (88, 'image_formats', 'webp', 0, 0, NOW(), NOW()),
 (89, 'image_quality_webp', '75', 0, 0, NOW(), NOW()),
-(90, 'image_quality_avif', '50', 0, 0, NOW(), NOW())
+(90, 'image_quality_avif', '50', 0, 0, NOW(), NOW()),
+(91, 'header_menu_items', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -14936,9 +14937,11 @@ shop manages them where it manages the rest. What makes them special is that the
 cannot be deleted, and that they arrive mandatory: an order nobody agreed to any terms
 for is not one a shop wants to have taken.
 
-`content_id` is left null here. It mirrors the `terms_conditions_content_id` setting,
-which a fresh shop has no value for yet — there is no content to point at until the
-merchant writes one. Filling it with 0 would name a content that does not exist.
+`content_id` is left null here: a fresh shop has no content to point at until the
+merchant writes one, and filling it with 0 would name a content that does not exist.
+It is the one place that says which content holds the terms; the
+`terms_conditions_content_id` setting is deprecated and only kept for the themes that
+still read it.
 */
 INSERT INTO `consent` (`id`, `code`, `content_id`, `mandatory`, `active`, `position`, `created_at`, `updated_at`) VALUES
 (1, 'terms_and_conditions', NULL, 1, 1, 1, NOW(), NOW())
