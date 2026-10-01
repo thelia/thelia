@@ -1,6 +1,6 @@
 # 3.1.1
 
-Security release of the 3.1 line, without any breaking change. It ships `setup/update/sql/3.1.1.sql`, which changes no schema and only records the new version; `thelia/setup` and `thelia/config` ship as 3.1.2 with this core. Update the back-office theme `thelia/backoffice-default-twig-template` to 1.1.1 at the same time.
+Security release of the 3.1 line, without any breaking change. It ships `setup/update/sql/3.1.1.sql`, which changes no schema and only records the new version; `thelia/setup` ships as 3.1.2 with this core; `thelia/config` does not change and stays at 3.1.1. Update the back-office theme `thelia/backoffice-default-twig-template` to 1.1.1 at the same time.
 
 ## Security
 
