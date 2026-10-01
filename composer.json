@@ -51,7 +51,8 @@
         "symfony/browser-kit": "7.4.*",
         "symfony/phpunit-bridge": "7.4.*",
         "symfony/css-selector": "7.4.*",
-        "symfony/debug-bundle": "7.4.*"
+        "symfony/debug-bundle": "7.4.*",
+        "thelia/cms-module": "dev-main"
     },
     "scripts": {
         "phpc": [
