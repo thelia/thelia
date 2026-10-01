@@ -39,6 +39,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderQuery;
+use Thelia\Tests\Support\Flexy\ThemeContentSlots;
 
 /**
  * The consents of the payment step, seen from a browser.
@@ -183,6 +184,27 @@ final class CheckoutConsentsTest extends GuestCheckoutTestCase
             $links->attr('href'),
             'The link must lead to the content the consent points at.',
         );
+    }
+
+    /**
+     * A consent pointing at a content the merchant hid must not send the buyer to a page
+     * they cannot open: the box stays, the link goes.
+     */
+    public function testTheBoxGivesNoLinkWhenTheContentHoldingTheTermsIsHidden(): void
+    {
+        if (!ThemeContentSlots::areReadBy(self::PAYMENT_STEP_COMPONENT)) {
+            self::markTestSkipped('The installed theme links the consent to its content without checking it is visible.');
+        }
+
+        $this->openACheckoutReadyCart();
+
+        $content = $this->publishTheTermsAsAContent();
+        $content->setVisible(0)->save($this->getPropelConnection());
+
+        $block = $this->consentBlockOf($this->requestThePaymentStep(), Consent::CODE_TERMS_AND_CONDITIONS);
+
+        self::assertCount(1, $block->filter('input[type="checkbox"]'), 'The box must still be asked.');
+        self::assertCount(0, $block->filter('a'), 'A hidden content must give no link.');
     }
 
     /**

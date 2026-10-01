@@ -14,12 +14,18 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use Symfony\Component\DomCrawler\Crawler;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Customer\CustomerFacade;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Consent;
+use Thelia\Model\ConsentQuery;
+use Thelia\Model\Content;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\ConsentTableMap;
+use Thelia\Tests\Support\Flexy\ThemeContentSlots;
 
 /**
  * What the checkout does with a visitor who has a cart and no session.
@@ -339,6 +345,9 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         $this->openASessionWithACart();
 
         $content = $this->fixtures()->content($this->fixtures()->folder(), ['title' => 'Privacy policy']);
+        // The consent is where the document is designated; the setting is still written for
+        // the themes published before it, which read that instead.
+        $this->designateTheTermsContent($content);
         ConfigQuery::write('terms_conditions_content_id', (string) $content->getId());
 
         $crawler = $this->requestIdentificationPage();
@@ -348,6 +357,52 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
             $crawler->filter('form[name="flexybundle_form_guest_checkout"]')->text(''),
             'The document the box commits the buyer to has to be reachable from the box.',
         );
+    }
+
+    /**
+     * One document for the terms, wherever the buyer meets them: the box of this page
+     * links to the content the terms consent points at, the one the payment step links
+     * to, and no longer to the content of the former setting.
+     */
+    public function testTheConsentBoxLinksToTheContentTheTermsConsentPointsAt(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->skipUnlessTheThemeReadsTheContentSlots();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $folder = $this->fixtures()->folder();
+        $terms = $this->fixtures()->content($folder, ['title' => 'Terms of the consent']);
+        $formerSetting = $this->fixtures()->content($folder, ['title' => 'Terms of the former setting']);
+        $this->designateTheTermsContent($terms);
+        ConfigQuery::write('terms_conditions_content_id', (string) $formerSetting->getId());
+
+        $links = $this->requestIdentificationPage()->filter('form[name="flexybundle_form_guest_checkout"] a[target="_blank"]');
+
+        self::assertCount(1, $links, 'The box must link to one document.');
+        self::assertSame('Terms of the consent', trim($links->text()), 'The box must link to the content of the terms consent.');
+        self::assertSame($terms->getUrl('en_US'), $links->attr('href'));
+    }
+
+    /**
+     * A content the merchant hid is a page the buyer cannot open: no link rather than a
+     * link to a 404.
+     */
+    public function testTheConsentBoxHasNoLinkWhenTheTermsContentIsHidden(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->skipUnlessTheThemeReadsTheContentSlots();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $this->designateTheTermsContent(
+            $this->fixtures()->content($this->fixtures()->folder(), ['title' => 'Hidden terms', 'visible' => 0]),
+        );
+
+        $form = $this->requestIdentificationPage()->filter('form[name="flexybundle_form_guest_checkout"]');
+
+        self::assertStringNotContainsString('Hidden terms', $form->text(''));
+        self::assertCount(0, $form->filter('a[target="_blank"]'), 'A hidden content must give no link.');
     }
 
     /**
@@ -381,5 +436,47 @@ final class GuestCheckoutIdentificationTest extends GuestCheckoutTestCase
         unset($values['accept_privacy_policy']);
 
         $this->client->request('POST', $form->getUri(), [$prefix => $values]);
+    }
+
+    /**
+     * The checkout pages carry a footer of their own, with the same information links as
+     * the shop's: the visible contents of the information folder.
+     */
+    public function testTheCheckoutFooterListsTheVisibleContentsOfTheInformationFolder(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->openASessionWithACart();
+
+        $folder = $this->fixtures()->folder();
+        $this->fixtures()->content($folder, ['title' => 'Checkout legal notice']);
+        $this->fixtures()->content($folder, ['title' => 'Checkout hidden notice', 'visible' => 0]);
+        ConfigQuery::write('information_folder_id', (string) $folder->getId());
+
+        $links = $this->requestIdentificationPage()->filter('footer .FooterCheckout-links a');
+
+        self::assertSame(['Checkout legal notice'], $links->each(static fn (Crawler $link): string => trim($link->text())));
+    }
+
+    private function skipUnlessTheThemeReadsTheContentSlots(): void
+    {
+        if (!ThemeContentSlots::areReadByTheTheme()) {
+            self::markTestSkipped('The installed theme reads the terms from the former setting.');
+        }
+    }
+
+    private function designateTheTermsContent(Content $content): void
+    {
+        $consent = ConsentQuery::create()
+            ->filterByCode(Consent::CODE_TERMS_AND_CONDITIONS)
+            ->findOne($this->getPropelConnection())
+            ?? self::fail('The shop must ship with the terms and conditions consent.');
+
+        $consent->setContentId($content->getId())->save($this->getPropelConnection());
+
+        // The page is rendered in this very process: a consent read before this change
+        // would otherwise be handed back to it as it was.
+        ConsentTableMap::clearInstancePool();
+        ConsentTableMap::clearRelatedInstancePool();
     }
 }
