@@ -25,6 +25,7 @@ use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
+use Thelia\Core\Event\Sale\SaleProductsQueryEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -112,12 +113,19 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations.
      *
+     * The selection can be narrowed by a module listening to TheliaEvents::SALE_PRODUCTS_QUERY. The promo status
+     * is still reset on every product of the sale, so a product a listener excludes does not keep a promo status
+     * written when it was selected.
+     *
      * @throws \RuntimeException
      * @throws \Exception
      * @throws PropelException
      */
-    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
-    {
+    public function updateProductsSaleStatus(
+        ProductSaleStatusUpdateEvent $event,
+        ?string $eventName = null,
+        ?EventDispatcherInterface $dispatcher = null,
+    ): void {
         $sale = $event->getSale();
 
         if (null === $sale) {
@@ -138,8 +146,20 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
         $taxCalculator = $this->taxCalculatorFactory->createTaxCalculator();
 
+        $selectionQuery = SaleProductQuery::create()->filterBySale($sale)->orderByProductId();
+
+        // Everything the sale selects, whatever a module keeps out of it below: the promo status of these
+        // products is reset, the excluded ones included.
+        $selectedProductIds = SaleProductQuery::create()
+            ->filterBySale($sale)
+            ->select('ProductId')
+            ->distinct()
+            ->find();
+
+        $dispatcher?->dispatch(new SaleProductsQueryEvent($sale, $selectionQuery), TheliaEvents::SALE_PRODUCTS_QUERY);
+
         // Get all selected product sale elements for this sale
-        if (null === $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()->find()) {
+        if (null === $saleProducts = $selectionQuery->find()) {
             return;
         }
         $saleOffsetByCurrency = $sale->getPriceOffsets();
@@ -154,12 +174,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // A product is present once per selected attribute value, so the sale status of its PSE has to be
             // reset once and for all before processing the selection. Doing it in the loop below would discard
             // the promo status set by the previously processed attribute values of the same product.
-            $saleProductIds = [];
-
-            /** @var SaleProduct $saleProduct */
-            foreach ($saleProducts as $saleProduct) {
-                $saleProductIds[$saleProduct->getProductId()] = $saleProduct->getProductId();
-            }
+            $saleProductIds = array_map('intval', $selectedProductIds->toArray());
 
             if ([] !== $saleProductIds) {
                 // Reset all sale status on the PSE of the sale's products

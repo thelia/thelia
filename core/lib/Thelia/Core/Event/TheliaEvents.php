@@ -635,6 +635,7 @@ final class TheliaEvents
     public const SALE_TOGGLE_ACTIVITY = 'action.toggleSaleActivity';
     public const SALE_CLEAR_SALE_STATUS = 'action.clearSaleStatus';
     public const UPDATE_PRODUCT_SALE_STATUS = 'action.updateProductSaleStatus';
+    public const SALE_PRODUCTS_QUERY = 'action.saleProductsQuery';
     public const CHECK_SALE_ACTIVATION_EVENT = 'action.checkSaleActivationEvent';
 
     // -- Catalog price rules --------------------------------------------
