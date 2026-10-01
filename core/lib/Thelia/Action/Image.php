@@ -27,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\SvgSanitizer;
 use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -46,7 +47,8 @@ use Thelia\Tools\URL;
  * resolution image is always available.
  *
  * SVG images are never rasterized: only their width and height attributes are rewritten, and no Imagine
- * image object is attached to the event.
+ * image object is attached to the event. They are never linked to nor copied as uploaded either: the web
+ * space only receives a copy stripped of its active content (see SvgSanitizer), whatever the delivery mode.
  *
  * Various image processing options are available :
  *
@@ -118,18 +120,28 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         }
 
         $originalImagePathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
+        $isVectorImage = $this->isVectorImage($imageExt);
+
+        // A link to an SVG source was published by earlier versions: it would serve the
+        // source as it was uploaded, so it is replaced by a sanitized copy.
+        if ($isVectorImage && is_link($originalImagePathInCache) && file_exists($sourceFile)) {
+            @unlink($originalImagePathInCache);
+            $this->publishSvg($this->readSanitizedSvg($sourceFile), $originalImagePathInCache, $subdir);
+        }
 
         if (!file_exists($cacheFilePath)) {
             if (!file_exists($sourceFile)) {
                 return;
             }
 
+            $sanitizedSvg = $isVectorImage ? $this->readSanitizedSvg($sourceFile) : null;
+
             // Create a cached version of the original image in the web space, if not exists
-
             if (!file_exists($originalImagePathInCache)) {
-                $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
-
-                if ('symlink' === $mode) {
+                if (null !== $sanitizedSvg) {
+                    // The web space never links to nor copies an SVG as it was uploaded.
+                    $this->publishSvg($sanitizedSvg, $originalImagePathInCache, $subdir);
+                } elseif ('symlink' === ConfigQuery::read('original_image_delivery_mode', 'symlink')) {
                     if (false === symlink($sourceFile, $originalImagePathInCache)) {
                         throw new ImageException(\sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($sourceFile), $subdir));
                     }
@@ -141,9 +153,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
-                if ($this->isVectorImage($imageExt)) {
+                if (null !== $sanitizedSvg) {
                     $dom = new \DOMDocument('1.0', 'utf-8');
-                    $dom->load($originalImagePathInCache);
+                    $dom->loadXML($sanitizedSvg, \LIBXML_NONET);
                     $svg = $dom->documentElement;
 
                     if (!$svg->hasAttribute('viewBox')) {
@@ -188,7 +200,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         // The raster pipeline cannot open a vector image: attaching an ImageInterface to the event
         // would fail on every single render, including when the cached file is already up to date.
-        if ($this->isVectorImage($imageExt)) {
+        if ($isVectorImage) {
             $event->setImageObject(null);
 
             return;
@@ -208,6 +220,31 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     private function isVectorImage(string $extension): bool
     {
         return 'svg' === strtolower($extension);
+    }
+
+    /**
+     * @throws ImageException when the SVG cannot be read or is not an SVG document
+     */
+    private function readSanitizedSvg(string $sourceFile): string
+    {
+        $content = @file_get_contents($sourceFile);
+        $sanitized = false === $content ? null : (new SvgSanitizer())->sanitize($content);
+
+        if (null === $sanitized) {
+            throw new ImageException(\sprintf('%s is not a valid SVG image and is not published.', basename($sourceFile)));
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * @throws ImageException
+     */
+    private function publishSvg(string $sanitizedSvg, string $path, string $subdir): void
+    {
+        if (false === @file_put_contents($path, $sanitizedSvg)) {
+            throw new ImageException(\sprintf('Failed to write %s in %s image cache directory', basename($path), $subdir));
+        }
     }
 
     private function applyTransformation(
