@@ -29,8 +29,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * an explicit, non-interactive, idempotent command for CI environments.
  *
  * Each SQL statement is executed individually with error handling:
- * "table/column/index already exists" errors are silently ignored
- * to ensure idempotent re-runs.
+ * "table/column/index already exists" and "column/index to drop does not
+ * exist" errors are silently ignored to ensure idempotent re-runs.
  */
 #[AsCommand(
     name: 'module:schema:apply',
@@ -44,6 +44,7 @@ final class ModuleSchemaApplyCommand extends Command
         1060, // Duplicate column name
         1061, // Duplicate key name
         1068, // Multiple primary key defined
+        1091, // Column or key to drop does not exist
         1826, // Duplicate FK constraint name (MySQL 8.0+)
     ];
 
