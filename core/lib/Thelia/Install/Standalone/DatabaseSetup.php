@@ -20,7 +20,13 @@ use Thelia\Tools\Version\Version;
 
 final class DatabaseSetup
 {
-    private const IGNORABLE_MYSQL_CODES = [1050, 1060, 1061, 1068, 1826];
+    /**
+     * Errors a module update script raises when its change is already in the
+     * schema: TheliaMain.sql creates the current shape, then every update/*.sql
+     * is replayed over it. A table, column or key it adds already exists (1050,
+     * 1060, 1061, 1068, 1826), a column or key it drops is already gone (1091).
+     */
+    private const IGNORABLE_MYSQL_CODES = [1050, 1060, 1061, 1068, 1091, 1826];
 
     private const MODULE_TYPE_MAP = [
         'classic' => 1,
