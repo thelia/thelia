@@ -148,6 +148,36 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         $this->facade->resolve($this->customer, self::lines(['ANY' => 1]), $this->currency);
     }
 
+    public function testALineTheCartTurnsDownIsReportedRefusedRatherThanAdded(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $saleElements = $this->saleElements(5);
+        $this->factory->cartItem($cart, $saleElements->getProduct(), $saleElements, ['quantity' => 4.0]);
+
+        $line = $this->facade->addToCart($this->customer, $cart, self::lines([(string) $saleElements->getRef() => 3]))->lines[0];
+
+        self::assertSame(['quantity_refused', false, 1.0], [$line->status->value, $line->added, $line->availableQuantity]);
+        self::assertSame([[(int) $saleElements->getId(), 4.0]], $this->cartLines($cart));
+    }
+
+    public function testTwoLinesOfOneSaleElementShareItsStock(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $saleElements = $this->saleElements(5);
+        $reference = (string) $saleElements->getRef();
+
+        $table = $this->facade->addToCart($this->customer, $cart, new ReferenceQuantityLines([
+            new ReferenceQuantity($reference, 3),
+            new ReferenceQuantity(mb_strtolower($reference), 3),
+        ]));
+
+        self::assertSame(
+            [['resolved', true, null], ['quantity_refused', false, 2.0]],
+            array_map(static fn (QuickOrderLine $line): array => [$line->status->value, $line->added, $line->availableQuantity], $table->lines),
+        );
+        self::assertSame([[(int) $saleElements->getId(), 3.0]], $this->cartLines($cart));
+    }
+
     private function spendOnAForeignList(): void
     {
         try {
@@ -184,9 +214,9 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         return $lines;
     }
 
-    private function saleElements(): ProductSaleElements
+    private function saleElements(int $stock = 50): ProductSaleElements
     {
-        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->currency, ['baseQuantity' => 50]);
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->currency, ['baseQuantity' => $stock]);
 
         return $product->getProductSaleElementss()->getFirst()
             ?? throw new \LogicException('The product has no sale element.');

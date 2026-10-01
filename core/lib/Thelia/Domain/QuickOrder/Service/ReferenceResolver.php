@@ -32,6 +32,7 @@ use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\AttributeI18n;
 use Thelia\Model\AttributeI18nQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Country;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
@@ -123,11 +124,14 @@ final readonly class ReferenceResolver
         $attributes = $this->attributesOf(array_keys($ambiguous), $locales);
         $prices = $this->untaxedUnitPricesOf($chosen, $customer, $currency);
         $this->warmTaxRulesOf($chosen);
+        // Read once: it goes through the session cart and, for a signed-in customer
+        // without a delivery address yet, their default address.
+        $deliveryCountry = [] === $chosen ? null : $this->taxEngine->getDeliveryCountry();
 
         $tableLines = [];
 
         foreach ($decisions as $decision) {
-            $tableLines[] = $this->lineOf($decision['line'], $decision['chosen'], $decision['candidates'], $titles, $attributes, $prices);
+            $tableLines[] = $this->lineOf($decision['line'], $decision['chosen'], $decision['candidates'], $titles, $attributes, $prices, $deliveryCountry);
         }
 
         return new QuickOrderTable($tableLines);
@@ -146,6 +150,7 @@ final readonly class ReferenceResolver
         array $titles,
         array $attributes,
         array $prices,
+        ?Country $deliveryCountry,
     ): QuickOrderLine {
         if (null === $chosen) {
             if (\count($candidates) < 2 || null !== $line->productSaleElementsId) {
@@ -169,7 +174,8 @@ final readonly class ReferenceResolver
             return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title);
         }
 
-        if (ConfigQuery::checkAvailableStock()) {
+        // A virtual product is never short of stock, as on its product page.
+        if (ConfigQuery::checkAvailableStock() && 0 === (int) $chosen->getProduct()->getVirtual()) {
             $stock = (float) $chosen->getQuantity();
 
             if ($stock <= 0) {
@@ -182,7 +188,7 @@ final readonly class ReferenceResolver
         }
 
         $taxedUnitPrice = (float) $this->taxCalculatorFactory->createTaxCalculator()
-            ->load($chosen->getProduct(), $this->taxEngine->getDeliveryCountry())
+            ->load($chosen->getProduct(), $deliveryCountry ?? $this->taxEngine->getDeliveryCountry())
             ->getTaxedPrice($price['untaxed']);
 
         return new QuickOrderLine(
@@ -202,6 +208,9 @@ final readonly class ReferenceResolver
      * The sale element a line goes to, or null when the buyer still has to choose
      * or nothing carries the reference. A sale element the line names must be one
      * of the candidates: a request cannot point a reference at any sale element.
+     * One the reference no longer offers falls back on the only candidate left, when
+     * there is one: a product reference saved with the default sale element of the
+     * day still finds the product once the shop moves its default.
      *
      * @param list<ProductSaleElements> $candidates
      */
@@ -213,8 +222,6 @@ final readonly class ReferenceResolver
                     return $candidate;
                 }
             }
-
-            return null;
         }
 
         return 1 === \count($candidates) ? $candidates[0] : null;
