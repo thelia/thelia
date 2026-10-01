@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Thelia\Domain\Cart\Service\CartPurgeHorizon;
+use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Export\Type\ConversionFunnelExport;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\OrderStatus;
@@ -23,7 +26,9 @@ use Thelia\Test\IntegrationTestCase;
 
 /**
  * The conversion funnel export writes one row per calendar day of the period, zero-filled,
- * so a period without any cart still yields a file instead of "no data found".
+ * so a period without any cart still yields a file instead of "no data found". The period
+ * starts on the cart purge horizon at the earliest: the tests on fixed past dates keep the
+ * carts for a century, the tests on the horizon set a retention of their own.
  */
 final class ConversionFunnelExportTest extends IntegrationTestCase
 {
@@ -39,10 +44,19 @@ final class ConversionFunnelExportTest extends IntegrationTestCase
 
     private FixtureFactory $factory;
 
+    private const int CENTURY_IN_DAYS = 36600;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
+        $this->givenTheCartRetention(self::CENTURY_IN_DAYS, self::CENTURY_IN_DAYS);
+    }
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+        parent::tearDown();
     }
 
     public function testAMonthRangeYieldsOneAscendingRowPerDayOfThatMonth(): void
@@ -99,12 +113,13 @@ final class ConversionFunnelExportTest extends IntegrationTestCase
         }
     }
 
-    public function testWithoutARangeTheLastTwelveMonthsUpToTodayAreExported(): void
+    public function testWithoutARangeThePeriodRunsFromThePurgeHorizonUpToToday(): void
     {
+        $this->givenTheCartRetention(60, 30);
+
         $rows = $this->exportedRows(null);
 
-        $from = new \DateTimeImmutable('first day of -12 months');
-        self::assertSame($from->format('Y-m-d'), $rows[0]['day']);
+        self::assertSame((new \DateTimeImmutable('-30 days'))->format('Y-m-d'), $rows[0]['day']);
         self::assertSame((new \DateTimeImmutable('today'))->format('Y-m-d'), $rows[\count($rows) - 1]['day']);
     }
 
@@ -116,12 +131,43 @@ final class ConversionFunnelExportTest extends IntegrationTestCase
         self::assertSame((new \DateTimeImmutable('today'))->format('Y-m-d'), $rows[9]['day']);
     }
 
-    public function testAnEndAloneRunsTwelveMonthsBeforeIt(): void
+    public function testAnEndAloneStartsOnThePurgeHorizon(): void
     {
-        $rows = $this->exportedRows(['start' => null, 'end' => new \DateTime('2024-06-30 23:59:59')]);
+        $this->givenTheCartRetention(60, 30);
 
-        self::assertSame('2023-06-01', $rows[0]['day']);
-        self::assertSame('2024-06-30', $rows[\count($rows) - 1]['day']);
+        $rows = $this->exportedRows(['start' => null, 'end' => new \DateTime('today 23:59:59')]);
+
+        self::assertSame((new \DateTimeImmutable('-30 days'))->format('Y-m-d'), $rows[0]['day']);
+    }
+
+    public function testAStartBeforeThePurgeHorizonIsMovedToTheHorizon(): void
+    {
+        $this->givenTheCartRetention(60, 30);
+
+        $rows = $this->exportedRows(['start' => new \DateTime('-90 days 00:00:00'), 'end' => null]);
+
+        self::assertSame((new \DateTimeImmutable('-30 days'))->format('Y-m-d'), $rows[0]['day']);
+    }
+
+    public function testAnOrderBeforeThePurgeHorizonIsNotExported(): void
+    {
+        $this->givenTheCartRetention(60, 30);
+        $range = ['start' => new \DateTime('-90 days 00:00:00'), 'end' => null];
+        $baseline = array_sum(array_column($this->exportedRows($range), 'orders_created'));
+
+        $order = $this->factory->order();
+        $order->setCreatedAt(new \DateTime('-45 days'))->save($this->getPropelConnection());
+
+        self::assertSame($baseline, array_sum(array_column($this->exportedRows($range), 'orders_created')));
+    }
+
+    public function testAPeriodEndingBeforeThePurgeHorizonHasNoData(): void
+    {
+        $this->givenTheCartRetention(60, 30);
+
+        $this->expectException(DataTransferNoDataFoundException::class);
+
+        $this->exportedRows(['start' => new \DateTime('-90 days 00:00:00'), 'end' => new \DateTime('-60 days 23:59:59')]);
     }
 
     public function testTheHeadersFollowTheDeclaredOrder(): void
@@ -141,6 +187,12 @@ final class ConversionFunnelExportTest extends IntegrationTestCase
         self::assertNotNull($export);
         self::assertSame(ConversionFunnelExport::class, $export->getHandleClass());
         self::assertSame('thelia.export.reports', $export->getExportCategory()?->getRef());
+    }
+
+    private function givenTheCartRetention(int $noOrderDays, int $anonymousDays): void
+    {
+        ConfigQuery::write(CartPurgeHorizon::CONFIG_KEY_CART_NO_ORDER_DAYS, (string) $noOrderDays);
+        ConfigQuery::write(CartPurgeHorizon::CONFIG_KEY_CART_ANONYMOUS_DAYS, (string) $anonymousDays);
     }
 
     /**
