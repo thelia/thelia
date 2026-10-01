@@ -38,6 +38,18 @@ use Thelia\Tools\TokenProvider;
 #[AsCommand(name: 'thelia:install', description: 'Install thelia using cli tools. For now Thelia only use mysql database')]
 class Install extends ContainerAwareCommand
 {
+    /**
+     * The theme of each type the install applies when it is asked none: the themes the
+     * project requires, as bin/install does. A theme the shop does not have makes the
+     * install end on a failure.
+     */
+    public const array DEFAULT_THEMES = [
+        'frontOffice' => 'flexy',
+        'backOffice' => 'default-twig',
+        'pdf' => 'default',
+        'email' => 'default',
+    ];
+
     public function __construct(
         private readonly string $environment,
         private readonly ModuleRegistrationStep $moduleRegistrationStep = new ModuleRegistrationStep(),
@@ -205,18 +217,19 @@ class Install extends ContainerAwareCommand
         // template:set raises outside its module step stops the install here.
         $templatesApplied = $this->templateApplier->apply($output, $connectionInfo, $themes);
 
-        $this->runModulesPostActivation($output, $connectionInfo);
+        try {
+            $this->runModulesPostActivation($output, $connectionInfo);
 
-        $this->maybeImportDemoData($input, $output, $connectionInfo);
-        $this->maybeCreateAdminUser($input, $output, $connectionInfo);
-
-        if (!$templatesApplied) {
-            $output->writeln('<error>Thelia installed with errors: a template could not be applied. Check messages above.</error>');
-
-            return Command::FAILURE;
+            $this->maybeImportDemoData($input, $output, $connectionInfo);
+            $this->maybeCreateAdminUser($input, $output, $connectionInfo);
+        } finally {
+            // Said even when a later step throws: its own error does not tell the template failed.
+            if (!$templatesApplied) {
+                $output->writeln('<error>Thelia installed with errors: a template could not be applied. Check messages above.</error>');
+            }
         }
 
-        return Command::SUCCESS;
+        return $templatesApplied ? Command::SUCCESS : Command::FAILURE;
     }
 
     /**
@@ -552,12 +565,7 @@ class Install extends ContainerAwareCommand
             'email' => $input->getOption('email_theme'),
         ];
 
-        $defaults = [
-            'frontOffice' => 'flexy',
-            'backOffice' => 'default',
-            'pdf' => 'default',
-            'email' => 'default',
-        ];
+        $defaults = self::DEFAULT_THEMES;
 
         foreach ($themes as $type => $value) {
             $value = \is_string($value) ? trim($value) : null;

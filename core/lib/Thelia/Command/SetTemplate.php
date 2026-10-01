@@ -160,7 +160,8 @@ class SetTemplate extends ContainerAwareCommand
     {
         $frames = [];
         foreach ($throwable->getTrace() as $index => $frame) {
-            $frames[] = \sprintf('#%d %s(%d): %s%s%s()', $index, $frame['file'] ?? '[internal function]', $frame['line'] ?? 0, $frame['class'] ?? '', $frame['type'] ?? '', $frame['function']);
+            // One frame per line: a file or class name cannot start a line of its own.
+            $frames[] = \sprintf('#%d %s(%d): %s%s%s()', $index, TerminalText::singleLine($frame['file'] ?? '[internal function]'), $frame['line'] ?? 0, TerminalText::singleLine($frame['class'] ?? ''), $frame['type'] ?? '', TerminalText::singleLine($frame['function']));
         }
 
         return TerminalText::withoutControlCharacters(implode("\n", $frames));

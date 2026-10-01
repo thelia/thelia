@@ -450,7 +450,7 @@ foreach ($commands as $cmd) {
     try {
         // A console.terminate listener dying on a container file the command deleted does
         // not decide the result: the exit code the command returned does.
-        $exitCode = (new Thelia\Install\Standalone\CommandExitCodeRecorder())->run($app, new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output, $kernel->getContainer()->get('event_dispatcher'));
+        $exitCode = (new Thelia\Install\CommandExitCodeRecorder())->run($app, new Symfony\Component\Console\Input\ArrayInput($cmd['input']), $output, $kernel->getContainer()->get('event_dispatcher'));
     } catch (\Error $e) {
         // Counted once, below, with the other failures.
         $exitCode = 1;

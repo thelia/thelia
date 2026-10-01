@@ -93,10 +93,11 @@ final class ModuleRegistrationWarnings
     /**
      * Registering writes each module on its own: an active module whose <required> module
      * ships inactive, or is held inactive by the row the table already had, is registered
-     * active next to an inactive dependency. Only a theme activates the required modules of a module it brings
-     * and activates (ModuleManagement::install()); the install does not, so that a module
-     * shipped inactive is never switched on without the merchant, and it does not check that
-     * the active module runs without the inactive one.
+     * active next to an inactive dependency. Only template:set activates the required modules
+     * of a module the theme brings and activates
+     * (ModuleManagement::installModulesFromTemplatePath()); the install does not, so that a
+     * module shipped inactive is never switched on without the merchant, and it does not
+     * check that the active module runs without the inactive one.
      *
      * @param list<ModuleDescriptorRecord>                        $records
      * @param array<string, array{activate: int, mandatory: int}> $registered

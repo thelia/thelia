@@ -310,8 +310,9 @@ class ModuleManagement
 
         $this->eventDispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
-        // The activation wrote the row through another instance: read it back so the caller
-        // never decides on a stale state.
+        // The activation writes the row through the instance it loads: the same one while
+        // Propel pools instances, another one when pooling is off (the test suites). Read it
+        // back so the caller never decides on a stale state.
         $module->reload();
 
         return $module;
@@ -320,6 +321,10 @@ class ModuleManagement
     /**
      * The install step honours `<enabled-by-default>0</enabled-by-default>`: a module a
      * theme requires is installed and registered, but not activated on the merchant's behalf.
+     * The descriptor read is the copy at the given path: for a module the shop does not know,
+     * the copy the install event then installs; for a module the shop knows, which may run
+     * from local/modules or vendor/thelia/modules, only the wording of what the theme reports
+     * depends on it.
      */
     private function shipsInactive(ModuleValidator $moduleValidator, string $absolutePathToModule): bool
     {
