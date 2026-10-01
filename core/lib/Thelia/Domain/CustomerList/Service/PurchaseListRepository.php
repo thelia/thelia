@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\CustomerList\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
@@ -56,6 +57,24 @@ final readonly class PurchaseListRepository
     public function findOneReadableBy(Customer $customer, int $listId): ?CustomerList
     {
         return $this->readableQuery($customer)->filterById($listId)->findOne();
+    }
+
+    /**
+     * Holds the customer row until the end of the transaction in progress: two
+     * creations at once then count the lists one after the other.
+     */
+    public function lockOwner(Customer $customer, ConnectionInterface $connection): void
+    {
+        $this->lockRow('customer', (int) $customer->getId(), $connection);
+    }
+
+    /**
+     * Holds the list row until the end of the transaction in progress: the lines
+     * read after it are the ones no other write can replace before this one ends.
+     */
+    public function lockList(CustomerList $list, ConnectionInterface $connection): void
+    {
+        $this->lockRow('customer_list', (int) $list->getId(), $connection);
     }
 
     public function countOwnedBy(Customer $customer): int
@@ -210,5 +229,13 @@ final readonly class PurchaseListRepository
     private static function wholeQuantity(float|int|string|null $quantity): int
     {
         return max(1, (int) round((float) $quantity));
+    }
+
+    private function lockRow(string $table, int $id, ConnectionInterface $connection): void
+    {
+        $lock = $connection->prepare(\sprintf('SELECT `id` FROM `%s` WHERE `id` = :id FOR UPDATE', $table));
+        $lock->bindValue(':id', $id, \PDO::PARAM_INT);
+        $lock->execute();
+        $lock->closeCursor();
     }
 }

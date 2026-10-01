@@ -96,6 +96,34 @@ final class ReferenceQuantityLinesTest extends TestCase
         self::assertSame([1, 1, 2], array_map(static fn (ReferenceQuantity $line): int => $line->quantity, $merged->all()));
     }
 
+    public function testAQuantityAboveTheMaximumIsRefused(): void
+    {
+        $this->expectException(InvalidReferenceQuantityException::class);
+
+        new ReferenceQuantityLines([new ReferenceQuantity('A', ReferenceQuantityLines::MAX_QUANTITY + 1)]);
+    }
+
+    public function testTheMaximumHoldsForTheLinesOfOneReferenceAddedUp(): void
+    {
+        self::assertSame(ReferenceQuantityLines::MAX_QUANTITY, (new ReferenceQuantityLines([
+            new ReferenceQuantity('A', ReferenceQuantityLines::MAX_QUANTITY - 1),
+            new ReferenceQuantity('A', 1),
+        ]))->all()[0]->quantity);
+
+        $this->expectException(InvalidReferenceQuantityException::class);
+
+        new ReferenceQuantityLines([new ReferenceQuantity('A', \PHP_INT_MAX), new ReferenceQuantity('A', \PHP_INT_MAX)]);
+    }
+
+    public function testMergingCannotTakeALineAboveTheMaximum(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('A', ReferenceQuantityLines::MAX_QUANTITY)]);
+
+        $this->expectException(InvalidReferenceQuantityException::class);
+
+        $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('A', 1)]));
+    }
+
     public function testFiveHundredLinesFit(): void
     {
         self::assertCount(ReferenceQuantityLines::MAX_LINES, new ReferenceQuantityLines(self::distinctLines(ReferenceQuantityLines::MAX_LINES)));

@@ -35,6 +35,12 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
 
     public const int MAX_REFERENCE_LENGTH = 255;
 
+    /**
+     * Per line, the lines of one reference added up: a list keeps it in an INTEGER
+     * column, and no order by reference needs more.
+     */
+    public const int MAX_QUANTITY = 999_999;
+
     /** @var list<ReferenceQuantity> */
     private array $lines;
 
@@ -61,7 +67,7 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
             }
 
             $key = $reference."\0".($line->productSaleElementsId ?? '');
-            $quantity = ($merged[$key]->quantity ?? 0) + $line->quantity;
+            $quantity = self::boundedQuantity($reference, $merged[$key]->quantity ?? 0, $line->quantity);
             $merged[$key] = new ReferenceQuantity($reference, $quantity, $line->productSaleElementsId);
         }
 
@@ -70,6 +76,18 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
         }
 
         $this->lines = array_values($merged);
+    }
+
+    /**
+     * Checked before the addition, so that it never leaves the integers.
+     */
+    private static function boundedQuantity(string $reference, int $current, int $added): int
+    {
+        if ($added > self::MAX_QUANTITY - $current) {
+            throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" is at most %d.', $reference, self::MAX_QUANTITY));
+        }
+
+        return $current + $added;
     }
 
     public static function normalizeReference(string $reference): string

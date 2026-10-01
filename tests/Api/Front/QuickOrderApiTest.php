@@ -106,6 +106,8 @@ final class QuickOrderApiTest extends ApiTestCase
         yield 'zero quantity' => [[['reference' => 'ABC', 'quantity' => 0]]];
         yield 'quantity as text' => [[['reference' => 'ABC', 'quantity' => 'two']]];
         yield 'a price chosen by the caller' => [[['reference' => 'ABC', 'quantity' => 1, 'price' => 0.01]]];
+        yield 'a quantity above the maximum' => [[['reference' => 'ABC', 'quantity' => 3000000000]]];
+        yield 'two lines of one reference above the maximum once added up' => [[['reference' => 'ABC', 'quantity' => 600000], ['reference' => 'ABC', 'quantity' => 600000]]];
         yield 'more than five hundred lines' => [array_map(static fn (int $n): array => ['reference' => 'REF-'.$n, 'quantity' => 1], range(1, 501))];
     }
 
