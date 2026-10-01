@@ -16,6 +16,11 @@ namespace Thelia\Domain\Cart\Service;
 
 use Thelia\Model\ConfigQuery;
 
+/**
+ * The retention of the carts without order, read once for the purge and for every
+ * report that compares carts to orders: before the horizon, the carts are gone
+ * while the orders stay.
+ */
 final readonly class CartPurgeHorizon
 {
     public const string CONFIG_KEY_CART_NO_ORDER_DAYS = 'purification_cart_no_order_days';
@@ -36,12 +41,26 @@ final readonly class CartPurgeHorizon
         }
     }
 
+    /**
+     * A negative retention is read as 0: the purge then deletes every cart without
+     * order, as it did with the negative value, and the reports start now.
+     */
     public static function fromConfig(): self
     {
         return new self(
-            (int) ConfigQuery::read(self::CONFIG_KEY_CART_NO_ORDER_DAYS, self::DEFAULT_CART_NO_ORDER_DAYS),
-            (int) ConfigQuery::read(self::CONFIG_KEY_CART_ANONYMOUS_DAYS, self::DEFAULT_CART_ANONYMOUS_DAYS),
+            max(0, (int) ConfigQuery::read(self::CONFIG_KEY_CART_NO_ORDER_DAYS, self::DEFAULT_CART_NO_ORDER_DAYS)),
+            max(0, (int) ConfigQuery::read(self::CONFIG_KEY_CART_ANONYMOUS_DAYS, self::DEFAULT_CART_ANONYMOUS_DAYS)),
         );
+    }
+
+    public function cartNoOrderDays(): int
+    {
+        return $this->cartNoOrderDays;
+    }
+
+    public function cartAnonymousDays(): int
+    {
+        return $this->cartAnonymousDays;
     }
 
     public function retentionDays(): int
@@ -59,5 +78,14 @@ final readonly class CartPurgeHorizon
     public function mayHavePurged(\DateTimeInterface $from, ?\DateTimeImmutable $now = null): bool
     {
         return $from < $this->earliestSurvivingCartDate($now);
+    }
+
+    /**
+     * The start of a period that compares carts to orders: the horizon when the
+     * period reaches before it, the period start otherwise.
+     */
+    public function boundedStart(\DateTimeImmutable $from, ?\DateTimeImmutable $now = null): \DateTimeImmutable
+    {
+        return $this->mayHavePurged($from, $now) ? $this->earliestSurvivingCartDate($now) : $from;
     }
 }
