@@ -111,6 +111,26 @@ final class DatabaseSetupTest extends IntegrationTestCase
     }
 
     /**
+     * A module ships its schema in its current shape (TheliaMain.sql) along with the
+     * update scripts that led there, and a fresh install replays both. A column, index or
+     * foreign key an update drops is then already gone: the install must not warn about it.
+     */
+    public function testAModuleUpdateDroppingWhatIsAlreadyGoneRaisesNoWarning(): void
+    {
+        $setup = $this->createDatabaseSetup();
+        $setup->connect();
+
+        try {
+            (new \ReflectionMethod($setup, 'applyModuleSchema'))
+                ->invoke($setup, THELIA_ROOT.'tests/fixtures/install/AbsentDropProbe', 'AbsentDropProbe');
+
+            self::assertSame([], $setup->getWarnings());
+        } finally {
+            $setup->getPdo()->exec('DROP TABLE IF EXISTS `absent_drop_probe`');
+        }
+    }
+
+    /**
      * Builds a DatabaseSetup pointing at the configured test database. Credentials come from
      * the environment ($_SERVER, populated from .env.test.local by the test bootstrap), so the
      * suite connects to the CI MySQL (127.0.0.1) as well as a local DDEV database (db), instead
