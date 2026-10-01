@@ -220,6 +220,16 @@ final class PurchaseListApiTest extends ApiTestCase
         self::assertSame(['resolved', 'unknown'], array_column($lines, 'status'));
     }
 
+    public function testASaleElementThatDoesNotExistIsSavedAsAnUnknownReference(): void
+    {
+        $token = $this->authenticateAsCustomer($this->customer());
+
+        $created = $this->jsonRequest('POST', self::BASE, ['title' => 'Ghost', 'lines' => [['reference' => 'GHOST', 'quantity' => 1, 'productSaleElementsId' => 999999999]]], $token, 'json');
+
+        self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
+        self::assertSame([['reference' => 'GHOST', 'quantity' => 1, 'productSaleElementsId' => null]], self::decode($created)['items']);
+    }
+
     /**
      * @return iterable<string, array{0: string, 1: string, 2: array<string, mixed>, 3: string}>
      */
@@ -228,6 +238,7 @@ final class PurchaseListApiTest extends ApiTestCase
         yield 'a creation without a title' => ['POST', '', ['title' => '   '], 'json'];
         yield 'a title of 256 characters' => ['POST', '', ['title' => str_repeat('a', 256)], 'json'];
         yield 'a line carrying a price' => ['POST', '', ['title' => 'Priced', 'lines' => [['reference' => 'ABC', 'quantity' => 1, 'price' => 0.01]]], 'json'];
+        yield 'a quantity above the maximum' => ['POST', '', ['title' => 'Huge', 'lines' => [['reference' => 'ABC', 'quantity' => 3000000000]]], 'json'];
         yield 'a creation of 501 lines' => ['POST', '', ['title' => 'Too long', 'lines' => self::manyLines(501)], 'json'];
         yield 'a rename without a title' => ['PATCH', '/{id}', ['title' => ''], 'merge-patch+json'];
         yield 'a rename carrying lines' => ['PATCH', '/{id}', ['title' => 'Renamed', 'lines' => [['reference' => 'ABC', 'quantity' => 1]]], 'merge-patch+json'];

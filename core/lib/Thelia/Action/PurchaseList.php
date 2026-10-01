@@ -19,12 +19,14 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\CustomerList\PurchaseListEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
 use Thelia\Model\CustomerList;
 use Thelia\Model\CustomerListItem;
 use Thelia\Model\CustomerListItemQuery;
 use Thelia\Model\Map\CustomerListTableMap;
+use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Writes the purchase lists. Who may write is decided before the dispatch, by
@@ -88,17 +90,47 @@ class PurchaseList extends BaseAction implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * A sale element that does not exist, or no longer does, is dropped from its line
+     * and the reference kept, as an unknown reference is: the line still shows, and
+     * the next check of the list says what became of it.
+     */
     private function insertLines(CustomerList $list, ReferenceQuantityLines $lines, ConnectionInterface $connection): void
     {
+        $existing = $this->existingSaleElementsIds($lines, $connection);
+
         foreach ($lines as $position => $line) {
             (new CustomerListItem())
                 ->setCustomerListId((int) $list->getId())
                 ->setRef($line->reference)
-                ->setProductSaleElementsId($line->productSaleElementsId)
+                ->setProductSaleElementsId(isset($existing[$line->productSaleElementsId]) ? $line->productSaleElementsId : null)
                 ->setQuantity($line->quantity)
                 ->setPosition($position + 1)
                 ->save($connection);
         }
+    }
+
+    /**
+     * @return array<int, true>
+     */
+    private function existingSaleElementsIds(ReferenceQuantityLines $lines, ConnectionInterface $connection): array
+    {
+        $named = array_values(array_filter(array_map(
+            static fn (ReferenceQuantity $line): ?int => $line->productSaleElementsId,
+            $lines->all(),
+        )));
+
+        if ([] === $named) {
+            return [];
+        }
+
+        $existing = [];
+
+        foreach (ProductSaleElementsQuery::create()->filterById($named)->select(['Id'])->find($connection) as $id) {
+            $existing[(int) $id] = true;
+        }
+
+        return $existing;
     }
 
     private function listOf(PurchaseListEvent $event): CustomerList

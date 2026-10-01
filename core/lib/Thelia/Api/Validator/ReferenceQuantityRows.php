@@ -72,6 +72,7 @@ final class ReferenceQuantityRows extends Compound
                                 new Assert\NotNull(groups: $groups),
                                 new Assert\Type('int', groups: $groups),
                                 new Assert\Positive(groups: $groups),
+                                new Assert\LessThanOrEqual(ReferenceQuantityLines::MAX_QUANTITY, groups: $groups),
                             ],
                             'productSaleElementsId' => new Assert\Optional(
                                 [new Assert\Type('int', groups: $groups), new Assert\Positive(groups: $groups)],

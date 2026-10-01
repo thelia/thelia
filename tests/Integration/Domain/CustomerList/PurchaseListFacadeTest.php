@@ -116,6 +116,19 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         self::assertSame('Not yours', CustomerListQuery::create()->findPk($list->getId())?->getTitle());
     }
 
+    public function testASharedListOfAnotherCustomerStaysInvisibleUntilCompaniesExist(): void
+    {
+        $shared = $this->facade->create($this->customer(), 'Shared elsewhere');
+        $shared->setShared(true)->save($this->getPropelConnection());
+        $customer = $this->customer();
+
+        self::assertSame([], $this->facade->listVisibleFor($customer));
+
+        $this->expectException(PurchaseListNotFoundException::class);
+
+        $this->facade->getVisible($customer, (int) $shared->getId());
+    }
+
     public function testRenamingAndEditingTheLines(): void
     {
         $customer = $this->customer();
@@ -278,6 +291,50 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         $this->facade->appendFromCart($customer, (int) $list->getId(), $this->factory->cart($customer));
     }
 
+    public function testAddingLinesLocksTheListBeforeReadingItsLines(): void
+    {
+        $customer = $this->customer();
+        $list = $this->facade->create($customer, 'Locked', self::lines(['A' => 1]));
+
+        $statements = $this->recordSqlQueries(fn () => $this->facade->appendItems($customer, (int) $list->getId(), self::lines(['B' => 1])));
+
+        self::assertLessThan(
+            self::firstIndexOf($statements, '/FROM `customer_list_item`/'),
+            self::firstIndexOf($statements, '/FROM `customer_list` WHERE `id` = .* FOR UPDATE/'),
+            'Two additions at once each replace the list with the lines they read: the read must wait for the lock.',
+        );
+    }
+
+    public function testCreatingLocksTheCustomerBeforeCountingTheirLists(): void
+    {
+        $customer = $this->customer();
+
+        $statements = $this->recordSqlQueries(fn () => $this->facade->create($customer, 'Counted'));
+
+        self::assertLessThan(
+            self::firstIndexOf($statements, '/COUNT\(.*FROM `customer_list`/'),
+            self::firstIndexOf($statements, '/FROM `customer` WHERE `id` = .* FOR UPDATE/'),
+            'Two creations at once would both count 99 lists and both pass the limit.',
+        );
+    }
+
+    public function testASaleElementThatDoesNotExistIsDroppedAndTheReferenceKept(): void
+    {
+        $customer = $this->customer();
+        [, $saleElements] = $this->productWithSaleElement('KNOWN');
+
+        $list = $this->facade->create($customer, 'Mixed', new ReferenceQuantityLines([
+            new ReferenceQuantity('KNOWN', 1, (int) $saleElements->getId()),
+            new ReferenceQuantity('GHOST', 2, 999999999),
+        ]));
+
+        self::assertSame(
+            [(int) $saleElements->getId(), null],
+            array_map(static fn (ReferenceQuantity $line): ?int => $line->productSaleElementsId, $this->facade->linesToLoad($customer, (int) $list->getId())),
+        );
+        self::assertSame([['KNOWN', 1], ['GHOST', 2]], $this->storedLines($list));
+    }
+
     public function testALineWhoseSaleElementLeftTheCatalogStaysWithItsReference(): void
     {
         $customer = $this->customer();
@@ -323,6 +380,20 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         $this->facade->delete($customer, (int) $list->getId());
 
         self::assertSame([TheliaEvents::PURCHASE_LIST_CREATE, TheliaEvents::PURCHASE_LIST_UPDATE, TheliaEvents::PURCHASE_LIST_DELETE], $seen);
+    }
+
+    /**
+     * @param list<string> $statements
+     */
+    private static function firstIndexOf(array $statements, string $pattern): int
+    {
+        foreach ($statements as $index => $statement) {
+            if (1 === preg_match($pattern, $statement)) {
+                return $index;
+            }
+        }
+
+        self::fail(\sprintf('No statement matches %s.', $pattern));
     }
 
     private function customer(): Customer

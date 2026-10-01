@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\CustomerList;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomerList\PurchaseListEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -28,6 +30,7 @@ use Thelia\Domain\CustomerList\Service\PurchaseListRepository;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerList;
+use Thelia\Model\Map\CustomerListTableMap;
 
 /**
  * The purchase lists of a signed-in customer: the one entry point the API, the
@@ -88,15 +91,21 @@ final readonly class PurchaseListFacade
 
     public function create(Customer $customer, string $title, ReferenceQuantityLines $lines = new ReferenceQuantityLines()): CustomerList
     {
-        if ($this->repository->countOwnedBy($customer) >= self::MAX_LISTS_PER_CUSTOMER) {
-            throw new InvalidPurchaseListException(\sprintf('A customer keeps at most %d purchase lists.', self::MAX_LISTS_PER_CUSTOMER));
-        }
+        $title = self::normalizeTitle($title);
 
-        $event = new PurchaseListEvent($customer, null, self::normalizeTitle($title), $lines);
-        $this->dispatcher->dispatch($event, TheliaEvents::PURCHASE_LIST_CREATE);
+        return $this->inTransaction(function (ConnectionInterface $connection) use ($customer, $title, $lines): CustomerList {
+            $this->repository->lockOwner($customer, $connection);
 
-        return $event->getCustomerList()
-            ?? throw new \LogicException('No listener created the purchase list.');
+            if ($this->repository->countOwnedBy($customer) >= self::MAX_LISTS_PER_CUSTOMER) {
+                throw new InvalidPurchaseListException(\sprintf('A customer keeps at most %d purchase lists.', self::MAX_LISTS_PER_CUSTOMER));
+            }
+
+            $event = new PurchaseListEvent($customer, null, $title, $lines);
+            $this->dispatcher->dispatch($event, TheliaEvents::PURCHASE_LIST_CREATE);
+
+            return $event->getCustomerList()
+                ?? throw new \LogicException('No listener created the purchase list.');
+        });
     }
 
     public function createFromCart(Customer $customer, Cart $cart, string $title): CustomerList
@@ -129,7 +138,13 @@ final readonly class PurchaseListFacade
     {
         $list = $this->getWritable($customer, $listId);
 
-        return $this->update($list, $customer, null, $this->repository->linesOf($list)->merge($lines));
+        return $this->inTransaction(function (ConnectionInterface $connection) use ($list, $customer, $lines): CustomerList {
+            // The lines are read under the lock: two additions at once would otherwise
+            // each replace the list with what they read, and the first would be lost.
+            $this->repository->lockList($list, $connection);
+
+            return $this->update($list, $customer, null, $this->repository->linesOf($list)->merge($lines));
+        });
     }
 
     public function appendFromCart(Customer $customer, int $listId, Cart $cart): CustomerList
@@ -197,6 +212,30 @@ final readonly class PurchaseListFacade
         $this->dispatcher->dispatch($event, TheliaEvents::PURCHASE_LIST_UPDATE);
 
         return $event->getCustomerList() ?? $list;
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(ConnectionInterface): T $work
+     *
+     * @return T
+     */
+    private function inTransaction(callable $work): mixed
+    {
+        $connection = Propel::getWriteConnection(CustomerListTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $result = $work($connection);
+            $connection->commit();
+
+            return $result;
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
     }
 
     private static function normalizeTitle(string $title): string
