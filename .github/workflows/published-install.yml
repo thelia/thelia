@@ -1,0 +1,85 @@
+name: Published install
+
+# Installs a new shop the way the thelia/thelia-project README tells a new user to: the latest
+# published skeleton, its released packages and modules, nothing from this repository. A module
+# release that needs an unreleased core class, or a theme tagged ahead of the core, breaks this
+# install without failing any pull request; this job is where it shows.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/published-install.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Fresh install from Packagist (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.3', '8.4' ]
+    env:
+      SHOP_DIR: ${{ github.workspace }}/shop
+      # Without a token, Flex skips the thelia/thelia-recipes endpoint without a word.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      COMPOSER_NO_INTERACTION: '1'
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '3306'
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: thelia
+    steps:
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          ini-values: post_max_size=20M
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+
+      - name: Create the shop
+        run: composer create-project thelia/thelia-project "$SHOP_DIR" --no-progress
+
+      - name: Show the resolved Thelia packages
+        working-directory: ${{ env.SHOP_DIR }}
+        run: composer show 'thelia/*'
+
+      - name: Install the shop
+        working-directory: ${{ env.SHOP_DIR }}
+        run: >-
+          php bin/install
+          --frontoffice_theme=flexy --backoffice_theme=default-twig
+          --pdf_theme=default --email_theme=default
+          --with-demo --with-admin
+          --admin_login=thelia --admin_password=thelia
+          --admin_first_name=Admin --admin_last_name=User
+          --admin_email=admin@example.com
+
+      - name: Serve the storefront and the back-office login
+        working-directory: ${{ env.SHOP_DIR }}
+        run: |
+          php -S 127.0.0.1:8000 -t public > "$RUNNER_TEMP/server.log" 2>&1 &
+          for _ in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8000/ && break; sleep 1; done
+          status=0
+          for path in / /admin/login; do
+            code=$(curl -s -o "$RUNNER_TEMP/page.html" -w '%{http_code}' "http://127.0.0.1:8000$path")
+            echo "$path -> $code"
+            if [ "$code" != "200" ]; then
+              echo "::error::GET $path answered $code on a fresh install of the published release"
+              head -c 2000 "$RUNNER_TEMP/page.html"; echo
+              status=1
+            fi
+          done
+          if grep -E 'PHP (Fatal|Warning|Deprecated)' "$RUNNER_TEMP/server.log"; then
+            echo "::error::the server logged PHP errors"
+            status=1
+          fi
+          exit $status
