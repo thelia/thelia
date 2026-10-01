@@ -21,9 +21,19 @@ use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 
 class TheliaFilter extends AbstractFilter
 {
+    /**
+     * The queries the selection was applied to. `AbstractFilter::apply()` calls filterProperty() for
+     * every entry of the request, while the selection is the same whichever the entry: it is applied
+     * the first time and not again to the same query.
+     *
+     * @var \WeakMap<ModelCriteria, true>
+     */
+    private \WeakMap $applied;
+
     public function __construct(private readonly FilterService $filterService, private readonly RequestStack $requestStack)
     {
         parent::__construct();
+        $this->applied = new \WeakMap();
     }
 
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -37,6 +47,12 @@ class TheliaFilter extends AbstractFilter
         if (!$request || (!isset($context['filters']['tfilters']) && \count($request->query->all('tfilters')) < 1)) {
             return;
         }
+
+        if (isset($this->applied[$query])) {
+            return;
+        }
+
+        $this->applied[$query] = true;
 
         $isApiRoute = $request->request->get('isApiRoute', false);
 
