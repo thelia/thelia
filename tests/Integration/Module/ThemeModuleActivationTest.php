@@ -422,6 +422,71 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     }
 
     /**
+     * A module the theme brings that ships inactive is registered, not activated: none of
+     * its <required> modules is switched on on its behalf either.
+     */
+    public function testAModuleThatShipsInactiveActivatesNoneOfItsRequiredModules(): void
+    {
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE, self::NEW_INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
+        $themeDir = $this->writeTheme([self::NEW_INACTIVE_CODE]);
+
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $moduleManagement->installModulesFromTemplatePath($themeDir, new BufferedOutput());
+
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE));
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'A module shipped inactive switches on none of its required modules.');
+    }
+
+    /**
+     * The activation switches the <required> modules on before it checks the module itself:
+     * when the module the theme brings fails its check, its required modules stay active.
+     */
+    public function testTheRequiredModulesOfAModuleThatFailsStayActive(): void
+    {
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
+        $this->registerSampleModule(self::INACTIVE_CODE);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>', '99.0.0');
+        $themeDir = $this->writeTheme([self::FAILING_CODE]);
+
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+
+        try {
+            $moduleManagement->installModulesFromTemplatePath($themeDir, new BufferedOutput());
+            self::fail('A module that requires Thelia 99.0.0 cannot be activated.');
+        } catch (\Exception $exception) {
+            self::assertStringContainsString('requires Thelia 99.0.0', $exception->getMessage());
+        }
+
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::FAILING_CODE));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'Its required module was activated before the module failed, and stays active.');
+    }
+
+    /**
+     * The shop registered the module under the code its namespace starts with and under the
+     * namespace of an older release, and the release on disk lives in a directory of another
+     * name: the row is found by that code, and kept.
+     */
+    public function testAModuleRegisteredUnderTheCodeOfItsNamespaceKeepsItsRow(): void
+    {
+        $directoryName = 'ThemeShipSampleRenamedDirectory';
+        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::SWITCHED_OFF_CODE, '');
+        $this->registerSampleModule(self::SWITCHED_OFF_CODE, 0, 'FormerVendor\\'.self::SWITCHED_OFF_CODE);
+        $rowId = ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE)?->getId();
+
+        /** @var ModuleManagement $moduleManagement */
+        $moduleManagement = $this->getService(ModuleManagement::class);
+        $module = $moduleManagement->installModule(THELIA_MODULE_DIR.$directoryName);
+
+        self::assertSame($rowId, $module->getId(), 'The row registered under the code of the namespace is the one handed back.');
+        self::assertNull(ModuleQuery::create()->findOneByCode($directoryName), 'No row is installed under the name of the directory.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE));
+    }
+
+    /**
      * module:refresh registers a module under the name of its directory, which need not be the
      * code its namespace starts with: the row is found by that name, and kept.
      */

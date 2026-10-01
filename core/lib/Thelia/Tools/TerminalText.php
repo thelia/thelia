@@ -26,17 +26,17 @@ final class TerminalText
      * embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the zero-width
      * and directional marks (U+200B to U+200F, U+061C), the invisible operators and word
      * joiner (U+2060 to U+2064), the deprecated format controls (U+206A to U+206F), the
-     * interlinear annotation marks (U+FFF9 to U+FFFB), the tag characters (U+E0000 to
-     * U+E007F), the Mongolian free variation selectors and vowel separator (U+180B to
-     * U+180F), the combining grapheme joiner (U+034F), the variation selectors (U+FE00 to
-     * U+FE0F, U+E0100 to U+E01EF), the musical format controls (U+1D173 to U+1D17A), the
-     * blank fillers (U+115F,
-     * U+1160, U+2800, U+3164, U+FFA0), the soft hyphen (U+00AD), the line and paragraph separators
-     * (U+2028, U+2029) and the byte order mark (U+FEFF). The line feed is kept: messages span
-     * lines, so a module directory named with one can still start a line of its own. A
-     * text that is not valid UTF-8 has each byte outside a well-formed sequence replaced first: a raw C1 byte (0x80
-     * to 0x9F) is a control character to a terminal that is not in UTF-8. Each range is then
-     * matched as its UTF-8 encoding, byte by byte.
+     * interlinear annotation marks (U+FFF9 to U+FFFB), the tag block (U+E0000 to U+E00FF), the
+     * Khmer inherent vowels (U+17B4, U+17B5), the shorthand format controls (U+1BCA0 to
+     * U+1BCA3), the Mongolian free variation selectors and vowel separator (U+180B to U+180F),
+     * the combining grapheme joiner (U+034F), the variation selectors (U+FE00 to U+FE0F,
+     * U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the blank fillers
+     * (U+115F, U+1160, U+2800, U+3164, U+FFA0), the soft hyphen (U+00AD), the line and
+     * paragraph separators (U+2028, U+2029) and the byte order mark (U+FEFF). The line feed is
+     * kept: messages span lines, so a module directory named with one can still start a line
+     * of its own. A text that is not valid UTF-8 has each byte outside a well-formed sequence
+     * replaced first: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that
+     * is not in UTF-8. Each range is then matched as its UTF-8 encoding, byte by byte.
      */
     public static function withoutControlCharacters(string $text): string
     {
@@ -46,7 +46,7 @@ final class TerminalText
             $text = preg_replace('/(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]/', '?', $text) ?? '';
         }
 
-        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80\x81][\x80-\xBF]/', '?', $text) ?? '';
+        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80-\x83][\x80-\xBF]|\xE1\x9E[\xB4\xB5]|\xF0\x9B\xB2[\xA0-\xA3]/', '?', $text) ?? '';
     }
 
     /**

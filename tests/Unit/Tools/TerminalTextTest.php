@@ -32,12 +32,12 @@ final class TerminalTextTest extends TestCase
         self::assertSame('Acme?', TerminalText::singleLine("Acme\e"));
     }
 
-    /** @return iterable<string, array{string, string}> */
     public function testAMessageSpreadOverLinesIsPrintedOnOne(): void
     {
         self::assertSame('first error. second error.?OK', TerminalText::onOneLine("first error.\n  \r\nsecond error.\tOK\n"));
     }
 
+    /** @return iterable<string, array{string, string}> */
     public static function texts(): iterable
     {
         yield 'an escape sequence' => ["Acme\e[31m", 'Acme?[31m'];
@@ -76,5 +76,9 @@ final class TerminalTextTest extends TestCase
         yield 'a mongolian free variation selector' => ["Ac\u{180B}me", 'Ac?me'];
         yield 'a supplementary variation selector' => ["Acme\u{E0100}", 'Acme?'];
         yield 'a musical format control' => ["Ac\u{1D173}me", 'Ac?me'];
+        yield 'a khmer inherent vowel' => ["Ac\u{17B4}me", 'Ac?me'];
+        yield 'a shorthand format control' => ["Ac\u{1BCA0}me", 'Ac?me'];
+        yield 'an unassigned tag-block character' => ["Acme\u{E00FF}", 'Acme?'];
+        yield 'a khmer vowel sign is kept' => ["Ac\u{17B6}me", "Ac\u{17B6}me"];
     }
 }

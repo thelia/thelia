@@ -20,7 +20,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Thelia\Install\Standalone\CommandExitCodeRecorder;
 
 /**
  * The template step of thelia:install: template:set for each chosen theme, in the same

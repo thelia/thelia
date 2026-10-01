@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Install\Standalone;
+namespace Thelia\Install;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;

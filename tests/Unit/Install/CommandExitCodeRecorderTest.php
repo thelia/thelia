@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Thelia\Install\Standalone\CommandExitCodeRecorder;
+use Thelia\Install\CommandExitCodeRecorder;
 
 /**
  * The installers read a failed post-install command as a success when a console.terminate

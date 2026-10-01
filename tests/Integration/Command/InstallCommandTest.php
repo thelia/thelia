@@ -78,4 +78,15 @@ final class InstallCommandTest extends IntegrationTestCase
         self::assertStringNotContainsString('Creating Thelia database', $tester->getDisplay(), 'Nothing is created after a refused descriptor.');
         self::assertStringNotContainsString('Config file created', $tester->getDisplay());
     }
+
+    /**
+     * A template thelia:install cannot apply makes it end on a failure: each theme it applies
+     * when it is asked none has to be one the project installs.
+     */
+    public function testEachDefaultThemeIsOneTheShopHas(): void
+    {
+        foreach (Install::DEFAULT_THEMES as $type => $name) {
+            self::assertDirectoryExists(THELIA_TEMPLATE_DIR.$type.DS.$name, \sprintf('The default %s theme "%s" is not installed.', $type, $name));
+        }
+    }
 }
