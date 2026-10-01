@@ -44,6 +44,7 @@ final class CustomerListsPersonalDataTest extends IntegrationTestCase
     {
         $customer = $this->factory->customer($this->factory->customerTitle());
         $this->getService(PurchaseListFacade::class)->create($customer, 'Restock', new ReferenceQuantityLines([new ReferenceQuantity('ABC', 3)]));
+        $this->getService(PurchaseListFacade::class)->create($this->factory->customer($this->factory->customerTitle()), 'Someone else', new ReferenceQuantityLines([new ReferenceQuantity('XYZ', 1)]));
 
         $data = $this->getService(CustomerPersonalDataExporter::class)->export($customer);
 

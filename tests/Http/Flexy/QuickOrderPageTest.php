@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
@@ -97,7 +98,8 @@ final class QuickOrderPageTest extends WebIntegrationTestCase
      * checks the customer again. The refusal is read on the exception itself, before the
      * shop's error handling turns it into a page.
      */
-    public function testAnActionOfAVisitorIsRefused(): void
+    #[DataProvider('actionsOfTheTable')]
+    public function testAnActionOfAVisitorIsRefused(string $action): void
     {
         $this->client->catchExceptions(false);
 
@@ -106,7 +108,18 @@ final class QuickOrderPageTest extends WebIntegrationTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $component->call('check');
+        $component->call($action);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function actionsOfTheTable(): iterable
+    {
+        yield 'check' => ['check'];
+        yield 'add to cart' => ['addToCart'];
+        yield 'save the list' => ['saveList'];
+        yield 'save as a list' => ['saveAsList'];
     }
 
     public function testThreeTypedReferencesReachTheCart(): void
