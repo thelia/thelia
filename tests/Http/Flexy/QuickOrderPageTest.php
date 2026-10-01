@@ -218,6 +218,21 @@ final class QuickOrderPageTest extends WebIntegrationTestCase
         self::assertTrue($table->hasInvalidQuantity(1));
     }
 
+    public function testAQuantityAboveTheMaximumOfTheCoreIsLeftOutWithItsBound(): void
+    {
+        $this->injector?->setCustomer($this->customer());
+        $reference = (string) $this->saleElementsOf($this->product())->getRef();
+
+        $component = $this->table();
+        $component->set('rows', [self::row($reference, 1), self::row('OTHER', '1000000')]);
+        $rendered = (string) $component->call('check')->render();
+
+        $table = $this->component($component);
+        self::assertSame(1, $table->readyCount());
+        self::assertTrue($table->hasInvalidQuantity(1));
+        self::assertStringContainsString('999,999', $rendered);
+    }
+
     private function table(): TestLiveComponent
     {
         return $this->createLiveComponent(self::COMPONENT, client: $this->client);
