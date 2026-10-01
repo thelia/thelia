@@ -25,6 +25,7 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 ## Fixes
 
 - An export that declares no column alias keeps the columns of its data. `AbstractExport::applyOrderAndAliases()` and `JsonFileAbstractExport::applyOrderAndAliases()` only handed the data back untouched for a `null` `$orderAndAliases`, while the property is `[]` by default, so such an export wrote one empty line per record. An empty list is now read as no alias at all; an export that declares aliases is unchanged.
+- The `tfilters` selection of a collection reaches its query once. `TheliaFilter::filterProperty()` ignores the property it is called for and `AbstractFilter::apply()` calls it for every entry of the request, so each parameter (`visible`, `itemsPerPage`, `page`, `category_depth`, ...) applied every condition of the selection once more to the same query: seven to eight copies of the category and attribute conditions on a product listing, and a query that slowed down with every parameter added. The selection is now applied the first time `TheliaFilter` sees a query and not again to that query, whether it is read from the context or from the request.
 
 ## Breaking changes
 
