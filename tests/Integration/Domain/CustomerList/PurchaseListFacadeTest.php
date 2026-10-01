@@ -228,6 +228,56 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         $this->facade->createFromCart($this->customer(), $cart, 'Not my cart');
     }
 
+    public function testTheCartAndAnOrderAddTheirLinesToAnExistingList(): void
+    {
+        $customer = $this->customer();
+        [$product, $saleElements] = $this->productWithSaleElement('ADDED');
+        $list = $this->facade->create($customer, 'Existing', new ReferenceQuantityLines([
+            new ReferenceQuantity('ADDED', 1, (int) $saleElements->getId()),
+            new ReferenceQuantity('OTHER', 2),
+        ]));
+        $cart = $this->factory->cart($customer);
+        $this->factory->cartItem($cart, $product, $saleElements, ['quantity' => 4.0]);
+        $order = $this->factory->order($customer);
+        $this->orderLine((int) $order->getId(), $product, $saleElements, 3.0);
+
+        $this->facade->appendFromCart($customer, (int) $list->getId(), $cart);
+        $this->facade->appendFromOrder($customer, (int) $list->getId(), (int) $order->getId());
+
+        self::assertSame([['ADDED', 8], ['OTHER', 2]], $this->storedLines($list));
+    }
+
+    public function testTheCartOrTheOrderOfAnotherCustomerAddsNothing(): void
+    {
+        $customer = $this->customer();
+        $list = $this->facade->create($customer, 'Mine', self::lines(['MINE' => 1]));
+        $foreignCart = $this->factory->cart($this->customer());
+        $foreignOrder = $this->factory->order($this->customer());
+
+        foreach ([
+            fn () => $this->facade->appendFromCart($customer, (int) $list->getId(), $foreignCart),
+            fn () => $this->facade->appendFromOrder($customer, (int) $list->getId(), (int) $foreignOrder->getId()),
+        ] as $append) {
+            try {
+                $append();
+                self::fail('A source of another customer was read.');
+            } catch (PurchaseListSourceNotFoundException) {
+            }
+        }
+
+        self::assertSame([['MINE', 1]], $this->storedLines($list));
+    }
+
+    public function testTheListOfAnotherCustomerCannotReceiveTheCart(): void
+    {
+        $list = $this->facade->create($this->customer(), 'Not mine');
+        $customer = $this->customer();
+
+        $this->expectException(PurchaseListNotFoundException::class);
+
+        $this->facade->appendFromCart($customer, (int) $list->getId(), $this->factory->cart($customer));
+    }
+
     public function testALineWhoseSaleElementLeftTheCatalogStaysWithItsReference(): void
     {
         $customer = $this->customer();

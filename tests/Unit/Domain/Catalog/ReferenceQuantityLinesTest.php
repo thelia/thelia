@@ -61,6 +61,41 @@ final class ReferenceQuantityLinesTest extends TestCase
         self::assertSame(3, $merged->all()[0]->quantity);
     }
 
+    public function testALineWithoutSaleElementJoinsTheOnlyLineOfItsReference(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('AZER1', 3, 7), new ReferenceQuantity('B', 1)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('azer1', 2)]));
+
+        self::assertCount(2, $merged);
+        self::assertSame(['AZER1', 5, 7], [$merged->all()[0]->reference, $merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
+    }
+
+    public function testAGivenSaleElementSettlesALineThatHadNone(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('AZER1', 3)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('AZER1', 2, 7)]));
+
+        self::assertCount(1, $merged);
+        self::assertSame([5, 7], [$merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
+    }
+
+    public function testTwoSaleElementsOfOneReferenceStayTwoLines(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 2, 12)]));
+
+        self::assertCount(2, $merged);
+    }
+
+    public function testALineWithoutSaleElementDoesNotPickBetweenTwoLines(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11), new ReferenceQuantity('TSHIRT', 1, 12)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 2)]));
+
+        self::assertCount(3, $merged);
+        self::assertSame([1, 1, 2], array_map(static fn (ReferenceQuantity $line): int => $line->quantity, $merged->all()));
+    }
+
     public function testFiveHundredLinesFit(): void
     {
         self::assertCount(ReferenceQuantityLines::MAX_LINES, new ReferenceQuantityLines(self::distinctLines(ReferenceQuantityLines::MAX_LINES)));

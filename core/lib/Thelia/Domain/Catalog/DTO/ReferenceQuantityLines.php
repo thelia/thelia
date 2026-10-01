@@ -82,10 +82,60 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
     /**
      * These lines followed by the given ones, a reference already present
      * adding its quantity to the existing line.
+     *
+     * A line that names no sale element is the same reference as the one line
+     * already holding it, whatever sale element that line settled on, and the
+     * other way round: a given sale element settles a line that had none. Only
+     * two different sale elements of one reference stay two lines. References
+     * are compared regardless of case, as the resolver matches them.
      */
     public function merge(self $other): self
     {
-        return new self([...$this->lines, ...$other->lines]);
+        $lines = $this->lines;
+
+        foreach ($other->lines as $line) {
+            $index = self::onlyLineToJoin($lines, $line);
+
+            if (null === $index) {
+                $lines[] = $line;
+
+                continue;
+            }
+
+            $lines[$index] = new ReferenceQuantity(
+                $lines[$index]->reference,
+                $lines[$index]->quantity + $line->quantity,
+                $lines[$index]->productSaleElementsId ?? $line->productSaleElementsId,
+            );
+        }
+
+        return new self($lines);
+    }
+
+    /**
+     * @param list<ReferenceQuantity> $lines
+     */
+    private static function onlyLineToJoin(array $lines, ReferenceQuantity $line): ?int
+    {
+        $reference = mb_strtolower(self::normalizeReference($line->reference));
+        $sameReference = array_keys(array_filter(
+            $lines,
+            static fn (ReferenceQuantity $current): bool => mb_strtolower($current->reference) === $reference,
+        ));
+
+        foreach ($sameReference as $index) {
+            if ($lines[$index]->productSaleElementsId === $line->productSaleElementsId) {
+                return $index;
+            }
+        }
+
+        if (1 !== \count($sameReference)) {
+            return null;
+        }
+
+        $current = $lines[$sameReference[0]];
+
+        return null === $current->productSaleElementsId || null === $line->productSaleElementsId ? $sameReference[0] : null;
     }
 
     /**
