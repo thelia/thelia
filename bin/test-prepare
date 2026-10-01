@@ -150,11 +150,15 @@ function runPostActivateAll(string $projectRoot): void
 
     exec($command, $output, $exitCode);
 
+    // A module left half set up makes the tests touching it fail far from the
+    // cause, so the preparation stops here and says which module it was.
     if (0 !== $exitCode) {
-        fwrite(STDERR, "  WARN module:post-activate-all failed:\n");
+        fwrite(STDERR, "ERROR: module:post-activate-all failed:\n");
         foreach ($output as $line) {
             fwrite(STDERR, "    {$line}\n");
         }
+
+        exit(1);
     }
 }
 

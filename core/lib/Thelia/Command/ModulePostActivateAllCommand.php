@@ -33,6 +33,7 @@ class ModulePostActivateAllCommand extends Command
 
         $con = Propel::getConnection();
         $count = 0;
+        $failedModuleCodes = [];
 
         foreach ($modules as $module) {
             $code = $module->getCode();
@@ -48,11 +49,24 @@ class ModulePostActivateAllCommand extends Command
                 $instance->postActivation($con);
                 ++$count;
             } catch (\Throwable $e) {
-                $output->writeln(\sprintf('  <comment>%s: %s</comment>', $code, $e->getMessage()));
+                $failedModuleCodes[] = $code;
+                $output->writeln(\sprintf('  <error>%s: %s</error>', $code, $e->getMessage()));
             }
         }
 
         $output->writeln(\sprintf('%d module(s) post-activated.', $count));
+
+        // A failing module does not stop the others, but the command fails: an
+        // install must not report success with a module left half set up.
+        if ([] !== $failedModuleCodes) {
+            $output->writeln(\sprintf(
+                '<error>Post-activation failed for %d module(s): %s.</error>',
+                \count($failedModuleCodes),
+                implode(', ', $failedModuleCodes),
+            ));
+
+            return Command::FAILURE;
+        }
 
         return Command::SUCCESS;
     }
