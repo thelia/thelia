@@ -105,6 +105,11 @@ try {
         (new \Symfony\Component\Filesystem\Filesystem())->remove($propelTestCache);
     }
 
+    // The application cache pools live outside var/cache/<env> and outlive
+    // the database just recreated: a module's cached menus would still answer
+    // for the previous one. They are emptied before any command can read them.
+    runCachePoolClear($projectRoot);
+
     // Run postActivation() for all modules — some modules create their
     // tables in postActivation() (e.g. CustomDelivery, ShortCode) rather
     // than via TheliaMain.sql. Without this step, module-specific tables
@@ -154,6 +159,37 @@ function runPostActivateAll(string $projectRoot): void
     // cause, so the preparation stops here and says which module it was.
     if (0 !== $exitCode) {
         fwrite(STDERR, "ERROR: module:post-activate-all failed:\n");
+        foreach ($output as $line) {
+            fwrite(STDERR, "    {$line}\n");
+        }
+
+        exit(1);
+    }
+}
+
+/**
+ * Empties every application cache pool of the test environment.
+ *
+ * The pools sit in var/pools/<env>, or on a cache server with THELIA_CACHE_DSN,
+ * so dropping the database and clearing var/cache/<env> both leave them as
+ * they were, still filled from the database the tests ran on before.
+ */
+function runCachePoolClear(string $projectRoot): void
+{
+    echo "Clearing the application cache pools...\n";
+    $console = $projectRoot.'bin'.DS.'console';
+    $env = $_SERVER['APP_ENV'] ?? 'test';
+    $command = \sprintf(
+        '%s %s cache:pool:clear --all --env=%s 2>&1',
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg($console),
+        escapeshellarg($env),
+    );
+
+    exec($command, $output, $exitCode);
+
+    if (0 !== $exitCode) {
+        fwrite(STDERR, "ERROR: cache:pool:clear failed:\n");
         foreach ($output as $line) {
             fwrite(STDERR, "    {$line}\n");
         }
