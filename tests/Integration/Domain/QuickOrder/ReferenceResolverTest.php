@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\QuickOrder;
 
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
@@ -26,10 +27,12 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\ForgetsPooledModels;
 use Thelia\Test\Trait\RecordsSqlQueries;
 
 final class ReferenceResolverTest extends IntegrationTestCase
 {
+    use ForgetsPooledModels;
     use RecordsSqlQueries;
 
     private FixtureFactory $factory;
@@ -214,17 +217,47 @@ final class ReferenceResolverTest extends IntegrationTestCase
         self::assertSame(1, $table->summary()['unknown']);
     }
 
+    public function testAVirtualProductIsNeverShortOfStock(): void
+    {
+        $product = $this->product(['baseQuantity' => 0]);
+        $product->setVirtual(1)->save($this->getPropelConnection());
+
+        self::assertSame(LineStatus::Resolved, $this->resolveOne((string) $this->defaultSaleElementsOf($product)->getRef())->status);
+    }
+
+    public function testAProductReferenceKeptWithAnOldDefaultFindsTheNewOne(): void
+    {
+        $product = $this->product();
+        $old = $this->defaultSaleElementsOf($product);
+        $old->setRef('OLD-DEFAULT-'.$old->getId())->setIsDefault(true)->save($this->getPropelConnection());
+        $new = $this->factory->productSaleElement($product, ['ref' => 'NEW-DEFAULT-'.$product->getId(), 'quantity' => 50]);
+        $this->factory->productPrice($new, $this->currency);
+        $old->setIsDefault(false)->save($this->getPropelConnection());
+        $new->setIsDefault(true)->save($this->getPropelConnection());
+
+        $line = $this->resolveOne((string) $product->getRef(), 1, (int) $old->getId());
+
+        self::assertSame([LineStatus::Resolved, (int) $new->getId()], [$line->status, $line->productSaleElementsId]);
+    }
+
+    /**
+     * Measured the way a signed-in buyer of the theme pays for it: a customer in the
+     * session whose cart has no delivery address, two tax rules, and nothing pooled.
+     */
     public function testTheNumberOfStatementsDoesNotGrowWithTheNumberOfLines(): void
     {
+        $this->getService(SecurityContext::class)->setCustomerUser($this->customer);
+        $taxRules = [$this->factory->taxRule(), $this->factory->taxRule(['isDefault' => false])];
         $references = [];
 
         for ($n = 0; $n < 40; ++$n) {
-            $references[] = (string) $this->defaultSaleElementsOf($this->product())->getRef();
+            $product = $this->factory->product($this->factory->category(), $taxRules[$n % 2], $this->currency, ['baseQuantity' => 50]);
+            $references[] = (string) $this->defaultSaleElementsOf($product)->getRef();
         }
 
         // The first resolution also loads what the request keeps for good (the
-        // language, the currency, the delivery country): it is left out of the count.
-        $this->countStatementsResolving(\array_slice($references, 0, 1));
+        // language, the currency, the taxes of each tax rule): it is left out of the count.
+        $this->countStatementsResolving(\array_slice($references, 0, 2));
         $few = $this->countStatementsResolving(\array_slice($references, 0, 4));
         $many = $this->countStatementsResolving($references);
 
@@ -238,7 +271,7 @@ final class ReferenceResolverTest extends IntegrationTestCase
     {
         $lines = new ReferenceQuantityLines(array_map(static fn (string $reference): ReferenceQuantity => new ReferenceQuantity($reference, 1), $references));
 
-        return \count($this->recordSqlQueries(fn () => $this->resolver->resolve($this->customer, $lines, $this->currency)));
+        return \count($this->recordSqlQueriesWithoutPooledModels(fn () => $this->resolver->resolve($this->customer, $lines, $this->currency)));
     }
 
     private function resolveOne(string $reference, int $quantity = 1, ?int $productSaleElementsId = null): QuickOrderLine

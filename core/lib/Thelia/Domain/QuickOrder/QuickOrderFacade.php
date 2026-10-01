@@ -26,6 +26,7 @@ use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\Service\QuickOrderLimiter;
 use Thelia\Domain\QuickOrder\Service\ReferenceResolver;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\CartTableMap;
@@ -37,7 +38,9 @@ use Thelia\Model\Map\CartTableMap;
  * before the cart changes. addToCart() resolves the lines again rather than trust
  * the table the browser holds, then adds the resolved ones through CartFacade, the
  * way a product page does, in one transaction: either every resolved line is in
- * the cart, or none is.
+ * the cart, or none is. A line is only reported added once the cart holds it: the
+ * resolver checks a line against the stock alone, and the cart keeps its quantity
+ * without a word when what it already holds leaves too little stock for the rest.
  *
  * Every entry point spends the account's quick order budget before it reads
  * anything, so the API and the theme share one limit and a list of another account
@@ -102,6 +105,7 @@ final readonly class QuickOrderFacade
 
         try {
             $tableLines = [];
+            $inCart = $this->quantitiesIn($cart);
 
             foreach ($table->lines as $line) {
                 if (LineStatus::Resolved !== $line->status) {
@@ -110,13 +114,18 @@ final readonly class QuickOrderFacade
                     continue;
                 }
 
-                $this->cartFacade->addItem(new CartItemAddDTO(
+                $item = $this->cartFacade->addItem(new CartItemAddDTO(
                     $cart,
                     (int) $line->productId,
                     (int) $line->productSaleElementsId,
                     $line->quantity,
                 ));
-                $tableLines[] = $line->markAdded();
+                $before = $inCart[(int) $item->getId()] ?? 0.0;
+                $inCart[(int) $item->getId()] = (float) $item->getQuantity();
+
+                $tableLines[] = $inCart[(int) $item->getId()] - $before >= $line->quantity
+                    ? $line->markAdded()
+                    : $line->refusedByTheCart((float) $item->getProductSaleElements()->getQuantity() - $before);
             }
 
             $connection->commit();
@@ -127,6 +136,24 @@ final readonly class QuickOrderFacade
         }
 
         return new QuickOrderTable($tableLines);
+    }
+
+    /**
+     * The quantity of each line of the cart, by line: the cart (or a module answering
+     * CART_FINDITEM) picks the line a sale element is added to, so that line is the one
+     * compared before and after.
+     *
+     * @return array<int, float>
+     */
+    private function quantitiesIn(Cart $cart): array
+    {
+        $quantities = [];
+
+        foreach (CartItemQuery::create()->filterByCartId($cart->getId())->find() as $item) {
+            $quantities[(int) $item->getId()] = (float) $item->getQuantity();
+        }
+
+        return $quantities;
     }
 
     private function spendBudget(Customer $customer): void

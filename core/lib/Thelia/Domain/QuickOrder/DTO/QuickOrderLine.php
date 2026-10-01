@@ -60,6 +60,27 @@ final readonly class QuickOrderLine
     }
 
     /**
+     * The line the cart turned down: what it still takes of this sale element,
+     * once what it already holds is counted.
+     */
+    public function refusedByTheCart(float $availableQuantity): self
+    {
+        return new self(
+            $this->reference,
+            $this->quantity,
+            LineStatus::QuantityRefused,
+            $this->productSaleElementsId,
+            $this->productId,
+            $this->title,
+            $this->untaxedUnitPrice,
+            $this->taxedUnitPrice,
+            $this->promo,
+            max(0.0, $availableQuantity),
+            $this->candidates,
+        );
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
