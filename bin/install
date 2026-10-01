@@ -287,6 +287,16 @@ foreach ($themes as $type => $name) {
 
 $commands = [];
 
+// The application cache pools outlive the database: they are kept outside var/cache/<env>
+// (or on a cache server, with THELIA_CACHE_DSN), so neither cache:clear nor template:set
+// empties them. Left as they are, they keep answering for the database that was just
+// replaced: a module's cached menus, cached API resources, refresh tokens of accounts that
+// no longer exist. They are emptied first, before any other command can read them.
+$commands[] = [
+    'label' => 'Clearing the application cache pools',
+    'input' => ['command' => 'cache:pool:clear', '--all' => true],
+];
+
 // The API login endpoints sign their tokens with the LexikJWTAuthenticationBundle
 // key pair. composer.json only generates it on post-install-cmd, so an install
 // whose composer step ran with --no-scripts, or ended on a "composer update"
