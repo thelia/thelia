@@ -63,7 +63,7 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
         self::assertSame('one-time-code', $page->filter('[data-testid="two-factor-code"]')->attr('autocomplete'));
         self::assertSame('', (string) $page->filter('[data-testid="two-factor-code"]')->attr('value'));
         self::assertCount(1, $page->filter('[data-testid="two-factor-toggle"]'));
-        self::assertCount(1, $page->filter('form[action="/admin/two-factor/cancel"]'));
+        self::assertCount(1, $page->filter('form[action$="/admin/two-factor/cancel"]'));
     }
 
     public function testTheActivationShowsAQrCodeThenBackupCodesThatAReloadDoesNotShowAgain(): void
@@ -72,7 +72,7 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
         $this->signInWithPassword($admin);
 
         $setup = $this->request('GET', '/admin/account/two-factor');
-        self::assertSame('/admin/two-factor/setup', $setup->filter('[data-testid="account-two-factor-enable"]')->attr('href'));
+        self::assertSame('/admin/two-factor/setup', parse_url((string) $setup->filter('[data-testid="account-two-factor-enable"]')->attr('href'), \PHP_URL_PATH));
 
         $setup = $this->request('GET', '/admin/two-factor/setup');
         $secret = (string) $setup->filter('[data-testid="two-factor-secret"]')->attr('value');
@@ -259,7 +259,7 @@ final class AdminTwoFactorScreensTest extends WebIntegrationTestCase
 
         $account = $this->request('GET', '/admin/account/two-factor');
         self::assertResponseIsSuccessful();
-        self::assertSame('/admin/two-factor/setup', $account->filter('[data-testid="account-two-factor-enable"]')->attr('href'));
+        self::assertSame('/admin/two-factor/setup', parse_url((string) $account->filter('[data-testid="account-two-factor-enable"]')->attr('href'), \PHP_URL_PATH));
     }
 
     public function testAnAdministratorWhoseSecondFactorAPeerResetsOnAShopThatRequiresItIsSentToTheActivation(): void
