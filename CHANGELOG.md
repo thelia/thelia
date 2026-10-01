@@ -28,6 +28,15 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - The terms and conditions have a single source, the content of the `terms_and_conditions` consent. The update script copies `terms_conditions_content_id` onto that consent when it names no content and the setting names one that exists. The setting is deprecated: the demo import still writes it for the 1.1 themes that read it, and it will be removed in the next major version.
 - `Thelia\Core\Template\BackOffice\BackOfficeNavigation::isSectionVisible($section)` tells a back-office theme whether to show a navigation section. A module hides one, `folder` for instance, by implementing `NavigationSectionVoterInterface` (tag `thelia.backoffice_navigation_voter`, autoconfigured). The routes of the section and their permissions do not change.
 
+## Search
+
+- `Thelia\Core\Event\Product\ProductSearchedEvent` carries a product search a shopper submitted on the front, with its locale and the number of products found, so a module can keep a search log whatever runs the search. It is dispatched under its class name, so a module subscribes to `ProductSearchedEvent::class` and keeps working on an older core. Flexy raises it once per submitted search, on the first page of results; TntSearch 4.1 logs it, which brings the searches of the shop to the "Searches without result" report.
+
+## Exports and imports
+
+- A conversion funnel export, `thelia.export.conversion_funnel` in a new Reports category, writes one row per day with the carts created, the carts holding a line, those with a delivery module, those with a payment module, the orders placed and the orders paid. The period rate of paid orders to carts holding a line is read on the back-office report, not per day. Days without activity are kept with zero counts. The period starts on the cart purge horizon at the earliest, as on the back-office report, so orders are never set against carts the purge already deleted; without a period it runs from that horizon up to today.
+- `maintenance:purge` reads the cart retention settings, `purification_cart_no_order_days` and `purification_cart_anonymous_days`, through `Thelia\Domain\Cart\Service\CartPurgeHorizon`, which the conversion report and its export read too. A negative value is read as 0: the purge deletes every cart without order, as it did with the negative value, and the reports start at the current time instead of failing.
+
 ## Fixes
 
 - An export that declares no column alias keeps the columns of its data. `AbstractExport::applyOrderAndAliases()` and `JsonFileAbstractExport::applyOrderAndAliases()` only handed the data back untouched for a `null` `$orderAndAliases`, while the property is `[]` by default, so such an export wrote one empty line per record. An empty list is now read as no alias at all; an export that declares aliases is unchanged.
