@@ -155,7 +155,8 @@ No daily conversion rate: the orders of a given day can come from carts
 created on other days, so a per-day ratio would mislead. The period starts on
 the cart purge horizon at the earliest, as on the screen: without a start, the
 export runs from the horizon up to today, and a period that ends before the
-horizon has no data.
+horizon has no data. The horizon falls at the current time of day, so the first row
+of such a period only counts the carts and orders created after that time.
 
 ## Limits
 
