@@ -476,6 +476,58 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testAPercentCouponOnACartAtTwoRatesFreezesTheVatOfTheDiscountedBase(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->taxRuleTaxingAt($this->countryOf('FR'), '5'),
+            $fixtures['currency'],
+            ['baseQuantity' => 100],
+        );
+        (new CartItem())
+            ->setCartId($fixtures['cart']->getId())
+            ->setProductId($product->getId())
+            ->setProductSaleElementsId(ProductSaleElementsQuery::create()->filterByProductId($product->getId())->findOne()?->getId())
+            ->setQuantity(1)
+            ->setPrice('30.00')
+            ->setPromoPrice('30.00')
+            ->setPromo(0)
+            ->save($this->getPropelConnection());
+        $fixtures['cart']->clearCartItems();
+        $this->consumeTenPercentCoupon($fixtures);
+        self::assertEqualsWithDelta(4.0, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Control: ten percent of the untaxed 40.00.');
+
+        $order = $this->checkout($fixtures);
+
+        self::assertEqualsWithDelta(
+            (2.0 + 1.5) * 0.9,
+            (float) $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount(),
+            0.0001,
+            'The VAT of the lines, 2.00 at 20 % and 1.50 at 5 %, on a base ten percent smaller.',
+        );
+    }
+
+    public function testACouponPricedOnAnExemptCartIsPricedAgainOnceTheVerificationExpired(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $this->consumeTenPercentCoupon($fixtures);
+        self::assertEqualsWithDelta(1.0, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Control: ten percent of the untaxed 10.00.');
+
+        $this->getService(CouponAction::class)->reconcileWithVatExemption();
+        $fixtures['cart']->reload();
+        self::assertEqualsWithDelta(1.0, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Nothing changed: the discount stays.');
+
+        $this->verifyInvoiceCopy($fixtures, new \DateTime('-100 days'));
+        $this->session()->setSessionCart($fixtures['cart']);
+        $this->getService(CouponAction::class)->reconcileWithVatExemption();
+        $fixtures['cart']->reload();
+
+        self::assertEqualsWithDelta(1.2, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Ten percent of the taxed 12.00 once the cart is taxed again.');
+    }
+
     public function testACouponTypedBeforeTheExemptingAddressIsRepricedWhenTheAddressIsChosen(): void
     {
         $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);

@@ -53,6 +53,7 @@ readonly class ExemptedVatCalculator
         float $postageVat,
     ): float {
         $vat = 0.0;
+        $untaxedTotal = 0.0;
         $cartItems = $cart->getCartItems();
         $productsById = $this->productsOf($cartItems);
 
@@ -65,14 +66,15 @@ readonly class ExemptedVatCalculator
                 ->load($productsById[$cartItem->getProductId()], $country, $state)
                 ->getTaxedPrice($untaxedPrice);
 
-            $vat += $this->lineTotal($taxedPrice, (float) $cartItem->getQuantity()) - $this->lineTotal($untaxedPrice, (float) $cartItem->getQuantity());
+            $untaxedLineTotal = $this->lineTotal($untaxedPrice, (float) $cartItem->getQuantity());
+            $vat += $this->lineTotal($taxedPrice, (float) $cartItem->getQuantity()) - $untaxedLineTotal;
+            $untaxedTotal += $untaxedLineTotal;
         }
 
-        $discount = (float) $cart->getDiscount();
+        $discount = min((float) $cart->getDiscount(), $untaxedTotal);
 
-        if (0.0 !== $discount) {
-            $vat -= $discount * ($this->taxCalculatorFactory->createTaxCalculator()
-                ->computeCartTaxFactor($cart, $country, $state) - 1);
+        if ($discount > 0.0) {
+            $vat -= $vat * $discount / $untaxedTotal;
         }
 
         $vat += $postageVat;
