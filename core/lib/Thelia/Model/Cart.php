@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\Cart as BaseCart;
 
@@ -142,9 +144,10 @@ class Cart extends BaseCart
         bool $withGiftWrapping = false,
     ): float {
         $total = 0;
+        $cartTaxCalculator = $this->createCartTaxCalculator($this);
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getTotalRealTaxedPrice($country, $state);
+            $total += $cartItem->getTotalRealTaxedPrice($country, $state, $cartTaxCalculator);
         }
 
         if ($withDiscount) {
@@ -156,7 +159,7 @@ class Cart extends BaseCart
         }
 
         if ($withPostage) {
-            $total += $this->getTaxedPostage();
+            $total += $this->taxedPostageUnder($cartTaxCalculator);
         }
 
         // Off by default, and asked for only by the callers that want the grand total the
@@ -286,19 +289,21 @@ class Cart extends BaseCart
     }
 
     /**
-     * Return the postage, tax included.
-     *
-     * The postage column is stored tax included, exactly like Order::getPostage(),
-     * so this method only spells the convention out for the caller.
+     * @throws PropelException
      */
-    public function getTaxedPostage(): float
+    public function isVatExempted(): bool
     {
-        return (float) $this->getPostage();
+        return $this->createCartTaxCalculator($this) instanceof ExemptTaxCalculator;
     }
 
     /**
-     * Return the postage without tax.
+     * @throws PropelException
      */
+    public function getTaxedPostage(): float
+    {
+        return $this->taxedPostageUnder($this->createCartTaxCalculator($this));
+    }
+
     public function getUntaxedPostage(): float
     {
         return 0 < (float) $this->getPostageTax()
@@ -354,5 +359,20 @@ class Cart extends BaseCart
                 ->getTaxedPrice($untaxedPrice),
             2,
         );
+    }
+
+    /**
+     * @throws PropelException
+     */
+    public function getPostageTaxAmount(): float
+    {
+        return $this->isVatExempted() ? 0.0 : (float) $this->getPostageTax();
+    }
+
+    private function taxedPostageUnder(TaxCalculatorInterface $cartTaxCalculator): float
+    {
+        return $cartTaxCalculator instanceof ExemptTaxCalculator
+            ? $this->getUntaxedPostage()
+            : (float) $this->getPostage();
     }
 }

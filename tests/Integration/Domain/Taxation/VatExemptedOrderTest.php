@@ -30,8 +30,8 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
+use Thelia\Domain\Order\Service\OrderFingerprint;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
-use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
@@ -235,25 +235,17 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(0.0, (float) $cart->getTotalVAT($country, null, true), 0.0001);
     }
 
-    /**
-     * calculatePostage() is the only listener that takes VAT off a delivery
-     * quote, and it only runs once, on CART_SET_POSTAGE - so a buyer who picks
-     * a delivery module before supplying the VAT number that exempts him would
-     * keep the postage tax quoted for the wrong buyer, unless changing the
-     * invoice address after the fact re-fires the same listener.
-     */
-    public function testChangingTheInvoiceAddressAfterPostageWasQuotedRecalculatesItsTax(): void
+    public function testChangingTheInvoiceAddressAfterPostageWasQuotedTakesItsTaxOff(): void
     {
         $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
         $cart = $this->createCheckoutReadyCart('FR', null)['cart'];
 
         $dispatcher = new EventDispatcher();
-        $action = new class($this->getService(VatExemptionResolver::class)) extends CartAction {
+        $action = new class extends CartAction {
             public OrderPostage $quote;
 
-            public function __construct(VatExemptionResolver $vatExemptionResolver)
+            public function __construct()
             {
-                $this->vatExemptionResolver = $vatExemptionResolver;
             }
 
             protected function getPostageByDeliveryModuleId(
@@ -272,7 +264,7 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         $cart->reload();
         self::assertEqualsWithDelta(
             2.0,
-            (float) $cart->getPostageTax(),
+            $cart->getPostageTaxAmount(),
             0.0001,
             'Control: the initial quote must actually carry a postage tax, or the test proves nothing.',
         );
@@ -289,10 +281,11 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
 
         self::assertEqualsWithDelta(
             0.0,
-            (float) $cart->getPostageTax(),
+            $cart->getPostageTaxAmount(),
             0.0001,
-            'The postage tax must be recalculated once the new invoice address qualifies for exemption.',
+            'The postage tax must be taken off once the new invoice address qualifies for exemption.',
         );
+        self::assertEqualsWithDelta(10.0, $cart->getTaxedPostage(), 0.0001);
     }
 
     public function testTheSameCartIsShownTaxedWhenTheSettingIsOff(): void
@@ -353,7 +346,6 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         self::assertSame(0, $this->taxLinesOf($reread));
         self::assertSame(1, $reread->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
         self::assertSame($exemptedAmountBefore, $reread->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount());
-        self::assertTrue($this->getService(VatExemptionResolver::class)->isExemptedForOrder($reread));
     }
 
     public function testMovingTheInvoiceAddressBackHomeTaxesTheOrderPostageIncluded(): void
@@ -365,7 +357,7 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
 
         $action->calculatePostage(new CartCheckoutEvent($cart), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
         $cart->reload();
-        self::assertEqualsWithDelta(0.0, (float) $cart->getPostageTax(), 0.0001, 'Control: the exempt cart must start with untaxed postage.');
+        self::assertEqualsWithDelta(0.0, $cart->getPostageTaxAmount(), 0.0001, 'Control: the exempt cart must start with untaxed postage.');
 
         $homeAddress = $this->createCartAddress(
             $this->factory->customerTitle()->getId(),
@@ -375,7 +367,7 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         );
         $action->setInvoiceAddressManual((new CartCheckoutEvent($cart))->setCartAddress($homeAddress), TheliaEvents::CART_SET_INVOICE_ADDRESS_MANUAL, $dispatcher);
         $cart->reload();
-        self::assertEqualsWithDelta(2.0, (float) $cart->getPostageTax(), 0.0001);
+        self::assertEqualsWithDelta(2.0, $cart->getPostageTaxAmount(), 0.0001);
 
         $fixtures['invoiceAddressId'] = $homeAddress->getId();
         $order = $this->checkout($fixtures);
@@ -424,6 +416,166 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(0.0, $tax, 0.0001);
     }
 
+    public function testAVerificationRecordedAfterThePostageQuoteTakesTheTaxOffThePostageOfTheOrder(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', null);
+        $this->quotePostage($fixtures['cart']);
+        self::assertEqualsWithDelta(2.0, $fixtures['cart']->getPostageTaxAmount(), 0.0001, 'Control: the unverified buyer is quoted a taxed postage.');
+
+        $this->verifyInvoiceCopy($fixtures, new \DateTime('-1 day'));
+        $order = $this->checkout($fixtures);
+
+        self::assertSame(1, $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
+        self::assertEqualsWithDelta(10.0, (float) $order->getPostage(), 0.0001);
+        self::assertEqualsWithDelta(0.0, (float) $order->getPostageTax(), 0.0001);
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+        self::assertEqualsWithDelta(0.0, $tax, 0.0001);
+    }
+
+    public function testAVerificationThatExpiresAfterThePostageQuoteTaxesThePostageOnScreenAndOnTheOrder(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $this->quotePostage($fixtures['cart']);
+        self::assertEqualsWithDelta(10.0, $fixtures['cart']->getTaxedPostage(), 0.0001, 'Control: the exempt buyer is shown an untaxed postage.');
+
+        $this->verifyInvoiceCopy($fixtures, new \DateTime('-100 days'));
+
+        self::assertEqualsWithDelta(12.0, $fixtures['cart']->getTaxedPostage(), 0.0001);
+        self::assertEqualsWithDelta(2.0, $fixtures['cart']->getPostageTaxAmount(), 0.0001);
+        $this->assertTaxedThroughout($this->checkout($fixtures));
+    }
+
+    public function testTurningTheSettingOffAfterThePostageQuoteTaxesThePostageOfTheOrder(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $this->quotePostage($fixtures['cart']);
+
+        $this->configure(VatExemptionMode::DISABLED);
+
+        $this->assertTaxedThroughout($this->checkout($fixtures));
+    }
+
+    public function testAPercentCouponOnAnExemptOrderFreezesTheVatOfTheDiscountedBase(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $this->consumeTenPercentCoupon($fixtures);
+        self::assertEqualsWithDelta(1.0, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Control: ten percent of the untaxed 10.00.');
+
+        $order = $this->checkout($fixtures);
+
+        self::assertEqualsWithDelta(
+            1.80,
+            (float) $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount(),
+            0.0001,
+            'Twenty percent of the discounted base of 9.00.',
+        );
+    }
+
+    public function testACouponTypedBeforeTheExemptingAddressIsRepricedWhenTheAddressIsChosen(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('FR', new \DateTime('-10 days'));
+        $this->consumeTenPercentCoupon($fixtures);
+        self::assertEqualsWithDelta(1.2, (float) $fixtures['cart']->getDiscount(), 0.0001, 'Control: ten percent of the taxed 12.00.');
+
+        $exemptingAddress = $this->createCartAddress(
+            $this->factory->customerTitle()->getId(),
+            $this->countryOf('BE')->getId(),
+            'BE0123456789',
+            new \DateTime('-10 days'),
+        );
+        $this->kernelDispatcher()->dispatch(
+            (new CartCheckoutEvent($fixtures['cart']))->setCartAddress($exemptingAddress),
+            TheliaEvents::CART_SET_INVOICE_ADDRESS_MANUAL,
+        );
+        $fixtures['cart']->reload();
+
+        self::assertEqualsWithDelta(1.0, (float) $fixtures['cart']->getDiscount(), 0.0001);
+    }
+
+    public function testTheExemptedVatCountsThePostageVatTheCartWasQuoted(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(13.0, 3.0, 'VAT split'));
+        $action->calculatePostage(new CartCheckoutEvent($fixtures['cart']), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $fixtures['cart']->reload();
+
+        $order = $this->checkout($fixtures);
+
+        self::assertEqualsWithDelta(
+            2.0 + 3.0,
+            (float) $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount(),
+            0.0001,
+        );
+    }
+
+    public function testTheFingerprintOfACartFollowsItsExemption(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $fingerprint = $this->getService(OrderFingerprint::class);
+        $exempt = $fingerprint->of($fixtures['cart'], $fixtures['deliveryModule']->getId(), $fixtures['paymentModule']->getId(), null);
+
+        $this->configure(VatExemptionMode::DISABLED);
+
+        self::assertNotSame($exempt, $fingerprint->of($fixtures['cart'], $fixtures['deliveryModule']->getId(), $fixtures['paymentModule']->getId(), null));
+    }
+
+    /**
+     * @param array{cart: Cart, customer: \Thelia\Model\Customer, currency: \Thelia\Model\Currency, deliveryModule: \Thelia\Model\Module, paymentModule: \Thelia\Model\Module, deliveryAddressId: int, invoiceAddressId: int} $fixtures
+     */
+    private function consumeTenPercentCoupon(array $fixtures): void
+    {
+        $session = $this->session();
+        $session->setCustomerUser($fixtures['customer']);
+        $session->setSessionCart($fixtures['cart']);
+        $session->setCurrency($fixtures['currency']);
+        $coupon = $this->factory->coupon([
+            'code' => 'TEN-PERCENT-'.uniqid(),
+            'type' => 'thelia.coupon.type.remove_x_percent',
+            'effects' => ['percentage' => 10.0],
+            'conditions' => $this->atLeastOneArticle(),
+        ]);
+        $session->setConsumedCoupons([$coupon->getCode()]);
+        $this->getService(CouponAction::class)->updateOrderDiscount(new Event(), 'test.recompute', $this->kernelDispatcher());
+        $fixtures['cart']->reload();
+    }
+
+    private function quotePostage(Cart $cart): void
+    {
+        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+        $action->calculatePostage(new CartCheckoutEvent($cart), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
+        $cart->reload();
+    }
+
+    /**
+     * @param array{cart: Cart, invoiceAddressId: int} $fixtures
+     */
+    private function verifyInvoiceCopy(array $fixtures, \DateTime $verifiedAt): void
+    {
+        CartAddressQuery::create()
+            ->filterById($fixtures['invoiceAddressId'])
+            ->update(['VatVerifiedAt' => $verifiedAt->format('Y-m-d H:i:s')]);
+        CartAddressTableMap::clearInstancePool();
+        $fixtures['cart']->reload(true);
+    }
+
+    private function assertTaxedThroughout(Order $order): void
+    {
+        self::assertSame(0, $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
+        self::assertEqualsWithDelta(12.0, (float) $order->getPostage(), 0.0001);
+        self::assertEqualsWithDelta(2.0, (float) $order->getPostageTax(), 0.0001);
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+        self::assertEqualsWithDelta(2.0 + 2.0, $tax, 0.0001, 'VAT on the 10.00 line at 20% plus the VAT of the postage.');
+    }
+
     private function atLeastOneArticle(): string
     {
         $conditions = new ConditionCollection();
@@ -442,12 +594,11 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
     private function postageQuotedAt(OrderPostage $quote): array
     {
         $dispatcher = new EventDispatcher();
-        $action = new class($this->getService(VatExemptionResolver::class)) extends CartAction {
+        $action = new class extends CartAction {
             public OrderPostage $quote;
 
-            public function __construct(VatExemptionResolver $vatExemptionResolver)
+            public function __construct()
             {
-                $this->vatExemptionResolver = $vatExemptionResolver;
             }
 
             protected function getPostageByDeliveryModuleId(

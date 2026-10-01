@@ -105,6 +105,13 @@ final class AttributeAccessServiceTest extends IntegrationTestCase
 
         self::assertTrue($this->attributeAccess->attributeCart('is_vat_exempted'));
         self::assertSame('BE0123456789', $this->attributeAccess->attributeCart('invoice_vat_number'));
+        self::assertSame('exempted', $this->attributeAccess->attributeCart('vat_exemption_state'));
+
+        $invoiceAddress->setVatVerifiedAt(new \DateTime('-400 days'))->save($this->getPropelConnection());
+        $cart->reload(true);
+
+        self::assertFalse($this->attributeAccess->attributeCart('is_vat_exempted'));
+        self::assertSame('verification_expired', $this->attributeAccess->attributeCart('vat_exemption_state'));
     }
 
     public function testOrderAttributesExposeTheFrozenVatExemptionState(): void

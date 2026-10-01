@@ -20,6 +20,28 @@ use Thelia\Model\Map\AddressTableMap;
 
 class Address extends BaseAddress
 {
+    private const array COLUMNS_COPIED_TO_CARTS = [
+        AddressTableMap::COL_TITLE_ID,
+        AddressTableMap::COL_COMPANY,
+        AddressTableMap::COL_SIRET,
+        AddressTableMap::COL_VAT_NUMBER,
+        AddressTableMap::COL_VAT_VERIFIED_AT,
+        AddressTableMap::COL_VAT_VERIFIED_NAME,
+        AddressTableMap::COL_FIRSTNAME,
+        AddressTableMap::COL_LASTNAME,
+        AddressTableMap::COL_ADDRESS1,
+        AddressTableMap::COL_ADDRESS2,
+        AddressTableMap::COL_ADDRESS3,
+        AddressTableMap::COL_ZIPCODE,
+        AddressTableMap::COL_CITY,
+        AddressTableMap::COL_PHONE,
+        AddressTableMap::COL_CELLPHONE,
+        AddressTableMap::COL_COUNTRY_ID,
+        AddressTableMap::COL_STATE_ID,
+    ];
+
+    private bool $cartCopiesAreStale = false;
+
     /**
      * put the the current address as default one.
      */
@@ -45,8 +67,31 @@ class Address extends BaseAddress
     public function preUpdate(?ConnectionInterface $con = null): bool
     {
         $this->dropVatVerificationWhenItsSubjectChanges();
+        $this->cartCopiesAreStale = [] !== array_intersect($this->getModifiedColumns(), self::COLUMNS_COPIED_TO_CARTS);
 
         return parent::preUpdate($con);
+    }
+
+    public function postUpdate(?ConnectionInterface $con = null): void
+    {
+        if ($this->cartCopiesAreStale) {
+            $this->cartCopiesAreStale = false;
+
+            $invoiceCopyIds = CartQuery::create()
+                ->useCartAddressRelatedByAddressInvoiceIdQuery()
+                    ->filterByAddressId($this->getId())
+                ->endUse()
+                ->where('NOT EXISTS (SELECT 1 FROM `order` WHERE `order`.`cart_id` = `cart`.`id`)')
+                ->select('AddressInvoiceId')
+                ->find($con)
+                ->getData();
+
+            foreach (CartAddressQuery::create()->filterById($invoiceCopyIds)->find($con) as $cartAddress) {
+                $cartAddress->copyFrom($this)->save($con);
+            }
+        }
+
+        parent::postUpdate($con);
     }
 
     public function getVatVerificationValid(): bool

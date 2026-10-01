@@ -265,10 +265,10 @@ class AttributeAccessService
                 $result = $cart->getUntaxedPostage();
                 break;
             case 'postage':
-                $result = $cart->getPostage();
+                $result = $cart->getTaxedPostage();
                 break;
             case 'postage_tax':
-                $result = $cart->getPostageTax();
+                $result = $cart->getPostageTaxAmount();
                 break;
             case 'total_price':
             case 'total_price_with_discount':
@@ -357,6 +357,9 @@ class AttributeAccessService
                 break;
             case 'is_vat_exempted':
                 $result = $this->vatExemptionResolver->isExemptedForCart($cart);
+                break;
+            case 'vat_exemption_state':
+                $result = $this->vatExemptionResolver->stateForCart($cart)->value;
                 break;
             case 'invoice_vat_number':
                 $result = $cart->getCartAddressRelatedByAddressInvoiceId()?->getVatNumber() ?? '';

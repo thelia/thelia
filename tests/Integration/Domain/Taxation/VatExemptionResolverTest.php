@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Taxation;
 
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Domain\Taxation\Enum\VatExemptionState;
 use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
@@ -108,17 +109,34 @@ final class VatExemptionResolverTest extends IntegrationTestCase
         self::assertFalse($this->resolver()->isExemptedForCart($this->factory->cart()));
     }
 
-    public function testAFrozenExemptedOrderStaysExempted(): void
+    public function testAVerificationNextToNoNumberExemptsNothing(): void
     {
-        $order = $this->factory->order();
-        $order->getOrderAddressRelatedByInvoiceOrderAddressId()->setVatExempted(1)->save($this->getPropelConnection());
+        $cart = $this->cartBilledTo('BE', new \DateTime('-10 days'));
+        $cart->getCartAddressRelatedByAddressInvoiceId()->setVatNumber(null)->save($this->getPropelConnection());
 
-        self::assertTrue($this->resolver()->isExemptedForOrder($order));
+        self::assertFalse($this->resolver()->isExemptedForCart($cart));
     }
 
-    public function testAnOrderWithoutTheFrozenFlagIsTaxed(): void
+    public function testTheStateTellsANumberNobodyVerified(): void
     {
-        self::assertFalse($this->resolver()->isExemptedForOrder($this->factory->order()));
+        self::assertSame(VatExemptionState::NOT_VERIFIED, $this->resolver()->stateForCart($this->cartBilledTo('BE', null)));
+    }
+
+    public function testTheStateTellsAVerificationThatExpired(): void
+    {
+        ConfigQuery::write('vat_verification_lifetime_days', '90');
+
+        self::assertSame(VatExemptionState::VERIFICATION_EXPIRED, $this->resolver()->stateForCart($this->cartBilledTo('BE', new \DateTime('-100 days'))));
+    }
+
+    public function testTheStateOfABuyerAtHomeSaysNothingOfItsNumber(): void
+    {
+        self::assertSame(VatExemptionState::NOT_APPLICABLE, $this->resolver()->stateForCart($this->cartBilledTo('FR', null)));
+    }
+
+    public function testTheStateOfAnExemptedBuyer(): void
+    {
+        self::assertSame(VatExemptionState::EXEMPTED, $this->resolver()->stateForCart($this->cartBilledTo('BE', new \DateTime('-10 days'))));
     }
 
     private function resolver(): VatExemptionResolver

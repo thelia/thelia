@@ -28,7 +28,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Resource\Cart;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
-use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Cart as PropelCart;
 use Thelia\Model\Country;
@@ -41,7 +40,6 @@ class CartNormalizer extends AbstractItemNormalizer
         private readonly Session $session,
         private readonly RequestStack $requestStack,
         private readonly PostageEstimator $postageEstimator,
-        private readonly VatExemptionResolver $vatExemptionResolver,
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         PropertyMetadataFactoryInterface $propertyMetadataFactory,
         IriConverterInterface $iriConverter,
@@ -81,7 +79,8 @@ class CartNormalizer extends AbstractItemNormalizer
         $this->requestStack->getMainRequest()?->setSession($this->session); // Todo : Quick fix for Call to undefined method Symfony\Component\HttpFoundation\Session\Session::getMethod
         $propelCart = $object->getPropelModel();
         [$country, $state] = $this->taxationPlaceOf($propelCart);
-        [$estimatedPostage, $postageTax] = $this->deliveryCostOf($propelCart, $country, $state);
+        $vatExempted = $propelCart->isVatExempted();
+        [$estimatedPostage, $postageTax] = $this->deliveryCostOf($propelCart, $country, $state, $vatExempted);
         /* @var Cart $object */
         $object
             ->setTotalWithoutTax($propelCart->getTotalAmount())
@@ -90,7 +89,13 @@ class CartNormalizer extends AbstractItemNormalizer
             ->setDelivery($estimatedPostage)
             ->setTotal($propelCart->getTaxedAmount($country, false, null))
             ->setVirtual($propelCart->isVirtual())
-            ->setIsVatExempted($this->vatExemptionResolver->isExemptedForCart($propelCart));
+            ->setIsVatExempted($vatExempted);
+
+        if (null !== $propelCart->getPostage()) {
+            $object
+                ->setPostage($propelCart->getTaxedPostage())
+                ->setPostageTax($propelCart->getPostageTaxAmount());
+        }
 
         return parent::normalize($object, $format, $context);
     }
@@ -137,10 +142,10 @@ class CartNormalizer extends AbstractItemNormalizer
      *
      * @return array{0: float|null, 1: float|null}
      */
-    private function deliveryCostOf(PropelCart $propelCart, Country $country, ?State $state): array
+    private function deliveryCostOf(PropelCart $propelCart, Country $country, ?State $state, bool $vatExempted): array
     {
         if (null !== $propelCart->getDeliveryModuleId() && null !== $propelCart->getPostage()) {
-            return [(float) $propelCart->getPostage(), (float) $propelCart->getPostageTax()];
+            return [$propelCart->getTaxedPostage(), $propelCart->getPostageTaxAmount()];
         }
 
         $postageInfo = $this->postageEstimator->estimatePostageForCountry(
@@ -149,7 +154,14 @@ class CartNormalizer extends AbstractItemNormalizer
             state: $state,
         );
 
-        return [$postageInfo->getBestPostageAmount(), $postageInfo->getBestPostageTax()];
+        $amount = $postageInfo->getBestPostageAmount();
+        $tax = $postageInfo->getBestPostageTax();
+
+        if ($vatExempted && null !== $amount) {
+            return [$amount - (float) $tax, 0.0];
+        }
+
+        return [$amount, $tax];
     }
 
     public function getSupportedTypes(?string $format): array

@@ -522,11 +522,15 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $orderAddress = $event->getOrderAddress();
 
+        if (1 !== (int) $orderAddress->getVatExempted()) {
+            $orderAddress
+                ->setCompany($event->getCompany())
+                ->setSiret($event->getSiret())
+                ->setVatNumber($event->getVatNumber());
+        }
+
         $orderAddress
             ->setCustomerTitleId($event->getTitle() === null ? null : (int) $event->getTitle())
-            ->setCompany($event->getCompany())
-            ->setSiret($event->getSiret())
-            ->setVatNumber($event->getVatNumber())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
             ->setAddress1($event->getAddress1())

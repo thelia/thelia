@@ -17,12 +17,12 @@ namespace Thelia\Domain\Taxation\Service;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Domain\Localization\Service\EuropeanUnionCountries;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
+use Thelia\Domain\Taxation\Enum\VatExemptionState;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\Order;
 
 /**
  * Whether an order leaves without VAT because its buyer accounts for it.
@@ -59,42 +59,42 @@ final class VatExemptionResolver implements ResetInterface
 
     public function isExemptedForCart(Cart $cart): bool
     {
+        return VatExemptionState::EXEMPTED === $this->stateForCart($cart);
+    }
+
+    public function stateForCart(Cart $cart): VatExemptionState
+    {
         if (VatExemptionMode::VERIFIED_VAT_NUMBER !== VatExemptionMode::fromShopConfiguration()) {
-            return false;
+            return VatExemptionState::NOT_APPLICABLE;
         }
 
         // A shop that is itself out of the VAT scope charges none to begin with,
         // and has no VAT to reverse onto its buyer.
         if (ConfigQuery::isStoreVatExempt()) {
-            return false;
+            return VatExemptionState::NOT_APPLICABLE;
         }
 
         $invoiceAddress = $cart->getCartAddressRelatedByAddressInvoiceId();
 
-        if (!$invoiceAddress instanceof CartAddress) {
-            return false;
+        if (!$invoiceAddress instanceof CartAddress || '' === trim((string) $invoiceAddress->getVatNumber())) {
+            return VatExemptionState::NOT_APPLICABLE;
         }
 
-        return $this->qualifies($invoiceAddress->getVatVerifiedAt(), $this->isoCodeOf($invoiceAddress->getCountryId()));
-    }
-
-    /**
-     * What the order was invoiced on, read back rather than decided again.
-     *
-     * An order that left untaxed stays untaxed even after the number is revoked
-     * or the shop turns the setting off, so this never re-runs the rule.
-     */
-    public function isExemptedForOrder(Order $order): bool
-    {
-        return $order->getVatExempted();
-    }
-
-    private function qualifies(?\DateTimeInterface $verifiedAt, ?string $buyerCountryCode): bool
-    {
-        if (null === $verifiedAt || $this->hasExpired($verifiedAt)) {
-            return false;
+        if (!$this->crossesABorderOfTheUnion($this->isoCodeOf($invoiceAddress->getCountryId()))) {
+            return VatExemptionState::NOT_APPLICABLE;
         }
 
+        $verifiedAt = $invoiceAddress->getVatVerifiedAt();
+
+        if (null === $verifiedAt) {
+            return VatExemptionState::NOT_VERIFIED;
+        }
+
+        return $this->hasExpired($verifiedAt) ? VatExemptionState::VERIFICATION_EXPIRED : VatExemptionState::EXEMPTED;
+    }
+
+    private function crossesABorderOfTheUnion(?string $buyerCountryCode): bool
+    {
         if (null === $buyerCountryCode || !$this->europeanUnionCountries->isMember($buyerCountryCode)) {
             return false;
         }
