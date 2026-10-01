@@ -43,6 +43,8 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           ini-values: post_max_size=20M
+          # A coverage driver turns JIT off with a startup warning that the server log check reads as a PHP error.
+          coverage: none
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
       - name: Create the shop
