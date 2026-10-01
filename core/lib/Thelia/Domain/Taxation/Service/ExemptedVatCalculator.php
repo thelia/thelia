@@ -17,11 +17,12 @@ namespace Thelia\Domain\Taxation\Service;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
-use Thelia\Model\ModuleQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
-use Thelia\Module\AbstractDeliveryModule;
-use Thelia\Module\AbstractDeliveryModuleWithState;
 
 /**
  * The VAT a cart would have carried had it not been exempted.
@@ -49,62 +50,64 @@ readonly class ExemptedVatCalculator
         Cart $cart,
         Country $country,
         ?State $state,
-        float $untaxedPostage,
-        ?int $deliveryModuleId,
-        ?string $locale,
+        float $postageVat,
     ): float {
         $vat = 0.0;
+        $cartItems = $cart->getCartItems();
+        $productsById = $this->productsOf($cartItems);
 
-        foreach ($cart->getCartItems() as $cartItem) {
+        foreach ($cartItems as $cartItem) {
             $untaxedPrice = 1 === (int) $cartItem->getPromo()
                 ? (float) $cartItem->getPromoPrice()
                 : (float) $cartItem->getPrice();
 
             $taxedPrice = $this->taxCalculatorFactory->createTaxCalculator()
-                ->load($cartItem->getProduct(), $country, $state)
+                ->load($productsById[$cartItem->getProductId()], $country, $state)
                 ->getTaxedPrice($untaxedPrice);
 
-            $vat += ($taxedPrice - $untaxedPrice) * $cartItem->getQuantity();
+            $vat += $this->lineTotal($taxedPrice, (float) $cartItem->getQuantity()) - $this->lineTotal($untaxedPrice, (float) $cartItem->getQuantity());
         }
 
-        // A discount is stored taxed, and a taxed order spreads it over the
-        // rates of the goods. The share of it that was VAT is not exempted
-        // twice: it never reached the buyer.
         $discount = (float) $cart->getDiscount();
 
         if (0.0 !== $discount) {
-            $vat -= $discount - $this->taxCalculatorFactory->createTaxCalculator()
-                ->computeUntaxedCartDiscount($cart, $country, $state);
+            $vat -= $discount * ($this->taxCalculatorFactory->createTaxCalculator()
+                ->computeCartTaxFactor($cart, $country, $state) - 1);
         }
 
-        $vat += $this->postageVat($untaxedPostage, $country, $deliveryModuleId, $locale);
+        $vat += $postageVat;
 
         return round(max(0.0, $vat), 2);
     }
 
+    private function lineTotal(float $unitPrice, float $quantity): float
+    {
+        if (ConfigQuery::isRoundingModeRoundingOfSums()) {
+            return round($unitPrice * $quantity, 2);
+        }
+
+        return round($unitPrice, 2) * $quantity;
+    }
+
     /**
-     * @throws PropelException
+     * @param iterable<CartItem> $cartItems
+     *
+     * @return array<int, Product>
      */
-    private function postageVat(
-        float $untaxedPostage,
-        Country $country,
-        ?int $deliveryModuleId,
-        ?string $locale,
-    ): float {
-        if (0.0 === $untaxedPostage || null === $deliveryModuleId) {
-            return 0.0;
+    private function productsOf(iterable $cartItems): array
+    {
+        $productIds = [];
+
+        foreach ($cartItems as $cartItem) {
+            $productIds[] = $cartItem->getProductId();
         }
 
-        $module = ModuleQuery::create()->findPk($deliveryModuleId)?->createInstance();
+        $productsById = [];
 
-        // Only a module built on one of the shipped base classes exposes the rule it
-        // taxes its carriage with. Another one quoted a postage Thelia cannot
-        // re-quote without it, so the carriage is left out rather than taxed
-        // under a rule it never used.
-        if (!$module instanceof AbstractDeliveryModule && !$module instanceof AbstractDeliveryModuleWithState) {
-            return 0.0;
+        foreach (ProductQuery::create()->filterById(array_unique($productIds))->find() as $product) {
+            $productsById[$product->getId()] = $product;
         }
 
-        return (float) $module->buildOrderPostage($untaxedPostage, $country, $locale)->getAmountTax();
+        return $productsById;
     }
 }

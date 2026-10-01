@@ -38,8 +38,7 @@ use Thelia\Test\ActionIntegrationTestCase;
  *
  * A module reports what an authority answered and Thelia records it, so the
  * rule that nothing else may set those columns holds in one place. A refusal
- * and an unreachable service both clear the state: the first means the number
- * stopped verifying, the second means nobody knows any more.
+ * clears the state, an unreachable service leaves it as it was.
  */
 final class VatNumberVerifiedEventTest extends ActionIntegrationTestCase
 {
@@ -80,9 +79,28 @@ final class VatNumberVerifiedEventTest extends ActionIntegrationTestCase
         self::assertNull($address->getVatVerifiedName());
     }
 
-    public function testAnUnreachableServiceAlsoClearsIt(): void
+    public function testAnUnreachableServiceLeavesAValidVerificationStanding(): void
     {
         $address = $this->verifiedAddress();
+        $address->reload();
+        $verifiedAt = $address->getVatVerifiedAt('Y-m-d H:i:s');
+        self::assertNotNull($verifiedAt, 'Control: the address starts verified.');
+
+        $this->dispatch(
+            new VatNumberVerifiedEvent($address, VatVerificationResult::undetermined()),
+            TheliaEvents::VAT_NUMBER_VERIFIED,
+        );
+
+        $address->reload();
+        self::assertSame($verifiedAt, $address->getVatVerifiedAt('Y-m-d H:i:s'), 'An outage told nothing about the number.');
+        self::assertNotNull($address->getVatVerifiedName());
+    }
+
+    public function testAnUnreachableServiceGrantsNothing(): void
+    {
+        $address = $this->verifiedAddress();
+        AddressQuery::create()->filterById($address->getId())->update(['VatVerifiedAt' => null, 'VatVerifiedName' => null]);
+        $address->reload();
 
         $this->dispatch(
             new VatNumberVerifiedEvent($address, VatVerificationResult::undetermined()),
@@ -91,6 +109,21 @@ final class VatNumberVerifiedEventTest extends ActionIntegrationTestCase
 
         $address->reload();
         self::assertNull($address->getVatVerifiedAt());
+    }
+
+    public function testAnAnswerForAnAddressWithoutNumberIsNotRecorded(): void
+    {
+        $address = $this->verifiedAddress();
+        AddressQuery::create()->filterById($address->getId())->update(['VatNumber' => null, 'VatVerifiedAt' => null, 'VatVerifiedName' => null]);
+        $address->reload();
+
+        $this->dispatch(
+            new VatNumberVerifiedEvent($address, VatVerificationResult::verified(new \DateTimeImmutable(), 'ACME')),
+            TheliaEvents::VAT_NUMBER_VERIFIED,
+        );
+
+        $address->reload();
+        self::assertNull($address->getVatVerifiedAt(), 'An address with no VAT number has nothing a verification could confirm.');
     }
 
     public function testTheShippedVerifierAnswersNothingSoNoAddressIsEverVerified(): void
@@ -194,19 +227,21 @@ final class VatNumberVerifiedEventTest extends ActionIntegrationTestCase
         self::assertTrue($this->getService(VatExemptionResolver::class)->isExemptedForCart($this->reloadedCart($cart)));
     }
 
-    public function testACopyCarryingAnotherNumberIsLeftAlone(): void
+    public function testACopyFollowsTheNewNumberOfItsAddressAndOnlyItsVerification(): void
     {
         [$address, $cart] = $this->cartBilledToABelgianAddress(new \DateTime('-1 day'));
         $address->setVatNumber('BE0987654321')->save($this->getPropelConnection());
+
+        $copy = $this->invoiceCopyOf($cart);
+        self::assertSame('BE0987654321', $copy->getVatNumber());
+        self::assertNull($copy->getVatVerifiedAt(), 'The verification of the previous number does not follow.');
 
         $this->dispatch(
             new VatNumberVerifiedEvent($address, VatVerificationResult::verified(new \DateTimeImmutable(), 'Other SPRL')),
             TheliaEvents::VAT_NUMBER_VERIFIED,
         );
 
-        $copy = $this->invoiceCopyOf($cart);
-        self::assertSame('BE0123456789', $copy->getVatNumber());
-        self::assertNotSame('Other SPRL', $copy->getVatVerifiedName());
+        self::assertSame('Other SPRL', $this->invoiceCopyOf($cart)->getVatVerifiedName());
     }
 
     /**
@@ -266,8 +301,10 @@ final class VatNumberVerifiedEventTest extends ActionIntegrationTestCase
     private function address(): Address
     {
         $factory = $this->createFixtureFactory();
+        $address = $factory->address($factory->customer($factory->customerTitle()));
+        $address->setCompany('Acme')->setVatNumber('BE0123456789')->save($this->getPropelConnection());
 
-        return $factory->address($factory->customer($factory->customerTitle()));
+        return $address;
     }
 
     private function verifiedAddress(): Address

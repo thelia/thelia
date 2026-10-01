@@ -22,7 +22,6 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
-use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CartItem;
@@ -113,15 +112,13 @@ final class CartOrderPostageSemanticsTest extends ActionIntegrationTestCase
      */
     private function quotePostageOnCart(Cart $cart): void
     {
-        $action = new class($this->getService(VatExemptionResolver::class)) extends CartAction {
+        $action = new class extends CartAction {
             public OrderPostage $quote;
 
-            public function __construct(VatExemptionResolver $vatExemptionResolver)
+            public function __construct()
             {
-                // The overridden method below is the only one this test calls.
-                // It needs the exemption resolver, because the listener takes the
-                // VAT back off a postage quoted for a buyer who accounts for it.
-                $this->vatExemptionResolver = $vatExemptionResolver;
+                // The overridden method below is the only one this test calls,
+                // and it uses none of the parent's dependencies.
             }
 
             protected function getPostageByDeliveryModuleId(

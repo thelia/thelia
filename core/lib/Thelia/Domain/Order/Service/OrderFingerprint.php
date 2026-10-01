@@ -82,13 +82,13 @@ final readonly class OrderFingerprint
             );
         }
 
-        return [
+        $fingerprint = [
             'lines' => $this->sorted($lines),
             'delivery' => $this->cartAddress(CartAddressQuery::create()->findPk($cart->getAddressDeliveryId())),
             'invoice' => $this->cartAddress(CartAddressQuery::create()->findPk($cart->getAddressInvoiceId())),
             'delivery_module' => $deliveryModuleId,
-            'postage' => $this->amount((string) $cart->getPostage()),
-            'postage_tax' => $this->amount((string) $cart->getPostageTax()),
+            'postage' => $this->amount((string) $cart->getTaxedPostage()),
+            'postage_tax' => $this->amount((string) $cart->getPostageTaxAmount()),
             'payment_module' => $paymentModuleId,
             'currency' => $currencyId,
             'discount' => $this->amount((string) $cart->getDiscount()),
@@ -99,6 +99,12 @@ final readonly class OrderFingerprint
             'gift_wrapping' => null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId(),
             'gift_message' => (string) $cart->getGiftMessage(),
         ];
+
+        if ($cart->isVatExempted()) {
+            $fingerprint['vat_exempted'] = true;
+        }
+
+        return $fingerprint;
     }
 
     /**

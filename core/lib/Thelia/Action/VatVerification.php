@@ -23,19 +23,20 @@ use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Map\AddressTableMap;
 use Thelia\Model\Map\CartAddressTableMap;
 
-/**
- * Records on the address what a verification service answered about its VAT number.
- *
- * Only this listener writes those columns. A refusal and an unanswered check
- * both clear the state rather than leaving the previous answer standing: a
- * number that no longer verifies must stop exempting, and a service that could
- * not be reached has told us nothing about it either.
- */
 class VatVerification extends BaseAction implements EventSubscriberInterface
 {
     public function record(VatNumberVerifiedEvent $event): void
     {
         $result = $event->getResult();
+
+        if (VatVerificationStatus::UNDETERMINED === $result->status) {
+            return;
+        }
+
+        if ('' === trim((string) $event->getVerifiedVatNumber())) {
+            return;
+        }
+
         $verified = VatVerificationStatus::VERIFIED === $result->status;
 
         $address = $event->getAddress();

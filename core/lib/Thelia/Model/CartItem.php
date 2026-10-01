@@ -176,9 +176,9 @@ class CartItem extends BaseCartItem
     /**
      * @throws PropelException
      */
-    public function getRealTaxedPrice(Country $country, ?State $state = null): float
+    public function getRealTaxedPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
     {
-        return 1 === (int) $this->getPromo() ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
+        return 1 === (int) $this->getPromo() ? $this->getTaxedPromoPrice($country, $state, $cartTaxCalculator) : $this->getTaxedPrice($country, $state, $cartTaxCalculator);
     }
 
     /**
@@ -190,8 +190,12 @@ class CartItem extends BaseCartItem
      *
      * @throws PropelException
      */
-    private function createLineCartTaxCalculator(): TaxCalculatorInterface
+    private function createLineCartTaxCalculator(?TaxCalculatorInterface $cartTaxCalculator): TaxCalculatorInterface
     {
+        if ($cartTaxCalculator instanceof TaxCalculatorInterface) {
+            return $cartTaxCalculator;
+        }
+
         $cart = $this->getCart();
 
         if (!$cart instanceof Cart) {
@@ -204,41 +208,41 @@ class CartItem extends BaseCartItem
     /**
      * @throws PropelException
      */
-    public function getTaxedPrice(Country $country, ?State $state = null): float
+    public function getTaxedPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
     {
-        return $this->createLineCartTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
+        return $this->createLineCartTaxCalculator($cartTaxCalculator)->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPrice());
     }
 
     /**
      * @throws PropelException
      */
-    public function getTaxedPromoPrice(Country $country, ?State $state = null): float
+    public function getTaxedPromoPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
     {
-        return $this->createLineCartTaxCalculator()->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
+        return $this->createLineCartTaxCalculator($cartTaxCalculator)->load($this->getProduct(), $country, $state)->getTaxedPrice((float) $this->getPromoPrice());
     }
 
     /**
      * @throws PropelException
      */
-    public function getTotalRealTaxedPrice(Country $country, ?State $state = null): float
+    public function getTotalRealTaxedPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
     {
-        return 1 === (int) $this->getPromo() ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
+        return 1 === (int) $this->getPromo() ? $this->getTotalTaxedPromoPrice($country, $state, $cartTaxCalculator) : $this->getTotalTaxedPrice($country, $state, $cartTaxCalculator);
     }
 
     /**
      * @throws PropelException
      */
-    public function getTotalTaxedPrice(Country $country, ?State $state = null): float
+    public function getTotalTaxedPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
     {
-        return $this->lineTotal($this->getTaxedPrice($country, $state));
+        return $this->lineTotal($this->getTaxedPrice($country, $state, $cartTaxCalculator));
     }
 
     /**
      * @throws PropelException
      */
-    public function getTotalTaxedPromoPrice(Country $country, ?State $state = null)
+    public function getTotalTaxedPromoPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null)
     {
-        return $this->lineTotal($this->getTaxedPromoPrice($country, $state));
+        return $this->lineTotal($this->getTaxedPromoPrice($country, $state, $cartTaxCalculator));
     }
 
     public function getTotalPrice(): float

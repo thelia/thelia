@@ -486,6 +486,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_SET_DELIVERY_MODULE => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SET_DELIVERY_ADDRESS => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_SET_INVOICE_ADDRESS_MANUAL => ['updateOrderDiscount', 10],
             // The buyer can sit on the payment page long after the last cart change,
             // and an automatic promotion can stop applying in the meantime: disabled
             // by the merchant, expired, or out of stock for its offered product.

@@ -30,24 +30,7 @@ class CartAddressService
         $cartAddress ??= new CartAddress();
 
         $cartAddress
-            ->setCustomerTitleId($address->getTitleId())
-            ->setAddressId($address->getId())
-            ->setCompany($address->getCompany())
-            ->setSiret($address->getSiret())
-            ->setVatNumber($address->getVatNumber())
-            ->setVatVerifiedAt($address->getVatVerifiedAt())
-            ->setVatVerifiedName($address->getVatVerifiedName())
-            ->setFirstname($address->getFirstname())
-            ->setLastname($address->getLastname())
-            ->setAddress1($address->getAddress1())
-            ->setAddress2($address->getAddress2())
-            ->setAddress3($address->getAddress3())
-            ->setZipcode($address->getZipcode())
-            ->setCity($address->getCity())
-            ->setPhone($address->getPhone())
-            ->setCellphone($address->getCellphone())
-            ->setCountryId($address->getCountryId())
-            ->setStateId($address->getStateId())
+            ->copyFrom($address)
             ->save();
 
         return $cartAddress;

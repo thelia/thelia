@@ -29,6 +29,7 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerVersionQuery;
+use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
@@ -411,6 +412,34 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             ->save($this->getPropelConnection());
 
         return $entry;
+    }
+
+    public function testAnonymizeErasesTheVatVerificationOfAnExemptOrderButKeepsItsExemption(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $order = $customer->getOrders()->getFirst();
+        self::assertInstanceOf(Order::class, $order);
+        OrderAddressQuery::create()
+            ->filterById($order->getInvoiceOrderAddressId())
+            ->update([
+                'Company' => 'Acme',
+                'VatNumber' => 'BE0123456789',
+                'VatVerifiedAt' => '2026-09-20 10:00:00',
+                'VatVerifiedName' => 'Acme SPRL',
+                'VatExempted' => 1,
+                'VatExemptedAmount' => '20.000000',
+            ]);
+
+        $this->anonymize($customer);
+
+        OrderAddressTableMap::clearInstancePool();
+        $invoiceAddress = OrderAddressQuery::create()->findPk($order->getInvoiceOrderAddressId());
+        self::assertNotNull($invoiceAddress);
+        self::assertNull($invoiceAddress->getVatNumber());
+        self::assertNull($invoiceAddress->getVatVerifiedAt());
+        self::assertNull($invoiceAddress->getVatVerifiedName());
+        self::assertSame(1, $invoiceAddress->getVatExempted());
+        self::assertSame('20.000000', $invoiceAddress->getVatExemptedAmount());
     }
 
     private function anonymize(Customer $customer): void

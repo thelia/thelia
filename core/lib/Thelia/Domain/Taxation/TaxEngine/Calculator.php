@@ -24,6 +24,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxI18n;
@@ -210,7 +211,13 @@ class Calculator implements TaxCalculatorInterface
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
+            $product = ProductQuery::create()->findPk($cartItem->getProductId());
+
+            if (null === $product) {
+                continue;
+            }
+
+            $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($product->getTaxRule(), $country, $state);
 
             /** @var TaxRule $taxRule */
             foreach ($taxRulesCollection as $taxRule) {

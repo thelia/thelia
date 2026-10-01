@@ -37,7 +37,6 @@ use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
-use Thelia\Domain\Taxation\Service\VatExemptionResolver;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -70,7 +69,6 @@ readonly class OrderFacade
         private ConsentAnswerStoreInterface $consentAnswers,
         private RequestStack $requestStack,
         private GiftWrappingLineFactory $giftWrappingLineFactory,
-        private VatExemptionResolver $vatExemptionResolver,
         private ExemptedVatCalculator $exemptedVatCalculator,
     ) {
     }
@@ -129,7 +127,7 @@ readonly class OrderFacade
             // guarantees that address still carries a fresh verification: an
             // exemption resolved from today's cart would be frozen onto an
             // invoice address it was never actually checked against.
-            $vatExempted = !$useOrderDefinedAddresses && $this->vatExemptionResolver->isExemptedForCart($cart);
+            $vatExempted = !$useOrderDefinedAddresses && $cart->isVatExempted();
 
             $taxCountry = $this->orderAddressPersister->prepareOrderAddresses(
                 $placedOrder,
@@ -139,11 +137,19 @@ readonly class OrderFacade
                 $connection
             );
 
+            $quotedPostageTax = (float) $placedOrder->getPostageTax();
+
+            if ($vatExempted) {
+                $placedOrder
+                    ->setPostage((string) ((float) $placedOrder->getPostage() - (float) $placedOrder->getPostageTax()))
+                    ->setPostageTax('0');
+            }
+
             $placedOrder->setStatusId(OrderStatusQuery::getNotPaidStatus()?->getId());
             $placedOrder->save($connection);
 
             if ($vatExempted) {
-                $this->freezeExemptedVat($placedOrder, $cart, $taxCountry, $lang, $connection);
+                $this->freezeExemptedVat($placedOrder, $cart, $taxCountry, $quotedPostageTax, $connection);
             } else {
                 $this->persistPostageTaxBreakdown($placedOrder, $cart, $taxCountry, $lang, $connection);
             }
@@ -392,7 +398,7 @@ readonly class OrderFacade
         ModelOrder $placedOrder,
         CartModel $cart,
         Country $taxCountry,
-        LangModel $lang,
+        float $quotedPostageTax,
         ConnectionInterface $connection,
     ): void {
         $invoiceAddress = OrderAddressQuery::create()->findPk($placedOrder->getInvoiceOrderAddressId());
@@ -405,9 +411,7 @@ readonly class OrderFacade
             $cart,
             $taxCountry,
             OrderAddressQuery::create()->findPk($placedOrder->getDeliveryOrderAddressId())?->getState(),
-            (float) $placedOrder->getPostage(),
-            $placedOrder->getDeliveryModuleId(),
-            $lang->getLocale(),
+            $quotedPostageTax,
         );
 
         $invoiceAddress
