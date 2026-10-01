@@ -132,6 +132,23 @@ final readonly class PurchaseListFacade
         return $this->update($list, $customer, null, $this->repository->linesOf($list)->merge($lines));
     }
 
+    public function appendFromCart(Customer $customer, int $listId, Cart $cart): CustomerList
+    {
+        if ((int) $cart->getCustomerId() !== (int) $customer->getId()) {
+            throw new PurchaseListSourceNotFoundException('Cart not found.');
+        }
+
+        return $this->appendItems($customer, $listId, $this->repository->linesOfCart($cart));
+    }
+
+    public function appendFromOrder(Customer $customer, int $listId, int $orderId): CustomerList
+    {
+        $lines = $this->repository->linesOfOrder($customer, $orderId)
+            ?? throw new PurchaseListSourceNotFoundException(\sprintf('Order %d not found.', $orderId));
+
+        return $this->appendItems($customer, $listId, $lines);
+    }
+
     public function replaceItems(Customer $customer, int $listId, ReferenceQuantityLines $lines): CustomerList
     {
         return $this->update($this->getWritable($customer, $listId), $customer, null, $lines);
