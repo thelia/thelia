@@ -35,7 +35,74 @@ final class ModuleSchemaApplyCommandTest extends IntegrationTestCase
      */
     public function testAModuleUpdateDroppingWhatIsAlreadyGoneIsApplied(): void
     {
-        $pdo = new \PDO(
+        $pdo = $this->connect();
+        $output = new BufferedOutput();
+
+        try {
+            self::assertTrue($this->apply($pdo, 'AbsentDropProbe', $output), $output->fetch());
+        } finally {
+            $pdo->exec('DROP TABLE IF EXISTS `absent_drop_probe`');
+        }
+    }
+
+    /**
+     * TheliaMain.sql drops its tables before creating them: replaying it on a table that
+     * holds rows would empty it, so the module is refused and the rows stay.
+     */
+    public function testAModuleWhoseTablesHoldRowsIsRefused(): void
+    {
+        $pdo = $this->connect();
+        $output = new BufferedOutput();
+
+        try {
+            $this->createKeptDataProbe($pdo, 2);
+
+            self::assertFalse($this->apply($pdo, 'KeptDataProbe', $output));
+            $message = $output->fetch();
+            self::assertStringContainsString('kept_data_probe (2 rows)', $message);
+            self::assertStringContainsString('--force', $message);
+            self::assertSame(2, $this->countRows($pdo));
+        } finally {
+            $pdo->exec('DROP TABLE IF EXISTS `kept_data_probe`');
+        }
+    }
+
+    public function testForceReplaysAModuleWhoseTablesHoldRows(): void
+    {
+        $pdo = $this->connect();
+        $output = new BufferedOutput();
+
+        try {
+            $this->createKeptDataProbe($pdo, 2);
+
+            self::assertTrue((new ModuleSchemaApplyCommand())->getDefinition()->hasOption('force'));
+            self::assertTrue($this->apply($pdo, 'KeptDataProbe', $output, force: true), $output->fetch());
+            self::assertSame(0, $this->countRows($pdo));
+        } finally {
+            $pdo->exec('DROP TABLE IF EXISTS `kept_data_probe`');
+        }
+    }
+
+    public function testAModuleWhoseTablesAreEmptyOrAbsentIsApplied(): void
+    {
+        $pdo = $this->connect();
+        $output = new BufferedOutput();
+
+        try {
+            $pdo->exec('DROP TABLE IF EXISTS `kept_data_probe`');
+            self::assertTrue($this->apply($pdo, 'KeptDataProbe', $output), $output->fetch());
+
+            $this->createKeptDataProbe($pdo, 0);
+            self::assertTrue($this->apply($pdo, 'KeptDataProbe', $output), $output->fetch());
+            self::assertSame(0, $this->countRows($pdo));
+        } finally {
+            $pdo->exec('DROP TABLE IF EXISTS `kept_data_probe`');
+        }
+    }
+
+    private function connect(): \PDO
+    {
+        return new \PDO(
             \sprintf(
                 'mysql:host=%s;port=%s;dbname=%s',
                 (string) ($_SERVER['DATABASE_HOST'] ?? 'db'),
@@ -46,22 +113,35 @@ final class ModuleSchemaApplyCommandTest extends IntegrationTestCase
             (string) ($_SERVER['DATABASE_PASSWORD'] ?? 'db'),
             [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION],
         );
-        $output = new BufferedOutput();
+    }
+
+    private function apply(\PDO $pdo, string $moduleName, BufferedOutput $output, bool $force = false): bool
+    {
         $command = new ModuleSchemaApplyCommand();
 
-        try {
-            $applied = (new \ReflectionMethod($command, 'applyModuleSchema'))->invoke(
-                $command,
-                new SymfonyStyle(new ArrayInput([]), $output),
-                $pdo,
-                'AbsentDropProbe',
-                THELIA_ROOT.'tests/fixtures/install/AbsentDropProbe',
-                false,
-            );
+        return (bool) (new \ReflectionMethod($command, 'applyModuleSchema'))->invoke(
+            $command,
+            new SymfonyStyle(new ArrayInput([]), $output),
+            $pdo,
+            $moduleName,
+            THELIA_ROOT.'tests/fixtures/install/'.$moduleName,
+            false,
+            $force,
+        );
+    }
 
-            self::assertTrue($applied, $output->fetch());
-        } finally {
-            $pdo->exec('DROP TABLE IF EXISTS `absent_drop_probe`');
+    private function createKeptDataProbe(\PDO $pdo, int $rows): void
+    {
+        $pdo->exec('DROP TABLE IF EXISTS `kept_data_probe`');
+        $pdo->exec('CREATE TABLE `kept_data_probe` (`id` INTEGER NOT NULL AUTO_INCREMENT, `label` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB');
+
+        for ($row = 1; $row <= $rows; ++$row) {
+            $pdo->exec(\sprintf("INSERT INTO `kept_data_probe` (`label`) VALUES ('row %d')", $row));
         }
+    }
+
+    private function countRows(\PDO $pdo): int
+    {
+        return (int) $pdo->query('SELECT COUNT(*) FROM `kept_data_probe`')->fetchColumn();
     }
 }

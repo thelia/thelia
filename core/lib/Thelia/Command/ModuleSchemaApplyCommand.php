@@ -31,6 +31,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Each SQL statement is executed individually with error handling:
  * "table/column/index already exists" and "column/index to drop does not
  * exist" errors are silently ignored to ensure idempotent re-runs.
+ *
+ * TheliaMain.sql drops its tables before creating them again, so the module is
+ * refused when one of those tables holds a row, unless --force is given.
  */
 #[AsCommand(
     name: 'module:schema:apply',
@@ -54,6 +57,7 @@ final class ModuleSchemaApplyCommand extends Command
             ->addArgument('module', InputArgument::OPTIONAL, 'Module name')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply schemas for all modules that have a TheliaMain.sql')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'List SQL files that would be executed without executing them')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Replay TheliaMain.sql even when a table it drops holds rows, which are lost')
         ;
     }
 
@@ -65,6 +69,7 @@ final class ModuleSchemaApplyCommand extends Command
         $module = $input->getArgument('module');
         $all = (bool) $input->getOption('all');
         $dryRun = (bool) $input->getOption('dry-run');
+        $force = (bool) $input->getOption('force');
 
         if (!$module && !$all) {
             $io->error('Provide a module name or use --all.');
@@ -115,7 +120,7 @@ final class ModuleSchemaApplyCommand extends Command
 
             $hasError = false;
             foreach ($modules as $moduleName => $modulePath) {
-                if (!$this->applyModuleSchema($io, $pdo, $moduleName, $modulePath, $dryRun)) {
+                if (!$this->applyModuleSchema($io, $pdo, $moduleName, $modulePath, $dryRun, $force)) {
                     $hasError = true;
                 }
             }
@@ -136,7 +141,7 @@ final class ModuleSchemaApplyCommand extends Command
             return Command::FAILURE;
         }
 
-        return $this->applyModuleSchema($io, $pdo, $module, $modulePath, $dryRun)
+        return $this->applyModuleSchema($io, $pdo, $module, $modulePath, $dryRun, $force)
             ? Command::SUCCESS
             : Command::FAILURE;
     }
@@ -195,7 +200,7 @@ final class ModuleSchemaApplyCommand extends Command
         return null;
     }
 
-    private function applyModuleSchema(SymfonyStyle $io, \PDO $pdo, string $moduleName, string $modulePath, bool $dryRun): bool
+    private function applyModuleSchema(SymfonyStyle $io, \PDO $pdo, string $moduleName, string $modulePath, bool $dryRun, bool $force): bool
     {
         $files = [];
 
@@ -220,6 +225,10 @@ final class ModuleSchemaApplyCommand extends Command
             }
 
             return true;
+        }
+
+        if (!$force && file_exists($mainSql) && !$this->mainSchemaKeepsData($io, $pdo, $moduleName, $mainSql)) {
+            return false;
         }
 
         $io->text(\sprintf('<info>%s</info>: applying %d file(s)...', $moduleName, \count($files)));
@@ -267,6 +276,73 @@ final class ModuleSchemaApplyCommand extends Command
         }
 
         return true;
+    }
+
+    /**
+     * Refuses the module when a table its TheliaMain.sql drops exists and holds rows.
+     */
+    private function mainSchemaKeepsData(SymfonyStyle $io, \PDO $pdo, string $moduleName, string $mainSql): bool
+    {
+        $content = file_get_contents($mainSql);
+        if (false === $content) {
+            $io->error(\sprintf('Cannot read file: %s', $mainSql));
+
+            return false;
+        }
+
+        $populatedTables = [];
+        foreach ($this->droppedTables($content) as $table) {
+            $exists = $pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?');
+            $exists->execute([$table]);
+            if (0 === (int) $exists->fetchColumn()) {
+                continue;
+            }
+
+            $rowCount = (int) $pdo->query(\sprintf('SELECT COUNT(*) FROM `%s`', $table))->fetchColumn();
+            if ($rowCount > 0) {
+                $populatedTables[] = \sprintf('%s (%d row%s)', $table, $rowCount, 1 === $rowCount ? '' : 's');
+            }
+        }
+
+        if ([] === $populatedTables) {
+            return true;
+        }
+
+        $io->error([
+            \sprintf(
+                'Module "%s" not applied: its TheliaMain.sql drops tables that hold data, which would be lost: %s.',
+                $moduleName,
+                implode(', ', $populatedTables),
+            ),
+            'To change the schema of an installed module, ship the change as a Config/update/<version>.sql script. '
+            .'To replay TheliaMain.sql anyway and empty these tables, run the command again with --force.',
+        ]);
+
+        return false;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function droppedTables(string $sql): array
+    {
+        $tables = [];
+
+        foreach ($this->splitSql($sql) as $statement) {
+            $statement = trim((string) preg_replace('/^\s*(--|#).*$/m', '', $statement));
+            if (!preg_match('/^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(.+)$/is', $statement, $match)) {
+                continue;
+            }
+
+            foreach (explode(',', $match[1]) as $table) {
+                $table = trim($table, " \t\n\r`");
+                if ('' !== $table) {
+                    $tables[$table] = $table;
+                }
+            }
+        }
+
+        return array_values($tables);
     }
 
     private function isIgnorableError(\PDOException $e): bool
