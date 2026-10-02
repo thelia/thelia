@@ -1,6 +1,6 @@
 # 3.2.0
 
-Second minor of the 3.x line. 217 commits since 3.1.0. The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history, next to the VAT verification columns of the address, cart address and order address tables.
+Second minor of the 3.x line. 219 commits since 3.1.0. The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history, next to the VAT verification columns of the address, cart address and order address tables.
 
 ## Promotions and sales
 
@@ -109,6 +109,7 @@ Second minor of the 3.x line. 217 commits since 3.1.0. The version number follow
 - `bin/install` and `bin/test-prepare` clear the application cache pools when they recreate the database. `var/pools/<env>`, or the backend that `THELIA_CACHE_DSN` names, stayed in place, so after a reinstall a module could serve what it had cached from the previous database (the footer menu of the CMS kept entries the new database did not hold). Both run `cache:pool:clear --all` first, which reaches a remote cache backend too.
 - `Thelia\Domain\Pricing\CatalogPriceResolverInterface` has its alias declared, to `Rule\CatalogPriceRuleResolver`, in `Config/Resources/services/core/pricing.php`. It came from the rule of the service loader for an interface with a single implementation, which does not hold for a decorator: the loader registers those aliases once at the end of the file it loads, where the core scan and the `configureServices()` of every module run, so a module class implementing the interface made it doubly implemented, no alias was registered and the container failed to compile on `EffectivePriceResolver`. `docs/catalog-price-rules.md` says where the alias lives and how a module decorates the contract; a module whose prices depend on the visitor or on the cart also decorates `PricingActivityChecker`, otherwise the core never asks.
 - A checkout step declared by a module lands after the steps already at its position and before the payment, which moves down to make room, so no two steps share a position. Steps that still share one, including the rows a 3.1 shop left on the delivery's place, are served cart first, then delivery, then module steps, then payment and confirmation: a module step is never served before the delivery.
+- A delivery module that cannot quote the cart (not available for the address, unknown module, virtual cart) is taken off the cart with its postage instead of staying on it silently, so the checkout no longer lets the buyer pay with a carrier that never quoted. A posted module id that is not a carrier serving the address leaves the cart without one.
 
 ## Administrators
 
