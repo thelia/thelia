@@ -683,4 +683,45 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
     ('videos_library_path', 'local/media/videos', 0, 0, NOW(), NOW()),
     ('video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW());
 
+-- The two flag facets of a product listing: on sale, and new.
+--
+-- `choice_filter_other` is what makes a filter that hangs off no feature and
+-- no attribute reachable from the back office: the category and the template
+-- screens list its rows, and a merchant decides there whether the facet
+-- shows, where it sits and how it is drawn. A fresh install seeds both rows
+-- (setup/insert.sql); an upgraded shop gets them here.
+--
+-- The filters are matched by `type`, never by id, so a row is inserted only
+-- when no row of that type exists and takes the next free id: a shop that
+-- added rows of its own keeps them. The i18n rows cover the eight locales a
+-- fresh install seeds, and INSERT IGNORE keeps a title the merchant already typed.
+INSERT INTO `choice_filter_other` (`type`, `visible`)
+    SELECT 'promo', 1 FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `choice_filter_other` WHERE `type` = 'promo');
+
+INSERT INTO `choice_filter_other` (`type`, `visible`)
+    SELECT 'new', 1 FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `choice_filter_other` WHERE `type` = 'new');
+
+SET @promo_filter_id := (SELECT MIN(`id`) FROM `choice_filter_other` WHERE `type` = 'promo');
+SET @new_filter_id := (SELECT MIN(`id`) FROM `choice_filter_other` WHERE `type` = 'new');
+
+INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (@promo_filter_id, 'cs_CZ', 'Akce', NULL),
+    (@new_filter_id, 'cs_CZ', 'Novinka', NULL),
+    (@promo_filter_id, 'de_DE', 'Aktion', NULL),
+    (@new_filter_id, 'de_DE', 'Neuheit', NULL),
+    (@promo_filter_id, 'en_US', 'Promotion', NULL),
+    (@new_filter_id, 'en_US', 'Newness', NULL),
+    (@promo_filter_id, 'es_ES', 'Promoción', NULL),
+    (@new_filter_id, 'es_ES', 'Novedad', NULL),
+    (@promo_filter_id, 'fr_FR', 'Promotion', NULL),
+    (@new_filter_id, 'fr_FR', 'Nouveauté', NULL),
+    (@promo_filter_id, 'it_IT', 'Promozione', NULL),
+    (@new_filter_id, 'it_IT', 'Novità', NULL),
+    (@promo_filter_id, 'nl_NL', 'Promotie', NULL),
+    (@new_filter_id, 'nl_NL', 'Nieuw', NULL),
+    (@promo_filter_id, 'ru_RU', 'Акция', NULL),
+    (@new_filter_id, 'ru_RU', 'Новинка', NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
