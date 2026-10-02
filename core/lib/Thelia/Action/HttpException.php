@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
@@ -99,6 +100,8 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     protected function display404(ExceptionEvent $event): void
     {
+        $this->forgetTheRefusedView($event->getRequest());
+
         $this->parser->setTemplateDefinition(
             $this->parser->getTemplateHelper()->getActiveFrontTemplate(),
         );
@@ -106,6 +109,25 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), Response::HTTP_NOT_FOUND);
 
         $event->setResponse($response);
+    }
+
+    /**
+     * The url of a hidden product, brand, category, folder or content resolves to its view
+     * before the page refuses it. Rendered with that view still on the request, the not found
+     * page would carry what the theme and the modules print for it (language versions, the
+     * breadcrumb) and tell a hidden page apart from an url that leads nowhere.
+     */
+    private function forgetTheRefusedView(HttpRequest $request): void
+    {
+        $view = $request->attributes->get('_view');
+
+        if (!\is_string($view) || '' === $view) {
+            return;
+        }
+
+        $request->attributes->remove('_view');
+        $request->attributes->remove($view.'_id');
+        $request->query->remove($view.'_id');
     }
 
     protected function displayException(ExceptionEvent $event): void
