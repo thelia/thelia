@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Thelia\Controller\Api\RefreshTokenController;
 use Thelia\Controller\Front\ContactController;
 use Thelia\Controller\Front\DefaultController;
+use Thelia\Controller\Front\ExpressCheckoutController;
 
 return static function (RoutingConfigurator $routes): void {
     $routes->add('api_front_login_check', '/api/front/login');
@@ -39,6 +40,19 @@ return static function (RoutingConfigurator $routes): void {
     // theme, which owns the contact page and its markup.
     $routes->add('contact_submit', '/contact')
         ->controller([ContactController::class, 'send'])
+        ->methods(['POST']);
+
+    // Owned by the core rather than by each wallet module: this is where the buyer is put
+    // in the session and the cart handed to them, and doing that in the wrong order
+    // deletes the cart. A module only reads its provider's answer.
+    $routes->add('express_checkout_confirm', '/checkout/express/{moduleCode}/confirm')
+        ->controller([ExpressCheckoutController::class, 'confirm'])
+        ->requirements(['moduleCode' => '[A-Za-z0-9_]+'])
+        ->methods(['POST']);
+
+    $routes->add('express_checkout_amount', '/checkout/express/{moduleCode}/amount')
+        ->controller([ExpressCheckoutController::class, 'amount'])
+        ->requirements(['moduleCode' => '[A-Za-z0-9_]+'])
         ->methods(['POST']);
 
     $routes->import('.', 'module_attribute');
