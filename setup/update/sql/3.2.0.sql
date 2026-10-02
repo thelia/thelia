@@ -255,11 +255,15 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
 -- Three starting points, told apart by the schema itself:
 -- - a shop on Thelia 3.0 or 3.1, or one that came from 2.5 or earlier, holds the
 --   file on `<type>_image`: it is copied into every translation the image has,
---   the default language gets a translation when it had none (the rule of the
---   2.6.1 script), then the column is dropped;
+--   every active language and the default one get a translation carrying it when
+--   they had none, so a shop that shows only the requested language
+--   (`default_lang_without_translation` = 0) keeps its images in each language
+--   it serves, then the column is dropped. Without a default language the file
+--   has nowhere to go, and the column is kept for the next run;
 -- - a shop that came from 2.6 already holds the files in the translations: they
 --   are kept as they are, the column only becomes nullable, and a file still
---   found on `<type>_image` only fills the translations that have none;
+--   found on `<type>_image` only fills the translations, and the languages,
+--   that have none;
 -- - an empty file name is stored as NULL, which is what "no file" reads as.
 --
 -- Every statement checks the schema first and runs through PREPARE, which MySQL
@@ -277,9 +281,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `product_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `product_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `product_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `product_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `product_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `product_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `product_image_i18n` `translation` INNER JOIN `product_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -287,7 +291,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `product_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `product_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
@@ -302,9 +306,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'category_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `category_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `category_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `category_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `category_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `category_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `category_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `category_image_i18n` `translation` INNER JOIN `category_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -312,7 +316,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `category_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `category_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
@@ -327,9 +331,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `content_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `content_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `content_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `content_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `content_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `content_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `content_image_i18n` `translation` INNER JOIN `content_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -337,7 +341,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `content_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `content_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
@@ -352,9 +356,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `folder_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `folder_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `folder_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `folder_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `folder_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `folder_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `folder_image_i18n` `translation` INNER JOIN `folder_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -362,7 +366,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `folder_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `folder_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
@@ -377,9 +381,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'brand_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `brand_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `brand_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `brand_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `brand_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `brand_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `brand_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `brand_image_i18n` `translation` INNER JOIN `brand_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -387,7 +391,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `brand_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `brand_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
@@ -402,9 +406,9 @@ EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @image_file_untranslated := (SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'module_image' AND `COLUMN_NAME` = 'file');
-SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `module_image_i18n` (`id`, `locale`, `file`) SELECT `image`.`id`, ?, `image`.`file` FROM `module_image` `image` WHERE CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `module_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = ?)', 'DO ?, ?');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'INSERT INTO `module_image_i18n` (`id`, `locale`, `file`) SELECT DISTINCT `image`.`id`, `active_lang`.`locale`, `image`.`file` FROM `module_image` `image` CROSS JOIN `lang` `active_lang` WHERE (`active_lang`.`active` = 1 OR `active_lang`.`locale` = ?) AND CHAR_LENGTH(`active_lang`.`locale`) > 0 AND CHAR_LENGTH(`image`.`file`) > 0 AND NOT EXISTS (SELECT 1 FROM `module_image_i18n` `translation` WHERE `translation`.`id` = `image`.`id` AND `translation`.`locale` = `active_lang`.`locale`)', 'DO ?');
 PREPARE image_file_statement FROM @statement;
-EXECUTE image_file_statement USING @image_file_default_locale, @image_file_default_locale;
+EXECUTE image_file_statement USING @image_file_default_locale;
 DEALLOCATE PREPARE image_file_statement;
 
 SET @statement := IF(@image_file_untranslated, 'UPDATE `module_image_i18n` `translation` INNER JOIN `module_image` `image` ON `image`.`id` = `translation`.`id` SET `translation`.`file` = `image`.`file` WHERE COALESCE(CHAR_LENGTH(`translation`.`file`), 0) = 0 AND CHAR_LENGTH(`image`.`file`) > 0', 'DO 0');
@@ -412,7 +416,7 @@ PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
 
-SET @statement := IF(@image_file_untranslated, 'ALTER TABLE `module_image` DROP COLUMN `file`', 'DO 0');
+SET @statement := IF(@image_file_untranslated AND @image_file_default_locale IS NOT NULL, 'ALTER TABLE `module_image` DROP COLUMN `file`', 'DO 0');
 PREPARE image_file_statement FROM @statement;
 EXECUTE image_file_statement;
 DEALLOCATE PREPARE image_file_statement;
