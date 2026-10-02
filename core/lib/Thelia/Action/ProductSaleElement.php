@@ -31,6 +31,9 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Product\Identifier\Gtin;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombination;
@@ -164,8 +167,17 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->setNewness($event->getIsnew())
                 ->setWeight($event->getWeight())
                 ->setIsDefault($defaultStatus)
-                ->setEanCode($event->getEanCode())
-                ->save();
+                ->setEanCode($event->getEanCode());
+
+            if (null !== $event->getMpn()) {
+                $salesElement->setMpn($event->getMpn());
+            }
+
+            if (null !== $event->getManufacturerBrandId()) {
+                $salesElement->setManufacturerBrandId(0 === $event->getManufacturerBrandId() ? null : $event->getManufacturerBrandId());
+            }
+
+            $salesElement->save();
 
             // Update/create price for current currency
             $productPrice = ProductPriceQuery::create()
@@ -203,6 +215,14 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $exception) {
             $con->rollback();
+
+            // The refused values stay on the instance the pool hands out, and the next
+            // save of the product cascades to it: one refused row would then refuse
+            // every later row of the same request. Read the stored row back.
+            if (($exception instanceof InvalidGtinException || $exception instanceof InvalidMpnException)
+                && null !== $salesElement && !$salesElement->isNew()) {
+                $salesElement->reload();
+            }
 
             throw $exception;
         }
@@ -472,6 +492,18 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
 
+    /**
+     * A code stored before the GTIN check existed may not pass it, and the clone is a new
+     * row, so it would be checked: the clone starts without it rather than refusing the
+     * whole copy. The original keeps its code untouched.
+     */
+    private function cloneableGtin(?string $code): string
+    {
+        $normalizedCode = Gtin::normalize((string) $code);
+
+        return '' !== $normalizedCode && null === Gtin::violationOf($normalizedCode) ? $normalizedCode : '';
+    }
+
     public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key): void
     {
         $originalProductPSEPrice = ProductPriceQuery::create()
@@ -493,7 +525,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setQuantity($originalProductPSE->getQuantity() ?? 0.0)
             ->setOnsale($originalProductPSE->getPromo() ?? 0)
             ->setIsnew($originalProductPSE->getNewness() ?? 0)
-            ->setEanCode($originalProductPSE->getEanCode())
+            ->setEanCode($this->cloneableGtin($originalProductPSE->getEanCode()))
+            ->setMpn($originalProductPSE->getMpn() ?? '')
+            ->setManufacturerBrandId($originalProductPSE->getManufacturerBrandId() ?? 0)
             ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
             ->setPrice((float) $originalProductPSEPrice->getPrice())
             ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())

@@ -1083,4 +1083,46 @@ INNER JOIN (
     UNION ALL SELECT 'vat_verification_lifetime_days', 'fr_FR', 'Nombre de jours pendant lesquels la vérification d''un numéro de TVA permet l''exonération (0 ou moins revient à 90)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- The manufacturer part number and the manufacturer brand of a combination, beside its GTIN
+-- kept in `ean_code`. Null on every combination that predates them: no part number, and the
+-- brand of the product stands for the manufacturer. The order line freezes the part number
+-- sold, as it already does for the GTIN.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'mpn');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `mpn` VARCHAR(255) NULL AFTER `ean_code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'manufacturer_brand_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `manufacturer_brand_id` INTEGER NULL AFTER `mpn`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The search by part number and the manufacturer brand filter read these columns: without an
+-- index they scan the whole table. The index on `ean_code` is added above, for the quick order.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `INDEX_NAME` = 'idx_product_sale_elements_mpn');
+SET @statement := IF(@add_index, 'ALTER TABLE `product_sale_elements` ADD INDEX `idx_product_sale_elements_mpn` (`mpn`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `INDEX_NAME` = 'idx_product_sale_elements_manufacturer_brand_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `product_sale_elements` ADD INDEX `idx_product_sale_elements_manufacturer_brand_id` (`manufacturer_brand_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_constraint := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `CONSTRAINT_NAME` = 'fk_product_sale_elements_manufacturer_brand_id');
+SET @statement := IF(@add_constraint, 'ALTER TABLE `product_sale_elements` ADD CONSTRAINT `fk_product_sale_elements_manufacturer_brand_id` FOREIGN KEY (`manufacturer_brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT', 'DO 0');
+PREPARE add_constraint_statement FROM @statement;
+EXECUTE add_constraint_statement;
+DEALLOCATE PREPARE add_constraint_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'mpn');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `mpn` VARCHAR(255) NULL AFTER `ean_code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

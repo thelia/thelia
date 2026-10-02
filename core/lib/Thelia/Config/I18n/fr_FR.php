@@ -951,4 +951,11 @@ return [
     'This order is already being placed. Please wait a moment and try again.' => 'Cette commande est déjà en cours de création. Merci de patienter un instant puis de réessayer.',
     'This order requires an account.' => 'Cette commande nécessite un compte.',
     'This shop is not asking for the consent "%consent".' => 'Cette boutique ne demande pas le consentement « %consent ».',
+    'a GTIN is made of digits only' => 'un GTIN ne contient que des chiffres',
+    'a GTIN has 8, 12, 13 or 14 digits, this one has %count' => 'un GTIN compte 8, 12, 13 ou 14 chiffres, celui-ci en compte %count',
+    'its check digit is wrong, the code was probably mistyped' => 'sa clé de contrôle est fausse, le code a sans doute été mal saisi',
+    'The GTIN "%code" is refused: %reason.' => 'Le GTIN « %code » est refusé : %reason.',
+    'The GTIN "%code" of the combination %ref is refused: %reason.' => 'Le GTIN « %code » de la combinaison %ref est refusé : %reason.',
+    'The manufacturer part number must be %max characters at most.' => 'La référence fabricant ne doit pas dépasser %max caractères.',
+    'The manufacturer part number of the combination %ref must be %max characters at most.' => 'La référence fabricant de la combinaison %ref ne doit pas dépasser %max caractères.',
 ];
