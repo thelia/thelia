@@ -416,6 +416,119 @@ final class CheckoutProgressionTest extends IntegrationTestCase
         self::assertSame(['cart', 'delivery', 'a_fixture_module_step', 'payment', 'confirmation'], $codes);
     }
 
+    /**
+     * A row created by an earlier version on the place of the delivery, as the 3.1 series
+     * did for a module asking for 2 or 3: the delivery is still served first, whatever
+     * the code of the module step.
+     */
+    public function testAModuleRowSharingThePlaceOfTheDeliveryIsServedAfterIt(): void
+    {
+        $moduleStep = new class implements CheckoutStepProviderInterface {
+            public function code(): string
+            {
+                return 'a_fixture_module_step';
+            }
+
+            public function defaultPosition(): int
+            {
+                return 2;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        (new CheckoutStep())
+            ->setCode('a_fixture_module_step')
+            ->setPosition($this->stepNamedInTable(CheckoutStep::CODE_DELIVERY)->getPosition())
+            ->setActive(1)
+            ->setMandatory(0)
+            ->save($this->getPropelConnection());
+
+        $progression = new CheckoutProgressionService(
+            [...$this->stepProviders(), $moduleStep],
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        );
+
+        $codes = $this->codesOf($progression->activeSteps($this->cartWithAnItem()));
+
+        self::assertSame(['cart', 'delivery', 'a_fixture_module_step', 'payment', 'confirmation'], $codes);
+    }
+
+    /**
+     * The tie rule never puts anything ahead of the cart, even a row whose code sorts
+     * after it: the tunnel still opens on the cart and is not thrown back to the defaults.
+     */
+    public function testAModuleRowSharingThePlaceOfTheCartIsServedAfterIt(): void
+    {
+        $moduleStep = new class implements CheckoutStepProviderInterface {
+            public function code(): string
+            {
+                return 'z_fixture_module_step';
+            }
+
+            public function defaultPosition(): int
+            {
+                return 1;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        (new CheckoutStep())
+            ->setCode('z_fixture_module_step')
+            ->setPosition($this->stepNamedInTable(CheckoutStep::CODE_CART)->getPosition())
+            ->setActive(1)
+            ->setMandatory(0)
+            ->save($this->getPropelConnection());
+
+        $progression = new CheckoutProgressionService(
+            [...$this->stepProviders(), $moduleStep],
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        );
+
+        $codes = $this->codesOf($progression->activeSteps($this->cartWithAnItem()));
+
+        self::assertSame(['cart', 'z_fixture_module_step', 'delivery', 'payment', 'confirmation'], $codes);
+    }
+
     public function testTheStepsServedCarryThePositionOfTheRankTheyAreServedAt(): void
     {
         $moduleStep = new class implements CheckoutStepProviderInterface {
