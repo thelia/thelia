@@ -121,7 +121,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW()),
 (111, 'ai_mcp_enabled', '0', 0, 0, NOW(), NOW()),
 (112, 'ai_tool_approval_ttl_hours', '24', 0, 0, NOW(), NOW()),
-(113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW())
+(113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW()),
+(114, 'express_payment_zones', '', 0, 0, NOW(), NOW())
 
 ;
 
