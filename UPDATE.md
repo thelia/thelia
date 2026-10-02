@@ -98,6 +98,102 @@ largest ones over several windows.
 
 ## Release notes
 
+### Moving from 3.1.x to 3.2.0
+
+#### What the update script does now
+
+`php local/setup/update.php` changed in 3.2:
+
+- It accepts `-n` or `--no-interaction`.
+- It exits with code 0 when the database is already up to date.
+- It purges `var/cache/<env>` and `var/propel/<env>` itself before it starts.
+
+```bash
+php local/setup/update.php --no-interaction
+```
+
+The script also performs these changes on the database:
+
+- It copies the image file into the translation of each active language, then drops the
+  `file` column of the image tables (see "Image files per language" below).
+- It switches `active-admin-template` to `default-twig` and deactivates TheliaSmarty (see
+  "The Smarty back-office is gone" below).
+
+#### After the Composer update
+
+Run the module refresh once Composer is done:
+
+```bash
+php Thelia module:refresh
+```
+
+A module newly shipped with the release is registered inactive. Activate it from the
+back-office, or with `php Thelia module:activate <ModuleCode>`.
+
+TheliaCMS (`thelia/cms-module`) is not required by the skeleton. To add it to a project:
+
+```bash
+composer require thelia/cms-module
+php Thelia module:refresh
+```
+
+#### API Platform stays on 4.3
+
+The core pins API Platform to 4.3.x and conflicts with 4.4 on purpose. A project that requires
+`^4.4` cannot resolve: set the constraint back to `^4.3` in `composer.json`.
+
+Add one setting to `config/packages/api_platform.yaml`. It removes the "multiple ApiResource
+with the same shortName" warnings:
+
+```yaml
+# config/packages/api_platform.yaml
+api_platform:
+    defaults:
+        extra_properties:
+            deduplicate_resource_short_names: true
+```
+
+#### Image files per language
+
+The `file` column of `product_image`, `category_image`, `content_image`, `folder_image` and
+`brand_image` is removed. Each image now carries its file in its translation, so an image can
+differ from one language to the next. The update script copies the existing file into the
+translation of every active language.
+
+A module that read the `file` column has to read `file` from the matching `*_image_i18n` table
+instead (`product_image_i18n`, `category_image_i18n`, and so on). Check the modules that
+export or display images; for example, GoogleShoppingXml and EasyProductManager need their
+4.0.0 versions.
+
+#### The Smarty back-office is gone
+
+The Smarty back-office is removed. The update script sets `active-admin-template` to
+`default-twig` and deactivates TheliaSmarty. A shop that still wants the Smarty back-office
+adds `thelia/backoffice-default-template` itself; that package is no longer maintained.
+
+#### Back-office CSRF token
+
+The back-office still accepts the CSRF token in the URL, but this is deprecated and 3.3 will
+refuse it. A module that builds back-office requests sends the token in the POST body
+instead. Toggles, position changes and deletions require the token: a request without a valid
+one answers 403.
+
+#### Themes
+
+Flexy and default-twig 1.2 are required: the 3.2 core refuses a theme older than 1.2. Updating
+through `thelia/thelia-skeleton` brings them. If you forked Flexy 1.1:
+
+- Take over the `GuestOrderPlacedSubscriber` fix of Flexy 1.2: the core no longer raises
+  `ORDER_CART_CLEAR`.
+- Your theme can now read the content slots.
+
+#### Payment modules
+
+The payment flow changed: `supportsPaymentRetry()` is a new part of the contract, the cart is
+kept until the payment completes, and the amount is checked together with the shipping cost.
+Review each payment module of the shop against
+Payment modules.
+
 ### Moving from 3.0.0 to 3.1.0
 
 Two changes of this release show up in production without anything being asked for.
