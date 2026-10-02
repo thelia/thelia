@@ -1083,4 +1083,10 @@ INNER JOIN (
     UNION ALL SELECT 'vat_verification_lifetime_days', 'fr_FR', 'Nombre de jours pendant lesquels la vérification d''un numéro de TVA permet l''exonération (0 ou moins revient à 90)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- Whether a shop shows express payment buttons in its checkout. Empty means nowhere, which
+-- is the shop every existing boutique already is: no wallet appears until the merchant turns
+-- the zone on and installs a module that fills it.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('express_payment_zones', '', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
