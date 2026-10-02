@@ -31,6 +31,8 @@ readonly class PSEUpdateDTO implements DTOEventActionInterface
         public ?string $eanCode = null,
         public int $taxRuleId = 0,
         public bool $fromDefaultCurrency = false,
+        public ?string $mpn = null,
+        public ?int $manufacturerBrandId = null,
     ) {
     }
 
@@ -49,6 +51,8 @@ readonly class PSEUpdateDTO implements DTOEventActionInterface
             'ean_code' => $this->eanCode,
             'tax_rule_id' => $this->taxRuleId,
             'from_default_currency' => $this->fromDefaultCurrency,
+            'mpn' => $this->mpn,
+            'manufacturer_brand_id' => $this->manufacturerBrandId,
         ];
     }
 }

@@ -17,8 +17,12 @@ namespace Thelia\Model;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Catalog\Product\Identifier\Gtin;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\ProductPriceTools;
 
@@ -183,6 +187,51 @@ class ProductSaleElements extends BaseProductSaleElements
     {
         /* @var $query ProductSaleElementsQuery */
         $query->filterByProductId($this->getProductId());
+    }
+
+    /**
+     * Every writer of a combination ends here — the back office, the API, the imports and
+     * the modules that save the model themselves — so this is where the codes are checked.
+     *
+     * Only a code that changes is checked: a value stored before the check existed, valid
+     * or not, does not stop an edit that leaves it alone.
+     *
+     * @throws InvalidGtinException
+     * @throws InvalidMpnException
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        if ($this->isColumnModified(ProductSaleElementsTableMap::COL_EAN_CODE) && null !== $this->ean_code) {
+            $normalizedCode = Gtin::normalize($this->ean_code);
+            $violation = '' === $normalizedCode ? null : Gtin::violationOf($normalizedCode);
+
+            if (null !== $violation) {
+                throw new InvalidGtinException($this->ean_code, $violation, $this->getRef());
+            }
+
+            $this->ean_code = $normalizedCode;
+        }
+
+        if ($this->isColumnModified(ProductSaleElementsTableMap::COL_MPN) && null !== $this->mpn) {
+            $mpn = trim($this->mpn);
+
+            if (mb_strlen($mpn) > InvalidMpnException::MAXIMUM_LENGTH) {
+                throw new InvalidMpnException($mpn, $this->getRef());
+            }
+
+            $this->mpn = '' === $mpn ? null : $mpn;
+        }
+
+        return parent::preSave($con);
+    }
+
+    /**
+     * The brand that makes the combination: its own when it has one, the product's
+     * otherwise, which is what most catalogues mean.
+     */
+    public function getEffectiveManufacturerBrandId(): ?int
+    {
+        return $this->getManufacturerBrandId() ?? $this->getProduct()?->getBrandId();
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool

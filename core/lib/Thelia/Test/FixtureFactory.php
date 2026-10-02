@@ -713,6 +713,9 @@ final class FixtureFactory
         $pse->setQuantity($overrides['quantity'] ?? 10);
         $pse->setWeight($overrides['weight'] ?? 0.0);
         $pse->setIsDefault($overrides['isDefault'] ?? false);
+        $pse->setEanCode($overrides['eanCode'] ?? null);
+        $pse->setMpn($overrides['mpn'] ?? null);
+        $pse->setManufacturerBrandId($overrides['manufacturerBrandId'] ?? null);
         $pse->save($this->connection);
 
         return $pse;

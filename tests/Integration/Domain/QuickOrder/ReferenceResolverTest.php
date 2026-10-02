@@ -77,9 +77,9 @@ final class ReferenceResolverTest extends IntegrationTestCase
     public function testAnEanCodeResolvesLikeAReference(): void
     {
         $saleElements = $this->defaultSaleElementsOf($this->product());
-        $saleElements->setEanCode('3760123450012')->save($this->getPropelConnection());
+        $saleElements->setEanCode('3760123450010')->save($this->getPropelConnection());
 
-        self::assertSame((int) $saleElements->getId(), $this->resolveOne('3760123450012')->productSaleElementsId);
+        self::assertSame((int) $saleElements->getId(), $this->resolveOne('3760123450010')->productSaleElementsId);
     }
 
     public function testAProductReferenceNoSaleElementCarriesResolvesToTheDefaultSaleElement(): void

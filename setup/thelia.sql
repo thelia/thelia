@@ -406,6 +406,8 @@ CREATE TABLE `product_sale_elements`
     `weight` FLOAT DEFAULT 0,
     `is_default` TINYINT(1) DEFAULT 0,
     `ean_code` VARCHAR(255),
+    `mpn` VARCHAR(255) COMMENT 'the manufacturer part number, as the merchant feeds ask for it beside the GTIN',
+    `manufacturer_brand_id` INTEGER COMMENT 'the brand of the manufacturer when it is not the brand of the product',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -413,11 +415,18 @@ CREATE TABLE `product_sale_elements`
     INDEX `ref` (`ref`),
     INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
     INDEX `idx_product_sale_elements_ean_code` (`ean_code`),
+    INDEX `idx_product_sale_elements_mpn` (`mpn`),
+    INDEX `idx_product_sale_elements_manufacturer_brand_id` (`manufacturer_brand_id`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_sale_elements_manufacturer_brand_id`
+        FOREIGN KEY (`manufacturer_brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -934,6 +943,7 @@ CREATE TABLE `order_product`
     `was_in_promo` TINYINT NOT NULL,
     `weight` VARCHAR(45),
     `ean_code` VARCHAR(255),
+    `mpn` VARCHAR(255) COMMENT 'the manufacturer part number of the combination, copied when the order is placed so the documents keep the value sold',
     `tax_rule_title` VARCHAR(255),
     `tax_rule_description` LONGTEXT,
     `parent` INTEGER COMMENT 'not managed yet',

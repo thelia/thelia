@@ -134,7 +134,7 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
             ->setOnsale(1)
             ->setIsnew(1)
             ->setIsdefault(true)
-            ->setEanCode('1234567890123')
+            ->setEanCode('1234567890128')
             ->setTaxRuleId($product->getTaxRuleId())
             ->setCurrencyId($currency->getId())
             ->setFromDefaultCurrency(0)
@@ -151,7 +151,7 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
         self::assertSame(1, $reloaded->getPromo());
         self::assertSame(1, $reloaded->getNewness());
         self::assertTrue((bool) $reloaded->getIsDefault());
-        self::assertSame('1234567890123', $reloaded->getEanCode());
+        self::assertSame('1234567890128', $reloaded->getEanCode());
 
         $price = ProductPriceQuery::create()
             ->filterByProductSaleElementsId($pse->getId())
