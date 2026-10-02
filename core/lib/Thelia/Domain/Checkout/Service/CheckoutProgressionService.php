@@ -346,11 +346,16 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
     }
 
     /**
-     * Who goes first when steps share a position: the steps the core ships, then the
-     * ones a module adds, then the steps the tunnel cannot do without, which close it.
+     * Who goes first when steps share a position: the cart, which opens the tunnel, the
+     * steps the core ships, then the ones a module adds, then the payment and the
+     * confirmation, which close it.
      */
     private function tieRank(string $code): int
     {
+        if (CheckoutStep::CODE_CART === $code) {
+            return -1;
+        }
+
         if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
             return 2;
         }
@@ -399,8 +404,9 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         $codes = array_keys($positions);
 
         // Two steps sharing a position is not an error the buyer should see as a tunnel
-        // whose order changes between two page loads, so the code settles the tie.
-        usort($codes, static fn (string $left, string $right): int => [$positions[$left], $left] <=> [$positions[$right], $right]);
+        // whose order changes between two page loads: the same tie rule as for a step
+        // no row names yet settles it, and the code last.
+        usort($codes, fn (string $left, string $right): int => [$positions[$left], $this->tieRank($left), $left] <=> [$positions[$right], $this->tieRank($right), $right]);
 
         return $codes;
     }
