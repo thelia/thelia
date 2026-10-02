@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Resource\CheckoutPlacementInput;
 use Thelia\Api\Resource\CheckoutPlacementOutput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
@@ -31,7 +32,9 @@ use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
+use Thelia\Domain\Checkout\Service\ExpressPaymentCheckoutGuard;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -63,6 +66,7 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
         private CheckoutPlacementService $placementService,
         private Security $security,
         private RequestStack $requestStack,
+        private ExpressPaymentCheckoutGuard $expressPaymentGuard,
     ) {
     }
 
@@ -81,6 +85,12 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
         // the order is written from it.
         if (!$customer instanceof Customer) {
             throw new NotFoundHttpException(CheckoutCartLocator::NOT_FOUND_MESSAGE);
+        }
+
+        try {
+            $this->expressPaymentGuard->refuseAnOrdinaryPlacementOf($cart);
+        } catch (InvalidPaymentException $refusal) {
+            throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
         }
 
         try {
