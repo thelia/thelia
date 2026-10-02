@@ -1,7 +1,6 @@
-# 3.2.0 (unreleased)
+# 3.2.0
 
-The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and the VAT verification columns of the address, cart address and order address tables.
-The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules. It also creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history.
+Second minor of the 3.x line. 212 commits since 3.1.0. The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history, next to the VAT verification columns of the address, cart address and order address tables.
 
 ## Promotions and sales
 
