@@ -34,24 +34,31 @@ Run the update script from the root of your project:
 php local/setup/update.php
 ```
 
-It first removes the compiled container and the generated Propel models of the previous
-release, so the new schema is read, then reports the version it starts from and the one it
-moves to, and applies each database migration in order. It offers to back the database up first; on a large
-database, take the manual backup above instead. If a migration fails, the script stops
-and offers to restore that backup.
+When the database is not on the version of the code, it first removes the compiled
+container and the generated Propel models of the previous release (`var/cache/<env>` and
+`var/propel/<env>`), so the new schema is read, then reports the version it starts from and
+the one it moves to, and applies each database migration in order. It offers to back the
+database up first; on a large database, take the manual backup above instead. If a
+migration fails, the script stops and offers to restore that backup.
+
+In a deployment pipeline, pass `--no-interaction` (or `-n`, or `--yes`): every question is
+answered yes, the backup and the restore after a failure included. The script exits with
+`0` when the update succeeds and when the database is already on the version of the code,
+so it can run on every release; any other code is a failure.
 
 ## 3. Rebuild the cache
 
-Do not run `cache:clear` in production: it empties the cache without rebuilding it, and
-the first request then compiles it under load. Remove the compiled cache and the Propel
-runtime, then warm the cache back up:
+The update script has already removed the compiled cache and the Propel runtime of the
+environment it ran in. Do not run `cache:clear` in production: it empties the cache without
+rebuilding it, and the first request then compiles it under load. Warm the cache back up
+instead:
 
 ```bash
-rm -rf var/cache/prod var/propel/prod
 php Thelia cache:warmup --env=prod
 ```
 
-In development, `var/cache/dev` and `var/propel/dev` are the ones to remove.
+If the script ran in another environment than the one you serve, remove that one first:
+`rm -rf var/cache/prod var/propel/prod`.
 
 ## Converting a database migrated from Thelia 2 to utf8mb4
 
