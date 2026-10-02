@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Import\Type;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -32,6 +34,7 @@ class ProductStockImport extends AbstractImport
 
     protected array $optionalColumns = [
         'ean',
+        'mpn',
     ];
 
     public function importData(array $data): ?string
@@ -50,10 +53,25 @@ class ProductStockImport extends AbstractImport
         $pse->setQuantity($data['stock']);
 
         if (isset($data['ean']) && !empty($data['ean'])) {
-            $pse->setEanCode($data['ean']);
+            $pse->setEanCode((string) $data['ean']);
         }
 
-        $pse->save();
+        if (isset($data['mpn']) && '' !== trim((string) $data['mpn'])) {
+            $pse->setMpn((string) $data['mpn']);
+        }
+
+        // A code that is not a GTIN refuses this row only, with the reason, and the
+        // import carries on with the next one.
+        try {
+            $pse->save();
+        } catch (InvalidGtinException|InvalidMpnException $refusal) {
+            // The refused values would otherwise stay on the pooled instance and come
+            // back with a later row of the same combination.
+            $pse->reload();
+
+            return $refusal->getMessage();
+        }
+
         ++$this->importedRows;
 
         return null;

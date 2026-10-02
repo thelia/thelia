@@ -266,7 +266,7 @@ class OrderExport extends JsonFileAbstractExport
      *
      * @return array<string, \DateTimeInterface>
      */
-    private function getDateRangeBounds(): array
+    protected function getDateRangeBounds(): array
     {
         $bounds = [];
 
@@ -279,7 +279,7 @@ class OrderExport extends JsonFileAbstractExport
         return $bounds;
     }
 
-    private function buildDateRangeCondition(): string
+    protected function buildDateRangeCondition(): string
     {
         $comparisons = ['start' => '>=', 'end' => '<='];
         $conditions = [];
