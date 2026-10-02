@@ -322,14 +322,14 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
                     : max($bounds['lowest'], min($bounds['highest'], $position));
             }
 
-            // Sharing a position with the payment, when the tunnel leaves no room ahead
-            // of it, means standing before it and never behind: the money is taken next
+            // Sharing a position, the step of the core comes first, then the steps of
+            // the modules by their code, and the payment last: the money is taken next
             // to last, whatever the code of the step that shares its position.
-            $slot = [$position, 0, $code];
+            $slot = [$position, $this->tieRank($code), $code];
             $index = \count($codes);
 
             foreach ($codes as $rank => $existing) {
-                $existingSlot = [$positions[$existing], \in_array($existing, CheckoutStep::REQUIRED_CODES, true) ? 1 : 0, $existing];
+                $existingSlot = [$positions[$existing], $this->tieRank($existing), $existing];
 
                 if ($existingSlot > $slot) {
                     $index = $rank;
@@ -343,6 +343,19 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         }
 
         return $codes;
+    }
+
+    /**
+     * Who goes first when steps share a position: the steps the core ships, then the
+     * ones a module adds, then the steps the tunnel cannot do without, which close it.
+     */
+    private function tieRank(string $code): int
+    {
+        if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
+            return 2;
+        }
+
+        return CheckoutStep::CODE_DELIVERY === $code ? 0 : 1;
     }
 
     /**

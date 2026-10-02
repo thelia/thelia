@@ -118,10 +118,30 @@ final class CheckoutStepConfigurationTest extends IntegrationTestCase
         $created = CheckoutStepQuery::create()->findOneByCode('gift-wrapping', $this->getPropelConnection());
 
         self::assertNotNull($created);
-        self::assertSame(2, $created->getPosition(), 'The only free place between the cart and the payment is 2.');
         self::assertSame(
-            ['cart', 'delivery', 'gift-wrapping', 'payment', 'confirmation'],
-            array_keys($this->orderedPositions()),
+            ['cart' => 1, 'delivery' => 2, 'gift-wrapping' => 3, 'payment' => 4, 'confirmation' => 5],
+            $this->orderedPositions(),
+            'The place before the payment is made, the payment and the confirmation move down.',
+        );
+    }
+
+    /**
+     * Two modules asking for the same place, the one the delivery stands on: the delivery
+     * keeps it, they follow it in the order they were created, nothing shares a position
+     * and the payment is still next to last.
+     */
+    public function testStepsAskingForTheSamePlaceAsAnotherOneFollowItWithoutSharingIt(): void
+    {
+        $service = new CheckoutStepConfigurationService(
+            [$this->providerFor('b-billing', 2), $this->providerFor('c-phone', 2)],
+            new CheckoutTunnelShape(),
+        );
+
+        self::assertSame(['b-billing', 'c-phone'], $service->synchronize());
+
+        self::assertSame(
+            ['cart' => 1, 'delivery' => 2, 'b-billing' => 3, 'c-phone' => 4, 'payment' => 5, 'confirmation' => 6],
+            $this->orderedPositions(),
         );
     }
 

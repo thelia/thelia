@@ -160,7 +160,8 @@ final readonly class CheckoutStepConfigurationService
 
     /**
      * Where a step a provider declares lands when its row is created: where it says it
-     * belongs, brought back between the cart and the payment when it says otherwise.
+     * belongs, after the steps already standing there, and brought back before the
+     * payment when it says otherwise.
      *
      * @throws PropelException
      */
@@ -168,27 +169,38 @@ final readonly class CheckoutStepConfigurationService
     {
         $wanted = $provider->defaultPosition();
 
+        $paymentPosition = $this->positionOf(CheckoutStep::CODE_PAYMENT);
         $bounds = $this->tunnelShape->creationBounds(
             $provider->code(),
             $this->positionOf(CheckoutStep::CODE_CART),
-            $this->positionOf(CheckoutStep::CODE_PAYMENT),
+            $paymentPosition,
         );
 
         if (null === $bounds) {
             return $wanted;
         }
 
-        if ($bounds['highest'] < $bounds['lowest']) {
-            // Cart and payment stand next to each other: there is no free position
-            // between them, so everything from there down moves one step further to
-            // open one. Renumbering the whole list instead would silently undo the
-            // spacing a merchant left between their own steps.
-            $this->pushDownFrom($bounds['lowest']);
-
-            return $bounds['lowest'];
+        if (null === $paymentPosition) {
+            // Nothing to make room before: the step stays within what the cart leaves.
+            return max($bounds['lowest'], $wanted);
         }
 
-        return max($bounds['lowest'], min($bounds['highest'], $wanted));
+        // The room is made rather than found: the step stands at the position it asks for
+        // when that place is free, after the steps already standing on it otherwise, and
+        // never past the payment, which it then makes room before. Everything from that
+        // place down moves one step further, so that the spacing a merchant left between
+        // their own steps is kept, and no two steps share a position.
+        $position = max($bounds['lowest'], min($wanted, $paymentPosition));
+
+        while ($position < $paymentPosition && null !== CheckoutStepQuery::create()->findOneByPosition($position)) {
+            ++$position;
+        }
+
+        if (null !== CheckoutStepQuery::create()->findOneByPosition($position)) {
+            $this->pushDownFrom($position);
+        }
+
+        return $position;
     }
 
     /**
