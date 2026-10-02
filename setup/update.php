@@ -25,11 +25,20 @@ const UPDATE_MAX_INPUT_ATTEMPTS = 3;
 
 $bootstrapToggle = false;
 $bootstraped = false;
+$interactive = true;
 
 $env = 'dev';
 
 // Autoload bootstrap
 foreach ($argv as $arg) {
+    // A deployment pipeline has no terminal to answer from: every question is
+    // answered with its default, yes.
+    if (in_array($arg, ['-n', '--no-interaction', '--yes'], true)) {
+        $interactive = false;
+
+        continue;
+    }
+
     if ('-b' === $arg) {
         $bootstrapToggle = true;
 
@@ -46,6 +55,8 @@ foreach ($argv as $arg) {
         $bootstraped = true;
     }
 }
+
+define('UPDATE_INTERACTIVE', $interactive);
 
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
@@ -77,24 +88,32 @@ if (is_file(dirname(__DIR__)."/.env.{$env}.local")) {
     (new Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
+// The code was just updated, and the compiled container and the generated Propel
+// models on disk still describe the previous release. Booting on them does not
+// always fail: it can succeed and leave the update running on the models of the
+// old schema. Whenever the database is not on the version of the code, both are
+// removed before the first boot and rebuilt from the new schema. A shop that is
+// already up to date keeps its caches.
+$databaseVersion = readDatabaseVersion();
+
+if (null !== $databaseVersion && Thelia\Core\TheliaKernel::THELIA_VERSION !== $databaseVersion) {
+    cliOutput(sprintf(
+        'The database is on version %s and the code on %s: removing the caches of the previous release',
+        $databaseVersion,
+        Thelia\Core\TheliaKernel::THELIA_VERSION,
+    ), 'info');
+    removeCompiledEnvironment($_ENV['APP_ENV']);
+}
+
 $thelia = new App\Kernel($_ENV['APP_ENV'], false);
 
 try {
     $thelia->boot();
 } catch (Throwable $bootFailure) {
-    // The code was just updated, and the compiled container and the generated
-    // Propel models on disk still describe the previous release: booting on them
-    // fails as soon as a bundle touches a model the old schema did not have.
-    // Both are rebuilt from the new schema, then the kernel starts again. A shop
-    // that is already up to date boots first time and keeps its caches.
-    $staleEnvironment = $_ENV['APP_ENV'];
+    // The database version could not be read, or the caches were written by
+    // something else than the previous release: rebuild them and start again.
     cliOutput(sprintf('Boot failed on the previous release caches (%s), rebuilding them', $bootFailure->getMessage()), 'info');
-    foreach ([THELIA_CACHE_DIR.$staleEnvironment, THELIA_ROOT.'var'.DS.'propel'.DS.$staleEnvironment] as $staleDirectory) {
-        if (is_dir($staleDirectory)) {
-            cliOutput(sprintf('Removing : %s', $staleDirectory), 'info');
-            (new Filesystem())->remove($staleDirectory);
-        }
-    }
+    removeCompiledEnvironment($_ENV['APP_ENV']);
 
     $thelia = new App\Kernel($_ENV['APP_ENV'], false);
     $thelia->boot();
@@ -116,8 +135,9 @@ try {
  */
 
 if ($update->isLatestVersion()) {
+    // Nothing to do is a success: a deployment calls this script on every release.
     cliOutput('You already have the latest version of Thelia : '.$update->getCurrentVersion(), 'success');
-    exit(3);
+    exit(0);
 }
 
 $current = $update->getCurrentVersion();
@@ -309,6 +329,12 @@ function readStdin($normalize = false)
 
 function askConfirmation($question): bool
 {
+    if (!UPDATE_INTERACTIVE) {
+        cliOutput($question.' y (--no-interaction)');
+
+        return true;
+    }
+
     for ($attempt = 0; $attempt < UPDATE_MAX_INPUT_ATTEMPTS; ++$attempt) {
         cliOutput($question);
 
@@ -336,6 +362,52 @@ function abortUpdate($reason): never
 {
     cliOutput('Update aborted : '.$reason, 'error');
     exit(6);
+}
+
+/**
+ * The version the database is on, read before the kernel boots, on the connection
+ * parameters the kernel itself uses. Null when it cannot be read: the boot then
+ * decides, and a failure there still rebuilds the caches.
+ */
+function readDatabaseVersion(): ?string
+{
+    $host = Thelia\Core\TheliaKernel::resolveEnv('DATABASE_HOST');
+
+    if (null === $host) {
+        return null;
+    }
+
+    try {
+        $connection = new PDO(
+            sprintf(
+                'mysql:host=%s;dbname=%s;port=%s',
+                $host,
+                Thelia\Core\TheliaKernel::resolveEnv('DATABASE_NAME', ''),
+                Thelia\Core\TheliaKernel::resolveEnv('DATABASE_PORT', '3306'),
+            ),
+            Thelia\Core\TheliaKernel::resolveEnv('DATABASE_USER', ''),
+            Thelia\Core\TheliaKernel::resolveEnv('DATABASE_PASSWORD', ''),
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
+        );
+        $version = $connection->query("SELECT `value` FROM `config` WHERE `name` = 'thelia_version'")->fetchColumn();
+    } catch (Throwable) {
+        return null;
+    }
+
+    return false === $version || null === $version ? null : (string) $version;
+}
+
+/**
+ * The compiled container and the generated Propel models of one environment.
+ */
+function removeCompiledEnvironment(string $environment): void
+{
+    foreach ([THELIA_CACHE_DIR.$environment, THELIA_ROOT.'var'.DS.'propel'.DS.$environment] as $compiledDirectory) {
+        if (is_dir($compiledDirectory)) {
+            cliOutput(sprintf('Removing : %s', $compiledDirectory), 'info');
+            (new Filesystem())->remove($compiledDirectory);
+        }
+    }
 }
 
 function joinPaths()
