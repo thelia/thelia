@@ -159,9 +159,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->setPostageTax((string) ($postage->getAmountTax() ?? 0.0))
                 ->setPostageTaxRuleTitle($postage->getTaxRuleTitle())
                 ->save();
-        } catch (\Exception $e) {
-            // If an exception is thrown here, we just ignore it.
-            // The delivery module will not be set on the cart.
+        } catch (\Exception) {
+            // The module cannot ship this cart (no postage for its address, module
+            // gone, virtual cart): CART_SET_DELIVERY_MODULE has already written it
+            // on the cart, so it is taken off again with its postage. Left there,
+            // the cart would go on to the payment with a carrier that never quoted.
+            $cart
+                ->setDeliveryModuleId(null)
+                ->setPostage(null)
+                ->setPostageTax('0')
+                ->setPostageTaxRuleTitle(null)
+                ->save();
         }
     }
 
