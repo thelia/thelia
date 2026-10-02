@@ -101,7 +101,9 @@
         "api-platform/serializer": ">=4.4.0 <5.0",
         "api-platform/state": ">=4.4.0 <5.0",
         "api-platform/symfony": ">=4.4.0 <5.0",
-        "api-platform/validator": ">=4.4.0 <5.0"
+        "api-platform/validator": ">=4.4.0 <5.0",
+        "thelia/backoffice-default-twig-template": "<1.2",
+        "thelia/flexy": "<1.2"
     },
     "extra": {
         "branch-alias": {
