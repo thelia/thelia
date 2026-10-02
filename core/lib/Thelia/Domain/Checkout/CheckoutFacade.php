@@ -22,6 +22,7 @@ use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
 use Thelia\Domain\Checkout\Service\CheckoutResetService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
+use Thelia\Domain\Checkout\Service\ExpressPaymentCheckoutGuard;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Cart;
 use Thelia\Model\Order;
@@ -35,6 +36,7 @@ final readonly class CheckoutFacade
         private CheckoutPaymentService $paymentService,
         private ShippingFacade $shippingFacade,
         private CheckoutProgressionService $progressionService,
+        private ExpressPaymentCheckoutGuard $expressPaymentGuard,
     ) {
     }
 
@@ -133,6 +135,7 @@ final readonly class CheckoutFacade
     public function pay(CheckoutDTO $dto): ?Response
     {
         $this->validateForOrder($dto->getCart());
+        $this->expressPaymentGuard->refuseAnOrdinaryPlacementOf($dto->getCart());
 
         return $this->paymentService->pay(
             $dto->getCart(),
