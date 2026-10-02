@@ -122,14 +122,18 @@ final class ImagesByLanguageMigrationTest extends IntegrationTestCase
 
         foreach (array_keys(self::IMAGE_TABLES) as $table) {
             self::assertSame(
-                [$this->defaultLocale => $table.'.jpg', $this->otherLocale => $table.'.jpg'],
+                $this->fileInEveryServedLanguage($table.'.jpg', [$this->otherLocale]),
                 $this->filesOf($table, self::FIRST_ID),
                 $table,
             );
         }
     }
 
-    public function testAnImageWithoutTranslationGetsOneInTheDefaultLanguageOnly(): void
+    /**
+     * A shop that shows only the requested language reads no file from the default one:
+     * every language it serves needs a translation of its own carrying the file.
+     */
+    public function testAnImageGetsATranslationInEveryLanguageTheShopServes(): void
     {
         $this->putTheImageTablesInTheirThelia3Shape();
 
@@ -138,11 +142,63 @@ final class ImagesByLanguageMigrationTest extends IntegrationTestCase
 
         $this->runMigration();
 
-        self::assertSame([$this->defaultLocale => 'no-translation.jpg'], $this->filesOf('product_image', self::FIRST_ID));
+        self::assertGreaterThan(1, \count($this->servedLocales()), 'The test database serves a single language: this test has lost its subject.');
+        self::assertSame($this->fileInEveryServedLanguage('no-translation.jpg'), $this->filesOf('product_image', self::FIRST_ID));
         self::assertSame(
-            [$this->defaultLocale => 'other-language-only.jpg', $this->otherLocale => 'other-language-only.jpg'],
+            $this->fileInEveryServedLanguage('other-language-only.jpg', [$this->otherLocale]),
             $this->filesOf('product_image', self::FIRST_ID + 1),
         );
+    }
+
+    public function testALanguageTheShopDoesNotServeGetsNoTranslation(): void
+    {
+        $deactivatedLocale = (string) $this->connection()->query('SELECT `locale` FROM `lang` WHERE `by_default` = 0 AND `active` = 1 ORDER BY `locale` LIMIT 1')->fetchColumn();
+        self::assertNotSame('', $deactivatedLocale, 'The test database serves no language besides the default one.');
+
+        $this->putTheImageTablesInTheirThelia3Shape();
+        $this->seedUntranslatedImage('product_image', self::FIRST_ID, 'served-only.jpg', []);
+
+        $deactivate = $this->connection()->prepare('UPDATE `lang` SET `active` = :active WHERE `locale` = :locale');
+        $deactivate->execute(['active' => 0, 'locale' => $deactivatedLocale]);
+
+        try {
+            $this->runMigration();
+        } finally {
+            $deactivate->execute(['active' => 1, 'locale' => $deactivatedLocale]);
+        }
+
+        self::assertArrayNotHasKey($deactivatedLocale, $this->filesOf('product_image', self::FIRST_ID));
+        self::assertArrayHasKey($this->defaultLocale, $this->filesOf('product_image', self::FIRST_ID));
+    }
+
+    /**
+     * Without a default language the file has nowhere to go for sure: the column stays
+     * on the image, and a later run, once the shop has one, moves it.
+     */
+    public function testTheFileStaysOnTheImageWhenTheShopHasNoDefaultLanguage(): void
+    {
+        $defaultIds = $this->connection()->query('SELECT `id` FROM `lang` WHERE `by_default` = 1')->fetchAll(\PDO::FETCH_COLUMN);
+
+        $this->putTheImageTablesInTheirThelia3Shape();
+        $this->seedUntranslatedImage('product_image', self::FIRST_ID, 'kept-on-the-image.jpg', []);
+
+        $this->connection()->exec('UPDATE `lang` SET `by_default` = 0');
+
+        try {
+            $this->runMigration();
+        } finally {
+            $restore = $this->connection()->prepare('UPDATE `lang` SET `by_default` = 1 WHERE `id` = :id');
+
+            foreach ($defaultIds as $id) {
+                $restore->execute(['id' => $id]);
+            }
+        }
+
+        foreach (array_keys(self::IMAGE_TABLES) as $table) {
+            self::assertTrue($this->hasColumn($table, 'file'), $table);
+        }
+
+        self::assertSame([], $this->filesOf('product_image', self::FIRST_ID));
     }
 
     /**
@@ -202,7 +258,7 @@ final class ImagesByLanguageMigrationTest extends IntegrationTestCase
         $this->runMigration();
 
         self::assertSame(
-            [$this->defaultLocale => 'translated-default.jpg', $this->otherLocale => 'left-on-the-image.jpg'],
+            [$this->defaultLocale => 'translated-default.jpg'] + $this->fileInEveryServedLanguage('left-on-the-image.jpg', [$this->otherLocale]),
             $this->filesOf('product_image', self::FIRST_ID),
         );
     }
@@ -227,7 +283,7 @@ final class ImagesByLanguageMigrationTest extends IntegrationTestCase
         $this->runMigration();
 
         self::assertSame(
-            [$this->defaultLocale => 'replayed.jpg', $this->otherLocale => 'replayed.jpg'],
+            $this->fileInEveryServedLanguage('replayed.jpg', [$this->otherLocale]),
             $this->filesOf('product_image', self::FIRST_ID),
         );
         $this->assertFreshInstallSchema();
@@ -365,6 +421,33 @@ final class ImagesByLanguageMigrationTest extends IntegrationTestCase
         self::assertCount(\count(self::IMAGE_TABLES), $drops, 'The 3.2.0 script does not move the image files into their translations.');
 
         return $statements;
+    }
+
+    /**
+     * The languages a shop serves: the active ones, and the default one in any case.
+     *
+     * @return list<string>
+     */
+    private function servedLocales(): array
+    {
+        return $this->connection()->query('SELECT DISTINCT `locale` FROM `lang` WHERE `active` = 1 OR `by_default` = 1')->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * The same file in every language the shop serves and in the other languages given,
+     * in the order filesOf() reads them back: the default language first.
+     *
+     * @param list<string> $otherLocales
+     *
+     * @return array<string, string>
+     */
+    private function fileInEveryServedLanguage(string $file, array $otherLocales = []): array
+    {
+        $locales = array_values(array_unique([...$this->servedLocales(), ...$otherLocales]));
+        $others = array_values(array_diff($locales, [$this->defaultLocale]));
+        sort($others);
+
+        return array_fill_keys([$this->defaultLocale, ...$others], $file);
     }
 
     /**
