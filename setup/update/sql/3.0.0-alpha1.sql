@@ -135,6 +135,10 @@ INSERT INTO `message` (`name`, `secured`, `text_layout_file_name`, `text_templat
 
 UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\PricePercentTaxType'
              WHERE `type` = 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType';
+UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\FixAmountTaxType'
+             WHERE `type` = 'Thelia\\TaxEngine\\TaxType\\FixAmountTaxType';
+UPDATE `tax` SET `type` = 'Thelia\\Domain\\Taxation\\TaxEngine\\TaxType\\FeatureFixAmountTaxType'
+             WHERE `type` = 'Thelia\\TaxEngine\\TaxType\\FeatureFixAmountTaxType';
 
 ALTER TABLE config
     MODIFY COLUMN `value` TEXT NULL;
