@@ -367,6 +367,55 @@ final class CheckoutProgressionTest extends IntegrationTestCase
         self::assertTrue((new CheckoutTunnelShape())->isRespectedBy($codes));
     }
 
+    /**
+     * A module step asking for the place the delivery stands on is served after it, though
+     * its code sorts first: the steps of the core win the tie, the payment still comes last.
+     */
+    public function testAnUnsyncedModuleStepSharingThePlaceOfTheDeliveryIsServedAfterIt(): void
+    {
+        $moduleStep = new class implements CheckoutStepProviderInterface {
+            public function code(): string
+            {
+                return 'a_fixture_module_step';
+            }
+
+            public function defaultPosition(): int
+            {
+                return 2;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        $progression = new CheckoutProgressionService(
+            [...$this->stepProviders(), $moduleStep],
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        );
+
+        $codes = $this->codesOf($progression->activeSteps($this->cartWithAnItem()));
+
+        self::assertSame(['cart', 'delivery', 'a_fixture_module_step', 'payment', 'confirmation'], $codes);
+    }
+
     public function testTheStepsServedCarryThePositionOfTheRankTheyAreServedAt(): void
     {
         $moduleStep = new class implements CheckoutStepProviderInterface {
