@@ -94,6 +94,8 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'brand.id',
         'productAssociatedContents.content.id',
         'productSaleElements.productPrices.currency.id',
+        'productSaleElements.eanCode' => 'exact',
+        'productSaleElements.mpn' => 'exact',
         'taxRule.id',
         'featureProducts.feature.id',
         'featureProducts.featureAv.id',

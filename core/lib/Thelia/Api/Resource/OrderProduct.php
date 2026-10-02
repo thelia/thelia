@@ -282,6 +282,17 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?string $eanCode = null;
 
+    /** The manufacturer part number of the combination as it was when the order was placed. */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        Order::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?string $mpn = null;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -596,6 +607,18 @@ class OrderProduct implements PropelResourceInterface
     public function setEanCode(?string $eanCode): self
     {
         $this->eanCode = $eanCode;
+
+        return $this;
+    }
+
+    public function getMpn(): ?string
+    {
+        return $this->mpn;
+    }
+
+    public function setMpn(?string $mpn): self
+    {
+        $this->mpn = $mpn;
 
         return $this;
     }

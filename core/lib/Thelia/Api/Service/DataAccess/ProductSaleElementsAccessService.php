@@ -129,6 +129,7 @@ class ProductSaleElementsAccessService
                 'isNew' => $pse->getNewness() ? true : false,
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
+                'mpn' => $pse->getMpn(),
                 'quantity' => $pse->getQuantity(),
                 'weight' => $pse->getWeight(),
                 'price' => $pse->getTaxedPrice($taxCountry),
