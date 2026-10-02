@@ -30,6 +30,12 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     protected int $isnew;
     protected bool $isdefault;
     protected ?string $ean_code;
+
+    /** Null leaves the stored part number alone, so a caller that does not know the field never wipes it; an empty string clears it. */
+    protected ?string $mpn = null;
+
+    /** Null leaves the stored manufacturer brand alone; 0 clears it, and the brand of the product applies again. */
+    protected ?int $manufacturer_brand_id = null;
     protected int $tax_rule_id;
     protected int $from_default_currency;
 
@@ -176,6 +182,36 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     public function setEanCode(?string $ean_code): self
     {
         $this->ean_code = $ean_code;
+
+        return $this;
+    }
+
+    public function getMpn(): ?string
+    {
+        return $this->mpn;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMpn(?string $mpn): self
+    {
+        $this->mpn = $mpn;
+
+        return $this;
+    }
+
+    public function getManufacturerBrandId(): ?int
+    {
+        return $this->manufacturer_brand_id;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setManufacturerBrandId(?int $manufacturerBrandId): self
+    {
+        $this->manufacturer_brand_id = $manufacturerBrandId;
 
         return $this;
     }

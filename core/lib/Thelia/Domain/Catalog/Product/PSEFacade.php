@@ -76,6 +76,8 @@ final readonly class PSEFacade
             ->setIsnew($dto->isNew ? 1 : 0)
             ->setIsdefault($dto->isDefault)
             ->setEanCode($dto->eanCode)
+            ->setMpn($dto->mpn)
+            ->setManufacturerBrandId($dto->manufacturerBrandId)
             ->setTaxRuleId($dto->taxRuleId)
             ->setFromDefaultCurrency($dto->fromDefaultCurrency ? 1 : 0);
 

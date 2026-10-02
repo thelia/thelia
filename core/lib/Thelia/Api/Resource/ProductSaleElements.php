@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -24,12 +25,14 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
@@ -73,6 +76,8 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
     filterClass: SearchFilter::class,
     properties: [
         'ref',
+        'eanCode' => 'exact',
+        'mpn' => 'exact',
         'product.id' => [
             'strategy' => 'exact',
             'fieldPath' => 'product_sale_elements.product_id',
@@ -255,7 +260,44 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
+    #[ApiProperty(description: 'The GTIN of the combination: EAN-8, UPC-A, EAN-13 (ISBN-13 included) or GTIN-14. Spaces and hyphens are dropped, the check digit is verified. Kept under this name for the clients that already write it.')]
+    #[GtinConstraint(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
     public ?string $eanCode = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    #[ApiProperty(description: 'The manufacturer part number, as the merchant feeds ask for it beside the GTIN.')]
+    #[Length(max: 255, groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?string $mpn = null;
+
+    #[Relation(targetResource: Brand::class, relationAlias: 'ManufacturerBrand')]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    #[ApiProperty(description: 'The brand that makes the combination, when it is not the brand of the product. Null means the brand of the product.')]
+    public ?Brand $manufacturerBrand = null;
+
+    /**
+     * The other combinations of the shop carrying the same GTIN, for the back office to
+     * warn about: a duplicate is allowed, as two combinations may be the same physical
+     * item, so it is reported rather than refused. Admin reads only.
+     *
+     * @var list<int>
+     */
+    #[Groups([self::GROUP_ADMIN_READ])]
+    #[ApiProperty(readable: true, writable: false, description: 'Ids of the other combinations carrying the same GTIN. A duplicate is saved and reported, never refused.')]
+    public array $gtinSharedWith = [];
 
     #[Relation(targetResource: ProductPrice::class)]
     #[Groups([
@@ -428,6 +470,48 @@ class ProductSaleElements implements PropelResourceInterface
     public function setEanCode(?string $eanCode): self
     {
         $this->eanCode = $eanCode;
+
+        return $this;
+    }
+
+    public function getMpn(): ?string
+    {
+        return $this->mpn;
+    }
+
+    public function setMpn(?string $mpn): self
+    {
+        $this->mpn = $mpn;
+
+        return $this;
+    }
+
+    public function getManufacturerBrand(): ?Brand
+    {
+        return $this->manufacturerBrand;
+    }
+
+    public function setManufacturerBrand(?Brand $manufacturerBrand): self
+    {
+        $this->manufacturerBrand = $manufacturerBrand;
+
+        return $this;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function getGtinSharedWith(): array
+    {
+        return $this->gtinSharedWith;
+    }
+
+    /**
+     * @param list<int> $gtinSharedWith
+     */
+    public function setGtinSharedWith(array $gtinSharedWith): self
+    {
+        $this->gtinSharedWith = $gtinSharedWith;
 
         return $this;
     }

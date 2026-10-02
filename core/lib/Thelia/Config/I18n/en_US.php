@@ -947,4 +947,11 @@ return [
     'This order requires an account.' => 'This order requires an account.',
     'This shop is not asking for the consent "%consent".' => 'This shop is not asking for the consent "%consent".',
     'You must accept "%consent" to place this order.' => 'You must accept "%consent" to place this order.',
+    'a GTIN is made of digits only' => 'a GTIN is made of digits only',
+    'a GTIN has 8, 12, 13 or 14 digits, this one has %count' => 'a GTIN has 8, 12, 13 or 14 digits, this one has %count',
+    'its check digit is wrong, the code was probably mistyped' => 'its check digit is wrong, the code was probably mistyped',
+    'The GTIN "%code" is refused: %reason.' => 'The GTIN "%code" is refused: %reason.',
+    'The GTIN "%code" of the combination %ref is refused: %reason.' => 'The GTIN "%code" of the combination %ref is refused: %reason.',
+    'The manufacturer part number must be %max characters at most.' => 'The manufacturer part number must be %max characters at most.',
+    'The manufacturer part number of the combination %ref must be %max characters at most.' => 'The manufacturer part number of the combination %ref must be %max characters at most.',
 ];

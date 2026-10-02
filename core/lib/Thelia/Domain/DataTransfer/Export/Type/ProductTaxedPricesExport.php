@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
+use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\ProductQuery;
@@ -48,6 +49,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'product_i18n_title' => 'title',
         'attribute_av_i18n_title' => 'attributes',
         'product_sale_elements_ean_code' => 'ean',
+        'product_sale_elements_mpn' => 'mpn',
         'product_price_price' => 'price',
         'product_price_promo_price' => 'promo_price',
         'currency_code' => 'currency',
@@ -55,6 +57,14 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'tax_rule_i18n_id' => 'tax_id',
         'tax_rule_i18n_title' => 'tax_title',
     ];
+
+    public function beforeSerialize(array $data): array
+    {
+        return SpreadsheetFormulaGuard::neutralizeColumns(
+            parent::beforeSerialize($data),
+            ['product_sale_elements_ean_code', 'product_sale_elements_mpn'],
+        );
+    }
 
     protected function getData(): array|string|ModelCriteria
     {
@@ -68,6 +78,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
                         product.id as "product_id",
                         attribute_av_i18n.title as "attribute_av_i18n_title",
                         product_sale_elements.ean_code as "product_sale_elements_ean_code",
+                        product_sale_elements.mpn as "product_sale_elements_mpn",
                         product_price.price as "product_price_price",
                         product_price.promo_price as "product_price_promo_price",
                         currency.code as "currency_code",

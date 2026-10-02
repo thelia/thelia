@@ -335,6 +335,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('WEIGHT', $PSEValue->getWeight())
                 ->set('REF', $PSEValue->getRef())
                 ->set('EAN_CODE', $PSEValue->getEanCode())
+                ->set('MPN', $PSEValue->getMpn())
+                ->set('MANUFACTURER_BRAND_ID', $PSEValue->getEffectiveManufacturerBrandId())
                 ->set('PRODUCT_ID', $PSEValue->getProductId())
                 ->set('PRICE', $price)
                 ->set('PRICE_TAX', $taxedPrice - $price)
@@ -387,6 +389,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         return [
             'ref',
             'ean_code',
+            'mpn',
         ];
     }
 
@@ -405,6 +408,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     break;
                 case 'ean_code':
                     $search->filterByEanCode($searchTerm, $searchCriteria);
+                    break;
+                case 'mpn':
+                    $search->filterByMpn($searchTerm, $searchCriteria);
                     break;
             }
         }
