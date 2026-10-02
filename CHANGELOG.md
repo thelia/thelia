@@ -121,6 +121,19 @@ The whole tunnel is reachable from the front API, for an authenticated account a
 - Saving an `Address` whose VAT number or country changed clears `vat_verified_at` and `vat_verified_name`, unless the same save writes the verification. Saving an `OrderAddress` with a new VAT number does the same.
 - `Cart::getPostage()` and `Cart::getPostageTax()` hold the quote of the delivery module. What the buyer owes is read from `Cart::getTaxedPostage()`, `Cart::getUntaxedPostage()` and `Cart::getPostageTaxAmount()`, which take the exemption into account; the front API `Cart.postage` and `Cart.postageTax` and the Flexy `postage` and `postage_tax` cart attributes follow them.
 
+# 3.1.1
+
+Security release of the 3.1 line, without any breaking change. It ships `setup/update/sql/3.1.1.sql`, which changes no schema and only records the new version; `thelia/setup` ships as 3.1.2 with this core; `thelia/config` does not change and stays at 3.1.1. Update the back-office theme `thelia/backoffice-default-twig-template` to 1.1.1 at the same time.
+
+## Security
+
+- GHSA-gvcv-hvpp-89gx — uploaded SVG images are sanitized more strictly and only reach the image cache once sanitized, and the back-office theme 1.1.1 runs the store logo and banner through the same checks. Run `php bin/console image-cache:clear` after the update.
+- GHSA-j2c3-9c4q-c2ch — fixed in the back-office theme 1.1.1: the combinations and default price forms of a product only save through a POST that carries the form token.
+
+## Fixed
+
+- A fresh install no longer dies at boot on `thelia/thelia-library-module` 2.0.10, which relies on a class of the 3.2 core: the core now declares a conflict with that release, so Composer keeps 2.0.9.
+
 # 3.1.0
 
 First minor of the 3.x line. 88 commits since 3.0.0. The version number follows the update script this release ships, `setup/update/sql/3.1.0.sql`, which carries the tables and columns behind guest checkout, checkout consents, the audience and countdown of a sale, automatic promotions and offered lines, order returns, order status transitions, product relation types, customer tags and configurable checkout steps.
