@@ -25,6 +25,7 @@
                         <li>id: L'id de la déclinaison de produit</li>
                         <li>stock: La quantité de la déclinaison </li>
                     </ul>
+                    Il peut avoir la colonne "ean", le GTIN de la déclinaison (8, 12, 13 ou 14 chiffres, clé de contrôle vérifiée : une ligne au code invalide est refusée), et la colonne "mpn", sa référence fabricant.
                     ]]>
                 </description>
             </import_descriptive>
@@ -37,7 +38,7 @@
                         <li>id: The id of your product sale elements </li>
                         <li>stock: The quantity of product you have </li>
                     </ul>
-                    It can have the column "ean" that defines the product's EAN code.
+                    It can have the column "ean", the GTIN of the combination (8, 12, 13 or 14 digits, check digit verified: a row with an invalid code is refused), and the column "mpn", its manufacturer part number.
                     ]]>
                 </description>
             </import_descriptive>

@@ -122,6 +122,21 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.order_lines" class="Thelia\Domain\DataTransfer\Export\Type\OrderLineExport" category_id="thelia.export.orders">
+            <export_descriptive locale="en_US">
+                <title>Order lines</title>
+                <description>
+                    One row per order line: product and combination references, GTIN and manufacturer part number as they were when the order was placed, quantity and unit price.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Lignes de commande</title>
+                <description>
+                    Une ligne par article commandé : références du produit et de la déclinaison, GTIN et référence fabricant tels qu'au moment de la commande, quantité et prix unitaire.
+                </description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.product_i18n" class="Thelia\Domain\DataTransfer\Export\Type\ProductI18nExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product I18n information</title>
