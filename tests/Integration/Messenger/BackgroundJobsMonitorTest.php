@@ -21,8 +21,12 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
+use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 use Thelia\Messenger\Transport\ShopDatabaseTransportFactory;
@@ -129,6 +133,86 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertSame(0, $this->monitor()->failedCount());
         self::assertFalse($this->monitor()->remove($id));
         self::assertFalse($this->monitor()->retry($id));
+    }
+
+    /**
+     * A failed job whose class can no longer be read (a module turned off) is listed
+     * and deleted like any other, instead of failing the screen.
+     */
+    public function testAnUnreadableFailedJobIsListedAndCanBeDeleted(): void
+    {
+        $id = $this->setAside(new UndecodableJob('RemovedModule\\Message\\SyncStock', 'The message class is not one the shop queues.', '{}'), 'The job cannot be read');
+
+        $jobs = $this->monitor()->failedJobs();
+        self::assertSame('RemovedModule\\Message\\SyncStock', $jobs[0]->messageClass);
+        self::assertStringStartsWith('Unreadable job', $jobs[0]->description);
+
+        self::assertTrue($this->monitor()->remove($id));
+        self::assertSame(0, $this->monitor()->failedCount());
+    }
+
+    /**
+     * The queue is down: the replay fails, and so does setting the job aside again.
+     * The caller learns both, and the job is written to the log rather than lost
+     * without a word.
+     */
+    public function testAReplayThatCannotPutTheJobBackSaysBoth(): void
+    {
+        $id = $this->setAside($this->mail(), 'SMTP down');
+        $refusingBus = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new \RuntimeException('The queue server is unreachable.');
+            }
+        };
+        $failedThatRefusesWrites = new class($this->failed) implements TransportInterface, ListableReceiverInterface, MessageCountAwareInterface {
+            public function __construct(private readonly DoctrineTransport $inner)
+            {
+            }
+
+            public function get(): iterable
+            {
+                return $this->inner->get();
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+                $this->inner->ack($envelope);
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+                $this->inner->reject($envelope);
+            }
+
+            public function send(Envelope $envelope): Envelope
+            {
+                throw new \RuntimeException('The database is read only.');
+            }
+
+            public function all(?int $limit = null): iterable
+            {
+                return $this->inner->all($limit);
+            }
+
+            public function find(mixed $id): ?Envelope
+            {
+                return $this->inner->find($id);
+            }
+
+            public function getMessageCount(): int
+            {
+                return $this->inner->getMessageCount();
+            }
+        };
+
+        try {
+            (new BackgroundJobsMonitor($this->jobs, $failedThatRefusesWrites, $refusingBus))->retry($id);
+            self::fail('The caller must learn the job is neither replayed nor set aside.');
+        } catch (\RuntimeException $exception) {
+            self::assertStringContainsString('unreachable', $exception->getMessage());
+            self::assertStringContainsString('read only', $exception->getMessage());
+        }
     }
 
     private function monitor(): BackgroundJobsMonitor

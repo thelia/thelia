@@ -66,4 +66,15 @@ final class ShopDatabaseTransportFactoryTest extends TestCase
 
         ShopDatabaseTransportFactory::parametersOfPdoDsn('pgsql:host=db;dbname=shop');
     }
+
+    public function testTheTlsOptionsOfThePropelConnectionAreKeptForTheQueue(): void
+    {
+        self::assertSame(
+            [\PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/db-ca.pem', \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION],
+            ShopDatabaseTransportFactory::driverOptionsOf([
+                'options' => [\PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/db-ca.pem'],
+                'attributes' => [\PDO::ATTR_ERRMODE => 'PDO::ERRMODE_EXCEPTION'],
+            ]),
+        );
+    }
 }

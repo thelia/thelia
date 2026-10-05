@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mailer\Envelope as MailerEnvelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -22,6 +24,7 @@ use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
@@ -213,11 +216,38 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
 
         $queued = $queue->kept[0];
         self::assertInstanceOf(SendEmailMessage::class, $queued);
-        (new NullTransport($dispatcher))->send($queued->getMessage(), $queued->getEnvelope());
+        $sent = (new NullTransport($dispatcher))->send($queued->getMessage(), $queued->getEnvelope());
+
+        self::assertNotNull($sent);
+        self::assertStringNotContainsString('X-Thelia-', $sent->toString(), 'The customer never receives the headers naming the order.');
 
         $entry = $this->emailEntry($order);
         self::assertNotNull($entry, 'The mail has left: it belongs in the history now.');
         self::assertSame(['message_code' => self::MESSAGE_CODE], $entry->getDecodedPayload());
+    }
+
+    /**
+     * A listener that swaps the envelope of the delivery (a DKIM or S/MIME set-up may)
+     * does not cost the order its history line.
+     */
+    public function testAMailWhoseEnvelopeAListenerSwapsIsStillInTheHistory(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $swapEnvelope = static function (MessageEvent $event): void {
+            if (!$event->isQueued()) {
+                $event->setEnvelope(new MailerEnvelope(new Address('bounce@example.com'), $event->getEnvelope()->getRecipients()));
+            }
+        };
+        $dispatcher->addListener(MessageEvent::class, $swapEnvelope, -10);
+
+        try {
+            $this->sendAboutOrder(['order_id' => $order->getId(), 'order_ref' => $order->getRef()]);
+        } finally {
+            $dispatcher->removeListener(MessageEvent::class, $swapEnvelope);
+        }
+
+        self::assertNotNull($this->emailEntry($order));
     }
 
     private function emailEntryCount(): int

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-enum ExportJobStatus: string
+enum JobStatus: string
 {
     case QUEUED = 'queued';
     case RUNNING = 'running';
