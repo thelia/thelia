@@ -97,6 +97,24 @@ final class ProductIdentifiersTest extends ActionIntegrationTestCase
         self::assertNotSame(77.0, $stored->getQuantity());
     }
 
+    /**
+     * A CSV saved from a French spreadsheet is Windows-1252: its non-breaking space
+     * between digit groups is the byte 0xA0, which is not UTF-8.
+     */
+    public function testACodeThatIsNotUtf8IsRefusedAndKeepsTheStoredGtin(): void
+    {
+        $combination = $this->combination(['eanCode' => '4006381333931']);
+
+        try {
+            $combination->setEanCode("5012345678900\xA0")->save();
+            self::fail('A code that is not UTF-8 must be refused.');
+        } catch (InvalidGtinException $refusal) {
+            self::assertSame(GtinViolation::NotDigits, $refusal->violation);
+        }
+
+        self::assertSame('4006381333931', $this->reloaded($combination)->getEanCode());
+    }
+
     public function testACodeOfAnotherLengthIsRefused(): void
     {
         $this->expectException(InvalidGtinException::class);
