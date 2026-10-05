@@ -80,6 +80,13 @@ final class OrderTrackingUrlTemplateTest extends TestCase
         yield 'protocol relative' => ['//carrier.example/%ID%'];
         yield 'credentials hiding the real host' => ['https://carrier.example@attacker.example/%ID%'];
         yield 'space inside' => ['https://carrier.example/track %ID%'];
+        yield 'backslash read as a slash by a browser' => ['https://attacker.example\\.carrier.example/%ID%'];
+        yield 'backslash before the host' => ['https://\\attacker.example/%ID%'];
+        yield 'marker in the host' => ['https://%ID%.carrier.example/track'];
+        yield 'marker as the host' => ['https://%ID%/track'];
+        yield 'control character' => ["https://carrier.example/track\x01%ID%"];
+        yield 'no-break space' => ["https://carrier.example/track\u{00A0}%ID%"];
+        yield 'line break inside' => ["https://carrier.example/\n%ID%"];
     }
 
     public function testTheSchemeIsReadWhateverItsCase(): void

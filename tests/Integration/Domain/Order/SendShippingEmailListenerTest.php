@@ -27,6 +27,7 @@ use Thelia\Domain\Order\Service\OrderStatusCatalog;
 use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleConfigQuery;
@@ -91,6 +92,27 @@ final class SendShippingEmailListenerTest extends ActionIntegrationTestCase
         self::assertSame('Carrier for the shipping e-mail', $sent[0]['carrier']);
         self::assertSame($order->getCustomerId(), $sent[0]['customer_id']);
         self::assertSame($order->getCustomer()->getEmail(), array_key_first($this->mailer->messages[0]['to']));
+    }
+
+    /**
+     * The carrier is named in the language of the customer, and naming it leaves the
+     * shared module instance in the language it had: a back office page rendered
+     * after a bulk move keeps its own language.
+     */
+    public function testTheCarrierIsNamedInTheLanguageOfTheCustomerWithoutSwitchingTheModule(): void
+    {
+        $carrier = $this->carrier(null);
+        $carrier->setLocale('fr_FR')->setTitle('Transporteur de test')->save($this->getPropelConnection());
+        $carrier->setLocale('en_US');
+        $order = $this->processingOrderShippedBy($carrier, '6A12');
+        $order->getCustomer()->setLangId(LangQuery::create()->findOneByLocale('fr_FR')->getId())->save($this->getPropelConnection());
+        $module = $order->getModuleRelatedByDeliveryModuleId();
+        $module->setLocale('en_US');
+
+        $this->listener()->onOrderStatusUpdate($this->statusChange($order, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT));
+
+        self::assertSame('Transporteur de test', $this->mailer->parametersOfMessagesSent(SendShippingEmailListener::MESSAGE_CODE)[0]['carrier']);
+        self::assertSame('Carrier for the shipping e-mail', $module->getTitle(), 'The module keeps the language it was read in.');
     }
 
     public function testWithoutTrackingNumberTheEmailStillAnnouncesTheShipment(): void

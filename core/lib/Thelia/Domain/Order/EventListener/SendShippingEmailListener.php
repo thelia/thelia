@@ -22,6 +22,7 @@ use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
+use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
 
@@ -77,10 +78,12 @@ final readonly class SendShippingEmailListener
             return;
         }
 
+        $trackingNumber = trim((string) $order->getDeliveryRef());
+
         $this->mailer->sendEmailToCustomer(self::MESSAGE_CODE, $customer, [
             'order_id' => $order->getId(),
             'order_ref' => $order->getRef(),
-            'delivery_ref' => '' === trim((string) $order->getDeliveryRef()) ? null : trim((string) $order->getDeliveryRef()),
+            'delivery_ref' => '' === $trackingNumber ? null : $trackingNumber,
             'tracking_url' => $this->trackingUrlResolver->resolve($order),
             'carrier' => $this->carrierOf($order, $customer->getCustomerLang()->getLocale()),
         ]);
@@ -110,8 +113,11 @@ final readonly class SendShippingEmailListener
     private function carrierOf(Order $order, string $locale): ?string
     {
         $module = $order->getModuleRelatedByDeliveryModuleId();
+        // Read from the i18n table: setLocale(), and getTranslation() too through
+        // addModuleI18n(), would leave the shared module instance in the customer's
+        // language for the rest of the request.
         $title = null !== $module
-            ? ($module->setLocale($locale)->getTitle() ?: $module->getCode())
+            ? (ModuleI18nQuery::create()->filterById($module->getId())->filterByLocale($locale)->findOne()?->getTitle() ?: $module->getCode())
             : $order->getDeliveryModuleTitle();
         $title = trim((string) $title);
 

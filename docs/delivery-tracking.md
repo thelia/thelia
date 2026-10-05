@@ -10,7 +10,7 @@ Each delivery module can carry a tracking address template in its module configu
 https://www.laposte.fr/outils/suivre-vos-envois?code=%ID%
 ```
 
-The merchant types it in the back office, on the shipping zones page of the carrier. A template is refused unless it is an `http` or `https` address carrying `%ID%`: the template comes from the back office and ends up as a link in front of the customer, and a `javascript:` or `data:` address must never get there. The tracking number is url-encoded into the address, so a number with a space or a slash keeps the link valid.
+The merchant types it in the back office, on the shipping zones page of the carrier. A template is refused unless it is an `http` or `https` address carrying `%ID%` outside the host, with no credentials, backslash, space or control character: the template comes from the back office and ends up as a link in front of the customer, and a `javascript:` or `data:` address must never get there. The tracking number is url-encoded into the address, so a number with a space or a slash keeps the link valid.
 
 A module whose carrier wants a signature, a customer code or a format a template cannot express builds the link itself by implementing `Thelia\Module\DeliveryTrackingUrlProviderInterface` on its module class:
 
@@ -24,7 +24,7 @@ final class MyCarrier extends AbstractDeliveryModuleWithState implements Deliver
 }
 ```
 
-When the module implements it, the template is not read. An address it returns that is not `http(s)` is dropped all the same.
+When the module implements it, the template is not read. An address it returns that is not `http(s)` is dropped all the same, and an exception thrown by the module costs the order its link (it is logged), never the page or the status change that asked for it.
 
 ## Reading the link of an order
 
@@ -43,6 +43,8 @@ Where it shows:
 - saving an order that is already sent, or moving it between two statuses that both mean sent, sends nothing;
 - correcting the tracking number of a shipped order sends nothing, and the link follows the new number;
 - a status changed without a request (payment notification, API, script) sends the e-mail the same way.
+- an order taken back out of `sent` and shipped again enters the status again, and the customer is mailed again;
+- an import or a synchronisation that moves orders to `sent` through the status event mails their customers too: switch the e-mail off for the time of a bulk catch-up on historical orders.
 
 The message receives `order_id`, `order_ref`, `delivery_ref`, `tracking_url` and `carrier` (the title of the delivery module in the language of the customer), each null when unknown. Without a tracking number the e-mail still goes out and simply announces the shipment. The templates `order_shipped.html.twig` and `order_shipped.txt.twig` belong to the e-mail theme.
 

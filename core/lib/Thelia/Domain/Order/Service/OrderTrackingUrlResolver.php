@@ -16,6 +16,7 @@ namespace Thelia\Domain\Order\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Log\Tlog;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -32,7 +33,8 @@ use Thelia\Module\DeliveryTrackingUrlProviderInterface;
  *
  * The template comes from the back office and the number from the order: an
  * address that is not http(s) is never returned, so a setting cannot turn the
- * link shown to the customer into a script or a local file.
+ * link shown to the customer into a script or a local file, and the marker is
+ * refused in the host, so a tracking number can never choose the site it leads to.
  */
 final class OrderTrackingUrlResolver implements ResetInterface
 {
@@ -66,9 +68,7 @@ final class OrderTrackingUrlResolver implements ResetInterface
         $source = $this->sourceOf($moduleId);
 
         if ($source instanceof DeliveryTrackingUrlProviderInterface) {
-            $url = $source->getTrackingUrl($order);
-
-            return null !== $url && self::isWebAddress($url) ? $url : null;
+            return $this->askTheModule($source, $order);
         }
 
         return null === $source ? null : self::fill($source, $number);
@@ -88,7 +88,11 @@ final class OrderTrackingUrlResolver implements ResetInterface
      */
     public static function isValidTemplate(string $template): bool
     {
-        return self::isWebAddress($template) && str_contains($template, self::NUMBER_MARKER);
+        $template = trim($template);
+
+        return self::isWebAddress($template)
+            && str_contains($template, self::NUMBER_MARKER)
+            && !str_contains(self::authorityOf($template), self::NUMBER_MARKER);
     }
 
     /**
@@ -112,9 +116,36 @@ final class OrderTrackingUrlResolver implements ResetInterface
         $this->sourceByModuleId = [];
     }
 
+    /**
+     * An http(s) address with a host, and nothing a browser would read differently
+     * from what is checked here: no credentials before the host, no backslash (read
+     * as a slash), no space, control or invisible character anywhere.
+     */
     private static function isWebAddress(string $url): bool
     {
-        return 1 === preg_match('#^https?://[^\s/?\#@]+(?:[/?\#]\S*)?$#i', trim($url));
+        return 1 === preg_match('#^https?://[^\p{Z}\p{C}\\\\/?\#@]+(?:[/?\#][^\p{Z}\p{C}\\\\]*)?\z#iu', $url);
+    }
+
+    private static function authorityOf(string $url): string
+    {
+        return (string) preg_replace('#^https?://([^/?\#]*).*$#is', '$1', $url);
+    }
+
+    /**
+     * The module is third-party code: whatever goes wrong in it costs the order its
+     * link, never the page, the API read or the status change that asked for it.
+     */
+    private function askTheModule(DeliveryTrackingUrlProviderInterface $module, Order $order): ?string
+    {
+        try {
+            $url = trim((string) $module->getTrackingUrl($order));
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->error(\sprintf('The tracking link of order %s could not be built by %s: %s', $order->getRef(), $module::class, $throwable->getMessage()));
+
+            return null;
+        }
+
+        return self::isWebAddress($url) ? $url : null;
     }
 
     private function sourceOf(int $moduleId): DeliveryTrackingUrlProviderInterface|string|null
