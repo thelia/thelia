@@ -107,6 +107,36 @@ final class OrderTrackingUrlResolverTest extends IntegrationTestCase
         self::assertNull($resolver->resolve($this->orderShippedBy($carrier, '6A12')));
     }
 
+    /**
+     * The module is third-party code: a failure in it costs the order its link, never
+     * the order page, the API read or the status change that asked for the link.
+     */
+    public function testACarrierModuleThatFailsGivesNoLinkInsteadOfBreakingTheCaller(): void
+    {
+        $carrier = $this->carrier('https://carrier.example/%ID%');
+        $resolver = $this->resolverWith(new TrackingCarrierModule(self::CARRIER_CODE, null, new \RuntimeException('Carrier API down')));
+
+        self::assertNull($resolver->resolve($this->orderShippedBy($carrier, '6A12')));
+    }
+
+    /**
+     * The source of a carrier is read once per request: an order list does not read
+     * the configuration once per order. The next request reads it again.
+     */
+    public function testTheCarrierIsReadOncePerRequestAndAgainAfterAReset(): void
+    {
+        $carrier = $this->carrier('https://carrier.example/first/%ID%');
+        $resolver = $this->resolver();
+        $order = $this->orderShippedBy($carrier, '6A12');
+        self::assertSame('https://carrier.example/first/6A12', $resolver->resolve($order));
+
+        ModuleConfigQuery::create()->setConfigValue($carrier->getId(), OrderTrackingUrlResolver::TRACKING_URL_CONFIG_KEY, 'https://carrier.example/second/%ID%');
+        self::assertSame('https://carrier.example/first/6A12', $resolver->resolve($order), 'Same request: the carrier is not read again.');
+
+        $resolver->reset();
+        self::assertSame('https://carrier.example/second/6A12', $resolver->resolve($order));
+    }
+
     private function resolver(): OrderTrackingUrlResolver
     {
         // The carrier row has no service: the container answers as for a module that

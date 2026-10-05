@@ -29,6 +29,7 @@ final class TrackingCarrierModule extends AbstractDeliveryModuleWithState implem
     public function __construct(
         private readonly string $code,
         private readonly ?string $trackingUrl,
+        private readonly ?\Throwable $failure = null,
     ) {
     }
 
@@ -49,6 +50,10 @@ final class TrackingCarrierModule extends AbstractDeliveryModuleWithState implem
 
     public function getTrackingUrl(Order $order): ?string
     {
+        if (null !== $this->failure) {
+            throw $this->failure;
+        }
+
         return null === $this->trackingUrl ? null : str_replace('{ref}', (string) $order->getDeliveryRef(), $this->trackingUrl);
     }
 }
