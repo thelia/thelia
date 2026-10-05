@@ -140,7 +140,7 @@ final class OrderTrackingUrlResolver implements ResetInterface
         try {
             $url = trim((string) $module->getTrackingUrl($order));
         } catch (\Throwable $throwable) {
-            Tlog::getInstance()->error(\sprintf('The tracking link of order %s could not be built by %s: %s', $order->getRef(), $module::class, $throwable->getMessage()));
+            Tlog::getInstance()->error('The tracking link of order {ref} could not be built by {module}: {error}', ['ref' => $order->getRef(), 'module' => $module::class, 'error' => $throwable->getMessage()]);
 
             return null;
         }
@@ -165,6 +165,10 @@ final class OrderTrackingUrlResolver implements ResetInterface
         } catch (\InvalidArgumentException) {
             // A deactivated module is not in the container: its template still applies
             // to the orders it shipped.
+            $instance = null;
+        } catch (\Throwable $throwable) {
+            // Building the module runs third-party code too.
+            Tlog::getInstance()->error('The delivery module {module} could not be loaded for a tracking link: {error}', ['module' => $module->getCode(), 'error' => $throwable->getMessage()]);
             $instance = null;
         }
 
