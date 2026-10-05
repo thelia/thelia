@@ -33,6 +33,7 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
+use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
@@ -273,7 +274,7 @@ class ProductSaleElements implements PropelResourceInterface
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
     #[ApiProperty(description: 'The manufacturer part number, as the merchant feeds ask for it beside the GTIN.')]
-    #[Length(max: 255, groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    #[Length(max: InvalidMpnException::MAXIMUM_LENGTH, groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
     public ?string $mpn = null;
 
     #[Relation(targetResource: Brand::class, relationAlias: 'ManufacturerBrand')]
