@@ -423,4 +423,5 @@ return [
     'Customer rating' => 'Klantbeoordeling',
     'Price' => 'Prijs',
     'Configuration destination restrictions' => 'Configuratie van de bestemmingsbeperkingen',
+    'Configuration background jobs' => 'Configuratie van achtergrondtaken',
 ];

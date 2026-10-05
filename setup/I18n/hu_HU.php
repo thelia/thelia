@@ -27,4 +27,5 @@ return [
     'Search' => 'Keresés',
     'Shipping configuration' => 'Szállítási beállítások',
     'Translations' => 'Fordítások',
+    'Configuration background jobs' => 'Háttérfeladatok beállítása',
 ];
