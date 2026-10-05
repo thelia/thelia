@@ -116,13 +116,13 @@ abstract class AbstractImport implements \Iterator
     /**
      * Set language.
      *
-     * @param Lang|null $language A language model
+     * @param Lang|null $language A language model, the default language of the shop when null
      *
      * @return $this Return $this, allow chaining
      */
     public function setLang(?Lang $language = null)
     {
-        $this->language = $language;
+        $this->language = $language ?? Lang::getDefaultLanguage();
 
         return $this;
     }
