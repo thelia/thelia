@@ -21,7 +21,6 @@ use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -40,7 +39,6 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
     }
 
@@ -311,7 +309,6 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverReturning($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         $wasAdminEnvironment = Request::$isAdminEnv;
@@ -476,7 +473,6 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         $email = $mailerFactory->createEmailMessage(
@@ -578,7 +574,6 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
     }
 

@@ -2236,7 +2236,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
 (59, 'admin.configuration.delivery-date', NOW(), NOW()),
 (60, 'admin.sale-unit', NOW(), NOW()),
-(61, 'admin.configuration.destination-restriction', NOW(), NOW())
+(61, 'admin.configuration.destination-restriction', NOW(), NOW()),
+(62, 'admin.configuration.background-jobs', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15493,6 +15494,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'cs_CZ', NULL, NULL, NULL, NULL),
     (60, 'cs_CZ', NULL, NULL, NULL, NULL),
     (61, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (62, 'cs_CZ', 'Konfigurace úloh na pozadí', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15553,6 +15555,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'de_DE', NULL, NULL, NULL, NULL),
     (60, 'de_DE', 'Verkaufseinheiten', NULL, NULL, NULL),
     (61, 'de_DE', 'Konfiguration der Lieferbeschränkungen', NULL, NULL, NULL),
+    (62, 'de_DE', 'Konfiguration der Hintergrundaufgaben', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15613,6 +15616,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'en_US', 'Configuration delivery dates', NULL, NULL, NULL),
     (60, 'en_US', 'Sale units', NULL, NULL, NULL),
     (61, 'en_US', 'Configuration destination restrictions', NULL, NULL, NULL),
+    (62, 'en_US', 'Configuration background jobs', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15673,6 +15677,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'es_ES', NULL, NULL, NULL, NULL),
     (60, 'es_ES', 'Unidades de venta', NULL, NULL, NULL),
     (61, 'es_ES', 'Configuración de las restricciones de destino', NULL, NULL, NULL),
+    (62, 'es_ES', 'Configuración de tareas en segundo plano', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15733,6 +15738,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'fr_FR', 'Configuration des dates de livraison', NULL, NULL, NULL),
     (60, 'fr_FR', 'Unités de vente', NULL, NULL, NULL),
     (61, 'fr_FR', 'Configuration des restrictions de destination', NULL, NULL, NULL),
+    (62, 'fr_FR', 'Configuration des tâches en arrière-plan', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15793,6 +15799,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'it_IT', NULL, NULL, NULL, NULL),
     (60, 'it_IT', 'Unità di vendita', NULL, NULL, NULL),
     (61, 'it_IT', 'Configurazione delle restrizioni di destinazione', NULL, NULL, NULL),
+    (62, 'it_IT', 'Configurazione delle attività in background', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15853,6 +15860,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (59, 'nl_NL', NULL, NULL, NULL, NULL),
     (60, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
     (61, 'nl_NL', 'Configuratie van de bestemmingsbeperkingen', NULL, NULL, NULL),
+    (62, 'nl_NL', 'Configuratie van achtergrondtaken', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15912,7 +15920,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (58, 'ru_RU', NULL, NULL, NULL, NULL),
     (59, 'ru_RU', NULL, NULL, NULL, NULL),
     (60, 'ru_RU', 'Точки продаж', NULL, NULL, NULL),
-    (61, 'ru_RU', 'Настройка ограничений по направлениям доставки', NULL, NULL, NULL)
+    (61, 'ru_RU', 'Настройка ограничений по направлениям доставки', NULL, NULL, NULL),
+    (62, 'ru_RU', 'Настройка фоновых задач', NULL, NULL, NULL)
 ;
 
 
