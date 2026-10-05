@@ -68,6 +68,14 @@ final class GtinTest extends TestCase
         self::assertSame('4006381333931', Gtin::normalize("4006381\t333931"));
     }
 
+    public function testACodeThatIsNotUtf8IsKeptAsGivenAndRefused(): void
+    {
+        $normalized = Gtin::normalize("5012345678900\xA0");
+
+        self::assertSame("5012345678900\xA0", $normalized);
+        self::assertSame(GtinViolation::NotDigits, Gtin::violationOf($normalized));
+    }
+
     public function testTheLeadingZeroIsKept(): void
     {
         $normalized = Gtin::normalize('0 36000 29145 2');

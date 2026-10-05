@@ -29,10 +29,14 @@ final class Gtin
 
     /**
      * Drops what people type between the digit groups, as printed under a barcode.
+     *
+     * A code that is not valid UTF-8, such as a Windows-1252 non-breaking space from a
+     * spreadsheet, is returned as given: it is then refused as not digits, instead of
+     * being read as an empty code that would erase the stored one.
      */
     public static function normalize(string $code): string
     {
-        return (string) preg_replace('/[\s\-]+/u', '', $code);
+        return preg_replace('/[\s\-]+/u', '', $code) ?? $code;
     }
 
     /**
