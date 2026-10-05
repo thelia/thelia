@@ -40,6 +40,17 @@ final class Gtin
     }
 
     /**
+     * Null when a code as typed is accepted: nothing left once normalized, or a GTIN;
+     * otherwise the first rule it breaks.
+     */
+    public static function violationOfTypedCode(string $typedCode): ?GtinViolation
+    {
+        $normalizedCode = self::normalize($typedCode);
+
+        return '' === $normalizedCode ? null : self::violationOf($normalizedCode);
+    }
+
+    /**
      * Null when the normalized code is a GTIN; otherwise the first rule it breaks.
      */
     public static function violationOf(string $normalizedCode): ?GtinViolation

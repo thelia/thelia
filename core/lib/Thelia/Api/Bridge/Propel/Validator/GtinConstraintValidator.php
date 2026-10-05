@@ -42,8 +42,7 @@ class GtinConstraintValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $normalizedCode = Gtin::normalize($value);
-        $violation = '' === $normalizedCode ? null : Gtin::violationOf($normalizedCode);
+        $violation = Gtin::violationOfTypedCode($value);
 
         if (null === $violation || $this->isTheStoredCode($value)) {
             return;

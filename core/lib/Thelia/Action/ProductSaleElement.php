@@ -506,9 +506,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      */
     private function cloneableGtin(?string $code): string
     {
-        $normalizedCode = Gtin::normalize((string) $code);
+        $typedCode = (string) $code;
 
-        return '' !== $normalizedCode && null === Gtin::violationOf($normalizedCode) ? $normalizedCode : '';
+        return null === Gtin::violationOfTypedCode($typedCode) ? Gtin::normalize($typedCode) : '';
     }
 
     public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key): void
