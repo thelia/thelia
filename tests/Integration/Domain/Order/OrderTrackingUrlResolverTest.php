@@ -119,6 +119,19 @@ final class OrderTrackingUrlResolverTest extends IntegrationTestCase
         self::assertNull($resolver->resolve($this->orderShippedBy($carrier, '6A12')));
     }
 
+    public function testACarrierModuleThatCannotBeLoadedFallsBackToItsTemplate(): void
+    {
+        $carrier = $this->carrier('https://carrier.example/%ID%');
+        $brokenContainer = new class extends Container {
+            public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object
+            {
+                throw new \RuntimeException('The module constructor failed');
+            }
+        };
+
+        self::assertSame('https://carrier.example/6A12', (new OrderTrackingUrlResolver($brokenContainer))->resolve($this->orderShippedBy($carrier, '6A12')));
+    }
+
     /**
      * The source of a carrier is read once per request: an order list does not read
      * the configuration once per order. The next request reads it again.
