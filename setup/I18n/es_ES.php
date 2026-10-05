@@ -1149,4 +1149,6 @@ return [
     'Catalog price rules' => 'Reglas de precios del catálogo',
     'Promotion' => 'Promoción',
     'Newness' => 'Novedad',
+    'Shipping notice sent to the customer' => 'Aviso de envío enviado al cliente',
+    'Your order {{ order_ref }} has been shipped' => 'Tu pedido {{ order_ref }} ha sido enviado',
 ];

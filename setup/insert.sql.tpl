@@ -104,7 +104,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (93, 'videos_library_path', 'local/media/videos', 0, 0, NOW(), NOW()),
 (94, 'video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW()),
 (95, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
-(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW())
+(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
+(97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2235,7 +2236,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
-(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW())
+(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
+(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW())
 ;
 
 /**
@@ -2304,7 +2306,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (72, '{{ locale }}', {{ intl('The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).', locale) }}, NULL, NULL, NULL),
     (73, '{{ locale }}', {{ intl('Allow module installation from ZIP files.', locale) }}, NULL, NULL, NULL),
     (95, '{{ locale }}', {{ intl('Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)', locale) }}, NULL, NULL, NULL),
-    (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL),
+    (97, '{{ locale }}', {{ intl('Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4040,7 +4043,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (7, '{{ locale }}', {{ intl('Newsletter subscription confirmation mail', locale) }}, {{ intl('Your subscription to %store newsletter', locale) }}, NULL, NULL),
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
-    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
+    (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

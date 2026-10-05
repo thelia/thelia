@@ -433,4 +433,5 @@ return [
     'Catalog price rules' => 'Regole di prezzo del catalogo',
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
+    'Your order {{ order_ref }} has been shipped' => 'Il tuo ordine {{ order_ref }} è stato spedito',
 ];
