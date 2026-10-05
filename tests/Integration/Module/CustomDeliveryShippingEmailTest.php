@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Module;
 
 use CustomDelivery\CustomDelivery;
 use CustomDelivery\EventListeners\CustomDeliveryEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -46,7 +47,7 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
 
     protected function setUp(): void
     {
-        if (!method_exists(CustomDelivery::class, 'coreHandlesTheShippingEmail')) {
+        if (!method_exists(CustomDelivery::class, 'isValidTrackingUrlTemplateWithoutCore')) {
             self::markTestSkipped('The installed CustomDelivery predates the shipping e-mail of the core.');
         }
 
@@ -160,6 +161,36 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
 
         self::assertSame('', CustomDelivery::getTrackingUrlTemplate());
         self::assertNull($this->getService(OrderTrackingUrlResolver::class)->resolve($this->customDeliveryOrder('6A12')));
+    }
+
+    /**
+     * On a core without the rule the module checks the address itself: both rules must
+     * accept and refuse the same addresses, or a template valid in the module would be
+     * dropped by the core, and the other way round.
+     */
+    #[DataProvider('templates')]
+    public function testTheModuleRuleForAnOlderCoreMatchesTheCoreRule(string $template): void
+    {
+        self::assertSame(
+            OrderTrackingUrlResolver::isValidTemplate($template),
+            CustomDelivery::isValidTrackingUrlTemplateWithoutCore($template),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function templates(): iterable
+    {
+        yield 'valid' => ['https://carrier.example/track?parcel=%ID%'];
+        yield 'valid with port and fragment' => ['http://carrier.example:8080/t/%ID%#top'];
+        yield 'no marker' => ['https://carrier.example/track'];
+        yield 'script' => ['javascript:alert(1)//%ID%'];
+        yield 'marker in the host' => ['https://%ID%.carrier.example/'];
+        yield 'credentials' => ['https://carrier.example@attacker.example/%ID%'];
+        yield 'backslash' => ['https://attacker.example\\.carrier.example/%ID%'];
+        yield 'no-break space' => ["https://carrier.example/\u{00A0}%ID%"];
+        yield 'protocol relative' => ['//carrier.example/%ID%'];
     }
 
     private function listener(): CustomDeliveryEvents
