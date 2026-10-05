@@ -64,7 +64,8 @@ class FeatureFixAmountTaxType extends BaseTaxType
             }
         }
 
-        return $taxAmount;
+        // The amount is read as text, from the free value or the title of the feature value.
+        return (float) $taxAmount;
     }
 
     public function getRequirementsDefinition(): array
