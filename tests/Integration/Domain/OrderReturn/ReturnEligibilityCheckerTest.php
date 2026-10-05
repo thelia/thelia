@@ -271,6 +271,52 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
     }
 
     /**
+     * A shop that takes back only what it has shipped lists the sent status: a
+     * paid order still waiting for its parcel cannot be returned, through any of
+     * the paths that ask this gate.
+     */
+    public function testOnlyTheListedOrderStatusesOpenAReturn(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, ' sent ,');
+        [$paidOrder, $paidCustomer] = $this->paidOrderWithProduct();
+        [$sentOrder, $sentCustomer] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_SENT);
+
+        self::assertSame([OrderStatus::CODE_SENT], $this->checker->openingStatusCodes());
+        self::assertFalse($this->checker->isWithinReturnWindow($paidOrder));
+        self::assertFalse($this->checker->isReturnable($paidOrder));
+        self::assertTrue($this->checker->isWithinReturnWindow($sentOrder));
+        $this->checker->assertOrderReturnable($sentOrder, $sentCustomer);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->checker->assertOrderReturnable($paidOrder, $paidCustomer);
+    }
+
+    /**
+     * A listed status does not have to be a paid one: the list replaces the rule,
+     * it does not narrow it.
+     */
+    public function testAListedStatusOpensAReturnEvenWhenItIsNotAPaidOne(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, OrderStatus::CODE_NOT_PAID);
+        [$order] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_NOT_PAID);
+
+        self::assertTrue($this->checker->isWithinReturnWindow($order));
+    }
+
+    public function testAnEmptyListOpensAReturnOnAnyPaidStatus(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, '');
+        [$paidOrder] = $this->paidOrderWithProduct();
+        [$processingOrder] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_PROCESSING);
+        [$unpaidOrder] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_NOT_PAID);
+
+        self::assertSame([], $this->checker->openingStatusCodes());
+        self::assertTrue($this->checker->isWithinReturnWindow($paidOrder));
+        self::assertTrue($this->checker->isWithinReturnWindow($processingOrder));
+        self::assertFalse($this->checker->isWithinReturnWindow($unpaidOrder));
+    }
+
+    /**
      * @return array{Order, Customer}
      */
     private function shipmentRecordedDaysAgo(Order $order, int $days): void
