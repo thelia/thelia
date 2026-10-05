@@ -202,14 +202,13 @@ class ProductSaleElements extends BaseProductSaleElements
     public function preSave(?ConnectionInterface $con = null): bool
     {
         if ($this->isColumnModified(ProductSaleElementsTableMap::COL_EAN_CODE) && null !== $this->ean_code) {
-            $normalizedCode = Gtin::normalize($this->ean_code);
-            $violation = '' === $normalizedCode ? null : Gtin::violationOf($normalizedCode);
+            $violation = Gtin::violationOfTypedCode($this->ean_code);
 
             if (null !== $violation) {
                 throw new InvalidGtinException($this->ean_code, $violation, $this->getRef());
             }
 
-            $this->ean_code = $normalizedCode;
+            $this->ean_code = Gtin::normalize($this->ean_code);
         }
 
         if ($this->isColumnModified(ProductSaleElementsTableMap::COL_MPN) && null !== $this->mpn) {
