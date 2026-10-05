@@ -218,10 +218,17 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // The refused values stay on the instance the pool hands out, and the next
             // save of the product cascades to it: one refused row would then refuse
-            // every later row of the same request. Read the stored row back.
-            if (($exception instanceof InvalidGtinException || $exception instanceof InvalidMpnException)
-                && null !== $salesElement && !$salesElement->isNew()) {
-                $salesElement->reload();
+            // every later row of the same request. Read the stored row back. The product
+            // tax rule saved above is rolled back too, while the product still reads it
+            // as saved: the next row would carry the same rule and write nothing.
+            if ($exception instanceof InvalidGtinException || $exception instanceof InvalidMpnException) {
+                if (null !== $salesElement && !$salesElement->isNew()) {
+                    $salesElement->reload();
+                }
+
+                if (!$event->getProduct()->isNew()) {
+                    $event->getProduct()->reload();
+                }
             }
 
             throw $exception;
