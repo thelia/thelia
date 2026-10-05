@@ -28,11 +28,12 @@ readonly class PurgeExportCacheListener
     #[AsEventListener(event: TheliaEvents::MAINTENANCE_PURGE)]
     public function onMaintenancePurge(MaintenancePurgeEvent $event): void
     {
-        $deletedCount = $this->exportCachePurger->purgeOldExportFiles(THELIA_CACHE_DIR.'export'.DS);
+        $deletedCount = $this->exportCachePurger->purgeOldExportFiles(THELIA_CACHE_DIR.'export'.DS, $event->isDryRun());
 
         $event->addResult(\sprintf(
-            '<comment>Export cache files:</comment> <info>%d deleted</info>',
-            $deletedCount
+            '<comment>Export cache files:</comment> <info>%d %s</info>',
+            $deletedCount,
+            $event->isDryRun() ? 'to delete' : 'deleted',
         ));
     }
 }

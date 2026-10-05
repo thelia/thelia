@@ -21,7 +21,10 @@ class ExportCachePurger
 {
     private const EXPORT_CACHE_MAX_AGE_DAYS = 1;
 
-    public function purgeOldExportFiles(string $directory): int
+    /**
+     * @param bool $dryRun count the files that would be deleted, and delete nothing
+     */
+    public function purgeOldExportFiles(string $directory, bool $dryRun = false): int
     {
         if (!is_dir($directory)) {
             return 0;
@@ -34,7 +37,9 @@ class ExportCachePurger
         $deletedCount = 0;
 
         foreach ($finder as $oldExportFile) {
-            $fileSystem->remove($oldExportFile->getRealPath());
+            if (!$dryRun) {
+                $fileSystem->remove($oldExportFile->getRealPath());
+            }
             ++$deletedCount;
         }
 
