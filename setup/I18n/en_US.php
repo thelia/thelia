@@ -1568,4 +1568,5 @@ return [
     'Newness' => 'Newness',
     'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)',
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)',
+    'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' => 'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)',
 ];

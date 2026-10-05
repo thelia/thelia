@@ -104,7 +104,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (93, 'videos_library_path', 'local/media/videos', 0, 0, NOW(), NOW()),
 (94, 'video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW()),
 (95, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
-(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW())
+(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
+(97, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2199,7 +2200,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (72, '{{ locale }}', {{ intl('The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).', locale) }}, NULL, NULL, NULL),
     (73, '{{ locale }}', {{ intl('Allow module installation from ZIP files.', locale) }}, NULL, NULL, NULL),
     (95, '{{ locale }}', {{ intl('Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)', locale) }}, NULL, NULL, NULL),
-    (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL),
+    (97, '{{ locale }}', {{ intl('Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
