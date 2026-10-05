@@ -1568,4 +1568,9 @@ return [
     'Newness' => 'Newness',
     'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)',
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)',
+    'Returns - at the top' => 'Returns - at the top',
+    'Returns - at the bottom' => 'Returns - at the bottom',
+    'Returns - JavaScript' => 'Returns - JavaScript',
+    'Return edit - at the top' => 'Return edit - at the top',
+    'Return edit - at the bottom' => 'Return edit - at the bottom',
 ];

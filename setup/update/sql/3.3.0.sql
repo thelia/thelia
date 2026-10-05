@@ -63,4 +63,42 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Hooks of the return screens of the back office
+--
+-- The return list and the return sheet of the back office call these
+-- insertion points, but no row declared them: a module could not register
+-- on them, and a theme rendered them empty. INSERT IGNORE keeps a hook a
+-- merchant already created under the same code.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `hook` (`code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+    ('order-returns.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+    ('order-returns.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+    ('order-returns.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+    ('order-return-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+    ('order-return-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+
+INSERT IGNORE INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`)
+SELECT `hook`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL
+FROM `hook`
+INNER JOIN (
+    SELECT 'order-returns.top' AS `code`, 'en_US' AS `locale`, 'Returns - at the top' AS `title`
+    UNION ALL SELECT 'order-returns.top', 'fr_FR', 'Retours - en haut'
+    UNION ALL SELECT 'order-returns.top', 'de_DE', 'Rücksendungen - oben'
+    UNION ALL SELECT 'order-returns.bottom', 'en_US', 'Returns - at the bottom'
+    UNION ALL SELECT 'order-returns.bottom', 'fr_FR', 'Retours - en bas'
+    UNION ALL SELECT 'order-returns.bottom', 'de_DE', 'Rücksendungen - unten'
+    UNION ALL SELECT 'order-returns.js', 'en_US', 'Returns - JavaScript'
+    UNION ALL SELECT 'order-returns.js', 'fr_FR', 'Retours - JavaScript'
+    UNION ALL SELECT 'order-returns.js', 'de_DE', 'Rücksendungen - JavaScript'
+    UNION ALL SELECT 'order-return-edit.top', 'en_US', 'Return edit - at the top'
+    UNION ALL SELECT 'order-return-edit.top', 'fr_FR', 'Édition d''un retour - en haut'
+    UNION ALL SELECT 'order-return-edit.top', 'de_DE', 'Rücksendung bearbeiten - oben'
+    UNION ALL SELECT 'order-return-edit.bottom', 'en_US', 'Return edit - at the bottom'
+    UNION ALL SELECT 'order-return-edit.bottom', 'fr_FR', 'Édition d''un retour - en bas'
+    UNION ALL SELECT 'order-return-edit.bottom', 'de_DE', 'Rücksendung bearbeiten - unten'
+) AS `labels` ON `labels`.`code` = `hook`.`code`
+WHERE `hook`.`type` = 2;
+
 SET FOREIGN_KEY_CHECKS = 1;
