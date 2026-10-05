@@ -973,4 +973,5 @@ return [
     '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.' => '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.',
     '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.',
     '%product cannot be shipped to your address.' => '%product cannot be shipped to your address.',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'The value "%value" of the column %column is not a number (product sale element id %id)',
 ];

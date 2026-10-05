@@ -24,4 +24,5 @@ return [
     'New York' => 'نيويورك',
     'Order status transition override' => 'تجاوز انتقالات حالة الطلب',
     'Search' => 'بحث',
+    'Configuration background jobs' => 'إعدادات المهام في الخلفية',
 ];

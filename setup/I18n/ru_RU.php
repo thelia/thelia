@@ -1535,4 +1535,5 @@ return [
     'Customer rating' => 'Оценка покупателей',
     'Price' => 'Цена',
     'Configuration destination restrictions' => 'Настройка ограничений по направлениям доставки',
+    'Configuration background jobs' => 'Настройка фоновых задач',
 ];

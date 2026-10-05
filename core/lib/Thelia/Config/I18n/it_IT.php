@@ -352,4 +352,5 @@ return [
     '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.' => '%products non può essere ordinato con questo indirizzo di fatturazione. Rimuovilo dal carrello o scegli un altro indirizzo di fatturazione.',
     '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products non possono essere ordinati con questo indirizzo di fatturazione. Rimuovili dal carrello o scegli un altro indirizzo di fatturazione.',
     '%product cannot be shipped to your address.' => '%product non può essere spedito al tuo indirizzo.',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'Il valore "%value" della colonna %column non è un numero (id della variante di prodotto %id)',
 ];
