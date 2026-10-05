@@ -1117,4 +1117,9 @@ return [
     'Catalog price rules' => 'Katalogpreisregeln',
     'Promotion' => 'Aktion',
     'Newness' => 'Neuheit',
+    'Returns - at the top' => 'Rücksendungen - oben',
+    'Returns - at the bottom' => 'Rücksendungen - unten',
+    'Returns - JavaScript' => 'Rücksendungen - JavaScript',
+    'Return edit - at the top' => 'Rücksendung bearbeiten - oben',
+    'Return edit - at the bottom' => 'Rücksendung bearbeiten - unten',
 ];
