@@ -17,6 +17,7 @@ namespace Thelia\Tests\Http\Flexy;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
 use Thelia\Model\Customer;
 use Thelia\Model\Module;
@@ -119,7 +120,29 @@ final class AccountOrderTrackingLinkTest extends WebIntegrationTestCase
         $links = $crawler->filter('[data-testid="order-card-tracking-link"]');
         self::assertCount(1, $links, 'Only the shipped order offers its tracking link.');
         self::assertSame('https://carrier.example/track?parcel=SHIPPED1', $links->attr('href'));
+        self::assertSame('_blank', $links->attr('target'));
+        self::assertCount(1, $links->filter('.sr-only'), 'A screen reader hears that the link opens a new tab.');
         self::assertNotNull($shipped->getId());
+    }
+
+    /**
+     * A buyer without an account follows the order from the link of the confirmation
+     * e-mail: the tracking link of the parcel is there too.
+     */
+    public function testTheGuestOrderPageLinksTheTrackingNumberToTheCarrierPage(): void
+    {
+        $factory = $this->factory();
+        $guest = $factory->guestCustomer($factory->customerTitle());
+        $order = $this->order($guest, $this->carrier(), OrderStatus::CODE_SENT, 'GUEST 1');
+
+        $token = $this->getService(GuestOrderAccessService::class)->createToken($order);
+        $crawler = $this->client->request('GET', '/order/track/'.$token);
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $link = $crawler->filter('[data-testid="delivery-tracking-link"]');
+        self::assertCount(1, $link);
+        self::assertSame('https://carrier.example/track?parcel=GUEST%201', $link->attr('href'));
+        self::assertStringContainsString('noreferrer', (string) $link->attr('rel'), 'The page address carries the access token: it must not reach the carrier.');
     }
 
     private function openOrderAs(Customer $customer, Order $order): Crawler
