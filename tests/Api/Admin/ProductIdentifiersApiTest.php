@@ -22,6 +22,7 @@ use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 /**
  * The GTIN, the manufacturer part number and the manufacturer brand of a combination on
@@ -30,6 +31,8 @@ use Thelia\Test\FixtureFactory;
  */
 final class ProductIdentifiersApiTest extends ApiTestCase
 {
+    use RecordsSqlQueries;
+
     private FixtureFactory $factory;
 
     protected function setUp(): void
@@ -136,6 +139,36 @@ final class ProductIdentifiersApiTest extends ApiTestCase
         self::assertJsonResponseSuccessful($response);
         self::assertSame([$first->getId()], self::decodeJson($response)['gtinSharedWith']);
         self::assertSame('9780306406157', $this->reloaded($second)->getEanCode());
+    }
+
+    public function testAPageOfCombinationsReportsTheSharersOfEachInOneLookup(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $product = $this->product();
+        $first = $this->factory->productSaleElement($product, ['eanCode' => '9780306406157']);
+        $second = $this->factory->productSaleElement($product, ['eanCode' => '9780306406157']);
+        $alone = $this->factory->productSaleElement($product, ['eanCode' => '96385074']);
+        $sharersById = [];
+
+        $statements = $this->recordSqlQueries(function () use ($token, $product, &$sharersById): void {
+            $response = $this->jsonRequest('GET', '/api/admin/product_sale_elements?'.http_build_query(['product.id' => $product->getId(), 'itemsPerPage' => 50]), token: $token);
+            self::assertJsonResponseSuccessful($response);
+            $payload = self::decodeJson($response);
+
+            foreach ($payload['hydra:member'] ?? $payload['member'] ?? [] as $member) {
+                $sharersById[(int) $member['id']] = $member['gtinSharedWith'] ?? null;
+            }
+        });
+
+        self::assertSame([$second->getId()], $sharersById[$first->getId()] ?? null);
+        self::assertSame([$first->getId()], $sharersById[$second->getId()] ?? null);
+        self::assertSame([], $sharersById[$alone->getId()] ?? null);
+
+        $lookups = array_filter(
+            $statements,
+            static fn (string $statement): bool => str_contains($statement, 'FROM `product_sale_elements`') && str_contains($statement, 'ean_code` IN'),
+        );
+        self::assertCount(1, $lookups, 'The codes of a page are looked up once, not once per combination.');
     }
 
     public function testACombinationIsFoundByItsExactGtinOrPartNumber(): void
