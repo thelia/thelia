@@ -1343,4 +1343,21 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@destination_restriction_resource_id, 'nl_NL', 'Configuratie van de bestemmingsbeperkingen', NULL, NULL, NULL),
     (@destination_restriction_resource_id, 'ru_RU', 'Настройка ограничений по направлениям доставки', NULL, NULL, NULL);
 
+-- The queue of the background jobs, and the jobs that failed for good. Read and
+-- written by the Doctrine transport of Symfony Messenger, never by Propel. Nothing
+-- is queued in it until MESSENGER_TRANSPORT_DSN names a transport: without one,
+-- every job runs at once, as before.
+CREATE TABLE IF NOT EXISTS `messenger_messages`
+(
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `body` LONGTEXT NOT NULL,
+    `headers` LONGTEXT NOT NULL,
+    `queue_name` VARCHAR(190) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `available_at` DATETIME NOT NULL,
+    `delivered_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_messenger_messages_queue_name_available_at` (`queue_name`, `available_at`, `delivered_at`, `id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

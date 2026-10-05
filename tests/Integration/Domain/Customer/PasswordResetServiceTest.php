@@ -21,7 +21,6 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Customer\Exception\InvalidPasswordResetTokenException;
 use Thelia\Domain\Customer\Service\CustomerEmailRequestLimiter;
 use Thelia\Domain\Customer\Service\PasswordResetService;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Test\FixtureFactory;
@@ -62,7 +61,6 @@ final class PasswordResetServiceTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         $this->service = new PasswordResetService(
