@@ -415,4 +415,5 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Configuration background jobs' => 'Configuratie van achtergrondtaken',
 ];

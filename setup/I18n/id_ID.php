@@ -59,4 +59,5 @@ return [
     'Order' => 'Pesan',
     'Order status transition override' => 'Pengesampingan transisi status pesanan',
     'Translations' => 'Alih Bahasa',
+    'Configuration background jobs' => 'Konfigurasi tugas latar belakang',
 ];

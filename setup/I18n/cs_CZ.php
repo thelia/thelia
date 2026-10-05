@@ -31,4 +31,5 @@ return [
     'Your subscription to %store newsletter' => 'Váš odběr novinek z obchodu {{ config("store_name") }}',
     'Promotion' => 'Akce',
     'Newness' => 'Novinka',
+    'Configuration background jobs' => 'Konfigurace úloh na pozadí',
 ];

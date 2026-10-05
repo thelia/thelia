@@ -538,4 +538,5 @@ return [
     'states - table row' => 'štáty - riadok tabuľky',
     'Đồng' => 'Đồng',
     'Гривна' => 'ГРИВНА',
+    'Configuration background jobs' => 'Konfigurácia úloh na pozadí',
 ];

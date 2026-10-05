@@ -1149,4 +1149,5 @@ return [
     'Catalog price rules' => 'Reglas de precios del catálogo',
     'Promotion' => 'Promoción',
     'Newness' => 'Novedad',
+    'Configuration background jobs' => 'Configuración de tareas en segundo plano',
 ];
