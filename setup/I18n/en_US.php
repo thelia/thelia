@@ -1673,4 +1673,7 @@ return [
     'Newness' => 'Newness',
     'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)',
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)',
+    'Shipping notice sent to the customer' => 'Shipping notice sent to the customer',
+    'Your order {{ order_ref }} has been shipped' => 'Your order {{ order_ref }} has been shipped',
+    'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)',
 ];
