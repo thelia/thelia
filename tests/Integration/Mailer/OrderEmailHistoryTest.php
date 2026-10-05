@@ -14,12 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Mailer;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Order;
@@ -155,7 +160,6 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $refusingTransport,
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         $factoryWithARefusingTransport->sendEmailMessage(
@@ -167,6 +171,53 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
         );
 
         self::assertNull($this->emailEntry($order));
+    }
+
+    /**
+     * With a queue, the request only hands the mail to it, and the mail server is
+     * reached later by a worker, or never. The line waits for the mail to leave: the
+     * bus below keeps what it is given, as a queue nobody consumes yet would, and the
+     * worker is played by sending what it kept through a transport.
+     */
+    public function testAMailStillInTheQueueIsNotInTheHistoryUntilItLeaves(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        $queue = new class implements MessageBusInterface {
+            /** @var list<object> */
+            public array $kept = [];
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                $this->kept[] = $message;
+
+                return Envelope::wrap($message, $stamps);
+            }
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+
+        $queuingFactory = new MailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->getService(ParserResolver::class),
+            new Mailer(new NullTransport($dispatcher), $queue, $dispatcher),
+        );
+        $queuingFactory->sendEmailMessageOrFail(
+            self::MESSAGE_CODE,
+            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+            ['buyer@example.com' => 'Buyer'],
+            ['order_id' => $order->getId(), 'order_ref' => $order->getRef()],
+            'en_US',
+        );
+
+        self::assertCount(1, $queue->kept);
+        self::assertNull($this->emailEntry($order), 'A mail that has only been queued has not been sent.');
+
+        $queued = $queue->kept[0];
+        self::assertInstanceOf(SendEmailMessage::class, $queued);
+        (new NullTransport($dispatcher))->send($queued->getMessage(), $queued->getEnvelope());
+
+        $entry = $this->emailEntry($order);
+        self::assertNotNull($entry, 'The mail has left: it belongs in the history now.');
+        self::assertSame(['message_code' => self::MESSAGE_CODE], $entry->getDecodedPayload());
     }
 
     private function emailEntryCount(): int

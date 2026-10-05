@@ -22,8 +22,8 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\EventListener\OrderEmailHistoryListener;
 use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -59,7 +59,6 @@ class MailerFactory
         private readonly TemplateHelperInterface $templateHelper,
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
-        private readonly OrderHistoryRecorder $orderHistoryRecorder,
     ) {
     }
 
@@ -234,6 +233,7 @@ class MailerFactory
 
         try {
             $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
+            $this->tagWithTheOrderItIsAbout($instance, $messageCode, $messageParameters);
 
             $this->send($instance);
         } catch (\Exception $ex) {
@@ -245,13 +245,6 @@ class MailerFactory
 
             throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
-
-        // Only once the message is out. A send that failed has thrown above and
-        // leaves no line: an order history saying a customer was written to when
-        // nothing left the shop is worse than one that says nothing. Outside the
-        // try on purpose, so that a failure to record is never reported as a mail
-        // that did not leave.
-        $this->recordEmailSentOnOrder($messageCode, $messageParameters);
     }
 
     /**
@@ -268,16 +261,19 @@ class MailerFactory
     }
 
     /**
-     * Adds the mail to the history of the order it is about, when it is about one.
+     * Names, on the mail itself, the order it is about, when it is about one.
      *
-     * Only the message code travels: never the body, never the subject, never the
-     * address it went to. What the entry answers is "the shop wrote to this order on
-     * that date, with that message" — the rest is the message template and the order
-     * itself, both of which are already on file.
+     * The line in the order history is written once the mail server has accepted the
+     * mail ({@see OrderEmailHistoryListener}), which is in this request when the shop
+     * has no queue and in a worker, minutes later, when it has one: an order history
+     * saying a customer was written to when nothing left the shop is worse than one
+     * that says nothing. Only the order id and the message code travel, never the
+     * body or the address; they stay in the headers of the mail, where a mail server
+     * log already shows them.
      *
      * @param array<string, mixed> $messageParameters
      */
-    private function recordEmailSentOnOrder(string $messageCode, array $messageParameters): void
+    private function tagWithTheOrderItIsAbout(Email $email, string $messageCode, array $messageParameters): void
     {
         $orderId = $this->orderIdFromMessageParameters($messageParameters);
 
@@ -285,7 +281,9 @@ class MailerFactory
             return;
         }
 
-        $this->orderHistoryRecorder->recordEmailSent($orderId, $messageCode);
+        $email->getHeaders()
+            ->addTextHeader(OrderEmailHistoryListener::ORDER_ID_HEADER, (string) $orderId)
+            ->addTextHeader(OrderEmailHistoryListener::MESSAGE_CODE_HEADER, $messageCode);
     }
 
     /**

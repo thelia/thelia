@@ -24,7 +24,6 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Order;
@@ -95,7 +94,6 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         $action = new OrderAction(
@@ -126,7 +124,6 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
 
         return $mailerFactory->createEmailMessage(

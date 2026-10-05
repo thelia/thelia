@@ -4733,5 +4733,30 @@ CREATE TABLE `customer_list_item`
             ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- messenger_messages
+--
+-- The queue of the background jobs when the shop keeps them in its own
+-- database (MESSENGER_TRANSPORT_DSN=doctrine://default), and the jobs that
+-- failed for good whatever the transport. Read and written by the Doctrine
+-- transport of Symfony Messenger, never by Propel: the table is not in
+-- schema.xml and has no model.
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `messenger_messages`;
+
+CREATE TABLE `messenger_messages`
+(
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `body` LONGTEXT NOT NULL,
+    `headers` LONGTEXT NOT NULL,
+    `queue_name` VARCHAR(190) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `available_at` DATETIME NOT NULL,
+    `delivered_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_messenger_messages_queue_name_available_at` (`queue_name`, `available_at`, `delivered_at`, `id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
