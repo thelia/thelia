@@ -14,7 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
+use Thelia\Model\Customer;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleConfigQuery;
+use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -25,6 +31,17 @@ use Thelia\Test\ApiTestCase;
  */
 final class AccountOrderApiTest extends ApiTestCase
 {
+    private const string CARRIER_CODE = 'AccountOrderApiTestCarrier';
+
+    protected function tearDown(): void
+    {
+        // The module configuration is memoized in a static cache that outlives the
+        // transaction rollback.
+        ModuleConfigQuery::resetConfigCache();
+
+        parent::tearDown();
+    }
+
     public function testOrderPayloadExposesTheVirtualFlagsOfItsProducts(): void
     {
         $factory = $this->createFixtureFactory();
@@ -80,5 +97,62 @@ final class AccountOrderApiTest extends ApiTestCase
 
         self::assertTrue($data['vatExempted']);
         self::assertSame('Acme SPRL', $data['invoiceOrderAddress']['vatVerifiedName']);
+    }
+
+    public function testOrderPayloadGivesTheCarrierPageFollowingTheParcel(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $this->sentOrder($customer, 'https://carrier.example/track?parcel=%ID%', '6A 12');
+
+        $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($customer));
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+
+        self::assertSame('6A 12', $data['deliveryRef']);
+        self::assertSame('https://carrier.example/track?parcel=6A%2012', $data['deliveryTrackingUrl']);
+    }
+
+    public function testOrderPayloadHasNoTrackingLinkWithoutTrackingNumber(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $this->sentOrder($customer, 'https://carrier.example/track?parcel=%ID%', null);
+
+        $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($customer));
+
+        self::assertJsonResponseSuccessful($response);
+        self::assertArrayNotHasKey('deliveryTrackingUrl', json_decode($response->getContent(), true), 'An order without a tracking number has no link to give.');
+    }
+
+    public function testTheTrackingLinkOfAnOrderIsNotGivenToAnotherCustomer(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $owner = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $stranger = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $this->sentOrder($owner, 'https://carrier.example/track?parcel=%ID%', '6A12');
+
+        $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($stranger));
+
+        self::assertContains($response->getStatusCode(), [403, 404]);
+        self::assertStringNotContainsString('carrier.example', (string) $response->getContent());
+    }
+
+    private function sentOrder(Customer $customer, string $trackingUrlTemplate, ?string $trackingNumber): Order
+    {
+        $carrier = new Module();
+        $carrier
+            ->setCode(self::CARRIER_CODE)
+            ->setType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->setActivate(BaseModule::IS_ACTIVATED)
+            ->setFullNamespace(self::CARRIER_CODE.'\\'.self::CARRIER_CODE)
+            ->save($this->getPropelConnection());
+        ModuleConfigQuery::create()->setConfigValue($carrier->getId(), OrderTrackingUrlResolver::TRACKING_URL_CONFIG_KEY, $trackingUrlTemplate);
+
+        $order = $this->createFixtureFactory()->order($customer, ['statusCode' => 'sent', 'deliveryModuleCode' => self::CARRIER_CODE]);
+        $order->setDeliveryRef($trackingNumber)->save($this->getPropelConnection());
+
+        return $order;
     }
 }

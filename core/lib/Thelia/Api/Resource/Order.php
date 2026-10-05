@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -199,6 +200,15 @@ class Order implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $deliveryRef = null;
+
+    /**
+     * The carrier page where the customer follows the parcel, built from the tracking
+     * number and the delivery module of the order. Null without a tracking number or
+     * when the carrier has no tracking address.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[ApiProperty(readable: true, writable: false, description: 'Carrier page following the parcel of the order, built from the tracking number. Null when the order has no tracking number or its carrier no tracking address.')]
+    public ?string $deliveryTrackingUrl = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $invoiceRef = null;
@@ -543,6 +553,18 @@ class Order implements PropelResourceInterface
     public function setDeliveryRef(?string $deliveryRef): self
     {
         $this->deliveryRef = $deliveryRef;
+
+        return $this;
+    }
+
+    public function getDeliveryTrackingUrl(): ?string
+    {
+        return $this->deliveryTrackingUrl;
+    }
+
+    public function setDeliveryTrackingUrl(?string $deliveryTrackingUrl): self
+    {
+        $this->deliveryTrackingUrl = $deliveryTrackingUrl;
 
         return $this;
     }
