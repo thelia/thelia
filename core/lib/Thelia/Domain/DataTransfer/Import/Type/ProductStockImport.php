@@ -50,7 +50,16 @@ class ProductStockImport extends AbstractImport
             );
         }
 
-        $pse->setQuantity($data['stock']);
+        // A spreadsheet gives every cell as text: the stock is read as a number, and
+        // a cell that is not one refuses this row only.
+        if (!is_numeric($data['stock'])) {
+            return Translator::getInstance()->trans(
+                'The value "%value" of the column %column is not a number (product sale element id %id)',
+                ['%value' => $data['stock'], '%column' => 'stock', '%id' => $data['id']],
+            );
+        }
+
+        $pse->setQuantity((float) $data['stock']);
 
         if (isset($data['ean']) && !empty($data['ean'])) {
             $pse->setEanCode((string) $data['ean']);

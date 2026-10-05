@@ -75,10 +75,21 @@ class ProductPricesImport extends AbstractImport
                 ->setCurrency($currency);
         }
 
-        $price->setPrice($data['price']);
+        // A price is stored as a decimal string; JSON and XML files give numbers. A
+        // cell that is not a number refuses this row only.
+        foreach (['price', 'promo_price'] as $column) {
+            if (isset($data[$column]) && !is_numeric($data[$column])) {
+                return Translator::getInstance()->trans(
+                    'The value "%value" of the column %column is not a number (product sale element id %id)',
+                    ['%value' => $data[$column], '%column' => $column, '%id' => $data['id']],
+                );
+            }
+        }
+
+        $price->setPrice((string) $data['price']);
 
         if (isset($data['promo_price'])) {
-            $price->setPromoPrice($data['promo_price']);
+            $price->setPromoPrice((string) $data['promo_price']);
         }
 
         if (isset($data['promo'])) {

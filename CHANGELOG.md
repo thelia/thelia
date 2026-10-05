@@ -176,6 +176,7 @@ Second minor of the 3.x line. 221 commits since 3.1.0. The version number follow
 
 ## Fixes
 
+- The stock import reads a stock written as text, which is how a CSV file gives every cell, and the price import a price written as a number, which is how a JSON or XML file gives it. Both passed the cell as it came to a typed setter, so a CSV stock import or a JSON price import failed on its first row with a `TypeError`. A cell that is not a number now refuses its row with the reason, and the import goes on.
 - An import run without a language, as `import --locale=` does for a locale the shop does not have, reads the default language. `AbstractImport::setLang()` accepted null and stored it in a property that cannot hold it, so the import failed with a `TypeError`.
 - `maintenance:purge --dry-run` no longer deletes the export files older than a day: `PurgeExportCacheListener` ignored the dry run, and `ExportCachePurger::purgeOldExportFiles()` takes a `$dryRun` flag to count them instead.
 - A class with a property typed with a union or an intersection can be read by the application serializer. `Thelia\Api\Bridge\Propel\Serializer\PlainIdentifierDenormalizer`, which the serializer asks about every class it reads, called `getName()` on any property type and failed on those, `int|string` included.

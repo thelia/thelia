@@ -956,4 +956,5 @@ return [
     'The GTIN "%code" of the combination %ref is refused: %reason.' => 'The GTIN "%code" of the combination %ref is refused: %reason.',
     'The manufacturer part number must be %max characters at most.' => 'The manufacturer part number must be %max characters at most.',
     'The manufacturer part number of the combination %ref must be %max characters at most.' => 'The manufacturer part number of the combination %ref must be %max characters at most.',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'The value "%value" of the column %column is not a number (product sale element id %id)',
 ];

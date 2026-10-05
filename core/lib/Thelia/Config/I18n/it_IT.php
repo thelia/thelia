@@ -338,4 +338,5 @@ return [
     'This order requires an account.' => 'Questo ordine richiede un account.',
     'This shop is not asking for the consent "%consent".' => 'Questo negozio non richiede il consenso "%consent".',
     'You must accept "%consent" to place this order.' => 'Per effettuare questo ordine è necessario accettare "%consent".',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'Il valore "%value" della colonna %column non è un numero (id della variante di prodotto %id)',
 ];
