@@ -36,6 +36,9 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
+    /** How many rows are written between two reports of progress. */
+    public const PROGRESS_STEP = 500;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected ExportCachePurger $exportCachePurger,
@@ -83,6 +86,7 @@ class ExportHandler
         bool $includeImages = false,
         bool $includeDocuments = false,
         ?array $rangeDate = null,
+        ?\Closure $onProgress = null,
     ): ExportEvent {
         if (!$export->isHandlerAvailable()) {
             throw new \ErrorException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
@@ -103,31 +107,9 @@ class ExportHandler
             }
         }
 
+        $rangeDate = $this->resolveRangeDate($rangeDate);
+
         if (null !== $rangeDate) {
-            if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
-                $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
-                $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
-                $rangeDate['start'] = \DateTime::createFromFormat(
-                    'Y-m-d H:i:s',
-                    $startYear.'-'.$startMonth.'-1 00:00:00',
-                );
-            }
-
-            if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
-                $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
-                $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
-                $rangeDate['end'] = \DateTime::createFromFormat(
-                    'Y-m-d H:i:s',
-                    $endYear.'-'.$endMonth.'-1 23:59:59',
-                );
-
-                if ($rangeDate['end'] instanceof \DateTime) {
-                    $rangeDate['end']
-                        ->add(new \DateInterval('P1M'))
-                        ->sub(new \DateInterval('P1D'));
-                }
-            }
-
             $instance->setRangeDate($rangeDate);
         }
 
@@ -136,7 +118,7 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
-        $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+        $filePath = $this->processExport($event->getExport(), $event->getSerializer(), $onProgress);
 
         $event->setFilePath($filePath);
 
@@ -168,7 +150,53 @@ class ExportHandler
         return $event;
     }
 
-    protected function processExport(AbstractExport $export, SerializerInterface $serializer): string
+    /**
+     * The period of an export, as the export reads it: a start and an end given as a
+     * year and a month (the form of the back office) become the first second of that
+     * month and the last second of the end month. Dates are kept as they are.
+     *
+     * @param array{start?: mixed, end?: mixed}|null $rangeDate
+     *
+     * @return array{start?: mixed, end?: mixed}|null
+     */
+    public function resolveRangeDate(?array $rangeDate): ?array
+    {
+        if (null === $rangeDate) {
+            return null;
+        }
+
+        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
+            $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
+            $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
+            $rangeDate['start'] = \DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $startYear.'-'.$startMonth.'-1 00:00:00',
+            );
+        }
+
+        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
+            $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
+            $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
+            $rangeDate['end'] = \DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $endYear.'-'.$endMonth.'-1 23:59:59',
+            );
+
+            if ($rangeDate['end'] instanceof \DateTime) {
+                $rangeDate['end']
+                    ->add(new \DateInterval('P1M'))
+                    ->sub(new \DateInterval('P1D'));
+            }
+        }
+
+        return $rangeDate;
+    }
+
+    /**
+     * @param (\Closure(int): void)|null $onProgress told the number of rows written, every
+     *                                               PROGRESS_STEP rows and once at the end
+     */
+    protected function processExport(AbstractExport $export, SerializerInterface $serializer, ?\Closure $onProgress = null): string
     {
         $filename = \sprintf(
             '%s-%s-%s.%s',
@@ -188,6 +216,7 @@ class ExportHandler
         $file = new \SplFileObject($filePath, 'w+b');
 
         $serializer->prepareFile($file);
+        $written = 0;
 
         foreach ($export as $idx => $data) {
             if (!\is_array($data) || empty($data)) {
@@ -203,9 +232,17 @@ class ExportHandler
             }
 
             $file->fwrite($data);
+
+            if (null !== $onProgress && 0 === ++$written % self::PROGRESS_STEP) {
+                $onProgress($written);
+            }
         }
 
         $serializer->finalizeFile($file);
+
+        if (null !== $onProgress) {
+            $onProgress($written);
+        }
 
         unset($file);
 

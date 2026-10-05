@@ -18,9 +18,12 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
+use Thelia\Model\ExportJobQuery;
 
 readonly class PurgeExportCacheListener
 {
+    public const EXPORT_JOB_RETENTION_DAYS = 7;
+
     public function __construct(private ExportCachePurger $exportCachePurger)
     {
     }
@@ -33,6 +36,17 @@ readonly class PurgeExportCacheListener
         $event->addResult(\sprintf(
             '<comment>Export cache files:</comment> <info>%d %s</info>',
             $deletedCount,
+            $event->isDryRun() ? 'to delete' : 'deleted',
+        ));
+
+        // A job outlives its file by a few days, so the back office can still say
+        // what was exported and why an export failed.
+        $deletedJobs = ExportJobQuery::purgeCreatedBefore(self::EXPORT_JOB_RETENTION_DAYS, $event->isDryRun());
+
+        $event->addResult(\sprintf(
+            '<comment>Export jobs (>%d days):</comment> <info>%d %s</info>',
+            self::EXPORT_JOB_RETENTION_DAYS,
+            $deletedJobs,
             $event->isDryRun() ? 'to delete' : 'deleted',
         ));
     }
