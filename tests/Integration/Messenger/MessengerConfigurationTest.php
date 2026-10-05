@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Mime\Email;
+use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -50,5 +51,13 @@ final class MessengerConfigurationTest extends IntegrationTestCase
         $senders = iterator_to_array($locator->getSenders(new Envelope(new SendEmailMessage((new Email())->to('buyer@example.com')->text('Hello')))));
 
         self::assertSame(['async'], array_keys($senders));
+    }
+
+    public function testAnExportAskedForInTheBackOfficeGoesThroughTheJobTransport(): void
+    {
+        $locator = static::getContainer()->get('messenger.senders_locator');
+        \assert($locator instanceof SendersLocatorInterface);
+
+        self::assertSame(['async'], array_keys(iterator_to_array($locator->getSenders(new Envelope(new RunExportJob(1))))));
     }
 }
