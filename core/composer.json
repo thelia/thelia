@@ -34,6 +34,7 @@
         "michelf/php-markdown": "1.9.*",
         "commerceguys/addressing": "1.1.*",
         "doctrine/dbal": "^4.2",
+        "dragonmantank/cron-expression": "^3.4",
 
         "symfony/asset": "7.4.*",
         "symfony/cache": "7.4.*",
@@ -65,6 +66,7 @@
         "symfony/psr-http-message-bridge": "^7.4",
         "symfony/rate-limiter": "7.4.*",
         "symfony/routing": "7.4.*",
+        "symfony/scheduler": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/security-bundle": "7.4.*",
         "symfony/security-core": "7.4.*",
