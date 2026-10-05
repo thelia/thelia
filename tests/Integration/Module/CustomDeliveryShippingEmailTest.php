@@ -46,7 +46,7 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
 
     protected function setUp(): void
     {
-        if (!method_exists(CustomDelivery::class, 'coreSendsTheShippingEmail')) {
+        if (!method_exists(CustomDelivery::class, 'coreHandlesTheShippingEmail')) {
             self::markTestSkipped('The installed CustomDelivery predates the shipping e-mail of the core.');
         }
 
@@ -76,18 +76,22 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
         self::assertSame([], $this->mailer->parametersOfMessagesSent('mail_custom_delivery'));
     }
 
-    public function testTheTransitionSwitchKeepsTheModuleMessage(): void
+    /**
+     * The core owns the shipping e-mail: a merchant who switched it off in the store
+     * configuration does not get the module's message instead.
+     */
+    public function testTheModuleStaysQuietWhenTheCoreEmailIsSwitchedOff(): void
     {
-        CustomDelivery::setConfigValue(CustomDelivery::CONFIG_SEND_OWN_SHIPPING_EMAIL, '1');
+        ConfigQuery::write(SendShippingEmailListener::ENABLED_CONFIG_KEY, '0');
 
         $this->listener()->updateStatus($this->shipped($this->customDeliveryOrder('6A12')));
 
-        self::assertCount(1, $this->mailer->parametersOfMessagesSent('mail_custom_delivery'));
+        self::assertSame([], $this->mailer->parametersOfMessagesSent('mail_custom_delivery'));
     }
 
-    public function testWithTheCoreEmailSwitchedOffTheModuleSendsItsMessageWithAnEncodedLink(): void
+    public function testTheTransitionSwitchKeepsTheModuleMessageWithAnEncodedLink(): void
     {
-        ConfigQuery::write(SendShippingEmailListener::ENABLED_CONFIG_KEY, '0');
+        CustomDelivery::setConfigValue(CustomDelivery::CONFIG_SEND_OWN_SHIPPING_EMAIL, '1');
         CustomDelivery::saveTrackingUrlTemplate('https://carrier.example/track?parcel=%ID%');
 
         $this->listener()->updateStatus($this->shipped($this->customDeliveryOrder('6A 12')));
@@ -99,7 +103,7 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
 
     public function testAnOrderSavedAgainAsSentIsNotMailedTwiceByTheModule(): void
     {
-        ConfigQuery::write(SendShippingEmailListener::ENABLED_CONFIG_KEY, '0');
+        CustomDelivery::setConfigValue(CustomDelivery::CONFIG_SEND_OWN_SHIPPING_EMAIL, '1');
         $order = $this->customDeliveryOrder('6A12');
 
         $event = new OrderEvent($order);
@@ -126,6 +130,24 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
             'https://carrier.example/6A12',
             $this->getService(OrderTrackingUrlResolver::class)->resolve($this->customDeliveryOrder('6A12')),
         );
+    }
+
+    /**
+     * Cleared from the shipping page of the back office, the address stays cleared: the
+     * former global setting is not copied back by a later update or reactivation.
+     */
+    public function testAClearedTrackingAddressDoesNotComeBack(): void
+    {
+        ConfigQuery::write(CustomDelivery::CONFIG_TRACKING_URL, 'https://carrier.example/%ID%');
+        ModuleConfigQuery::create()->deleteConfigValue(CustomDelivery::getModuleId(), CustomDelivery::CORE_TRACKING_URL_KEY);
+        (new CustomDelivery())->update('4.0.4', '4.1.0', $this->getPropelConnection());
+
+        ModuleConfigQuery::create()->deleteConfigValue(CustomDelivery::getModuleId(), CustomDelivery::CORE_TRACKING_URL_KEY);
+        (new CustomDelivery())->update('4.0.4', '4.1.0', $this->getPropelConnection());
+        ModuleConfigQuery::resetConfigCache();
+
+        self::assertSame('', CustomDelivery::getTrackingUrlTemplate());
+        self::assertSame(CustomDelivery::DEFAULT_TRACKING_URL, ConfigQuery::read(CustomDelivery::CONFIG_TRACKING_URL));
     }
 
     public function testTheOldDefaultIsNoTrackingAddress(): void
