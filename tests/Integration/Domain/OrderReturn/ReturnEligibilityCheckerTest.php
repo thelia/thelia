@@ -317,7 +317,15 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
 
     public function testTheCountIsCumulativeByDefault(): void
     {
-        self::assertNull(ConfigQuery::read(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY));
+        self::assertSame('1', ConfigQuery::read(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY));
+        self::assertTrue($this->checker->isQuantityCumulative());
+    }
+
+    public function testTheCountIsCumulativeOnAShopWithoutTheSetting(): void
+    {
+        ConfigQuery::create()->filterByName(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY)->delete($this->getPropelConnection());
+        ConfigQuery::resetCache();
+
         self::assertTrue($this->checker->isQuantityCumulative());
     }
 
