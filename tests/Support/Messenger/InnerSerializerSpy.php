@@ -26,9 +26,13 @@ final class InnerSerializerSpy implements SerializerInterface
 
     public int $encoded = 0;
 
+    /** @var array<string, mixed>|null the last envelope handed to decode() */
+    public ?array $lastDecoded = null;
+
     public function decode(array $encodedEnvelope): Envelope
     {
         ++$this->decoded;
+        $this->lastDecoded = $encodedEnvelope;
 
         return new Envelope(new ProbeMessage('decoded'));
     }

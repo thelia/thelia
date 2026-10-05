@@ -90,7 +90,11 @@ class ImportHandler
         return $category;
     }
 
-    public function import(Import $import, File $file, ?Lang $language = null): ImportEvent
+    /**
+     * @param (\Closure(int): void)|null $onProgress told the number of rows read, every
+     *                                               ExportHandler::PROGRESS_STEP rows and once at the end
+     */
+    public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
 
@@ -122,7 +126,7 @@ class ImportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_BEGIN);
 
-        $errors = $this->processImport($event->getImport(), $event->getSerializer());
+        $errors = $this->processImport($event->getImport(), $event->getSerializer(), $onProgress);
 
         $event->setErrors($errors);
 
@@ -245,9 +249,10 @@ class ImportHandler
         return $file;
     }
 
-    protected function processImport(AbstractImport $import, SerializerInterface $serializer): array
+    protected function processImport(AbstractImport $import, SerializerInterface $serializer, ?\Closure $onProgress = null): array
     {
         $errors = [];
+        $read = 0;
 
         $import->setData($serializer->unserialize($import->getFile()->openFile('r')));
 
@@ -259,6 +264,14 @@ class ImportHandler
             if (null !== $error) {
                 $errors[] = $error;
             }
+
+            if (null !== $onProgress && 0 === ++$read % ExportHandler::PROGRESS_STEP) {
+                $onProgress($read);
+            }
+        }
+
+        if (null !== $onProgress) {
+            $onProgress($read);
         }
 
         return $errors;

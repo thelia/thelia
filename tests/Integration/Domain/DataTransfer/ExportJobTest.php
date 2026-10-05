@@ -21,7 +21,7 @@ use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
-use Thelia\Domain\DataTransfer\Job\ExportJobStatus;
+use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Model\Export;
@@ -71,7 +71,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job = $this->getService(ExportJobLauncher::class)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertGreaterThanOrEqual(2, $job->getProcessedRows());
         self::assertFileExists((string) $job->getFilePath());
         self::assertStringEndsWith('.csv', (string) $job->getFileName());
@@ -88,7 +88,7 @@ final class ExportJobTest extends IntegrationTestCase
 
         $job = $this->launcherWith($queue)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage(), adminId: null);
 
-        self::assertSame(ExportJobStatus::QUEUED, $job->getJobStatus());
+        self::assertSame(JobStatus::QUEUED, $job->getJobStatus());
         self::assertNull($job->getFilePath());
         self::assertCount(1, $queue->kept);
         self::assertInstanceOf(RunExportJob::class, $queue->kept[0]);
@@ -98,7 +98,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job->reload();
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertFileExists((string) $job->getFilePath());
     }
 
@@ -136,7 +136,7 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         $job->reload();
-        self::assertSame(ExportJobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertStringContainsString('Vendor\\Removed\\Module\\Export', (string) $job->getError());
         self::assertNotNull($job->getFinishedAt());
     }
@@ -158,8 +158,87 @@ final class ExportJobTest extends IntegrationTestCase
         $job->reload();
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertNull($job->getError());
+    }
+
+    /**
+     * Two workers handed the same job: the second finds it taken and leaves it alone.
+     */
+    public function testAJobRunningElsewhereIsNotRunASecondTime(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-5 minutes'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+        self::assertNull($job->getFilePath());
+    }
+
+    /**
+     * A worker that died left the job running: once the transport hands it again,
+     * past the redeliver timeout, it runs.
+     */
+    public function testAJobLeftRunningByAWorkerThatDiedRunsAgain(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->setUpdatedAt(new \DateTime('-2 hours'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+        $this->files[] = (string) $job->getFilePath();
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
+    }
+
+    /**
+     * A long export started two hours ago that still reports its progress is alive:
+     * it is not taken from under the worker writing it.
+     */
+    public function testALongExportThatStillWritesIsNotTakenFromItsWorker(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->setUpdatedAt(new \DateTime('-1 minute'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+        self::assertNull($job->getFilePath());
+    }
+
+    /**
+     * Replayed after the purge took its row, the job says so and stays among the
+     * failures rather than passing for done.
+     */
+    public function testAJobWhoseRowIsGoneFailsForGood(): void
+    {
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+
+        $this->handler()(new RunExportJob(999999999));
+    }
+
+    public function testAJobTheQueueRefusesIsRecordedAsFailed(): void
+    {
+        $refusingQueue = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new \RuntimeException('The queue server is unreachable.');
+            }
+        };
+
+        try {
+            $this->launcherWith($refusingQueue)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+            self::fail('The caller must learn the export was not queued.');
+        } catch (\RuntimeException) {
+        }
+
+        $job = ExportJobQuery::create()->orderById('desc')->findOne();
+        self::assertNotNull($job);
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertStringContainsString('unreachable', (string) $job->getError());
     }
 
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void

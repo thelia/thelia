@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\Transport;
 
-use Doctrine\DBAL\Connection as DbalConnection;
-use Doctrine\DBAL\DriverManager;
 use Propel\Runtime\Propel;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
@@ -47,7 +45,12 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
 {
     public const CONNECTION_NAME = 'default';
 
-    private ?DbalConnection $connection = null;
+    private ShopDatabaseConnection $connection;
+
+    public function __construct(?ShopDatabaseConnection $connection = null)
+    {
+        $this->connection = $connection ?? new ShopDatabaseConnection();
+    }
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
@@ -59,7 +62,7 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(\sprintf('The shop has one database, named "%s" in a Messenger DSN: "doctrine://%s" names another one.', self::CONNECTION_NAME, $configuration['connection']));
         }
 
-        return new DoctrineTransport(new Connection($configuration, $this->connection()), $serializer);
+        return new DoctrineTransport(new Connection($configuration, $this->connection->get()), $serializer);
     }
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
@@ -68,17 +71,9 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
     }
 
     /**
-     * One DBAL connection for every transport of the process, opened on first use.
+     * @return array{driver: 'pdo_mysql', user: string, password: string, driverOptions: array<int|string, mixed>, host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
      */
-    private function connection(): DbalConnection
-    {
-        return $this->connection ??= DriverManager::getConnection(self::connectionParameters());
-    }
-
-    /**
-     * @return array{driver: 'pdo_mysql', user: string, password: string, host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
-     */
-    private static function connectionParameters(): array
+    public static function connectionParameters(): array
     {
         $manager = Propel::getServiceContainer()->getConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $configuration = method_exists($manager, 'getConfiguration') ? $manager->getConfiguration() : null;
@@ -87,8 +82,39 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
             throw new TransportException('The shop database connection is not configured: the Messenger "doctrine://default" transport has nothing to connect to.');
         }
 
-        return ['driver' => 'pdo_mysql', 'user' => (string) ($configuration['user'] ?? ''), 'password' => (string) ($configuration['password'] ?? '')]
+        return ['driver' => 'pdo_mysql', 'user' => (string) ($configuration['user'] ?? ''), 'password' => (string) ($configuration['password'] ?? ''), 'driverOptions' => self::driverOptionsOf($configuration)]
             + self::parametersOfPdoDsn($configuration['dsn']);
+    }
+
+    /**
+     * The PDO options and attributes of the Propel connection, a TLS certificate
+     * among them: the queue connection is opened the way the shop one is, never in
+     * clear against a database that wants TLS. A value written as a class constant
+     * (`PDO::MYSQL_ATTR_SSL_CA`-style) is resolved, as Propel does.
+     *
+     * @param array<string, mixed> $configuration
+     *
+     * @return array<int|string, mixed>
+     */
+    public static function driverOptionsOf(array $configuration): array
+    {
+        $options = [];
+
+        foreach (['options', 'attributes'] as $section) {
+            if (!isset($configuration[$section]) || !\is_array($configuration[$section])) {
+                continue;
+            }
+
+            foreach ($configuration[$section] as $option => $value) {
+                if (\is_string($value) && str_contains($value, '::') && \defined($value)) {
+                    $value = \constant($value);
+                }
+
+                $options[$option] = $value;
+            }
+        }
+
+        return $options;
     }
 
     /**
