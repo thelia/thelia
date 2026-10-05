@@ -779,7 +779,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1425, 'item.edition.images', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1426, 'attribute-edit-form.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(1426, 'attribute-edit-form.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1427, 'order-returns.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1428, 'order-returns.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1429, 'order-returns.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1430, 'order-return-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1431, 'order-return-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert pdf hooks
@@ -2878,7 +2883,12 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  '{{ locale }}', {{ intl('Order status - form creation', locale) }}, NULL, NULL),
     (1423,  '{{ locale }}', {{ intl('Order status - form modification', locale) }}, NULL, NULL),
     (1424, '{{ locale }}', {{ intl('Order status - JavaScript', locale) }}, NULL, NULL),
-    (1425, '{{ locale }}', {{ intl('Edit images for an item', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (1425, '{{ locale }}', {{ intl('Edit images for an item', locale) }}, NULL, NULL),
+    (1427, '{{ locale }}', {{ intl('Returns - at the top', locale) }}, NULL, NULL),
+    (1428, '{{ locale }}', {{ intl('Returns - at the bottom', locale) }}, NULL, NULL),
+    (1429, '{{ locale }}', {{ intl('Returns - JavaScript', locale) }}, NULL, NULL),
+    (1430, '{{ locale }}', {{ intl('Return edit - at the top', locale) }}, NULL, NULL),
+    (1431, '{{ locale }}', {{ intl('Return edit - at the bottom', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
