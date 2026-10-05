@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
-use Thelia\Domain\DataTransfer\Job\ExportJobStatus;
+use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Model\Base\ExportJob as BaseExportJob;
 
 class ExportJob extends BaseExportJob
 {
-    public function getJobStatus(): ExportJobStatus
+    public function getJobStatus(): JobStatus
     {
-        return ExportJobStatus::tryFrom((string) $this->getStatus()) ?? ExportJobStatus::FAILED;
+        return JobStatus::tryFrom((string) $this->getStatus()) ?? JobStatus::FAILED;
     }
 
     public function isFinished(): bool

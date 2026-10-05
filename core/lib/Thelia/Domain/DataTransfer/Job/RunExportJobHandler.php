@@ -47,11 +47,11 @@ final readonly class RunExportJobHandler
     {
         $job = ExportJobQuery::create()->findPk($message->exportJobId);
 
-        if (!$job instanceof ExportJob || ExportJobStatus::DONE === $job->getJobStatus()) {
+        if (!$job instanceof ExportJob || JobStatus::DONE === $job->getJobStatus()) {
             return;
         }
 
-        $job->setStatus(ExportJobStatus::RUNNING->value)
+        $job->setStatus(JobStatus::RUNNING->value)
             ->setStartedAt(new \DateTime())
             ->setFinishedAt(null)
             ->setProcessedRows(0)
@@ -63,7 +63,7 @@ final readonly class RunExportJobHandler
         } catch (\Throwable $exception) {
             Tlog::getInstance()->addError(\sprintf('Export job %d failed: %s', $job->getId(), $exception->getMessage()));
 
-            $job->setStatus(ExportJobStatus::FAILED->value)
+            $job->setStatus(JobStatus::FAILED->value)
                 ->setError(mb_substr($exception->getMessage(), 0, 2000))
                 ->setFinishedAt(new \DateTime())
                 ->save();
@@ -103,7 +103,7 @@ final readonly class RunExportJobHandler
 
         $extension = $archiver instanceof ArchiverInterface ? $archiver->getExtension() : $serializer->getExtension();
 
-        $job->setStatus(ExportJobStatus::DONE->value)
+        $job->setStatus(JobStatus::DONE->value)
             ->setFilePath($event->getFilePath())
             ->setFileName($event->getExport()->getFileName().'.'.$extension)
             ->setFinishedAt(new \DateTime())
