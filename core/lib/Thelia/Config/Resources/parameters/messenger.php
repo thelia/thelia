@@ -27,5 +27,13 @@ return static function (ContainerConfigurator $container): void {
         ->set('env(MESSENGER_FAILURE_TRANSPORT_DSN)', 'doctrine://default?queue_name=failed')
         // Message classes, outside the core and the active modules, that a
         // project lets through its queues (see AllowedClassesSerializer).
-        ->set('thelia.messenger.allowed_message_classes', []);
+        ->set('thelia.messenger.allowed_message_classes', [])
+        // The recurring tasks of the core (see TheliaSchedule), as cron
+        // expressions read when a worker consumes scheduler_thelia. Empty leaves
+        // the task out. The currency rates are left out by default: the update
+        // overwrites every rate, the ones set by hand included.
+        ->set('env(THELIA_SCHEDULE_SALE_CHECK)', '* * * * *')
+        ->set('env(THELIA_SCHEDULE_MAINTENANCE_PURGE)', '30 3 * * *')
+        ->set('env(THELIA_SCHEDULE_FAILED_JOBS_PURGE)', '0 4 * * *')
+        ->set('env(THELIA_SCHEDULE_CURRENCY_RATES)', '');
 };
