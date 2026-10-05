@@ -36,4 +36,5 @@ return [
     'Availability' => 'Dostupnost',
     'Customer rating' => 'Hodnocení zákazníků',
     'Price' => 'Cena',
+    'Configuration background jobs' => 'Konfigurace úloh na pozadí',
 ];

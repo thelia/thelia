@@ -440,4 +440,5 @@ return [
     'Customer rating' => 'Valutazione dei clienti',
     'Price' => 'Prezzo',
     'Configuration destination restrictions' => 'Configurazione delle restrizioni di destinazione',
+    'Configuration background jobs' => 'Configurazione delle attività in background',
 ];

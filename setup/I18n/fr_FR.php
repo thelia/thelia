@@ -1562,4 +1562,5 @@ return [
     'Customer rating' => 'Note client',
     'Price' => 'Prix',
     'Configuration destination restrictions' => 'Configuration des restrictions de destination',
+    'Configuration background jobs' => 'Configuration des tâches en arrière-plan',
 ];

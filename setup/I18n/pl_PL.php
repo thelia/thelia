@@ -489,4 +489,5 @@ return [
     'Zaire' => 'Zair',
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabwe',
+    'Configuration background jobs' => 'Konfiguracja zadań w tle',
 ];

@@ -82,4 +82,5 @@ return [
     'New York' => 'Cidade',
     'Order status transition override' => 'Forçar transições de status do pedido',
     'Search' => 'Procurar',
+    'Configuration background jobs' => 'Configuração de tarefas em segundo plano',
 ];

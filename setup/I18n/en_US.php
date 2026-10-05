@@ -1688,4 +1688,5 @@ return [
     'Customer rating' => 'Customer rating',
     'Price' => 'Price',
     'Configuration destination restrictions' => 'Configuration destination restrictions',
+    'Configuration background jobs' => 'Configuration background jobs',
 ];
