@@ -67,7 +67,7 @@ final readonly class ExportJobLauncher
         $job = (new ExportJob())
             ->setExportId($export->getId())
             ->setAdminId($adminId)
-            ->setStatus(ExportJobStatus::QUEUED->value)
+            ->setStatus(JobStatus::QUEUED->value)
             ->setSerializer($serializerId)
             ->setArchiver($archiverId)
             ->setLangId($language?->getId())

@@ -2400,6 +2400,36 @@
       <parameter name="i18n_columns" value="title,description" />
     </behavior>
   </table>
+  <table name="import_job" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="import_id" required="true" type="INTEGER" />
+    <column description="the admin who asked for the import, NULL once that admin is gone" name="admin_id" type="INTEGER" />
+    <column description="queued, running, done or failed" defaultValue="queued" name="status" required="true" size="20" type="VARCHAR" />
+    <column name="lang_id" type="INTEGER" />
+    <column description="where the uploaded file waits for the import, on the server" name="file_path" required="true" size="255" type="VARCHAR" />
+    <column description="the name the file was uploaded under" name="file_name" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="0" description="the rows the import changed" name="imported_rows" required="true" type="INTEGER" />
+    <column description="the rows the import refused and why, as a JSON list" name="row_errors" type="LONGVARCHAR" />
+    <column description="why the import failed, as shown to the administrator" name="error" type="LONGVARCHAR" />
+    <column name="started_at" type="TIMESTAMP" />
+    <column name="finished_at" type="TIMESTAMP" />
+    <foreign-key foreignTable="import" name="fk_import_job_import_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="import_id" />
+    </foreign-key>
+    <foreign-key foreignTable="admin" name="fk_import_job_admin_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="admin_id" />
+    </foreign-key>
+    <foreign-key foreignTable="lang" name="fk_import_job_lang_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="lang_id" />
+    </foreign-key>
+    <index name="idx_import_job_import_id">
+      <index-column name="import_id" />
+    </index>
+    <index name="idx_import_job_created_at">
+      <index-column name="created_at" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="export_job" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="export_id" required="true" type="INTEGER" />

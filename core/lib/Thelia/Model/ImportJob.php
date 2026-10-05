@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Thelia\Domain\DataTransfer\Job\JobStatus;
-use Thelia\Model\Base\ExportJob as BaseExportJob;
+use Thelia\Model\Base\ImportJob as BaseImportJob;
 
-class ExportJob extends BaseExportJob
+class ImportJob extends BaseImportJob
 {
     public function getJobStatus(): JobStatus
     {
@@ -27,5 +27,17 @@ class ExportJob extends BaseExportJob
     public function isFinished(): bool
     {
         return $this->getJobStatus()->isFinished();
+    }
+
+    /**
+     * The rows the import refused, each with its reason.
+     *
+     * @return list<string>
+     */
+    public function getRowErrorList(): array
+    {
+        $errors = json_decode((string) $this->getRowErrors(), true);
+
+        return \is_array($errors) ? array_values(array_map('strval', $errors)) : [];
     }
 }

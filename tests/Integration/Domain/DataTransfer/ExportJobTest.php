@@ -21,7 +21,7 @@ use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
-use Thelia\Domain\DataTransfer\Job\ExportJobStatus;
+use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Model\Export;
@@ -71,7 +71,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job = $this->getService(ExportJobLauncher::class)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertGreaterThanOrEqual(2, $job->getProcessedRows());
         self::assertFileExists((string) $job->getFilePath());
         self::assertStringEndsWith('.csv', (string) $job->getFileName());
@@ -88,7 +88,7 @@ final class ExportJobTest extends IntegrationTestCase
 
         $job = $this->launcherWith($queue)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage(), adminId: null);
 
-        self::assertSame(ExportJobStatus::QUEUED, $job->getJobStatus());
+        self::assertSame(JobStatus::QUEUED, $job->getJobStatus());
         self::assertNull($job->getFilePath());
         self::assertCount(1, $queue->kept);
         self::assertInstanceOf(RunExportJob::class, $queue->kept[0]);
@@ -98,7 +98,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job->reload();
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertFileExists((string) $job->getFilePath());
     }
 
@@ -136,7 +136,7 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         $job->reload();
-        self::assertSame(ExportJobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertStringContainsString('Vendor\\Removed\\Module\\Export', (string) $job->getError());
         self::assertNotNull($job->getFinishedAt());
     }
@@ -158,7 +158,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job->reload();
         $this->files[] = (string) $job->getFilePath();
 
-        self::assertSame(ExportJobStatus::DONE, $job->getJobStatus());
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
         self::assertNull($job->getError());
     }
 

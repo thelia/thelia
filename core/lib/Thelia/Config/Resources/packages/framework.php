@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
+use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 
 return static function (ContainerConfigurator $container): void {
@@ -204,9 +205,10 @@ return static function (ContainerConfigurator $container): void {
                 // address of the shop are known; only the delivery to the mail
                 // server waits for the worker.
                 SendEmailMessage::class => 'async',
-                // An export asked for in the back office: its row tells how far
-                // it got while the page is free.
+                // An export or an import asked for in the back office: its row
+                // tells how it went while the page is free.
                 RunExportJob::class => 'async',
+                RunImportJob::class => 'async',
             ],
         ],
     ], prepend: true);

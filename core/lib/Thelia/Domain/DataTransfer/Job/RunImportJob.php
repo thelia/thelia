@@ -14,15 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-enum JobStatus: string
+/**
+ * Runs the import described by one import_job row, on the file it recorded.
+ */
+final readonly class RunImportJob
 {
-    case QUEUED = 'queued';
-    case RUNNING = 'running';
-    case DONE = 'done';
-    case FAILED = 'failed';
-
-    public function isFinished(): bool
-    {
-        return self::DONE === $this || self::FAILED === $this;
+    public function __construct(
+        public int $importJobId,
+    ) {
     }
 }

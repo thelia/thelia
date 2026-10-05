@@ -19,6 +19,7 @@ use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\ExportJobQuery;
+use Thelia\Model\ImportJobQuery;
 
 readonly class PurgeExportCacheListener
 {
@@ -47,6 +48,25 @@ readonly class PurgeExportCacheListener
             '<comment>Export jobs (>%d days):</comment> <info>%d %s</info>',
             self::EXPORT_JOB_RETENTION_DAYS,
             $deletedJobs,
+            $event->isDryRun() ? 'to delete' : 'deleted',
+        ));
+
+        $importJobs = ImportJobQuery::createdBefore(self::EXPORT_JOB_RETENTION_DAYS)->find();
+
+        if (!$event->isDryRun()) {
+            foreach ($importJobs as $importJob) {
+                // An import that never ran still holds the file it was given.
+                if (is_file($importJob->getFilePath())) {
+                    unlink($importJob->getFilePath());
+                }
+                $importJob->delete();
+            }
+        }
+
+        $event->addResult(\sprintf(
+            '<comment>Import jobs (>%d days):</comment> <info>%d %s</info>',
+            self::EXPORT_JOB_RETENTION_DAYS,
+            \count($importJobs),
             $event->isDryRun() ? 'to delete' : 'deleted',
         ));
     }
