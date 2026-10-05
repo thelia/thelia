@@ -21,7 +21,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Order\StatusAction\Effect\AllocateInvoiceRefAction;
@@ -451,7 +450,6 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
     }
 
@@ -461,7 +459,6 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
     }
 

@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use Thelia\Messenger\Serializer\AllowedClassesSerializer;
+
 return static function (ContainerConfigurator $container): void {
     $container->extension('framework', [
         'session' => [
@@ -166,6 +169,40 @@ return static function (ContainerConfigurator $container): void {
                 'policy' => 'sliding_window',
                 'limit' => 30,
                 'interval' => '1 minute',
+            ],
+        ],
+        'messenger' => [
+            // Read and written as JSON through an allow list, never PHP
+            // serialization: whoever can write to a queue picks the classes.
+            'serializer' => [
+                'default_serializer' => AllowedClassesSerializer::class,
+            ],
+            'failure_transport' => 'failed',
+            'transports' => [
+                // The jobs of the shop. Empty, MESSENGER_TRANSPORT_DSN leaves this
+                // transport synchronous and every job runs in the request that
+                // dispatched it. A worker consumes it once it names a queue:
+                // doctrine://default for the shop database, or a Redis or AMQP DSN.
+                'async' => [
+                    'dsn' => '%env(default:thelia.messenger.inline_transport_dsn:MESSENGER_TRANSPORT_DSN)%',
+                    // Three more attempts, 30 seconds, 2 minutes then 8 minutes
+                    // apart, which outlasts a mail server restarting. Then the job
+                    // is set aside in the failure transport: never lost, never
+                    // replayed in a loop.
+                    'retry_strategy' => [
+                        'max_retries' => 3,
+                        'delay' => 30000,
+                        'multiplier' => 4,
+                        'max_delay' => 0,
+                    ],
+                ],
+                'failed' => '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%',
+            ],
+            'routing' => [
+                // The mail is rendered in the request, where the language and the
+                // address of the shop are known; only the delivery to the mail
+                // server waits for the worker.
+                SendEmailMessage::class => 'async',
             ],
         ],
     ], prepend: true);
