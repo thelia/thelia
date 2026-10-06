@@ -17,6 +17,8 @@
   }
   ```
 
+- GHSA-gcgv-f8rf-w2wc — the CSV exports wrote customer and newsletter subscriber names, addresses and phone numbers exactly as typed, so a value starting with `=`, `+`, `-` or `@` reached the file as a formula that ran in the spreadsheet of the administrator who opened it. Any text cell of a CSV export, from the core or from a module, that starts with one of these characters, a tab or a carriage return now gets a leading `'` and stays text. A plain number such as `-5.00` or `+33612345678` is written unchanged. A cell holding `,` or `;` is also enclosed in quotes, so a spreadsheet that splits lines on the other separator cannot start a formula halfway through it. JSON, XML and YAML exports are unchanged.
+
 ## Fixed
 
 - A `Thelia\Core\File\Exception\FileException` built from a message alone threw a `TypeError` instead of itself.
