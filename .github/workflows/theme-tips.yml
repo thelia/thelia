@@ -31,10 +31,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # On the 3.2 line only the back-office theme is installed from a branch, its
+          # On the 3.2 line the front-office and back-office themes are installed from their
           # `1.2` maintenance branch; the other themes are published 1.2 releases.
           # The schedule only runs on the default branch: here, use workflow_dispatch.
           THEMES=(
+            "thelia-templates/flexy:1.2"
             "thelia-templates/default-twig:1.2"
           )
 

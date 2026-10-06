@@ -65,16 +65,16 @@ jobs:
         # build the Propel models and generate the JWT keys.
         run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
 
-      - name: Resolve the back-office theme from its 1.2 maintenance branch
+      - name: Resolve the front and back-office themes from their 1.2 maintenance branches
         # This is the 3.2 maintenance line. The development tips of the themes
         # (`main`) follow the next minor of the core and do not run on 3.2, so the
-        # themes come from their own 1.2 line: the back-office theme from its `1.2`
-        # branch, which carries the fixes released with the core patches, and the
-        # other themes from their published 1.2 releases, as composer.json requires.
-        # thelia/flexy cannot come from its `1.2` branch yet: its `main` declares the
-        # branch-alias 1.2.x-dev, so `1.2.x-dev` resolves to `main`.
+        # themes come from their own 1.2 line: the front-office and back-office
+        # themes from their `1.2` branch, which carries the fixes released with the
+        # core patches, and the other themes from their published 1.2 releases, as
+        # composer.json requires.
         run: |
           composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:1.2.x-dev" \
             "thelia/backoffice-default-twig-template:1.2.x-dev"
 
       - name: Locate the Composer download cache
@@ -96,7 +96,7 @@ jobs:
         run: composer update --no-progress --prefer-dist --optimize-autoloader
 
       - name: Check that the themes under test are on their 1.2 line
-        # The back-office theme must be the tip of its `1.2` branch; the other themes
+        # The front and back-office themes must be the tip of their `1.2` branch; the other themes
         # must be published 1.2 releases, never a development version of a later line.
         run: |
           for package in flexy backoffice-default-twig-template email-default-template pdf-default-template; do
@@ -105,8 +105,8 @@ jobs:
             reference=$(php -r '$p = json_decode(stream_get_contents(STDIN), true); echo $p["source"]["reference"] ?? $p["dist"]["reference"] ?? "unknown";' <<< "$info")
             echo "thelia/$package -> $version ($reference)"
             case "$package:$version" in
-              backoffice-default-twig-template:1.2.x-dev) ;;
-              backoffice-default-twig-template:*|*:*-dev|*:dev-*) echo "::error::thelia/$package resolved to $version, outside the expected 1.2 line"; exit 1 ;;
+              flexy:1.2.x-dev|backoffice-default-twig-template:1.2.x-dev) ;;
+              flexy:*|backoffice-default-twig-template:*|*:*-dev|*:dev-*) echo "::error::thelia/$package resolved to $version, outside the expected 1.2 line"; exit 1 ;;
               *:1.2.*) ;;
               *) echo "::error::thelia/$package resolved to $version, outside the expected 1.2 line"; exit 1 ;;
             esac
