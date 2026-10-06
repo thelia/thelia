@@ -17,6 +17,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\DocumentCacheProtection;
 use Thelia\Exception\DocumentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -43,25 +44,6 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 {
     /** @var string Config key for document delivery mode */
     public const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
-
-    /**
-     * Written at the root of the document cache for Apache. The web server serves the
-     * published documents itself, so the headers the shop sets on its own answers never
-     * reach them: a document is handed over as a download, except the types a browser
-     * shows without running anything, and its type is never guessed from its content.
-     * A file already there is left as it is.
-     */
-    public const CACHE_DIRECTORY_HTACCESS = <<<'HTACCESS'
-        # Written by Thelia: documents are served as downloads, never as pages of the shop.
-        <IfModule mod_headers.c>
-            Header set X-Content-Type-Options "nosniff"
-            Header set Content-Disposition "attachment"
-            <FilesMatch "\.(?i:pdf|jpe?g|png|gif|webp|avif|txt)$">
-                Header unset Content-Disposition
-            </FilesMatch>
-        </IfModule>
-
-        HTACCESS;
 
     /**
      * @return string root of the document cache directory in web space
@@ -123,18 +105,14 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     }
 
     /**
+     * Apache serves the published documents itself (see DocumentCacheProtection).
+     *
      * @throws DocumentException
      */
     private function protectCacheDirectory(): void
     {
-        $htaccess = $this->getCachePath().DS.'.htaccess';
-
-        if (file_exists($htaccess)) {
-            return;
-        }
-
-        if (false === @file_put_contents($htaccess, self::CACHE_DIRECTORY_HTACCESS)) {
-            throw new DocumentException(\sprintf('Failed to write %s in the document cache directory', basename($htaccess)));
+        if (!DocumentCacheProtection::protect($this->getCachePath())) {
+            throw new DocumentException('Failed to write .htaccess in the document cache directory');
         }
     }
 
