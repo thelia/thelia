@@ -72,6 +72,22 @@ final class ItemFileUploadPolicyApiTest extends ApiTestCase
         self::assertNull(ProductDocumentQuery::create()->filterByProductId($product->getId())->findOne());
     }
 
+    public function testADocumentNamedToBeStoredAsServerExecutableIsRefused(): void
+    {
+        $product = $this->createProduct();
+
+        // Storage drops the trailing space: the file would be stored as "report-<id>.php".
+        $response = $this->upload(
+            '/api/admin/product_documents',
+            $product,
+            $this->createTestTextFile('<?php echo 1;'),
+            'report.php ',
+        );
+
+        self::assertSame(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(ProductDocumentQuery::create()->filterByProductId($product->getId())->findOne());
+    }
+
     public function testANonImageIsRefusedAsAnImage(): void
     {
         $product = $this->createProduct();
