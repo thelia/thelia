@@ -399,13 +399,43 @@ function readDatabaseVersion(): ?string
 
 /**
  * The compiled container and the generated Propel models of one environment.
+ *
+ * Booting on them is what the removal prevents, so a directory that cannot be
+ * moved out of the way stops the script before anything else runs. Files that
+ * belong to another user (the web server, on a live shop) are left behind in the
+ * renamed directory, where nothing loads them, and the script carries on.
  */
 function removeCompiledEnvironment(string $environment): void
 {
+    require_once __DIR__.\DIRECTORY_SEPARATOR.'CompiledDirectoryRemover.php';
+
+    $remover = new Thelia\Setup\CompiledDirectoryRemover();
+
     foreach ([THELIA_CACHE_DIR.$environment, THELIA_ROOT.'var'.DS.'propel'.DS.$environment] as $compiledDirectory) {
-        if (is_dir($compiledDirectory)) {
-            cliOutput(sprintf('Removing : %s', $compiledDirectory), 'info');
-            (new Filesystem())->remove($compiledDirectory);
+        if (!is_dir($compiledDirectory)) {
+            continue;
+        }
+
+        cliOutput(sprintf('Removing : %s', $compiledDirectory), 'info');
+
+        try {
+            $leftover = $remover->remove($compiledDirectory);
+        } catch (RuntimeException $exception) {
+            cliOutput('Update aborted, the database was not changed : '.$exception->getMessage(), 'error');
+            exit(8);
+        }
+
+        if (null !== $leftover) {
+            $owner = Thelia\Setup\CompiledDirectoryRemover::ownerOf($leftover);
+            cliOutput(sprintf(
+                'Some files of %s belong to %s and could not be deleted. They were moved to %s, '
+                .'which is never loaded, and the update goes on. Delete them as that user: sudo -u %s rm -rf %s',
+                $compiledDirectory,
+                $owner,
+                $leftover,
+                $owner,
+                escapeshellarg($leftover),
+            ), 'warning');
         }
     }
 }
