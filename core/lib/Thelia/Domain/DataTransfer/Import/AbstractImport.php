@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Import;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\MissingColumnsException;
 use Thelia\Model\Lang;
 
 /**
@@ -170,7 +171,7 @@ abstract class AbstractImport implements \Iterator
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
         if ([] !== $diff) {
-            throw new \UnexpectedValueException(Translator::getInstance()->trans('The following columns are missing: %columns', ['%columns' => implode(', ', $diff)]));
+            throw new MissingColumnsException(Translator::getInstance()->trans('The following columns are missing: %columns', ['%columns' => implode(', ', $diff)]));
         }
     }
 
