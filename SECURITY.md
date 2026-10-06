@@ -69,7 +69,7 @@ through GitHub for vulnerabilities affecting released versions.
 | 3.2 | `3.2` | Yes — security fixes | — |
 | 3.1 | `3.1` | Critical security fixes only — update to 3.2 | To be announced |
 | 3.0 | — | No — update to 3.2 | 16 September 2026, with the 3.1.0 release |
-| 2.6 | `2.6` | No | 6 October 2026 |
+| 2.6 | `2.6` | No — update to 3.2 | 6 October 2026, with the 3.2.1 release |
 | 2.5 and older | — | No | Ended |
 
 Thelia 3 is developed on a single trunk: a security fix ships in the next 3.x release, and
