@@ -1,6 +1,6 @@
 # 3.2.1
 
-Security and maintenance release of the 3.2 line, without any breaking change. It ships `setup/update/sql/3.2.1.sql`, which renames the tax types a shop migrated from Thelia 2 still stores under their Thelia 2 class, declares the back-office hooks the Twig templates call, and records the new version. `thelia/setup` ships as 3.2.1 with this core; `thelia/config` does not change and stays at 3.2.0. Update the back-office theme `thelia/backoffice-default-twig-template` to 1.2.2 and the front theme `thelia/flexy` to 1.2.1 at the same time.
+Security and maintenance release of the 3.2 line, without any breaking change. It ships `setup/update/sql/3.2.1.sql`, which renames the tax types a shop migrated from Thelia 2 still stores under their Thelia 2 class, declares the back-office hooks the Twig templates call, and records the new version. `thelia/setup` ships as 3.2.1 with this core; `thelia/config` does not change and stays at 3.2.0. The core refuses a back-office theme `thelia/backoffice-default-twig-template` older than 1.2.2, which carries the same CSV export fix: update it to 1.2.2, and the front theme `thelia/flexy` to 1.2.1, at the same time.
 
 ## Security
 
