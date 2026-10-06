@@ -57,6 +57,18 @@ final class FileUploadConstraintsApiTest extends ApiTestCase
         self::assertSame([], $constraints['allowedExtensions']);
         self::assertContains('exe', $constraints['forbiddenExtensions']);
         self::assertContains('php', $constraints['forbiddenExtensions']);
+        self::assertContains('html', $constraints['forbiddenExtensions']);
+    }
+
+    public function testADocumentABrowserRunsStaysForbiddenWhateverTheShopConfiguration(): void
+    {
+        ConfigQuery::write(FileConfiguration::DOCUMENT_EXTENSION_BLACKLIST_VARIABLE, 'exe');
+
+        $constraints = $this->readConstraints($this->createDocument());
+
+        self::assertContains('exe', $constraints['forbiddenExtensions']);
+        self::assertContains('html', $constraints['forbiddenExtensions']);
+        self::assertContains('js', $constraints['forbiddenExtensions']);
     }
 
     public function testWhatIsPublishedFollowsTheShopConfiguration(): void

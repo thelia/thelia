@@ -154,6 +154,17 @@ readonly class FileProcessorService
             );
         }
 
+        // A document is served from the shop origin: one a browser opens as a page or runs
+        // as a script is refused, whatever the caller's configuration.
+        if (null === $message && 'document' === $objectType && null !== ($activeExtension = FileConfiguration::findBrowserActiveExtension($realFileName))) {
+            $message = $this->translator->trans(
+                'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                [
+                    '%extension' => $activeExtension,
+                ],
+            );
+        }
+
         if (null !== $message) {
             throw new ProcessFileException($message, 415);
         }
