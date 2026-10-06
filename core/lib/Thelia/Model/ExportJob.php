@@ -14,10 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\DataTransfer\Job\DataTransferJob;
 use Thelia\Model\Base\ExportJob as BaseExportJob;
 use Thelia\Model\Tools\DataTransferJobTrait;
 
-class ExportJob extends BaseExportJob
+class ExportJob extends BaseExportJob implements DataTransferJob
 {
     use DataTransferJobTrait;
 }

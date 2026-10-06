@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Model\Import;
@@ -24,23 +23,20 @@ use Thelia\Model\Lang;
 /**
  * Records an import and hands it to the job queue.
  *
- * The uploaded file is moved out of the request into var/data-transfer/import, not
- * into the cache: a deployment empties the cache, and the import would lose its file
- * before a worker reached it. Without a queue the import runs in this call and comes
+ * The uploaded file is moved out of the request into the import storage
+ * ({@see ImportStorage}), not into the cache: a deployment empties the cache, and the
+ * import would lose its file before a worker reached it. Without a queue the import runs in this call and comes
  * back finished, with the rows it changed and the ones it refused, as it did in the
  * page. With one it comes back queued.
  */
 final readonly class ImportJobLauncher
 {
-    public const STORAGE_DIRECTORY = 'var/data-transfer/import';
-
     private const MAX_NAME_LENGTH = 100;
 
     public function __construct(
         private ImportHandler $importHandler,
         private JobLifecycle $lifecycle,
-        #[Autowire('%kernel.project_dir%')]
-        private string $projectDirectory,
+        private ImportStorage $storage,
     ) {
     }
 
@@ -49,12 +45,11 @@ final readonly class ImportJobLauncher
         // Refused here, in the request, rather than by a worker minutes later.
         $this->importHandler->validateUpload($originalName, $file);
 
-        $relativeDirectory = self::STORAGE_DIRECTORY.'/'.(new \DateTime())->format('Ymd');
         $stored = $file->move(
-            $this->projectDirectory.\DIRECTORY_SEPARATOR.$relativeDirectory,
+            $this->storage->directory().\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd'),
             uniqid('', true).'-'.self::shortName($originalName),
         );
-        $relativePath = $relativeDirectory.'/'.$stored->getFilename();
+        $relativePath = $this->storage->relativePathOf($stored->getPathname());
 
         try {
             $job = (new ImportJob())

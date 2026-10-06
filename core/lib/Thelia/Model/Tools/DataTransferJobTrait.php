@@ -17,7 +17,8 @@ namespace Thelia\Model\Tools;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 
 /**
- * The status of an export or import job row.
+ * The status of an export or import job row, and what its lifecycle does to it
+ * ({@see \Thelia\Domain\DataTransfer\Job\DataTransferJob}).
  */
 trait DataTransferJobTrait
 {
@@ -29,5 +30,18 @@ trait DataTransferJobTrait
     public function isFinished(): bool
     {
         return $this->getJobStatus()->isFinished();
+    }
+
+    public function markFailed(string $error): void
+    {
+        $this->setStatus(JobStatus::FAILED->value)
+            ->setError($error)
+            ->setFinishedAt(new \DateTime())
+            ->save();
+    }
+
+    public function refresh(): void
+    {
+        $this->reload();
     }
 }

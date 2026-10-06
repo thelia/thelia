@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -27,6 +28,9 @@ use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
+use Thelia\Messenger\JobFailureMessage;
+use Thelia\Messenger\Transport\ConfiguredQueues;
+use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Export;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
@@ -239,7 +243,7 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(ExportHandler::class),
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
-            new JobLifecycle(new JobClaim(), $bus, 'sync://'),
+            $this->lifecycle($bus, 'sync://'),
         );
         $handler(new RunExportJob($job->getId()));
 
@@ -338,7 +342,45 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertNotNull($job);
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         // The queue's own words may name a server: they go to the log, not the screen.
-        self::assertSame('The job could not be queued. The details are in the server log.', $job->getError());
+        self::assertSame(JobLifecycle::NOT_QUEUED, $job->getError());
+    }
+
+    /**
+     * The failure transport keeps what the job says of its failure, and the back
+     * office lists it: never the text of a database error.
+     */
+    public function testAFailureSetAsideNeverQuotesADatabaseError(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        try {
+            $this->lifecycle($this->queue())->fail($job, new \PDOException("SQLSTATE[23000]: Duplicate entry 'buyer@example.com'"));
+        } catch (UnrecoverableMessageHandlingException $exception) {
+            self::assertStringNotContainsString('buyer@example.com', $exception->getMessage());
+            self::assertStringContainsString(JobFailureMessage::SERVER_ERROR, $exception->getMessage());
+        }
+
+        $job->reload();
+        self::assertSame(JobFailureMessage::SERVER_ERROR, $job->getError());
+    }
+
+    /**
+     * Without a queue, a job that fails before it is even taken (its row unreadable,
+     * the claim refused by the database) is not left waiting for nobody.
+     */
+    public function testWithoutAQueueAJobThatFailsBeforeItStartsIsRecordedAsFailed(): void
+    {
+        $failingAtOnce = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new HandlerFailedException(Envelope::wrap($message), [new \PDOException('SQLSTATE[HY000] [2002] Connection refused')]);
+            }
+        };
+
+        $job = $this->launcherWith($failingAtOnce)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(JobFailureMessage::SERVER_ERROR, $job->getError());
     }
 
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
@@ -371,7 +413,7 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(ExportHandler::class),
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
-            self::lifecycle($bus),
+            $this->lifecycle($bus),
         );
     }
 
@@ -386,13 +428,13 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(ExportHandler::class),
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
-            self::lifecycle($bus),
+            $this->lifecycle($bus),
         );
     }
 
-    private static function lifecycle(MessageBusInterface $bus): JobLifecycle
+    private function lifecycle(MessageBusInterface $bus, string $heavyDsn = 'doctrine://default?queue_name=heavy'): JobLifecycle
     {
-        return new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy');
+        return new JobLifecycle(new JobClaim(), $bus, new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), 'doctrine://default', $heavyDsn, 'doctrine://default?queue_name=failed'));
     }
 
     /**

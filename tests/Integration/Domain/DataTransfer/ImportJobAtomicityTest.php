@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Model\Category;
 use Thelia\Model\ImportJobQuery;
@@ -61,8 +62,8 @@ final class ImportJobAtomicityTest extends IntegrationTestCase
     {
         foreach ($this->jobs as $jobId) {
             $job = ImportJobQuery::create()->findPk($jobId);
-            if (null !== $job && is_file($job->getStoredFilePath())) {
-                unlink($job->getStoredFilePath());
+            if (null !== $job && is_file($this->getService(ImportStorage::class)->pathOf($job))) {
+                unlink($this->getService(ImportStorage::class)->pathOf($job));
             }
             $job?->delete();
         }

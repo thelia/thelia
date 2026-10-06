@@ -29,6 +29,10 @@ use Thelia\Config\DatabaseConfiguration;
  * counted from the last sign of life of the job, which its handler gives as it goes,
  * not from its start: a long export that is still writing is never taken from under
  * the worker running it.
+ *
+ * The times compared are written by PHP in its own time zone, on the row and here:
+ * the web server and the workers must share it (date.timezone), and the hour that
+ * repeats when clocks go back may hand a silent job over an hour late.
  */
 final readonly class JobClaim
 {

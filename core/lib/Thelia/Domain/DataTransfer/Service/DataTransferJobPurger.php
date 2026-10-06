@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Service;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Messenger\FailedMessagePurger;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ImportJobQuery;
@@ -38,8 +37,7 @@ final readonly class DataTransferJobPurger
     public const JOB_RETENTION_DAYS = 7;
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private string $projectDirectory,
+        private ImportStorage $storage,
     ) {
     }
 
@@ -64,9 +62,7 @@ final readonly class DataTransferJobPurger
             foreach ($jobs as $job) {
                 // An import that never ran still holds the file it was given. The path
                 // comes from the row: nothing outside the import storage is deleted.
-                if ($job->isStoredInTheImportDirectory()) {
-                    unlink($job->getStoredFilePath());
-                }
+                $this->storage->discardFileOf($job);
 
                 $job->delete();
             }
@@ -82,7 +78,7 @@ final readonly class DataTransferJobPurger
      */
     public function sweepImportStorage(bool $dryRun = false): int
     {
-        $directory = $this->projectDirectory.\DIRECTORY_SEPARATOR.ImportJobLauncher::STORAGE_DIRECTORY;
+        $directory = $this->storage->directory();
 
         if (!is_dir($directory)) {
             return 0;

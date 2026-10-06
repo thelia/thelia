@@ -46,6 +46,15 @@ final readonly class ConfiguredQueues
     }
 
     /**
+     * True when no queue holds the heavy jobs: they run at once, in the call that
+     * dispatches them.
+     */
+    public function heavyJobsRunInline(): bool
+    {
+        return str_starts_with($this->heavyDsn, 'sync://');
+    }
+
+    /**
      * The failure queue, when it is a table of the shop database.
      */
     public function failureQueueInTheShopDatabase(): ?ShopDatabaseQueue

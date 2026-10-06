@@ -21,12 +21,16 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
 use Thelia\Domain\DataTransfer\Job\JobHeartbeat;
 use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJobHandler;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Messenger\Transport\ConfiguredQueues;
+use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Import;
 use Thelia\Model\ImportJobQuery;
 use Thelia\Model\ImportQuery;
@@ -74,7 +78,7 @@ final class ImportJobTest extends IntegrationTestCase
         self::assertSame(1, $job->getImportedRows());
         self::assertSame([], $job->getRowErrorList());
         self::assertSame(42.0, (float) $this->reloadedQuantity());
-        self::assertFileDoesNotExist($job->getStoredFilePath(), 'The uploaded file goes once the import is done.');
+        self::assertFileDoesNotExist($this->storage()->pathOf($job), 'The uploaded file goes once the import is done.');
     }
 
     public function testWithAQueueTheFileWaitsOutsideTheCacheForAWorker(): void
@@ -82,12 +86,12 @@ final class ImportJobTest extends IntegrationTestCase
         $queue = $this->queue();
 
         $job = $this->launcherWith($queue)->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        $this->files[] = $job->getStoredFilePath();
+        $this->files[] = $this->storage()->pathOf($job);
 
         self::assertSame(JobStatus::QUEUED, $job->getJobStatus());
-        self::assertStringStartsWith(ImportJobLauncher::STORAGE_DIRECTORY, (string) $job->getFilePath());
-        self::assertStringNotContainsString(THELIA_CACHE_DIR, $job->getStoredFilePath());
-        self::assertFileExists($job->getStoredFilePath());
+        self::assertStringStartsWith(ImportStorage::DIRECTORY, (string) $job->getFilePath());
+        self::assertStringNotContainsString(THELIA_CACHE_DIR, $this->storage()->pathOf($job));
+        self::assertFileExists($this->storage()->pathOf($job));
         self::assertSame(5.0, (float) $this->reloadedQuantity());
 
         $this->handler()(new RunImportJob($job->getId()));
@@ -109,7 +113,7 @@ final class ImportJobTest extends IntegrationTestCase
     public function testAFinishedImportIsNotRunAgain(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        $this->files[] = $job->getStoredFilePath();
+        $this->files[] = $this->storage()->pathOf($job);
         $this->handler()(new RunImportJob($job->getId()));
 
         $this->combination->setQuantity(8)->save($this->getPropelConnection());
@@ -121,7 +125,7 @@ final class ImportJobTest extends IntegrationTestCase
     public function testAnImportWhoseFileIsGoneFailsAndSaysWhy(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        unlink($job->getStoredFilePath());
+        unlink($this->storage()->pathOf($job));
 
         try {
             $this->handler()(new RunImportJob($job->getId()));
@@ -137,7 +141,7 @@ final class ImportJobTest extends IntegrationTestCase
     public function testAJobRunningElsewhereIsNotRunASecondTime(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        $this->files[] = $job->getStoredFilePath();
+        $this->files[] = $this->storage()->pathOf($job);
         $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-5 minutes'))->save($this->getPropelConnection());
 
         $this->handler()(new RunImportJob($job->getId()));
@@ -145,7 +149,7 @@ final class ImportJobTest extends IntegrationTestCase
 
         self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
         self::assertSame(5.0, (float) $this->reloadedQuantity());
-        self::assertFileExists($job->getStoredFilePath());
+        self::assertFileExists($this->storage()->pathOf($job));
     }
 
     /**
@@ -155,7 +159,7 @@ final class ImportJobTest extends IntegrationTestCase
     public function testAnImportRunningElsewhereIsLookedAtAgainButNeverRestartedOnceFailed(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        $this->files[] = $job->getStoredFilePath();
+        $this->files[] = $this->storage()->pathOf($job);
         $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
 
         $queue = $this->recordingQueue();
@@ -179,12 +183,12 @@ final class ImportJobTest extends IntegrationTestCase
         $name = str_repeat('inventaire-entrepot-', 15).'stock.csv';
 
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), $name);
-        $this->files[] = $job->getStoredFilePath();
+        $this->files[] = $this->storage()->pathOf($job);
 
         self::assertLessThanOrEqual(255, \strlen((string) $job->getFilePath()));
-        self::assertStringStartsWith(ImportJobLauncher::STORAGE_DIRECTORY, (string) $job->getFilePath());
+        self::assertStringStartsWith(ImportStorage::DIRECTORY, (string) $job->getFilePath());
         self::assertStringEndsWith('.csv', (string) $job->getFileName());
-        self::assertFileExists($job->getStoredFilePath());
+        self::assertFileExists($this->storage()->pathOf($job));
     }
 
     /**
@@ -209,8 +213,8 @@ final class ImportJobTest extends IntegrationTestCase
         $job = ImportJobQuery::create()->orderById('desc')->findOne();
         self::assertNotNull($job);
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
-        self::assertSame('The job could not be queued. The details are in the server log.', $job->getError());
-        self::assertFileDoesNotExist($job->getStoredFilePath());
+        self::assertSame(JobLifecycle::NOT_QUEUED, $job->getError());
+        self::assertFileDoesNotExist($this->storage()->pathOf($job));
     }
 
     /**
@@ -233,7 +237,7 @@ final class ImportJobTest extends IntegrationTestCase
     public function testAFailedImportLeavesTheTransactionOfItsCallerUsable(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
-        unlink($job->getStoredFilePath());
+        unlink($this->storage()->pathOf($job));
         $connection = $this->getPropelConnection();
         $depth = $connection->getNestedTransactionCount();
 
@@ -267,6 +271,31 @@ final class ImportJobTest extends IntegrationTestCase
         } finally {
             (new Filesystem())->remove($directory);
         }
+    }
+
+    /**
+     * An archive whose files all sit in a folder cannot be imported: its extracted
+     * copy still goes.
+     */
+    public function testTheExtractedCopyGoesEvenWhenTheArchiveCannotBeImported(): void
+    {
+        $directory = sys_get_temp_dir().'/import-archive-'.uniqid('', true);
+        mkdir($directory);
+        $archive = new \ZipArchive();
+        $archive->open($directory.'/stock.zip', \ZipArchive::CREATE);
+        $archive->addFromString('nested/stock.csv', "id,stock\n".$this->combination->getId().",23\n");
+        $archive->close();
+
+        try {
+            $this->getService(ImportHandler::class)->import($this->stockImport(), new File($directory.'/stock.zip'));
+            self::fail('Nothing at the root of the archive can be imported.');
+        } catch (FormValidationException) {
+        } finally {
+            $left = array_values(array_diff((array) scandir($directory), ['.', '..']));
+            (new Filesystem())->remove($directory);
+        }
+
+        self::assertSame(['stock.zip'], $left);
     }
 
     public function testAJobWhoseRowIsGoneFailsForGood(): void
@@ -332,8 +361,8 @@ final class ImportJobTest extends IntegrationTestCase
     {
         return new ImportJobLauncher(
             $this->getService(ImportHandler::class),
-            new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy'),
-            (string) static::getContainer()->getParameter('kernel.project_dir'),
+            $this->lifecycle($bus),
+            $this->storage(),
         );
     }
 
@@ -347,8 +376,19 @@ final class ImportJobTest extends IntegrationTestCase
         return new RunImportJobHandler(
             $this->getService(ImportHandler::class),
             $this->getService(JobHeartbeat::class),
-            new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy'),
+            $this->lifecycle($bus),
+            $this->storage(),
         );
+    }
+
+    private function lifecycle(MessageBusInterface $bus): JobLifecycle
+    {
+        return new JobLifecycle(new JobClaim(), $bus, new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), 'doctrine://default', 'doctrine://default?queue_name=heavy', 'doctrine://default?queue_name=failed'));
+    }
+
+    private function storage(): ImportStorage
+    {
+        return $this->getService(ImportStorage::class);
     }
 
     /**
