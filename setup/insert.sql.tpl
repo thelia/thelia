@@ -2223,7 +2223,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (55, 'admin.order.status-force', NOW(), NOW()),
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
-(58, 'admin.configuration.gift-wrapping', NOW(), NOW())
+(58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
+(59, 'admin.configuration.delivery-date', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -4026,7 +4027,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (55, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL),
     (56, '{{ locale }}', {{ intl('Configuration / Tag', locale) }}, NULL, NULL, NULL),
     (57, '{{ locale }}', {{ intl('Catalog price rules', locale) }}, NULL, NULL, NULL),
-    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL),
+    (59, '{{ locale }}', {{ intl('Configuration delivery dates', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

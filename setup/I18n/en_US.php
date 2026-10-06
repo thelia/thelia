@@ -428,6 +428,7 @@ return [
     'Configuration / Template' => 'Configuration / Template',
     'Configuration checkout consents' => 'Configuration checkout consents',
     'Configuration gift wrappings' => 'Configuration gift wrappings',
+    'Configuration delivery dates' => 'Configuration delivery dates',
     'Configuration checkout steps' => 'Configuration checkout steps',
     'Catalog price rules' => 'Catalog price rules',
     'Configuration order status' => 'Configuration order status',

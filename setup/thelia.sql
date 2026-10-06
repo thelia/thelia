@@ -785,6 +785,10 @@ CREATE TABLE `order`
     `cart_id` INTEGER NOT NULL,
     `cart_fingerprint` VARCHAR(64),
     `gift_message` TEXT,
+    `delivery_date` DATE COMMENT 'the day the buyer asked for, in the shop time zone, NULL when the carrier offered no date',
+    `delivery_slot_id` INTEGER COMMENT 'the slot the buyer picked, NULL once that slot is deleted from the carrier settings',
+    `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
+    `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -802,6 +806,7 @@ CREATE TABLE `order`
     INDEX `fk_order_delivery_module_id_idx` (`delivery_module_id`),
     INDEX `fk_order_lang_id_idx` (`lang_id`),
     INDEX `idx_order_cart_fk` (`cart_id`),
+    INDEX `idx_order_delivery_slot_id` (`delivery_slot_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
@@ -841,7 +846,12 @@ CREATE TABLE `order`
         FOREIGN KEY (`lang_id`)
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_delivery_slot_id`
+        FOREIGN KEY (`delivery_slot_id`)
+        REFERENCES `delivery_slot` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -1239,6 +1249,101 @@ CREATE TABLE `area_delivery_module`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- delivery_date_rule
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_date_rule`;
+
+CREATE TABLE `delivery_date_rule`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `choice_mode` VARCHAR(16) DEFAULT 'none' NOT NULL COMMENT 'what the buyer picks: none, date or slot',
+    `minimum_delay_days` INTEGER DEFAULT 0 NOT NULL COMMENT 'how many days after today the first day offered is',
+    `horizon_days` INTEGER DEFAULT 30 NOT NULL COMMENT 'how many days after today the last day offered is',
+    `closed_weekdays` VARCHAR(20) COMMENT 'the days of the week the carrier does not deliver, ISO numbers from 1 (Monday) to 7 (Sunday) separated by commas; NULL follows the shop days',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `delivery_date_rule_module_id_UNIQUE` (`module_id`),
+    CONSTRAINT `fk_delivery_date_rule_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- delivery_slot
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_slot`;
+
+CREATE TABLE `delivery_slot`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `start_time` TIME NOT NULL COMMENT 'the local hour the slot starts at',
+    `end_time` TIME NOT NULL COMMENT 'the local hour the slot ends at',
+    `capacity` INTEGER COMMENT 'how many orders the slot takes on a given day, NULL for no limit',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_delivery_slot_module_id` (`module_id`),
+    CONSTRAINT `fk_delivery_slot_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- delivery_closure
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_closure`;
+
+CREATE TABLE `delivery_closure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER COMMENT 'the carrier the closure applies to, NULL for the whole shop',
+    `start_date` DATE NOT NULL,
+    `end_date` DATE NOT NULL,
+    `label` VARCHAR(255) COMMENT 'a note for the merchant, never shown to the buyer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_delivery_closure_module_id_end_date` (`module_id`, `end_date`),
+    CONSTRAINT `fk_delivery_closure_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- delivery_slot_booking
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_slot_booking`;
+
+CREATE TABLE `delivery_slot_booking`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `delivery_slot_id` INTEGER NOT NULL,
+    `delivery_date` DATE NOT NULL,
+    `booked` INTEGER DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `delivery_slot_booking_slot_date_UNIQUE` (`delivery_slot_id`, `delivery_date`),
+    CONSTRAINT `fk_delivery_slot_booking_delivery_slot_id`
+        FOREIGN KEY (`delivery_slot_id`)
+        REFERENCES `delivery_slot` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile
 -- ---------------------------------------------------------------------
 
@@ -1590,12 +1695,15 @@ CREATE TABLE `cart`
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `gift_wrapping_id` INTEGER COMMENT 'the gift wrapping the buyer picked, at most one, null while they picked none',
     `gift_message` TEXT COMMENT 'the note the buyer wrote for whoever receives the parcel, distinct from any comment addressed to the merchant',
+    `delivery_date` DATE COMMENT 'the delivery day the buyer picked for the selected carrier, NULL while they picked none',
+    `delivery_slot_id` INTEGER COMMENT 'the slot of that day the buyer picked, when the carrier offers slots',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `token_UNIQUE` (`token`),
     INDEX `idx_cart_customer_id` (`customer_id`),
     INDEX `idx_cart_gift_wrapping_id` (`gift_wrapping_id`),
+    INDEX `idx_cart_delivery_slot_id` (`delivery_slot_id`),
     INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
     INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
@@ -1633,7 +1741,12 @@ CREATE TABLE `cart`
         FOREIGN KEY (`gift_wrapping_id`)
         REFERENCES `gift_wrapping` (`id`)
         ON DELETE SET NULL
+        ON UPDATE RESTRICT,
+    CONSTRAINT `fk_cart_delivery_slot_id`
+        FOREIGN KEY (`delivery_slot_id`)
+        REFERENCES `delivery_slot` (`id`)
         ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -3585,6 +3698,24 @@ CREATE TABLE `product_association_type_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- delivery_slot_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `delivery_slot_i18n`;
+
+CREATE TABLE `delivery_slot_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `delivery_slot_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `delivery_slot` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile_i18n
 -- ---------------------------------------------------------------------
 
@@ -4273,6 +4404,10 @@ CREATE TABLE `order_version`
     `cart_id` INTEGER NOT NULL,
     `cart_fingerprint` VARCHAR(64),
     `gift_message` TEXT,
+    `delivery_date` DATE COMMENT 'the day the buyer asked for, in the shop time zone, NULL when the carrier offered no date',
+    `delivery_slot_id` INTEGER COMMENT 'the slot the buyer picked, NULL once that slot is deleted from the carrier settings',
+    `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
+    `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
