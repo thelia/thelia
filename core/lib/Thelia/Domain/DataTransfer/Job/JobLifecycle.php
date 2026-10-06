@@ -131,7 +131,9 @@ final readonly class JobLifecycle
         $reason = JobFailureMessage::forAdministrator($exception);
         $job->markFailed($reason);
 
-        // The failure transport keeps this text and the back office lists it.
-        throw new UnrecoverableMessageHandlingException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason), 0, $exception);
+        // The failure transport keeps this exception and the back office lists it.
+        // Symfony stores the whole chain of an exception it sets aside, so the cause
+        // is not chained: its text may quote a customer, the log names it.
+        throw new UnrecoverableMessageHandlingException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason));
     }
 }
