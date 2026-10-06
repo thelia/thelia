@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Domain\DataTransfer\ImportHandler;
-use Thelia\Log\Tlog;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportJobQuery;
 use Thelia\Model\Map\ImportJobTableMap;
@@ -29,9 +28,9 @@ use Thelia\Model\Map\ImportJobTableMap;
  *
  * A finished import is never run again, and one being run is not run a second time at
  * once ({@see JobClaim}): a queue may deliver a job twice, and an import changes the
- * catalog. A failed one goes straight to the failure transport and runs
- * again from the first row when it is replayed; each row is written on its own, so the
- * rows written before the failure are written a second time, with the same values.
+ * catalog. A failed one goes straight to the failure transport ({@see JobLifecycle})
+ * and runs again from the first row when it is replayed: nothing of the failed run was
+ * kept.
  * The uploaded file is deleted once the import is done, and kept while it may be
  * replayed.
  */
@@ -41,6 +40,7 @@ final readonly class RunImportJobHandler
     public function __construct(
         private ImportHandler $importHandler,
         private JobHeartbeat $heartbeat,
+        private JobLifecycle $lifecycle,
     ) {
     }
 
@@ -52,18 +52,23 @@ final readonly class RunImportJobHandler
             throw new UnrecoverableMessageHandlingException(\sprintf('Import job %d no longer exists.', $message->importJobId));
         }
 
-        if (!JobClaim::claim(ImportJobTableMap::TABLE_NAME, $job->getId())) {
-            // Done already, or being run by another worker right now.
+        if (!$this->lifecycle->claim($job, ImportJobTableMap::TABLE_NAME, $message)) {
             return;
         }
 
-        $job->reload();
         $job->setImportedRows(0)->setRowErrors(null)->save();
 
         // The whole import is one transaction: stopped half way (an error, a worker
         // killed, a deployment), it leaves the catalog as it was, never half imported.
+        // The row is set done inside it, so the catalog and the row never disagree. A
+        // caller that already holds a transaction keeps it: committing or rolling back
+        // is its call, a nested Propel transaction would only be a counter.
         $connection = Propel::getWriteConnection(ImportJobTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
+        $ownsTransaction = !$connection->inTransaction();
+
+        if ($ownsTransaction) {
+            $connection->beginTransaction();
+        }
 
         try {
             $import = $job->getImport() ?? throw new \RuntimeException('The import of this job no longer exists.');
@@ -85,29 +90,24 @@ final readonly class RunImportJobHandler
                 },
             );
 
-            $connection->commit();
-        } catch (\Throwable $exception) {
-            if ($connection->inTransaction()) {
-                $connection->rollBack();
-            }
-
-            Tlog::getInstance()->addError(\sprintf('Import job %d failed: %s', $job->getId(), $exception->getMessage()));
-
-            $job->setStatus(JobStatus::FAILED->value)
-                ->setError(mb_substr($exception->getMessage(), 0, 2000))
+            $job->setStatus(JobStatus::DONE->value)
+                ->setImportedRows((int) $event->getImport()->getImportedRows())
+                ->setRowErrors([] === $event->getErrors() ? null : json_encode(array_values($event->getErrors()), \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR))
                 ->setFinishedAt(new \DateTime())
                 ->save();
 
-            throw new UnrecoverableMessageHandlingException(\sprintf('Import job %d failed: %s', $job->getId(), $exception->getMessage()), 0, $exception);
+            if ($ownsTransaction) {
+                $connection->commit();
+            }
+        } catch (\Throwable $exception) {
+            if ($ownsTransaction && $connection->inTransaction()) {
+                $connection->rollBack();
+            }
+
+            $this->lifecycle->fail($job, $exception);
         }
 
-        $job->setStatus(JobStatus::DONE->value)
-            ->setImportedRows((int) $event->getImport()->getImportedRows())
-            ->setRowErrors([] === $event->getErrors() ? null : json_encode(array_values($event->getErrors()), \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR))
-            ->setFinishedAt(new \DateTime())
-            ->save();
-
-        if (is_file($job->getStoredFilePath())) {
+        if ($job->isStoredInTheImportDirectory()) {
             unlink($job->getStoredFilePath());
         }
     }

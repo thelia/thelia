@@ -14,16 +14,39 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
+use Thelia\Messenger\Message\DescribedJob;
+
 /**
  * Runs the export described by one export_job row.
  *
  * Only the id travels: what to export and how is read from the row when the job
  * runs, so a job replayed from the failure transport runs on the row as it is then.
  */
-final readonly class RunExportJob
+final readonly class RunExportJob implements DataTransferJobMessage, DescribedJob
 {
     public function __construct(
         public int $exportJobId,
+        public int $postponements = 0,
     ) {
+    }
+
+    public function jobId(): int
+    {
+        return $this->exportJobId;
+    }
+
+    public function postponements(): int
+    {
+        return $this->postponements;
+    }
+
+    public function postponed(): static
+    {
+        return new self($this->exportJobId, $this->postponements + 1);
+    }
+
+    public function describe(): string
+    {
+        return \sprintf('Export #%d', $this->exportJobId);
     }
 }

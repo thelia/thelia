@@ -29,9 +29,8 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Thelia\Domain\DataTransfer\Job\RunExportJob;
-use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Log\Tlog;
+use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\UndecodableJob;
 
 /**
@@ -196,22 +195,14 @@ final readonly class BackgroundJobsMonitor
 
     private static function describe(object $message): string
     {
+        if ($message instanceof DescribedJob) {
+            return $message->describe();
+        }
+
         if ($message instanceof SendEmailMessage && $message->getMessage() instanceof Email) {
             $email = $message->getMessage();
 
             return \sprintf('%s → %s', (string) $email->getSubject(), implode(', ', array_map(static fn (Address $address): string => $address->getAddress(), $email->getTo())));
-        }
-
-        if ($message instanceof UndecodableJob) {
-            return \sprintf('Unreadable job: %s', $message->reason);
-        }
-
-        if ($message instanceof RunExportJob) {
-            return \sprintf('Export #%d', $message->exportJobId);
-        }
-
-        if ($message instanceof RunImportJob) {
-            return \sprintf('Import #%d', $message->importJobId);
         }
 
         $parts = explode('\\', $message::class);
