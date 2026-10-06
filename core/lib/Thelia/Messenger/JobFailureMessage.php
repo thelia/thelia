@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\DataTransfer\Job;
+namespace Thelia\Messenger;
 
 use Doctrine\DBAL\Exception as DbalException;
 use Propel\Runtime\Exception\PropelException;
@@ -21,8 +21,8 @@ use Symfony\Component\Messenger\Exception\TransportException;
 /**
  * What an administrator reads of a failed job.
  *
- * The reason an export or an import gives itself (no data to export, a file it cannot
- * read) is shown as it is. The text of a database, transport or PHP error is not: it
+ * The reason a job gives itself (no data to export, a file it cannot read, a command
+ * that exited with an error) is shown as it is. The text of a database, transport or PHP error is not: it
  * quotes SQL, values and host names. It is written to the server log, and the
  * administrator reads that the details are there.
  */

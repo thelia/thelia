@@ -12,11 +12,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Unit\Domain\DataTransfer\Job;
+namespace Thelia\Tests\Unit\Messenger;
 
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Domain\DataTransfer\Job\JobFailureMessage;
+use Thelia\Messenger\JobFailureMessage;
 
 final class JobFailureMessageTest extends TestCase
 {
