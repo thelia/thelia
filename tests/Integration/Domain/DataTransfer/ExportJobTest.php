@@ -358,6 +358,8 @@ final class ExportJobTest extends IntegrationTestCase
         } catch (UnrecoverableMessageHandlingException $exception) {
             self::assertStringNotContainsString('buyer@example.com', $exception->getMessage());
             self::assertStringContainsString(JobFailureMessage::SERVER_ERROR, $exception->getMessage());
+            // The failure transport stores the whole chain: the cause is not in it.
+            self::assertNull($exception->getPrevious());
         }
 
         $job->reload();
