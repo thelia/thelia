@@ -45,6 +45,14 @@ if (empty($_SERVER['DATABASE_HOST'])) {
     }
 }
 
+// Every job runs at once in the tests, whatever queue the machine running them is
+// configured with (a DDEV override, a shell export): a test never leaves a job behind
+// for a worker. Set here, after the .env files: an <env> of phpunit.xml is overwritten.
+foreach (['MESSENGER_TRANSPORT_DSN', 'MESSENGER_HEAVY_TRANSPORT_DSN'] as $queueVariable) {
+    $_SERVER[$queueVariable] = $_ENV[$queueVariable] = '';
+    putenv($queueVariable.'=');
+}
+
 if ($_SERVER['APP_DEBUG']) {
     umask(0o000);
 }
