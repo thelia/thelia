@@ -24,8 +24,12 @@ use Thelia\Domain\Cart\Service\CartItemService;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
+use Thelia\Domain\Checkout\Exception\DeliveryDateRequiredException;
+use Thelia\Domain\Checkout\Exception\DeliveryDateUnavailableException;
+use Thelia\Domain\Checkout\Exception\DeliverySlotFullException;
 use Thelia\Domain\Checkout\Exception\GiftMessageTooLongException;
 use Thelia\Domain\Checkout\Exception\UnknownGiftWrappingException;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSelection;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -39,6 +43,9 @@ final readonly class CartFacade
         private PostageHandler $postageHandler,
         private CartRetriever $cartRetriever,
         private CartGiftWrappingService $cartGiftWrappingService,
+        // Defaulted so that a caller building the facade by hand with the arguments it
+        // took before delivery dates keeps working; the container always passes it.
+        private ?DeliveryDateSelection $deliveryDateSelection = null,
     ) {
     }
 
@@ -89,6 +96,32 @@ final readonly class CartFacade
     public function writeGiftMessage(Cart $cart, ?string $giftMessage): void
     {
         $this->cartGiftWrappingService->writeGiftMessage($cart, $giftMessage);
+    }
+
+    /**
+     * Record the delivery day, and the slot of that day, the buyer picked for the carrier of
+     * the cart, or clear the choice with a null day.
+     *
+     * Judged against what the carrier offers right now, never against what the page showed.
+     *
+     * @param string|null $date the day as Y-m-d
+     *
+     * @throws DeliveryDateRequiredException    when the carrier offers slots and none was given
+     * @throws DeliveryDateUnavailableException when the day or the slot is not offered
+     * @throws DeliverySlotFullException        when the slot has no place left that day
+     */
+    public function chooseDeliveryDate(Cart $cart, ?string $date, ?int $slotId = null): void
+    {
+        ($this->deliveryDateSelection ?? throw new \LogicException('CartFacade was built without its delivery date selection.'))->choose($cart, $date, $slotId);
+    }
+
+    /**
+     * Take the delivery day off the cart when it is no longer possible — the carrier no
+     * longer offers it, the slot filled up — and say whether it did, so the buyer can be told.
+     */
+    public function dropDeliveryDateIfNoLongerPossible(Cart $cart): bool
+    {
+        return $this->deliveryDateSelection?->dropIfNoLongerPossible($cart) ?? false;
     }
 
     /**
