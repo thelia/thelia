@@ -30,7 +30,7 @@ use Thelia\Config\DatabaseConfiguration;
  * not from its start: a long export that is still writing is never taken from under
  * the worker running it.
  */
-final class JobClaim
+final readonly class JobClaim
 {
     /** The default redeliver timeout of the Doctrine transport. */
     public const STALE_AFTER_SECONDS = 3600;
@@ -40,7 +40,7 @@ final class JobClaim
      *
      * @return bool true when this run owns the job now
      */
-    public static function claim(string $table, int $jobId): bool
+    public function claim(string $table, int $jobId): bool
     {
         $now = new \DateTimeImmutable();
 
