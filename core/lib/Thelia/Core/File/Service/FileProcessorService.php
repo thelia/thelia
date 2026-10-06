@@ -145,22 +145,11 @@ readonly class FileProcessorService
             }
         }
 
-        if (null === $message && null !== ($refusedExtension = $this->findRefusedExtension($fileBeingUploaded, $extBlackList))) {
+        if (null === $message && null !== ($refusedExtension = $this->findRefusedExtension($fileBeingUploaded, $objectType, $extBlackList))) {
             $message = $this->translator->trans(
                 'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
                 [
                     '%extension' => $refusedExtension,
-                ],
-            );
-        }
-
-        // A document is served from the shop origin: one a browser opens as a page or runs
-        // as a script is refused, whatever the caller's configuration.
-        if (null === $message && 'document' === $objectType && null !== ($activeExtension = FileConfiguration::findBrowserActiveExtension($realFileName))) {
-            $message = $this->translator->trans(
-                'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
-                [
-                    '%extension' => $activeExtension,
                 ],
             );
         }
@@ -176,7 +165,7 @@ readonly class FileProcessorService
      *
      * @param list<string> $extBlackList
      */
-    private function findRefusedExtension(UploadedFile $fileBeingUploaded, array $extBlackList): ?string
+    private function findRefusedExtension(UploadedFile $fileBeingUploaded, string $objectType, array $extBlackList): ?string
     {
         $blackListRegex = [] === $extBlackList ? null : '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
 
@@ -192,6 +181,14 @@ readonly class FileProcessorService
 
             if (null !== $executableExtension) {
                 return $executableExtension;
+            }
+
+            // A document is served from the shop origin: one a browser opens as a page or
+            // runs as a script is refused, whatever the caller's configuration.
+            $browserActiveExtension = 'document' === $objectType ? FileConfiguration::findBrowserActiveExtension($fileName) : null;
+
+            if (null !== $browserActiveExtension) {
+                return $browserActiveExtension;
             }
         }
 
