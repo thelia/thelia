@@ -16,8 +16,6 @@ namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Model\Import;
 use Thelia\Model\ImportJob;
@@ -40,7 +38,7 @@ final readonly class ImportJobLauncher
 
     public function __construct(
         private ImportHandler $importHandler,
-        private MessageBusInterface $bus,
+        private JobLifecycle $lifecycle,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDirectory,
     ) {
@@ -76,21 +74,15 @@ final readonly class ImportJobLauncher
         }
 
         try {
-            $this->bus->dispatch(new RunImportJob($job->getId()));
-        } catch (HandlerFailedException) {
-            // Run at once, without a queue: the handler has written why on the row.
+            $this->lifecycle->dispatch($job, new RunImportJob($job->getId()));
         } catch (\Throwable $exception) {
-            // The queue refused the job: the row would wait forever for a worker.
-            $job->setStatus(JobStatus::FAILED->value)
-                ->setError(mb_substr('The import could not be queued: '.$exception->getMessage(), 0, 2000))
-                ->setFinishedAt(new \DateTime())
-                ->save();
-            unlink($stored->getPathname());
+            // The queue refused the job: the row is failed, and the file goes with it.
+            if (is_file($stored->getPathname())) {
+                unlink($stored->getPathname());
+            }
 
             throw $exception;
         }
-
-        $job->reload();
 
         return $job;
     }

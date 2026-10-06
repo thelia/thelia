@@ -15,63 +15,28 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Thelia\Command\MessengerFailedPurgeCommand;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\DataTransfer\Service\DataTransferJobPurger;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
-use Thelia\Model\ExportJobQuery;
-use Thelia\Model\ImportJobQuery;
 
 readonly class PurgeExportCacheListener
 {
-    public const EXPORT_JOB_RETENTION_DAYS = 7;
-
-    public const FAILED_JOB_RETENTION_DAYS = MessengerFailedPurgeCommand::DEFAULT_RETENTION_DAYS;
-
-    public function __construct(private ExportCachePurger $exportCachePurger)
-    {
+    public function __construct(
+        private ExportCachePurger $exportCachePurger,
+        private DataTransferJobPurger $jobPurger,
+    ) {
     }
 
     #[AsEventListener(event: TheliaEvents::MAINTENANCE_PURGE)]
     public function onMaintenancePurge(MaintenancePurgeEvent $event): void
     {
-        $deletedCount = $this->exportCachePurger->purgeOldExportFiles(THELIA_CACHE_DIR.'export'.DS, $event->isDryRun());
+        $dryRun = $event->isDryRun();
+        $verb = $dryRun ? 'to delete' : 'deleted';
 
-        $event->addResult(\sprintf(
-            '<comment>Export cache files:</comment> <info>%d %s</info>',
-            $deletedCount,
-            $event->isDryRun() ? 'to delete' : 'deleted',
-        ));
-
-        // A job outlives its file by a few days, so the back office can still say
-        // what was exported. A failed one stays as long as the failed jobs do: it
-        // can be replayed from there, and replaying needs its row.
-        $deletedJobs = ExportJobQuery::purgeCreatedBefore(self::EXPORT_JOB_RETENTION_DAYS, $event->isDryRun(), self::FAILED_JOB_RETENTION_DAYS);
-
-        $event->addResult(\sprintf(
-            '<comment>Export jobs (>%d days):</comment> <info>%d %s</info>',
-            self::EXPORT_JOB_RETENTION_DAYS,
-            $deletedJobs,
-            $event->isDryRun() ? 'to delete' : 'deleted',
-        ));
-
-        $importJobs = ImportJobQuery::createdBefore(self::EXPORT_JOB_RETENTION_DAYS, self::FAILED_JOB_RETENTION_DAYS)->find();
-
-        if (!$event->isDryRun()) {
-            foreach ($importJobs as $importJob) {
-                // An import that never ran still holds the file it was given.
-                if (is_file($importJob->getStoredFilePath())) {
-                    unlink($importJob->getStoredFilePath());
-                }
-                $importJob->delete();
-            }
-        }
-
-        $event->addResult(\sprintf(
-            '<comment>Import jobs (>%d days):</comment> <info>%d %s</info>',
-            self::EXPORT_JOB_RETENTION_DAYS,
-            \count($importJobs),
-            $event->isDryRun() ? 'to delete' : 'deleted',
-        ));
+        $event->addResult(\sprintf('<comment>Export cache files:</comment> <info>%d %s</info>', $this->exportCachePurger->purgeOldExportFiles(THELIA_CACHE_DIR.'export'.DS, $dryRun), $verb));
+        $event->addResult(\sprintf('<comment>Export jobs (>%d days):</comment> <info>%d %s</info>', DataTransferJobPurger::JOB_RETENTION_DAYS, $this->jobPurger->purgeExportJobs($dryRun), $verb));
+        $event->addResult(\sprintf('<comment>Import jobs (>%d days):</comment> <info>%d %s</info>', DataTransferJobPurger::JOB_RETENTION_DAYS, $this->jobPurger->purgeImportJobs($dryRun), $verb));
+        $event->addResult(\sprintf('<comment>Import files left behind:</comment> <info>%d %s</info>', $this->jobPurger->sweepImportStorage($dryRun), $verb));
     }
 }

@@ -31,6 +31,9 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 final readonly class FailedMessagePurger
 {
+    /** How long a failed job is kept, and with it the row of a failed export or import. */
+    public const RETENTION_DAYS = 30;
+
     public function __construct(
         #[Autowire(service: 'messenger.transport.failed')]
         private TransportInterface $failureTransport,

@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
@@ -38,7 +36,7 @@ final readonly class ExportJobLauncher
         private ExportHandler $exportHandler,
         private SerializerManager $serializerManager,
         private ArchiverManager $archiverManager,
-        private MessageBusInterface $bus,
+        private JobLifecycle $lifecycle,
     ) {
     }
 
@@ -77,21 +75,7 @@ final readonly class ExportJobLauncher
             ->setRangeEnd(self::date($rangeDate['end'] ?? null));
         $job->save();
 
-        try {
-            $this->bus->dispatch(new RunExportJob($job->getId()));
-        } catch (HandlerFailedException) {
-            // Run at once, without a queue: the handler has written why on the row.
-        } catch (\Throwable $exception) {
-            // The queue refused the job: the row would wait forever for a worker.
-            $job->setStatus(JobStatus::FAILED->value)
-                ->setError(mb_substr('The export could not be queued: '.$exception->getMessage(), 0, 2000))
-                ->setFinishedAt(new \DateTime())
-                ->save();
-
-            throw $exception;
-        }
-
-        $job->reload();
+        $this->lifecycle->dispatch($job, new RunExportJob($job->getId()));
 
         return $job;
     }

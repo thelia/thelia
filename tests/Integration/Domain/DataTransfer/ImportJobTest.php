@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\JobClaim;
+use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJobHandler;
@@ -183,7 +186,64 @@ final class ImportJobTest extends IntegrationTestCase
         $job = ImportJobQuery::create()->orderById('desc')->findOne();
         self::assertNotNull($job);
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame('The job could not be queued. The details are in the server log.', $job->getError());
         self::assertFileDoesNotExist($job->getStoredFilePath());
+    }
+
+    /**
+     * A refused row quotes the cell it refused, as the file gave it: a file saved in
+     * Latin-1 is not valid UTF-8, and the import is still recorded as done.
+     */
+    public function testARefusedRowThatIsNotUtf8IsStillRecorded(): void
+    {
+        $job = $this->getService(ImportJobLauncher::class)->launch($this->stockImport(), $this->upload(3, extraRow: $this->combination->getId().",d\xE9fectueux\n"), 'stock.csv');
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
+        self::assertCount(1, $job->getRowErrorList());
+        self::assertStringContainsString('fectueux', $job->getRowErrorList()[0]);
+    }
+
+    /**
+     * A caller that runs the import inside a transaction of its own keeps it: a failed
+     * import does not leave it unable to commit.
+     */
+    public function testAFailedImportLeavesTheTransactionOfItsCallerUsable(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
+        unlink($job->getStoredFilePath());
+        $connection = $this->getPropelConnection();
+        $depth = $connection->getNestedTransactionCount();
+
+        try {
+            $this->handler()(new RunImportJob($job->getId()));
+        } catch (UnrecoverableMessageHandlingException) {
+        }
+
+        self::assertSame($depth, $connection->getNestedTransactionCount());
+        self::assertTrue($connection->isCommitable());
+    }
+
+    /**
+     * An archive is extracted next to the upload: the extracted copy goes once the
+     * import is over, rather than piling up in the import storage.
+     */
+    public function testTheExtractedCopyOfAnArchiveIsRemoved(): void
+    {
+        $directory = sys_get_temp_dir().'/import-archive-'.uniqid('', true);
+        mkdir($directory);
+        $archive = new \ZipArchive();
+        $archive->open($directory.'/stock.zip', \ZipArchive::CREATE);
+        $archive->addFromString('stock.csv', "id,stock\n".$this->combination->getId().",23\n");
+        $archive->close();
+
+        try {
+            $this->getService(ImportHandler::class)->import($this->stockImport(), new File($directory.'/stock.zip'));
+
+            self::assertSame(23.0, $this->reloadedQuantity());
+            self::assertSame(['stock.zip'], array_values(array_diff((array) scandir($directory), ['.', '..'])));
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
     }
 
     public function testAJobWhoseRowIsGoneFailsForGood(): void
@@ -247,7 +307,11 @@ final class ImportJobTest extends IntegrationTestCase
 
     private function launcherWith(MessageBusInterface $bus): ImportJobLauncher
     {
-        return new ImportJobLauncher($this->getService(ImportHandler::class), $bus, (string) static::getContainer()->getParameter('kernel.project_dir'));
+        return new ImportJobLauncher(
+            $this->getService(ImportHandler::class),
+            new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy'),
+            (string) static::getContainer()->getParameter('kernel.project_dir'),
+        );
     }
 
     private function handler(): RunImportJobHandler

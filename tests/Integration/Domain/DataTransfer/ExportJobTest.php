@@ -17,10 +17,13 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\JobClaim;
+use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
@@ -163,18 +166,86 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * Two workers handed the same job: the second finds it taken and leaves it alone.
+     * Two workers handed the same job: the second finds it taken and leaves it alone,
+     * but looks again later rather than dropping the message. Dropped, a job whose
+     * worker dies afterwards would stay running forever.
      */
-    public function testAJobRunningElsewhereIsNotRunASecondTime(): void
+    public function testAJobRunningElsewhereIsLookedAtAgainLater(): void
     {
+        $queue = $this->queue();
         $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
         $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-5 minutes'))->save($this->getPropelConnection());
 
-        $this->handler()(new RunExportJob($job->getId()));
+        $this->handlerWith($queue)(new RunExportJob($job->getId()));
         $job->reload();
 
         self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
         self::assertNull($job->getFilePath());
+        self::assertCount(1, $queue->kept);
+        self::assertEquals(new RunExportJob($job->getId(), 1), $queue->kept[0]);
+        self::assertEquals([new DelayStamp(JobLifecycle::POSTPONE_DELAY_SECONDS * 1000)], $queue->stamps[0]);
+    }
+
+    public function testAJobStillRunningAfterEveryCheckIsLeftAlone(): void
+    {
+        $queue = $this->queue();
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
+
+        $this->handlerWith($queue)(new RunExportJob($job->getId(), JobLifecycle::MAX_POSTPONEMENTS));
+
+        self::assertCount(0, $queue->kept);
+    }
+
+    /**
+     * Without a queue, looking again would run the job at once, in the same call, over
+     * and over: the run that holds the job finishes it.
+     */
+    public function testWithoutAQueueAJobRunningElsewhereIsNotLookedAtAgain(): void
+    {
+        $bus = $this->queue();
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
+
+        $handler = new RunExportJobHandler(
+            $this->getService(ExportHandler::class),
+            $this->getService(SerializerManager::class),
+            $this->getService(ArchiverManager::class),
+            new JobLifecycle(new JobClaim(), $bus, 'sync://'),
+        );
+        $handler(new RunExportJob($job->getId()));
+
+        self::assertCount(0, $bus->kept);
+    }
+
+    /**
+     * A finished job delivered again is simply acknowledged: nothing to look at later.
+     */
+    public function testAFinishedJobDeliveredAgainIsNotLookedAtAgain(): void
+    {
+        $queue = $this->queue();
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::DONE->value)->save($this->getPropelConnection());
+
+        $this->handlerWith($queue)(new RunExportJob($job->getId()));
+
+        self::assertCount(0, $queue->kept);
+    }
+
+    /**
+     * The silence after which a running job is taken again is the redeliver timeout of
+     * the transport, counted from its last sign of life.
+     */
+    public function testAJobIsTakenAgainOnlyOnceSilentForTheRedeliverTimeout(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $claim = new JobClaim();
+
+        $job->setStatus(JobStatus::RUNNING->value)->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS - 60)))->save($this->getPropelConnection());
+        self::assertFalse($claim->claim('export_job', $job->getId()));
+
+        $job->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS + 60)))->save($this->getPropelConnection());
+        self::assertTrue($claim->claim('export_job', $job->getId()));
     }
 
     /**
@@ -238,7 +309,8 @@ final class ExportJobTest extends IntegrationTestCase
         $job = ExportJobQuery::create()->orderById('desc')->findOne();
         self::assertNotNull($job);
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
-        self::assertStringContainsString('unreachable', (string) $job->getError());
+        // The queue's own words may name a server: they go to the log, not the screen.
+        self::assertSame('The job could not be queued. The details are in the server log.', $job->getError());
     }
 
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
@@ -271,7 +343,7 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(ExportHandler::class),
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
-            $bus,
+            self::lifecycle($bus),
         );
     }
 
@@ -280,8 +352,23 @@ final class ExportJobTest extends IntegrationTestCase
         return $this->getService(RunExportJobHandler::class);
     }
 
+    private function handlerWith(MessageBusInterface $bus): RunExportJobHandler
+    {
+        return new RunExportJobHandler(
+            $this->getService(ExportHandler::class),
+            $this->getService(SerializerManager::class),
+            $this->getService(ArchiverManager::class),
+            self::lifecycle($bus),
+        );
+    }
+
+    private static function lifecycle(MessageBusInterface $bus): JobLifecycle
+    {
+        return new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy');
+    }
+
     /**
-     * @return MessageBusInterface&object{kept: list<object>}
+     * @return MessageBusInterface&object{kept: list<object>, stamps: list<array<mixed>>}
      */
     private function queue(): MessageBusInterface
     {
@@ -289,9 +376,13 @@ final class ExportJobTest extends IntegrationTestCase
             /** @var list<object> */
             public array $kept = [];
 
+            /** @var list<array<mixed>> */
+            public array $stamps = [];
+
             public function dispatch(object $message, array $stamps = []): Envelope
             {
                 $this->kept[] = $message;
+                $this->stamps[] = $stamps;
 
                 return Envelope::wrap($message, $stamps);
             }
