@@ -17,6 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Messenger\Middleware\ReplayedJobMiddleware;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 
 return static function (ContainerConfigurator $container): void {
@@ -189,6 +190,14 @@ return static function (ContainerConfigurator $container): void {
                 'default_serializer' => AllowedClassesSerializer::class,
             ],
             'failure_transport' => 'failed',
+            'default_bus' => 'messenger.bus.default',
+            'buses' => [
+                'messenger.bus.default' => [
+                    // A job replayed by messenger:failed:retry starts afresh, as one
+                    // replayed from the back office does.
+                    'middleware' => [ReplayedJobMiddleware::class],
+                ],
+            ],
             'transports' => [
                 // The jobs of the shop. Empty, MESSENGER_TRANSPORT_DSN leaves this
                 // transport synchronous and every job runs in the request that

@@ -14,15 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
-use Thelia\Model\ExportJob;
-use Thelia\Model\ImportJob;
+use Thelia\Messenger\Transport\ConfiguredQueues;
 
 /**
  * The steps every export or import job goes through, written once for both.
@@ -33,20 +31,24 @@ use Thelia\Model\ImportJob;
  * until the job is over or has been silent long enough to be taken again
  * ({@see JobClaim}). A message delivered again while its worker is alive would
  * otherwise be acknowledged and the job left running forever.
+ *
+ * What a failure says goes through {@see JobFailureMessage}: the row, the failure
+ * transport and the log never carry the text of a database or PHP error.
  */
 final readonly class JobLifecycle
 {
     /** How long a job found running waits before it is looked at again. */
     public const POSTPONE_DELAY_SECONDS = 600;
 
-    /** Twelve hours of looking again, then the message gives up and says so. */
+    /** Twelve hours of looking again, then the message is set aside. */
     public const MAX_POSTPONEMENTS = 72;
+
+    public const NOT_QUEUED = 'The job could not be queued. The details are in the server log.';
 
     public function __construct(
         private JobClaim $jobClaim,
         private MessageBusInterface $bus,
-        #[Autowire('%env(thelia_heavy_queue:MESSENGER_TRANSPORT_DSN)%')]
-        private string $heavyTransportDsn = 'sync://',
+        private ConfiguredQueues $queues,
     ) {
     }
 
@@ -56,42 +58,52 @@ final readonly class JobLifecycle
      * A queue that refuses the message leaves a row nobody will ever take: the row is
      * failed, and the caller learns why.
      */
-    public function dispatch(ExportJob|ImportJob $job, DataTransferJobMessage $message): void
+    public function dispatch(DataTransferJob $job, DataTransferJobMessage $message): void
     {
         try {
             $this->bus->dispatch($message);
-        } catch (HandlerFailedException) {
-            // Run at once, without a queue: the handler has written why on the row.
-        } catch (\Throwable $exception) {
-            Tlog::getInstance()->addError(\sprintf('%s %d could not be queued: %s', $job::class, $job->getId(), $exception->getMessage()));
+        } catch (HandlerFailedException $exception) {
+            // Run at once, without a queue. The handler wrote why on the row, unless it
+            // failed before taking the job: then the row would wait for nobody.
+            $job->refresh();
 
-            $job->setStatus(JobStatus::FAILED->value)
-                ->setError('The job could not be queued. The details are in the server log.')
-                ->setFinishedAt(new \DateTime())
-                ->save();
+            if (JobStatus::QUEUED === $job->getJobStatus()) {
+                Tlog::getInstance()->addError(\sprintf('%s %d failed before it started: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
+                $job->markFailed(JobFailureMessage::forAdministrator($exception));
+            }
+
+            return;
+        } catch (\Throwable $exception) {
+            Tlog::getInstance()->addError(\sprintf('%s %d could not be queued: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
+            $job->markFailed(self::NOT_QUEUED);
 
             throw $exception;
         }
 
-        $job->reload();
+        $job->refresh();
     }
 
     /**
+     * Takes the job for this run, or, when another run holds it, sends the message
+     * again to look at it later (set aside after twelve hours).
+     *
      * @param 'export_job'|'import_job' $table
      *
      * @return bool true when this run owns the job; false when it is done, or running
-     *              elsewhere (then looked at again later)
+     *              elsewhere and looked at again later
      */
-    public function claim(ExportJob|ImportJob $job, string $table, DataTransferJobMessage $message): bool
+    public function claimOrPostpone(DataTransferJob $job, string $table, DataTransferJobMessage $message): bool
     {
+        // Only the message first sent, or replayed by an administrator, may restart a
+        // failed job: one looking again leaves it to the administrator.
         $claimed = $this->jobClaim->claim($table, (int) $job->getId(), 0 === $message->postponements());
-        $job->reload();
+        $job->refresh();
 
         if ($claimed || JobStatus::RUNNING !== $job->getJobStatus()) {
             return $claimed;
         }
 
-        if (str_starts_with($this->heavyTransportDsn, 'sync://')) {
+        if ($this->queues->heavyJobsRunInline()) {
             // Without a queue, looking again would run at once, in this very call,
             // over and over: the run that holds the job finishes it.
             return false;
@@ -112,15 +124,14 @@ final readonly class JobLifecycle
      * Records why the job failed and sends it to the failure transport, without
      * retries: running it again unchanged fails the same way.
      */
-    public function fail(ExportJob|ImportJob $job, \Throwable $exception): never
+    public function fail(DataTransferJob $job, \Throwable $exception): never
     {
-        Tlog::getInstance()->addError(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $exception->getMessage()));
+        Tlog::getInstance()->addError(\sprintf('%s %d failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
 
-        $job->setStatus(JobStatus::FAILED->value)
-            ->setError(JobFailureMessage::forAdministrator($exception))
-            ->setFinishedAt(new \DateTime())
-            ->save();
+        $reason = JobFailureMessage::forAdministrator($exception);
+        $job->markFailed($reason);
 
-        throw new UnrecoverableMessageHandlingException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $exception->getMessage()), 0, $exception);
+        // The failure transport keeps this text and the back office lists it.
+        throw new UnrecoverableMessageHandlingException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason), 0, $exception);
     }
 }

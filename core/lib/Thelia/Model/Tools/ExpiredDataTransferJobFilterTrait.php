@@ -33,8 +33,8 @@ trait ExpiredDataTransferJobFilterTrait
         return $this
             ->filterByCreatedAt(new \DateTime(\sprintf('-%d days', $days)), Criteria::LESS_THAN)
             // Two named conditions, so the OR is parenthesized.
-            ->condition('notFailed', $model.'.Status <> ?', JobStatus::FAILED->value)
-            ->condition('failureExpired', $model.'.CreatedAt < ?', (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s'))
-            ->where(['notFailed', 'failureExpired'], Criteria::LOGICAL_OR);
+            ->condition('done', $model.'.Status = ?', JobStatus::DONE->value)
+            ->condition('replayExpired', $model.'.CreatedAt < ?', (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s'))
+            ->where(['done', 'replayExpired'], Criteria::LOGICAL_OR);
     }
 }

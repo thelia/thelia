@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Thelia\Messenger\Message\DescribedJob;
+use Thelia\Messenger\Message\ReplayableJob;
 
 /**
  * Runs the import described by one import_job row.
@@ -22,8 +23,10 @@ use Thelia\Messenger\Message\DescribedJob;
  * Only the id travels: what to import and how is read from the row when the job
  * runs, so a job replayed from the failure transport runs on the row as it is then.
  */
-final readonly class RunImportJob implements DataTransferJobMessage, DescribedJob
+final readonly class RunImportJob implements DataTransferJobMessage, DescribedJob, ReplayableJob
 {
+    use DataTransferJobMessageTrait;
+
     public function __construct(
         public int $importJobId,
         public int $postponements = 0,
@@ -33,16 +36,6 @@ final readonly class RunImportJob implements DataTransferJobMessage, DescribedJo
     public function jobId(): int
     {
         return $this->importJobId;
-    }
-
-    public function postponements(): int
-    {
-        return $this->postponements;
-    }
-
-    public function postponed(): static
-    {
-        return new self($this->importJobId, $this->postponements + 1);
     }
 
     public function describe(): string
