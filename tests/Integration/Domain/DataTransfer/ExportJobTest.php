@@ -186,15 +186,43 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertEquals([new DelayStamp(JobLifecycle::POSTPONE_DELAY_SECONDS * 1000)], $queue->stamps[0]);
     }
 
-    public function testAJobStillRunningAfterEveryCheckIsLeftAlone(): void
+    public function testAJobStillRunningAfterEveryCheckIsSetAside(): void
     {
         $queue = $this->queue();
         $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
         $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
 
-        $this->handlerWith($queue)(new RunExportJob($job->getId(), JobLifecycle::MAX_POSTPONEMENTS));
+        try {
+            $this->handlerWith($queue)(new RunExportJob($job->getId(), JobLifecycle::MAX_POSTPONEMENTS));
+            self::fail('After every check, the message is set aside where the administrator sees it.');
+        } catch (UnrecoverableMessageHandlingException) {
+        }
 
         self::assertCount(0, $queue->kept);
+        $job->reload();
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+    }
+
+    /**
+     * A message looking again at a job that failed meanwhile leaves it to the
+     * administrator: it never restarts a failed job on its own.
+     */
+    public function testALookAgainNeverRestartsAJobThatFailedMeanwhile(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::FAILED->value)->setError('The export failed.')->save($this->getPropelConnection());
+
+        $this->handlerWith($this->queue())(new RunExportJob($job->getId(), 1));
+        $job->reload();
+
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertNull($job->getFilePath());
+
+        // Replayed by the administrator, the original message takes it.
+        $this->handlerWith($this->queue())(new RunExportJob($job->getId()));
+        $job->reload();
+        $this->files[] = (string) $job->getFilePath();
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
     }
 
     /**
