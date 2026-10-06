@@ -15,9 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Core\Serializer\Serializer;
 
 use Thelia\Core\Serializer\AbstractSerializer;
+use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
 
 /**
  * Class CSVSerializer.
+ *
+ * A CSV file is opened in a spreadsheet, so a text cell the spreadsheet would run as a
+ * formula is written as text, whatever export produced it.
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
@@ -98,7 +102,10 @@ class CSVSerializer extends AbstractSerializer
             if (\is_array($value)) {
                 $value = \gettype($value);
             }
+
+            $value = SpreadsheetFormulaGuard::neutralize($value);
         }
+        unset($value);
 
         $fd = fopen('php://memory', 'w+');
         fputcsv($fd, $data, $this->delimiter, $this->enclosure, $this->escape);
