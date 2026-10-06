@@ -73,6 +73,7 @@ class AdminResources
     public const COUPON = 'admin.coupon';
     public const CURRENCY = 'admin.configuration.currency';
     public const CUSTOMER = 'admin.customer';
+    public const DELIVERY_DATE = 'admin.configuration.delivery-date';
     public const FEATURE = 'admin.configuration.feature';
     public const FOLDER = 'admin.folder';
     public const GIFT_WRAPPING = 'admin.configuration.gift-wrapping';

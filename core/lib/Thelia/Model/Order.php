@@ -565,6 +565,37 @@ class Order extends BaseOrder
     }
 
     /**
+     * The day the buyer asked to be delivered, as Y-m-d: a calendar day of the shop, which
+     * a reader must not shift into another time zone. Null when the carrier offered none.
+     */
+    public function getDeliveryDay(): ?string
+    {
+        $day = $this->getDeliveryDate('Y-m-d');
+
+        return \is_string($day) ? $day : null;
+    }
+
+    /**
+     * The local hour the slot the buyer picked starts at, as H:i, null without a slot.
+     */
+    public function getDeliverySlotStartsAt(): ?string
+    {
+        $hour = $this->getDeliverySlotStart('H:i');
+
+        return \is_string($hour) ? $hour : null;
+    }
+
+    /**
+     * The local hour the slot the buyer picked ends at, as H:i, null without a slot.
+     */
+    public function getDeliverySlotEndsAt(): ?string
+    {
+        $hour = $this->getDeliverySlotEnd('H:i');
+
+        return \is_string($hour) ? $hour : null;
+    }
+
+    /**
      * Check if the current status of this order is CANCELED.
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one

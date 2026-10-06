@@ -170,6 +170,8 @@ final readonly class CustomerPersonalDataExporter
             'postage_tax' => $order->getPostageTax(),
             'transaction_reference' => $order->getTransactionRef(),
             'delivery_reference' => $order->getDeliveryRef(),
+            'delivery_date' => $order->getDeliveryDay(),
+            'delivery_slot' => null === $order->getDeliverySlotStartsAt() ? null : $order->getDeliverySlotStartsAt().'-'.$order->getDeliverySlotEndsAt(),
             'created_at' => $this->formatDate($order->getCreatedAt()),
             'invoice_address' => $this->exportOrderAddress($order->getOrderAddressRelatedByInvoiceOrderAddressId()),
             'delivery_address' => $this->exportOrderAddress($order->getOrderAddressRelatedByDeliveryOrderAddressId()),

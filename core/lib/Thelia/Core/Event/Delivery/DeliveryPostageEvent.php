@@ -45,6 +45,10 @@ class DeliveryPostageEvent extends ActionEvent
         protected ?Country $country = null,
         protected ?State $state = null,
     ) {
+        // The day the buyer picked, for a module that prices or plans by the day. Absent
+        // until the buyer has picked one, which is after the carriers were first quoted.
+        $day = $cart->getDeliveryDate('Y-m-d');
+        $this->deliveryDate = null === $day ? null : (\DateTime::createFromFormat('!Y-m-d', $day) ?: null);
     }
 
     public function getCart(): Cart

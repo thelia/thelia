@@ -36,6 +36,22 @@ enum CheckoutViolationCode: string
 
     case DeliveryInvalid = 'delivery-invalid';
 
+    /**
+     * The carrier offers delivery dates and none, or no slot, was picked.
+     */
+    case DeliveryDateMissing = 'delivery-date-missing';
+
+    /**
+     * The day or the slot picked is not one the carrier offers, or no longer is.
+     */
+    case DeliveryDateUnavailable = 'delivery-date-unavailable';
+
+    /**
+     * The slot picked has no place left that day. Told apart from the day being impossible
+     * because the answer differs: another slot of the same day may still be open.
+     */
+    case DeliverySlotFull = 'delivery-slot-full';
+
     case InvoiceAddressIncomplete = 'invoice-address-incomplete';
 
     case PaymentInvalid = 'payment-invalid';

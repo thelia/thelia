@@ -25,6 +25,7 @@ use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\DTO\PaymentAction;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
+use Thelia\Domain\Checkout\Exception\DeliverySlotFullException;
 use Thelia\Domain\Checkout\Exception\UnknownConsentException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Model\CheckoutStep;
@@ -160,6 +161,11 @@ final readonly class CheckoutPlacementService
                 $outcome = $this->paymentService->payAndReturnOutcome(
                     OrderPaymentRequest::ofTheChoicesOnTheCart($request),
                 );
+            } catch (DeliverySlotFullException $full) {
+                // The guard above read a place left; another order took it before this one
+                // reached the conditional update, and the order was rolled back. Answered
+                // like every other refusal, so the caller can offer another slot.
+                throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $full)], previous: $full);
             } catch (CartAlreadyOrderedException $race) {
                 // Another node wrote the order between the re-read above and the insert:
                 // the lock this request holds is local to the server it runs on, and the
