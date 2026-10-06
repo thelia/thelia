@@ -17,6 +17,7 @@ namespace Thelia\Scheduler;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 
 /**
@@ -24,15 +25,21 @@ use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
  *
  * A task of the schedule that fails is not set aside with the failed jobs: Messenger
  * only sends there what came from a queue, and a schedule is no queue. Its last
- * failure is kept here, beside the state of the schedule, until a run goes through.
+ * failure is kept here, beside the state of the schedule, until a run goes through,
+ * or for a month at most: a task taken off the schedule does not stay failed forever.
+ * Two workers may finish tasks at the same moment, so the list is changed under a
+ * lock.
  */
 final readonly class RecurringTaskFailures
 {
     private const CACHE_KEY = 'thelia_schedule_failures';
 
+    private const KEPT_FOR_SECONDS = 30 * 86400;
+
     public function __construct(
         #[Autowire(service: 'cache.app')]
         private CacheItemPoolInterface $cache,
+        private ?LockFactory $lockFactory = null,
     ) {
     }
 
@@ -50,22 +57,39 @@ final readonly class RecurringTaskFailures
 
     public function record(string $task, string $error, \DateTimeImmutable $failedAt = new \DateTimeImmutable()): void
     {
-        $failures = $this->read();
-        $failures[$task] = ['failedAt' => $failedAt->format(\DATE_ATOM), 'error' => $error];
+        $this->change(static function (array $failures) use ($task, $error, $failedAt): array {
+            $failures[$task] = ['failedAt' => $failedAt->format(\DATE_ATOM), 'error' => $error];
 
-        $this->write($failures);
+            return $failures;
+        });
     }
 
     public function forget(string $task): void
     {
-        $failures = $this->read();
-
-        if (!isset($failures[$task])) {
+        if (!isset($this->read()[$task])) {
             return;
         }
 
-        unset($failures[$task]);
-        $this->write($failures);
+        $this->change(static function (array $failures) use ($task): array {
+            unset($failures[$task]);
+
+            return $failures;
+        });
+    }
+
+    /**
+     * @param \Closure(array<string, array{failedAt: string, error: string}>): array<string, array{failedAt: string, error: string}> $change
+     */
+    private function change(\Closure $change): void
+    {
+        $lock = $this->lockFactory?->createLock(self::CACHE_KEY, 10);
+        $lock?->acquire(true);
+
+        try {
+            $this->write($change($this->read()));
+        } finally {
+            $lock?->release();
+        }
     }
 
     /**
@@ -99,6 +123,6 @@ final readonly class RecurringTaskFailures
      */
     private function write(array $failures): void
     {
-        $this->cache->save($this->cache->getItem(self::CACHE_KEY)->set($failures));
+        $this->cache->save($this->cache->getItem(self::CACHE_KEY)->set($failures)->expiresAfter(self::KEPT_FOR_SECONDS));
     }
 }

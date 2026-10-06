@@ -17,6 +17,9 @@ namespace Thelia\Tests\Unit\Scheduler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Console\Exception\RunCommandFailedException;
+use Symfony\Component\Console\Messenger\RunCommandContext;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -44,7 +47,7 @@ final class RecurringTaskFailureListenerTest extends TestCase
 
     public function testAFailedTaskIsKeptWithWhy(): void
     {
-        $this->listener->onFailed($this->failed('maintenance:purge', new \RuntimeException('Command "maintenance:purge" exited with code "1".')));
+        $this->listener->onFailed($this->failed('maintenance:purge', new RunCommandFailedException('Command "maintenance:purge" exited with code "1".', new RunCommandContext(new RunCommandMessage('maintenance:purge'), 1, ''))));
 
         $failures = $this->failures->all();
         self::assertCount(1, $failures);
@@ -67,6 +70,20 @@ final class RecurringTaskFailureListenerTest extends TestCase
         $this->listener->onHandled(new WorkerMessageHandledEvent(new Envelope(new RunCommandMessage('maintenance:purge')), RecurringTaskFailureListener::RECEIVER));
 
         self::assertSame(['sale:check-activation'], array_map(static fn ($failure): string => $failure->task, $this->failures->all()));
+    }
+
+    /**
+     * A task taken off the schedule does not stay failed forever.
+     */
+    public function testAFailureIsForgottenAfterAMonth(): void
+    {
+        $clock = new MockClock();
+        $failures = new RecurringTaskFailures(new ArrayAdapter(clock: $clock));
+        $failures->record('currency:update-rates', 'Failed.');
+
+        $clock->sleep(31 * 86400);
+
+        self::assertSame([], $failures->all());
     }
 
     public function testAJobOfAQueueIsLeftToTheFailedJobs(): void
