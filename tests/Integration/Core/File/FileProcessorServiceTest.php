@@ -190,6 +190,16 @@ final class FileProcessorServiceTest extends IntegrationTestCase
         $this->validate('evil.html', '<html><script>alert(1)</script></html>', 'document');
     }
 
+    public function testConfigurationCannotReEnableADocumentABrowserRunsUnderItsStoredName(): void
+    {
+        ConfigQuery::write(FileConfiguration::DOCUMENT_EXTENSION_BLACKLIST_VARIABLE, 'exe');
+
+        $this->expectException(ProcessFileException::class);
+
+        // Stored as "evil-<id>.html".
+        $this->validate('evil.html ', '<html><script>alert(1)</script></html>', 'document');
+    }
+
     public function testAnExplicitDocumentPolicyCannotReEnableADocumentABrowserRuns(): void
     {
         $this->expectException(ProcessFileException::class);
