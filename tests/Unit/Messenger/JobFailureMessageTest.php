@@ -46,4 +46,14 @@ final class JobFailureMessageTest extends TestCase
     {
         self::assertSame(JobFailureMessage::SERVER_ERROR, JobFailureMessage::forAdministrator(new \TypeError('Argument #1 ($path) must be of type string, null given in /var/www/html/core/lib/Thelia/X.php')));
     }
+
+    public function testAPhpWarningIsNotShown(): void
+    {
+        self::assertSame(JobFailureMessage::SERVER_ERROR, JobFailureMessage::forAdministrator(new \ErrorException('unlink(/var/www/html/var/data-transfer/import/x.csv): No such file or directory', 0, \E_WARNING)));
+    }
+
+    public function testAReasonTheCoreGivesAsAnErrorExceptionIsShown(): void
+    {
+        self::assertSame('The export "x" cannot be run.', JobFailureMessage::forAdministrator(new \ErrorException('The export "x" cannot be run.')));
+    }
 }

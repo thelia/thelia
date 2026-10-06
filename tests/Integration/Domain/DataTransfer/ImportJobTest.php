@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
+use Thelia\Domain\DataTransfer\Job\JobHeartbeat;
 use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
@@ -145,6 +146,28 @@ final class ImportJobTest extends IntegrationTestCase
         self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
         self::assertSame(5.0, (float) $this->reloadedQuantity());
         self::assertFileExists($job->getStoredFilePath());
+    }
+
+    /**
+     * As for an export: a message finding the import running looks at it again later,
+     * and never restarts an import that failed meanwhile.
+     */
+    public function testAnImportRunningElsewhereIsLookedAtAgainButNeverRestartedOnceFailed(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
+        $this->files[] = $job->getStoredFilePath();
+        $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
+
+        $queue = $this->recordingQueue();
+        $this->handlerWith($queue)(new RunImportJob($job->getId()));
+        self::assertEquals([new RunImportJob($job->getId(), 1)], $queue->kept);
+
+        $job->setStatus(JobStatus::FAILED->value)->save($this->getPropelConnection());
+        $this->handlerWith($this->queue())(new RunImportJob($job->getId(), 1));
+        $job->reload();
+
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(5.0, $this->reloadedQuantity());
     }
 
     /**
@@ -317,6 +340,33 @@ final class ImportJobTest extends IntegrationTestCase
     private function handler(): RunImportJobHandler
     {
         return $this->getService(RunImportJobHandler::class);
+    }
+
+    private function handlerWith(MessageBusInterface $bus): RunImportJobHandler
+    {
+        return new RunImportJobHandler(
+            $this->getService(ImportHandler::class),
+            $this->getService(JobHeartbeat::class),
+            new JobLifecycle(new JobClaim(), $bus, 'doctrine://default?queue_name=heavy'),
+        );
+    }
+
+    /**
+     * @return MessageBusInterface&object{kept: list<object>}
+     */
+    private function recordingQueue(): MessageBusInterface
+    {
+        return new class implements MessageBusInterface {
+            /** @var list<object> */
+            public array $kept = [];
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                $this->kept[] = $message;
+
+                return Envelope::wrap($message, $stamps);
+            }
+        };
     }
 
     private function queue(): MessageBusInterface
