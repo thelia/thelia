@@ -59,7 +59,10 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
 
     private Module $carrier;
 
-    private string $shopClosedWeekdaysBefore;
+    /**
+     * Null when setUp() skipped the test before reading it: tearDown() then has nothing to restore.
+     */
+    private ?string $shopClosedWeekdaysBefore = null;
 
     protected function setUp(): void
     {
@@ -84,7 +87,9 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         }
         $this->registeredListeners = [];
 
-        ConfigQuery::write('delivery_closed_weekdays', $this->shopClosedWeekdaysBefore);
+        if (null !== $this->shopClosedWeekdaysBefore) {
+            ConfigQuery::write('delivery_closed_weekdays', $this->shopClosedWeekdaysBefore);
+        }
 
         parent::tearDown();
     }
