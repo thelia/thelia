@@ -127,6 +127,9 @@ class ProductVideo extends BaseCachedFile implements EventSubscriberInterface
         $leftHostedFile = $oldModel instanceof ProductVideoModel && $oldModel->isHostedFile();
 
         if ($uploadedFile instanceof UploadedFile) {
+            // Refused before the file it replaces is removed.
+            $this->fileManager->assertStorable($uploadedFile);
+
             if ($leftHostedFile) {
                 $this->removeStoredFile($oldModel);
             }

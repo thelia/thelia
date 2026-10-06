@@ -18,6 +18,8 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\Exception\FileException;
+use Thelia\Model\Product;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -66,6 +68,69 @@ final class DocumentActionTest extends ActionIntegrationTestCase
         $finalPath = $savedModel->getUploadDir().DS.$savedModel->getFile();
         self::assertFileExists($finalPath);
         $this->trackFileForCleanup($finalPath);
+    }
+
+    /**
+     * The upload policy runs before the save event; storage refuses on its own a name a
+     * web server may execute, for a caller that dispatches the event without asking it.
+     */
+    public function testSaveDocumentRefusesAServerExecutableStoredName(): void
+    {
+        $product = $this->createProduct();
+        $model = new ProductDocument();
+        $model->setProductId($product->getId());
+        $model->setVisible(1);
+        $model->setPosition(1);
+
+        $event = new FileCreateOrUpdateEvent($product->getId());
+        $event
+            ->setModel($model)
+            ->setUploadedFile($this->createUploadedFile($this->createTestTextFile('<?php echo 1;'), 'report.php ', 'text/plain'))
+            ->setParentName('Test Product');
+
+        try {
+            $this->dispatch($event, TheliaEvents::DOCUMENT_SAVE);
+            self::fail('A document stored as ".php" has to be refused.');
+        } catch (FileException) {
+        }
+
+        self::assertFileDoesNotExist($model->getUploadDir().DS.'report-'.$model->getId().'.php');
+    }
+
+    public function testUpdateDocumentRefusesAServerExecutableStoredNameAndKeepsTheFormerFile(): void
+    {
+        $product = $this->createProduct();
+        $model = new ProductDocument();
+        $model->setProductId($product->getId());
+        $model->setVisible(1);
+        $model->setPosition(1);
+
+        $saveEvent = new FileCreateOrUpdateEvent($product->getId());
+        $saveEvent
+            ->setModel($model)
+            ->setUploadedFile($this->createUploadedFile($this->createTestTextFile('PDF placeholder content'), 'manual.pdf', 'application/pdf'))
+            ->setParentName('Test Product');
+        $this->dispatch($saveEvent, TheliaEvents::DOCUMENT_SAVE);
+
+        $saved = $saveEvent->getModel();
+        $formerFile = (string) $saved->getFile();
+        $formerPath = $saved->getUploadDir().DS.$formerFile;
+        $this->trackFileForCleanup($formerPath);
+
+        $updateEvent = new FileCreateOrUpdateEvent($product->getId());
+        $updateEvent->setModel($saved);
+        $updateEvent->setOldModel(clone $saved);
+        $updateEvent->setUploadedFile($this->createUploadedFile($this->createTestTextFile('<?php echo 1;'), 'report.php ', 'text/plain'));
+
+        try {
+            $this->dispatch($updateEvent, TheliaEvents::DOCUMENT_UPDATE);
+            self::fail('A document stored as ".php" has to be refused.');
+        } catch (FileException) {
+        }
+
+        self::assertFileExists($formerPath);
+        self::assertSame($formerFile, ProductDocumentQuery::create()->findPk($saved->getId())?->getFile());
+        self::assertFileDoesNotExist($saved->getUploadDir().DS.'report-'.$saved->getId().'.php');
     }
 
     public function testDeleteDocumentRemovesModelAndFile(): void
@@ -138,5 +203,16 @@ final class DocumentActionTest extends ActionIntegrationTestCase
 
         $reloaded = ProductDocumentQuery::create()->findPk($savedModel->getId());
         self::assertSame(0, (int) $reloaded->getVisible());
+    }
+
+    private function createProduct(): Product
+    {
+        $factory = $this->createFixtureFactory();
+
+        return $factory->product(
+            $factory->category(),
+            $factory->taxRule(),
+            $factory->currency(),
+        );
     }
 }
