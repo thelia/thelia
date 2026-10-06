@@ -163,6 +163,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // An export reads, an import rewrites, the whole catalog in one job, and a
+            // queue runs them one after the other: a form sent over and over would
+            // hold the heavy queue for hours. Per administrator, ten in ten minutes is
+            // more than anyone runs by hand.
+            'admin_data_transfer_launch' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
             // Resolving references answers with titles, prices and stock levels for up
             // to five hundred lines at a time: without a cap, a signed-in account walks
             // the catalog and measures its stock. Thirty a minute leaves a buyer room to
