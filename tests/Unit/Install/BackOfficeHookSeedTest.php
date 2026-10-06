@@ -27,7 +27,7 @@ final class BackOfficeHookSeedTest extends TestCase
 {
     private const int BACK_OFFICE = 2;
 
-    private const string UPDATE_SCRIPT = '3.3.0.sql';
+    private const string UPDATE_SCRIPT = '3.2.1.sql';
 
     /**
      * The back-office hooks the seed declared up to 3.2.0 end at 1426; the range goes on to 1999 (2000 and up hold
