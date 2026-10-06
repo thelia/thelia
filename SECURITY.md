@@ -86,5 +86,5 @@ fixes GHSA-59cp-795h-6wgx, GHSA-m887-7g6m-w83g, GHSA-r63g-6wfg-v5v9 and, through
 TwigEngine 1.0.9, GHSA-8ffm-2g9j-m8pp. The 3.1.1 release fixes GHSA-gvcv-hvpp-89gx and,
 through the back-office theme 1.1.1, GHSA-j2c3-9c4q-c2ch. The 3.2.0 release fixes
 GHSA-cfvv-2jvw-x2hp together with the back-office theme 1.2.0. The 3.2.1 and 3.1.2
-releases fix GHSA-5524-qfxp-33v9, GHSA-7wrm-pcw6-4g9m and GHSA-gcgv-f8rf-w2wc; on the 3.2
-line, the back-office theme 1.2.2 also fixes GHSA-gcgv-f8rf-w2wc in the newsletter export.
+releases fix GHSA-5524-qfxp-33v9, GHSA-7wrm-pcw6-4g9m and GHSA-gcgv-f8rf-w2wc; the
+back-office themes 1.2.2 and 1.1.2 also fix GHSA-gcgv-f8rf-w2wc in the newsletter export.
