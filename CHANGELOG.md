@@ -1,3 +1,13 @@
+# 3.2.1 (unreleased)
+
+## Security
+
+- GHSA-5524-qfxp-33v9 — the upload policy checked the file name the client sent, while storage keeps only its letters, digits, dashes, underscores and dots. A document named `report.php ` (trailing space), `report.ph p` or `report.ph#p` passed both the extension blacklist and the server-executable floor, was stored as `report-1.php` and published under `public/cache/documents/`, where a web server that runs PHP in the document root executed it. The policy now checks the name the file is stored under as well as the name it was sent with, and storage itself refuses a server-executable name, so a caller that skips the policy cannot store one either. The SVG sanitizer also recognises an SVG by its stored name, and `MediaFacade::uploadImage()` and `MediaFacade::uploadDocument()` apply the upload policy, as the video upload already did. After the update, look for files with a server-executable extension (`.php`, `.phtml`, `.phar`…) under `local/media/` and `public/cache/` and remove them.
+
+## Fixed
+
+- A `Thelia\Core\File\Exception\FileException` built from a message alone threw a `TypeError` instead of itself.
+
 # 3.2.0
 
 Second minor of the 3.x line. 221 commits since 3.1.0. The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history, next to the VAT verification columns of the address, cart address and order address tables.
