@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -39,6 +40,7 @@ final readonly class RunImportJobHandler
 {
     public function __construct(
         private ImportHandler $importHandler,
+        private JobHeartbeat $heartbeat,
     ) {
     }
 
@@ -58,6 +60,11 @@ final readonly class RunImportJobHandler
         $job->reload();
         $job->setImportedRows(0)->setRowErrors(null)->save();
 
+        // The whole import is one transaction: stopped half way (an error, a worker
+        // killed, a deployment), it leaves the catalog as it was, never half imported.
+        $connection = Propel::getWriteConnection(ImportJobTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
         try {
             $import = $job->getImport() ?? throw new \RuntimeException('The import of this job no longer exists.');
 
@@ -65,16 +72,25 @@ final readonly class RunImportJobHandler
                 throw new \RuntimeException('The uploaded file of this import is no longer on the server.');
             }
 
+            $jobId = (int) $job->getId();
+            $heartbeat = $this->heartbeat;
             $event = $this->importHandler->import(
                 $import,
                 new File($job->getStoredFilePath()),
                 $job->getLang(),
-                // A sign of life, so a long import is never taken from the worker running it.
-                static function () use ($job): void {
-                    $job->setUpdatedAt(new \DateTime())->save();
+                // A sign of life, outside the transaction, so a long import is never
+                // taken from the worker running it.
+                static function () use ($heartbeat, $jobId): void {
+                    $heartbeat->beat(ImportJobTableMap::TABLE_NAME, $jobId);
                 },
             );
+
+            $connection->commit();
         } catch (\Throwable $exception) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
+
             Tlog::getInstance()->addError(\sprintf('Import job %d failed: %s', $job->getId(), $exception->getMessage()));
 
             $job->setStatus(JobStatus::FAILED->value)
