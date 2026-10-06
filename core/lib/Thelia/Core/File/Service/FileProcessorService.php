@@ -89,6 +89,10 @@ readonly class FileProcessorService
      * policy for $objectType (see FileConfiguration). Whatever the policy says, a file
      * name carrying a server-executable segment is always refused.
      *
+     * Storage does not keep the name the client sent: FileManager::renameFile() drops
+     * every character outside [a-zA-Z0-9-_.], so "report.php " is stored as
+     * "report-1.php". The extension checks hold for both names.
+     *
      * @param array<string, list<string>>|null $validMimeTypes
      * @param list<string>|null                $extBlackList
      *
@@ -141,27 +145,11 @@ readonly class FileProcessorService
             }
         }
 
-        if (null === $message && [] !== $extBlackList) {
-            $regex = '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
-
-            if (preg_match($regex, $realFileName)) {
-                $message = $this->translator->trans(
-                    'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
-                    [
-                        '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
-                    ],
-                );
-            }
-        }
-
-        // Defense in depth against double-extension bypasses (e.g. "shell.php.jpg"):
-        // reject any file whose name contains a server-executable segment, not just the
-        // terminal one. Applies to every upload, regardless of the caller's configuration.
-        if (null === $message && null !== ($dangerousExtension = FileConfiguration::findExecutableExtension($realFileName))) {
+        if (null === $message && null !== ($refusedExtension = $this->findRefusedExtension($fileBeingUploaded, $extBlackList))) {
             $message = $this->translator->trans(
                 'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
                 [
-                    '%extension' => $dangerousExtension,
+                    '%extension' => $refusedExtension,
                 ],
             );
         }
@@ -169,6 +157,48 @@ readonly class FileProcessorService
         if (null !== $message) {
             throw new ProcessFileException($message, 415);
         }
+    }
+
+    /**
+     * The first extension the policy refuses, in the name the client sent or in the one
+     * the file is stored under, or null when both names are allowed.
+     *
+     * @param list<string> $extBlackList
+     */
+    private function findRefusedExtension(UploadedFile $fileBeingUploaded, array $extBlackList): ?string
+    {
+        $blackListRegex = [] === $extBlackList ? null : '#^(.+)\\.('.implode('|', $extBlackList).')$#i';
+
+        foreach ($this->fileNames($fileBeingUploaded) as $fileName) {
+            if (null !== $blackListRegex && preg_match($blackListRegex, $fileName, $matches)) {
+                return $matches[2];
+            }
+
+            // Defense in depth against double-extension bypasses (e.g. "shell.php.jpg"):
+            // reject any file whose name contains a server-executable segment, not just the
+            // terminal one. Applies to every upload, regardless of the caller's configuration.
+            $executableExtension = FileConfiguration::findExecutableExtension($fileName);
+
+            if (null !== $executableExtension) {
+                return $executableExtension;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The name the client sent, and the one storage will give the file.
+     *
+     * @return list<string>
+     */
+    private function fileNames(UploadedFile $fileBeingUploaded): array
+    {
+        return array_values(array_unique([
+            $fileBeingUploaded->getClientOriginalName(),
+            // The model id only adds digits before the extension: 0 stands for the id to come.
+            $this->fileManager->renameFile(0, $fileBeingUploaded),
+        ]));
     }
 
     /**
@@ -190,7 +220,10 @@ readonly class FileProcessorService
      */
     private function sanitizeSvgUpload(UploadedFile $file): void
     {
-        if (!SvgSanitizer::isSvg($file->getClientOriginalName(), $file->getMimeType())) {
+        $isSvg = SvgSanitizer::isSvg($file->getClientOriginalName(), $file->getMimeType())
+            || SvgSanitizer::isSvg($this->fileManager->renameFile(0, $file));
+
+        if (!$isSvg) {
             return;
         }
 

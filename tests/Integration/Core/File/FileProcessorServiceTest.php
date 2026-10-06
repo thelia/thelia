@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\File\Exception\ProcessFileException;
 use Thelia\Core\File\FileConfiguration;
+use Thelia\Core\File\FileManager;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -90,6 +91,62 @@ final class FileProcessorServiceTest extends IntegrationTestCase
         $this->expectException(ProcessFileException::class);
 
         $this->validate('shell.php', '<?php echo 1;', 'document');
+    }
+
+    /**
+     * Storage keeps only [a-zA-Z0-9-_.] of the client name (FileManager::renameFile()):
+     * each of these names passes a check made on the name as sent, and is stored
+     * under a server-executable one.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function nameStoredAsServerExecutableProvider(): iterable
+    {
+        yield 'trailing space' => ['report.php '];
+        yield 'trailing tab' => ["report.php\t"];
+        yield 'space inside the extension' => ['report.ph p'];
+        yield 'character outside the stored alphabet' => ['hash.ph#p '];
+        yield 'zero-width space' => ["report.p\u{200B}hp"];
+        yield 'upper case and trailing space' => ['report.PHP '];
+        yield 'another executable extension' => ['report.phtml '];
+        yield 'executable segment before an empty extension' => ['report.ph p.'];
+    }
+
+    #[DataProvider('nameStoredAsServerExecutableProvider')]
+    public function testADocumentStoredUnderAServerExecutableNameIsRefused(string $fileName): void
+    {
+        $storedName = $this->getService(FileManager::class)->renameFile(1, $this->upload($fileName, '<?php echo 1;'));
+        self::assertNotNull(FileConfiguration::findExecutableExtension($storedName), \sprintf('"%s" is stored as "%s"', $fileName, $storedName));
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->validate($fileName, '<?php echo 1;', 'document');
+    }
+
+    public function testADocumentStoredUnderABlacklistedExtensionIsRefused(): void
+    {
+        $this->expectException(ProcessFileException::class);
+
+        $this->validate('payload.exe ', 'MZ', 'document');
+    }
+
+    public function testADocumentNameCleanedUpByStorageIsStillAccepted(): void
+    {
+        $this->validate('invoice.pdf ', '%PDF-1.4', 'document');
+        $this->validate('Mon devis (1).pdf', '%PDF-1.4', 'document');
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testSanitizeUploadReadsTheNameTheSvgIsStoredUnder(): void
+    {
+        // The leading comment makes the content sniff as text/html, and the trailing space
+        // hides the extension from the name as sent: the file is still stored as an .svg.
+        $upload = $this->upload('drawing.svg ', '<!-- drawing --><svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><rect width="1" height="1"/></svg>');
+
+        $this->getService(FileProcessorService::class)->sanitizeUpload($upload);
+
+        self::assertStringNotContainsString('alert', (string) file_get_contents($upload->getPathname()));
     }
 
     public function testExplicitConstraintsTakePrecedenceOverTheShopPolicy(): void
