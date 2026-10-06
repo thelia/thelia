@@ -25,11 +25,12 @@ use Thelia\Model\ConfigQuery;
  * anticipated does not require a core patch:
  *
  *   image_upload_allowed_mime_types    image/jpeg, image/png, image/avif
- *   document_upload_forbidden_extensions   php, phtml, exe
+ *   document_upload_forbidden_extensions   php, phtml, exe, html
  *
  * An empty or missing variable means "use the default list". Loosening these
- * variables can never re-enable a server-executable extension: that floor is
- * enforced unconditionally by FileProcessorService.
+ * variables can never re-enable a server-executable extension, nor a document a
+ * browser runs as a page or a script: those floors are enforced unconditionally by
+ * FileProcessorService.
  *
  * @author manuel raynaud <manu@raynaud.io>
  */
@@ -61,6 +62,25 @@ class FileConfiguration
         'cgi', 'pl', 'py', 'sh',
         'htaccess', 'htpasswd',
         'exe', 'bat', 'cmd', 'com',
+        ...self::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS,
+    ];
+
+    /**
+     * Extensions a web server serves with a type a browser opens as a page or runs as
+     * a script: HTML, XHTML and the XML types (an XHTML script element runs in any XML
+     * document), the XSL stylesheets that turn XML into a page, and JavaScript. Every
+     * one of them is in the stock nginx or Debian mime table under such a type.
+     *
+     * A document is published in the web space and served from the shop origin, so
+     * these are refused for every document upload, whatever the configuration above
+     * says. SVG is not listed: an uploaded SVG is stripped of its active content
+     * (SvgSanitizer). Its compressed form is, the sanitizer cannot read it.
+     */
+    public const BROWSER_ACTIVE_DOCUMENT_EXTENSIONS = [
+        'html', 'htm', 'xhtml', 'xhtm', 'xht', 'mht', 'mhtml',
+        'xml', 'xsl', 'xslt', 'rdf', 'mml', 'atom', 'rss', 'xspf', 'kml', 'xul',
+        'svgz',
+        'js', 'mjs', 'cjs',
     ];
 
     /**
@@ -157,6 +177,17 @@ class FileConfiguration
         }
 
         return null;
+    }
+
+    /**
+     * Returns the extension of the file name when a browser would open the file as a
+     * page or run it as a script (BROWSER_ACTIVE_DOCUMENT_EXTENSIONS), or null.
+     */
+    public static function findBrowserActiveExtension(string $fileName): ?string
+    {
+        $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
+
+        return \in_array($extension, self::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS, true) ? $extension : null;
     }
 
     /**

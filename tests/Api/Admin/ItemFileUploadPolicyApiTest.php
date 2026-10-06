@@ -88,6 +88,21 @@ final class ItemFileUploadPolicyApiTest extends ApiTestCase
         self::assertNull(ProductDocumentQuery::create()->filterByProductId($product->getId())->findOne());
     }
 
+    public function testAnHtmlDocumentIsRefused(): void
+    {
+        $product = $this->createProduct();
+
+        $response = $this->upload(
+            '/api/admin/product_documents',
+            $product,
+            $this->createTestTextFile('<html><script>alert(1)</script></html>'),
+            'evil.html',
+        );
+
+        self::assertSame(Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(ProductDocumentQuery::create()->filterByProductId($product->getId())->findOne());
+    }
+
     public function testANonImageIsRefusedAsAnImage(): void
     {
         $product = $this->createProduct();

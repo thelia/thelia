@@ -149,6 +149,67 @@ final class FileProcessorServiceTest extends IntegrationTestCase
         self::assertStringNotContainsString('alert', (string) file_get_contents($upload->getPathname()));
     }
 
+    /**
+     * A document is served from the shop origin: a browser opening one of these runs
+     * what it holds there.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    public static function browserActiveDocumentProvider(): iterable
+    {
+        $script = '<html><script>alert(1)</script></html>';
+        $xhtmlScript = '<?xml version="1.0"?><x:script xmlns:x="http://www.w3.org/1999/xhtml">alert(1)</x:script>';
+
+        yield 'html page' => ['evil.html', $script];
+        yield 'upper-case htm page' => ['evil.HTM', $script];
+        yield 'xhtml page' => ['evil.xhtml', $xhtmlScript];
+        yield 'xht page' => ['evil.xht', $xhtmlScript];
+        yield 'mhtml archive' => ['evil.mhtml', "MIME-Version: 1.0\r\n\r\n".$script];
+        yield 'xml document' => ['evil.xml', $xhtmlScript];
+        yield 'xsl stylesheet' => ['evil.xsl', $xhtmlScript];
+        yield 'rdf document' => ['evil.rdf', $xhtmlScript];
+        yield 'compressed svg' => ['evil.svgz', (string) gzencode('<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>')];
+        yield 'javascript' => ['evil.js', 'alert(1)'];
+        yield 'javascript module' => ['evil.mjs', 'alert(1)'];
+    }
+
+    #[DataProvider('browserActiveDocumentProvider')]
+    public function testADocumentABrowserRunsIsRefused(string $fileName, string $content): void
+    {
+        $this->expectException(ProcessFileException::class);
+
+        $this->validate($fileName, $content, 'document');
+    }
+
+    public function testConfigurationCannotReEnableADocumentABrowserRuns(): void
+    {
+        ConfigQuery::write(FileConfiguration::DOCUMENT_EXTENSION_BLACKLIST_VARIABLE, 'exe');
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->validate('evil.html', '<html><script>alert(1)</script></html>', 'document');
+    }
+
+    public function testAnExplicitDocumentPolicyCannotReEnableADocumentABrowserRuns(): void
+    {
+        $this->expectException(ProcessFileException::class);
+
+        $this->getService(FileProcessorService::class)->validateUpload(
+            $this->upload('evil.html', '<html><script>alert(1)</script></html>'),
+            'document',
+            [],
+            [],
+        );
+    }
+
+    public function testAnSvgDocumentIsStillAcceptedSinceItIsSanitized(): void
+    {
+        $this->validate('drawing.svg', '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>', 'document');
+        $this->validate('notes.txt', 'plain text', 'document');
+
+        $this->expectNotToPerformAssertions();
+    }
+
     public function testExplicitConstraintsTakePrecedenceOverTheShopPolicy(): void
     {
         // The Smarty back office passes its own policy; it must not be overridden.
