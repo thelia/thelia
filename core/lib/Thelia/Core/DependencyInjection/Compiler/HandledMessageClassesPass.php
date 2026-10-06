@@ -44,6 +44,10 @@ final class HandledMessageClassesPass implements CompilerPassInterface
             }
         }
 
+        // A handler taking any message ("*") would let every class of the shop out of
+        // a queue again: only the handlers of named classes count.
+        $classes = array_diff($classes, ['*', 'object']);
+
         $container->setParameter(self::PARAMETER, array_values(array_unique($classes)));
     }
 }
