@@ -36,6 +36,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Api\Controller\Admin\PostItemFileTranslationController;
+use Thelia\Api\State\Processor\ItemFileRemoveProcessor;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Map\BrandImageTableMap;
 
@@ -90,6 +91,7 @@ use Thelia\Model\Map\BrandImageTableMap;
         ),
         new Delete(
             uriTemplate: '/admin/brand_images/{id}',
+            processor: ItemFileRemoveProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
