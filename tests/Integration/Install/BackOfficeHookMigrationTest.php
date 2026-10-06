@@ -24,7 +24,7 @@ use Thelia\Model\Map\HookTableMap;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The statements 3.3.0.sql runs to give a shop installed before it the back-office hooks the
+ * The statements 3.2.1.sql runs to give a shop installed before it the back-office hooks the
  * Twig templates call. They are read from the shipped script, so the test fails if the script
  * stops doing what it claims.
  */
@@ -129,7 +129,7 @@ final class BackOfficeHookMigrationTest extends IntegrationTestCase
      */
     private function migrationStatements(): array
     {
-        $script = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.'3.3.0.sql');
+        $script = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.'3.2.1.sql');
 
         $statements = [];
 
@@ -141,7 +141,7 @@ final class BackOfficeHookMigrationTest extends IntegrationTestCase
             }
         }
 
-        self::assertCount(2, $statements, 'The 3.3.0 script does not add the back-office hooks and their titles.');
+        self::assertCount(2, $statements, 'The 3.2.1 script does not add the back-office hooks and their titles.');
 
         return $statements;
     }
