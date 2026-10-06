@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\File\Exception\ProcessFileException;
 use Thelia\Core\File\FileManager;
 use Thelia\Core\File\Service\FileProcessorService;
 use Thelia\Domain\Media\DTO\DocumentUploadDTO;
@@ -220,6 +221,58 @@ class MediaFacadeTest extends TestCase
         $this->assertNull($dto->description);
         $this->assertNull($dto->postscriptum);
         $this->assertTrue($dto->visible);
+    }
+
+    /**
+     * The facade stores what it is given: like the video upload, the image and the
+     * document uploads apply the shop upload policy before anything is written, so a
+     * caller that forgets to ask cannot be the hole.
+     */
+    public function testUploadDocumentAppliesTheUploadPolicyBeforeAnythingIsWritten(): void
+    {
+        $file = $this->createUploadedFileMock('report.php ');
+        $processor = $this->createMock(FileProcessorService::class);
+        $processor->expects(self::once())->method('validateUpload')->with($file, 'document')
+            ->willThrowException(new ProcessFileException('refused', 415));
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->facadeThatMustNotWrite($processor)->uploadDocument(new DocumentUploadDTO(parentId: 1, parentType: 'product', uploadedFile: $file));
+    }
+
+    public function testUploadDocumentSanitizesTheFileBeforeAnythingIsWritten(): void
+    {
+        $file = $this->createUploadedFileMock('drawing.svg');
+        $processor = $this->createMock(FileProcessorService::class);
+        $processor->expects(self::once())->method('validateUpload')->with($file, 'document');
+        $processor->expects(self::once())->method('sanitizeUpload')->with($file)
+            ->willThrowException(new ProcessFileException('not an svg', 415));
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->facadeThatMustNotWrite($processor)->uploadDocument(new DocumentUploadDTO(parentId: 1, parentType: 'product', uploadedFile: $file));
+    }
+
+    public function testUploadImageAppliesTheUploadPolicyBeforeAnythingIsWritten(): void
+    {
+        $file = $this->createUploadedFileMock('payload.exe');
+        $processor = $this->createMock(FileProcessorService::class);
+        $processor->expects(self::once())->method('validateUpload')->with($file, 'image')
+            ->willThrowException(new ProcessFileException('refused', 415));
+
+        $this->expectException(ProcessFileException::class);
+
+        $this->facadeThatMustNotWrite($processor)->uploadImage(new ImageUploadDTO(parentId: 1, parentType: 'product', uploadedFile: $file));
+    }
+
+    private function facadeThatMustNotWrite(FileProcessorService $processor): MediaFacade
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::never())->method('dispatch');
+        $fileManager = $this->createMock(FileManager::class);
+        $fileManager->expects(self::never())->method('getModelInstance');
+
+        return new MediaFacade($dispatcher, $fileManager, $processor, new ProductMediaOrder());
     }
 
     private function createUploadedFileMock(string $originalName): UploadedFile&MockObject
