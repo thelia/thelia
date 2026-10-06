@@ -18,10 +18,12 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Thelia\Messenger\FailedMessagePurger;
-use Thelia\Messenger\Serializer\AllowedClassesSerializer;
+use Thelia\Messenger\Transport\ConfiguredQueues;
+use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Messenger\Transport\ShopDatabaseTransportFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Messenger\ProbeMessage;
+use Thelia\Tests\Support\Messenger\ProbeSerializer;
 
 /**
  * A job set aside keeps everything it was dispatched with; past the retention, it
@@ -41,7 +43,7 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         $transport = $this->getService(ShopDatabaseTransportFactory::class)->createTransport(
             'doctrine://default?queue_name='.self::QUEUE,
             [],
-            $this->getService(AllowedClassesSerializer::class),
+            ProbeSerializer::create(static::getContainer()),
         );
         \assert($transport instanceof DoctrineTransport);
         $this->failureTransport = $transport;
@@ -76,6 +78,31 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
 
         self::assertSame(1, $purged);
         self::assertSame(['forty days ago'], $this->labelsLeft());
+    }
+
+    /**
+     * In the shop database a job is dated by its row, written when it was set aside,
+     * and the old ones go in one statement instead of being read one by one.
+     */
+    public function testInTheShopDatabaseTheOldJobsAreDeletedByTheDateOfTheirRow(): void
+    {
+        $this->setAside('set aside long ago', null);
+        $this->setAside('set aside today', null);
+        $this->getService(ShopDatabaseConnection::class)->get()->executeStatement(
+            'UPDATE messenger_messages SET created_at = ? WHERE queue_name = ? AND body LIKE ?',
+            [(new \DateTimeImmutable('-40 days', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'), self::QUEUE, '%long ago%'],
+        );
+
+        $purger = new FailedMessagePurger($this->failureTransport, new ConfiguredQueues(
+            $this->getService(ShopDatabaseConnection::class),
+            'sync://',
+            'sync://',
+            'doctrine://default?queue_name='.self::QUEUE,
+        ));
+
+        self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'), dryRun: true));
+        self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days')));
+        self::assertSame(['set aside today'], $this->labelsLeft());
     }
 
     private function setAside(string $label, ?\DateTimeImmutable $setAsideAt): void

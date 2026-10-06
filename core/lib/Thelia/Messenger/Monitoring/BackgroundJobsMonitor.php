@@ -32,6 +32,7 @@ use Symfony\Component\Mime\Email;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\UndecodableJob;
+use Thelia\Messenger\Transport\ConfiguredQueues;
 
 /**
  * What the back office shows of the background jobs: how many wait, which failed
@@ -53,6 +54,7 @@ final readonly class BackgroundJobsMonitor
         private MessageBusInterface $bus,
         #[Autowire(service: 'messenger.transport.async_heavy')]
         private ?TransportInterface $heavyTransport = null,
+        private ?ConfiguredQueues $queues = null,
     ) {
     }
 
@@ -76,7 +78,10 @@ final readonly class BackgroundJobsMonitor
         $count = $this->jobTransport->getMessageCount();
 
         // The heavy jobs wait on a queue of their own, unless it is the same one.
-        if ($this->heavyTransport instanceof MessageCountAwareInterface && $this->heavyTransport !== $this->jobTransport) {
+        if ($this->heavyTransport instanceof MessageCountAwareInterface
+            && $this->heavyTransport !== $this->jobTransport
+            && true !== $this->queues?->heavyJobsShareTheJobQueue()
+        ) {
             $count += $this->heavyTransport->getMessageCount();
         }
 
@@ -89,10 +94,20 @@ final readonly class BackgroundJobsMonitor
     }
 
     /**
+     * The last jobs set aside, the newest first.
+     *
      * @return list<FailedJob>
      */
     public function failedJobs(int $limit = 100): array
     {
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null !== $queue) {
+            // Read in SQL: the transport lists the oldest first, and past the limit the
+            // newest failures, the ones worth looking at, would never show.
+            return array_values(array_filter(array_map($this->find(...), $queue->newestIds($limit))));
+        }
+
         $jobs = [];
 
         foreach ($this->failureTransport()->all($limit) as $envelope) {
@@ -139,9 +154,9 @@ final readonly class BackgroundJobsMonitor
                 $this->failureTransport->send($envelope->withoutAll(TransportMessageIdStamp::class));
             } catch (\Throwable $putBackFailure) {
                 // Neither replayed nor set aside again: the log says which job it was, by
-                // its class and description, never by its content, which may hold the
-                // address and the order of a customer.
-                Tlog::getInstance()->addCritical(\sprintf('The failed job %s (%s: %s) could be neither replayed nor set aside again, it is lost from the queues.', $id, $envelope->getMessage()::class, self::describe($envelope->getMessage())));
+                // its id and class only. Its description and its content may name a
+                // customer, and the log is kept far longer than the failed jobs.
+                Tlog::getInstance()->addCritical(\sprintf('The failed job %s (%s) could be neither replayed nor set aside again, it is lost from the queues.', $id, $envelope->getMessage()::class));
 
                 throw new \RuntimeException(\sprintf('The job could not be replayed (%s), nor set aside again (%s).', $exception->getMessage(), $putBackFailure->getMessage()), 0, $exception);
             }
@@ -190,6 +205,8 @@ final readonly class BackgroundJobsMonitor
             \count($envelope->all(RedeliveryStamp::class)),
             $error instanceof ErrorDetailsStamp ? $error->getExceptionMessage() : '',
             $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName(),
+            // Replayed, a job the shop cannot read fails the same way.
+            !$message instanceof UndecodableJob,
         );
     }
 

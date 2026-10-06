@@ -27,6 +27,7 @@ final readonly class FailedJob
         public int $attempts,
         public string $error,
         public ?string $transport,
+        public bool $replayable = true,
     ) {
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Thelia\Messenger\Transport\ConfiguredQueues;
 
 /**
  * Deletes the jobs set aside in the failure transport for longer than a given time.
@@ -26,8 +27,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  * A failed job keeps everything it was dispatched with, an order confirmation keeps
  * the address and the content of the order, and nothing else ever removes it: left
  * alone, the failure transport becomes a store of personal data with no end date.
- * The date of a job is the one it was set aside on, carried by its last
- * RedeliveryStamp; a job that carries none is dated by nothing and kept.
+ * The date of a job is the one it was set aside on. In the shop database, the
+ * default, that is the date its row was written, and the old ones are deleted in one
+ * statement however many there are. Anywhere else every job is read, and dated by its
+ * last RedeliveryStamp; a job that carries none is dated by nothing and kept.
  */
 final readonly class FailedMessagePurger
 {
@@ -37,6 +40,7 @@ final readonly class FailedMessagePurger
     public function __construct(
         #[Autowire(service: 'messenger.transport.failed')]
         private TransportInterface $failureTransport,
+        private ?ConfiguredQueues $queues = null,
     ) {
     }
 
@@ -45,6 +49,12 @@ final readonly class FailedMessagePurger
      */
     public function purgeSetAsideBefore(\DateTimeImmutable $limit, bool $dryRun = false): int
     {
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null !== $queue) {
+            return $queue->deleteQueuedBefore($limit, $dryRun);
+        }
+
         if (!$this->failureTransport instanceof ListableReceiverInterface) {
             throw new \LogicException(\sprintf('The failure transport (%s) cannot list its jobs, so the shop cannot tell which are old enough to delete.', $this->failureTransport::class));
         }

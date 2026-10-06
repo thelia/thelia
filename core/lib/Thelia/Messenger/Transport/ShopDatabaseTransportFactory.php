@@ -14,15 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\Transport;
 
-use Propel\Runtime\Propel;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Thelia\Config\DatabaseConfiguration;
 
 /**
  * Keeps the jobs of the shop in its own database, behind `doctrine://default`.
@@ -45,11 +42,9 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
 {
     public const CONNECTION_NAME = 'default';
 
-    private ShopDatabaseConnection $connection;
-
-    public function __construct(?ShopDatabaseConnection $connection = null)
-    {
-        $this->connection = $connection ?? new ShopDatabaseConnection();
+    public function __construct(
+        private readonly ShopDatabaseConnection $connection,
+    ) {
     }
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
@@ -68,87 +63,5 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         return str_starts_with($dsn, 'doctrine://');
-    }
-
-    /**
-     * @return array{driver: 'pdo_mysql', user: string, password: string, driverOptions: array<int|string, mixed>, host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
-     */
-    public static function connectionParameters(): array
-    {
-        $manager = Propel::getServiceContainer()->getConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME);
-        $configuration = method_exists($manager, 'getConfiguration') ? $manager->getConfiguration() : null;
-
-        if (!\is_array($configuration) || !isset($configuration['dsn']) || !\is_string($configuration['dsn'])) {
-            throw new TransportException('The shop database connection is not configured: the Messenger "doctrine://default" transport has nothing to connect to.');
-        }
-
-        return ['driver' => 'pdo_mysql', 'user' => (string) ($configuration['user'] ?? ''), 'password' => (string) ($configuration['password'] ?? ''), 'driverOptions' => self::driverOptionsOf($configuration)]
-            + self::parametersOfPdoDsn($configuration['dsn']);
-    }
-
-    /**
-     * The PDO options and attributes of the Propel connection, a TLS certificate
-     * among them: the queue connection is opened the way the shop one is, never in
-     * clear against a database that wants TLS. A value written as a class constant
-     * (`PDO::MYSQL_ATTR_SSL_CA`-style) is resolved, as Propel does.
-     *
-     * @param array<string, mixed> $configuration
-     *
-     * @return array<int|string, mixed>
-     */
-    public static function driverOptionsOf(array $configuration): array
-    {
-        $options = [];
-
-        foreach (['options', 'attributes'] as $section) {
-            if (!isset($configuration[$section]) || !\is_array($configuration[$section])) {
-                continue;
-            }
-
-            foreach ($configuration[$section] as $option => $value) {
-                if (\is_string($value) && str_contains($value, '::') && \defined($value)) {
-                    $value = \constant($value);
-                }
-
-                $options[$option] = $value;
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * Reads `mysql:host=db;port=3306;dbname=shop;charset=utf8mb4` into DBAL parameters.
-     *
-     * @return array{host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
-     */
-    public static function parametersOfPdoDsn(string $dsn): array
-    {
-        if (!str_starts_with($dsn, 'mysql:')) {
-            throw new TransportException('The shop database is not a MySQL or MariaDB one: the Messenger "doctrine://default" transport only supports those.');
-        }
-
-        $parameters = [];
-
-        foreach (explode(';', substr($dsn, \strlen('mysql:'))) as $pair) {
-            [$name, $value] = array_pad(explode('=', $pair, 2), 2, '');
-            $name = strtolower(trim($name));
-            $value = trim($value);
-
-            if ('' === $value) {
-                continue;
-            }
-
-            match ($name) {
-                'host' => $parameters['host'] = $value,
-                'port' => $parameters['port'] = (int) $value,
-                'dbname' => $parameters['dbname'] = $value,
-                'charset' => $parameters['charset'] = $value,
-                'unix_socket' => $parameters['unix_socket'] = $value,
-                default => null,
-            };
-        }
-
-        return $parameters;
     }
 }

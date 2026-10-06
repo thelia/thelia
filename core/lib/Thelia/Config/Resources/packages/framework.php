@@ -203,9 +203,14 @@ return static function (ContainerConfigurator $container): void {
                 // long import never holds up the mails. Derived from
                 // MESSENGER_TRANSPORT_DSN (see HeavyTransportDsnProcessor), or set
                 // with MESSENGER_HEAVY_TRANSPORT_DSN. A job that fails is recorded
-                // on its row and set aside at once: there is nothing to retry.
+                // on its row and set aside at once, whatever failed: running a whole
+                // import again on its own is the administrator's call, from the
+                // failed jobs.
                 'async_heavy' => [
                     'dsn' => '%env(thelia_heavy_queue:MESSENGER_TRANSPORT_DSN)%',
+                    'retry_strategy' => [
+                        'max_retries' => 0,
+                    ],
                 ],
                 'failed' => '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%',
             ],
