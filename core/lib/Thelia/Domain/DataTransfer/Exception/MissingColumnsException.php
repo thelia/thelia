@@ -12,13 +12,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Form\Exception;
+namespace Thelia\Domain\DataTransfer\Exception;
 
 use Thelia\Messenger\UserFacingFailure;
 
 /**
- * Its message tells the person who filled the form what to change.
+ * An imported file without a column the import needs.
  */
-class FormValidationException extends \RuntimeException implements UserFacingFailure
+class MissingColumnsException extends \UnexpectedValueException implements UserFacingFailure
 {
 }

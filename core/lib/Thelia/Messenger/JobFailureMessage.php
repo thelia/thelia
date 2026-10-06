@@ -14,17 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger;
 
-use Doctrine\DBAL\Exception as DbalException;
-use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\Messenger\Exception\TransportException;
-
 /**
- * What an administrator reads of a failed job.
+ * What an administrator, and the server log, read of a failed job.
  *
- * The reason a job gives itself (no data to export, a file it cannot read, a command
- * that exited with an error) is shown as it is. The text of a database, transport or
- * PHP error is not: it quotes SQL, values, paths and host names. It is written to the
- * server log, and the administrator reads that the details are there.
+ * Only an exception written for the administrator ({@see UserFacingFailure}) is shown
+ * as it is. Any other may quote SQL, the values of a row, paths or host names: the
+ * administrator reads that the job failed and that the details are in the server
+ * log, and the log names the exception by its class, code and place, never by a text
+ * that may hold the personal data of a customer.
  */
 final class JobFailureMessage
 {
@@ -34,25 +31,39 @@ final class JobFailureMessage
 
     public static function forAdministrator(\Throwable $exception): string
     {
+        $userFacing = self::userFacingCause($exception);
+
+        return null === $userFacing ? self::SERVER_ERROR : mb_substr($userFacing->getMessage(), 0, self::MAX_LENGTH);
+    }
+
+    /**
+     * The exception as the log names it: its own words when they were written for the
+     * administrator, its class, code and place otherwise.
+     */
+    public static function forLog(\Throwable $exception): string
+    {
+        $userFacing = self::userFacingCause($exception);
+
+        if (null !== $userFacing) {
+            return $userFacing->getMessage();
+        }
+
+        $cause = $exception;
+        while (null !== $cause->getPrevious()) {
+            $cause = $cause->getPrevious();
+        }
+
+        return \sprintf('%s (code %s) at %s:%d', $cause::class, (string) $cause->getCode(), $cause->getFile(), $cause->getLine());
+    }
+
+    private static function userFacingCause(\Throwable $exception): ?\Throwable
+    {
         for ($cause = $exception; null !== $cause; $cause = $cause->getPrevious()) {
-            if (self::isInfrastructure($cause)) {
-                return self::SERVER_ERROR;
+            if ($cause instanceof UserFacingFailure) {
+                return $cause;
             }
         }
 
-        return mb_substr($exception->getMessage(), 0, self::MAX_LENGTH);
-    }
-
-    private static function isInfrastructure(\Throwable $exception): bool
-    {
-        return $exception instanceof \PDOException
-            || $exception instanceof \Error
-            // A PHP warning or notice turned into an exception quotes paths of the
-            // server. The core throws ErrorException with a message of its own too
-            // (an export whose module is gone): those keep the default E_ERROR.
-            || ($exception instanceof \ErrorException && \E_ERROR !== $exception->getSeverity())
-            || $exception instanceof PropelException
-            || $exception instanceof DbalException
-            || $exception instanceof TransportException;
+        return null;
     }
 }

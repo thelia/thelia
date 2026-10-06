@@ -12,13 +12,14 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Form\Exception;
+namespace Thelia\Domain\DataTransfer\Exception;
 
 use Thelia\Messenger\UserFacingFailure;
 
 /**
- * Its message tells the person who filled the form what to change.
+ * An export or an import job that cannot run as it was asked for: its definition, its
+ * format or its file is no longer there.
  */
-class FormValidationException extends \RuntimeException implements UserFacingFailure
+final class JobRefusedException extends \RuntimeException implements UserFacingFailure
 {
 }

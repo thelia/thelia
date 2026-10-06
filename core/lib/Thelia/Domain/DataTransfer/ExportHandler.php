@@ -21,6 +21,7 @@ use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\Export;
@@ -86,7 +87,7 @@ class ExportHandler
         ?\Closure $onProgress = null,
     ): ExportEvent {
         if (!$export->isHandlerAvailable()) {
-            throw new \ErrorException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
+            throw new HandlerUnavailableException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
         }
 
         $instance = $export->getHandleClassInstance();
