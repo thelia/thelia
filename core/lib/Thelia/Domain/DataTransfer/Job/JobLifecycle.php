@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ImportJob;
 
