@@ -28,10 +28,12 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
-use Thelia\Messenger\Serializer\AllowedClassesSerializer;
+use Thelia\Messenger\Transport\ConfiguredQueues;
+use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Messenger\Transport\ShopDatabaseTransportFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Messenger\ProbeMessage;
+use Thelia\Tests\Support\Messenger\ProbeSerializer;
 
 /**
  * What the back office reads of the queues, and the two gestures it has on a failed
@@ -105,6 +107,52 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
                 $heavy->reject($envelope);
             }
         }
+    }
+
+    /**
+     * A queue that cannot be told apart (an AMQP or a Redis one MESSENGER_HEAVY_TRANSPORT_DSN
+     * does not split) holds the heavy jobs with the others: each is counted once.
+     */
+    public function testHeavyJobsSharingTheJobQueueAreCountedOnce(): void
+    {
+        $sameQueue = $this->transport('test_monitor_jobs');
+        $this->jobs->send(new Envelope(new ProbeMessage('an export')));
+
+        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $sameQueue, $this->queues(heavyDsn: 'doctrine://default?queue_name=test_monitor_jobs'));
+
+        self::assertSame(1, $monitor->pendingCount());
+    }
+
+    /**
+     * The newest failures are the ones worth looking at: past the limit, the oldest
+     * are left out, never the newest.
+     */
+    public function testTheNewestFailuresAreListedFirstAndKeptWithinTheLimit(): void
+    {
+        $this->setAside(new ProbeMessage('oldest'), 'first');
+        $this->setAside(new ProbeMessage('middle'), 'second');
+        $this->setAside(new ProbeMessage('newest'), 'third');
+
+        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), null, $this->queues());
+
+        self::assertSame(['third', 'second'], array_map(static fn ($job): string => $job->error, $monitor->failedJobs(2)));
+    }
+
+    /**
+     * A job the shop cannot read fails the same way when replayed: the screen only
+     * offers to delete it.
+     */
+    public function testAnUnreadableJobIsNotOfferedForReplay(): void
+    {
+        $this->setAside(new UndecodableJob('Vendor\\Gone\\Job', 'The class no longer exists.', '{}'), 'Unreadable');
+        $this->setAside($this->mail(), 'SMTP down');
+
+        $replayable = [];
+        foreach ($this->monitor()->failedJobs() as $job) {
+            $replayable[$job->error] = $job->replayable;
+        }
+
+        self::assertSame(['Unreadable' => false, 'SMTP down' => true], array_intersect_key($replayable, ['Unreadable' => 1, 'SMTP down' => 1]));
     }
 
     /**
@@ -242,6 +290,11 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         return new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class));
     }
 
+    private function queues(string $jobDsn = 'doctrine://default?queue_name=test_monitor_jobs', string $heavyDsn = 'doctrine://default?queue_name=test_monitor_heavy'): ConfiguredQueues
+    {
+        return new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), $jobDsn, $heavyDsn, 'doctrine://default?queue_name=test_monitor_failed');
+    }
+
     private function setAside(object $message, string $reason): string
     {
         $this->failed->send(new Envelope($message, [
@@ -266,7 +319,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $transport = $this->getService(ShopDatabaseTransportFactory::class)->createTransport(
             'doctrine://default?queue_name='.$queue,
             [],
-            $this->getService(AllowedClassesSerializer::class),
+            ProbeSerializer::create(static::getContainer()),
         );
         \assert($transport instanceof DoctrineTransport);
 

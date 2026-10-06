@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Messenger;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Mime\Email;
@@ -66,5 +67,19 @@ final class MessengerConfigurationTest extends IntegrationTestCase
     public function testWithoutAQueueTheHeavyJobsRunAtOnceToo(): void
     {
         self::assertInstanceOf(SyncTransport::class, static::getContainer()->get('messenger.transport.async_heavy'));
+    }
+
+    /**
+     * A heavy job that fails is set aside at once, whatever failed: an import is not
+     * run three more times on its own.
+     */
+    public function testAHeavyJobIsNeverRetriedOnItsOwn(): void
+    {
+        $strategies = static::getContainer()->get('messenger.retry_strategy_locator');
+        \assert($strategies instanceof \Psr\Container\ContainerInterface);
+        $strategy = $strategies->get('async_heavy');
+        \assert($strategy instanceof RetryStrategyInterface);
+
+        self::assertFalse($strategy->isRetryable(new Envelope(new RunImportJob(1)), new \RuntimeException('Connection lost.')));
     }
 }
