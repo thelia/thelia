@@ -86,6 +86,28 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
     }
 
     /**
+     * The exports and imports wait on a queue of their own: the screen counts both.
+     */
+    public function testTheHeavyJobsAreCountedWithTheOthers(): void
+    {
+        $heavy = $this->transport('test_monitor_heavy');
+
+        try {
+            $this->jobs->send(new Envelope(new ProbeMessage('a mail')));
+            $heavy->send(new Envelope(new ProbeMessage('an export')));
+            $heavy->send(new Envelope(new ProbeMessage('an import')));
+
+            $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $heavy);
+
+            self::assertSame(3, $monitor->pendingCount());
+        } finally {
+            foreach ($heavy->all() as $envelope) {
+                $heavy->reject($envelope);
+            }
+        }
+    }
+
+    /**
      * A shop that names no queue has nothing waiting: the screen says jobs run at
      * once rather than showing an empty queue.
      */

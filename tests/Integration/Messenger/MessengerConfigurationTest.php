@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Mime\Email;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
+use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -53,11 +54,17 @@ final class MessengerConfigurationTest extends IntegrationTestCase
         self::assertSame(['async'], array_keys($senders));
     }
 
-    public function testAnExportAskedForInTheBackOfficeGoesThroughTheJobTransport(): void
+    public function testTheExportsAndImportsGoThroughTheHeavyJobTransport(): void
     {
         $locator = static::getContainer()->get('messenger.senders_locator');
         \assert($locator instanceof SendersLocatorInterface);
 
-        self::assertSame(['async'], array_keys(iterator_to_array($locator->getSenders(new Envelope(new RunExportJob(1))))));
+        self::assertSame(['async_heavy'], array_keys(iterator_to_array($locator->getSenders(new Envelope(new RunExportJob(1))))));
+        self::assertSame(['async_heavy'], array_keys(iterator_to_array($locator->getSenders(new Envelope(new RunImportJob(1))))));
+    }
+
+    public function testWithoutAQueueTheHeavyJobsRunAtOnceToo(): void
+    {
+        self::assertInstanceOf(SyncTransport::class, static::getContainer()->get('messenger.transport.async_heavy'));
     }
 }
