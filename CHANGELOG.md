@@ -1,25 +1,60 @@
-# 3.1.2 (unreleased)
+# 3.1.2
+
+Security release of the 3.1 line, without any breaking change. It ships `setup/update/sql/3.1.2.sql`, which changes no schema and records the new version, so that the update runs and protects the documents already published. `thelia/setup` ships as 3.1.3 with this core, its 3.1.2 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
 
 ## Security
 
-- GHSA-5524-qfxp-33v9 — the upload policy checked the file name the client sent, while storage keeps only its letters, digits, dashes, underscores and dots. A document named `report.php ` (trailing space), `report.ph p` or `report.ph#p` passed both the extension blacklist and the server-executable floor, was stored as `report-1.php` and published under `public/cache/documents/`, where a web server that runs PHP in the document root executed it. The policy now checks the name the file is stored under as well as the name it was sent with, and storage itself refuses a server-executable name, so a caller that skips the policy cannot store one either. The SVG sanitizer also recognises an SVG by its stored name. After the update, look for files with a server-executable extension (`.php`, `.phtml`, `.phar`…) under `local/media/` and `public/cache/` and remove them.
+- [GHSA-5524-qfxp-33v9](https://github.com/thelia/thelia/security/advisories/GHSA-5524-qfxp-33v9) — the upload policy checked the file name the client sent, while storage keeps only its letters, digits, dashes, underscores and dots. A document named `report.php ` (trailing space), `report.ph p` or `report.ph#p` passed both the extension blacklist and the server-executable floor, was stored as `report-1.php` and published under `public/cache/documents/`, where a web server that runs PHP in the document root executed it. The policy now checks the name the file is stored under as well as the name it was sent with, and storage itself refuses a server-executable name, so a caller that skips the policy cannot store one either. The SVG sanitizer also recognises an SVG by its stored name. Files already stored under such a name stay in place after the update: see the upgrade notes.
 
-- GHSA-7wrm-pcw6-4g9m — a document upload accepted HTML and the other types a browser opens as a page or runs as a script, and the shop published them under `public/cache/documents/`, so a script carried by a document ran on the shop origin for anyone opening its link. Documents with an HTML, XHTML, XML, XSL, JavaScript or compressed SVG extension are now refused, whatever `document_upload_forbidden_extensions` says; the list is `FileConfiguration::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS`. The file endpoints of the API serve a document as a download, with `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`. On Apache, the document cache gets an `.htaccess`, written by `update.php` for the documents already published and before any document is published, that sends `nosniff` for every document and `attachment` for all but PDF, raster image and plain text files, which still open in the browser. It needs the `FileInfo` override that `public/.htaccess` already needs. nginx does not read it; add this block to the server block, where the `^~` prefix also keeps the PHP location away from the document cache. Documents uploaded before the update stay published: look for such files under `local/media/documents/` and `public/cache/documents/` and remove them.
+- [GHSA-7wrm-pcw6-4g9m](https://github.com/thelia/thelia/security/advisories/GHSA-7wrm-pcw6-4g9m) — a document upload accepted HTML and the other types a browser opens as a page or runs as a script, and the shop published them under `public/cache/documents/`, so a script carried by a document ran on the shop origin for anyone opening its link. Documents with an HTML, XHTML, XML, XSL, JavaScript or compressed SVG extension are now refused, whatever `document_upload_forbidden_extensions` says; the list is `FileConfiguration::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS`. The file endpoints of the API serve a document as a download, with `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`. On Apache, the document cache gets an `.htaccess`, written by `update.php` for the documents already published and before any document is published, that sends `nosniff` for every document and `attachment` for all but PDF, raster image and plain text files, which still open in the browser. It needs the `FileInfo` override that `public/.htaccess` already needs. nginx does not read it: the upgrade notes give the equivalent block. Documents uploaded before the update stay published until they are removed, as the upgrade notes describe.
 
-  ```nginx
-  location ^~ /cache/documents/ {
-      add_header X-Content-Type-Options "nosniff" always;
-      add_header Content-Disposition "attachment" always;
-
-      location ~* \.(?:pdf|jpe?g|png|gif|webp|avif|txt)$ {
-          add_header X-Content-Type-Options "nosniff" always;
-      }
-  }
-  ```
+- [GHSA-gcgv-f8rf-w2wc](https://github.com/thelia/thelia/security/advisories/GHSA-gcgv-f8rf-w2wc) — the CSV exports wrote customer and newsletter subscriber names, addresses and phone numbers exactly as typed, so a value starting with `=`, `+`, `-` or `@` reached the file as a formula that ran in the spreadsheet of the administrator who opened it. Any text cell of a CSV export, from the core or from a module, that starts with one of these characters, a tab or a carriage return now gets a leading `'` and stays text. A plain number such as `-5.00` or `+33612345678` is written unchanged. A cell holding `,` or `;` is also enclosed in quotes, so a spreadsheet that splits lines on the other separator cannot start a formula halfway through it. JSON, XML and YAML exports are unchanged. The newsletter subscriber export of the back-office theme writes its own file and is not covered: the back-office theme fixes it in 1.2.2, for the 3.2 line.
 
 ## Fixed
 
 - A `Thelia\Core\File\Exception\FileException` built from a message alone threw a `TypeError` instead of itself.
+- The not found page of a hidden product, brand, category, folder or content no longer keeps the view and the id of the page it refused.
+
+## Upgrade notes
+
+Update the core and the setup package, then the database, from the root of the project, and warm the cache up. The project keeps the 3.1 line of the skeleton, so Composer keeps the core on 3.1:
+
+```bash
+composer update thelia/core thelia/setup --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+The update script writes the `.htaccess` of the document cache (`public/cache/documents/` by default), so on Apache the documents already published are served with the download headers from then on. If it cannot write the file, it prints a warning naming `Thelia\Core\File\DocumentCacheProtection`, which writes it. nginx does not read `.htaccess`: add this block to the server block of the shop. The `^~` prefix also keeps the PHP location away from the document cache.
+
+```nginx
+location ^~ /cache/documents/ {
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Content-Disposition "attachment" always;
+
+    location ~* \.(?:pdf|jpe?g|png|gif|webp|avif|txt)$ {
+        add_header X-Content-Type-Options "nosniff" always;
+    }
+}
+```
+
+### Files uploaded before the update
+
+The update refuses such uploads from now on, but it leaves the files already stored where they are. Look for an image or a document stored under a name a web server runs (GHSA-5524-qfxp-33v9), and for a document a browser opens as a page or runs as a script (GHSA-7wrm-pcw6-4g9m). From the root of the project, with GNU find:
+
+```bash
+find local/media public/cache -regextype posix-extended \
+  ! -type d ! -path public/cache/documents/.htaccess \
+  \( -iregex '.*/[^/]*\.(ph(p[3-8st]?|t(ml?)?|ar)|s(html?|tm)|ht(access|passwd))(\.[^/]*)?' \
+  -o -iregex '[^/]+/[^/]+/documents/.*\.(html?|x(ht(ml?)?|ml|slt?|spf|ul)|m(ht(ml)?|ml)|r(df|ss)|atom|kml|svgz|[cm]?js)' \) \
+  -print
+```
+
+The first pattern finds a server-executable extension anywhere in a file name (`report-1.php`, `shell.php.jpg`), among images and documents; the second finds an HTML, XML, XSL, JavaScript or compressed SVG document. The command only lists files. It skips the `.htaccess` the update writes, and it lists the links of the cache whose target is already gone. If the shop keeps its media or its document cache elsewhere (`document_cache_dir_from_web_root`), change the paths.
+
+For each file listed under `local/media/`, delete the image or the document from the back office, on the Images or Documents tab of its product, category, content, folder or brand, so its row goes too. Then run the command again with `-delete` in place of `-print` to remove the files left behind.
+
+In 3.1.2, deleting an image or a document over the admin API still removes its row only, and deleting it from the back office still leaves its copy under `public/cache/`: delete them from the back office, then run the command with `-delete`. A file deleted before the update is still served at its URL; the command lists it as well.
 
 # 3.1.1
 
