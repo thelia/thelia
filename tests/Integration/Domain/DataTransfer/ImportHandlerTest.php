@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Test\IntegrationTestCase;
@@ -25,6 +26,16 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class ImportHandlerTest extends IntegrationTestCase
 {
+    /** @var list<string> */
+    private array $temporaryFiles = [];
+
+    protected function tearDown(): void
+    {
+        array_map(unlink(...), array_filter($this->temporaryFiles, is_file(...)));
+
+        parent::tearDown();
+    }
+
     public function testAcceptedExtensionsAreDerivedFromTheRegisteredHandlers(): void
     {
         $extensions = $this->importHandler()->getAcceptedExtensions();
@@ -83,6 +94,45 @@ final class ImportHandlerTest extends IntegrationTestCase
         $handler->validateUpload('catalogue.zip');
     }
 
+    /**
+     * The name is chosen by whoever uploads the file: a program renamed products.csv
+     * is refused for what it holds.
+     */
+    public function testAFileWhoseContentIsNotItsFormatIsRefused(): void
+    {
+        $path = $this->temporaryFile("\x7FELF\x02\x01\x01\x00".str_repeat("\x00", 64));
+
+        $this->expectException(FormValidationException::class);
+
+        $this->importHandler()->validateUpload('products.csv', new File($path));
+    }
+
+    public function testAnArchiveThatIsNotOneIsRefused(): void
+    {
+        $path = $this->temporaryFile("id,stock\n1,2\n");
+
+        $this->expectException(FormValidationException::class);
+
+        $this->importHandler()->validateUpload('catalogue.zip', new File($path));
+    }
+
+    public function testAFileWhoseContentIsItsFormatIsAccepted(): void
+    {
+        $handler = $this->importHandler();
+
+        $handler->validateUpload('products.csv', new File($this->temporaryFile("id,stock\n1,2\n")));
+        $handler->validateUpload('products.json', new File($this->temporaryFile('[{"id":1,"stock":2}]')));
+
+        $zip = $this->temporaryFile('');
+        $archive = new \ZipArchive();
+        $archive->open($zip, \ZipArchive::OVERWRITE);
+        $archive->addFromString('products.csv', "id,stock\n1,2\n");
+        $archive->close();
+        $handler->validateUpload('catalogue.zip', new File($zip));
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testASerializerIsOnlyMatchedOnTheActualExtension(): void
     {
         $handler = $this->importHandler();
@@ -109,5 +159,14 @@ final class ImportHandlerTest extends IntegrationTestCase
         self::assertInstanceOf(ImportHandler::class, $handler);
 
         return $handler;
+    }
+
+    private function temporaryFile(string $content): string
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'import-content');
+        file_put_contents($path, $content);
+        $this->temporaryFiles[] = $path;
+
+        return $path;
     }
 }
