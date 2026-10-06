@@ -27,8 +27,9 @@ use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Import;
 use Thelia\Model\ImportCategory;
 use Thelia\Model\ImportCategoryQuery;
@@ -46,6 +47,7 @@ class ImportHandler
         protected EventDispatcherInterface $eventDispatcher,
         protected SerializerManager $serializerManager,
         protected ArchiverManager $archiverManager,
+        protected ArchiveInspector $archiveInspector = new ArchiveInspector(),
     ) {
     }
 
@@ -93,7 +95,7 @@ class ImportHandler
 
     /**
      * @param (\Closure(int): void)|null $onProgress told the number of rows read, every
-     *                                               ExportHandler::PROGRESS_STEP rows and once at the end
+     *                                               DataTransferProgress::STEP rows and once at the end
      */
     public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
@@ -101,18 +103,17 @@ class ImportHandler
         $extractedDirectory = null;
 
         if ($archiver instanceof AbstractArchiver) {
-            $extracted = $this->extractArchive($file, $archiver);
-
-            if ($extracted !== $file) {
-                $extractedDirectory = \dirname($extracted->getPathname());
-            }
-
-            $file = $extracted;
+            $this->archiveInspector->assertExtractable($file->getPathname(), $archiver->getExtension());
+            $extractedDirectory = $file->getPath().DS.uniqid('', true);
         }
 
         // The extracted copy is only read here: it goes once the import is over,
         // whatever came of it, rather than piling up next to the uploads.
         try {
+            if (null !== $extractedDirectory && $archiver instanceof AbstractArchiver) {
+                $file = $this->extractInto($file, $archiver, $extractedDirectory);
+            }
+
             return $this->importFile($import, $file, $language, $onProgress);
         } finally {
             if (null !== $extractedDirectory) {
@@ -126,11 +127,11 @@ class ImportHandler
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
         if (!$import->isHandlerAvailable()) {
-            throw new \ErrorException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
+            throw new HandlerUnavailableException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
         }
 
         $importHandleClass = $import->getHandleClass();
@@ -204,22 +205,67 @@ class ImportHandler
      * before anything is written to disk. Callers get the same policy the back office
      * displays, so the promise made by the interface is the one that is enforced.
      *
-     * @throws FormValidationException when the file may not be imported
+     * Given the file, its content is checked too: the name is chosen by whoever
+     * uploads it, the content is what gets stored and read.
+     *
+     * @throws UploadRefusedException when the file may not be imported (a FormValidationException)
      */
-    public function validateUpload(string $fileName): void
+    public function validateUpload(string $fileName, ?File $file = null): void
     {
         $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
 
         if (null !== $dangerousExtension) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
         }
 
         $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
         $acceptedExtensions = $this->getAcceptedExtensions();
 
         if (!\in_array($extension, $acceptedExtensions, true)) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
         }
+
+        if (null === $file) {
+            return;
+        }
+
+        if (!$this->contentMatchesExtension($file, $fileName)) {
+            throw new UploadRefusedException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
+        }
+
+        if ($this->matchArchiverByExtension($fileName) instanceof AbstractArchiver) {
+            $this->archiveInspector->assertExtractable($file->getPathname(), $extension);
+        }
+    }
+
+    /**
+     * An archive must be an archive of its kind; anything else must be text, the only
+     * thing a serializer reads.
+     */
+    private function contentMatchesExtension(File $file, string $fileName): bool
+    {
+        $detected = (new \finfo(\FILEINFO_MIME_TYPE))->file($file->getPathname());
+
+        if (false === $detected) {
+            return false;
+        }
+
+        $archiver = $this->matchArchiverByExtension($fileName);
+
+        if ($archiver instanceof AbstractArchiver) {
+            return self::withoutVendorPrefix($detected) === self::withoutVendorPrefix($archiver->getMimeType());
+        }
+
+        return str_starts_with($detected, 'text/')
+            || \in_array($detected, ['application/json', 'application/xml', 'application/csv', 'application/x-empty', 'inode/x-empty'], true);
+    }
+
+    /**
+     * application/x-gzip and application/gzip name the same format.
+     */
+    private static function withoutVendorPrefix(string $mimeType): string
+    {
+        return str_replace('/x-', '/', strtolower($mimeType));
     }
 
     public function matchArchiverByExtension(string $fileName): ?AbstractArchiver
@@ -252,11 +298,27 @@ class ImportHandler
 
     public function extractArchive(File $file, ArchiverInterface $archiver): File
     {
+        return $this->extractInto($file, $archiver, \dirname($file->getPathname()).DS.uniqid('', true));
+    }
+
+    /**
+     * Extracts the archive into $extractPath and gives its first file at the root, or
+     * the archive itself when there is none.
+     */
+    private function extractInto(File $file, ArchiverInterface $archiver, string $extractPath): File
+    {
         $archiver->open($file->getPathname());
-
-        $extractPath = \dirname($archiver->getArchivePath()).DS.uniqid('', true);
-
         $archiver->extract($extractPath);
+
+        // An archive with nothing in it creates no folder.
+        if (!is_dir($extractPath)) {
+            return $file;
+        }
+
+        // The sizes an archive declares are written by whoever made it: what was
+        // really written is measured, and too much is refused (the folder is then
+        // removed with the rest of the extraction).
+        $this->archiveInspector->assertExtractedSize($extractPath);
 
         /** @var \DirectoryIterator $item */
         foreach (new \DirectoryIterator($extractPath) as $item) {
@@ -275,7 +337,15 @@ class ImportHandler
         $errors = [];
         $read = 0;
 
-        $import->setData($serializer->unserialize($import->getFile()->openFile('r')));
+        // A file that does not parse (broken JSON, XML or YAML) is the administrator's to
+        // fix: said as such, not as a server error.
+        try {
+            $data = $serializer->unserialize($import->getFile()->openFile('r'));
+        } catch (\Throwable $unreadable) {
+            throw new UploadRefusedException(Translator::getInstance()->trans('The file cannot be read as a "%format" file: check its content.', ['%format' => $serializer->getExtension()]), 0, $unreadable);
+        }
+
+        $import->setData($data);
 
         foreach ($import as $data) {
             $import->checkMandatoryColumns($data);
@@ -286,7 +356,7 @@ class ImportHandler
                 $errors[] = $error;
             }
 
-            if (null !== $onProgress && 0 === ++$read % ExportHandler::PROGRESS_STEP) {
+            if (null !== $onProgress && 0 === ++$read % DataTransferProgress::STEP) {
                 $onProgress($read);
             }
         }
