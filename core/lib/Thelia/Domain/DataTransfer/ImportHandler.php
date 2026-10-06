@@ -27,6 +27,7 @@ use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Import;
@@ -101,18 +102,17 @@ class ImportHandler
         $extractedDirectory = null;
 
         if ($archiver instanceof AbstractArchiver) {
-            $extracted = $this->extractArchive($file, $archiver);
-
-            if ($extracted !== $file) {
-                $extractedDirectory = \dirname($extracted->getPathname());
-            }
-
-            $file = $extracted;
+            (new ArchiveInspector())->assertExtractable($file->getPathname(), $archiver->getExtension());
+            $extractedDirectory = $file->getPath().DS.uniqid('', true);
         }
 
         // The extracted copy is only read here: it goes once the import is over,
         // whatever came of it, rather than piling up next to the uploads.
         try {
+            if (null !== $extractedDirectory && $archiver instanceof AbstractArchiver) {
+                $file = $this->extractInto($file, $archiver, $extractedDirectory);
+            }
+
             return $this->importFile($import, $file, $language, $onProgress);
         } finally {
             if (null !== $extractedDirectory) {
@@ -130,7 +130,7 @@ class ImportHandler
         }
 
         if (!$import->isHandlerAvailable()) {
-            throw new \ErrorException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
+            throw new HandlerUnavailableException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
         }
 
         $importHandleClass = $import->getHandleClass();
@@ -224,8 +224,16 @@ class ImportHandler
             throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
         }
 
-        if (null !== $file && !$this->contentMatchesExtension($file, $fileName)) {
+        if (null === $file) {
+            return;
+        }
+
+        if (!$this->contentMatchesExtension($file, $fileName)) {
             throw new FormValidationException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
+        }
+
+        if ($this->matchArchiverByExtension($fileName) instanceof AbstractArchiver) {
+            (new ArchiveInspector())->assertExtractable($file->getPathname(), $extension);
         }
     }
 
@@ -289,10 +297,16 @@ class ImportHandler
 
     public function extractArchive(File $file, ArchiverInterface $archiver): File
     {
+        return $this->extractInto($file, $archiver, \dirname($file->getPathname()).DS.uniqid('', true));
+    }
+
+    /**
+     * Extracts the archive into $extractPath and gives its first file at the root, or
+     * the archive itself when there is none.
+     */
+    private function extractInto(File $file, ArchiverInterface $archiver, string $extractPath): File
+    {
         $archiver->open($file->getPathname());
-
-        $extractPath = \dirname($archiver->getArchivePath()).DS.uniqid('', true);
-
         $archiver->extract($extractPath);
 
         /** @var \DirectoryIterator $item */
