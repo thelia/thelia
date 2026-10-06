@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
@@ -55,7 +56,7 @@ final readonly class RunExportJobHandler
             throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
         }
 
-        if (!$this->lifecycle->claim($job, ExportJobTableMap::TABLE_NAME, $message)) {
+        if (!$this->lifecycle->claimOrPostpone($job, ExportJobTableMap::TABLE_NAME, $message)) {
             return;
         }
 
@@ -70,13 +71,13 @@ final readonly class RunExportJobHandler
 
     private function run(ExportJob $job): void
     {
-        $export = $job->getExport() ?? throw new \RuntimeException('The export of this job no longer exists.');
+        $export = $job->getExport() ?? throw new JobRefusedException('The export of this job no longer exists.');
         $serializer = $this->serializerManager->get($job->getSerializer());
         $archiver = null;
 
         if (null !== $job->getArchiver()) {
             $archiver = $this->archiverManager->get($job->getArchiver(), true)
-                ?? throw new \RuntimeException(\sprintf('The archiver "%s" is not available on this server.', $job->getArchiver()));
+                ?? throw new JobRefusedException(\sprintf('The archiver "%s" is not available on this server.', $job->getArchiver()));
         }
 
         $rangeDate = null;
