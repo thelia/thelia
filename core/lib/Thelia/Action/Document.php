@@ -45,6 +45,25 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     public const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
 
     /**
+     * Written at the root of the document cache for Apache. The web server serves the
+     * published documents itself, so the headers the shop sets on its own answers never
+     * reach them: a document is handed over as a download, except the types a browser
+     * shows without running anything, and its type is never guessed from its content.
+     * A file already there is left as it is.
+     */
+    public const CACHE_DIRECTORY_HTACCESS = <<<'HTACCESS'
+        # Written by Thelia: documents are served as downloads, never as pages of the shop.
+        <IfModule mod_headers.c>
+            Header set X-Content-Type-Options "nosniff"
+            Header set Content-Disposition "attachment"
+            <FilesMatch "\.(?i:pdf|jpe?g|png|gif|webp|avif|txt)$">
+                Header unset Content-Disposition
+            </FilesMatch>
+        </IfModule>
+
+        HTACCESS;
+
+    /**
      * @return string root of the document cache directory in web space
      */
     protected function getCacheDirFromWebRoot(): string
@@ -76,6 +95,8 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
+        $this->protectCacheDirectory();
+
         if (!file_exists($originalDocumentPathInCache)) {
             if (!file_exists($sourceFile)) {
                 throw new DocumentException(\sprintf('Source document file %s does not exists.', $sourceFile));
@@ -99,6 +120,22 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         // Update the event with file path and file URL
         $event->setDocumentPath($documentUrl);
         $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+    }
+
+    /**
+     * @throws DocumentException
+     */
+    private function protectCacheDirectory(): void
+    {
+        $htaccess = $this->getCachePath().DS.'.htaccess';
+
+        if (file_exists($htaccess)) {
+            return;
+        }
+
+        if (false === @file_put_contents($htaccess, self::CACHE_DIRECTORY_HTACCESS)) {
+            throw new DocumentException(\sprintf('Failed to write %s in the document cache directory', basename($htaccess)));
+        }
     }
 
     public static function getSubscribedEvents(): array
