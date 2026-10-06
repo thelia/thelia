@@ -17,30 +17,38 @@ namespace Thelia\Api\State\Processor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\Cart as CartResource;
 use Thelia\Api\Resource\CheckoutDeliveryAddressInput;
+use Thelia\Api\Resource\CheckoutDeliveryDateInput;
 use Thelia\Api\Resource\CheckoutDeliveryModuleInput;
 use Thelia\Api\Resource\CheckoutInvoiceAddressInput;
 use Thelia\Api\Resource\CheckoutPaymentModuleInput;
+use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
+use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
+use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
+use Thelia\Model\CheckoutStep;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * The four choices a buyer makes, each posted on its own and each answered with the cart
+ * The choices a buyer makes, each posted on its own and each answered with the cart
  * as the shop now sees it — postage included, since choosing a carrier or an address is
  * what moves it.
  *
@@ -60,6 +68,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         private CheckoutCartLocator $cartLocator,
         private CheckoutFacade $checkoutFacade,
         private ApiResourcePropelTransformerService $transformer,
+        private CartFacade $cartFacade,
     ) {
     }
 
@@ -79,10 +88,22 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
                 $data instanceof CheckoutInvoiceAddressInput => $this->selectInvoiceAddress($cart, $data),
                 $data instanceof CheckoutDeliveryModuleInput => $this->selectDeliveryModule($cart, $data),
                 $data instanceof CheckoutPaymentModuleInput => $this->selectPaymentModule($cart, $data),
+                $data instanceof CheckoutDeliveryDateInput => $this->cartFacade->chooseDeliveryDate($cart, $data->deliveryDate, $data->deliverySlotId),
                 default => throw new UnprocessableEntityHttpException('Unsupported checkout selection.'),
             };
         } catch (GuestCheckoutNotAllowedException $refusal) {
             throw new AccessDeniedHttpException($refusal->getMessage(), $refusal);
+        } catch (InvalidDeliveryException $refusal) {
+            if (!$data instanceof CheckoutDeliveryDateInput) {
+                throw $refusal;
+            }
+
+            // A refused day is answered in the shape a refused placement is, so the
+            // client branches on the same codes either way.
+            return new JsonResponse(
+                CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
         }
 
         // The selection wrote through events and services that hold their own instances
