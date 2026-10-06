@@ -184,7 +184,8 @@ return static function (ContainerConfigurator $container): void {
                 // The jobs of the shop. Empty, MESSENGER_TRANSPORT_DSN leaves this
                 // transport synchronous and every job runs in the request that
                 // dispatched it. A worker consumes it once it names a queue:
-                // doctrine://default for the shop database, or a Redis or AMQP DSN.
+                // doctrine://default for the shop database, or a Redis or AMQP DSN
+                // once symfony/redis-messenger or symfony/amqp-messenger is installed.
                 'async' => [
                     'dsn' => '%env(default:thelia.messenger.inline_transport_dsn:MESSENGER_TRANSPORT_DSN)%',
                     // Three more attempts, 30 seconds, 2 minutes then 8 minutes
@@ -198,6 +199,14 @@ return static function (ContainerConfigurator $container): void {
                         'max_delay' => 0,
                     ],
                 ],
+                // The heavy jobs, exports and imports, on a queue of their own so a
+                // long import never holds up the mails. Derived from
+                // MESSENGER_TRANSPORT_DSN (see HeavyTransportDsnProcessor), or set
+                // with MESSENGER_HEAVY_TRANSPORT_DSN. A job that fails is recorded
+                // on its row and set aside at once: there is nothing to retry.
+                'async_heavy' => [
+                    'dsn' => '%env(thelia_heavy_queue:MESSENGER_TRANSPORT_DSN)%',
+                ],
                 'failed' => '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%',
             ],
             'routing' => [
@@ -207,8 +216,8 @@ return static function (ContainerConfigurator $container): void {
                 SendEmailMessage::class => 'async',
                 // An export or an import asked for in the back office: its row
                 // tells how it went while the page is free.
-                RunExportJob::class => 'async',
-                RunImportJob::class => 'async',
+                RunExportJob::class => 'async_heavy',
+                RunImportJob::class => 'async_heavy',
             ],
         ],
     ], prepend: true);

@@ -52,6 +52,8 @@ final readonly class BackgroundJobsMonitor
         #[Autowire(service: 'messenger.transport.failed')]
         private TransportInterface $failureTransport,
         private MessageBusInterface $bus,
+        #[Autowire(service: 'messenger.transport.async_heavy')]
+        private ?TransportInterface $heavyTransport = null,
     ) {
     }
 
@@ -68,7 +70,18 @@ final readonly class BackgroundJobsMonitor
      */
     public function pendingCount(): ?int
     {
-        return $this->jobTransport instanceof MessageCountAwareInterface ? $this->jobTransport->getMessageCount() : null;
+        if (!$this->jobTransport instanceof MessageCountAwareInterface) {
+            return null;
+        }
+
+        $count = $this->jobTransport->getMessageCount();
+
+        // The heavy jobs wait on a queue of their own, unless it is the same one.
+        if ($this->heavyTransport instanceof MessageCountAwareInterface && $this->heavyTransport !== $this->jobTransport) {
+            $count += $this->heavyTransport->getMessageCount();
+        }
+
+        return $count;
     }
 
     public function failedCount(): int
