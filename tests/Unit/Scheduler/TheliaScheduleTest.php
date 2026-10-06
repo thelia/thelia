@@ -53,14 +53,30 @@ final class TheliaScheduleTest extends TestCase
     }
 
     /**
-     * Two workers consuming the schedule never run a task twice, and a worker coming
-     * back after a stop catches up the last missed run only.
+     * Two workers consuming the schedule build it each on the same lock store (LOCK_DSN):
+     * while one holds the lock, the other cannot take it, so no task runs twice.
      */
-    public function testTheScheduleIsLockedAndRemembersItsLastRun(): void
+    public function testTwoWorkersCannotHoldTheScheduleAtOnce(): void
+    {
+        $store = new InMemoryStore();
+        $first = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', ''))->getSchedule();
+        $second = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', ''))->getSchedule();
+
+        self::assertTrue($first->getLock()?->acquire());
+        self::assertFalse($second->getLock()?->acquire(), 'The second worker must wait for the first.');
+
+        $first->getLock()?->release();
+        self::assertTrue($second->getLock()?->acquire());
+    }
+
+    /**
+     * A worker coming back after a stop catches up the last missed run only, not every
+     * minute it missed.
+     */
+    public function testAWorkerComingBackCatchesUpTheLastMissedRunOnly(): void
     {
         $schedule = $this->schedule(saleCheck: '* * * * *', maintenancePurge: '', failedJobsPurge: '', currencyRates: '');
 
-        self::assertNotNull($schedule->getLock());
         self::assertNotNull($schedule->getState());
         self::assertTrue($schedule->shouldProcessOnlyLastMissedRun());
     }
