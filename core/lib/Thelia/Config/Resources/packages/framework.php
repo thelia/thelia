@@ -17,6 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Messenger\Middleware\ReplayedJobMiddleware;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 
 return static function (ContainerConfigurator $container): void {
@@ -163,6 +164,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // An export reads, an import rewrites, the whole catalog in one job, and a
+            // queue runs them one after the other: a form sent over and over would
+            // hold the heavy queue for hours. Per administrator, ten in ten minutes is
+            // more than anyone runs by hand.
+            'admin_data_transfer_launch' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
             // Resolving references answers with titles, prices and stock levels for up
             // to five hundred lines at a time: without a cap, a signed-in account walks
             // the catalog and measures its stock. Thirty a minute leaves a buyer room to
@@ -180,6 +190,14 @@ return static function (ContainerConfigurator $container): void {
                 'default_serializer' => AllowedClassesSerializer::class,
             ],
             'failure_transport' => 'failed',
+            'default_bus' => 'messenger.bus.default',
+            'buses' => [
+                'messenger.bus.default' => [
+                    // A job replayed by messenger:failed:retry starts afresh, as one
+                    // replayed from the back office does.
+                    'middleware' => [ReplayedJobMiddleware::class],
+                ],
+            ],
             'transports' => [
                 // The jobs of the shop. Empty, MESSENGER_TRANSPORT_DSN leaves this
                 // transport synchronous and every job runs in the request that

@@ -31,6 +31,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\Message\DescribedJob;
+use Thelia\Messenger\Message\ReplayableJob;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 
@@ -148,7 +149,8 @@ final readonly class BackgroundJobsMonitor
         $this->failureTransport->reject($envelope);
 
         try {
-            $this->bus->dispatch(new Envelope($envelope->getMessage(), [new TransportNamesStamp([$transport])]));
+            $message = $envelope->getMessage();
+            $this->bus->dispatch(new Envelope($message instanceof ReplayableJob ? $message->forReplay() : $message, [new TransportNamesStamp([$transport])]));
         } catch (\Throwable $exception) {
             try {
                 $this->failureTransport->send($envelope->withoutAll(TransportMessageIdStamp::class));

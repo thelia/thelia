@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Job;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\Export;
 use Thelia\Model\ExportJob;
@@ -57,7 +58,7 @@ final readonly class ExportJobLauncher
         $this->serializerManager->has($serializerId, true);
 
         if (null !== $archiverId && !$this->archiverManager->get($archiverId, true) instanceof ArchiverInterface) {
-            throw new \InvalidArgumentException(\sprintf('The archiver "%s" is not available on this server.', $archiverId));
+            throw new JobRefusedException(\sprintf('The archiver "%s" is not available on this server.', $archiverId));
         }
 
         $rangeDate = $this->exportHandler->resolveRangeDate($rangeDate);

@@ -17,7 +17,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Domain\DataTransfer\EventListener\PurgeExportCacheListener;
-use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Service\DataTransferJobPurger;
 use Thelia\Model\ExportJob;
@@ -29,8 +29,8 @@ use Thelia\Model\ImportQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The jobs of the exports and imports go with maintenance:purge after a week; an
- * import that never ran takes the file it still holds with it.
+ * The jobs of the exports and imports go with maintenance:purge a week after they are
+ * done, a month after otherwise; an import takes the file it still holds with it.
  */
 final class DataTransferJobPurgeTest extends IntegrationTestCase
 {
@@ -40,7 +40,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $this->storage = THELIA_ROOT.ImportJobLauncher::STORAGE_DIRECTORY.'/purge-test-'.uniqid();
+        $this->storage = $this->getService(ImportStorage::class)->directory().'/purge-test-'.uniqid();
         mkdir($this->storage, 0o777, true);
     }
 
@@ -54,7 +54,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
     public function testAWeekOldJobIsPurgedWithTheFileItHolds(): void
     {
         $file = $this->storedFile();
-        $oldImport = $this->importJob('-8 days', $file);
+        $oldImport = $this->importJob('-8 days', $file, JobStatus::DONE);
         $recentImport = $this->importJob('-1 day', '/nowhere.csv');
         $oldExport = $this->exportJob('-8 days');
         $recentExport = $this->exportJob('-1 day');
@@ -87,6 +87,23 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         self::assertNull(ExportJobQuery::create()->findPk($expiredExport));
     }
 
+    /**
+     * A job stuck waiting or running was set aside with the failed jobs, and may be
+     * replayed for as long: its row stays as long too.
+     */
+    public function testAJobThatNeverFinishedStaysAsLongAsTheFailures(): void
+    {
+        $stuck = $this->exportJob('-8 days', JobStatus::RUNNING);
+        $waiting = $this->importJob('-8 days', '/nowhere.csv', JobStatus::QUEUED);
+        $expired = $this->exportJob('-40 days', JobStatus::RUNNING);
+
+        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+
+        self::assertNotNull(ExportJobQuery::create()->findPk($stuck));
+        self::assertNotNull(ImportJobQuery::create()->findPk($waiting));
+        self::assertNull(ExportJobQuery::create()->findPk($expired));
+    }
+
     public function testADryRunKeepsEverything(): void
     {
         $file = $this->storedFile();
@@ -109,7 +126,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
     public function testAFileOutsideTheImportStorageIsNeverDeleted(): void
     {
         $outside = (string) tempnam(sys_get_temp_dir(), 'import-job-purge');
-        $job = $this->importJob('-8 days', $outside);
+        $job = $this->importJob('-8 days', $outside, JobStatus::DONE);
 
         try {
             $this->getService(DataTransferJobPurger::class)->purgeImportJobs();

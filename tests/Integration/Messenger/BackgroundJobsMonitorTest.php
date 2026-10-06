@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
+use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
 use Thelia\Messenger\Transport\ConfiguredQueues;
@@ -179,6 +180,31 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertTrue($this->monitor()->retry($id));
 
         self::assertSame(0, $this->monitor()->failedCount());
+    }
+
+    /**
+     * A job that was looked at again a few times before it was set aside is replayed
+     * afresh: carrying its count, it could never restart a job that failed.
+     */
+    public function testAReplayedExportStartsAfresh(): void
+    {
+        $id = $this->setAside(new RunExportJob(12, 3), 'The export failed.');
+        $bus = new class implements MessageBusInterface {
+            /** @var list<object> */
+            public array $dispatched = [];
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                $envelope = Envelope::wrap($message, $stamps);
+                $this->dispatched[] = $envelope->getMessage();
+
+                return $envelope;
+            }
+        };
+
+        (new BackgroundJobsMonitor($this->jobs, $this->failed, $bus))->retry($id);
+
+        self::assertEquals([new RunExportJob(12)], $bus->dispatched);
     }
 
     public function testAReplayThatFailsAgainKeepsTheJobAside(): void
