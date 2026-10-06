@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\Exception\FileException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
@@ -29,10 +32,46 @@ final class DocumentActionTest extends ActionIntegrationTestCase
 {
     use CreatesTestFiles;
 
+    private ?string $documentCacheDirectory = null;
+
+    private ?string $documentCacheFromWebRoot = null;
+
     protected function tearDown(): void
     {
         $this->cleanUpTestFiles();
+
+        if (null !== $this->documentCacheDirectory) {
+            (new Filesystem())->remove($this->documentCacheDirectory);
+        }
+
+        // The database changes are rolled back, the static config cache is not.
+        ConfigQuery::resetCache();
         parent::tearDown();
+    }
+
+    /**
+     * Apache serves the published documents itself, without the headers of the shop:
+     * the document cache carries its own, so that a document is downloaded rather than
+     * opened as a page of the shop origin.
+     */
+    public function testProcessDocumentProtectsTheDocumentCacheForApache(): void
+    {
+        $htaccess = $this->publishADocumentInAFreshCache().DS.'.htaccess';
+
+        self::assertFileExists($htaccess);
+        self::assertStringContainsString('Header set Content-Disposition "attachment"', (string) file_get_contents($htaccess));
+        self::assertStringContainsString('Header set X-Content-Type-Options "nosniff"', (string) file_get_contents($htaccess));
+    }
+
+    public function testProcessDocumentKeepsAnHtaccessTheShopWrote(): void
+    {
+        $cacheDirectory = THELIA_WEB_DIR.$this->useAFreshDocumentCache();
+        mkdir($cacheDirectory, 0o777, true);
+        file_put_contents($cacheDirectory.DS.'.htaccess', '# the shop rules');
+
+        $this->publishADocumentInAFreshCache(reuseTheCurrentCache: true);
+
+        self::assertSame('# the shop rules', file_get_contents($cacheDirectory.DS.'.htaccess'));
     }
 
     public function testSaveDocumentPersistsModelAndMovesFile(): void
@@ -214,5 +253,33 @@ final class DocumentActionTest extends ActionIntegrationTestCase
             $factory->taxRule(),
             $factory->currency(),
         );
+    }
+
+    /**
+     * @return string the absolute path of the document cache the document was published in
+     */
+    private function publishADocumentInAFreshCache(bool $reuseTheCurrentCache = false): string
+    {
+        $cacheFromWebRoot = $reuseTheCurrentCache ? (string) $this->documentCacheFromWebRoot : $this->useAFreshDocumentCache();
+
+        $source = $this->createTestTextFile('%PDF-1.4');
+        $this->trackFileForCleanup($source);
+
+        $event = new DocumentEvent();
+        $event->setSourceFilepath($source);
+        $event->setCacheSubdirectory('product');
+
+        $this->dispatch($event, TheliaEvents::DOCUMENT_PROCESS);
+
+        return THELIA_WEB_DIR.$cacheFromWebRoot;
+    }
+
+    private function useAFreshDocumentCache(): string
+    {
+        $this->documentCacheFromWebRoot = 'cache'.DS.uniqid('documents-test-');
+        $this->documentCacheDirectory = THELIA_WEB_DIR.$this->documentCacheFromWebRoot;
+        ConfigQuery::write('document_cache_dir_from_web_root', $this->documentCacheFromWebRoot);
+
+        return $this->documentCacheFromWebRoot;
     }
 }
