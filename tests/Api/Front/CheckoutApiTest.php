@@ -751,6 +751,7 @@ final class CheckoutApiTest extends ApiTestCase
         yield 'invoice address' => ['POST', 'invoice_address', ['addressId' => $checkout['address']->getId()]];
         yield 'delivery module' => ['POST', 'delivery_module', ['deliveryModuleId' => $checkout['deliveryModule']->getId()]];
         yield 'payment module' => ['POST', 'payment_module', ['paymentModuleId' => $checkout['paymentModule']->getId()]];
+        yield 'delivery date' => ['POST', 'delivery_date', ['deliveryDate' => (new \DateTimeImmutable('+3 days'))->format('Y-m-d')]];
         yield 'validation' => ['GET', 'validation', []];
         yield 'placement' => ['POST', 'place', []];
     }

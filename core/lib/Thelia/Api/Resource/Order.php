@@ -285,6 +285,29 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $giftMessage = null;
 
+    /**
+     * The day the buyer asked to be delivered or to collect the order, as Y-m-d.
+     *
+     * A calendar day of the shop, not an instant: it is published as written so that no
+     * client shifts it into the time zone of its browser. Null when the carrier offered
+     * no date. Information of the order, never a state: a day gone by blocks nothing.
+     */
+    #[Column(propelFieldName: 'deliveryDay')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $deliveryDate = null;
+
+    /**
+     * The local hours of the slot the buyer picked, as H:i, copied on the order when it was
+     * placed: they stay when the slot is edited or deleted from the carrier settings.
+     */
+    #[Column(propelFieldName: 'deliverySlotStartsAt')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $deliverySlotStart = null;
+
+    #[Column(propelFieldName: 'deliverySlotEndsAt')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $deliverySlotEnd = null;
+
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -680,6 +703,42 @@ class Order implements PropelResourceInterface
     public function getGiftMessage(): ?string
     {
         return $this->giftMessage;
+    }
+
+    public function getDeliveryDate(): ?string
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(?string $deliveryDate): self
+    {
+        $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
+    public function getDeliverySlotStart(): ?string
+    {
+        return $this->deliverySlotStart;
+    }
+
+    public function setDeliverySlotStart(?string $deliverySlotStart): self
+    {
+        $this->deliverySlotStart = $deliverySlotStart;
+
+        return $this;
+    }
+
+    public function getDeliverySlotEnd(): ?string
+    {
+        return $this->deliverySlotEnd;
+    }
+
+    public function setDeliverySlotEnd(?string $deliverySlotEnd): self
+    {
+        $this->deliverySlotEnd = $deliverySlotEnd;
+
+        return $this;
     }
 
     public function setGiftMessage(?string $giftMessage): self

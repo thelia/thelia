@@ -22,9 +22,8 @@ use Symfony\Component\Validator\Constraints\Positive;
 /**
  * Who carries the order, named by the module id `GET /front/delivery_modules` reports.
  *
- * Only the module is taken. The option a carrier offers — a pick-up point, a delivery
- * slot — has no place to go: the checkout carries no such choice, and the front API will
- * take one the day the domain has somewhere to put it.
+ * Only the module is taken. A pick-up point has no place to go yet; the delivery day and
+ * slot are posted apart, to .../delivery_date, once the carrier is chosen.
  */
 final class CheckoutDeliveryModuleInput
 {
