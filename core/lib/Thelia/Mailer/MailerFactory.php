@@ -268,8 +268,8 @@ class MailerFactory
      * has no queue and in a worker, minutes later, when it has one: an order history
      * saying a customer was written to when nothing left the shop is worse than one
      * that says nothing. Only the order id and the message code travel, never the
-     * body or the address; they stay in the headers of the mail, where a mail server
-     * log already shows them.
+     * body or the address, in headers of the mail that the history listener takes
+     * off before the mail leaves the shop: the customer never receives them.
      *
      * @param array<string, mixed> $messageParameters
      */
