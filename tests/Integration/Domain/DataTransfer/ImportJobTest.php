@@ -193,6 +193,26 @@ final class ImportJobTest extends IntegrationTestCase
         $this->handler()(new RunImportJob(999999999));
     }
 
+    /**
+     * The import tells how far it got, which is how its job shows a worker is still on
+     * it: a long import is never taken from under that worker.
+     */
+    public function testTheImportReportsItsProgress(): void
+    {
+        $reported = [];
+
+        $this->getService(ImportHandler::class)->import(
+            $this->stockImport(),
+            $this->upload(17),
+            null,
+            static function (int $rows) use (&$reported): void {
+                $reported[] = $rows;
+            },
+        );
+
+        self::assertSame([1], $reported);
+    }
+
     public function testAFileTheShopDoesNotReadIsRefusedBeforeAnyJobIsRecorded(): void
     {
         $this->expectException(\Throwable::class);

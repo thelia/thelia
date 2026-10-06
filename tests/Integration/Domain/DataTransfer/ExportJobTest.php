@@ -184,13 +184,29 @@ final class ExportJobTest extends IntegrationTestCase
     public function testAJobLeftRunningByAWorkerThatDiedRunsAgain(): void
     {
         $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
-        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->save($this->getPropelConnection());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->setUpdatedAt(new \DateTime('-2 hours'))->save($this->getPropelConnection());
 
         $this->handler()(new RunExportJob($job->getId()));
         $job->reload();
         $this->files[] = (string) $job->getFilePath();
 
         self::assertSame(JobStatus::DONE, $job->getJobStatus());
+    }
+
+    /**
+     * A long export started two hours ago that still reports its progress is alive:
+     * it is not taken from under the worker writing it.
+     */
+    public function testALongExportThatStillWritesIsNotTakenFromItsWorker(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->setUpdatedAt(new \DateTime('-1 minute'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+        self::assertNull($job->getFilePath());
     }
 
     /**

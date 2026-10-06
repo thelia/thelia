@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\RawMessage;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Log\Tlog;
 
@@ -41,10 +42,14 @@ final class OrderEmailHistoryListener
     /** @var \WeakMap<Envelope, array{int, string}> */
     private \WeakMap $pending;
 
+    /** @var \WeakMap<RawMessage, array{int, string}> the same, for a listener that swaps the envelope */
+    private \WeakMap $pendingByMessage;
+
     public function __construct(
         private readonly OrderHistoryRecorder $orderHistoryRecorder,
     ) {
         $this->pending = new \WeakMap();
+        $this->pendingByMessage = new \WeakMap();
     }
 
     /**
@@ -68,6 +73,7 @@ final class OrderEmailHistoryListener
 
         if (ctype_digit($orderId) && '' !== $messageCode) {
             $this->pending[$event->getEnvelope()] = [(int) $orderId, $messageCode];
+            $this->pendingByMessage[$message] = [(int) $orderId, $messageCode];
         }
     }
 
@@ -75,13 +81,14 @@ final class OrderEmailHistoryListener
     public function onSentMessage(SentMessageEvent $event): void
     {
         $envelope = $event->getMessage()->getEnvelope();
-        $pending = $this->pending[$envelope] ?? null;
+        $message = $event->getMessage()->getOriginalMessage();
+        $pending = $this->pending[$envelope] ?? $this->pendingByMessage[$message] ?? null;
 
         if (null === $pending) {
             return;
         }
 
-        unset($this->pending[$envelope]);
+        unset($this->pending[$envelope], $this->pendingByMessage[$message]);
         [$orderId, $messageCode] = $pending;
 
         try {

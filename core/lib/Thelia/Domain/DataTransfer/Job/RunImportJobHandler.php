@@ -65,7 +65,15 @@ final readonly class RunImportJobHandler
                 throw new \RuntimeException('The uploaded file of this import is no longer on the server.');
             }
 
-            $event = $this->importHandler->import($import, new File($job->getStoredFilePath()), $job->getLang());
+            $event = $this->importHandler->import(
+                $import,
+                new File($job->getStoredFilePath()),
+                $job->getLang(),
+                // A sign of life, so a long import is never taken from the worker running it.
+                static function () use ($job): void {
+                    $job->setUpdatedAt(new \DateTime())->save();
+                },
+            );
         } catch (\Throwable $exception) {
             Tlog::getInstance()->addError(\sprintf('Import job %d failed: %s', $job->getId(), $exception->getMessage()));
 
