@@ -16,6 +16,7 @@ namespace Thelia\Api\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 
@@ -32,8 +33,23 @@ class BinaryFileController
         }
 
         $propelModel = $resource->getPropelModel();
-        $filePath = $propelModel->getUploadDir().DS.$propelModel->getFile();
+        $fileName = (string) $propelModel->getFile();
+        $filePath = $propelModel->getUploadDir().DS.$fileName;
 
-        return new BinaryFileResponse($filePath);
+        $response = new BinaryFileResponse($filePath);
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+        // A document is whatever the shop accepted as one, and this answer comes from the
+        // shop origin: it is handed over as a download, never opened as a page of the shop.
+        if ('document' === $resource::getFileType()) {
+            $response->setContentDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                basename($fileName),
+                // A name stored by an earlier version may hold characters the plain header refuses.
+                (string) preg_replace('/[^\x20-\x7e]|[%"\\\\\/]/', '_', basename($fileName)),
+            );
+        }
+
+        return $response;
     }
 }
