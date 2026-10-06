@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\DataTransfer\Exception;
+
+use Thelia\Exception\UserFacingFailure;
+
+/**
+ * An export or an import job that cannot run as it was asked for: its definition, its
+ * format or its file is no longer there.
+ */
+final class JobRefusedException extends \RuntimeException implements UserFacingFailure
+{
+}
