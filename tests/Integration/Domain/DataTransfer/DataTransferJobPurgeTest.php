@@ -139,8 +139,14 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $purger->sweepImportStorage();
 
         self::assertFileDoesNotExist($leftBehind);
-        self::assertDirectoryDoesNotExist(\dirname($leftBehind));
         self::assertFileExists($recent);
+
+        // An empty directory goes once a day old, never while an upload may be about
+        // to land in it.
+        self::assertDirectoryExists(\dirname($leftBehind));
+        touch(\dirname($leftBehind), (int) strtotime('-2 days'));
+        $purger->sweepImportStorage();
+        self::assertDirectoryDoesNotExist(\dirname($leftBehind));
     }
 
     private function storedFile(string $name = ''): string

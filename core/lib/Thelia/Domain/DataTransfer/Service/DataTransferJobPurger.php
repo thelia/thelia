@@ -100,8 +100,9 @@ final readonly class DataTransferJobPurger
         $filesystem = new Filesystem();
         $filesystem->remove($files);
 
-        // The day directories, and the directories of extracted archives, once empty.
-        foreach (iterator_to_array((new Finder())->directories()->in($directory)->sortByName()->reverseSorting(), false) as $emptyCandidate) {
+        // The day directories, and the directories of extracted archives, once empty
+        // and a day old: a fresh one may be about to receive an upload.
+        foreach (iterator_to_array((new Finder())->directories()->in($directory)->date('before 1 day ago')->sortByName()->reverseSorting(), false) as $emptyCandidate) {
             if ([] === array_diff((array) scandir($emptyCandidate->getPathname()), ['.', '..'])) {
                 $filesystem->remove($emptyCandidate->getPathname());
             }

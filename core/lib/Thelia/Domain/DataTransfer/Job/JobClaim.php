@@ -37,10 +37,13 @@ final readonly class JobClaim
 
     /**
      * @param 'export_job'|'import_job' $table
+     * @param bool                      $allowFailed false for a message looking again at a job that was
+     *                                               running: a job that failed meanwhile waits for the
+     *                                               administrator to replay it, it never restarts on its own
      *
      * @return bool true when this run owns the job now
      */
-    public function claim(string $table, int $jobId): bool
+    public function claim(string $table, int $jobId, bool $allowFailed = true): bool
     {
         $now = new \DateTimeImmutable();
 
@@ -54,7 +57,7 @@ final readonly class JobClaim
             'updated' => $now->format('Y-m-d H:i:s'),
             'id' => $jobId,
             'queued' => JobStatus::QUEUED->value,
-            'failed' => JobStatus::FAILED->value,
+            'failed' => $allowFailed ? JobStatus::FAILED->value : JobStatus::QUEUED->value,
             'stillRunning' => JobStatus::RUNNING->value,
             'stale' => $now->modify(\sprintf('-%d seconds', self::STALE_AFTER_SECONDS))->format('Y-m-d H:i:s'),
         ]);

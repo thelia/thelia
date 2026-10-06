@@ -84,7 +84,7 @@ final readonly class JobLifecycle
      */
     public function claim(ExportJob|ImportJob $job, string $table, DataTransferJobMessage $message): bool
     {
-        $claimed = $this->jobClaim->claim($table, (int) $job->getId());
+        $claimed = $this->jobClaim->claim($table, (int) $job->getId(), 0 === $message->postponements());
         $job->reload();
 
         if ($claimed || JobStatus::RUNNING !== $job->getJobStatus()) {
@@ -98,9 +98,9 @@ final readonly class JobLifecycle
         }
 
         if ($message->postponements() >= self::MAX_POSTPONEMENTS) {
-            Tlog::getInstance()->addWarning(\sprintf('%s %d is still running after %d checks: no more checks will be made.', $job::class, $job->getId(), $message->postponements()));
-
-            return false;
+            // Set aside rather than dropped: the failed jobs show it, and replaying it
+            // takes the job over once its worker has gone quiet.
+            throw new UnrecoverableMessageHandlingException(\sprintf('%s %d is still running after %d checks: it is set aside with the failed jobs.', $job::class, $job->getId(), $message->postponements()));
         }
 
         $this->bus->dispatch($message->postponed(), [new DelayStamp(self::POSTPONE_DELAY_SECONDS * 1000)]);
