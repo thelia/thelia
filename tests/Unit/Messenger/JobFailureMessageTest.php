@@ -12,11 +12,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Unit\Domain\DataTransfer\Job;
+namespace Thelia\Tests\Unit\Messenger;
 
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Domain\DataTransfer\Job\JobFailureMessage;
+use Thelia\Messenger\JobFailureMessage;
 
 final class JobFailureMessageTest extends TestCase
 {
@@ -45,5 +45,15 @@ final class JobFailureMessageTest extends TestCase
     public function testAPhpErrorIsNotShown(): void
     {
         self::assertSame(JobFailureMessage::SERVER_ERROR, JobFailureMessage::forAdministrator(new \TypeError('Argument #1 ($path) must be of type string, null given in /var/www/html/core/lib/Thelia/X.php')));
+    }
+
+    public function testAPhpWarningIsNotShown(): void
+    {
+        self::assertSame(JobFailureMessage::SERVER_ERROR, JobFailureMessage::forAdministrator(new \ErrorException('unlink(/var/www/html/var/data-transfer/import/x.csv): No such file or directory', 0, \E_WARNING)));
+    }
+
+    public function testAReasonTheCoreGivesAsAnErrorExceptionIsShown(): void
+    {
+        self::assertSame('The export "x" cannot be run.', JobFailureMessage::forAdministrator(new \ErrorException('The export "x" cannot be run.')));
     }
 }
