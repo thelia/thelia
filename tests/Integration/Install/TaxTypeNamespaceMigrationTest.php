@@ -34,7 +34,7 @@ use Thelia\Test\IntegrationTestCase;
  * A tax records the class of its type, and the three tax types changed namespace
  * between Thelia 2 and Thelia 3. A tax still carrying its Thelia 2 class name
  * matches no tax type, and every product under its rule fails to be priced.
- * 3.0.0-alpha1.sql renames the classes of a shop being migrated, 3.3.0.sql those
+ * 3.0.0-alpha1.sql renames the classes of a shop being migrated, 3.2.1.sql those
  * of a shop that was migrated before it renamed all three.
  */
 final class TaxTypeNamespaceMigrationTest extends IntegrationTestCase
@@ -51,7 +51,7 @@ final class TaxTypeNamespaceMigrationTest extends IntegrationTestCase
     public static function scripts(): iterable
     {
         yield 'migration from Thelia 2' => ['3.0.0-alpha1.sql'];
-        yield 'repair of a shop already migrated' => ['3.3.0.sql'];
+        yield 'repair of a shop already migrated' => ['3.2.1.sql'];
     }
 
     public function testATaxOnItsThelia2ClassNameCannotBeComputed(): void
@@ -121,8 +121,8 @@ final class TaxTypeNamespaceMigrationTest extends IntegrationTestCase
         $tax = $this->thelia2Tax(FeatureFixAmountTaxType::class, ['feature' => 1, 'lang' => 1]);
         $current = $this->createFixtureFactory()->tax();
 
-        $this->runTaxStatementsOf('3.3.0.sql');
-        $this->runTaxStatementsOf('3.3.0.sql');
+        $this->runTaxStatementsOf('3.2.1.sql');
+        $this->runTaxStatementsOf('3.2.1.sql');
 
         self::assertSame(FeatureFixAmountTaxType::class, $this->storedTypeOf($tax));
         self::assertSame(PricePercentTaxType::class, $this->storedTypeOf($current));
