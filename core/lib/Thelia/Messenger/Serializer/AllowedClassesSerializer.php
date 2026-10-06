@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -36,6 +37,10 @@ use Thelia\Module\BaseModule;
  *
  * The same check runs when a job is queued, so a module that dispatches a class the
  * workers would refuse learns it on dispatch, not from a queue that never empties.
+ *
+ * A queued job that fails the check, or can no longer be built, is read as an
+ * UndecodableJob rather than refused: Symfony deletes a message it cannot decode, and
+ * the job would vanish without a trace.
  */
 final readonly class AllowedClassesSerializer implements SerializerInterface
 {
@@ -71,15 +76,58 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
         }
 
-        $this->assertAllowedMessage($headers['type'], MessageDecodingFailedException::class);
+        try {
+            $this->assertAllowedMessage($headers['type'], MessageDecodingFailedException::class);
 
-        foreach (array_keys($headers) as $name) {
-            if (\is_string($name) && str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
-                $this->assertAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)), MessageDecodingFailedException::class);
+            foreach (array_keys($headers) as $name) {
+                if (\is_string($name) && str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
+                    $this->assertAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)), MessageDecodingFailedException::class);
+                }
+            }
+
+            return $this->inner->decode($encodedEnvelope);
+        } catch (MessageDecodingFailedException $exception) {
+            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
+        }
+    }
+
+    /**
+     * The job as an UndecodableJob, with the stamps it carried that the shop reads:
+     * the failure transport keeps its date, its attempts and its reason.
+     *
+     * @param array<array-key, mixed> $headers
+     */
+    private function undecodable(array $headers, string $body, string $reason): Envelope
+    {
+        $message = new UndecodableJob((string) $headers['type'], $reason, $body);
+        $readableHeaders = ['type' => UndecodableJob::class, 'Content-Type' => 'application/json'];
+
+        foreach ($headers as $name => $value) {
+            if (\is_string($name) && str_starts_with($name, self::STAMP_HEADER_PREFIX) && $this->isAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)))) {
+                $readableHeaders[$name] = $value;
             }
         }
 
-        return $this->inner->decode($encodedEnvelope);
+        try {
+            return $this->inner->decode([
+                'body' => json_encode(['originalType' => $message->originalType, 'reason' => $reason, 'originalBody' => $body], \JSON_THROW_ON_ERROR),
+                'headers' => $readableHeaders,
+            ]);
+        } catch (\Throwable) {
+            // Even its stamps cannot be read: the job is kept, without them.
+            return new Envelope($message);
+        }
+    }
+
+    private function isAllowedStamp(string $class): bool
+    {
+        try {
+            $this->assertAllowedStamp($class, \LogicException::class);
+
+            return true;
+        } catch (\LogicException) {
+            return false;
+        }
     }
 
     public function encode(Envelope $envelope): array

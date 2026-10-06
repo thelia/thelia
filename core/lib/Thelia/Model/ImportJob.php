@@ -24,6 +24,17 @@ class ImportJob extends BaseImportJob
         return JobStatus::tryFrom((string) $this->getStatus()) ?? JobStatus::FAILED;
     }
 
+    /**
+     * Where the uploaded file is on this server. The row keeps a path relative to the
+     * project, so it stays short and survives the project being moved.
+     */
+    public function getStoredFilePath(): string
+    {
+        $path = (string) $this->getFilePath();
+
+        return str_starts_with($path, '/') ? $path : THELIA_ROOT.$path;
+    }
+
     public function isFinished(): bool
     {
         return $this->getJobStatus()->isFinished();

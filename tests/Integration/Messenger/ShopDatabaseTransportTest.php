@@ -107,6 +107,21 @@ final class ShopDatabaseTransportTest extends IntegrationTestCase
         $this->transport->ack($taken[0]);
     }
 
+    /**
+     * The queue has a connection of its own: a job dispatched inside a Propel
+     * transaction stays queued when that transaction is rolled back. This is why a job
+     * is dispatched once the writes it is about are committed.
+     */
+    public function testAJobQueuedInsideARolledBackTransactionStaysQueued(): void
+    {
+        $connection = $this->getPropelConnection();
+        $connection->beginTransaction();
+        $this->transport->send(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->text('Hello'))));
+        $connection->rollBack();
+
+        self::assertSame(1, $this->transport->getMessageCount());
+    }
+
     private function emptyQueue(): void
     {
         foreach ($this->transport->all() as $envelope) {

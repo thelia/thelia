@@ -36,6 +36,8 @@ final readonly class ImportJobLauncher
 {
     public const STORAGE_DIRECTORY = 'var/data-transfer/import';
 
+    private const MAX_NAME_LENGTH = 100;
+
     public function __construct(
         private ImportHandler $importHandler,
         private MessageBusInterface $bus,
@@ -49,26 +51,59 @@ final readonly class ImportJobLauncher
         // Refused here, in the request, rather than by a worker minutes later.
         $this->importHandler->validateUpload($originalName);
 
-        $directory = $this->projectDirectory.\DIRECTORY_SEPARATOR.self::STORAGE_DIRECTORY.\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd');
-        $stored = $file->move($directory, uniqid('', true).'-'.basename($originalName));
+        $relativeDirectory = self::STORAGE_DIRECTORY.'/'.(new \DateTime())->format('Ymd');
+        $stored = $file->move(
+            $this->projectDirectory.\DIRECTORY_SEPARATOR.$relativeDirectory,
+            uniqid('', true).'-'.self::shortName($originalName),
+        );
+        $relativePath = $relativeDirectory.'/'.$stored->getFilename();
 
-        $job = (new ImportJob())
-            ->setImportId($import->getId())
-            ->setAdminId($adminId)
-            ->setStatus(JobStatus::QUEUED->value)
-            ->setLangId($language?->getId())
-            ->setFilePath($stored->getPathname())
-            ->setFileName(basename($originalName));
-        $job->save();
+        try {
+            $job = (new ImportJob())
+                ->setImportId($import->getId())
+                ->setAdminId($adminId)
+                ->setStatus(JobStatus::QUEUED->value)
+                ->setLangId($language?->getId())
+                ->setFilePath($relativePath)
+                ->setFileName(self::shortName($originalName));
+            $job->save();
+        } catch (\Throwable $exception) {
+            // The file holds what was uploaded, personal data included: it never stays
+            // behind without a row that the purge would find it by.
+            unlink($stored->getPathname());
+
+            throw $exception;
+        }
 
         try {
             $this->bus->dispatch(new RunImportJob($job->getId()));
         } catch (HandlerFailedException) {
             // Run at once, without a queue: the handler has written why on the row.
+        } catch (\Throwable $exception) {
+            // The queue refused the job: the row would wait forever for a worker.
+            $job->setStatus(JobStatus::FAILED->value)
+                ->setError(mb_substr('The import could not be queued: '.$exception->getMessage(), 0, 2000))
+                ->setFinishedAt(new \DateTime())
+                ->save();
+            unlink($stored->getPathname());
+
+            throw $exception;
         }
 
         $job->reload();
 
         return $job;
+    }
+
+    /**
+     * The uploaded name, cut to keep its extension and the stored path short.
+     */
+    private static function shortName(string $originalName): string
+    {
+        $name = basename($originalName);
+        $extension = pathinfo($name, \PATHINFO_EXTENSION);
+        $stem = '' === $extension ? $name : substr($name, 0, -\strlen($extension) - 1);
+
+        return mb_substr($stem, 0, self::MAX_NAME_LENGTH).('' === $extension ? '' : '.'.mb_substr($extension, 0, 10));
     }
 }

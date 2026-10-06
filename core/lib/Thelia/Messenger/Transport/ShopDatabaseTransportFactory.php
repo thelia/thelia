@@ -76,7 +76,7 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
     }
 
     /**
-     * @return array{driver: 'pdo_mysql', user: string, password: string, host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
+     * @return array{driver: 'pdo_mysql', user: string, password: string, driverOptions: array<int|string, mixed>, host?: string, port?: int, dbname?: string, charset?: string, unix_socket?: string}
      */
     private static function connectionParameters(): array
     {
@@ -87,8 +87,39 @@ final class ShopDatabaseTransportFactory implements TransportFactoryInterface
             throw new TransportException('The shop database connection is not configured: the Messenger "doctrine://default" transport has nothing to connect to.');
         }
 
-        return ['driver' => 'pdo_mysql', 'user' => (string) ($configuration['user'] ?? ''), 'password' => (string) ($configuration['password'] ?? '')]
+        return ['driver' => 'pdo_mysql', 'user' => (string) ($configuration['user'] ?? ''), 'password' => (string) ($configuration['password'] ?? ''), 'driverOptions' => self::driverOptionsOf($configuration)]
             + self::parametersOfPdoDsn($configuration['dsn']);
+    }
+
+    /**
+     * The PDO options and attributes of the Propel connection, a TLS certificate
+     * among them: the queue connection is opened the way the shop one is, never in
+     * clear against a database that wants TLS. A value written as a class constant
+     * (`PDO::MYSQL_ATTR_SSL_CA`-style) is resolved, as Propel does.
+     *
+     * @param array<string, mixed> $configuration
+     *
+     * @return array<int|string, mixed>
+     */
+    public static function driverOptionsOf(array $configuration): array
+    {
+        $options = [];
+
+        foreach (['options', 'attributes'] as $section) {
+            if (!isset($configuration[$section]) || !\is_array($configuration[$section])) {
+                continue;
+            }
+
+            foreach ($configuration[$section] as $option => $value) {
+                if (\is_string($value) && str_contains($value, '::') && \defined($value)) {
+                    $value = \constant($value);
+                }
+
+                $options[$option] = $value;
+            }
+        }
+
+        return $options;
     }
 
     /**

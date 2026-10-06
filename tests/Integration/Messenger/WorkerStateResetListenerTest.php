@@ -14,11 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Worker;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\EventListener\ActiveLangsCacheListener;
@@ -99,6 +103,19 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
             if (null !== $request) {
                 $requestStack->push($request);
             }
+        }
+    }
+
+    public function testAWorkerReadsEveryModelAgainRatherThanFromThePool(): void
+    {
+        Propel::enableInstancePooling();
+
+        try {
+            $this->getService(WorkerStateResetListener::class)->onWorkerStarted(new WorkerStartedEvent(new Worker([], $this->getService(MessageBusInterface::class))));
+
+            self::assertFalse(Propel::isInstancePoolingEnabled());
+        } finally {
+            Propel::disableInstancePooling();
         }
     }
 

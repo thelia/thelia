@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Command\MessengerFailedPurgeCommand;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
@@ -24,6 +25,8 @@ use Thelia\Model\ImportJobQuery;
 readonly class PurgeExportCacheListener
 {
     public const EXPORT_JOB_RETENTION_DAYS = 7;
+
+    public const FAILED_JOB_RETENTION_DAYS = MessengerFailedPurgeCommand::DEFAULT_RETENTION_DAYS;
 
     public function __construct(private ExportCachePurger $exportCachePurger)
     {
@@ -41,8 +44,9 @@ readonly class PurgeExportCacheListener
         ));
 
         // A job outlives its file by a few days, so the back office can still say
-        // what was exported and why an export failed.
-        $deletedJobs = ExportJobQuery::purgeCreatedBefore(self::EXPORT_JOB_RETENTION_DAYS, $event->isDryRun());
+        // what was exported. A failed one stays as long as the failed jobs do: it
+        // can be replayed from there, and replaying needs its row.
+        $deletedJobs = ExportJobQuery::purgeCreatedBefore(self::EXPORT_JOB_RETENTION_DAYS, $event->isDryRun(), self::FAILED_JOB_RETENTION_DAYS);
 
         $event->addResult(\sprintf(
             '<comment>Export jobs (>%d days):</comment> <info>%d %s</info>',
@@ -51,13 +55,13 @@ readonly class PurgeExportCacheListener
             $event->isDryRun() ? 'to delete' : 'deleted',
         ));
 
-        $importJobs = ImportJobQuery::createdBefore(self::EXPORT_JOB_RETENTION_DAYS)->find();
+        $importJobs = ImportJobQuery::createdBefore(self::EXPORT_JOB_RETENTION_DAYS, self::FAILED_JOB_RETENTION_DAYS)->find();
 
         if (!$event->isDryRun()) {
             foreach ($importJobs as $importJob) {
                 // An import that never ran still holds the file it was given.
-                if (is_file($importJob->getFilePath())) {
-                    unlink($importJob->getFilePath());
+                if (is_file($importJob->getStoredFilePath())) {
+                    unlink($importJob->getStoredFilePath());
                 }
                 $importJob->delete();
             }

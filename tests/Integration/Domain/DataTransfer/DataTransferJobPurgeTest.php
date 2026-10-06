@@ -48,6 +48,25 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         self::assertNotNull(ExportJobQuery::create()->findPk($recentExport));
     }
 
+    /**
+     * A failed job can still be replayed from the failures for a month: its row stays
+     * as long, or the replay would find nothing to run.
+     */
+    public function testAFailedJobStaysAsLongAsTheFailures(): void
+    {
+        $failedImport = $this->importJob('-8 days', '/nowhere.csv', JobStatus::FAILED);
+        $expiredImport = $this->importJob('-40 days', '/nowhere.csv', JobStatus::FAILED);
+        $failedExport = $this->exportJob('-8 days', JobStatus::FAILED);
+        $expiredExport = $this->exportJob('-40 days', JobStatus::FAILED);
+
+        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+
+        self::assertNotNull(ImportJobQuery::create()->findPk($failedImport));
+        self::assertNull(ImportJobQuery::create()->findPk($expiredImport));
+        self::assertNotNull(ExportJobQuery::create()->findPk($failedExport));
+        self::assertNull(ExportJobQuery::create()->findPk($expiredExport));
+    }
+
     public function testADryRunKeepsEverything(): void
     {
         $file = tempnam(sys_get_temp_dir(), 'import-job-purge');
@@ -64,11 +83,11 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         unlink((string) $file);
     }
 
-    private function importJob(string $age, string $file): int
+    private function importJob(string $age, string $file, JobStatus $status = JobStatus::QUEUED): int
     {
         $job = (new ImportJob())
             ->setImportId((int) ImportQuery::create()->findOne()?->getId())
-            ->setStatus(JobStatus::QUEUED->value)
+            ->setStatus($status->value)
             ->setFilePath($file)
             ->setFileName('stock.csv');
         $job->save($this->getPropelConnection());
@@ -77,11 +96,11 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         return $job->getId();
     }
 
-    private function exportJob(string $age): int
+    private function exportJob(string $age, JobStatus $status = JobStatus::DONE): int
     {
         $job = (new ExportJob())
             ->setExportId((int) ExportQuery::create()->findOne()?->getId())
-            ->setStatus(JobStatus::DONE->value)
+            ->setStatus($status->value)
             ->setSerializer('thelia.csv');
         $job->save($this->getPropelConnection());
         $job->setCreatedAt(new \DateTime($age))->save($this->getPropelConnection());

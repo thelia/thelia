@@ -162,6 +162,69 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertNull($job->getError());
     }
 
+    /**
+     * Two workers handed the same job: the second finds it taken and leaves it alone.
+     */
+    public function testAJobRunningElsewhereIsNotRunASecondTime(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-5 minutes'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+        self::assertNull($job->getFilePath());
+    }
+
+    /**
+     * A worker that died left the job running: once the transport hands it again,
+     * past the redeliver timeout, it runs.
+     */
+    public function testAJobLeftRunningByAWorkerThatDiedRunsAgain(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->setStartedAt(new \DateTime('-2 hours'))->save($this->getPropelConnection());
+
+        $this->handler()(new RunExportJob($job->getId()));
+        $job->reload();
+        $this->files[] = (string) $job->getFilePath();
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
+    }
+
+    /**
+     * Replayed after the purge took its row, the job says so and stays among the
+     * failures rather than passing for done.
+     */
+    public function testAJobWhoseRowIsGoneFailsForGood(): void
+    {
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+
+        $this->handler()(new RunExportJob(999999999));
+    }
+
+    public function testAJobTheQueueRefusesIsRecordedAsFailed(): void
+    {
+        $refusingQueue = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new \RuntimeException('The queue server is unreachable.');
+            }
+        };
+
+        try {
+            $this->launcherWith($refusingQueue)->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+            self::fail('The caller must learn the export was not queued.');
+        } catch (\RuntimeException) {
+        }
+
+        $job = ExportJobQuery::create()->orderById('desc')->findOne();
+        self::assertNotNull($job);
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertStringContainsString('unreachable', (string) $job->getError());
+    }
+
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
     {
         $before = ExportJobQuery::create()->count();
