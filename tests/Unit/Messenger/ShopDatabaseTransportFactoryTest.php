@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Thelia\Messenger\Transport\PdoDsnReader;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Messenger\Transport\ShopDatabaseTransportFactory;
 
@@ -49,7 +50,7 @@ final class ShopDatabaseTransportFactoryTest extends TestCase
     {
         self::assertSame(
             ['host' => 'db', 'dbname' => 'shop', 'port' => 3307, 'charset' => 'utf8mb4'],
-            ShopDatabaseConnection::parametersOfPdoDsn('mysql:host=db;dbname=shop;port=3307;charset=utf8mb4'),
+            PdoDsnReader::parametersOfPdoDsn('mysql:host=db;dbname=shop;port=3307;charset=utf8mb4'),
         );
     }
 
@@ -57,7 +58,7 @@ final class ShopDatabaseTransportFactoryTest extends TestCase
     {
         self::assertSame(
             ['unix_socket' => '/run/mysqld/mysqld.sock', 'dbname' => 'shop'],
-            ShopDatabaseConnection::parametersOfPdoDsn('mysql:unix_socket=/run/mysqld/mysqld.sock;dbname=shop;port=;'),
+            PdoDsnReader::parametersOfPdoDsn('mysql:unix_socket=/run/mysqld/mysqld.sock;dbname=shop;port=;'),
         );
     }
 
@@ -65,14 +66,14 @@ final class ShopDatabaseTransportFactoryTest extends TestCase
     {
         $this->expectException(TransportException::class);
 
-        ShopDatabaseConnection::parametersOfPdoDsn('pgsql:host=db;dbname=shop');
+        PdoDsnReader::parametersOfPdoDsn('pgsql:host=db;dbname=shop');
     }
 
     public function testTheTlsOptionsOfThePropelConnectionAreKeptForTheQueue(): void
     {
         self::assertSame(
             [\PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/db-ca.pem', \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION],
-            ShopDatabaseConnection::driverOptionsOf([
+            PdoDsnReader::driverOptionsOf([
                 'options' => [\PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/db-ca.pem'],
                 'attributes' => [\PDO::ATTR_ERRMODE => 'PDO::ERRMODE_EXCEPTION'],
             ]),
