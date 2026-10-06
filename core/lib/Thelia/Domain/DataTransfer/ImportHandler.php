@@ -93,7 +93,7 @@ class ImportHandler
 
     /**
      * @param (\Closure(int): void)|null $onProgress told the number of rows read, every
-     *                                               ExportHandler::PROGRESS_STEP rows and once at the end
+     *                                               DataTransferProgress::STEP rows and once at the end
      */
     public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
@@ -286,7 +286,7 @@ class ImportHandler
                 $errors[] = $error;
             }
 
-            if (null !== $onProgress && 0 === ++$read % ExportHandler::PROGRESS_STEP) {
+            if (null !== $onProgress && 0 === ++$read % DataTransferProgress::STEP) {
                 $onProgress($read);
             }
         }

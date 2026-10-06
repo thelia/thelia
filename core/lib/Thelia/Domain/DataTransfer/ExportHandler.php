@@ -36,9 +36,6 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
-    /** How many rows are written between two reports of progress. */
-    public const PROGRESS_STEP = 500;
-
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected ExportCachePurger $exportCachePurger,
@@ -194,7 +191,7 @@ class ExportHandler
 
     /**
      * @param (\Closure(int): void)|null $onProgress told the number of rows written, every
-     *                                               PROGRESS_STEP rows and once at the end
+     *                                               DataTransferProgress::STEP rows and once at the end
      */
     protected function processExport(AbstractExport $export, SerializerInterface $serializer, ?\Closure $onProgress = null): string
     {
@@ -233,7 +230,7 @@ class ExportHandler
 
             $file->fwrite($data);
 
-            if (null !== $onProgress && 0 === ++$written % self::PROGRESS_STEP) {
+            if (null !== $onProgress && 0 === ++$written % DataTransferProgress::STEP) {
                 $onProgress($written);
             }
         }
