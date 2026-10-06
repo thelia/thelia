@@ -92,6 +92,7 @@
         "thelia/web-profiler-module": "^3.0"
     },
     "conflict": {
+        "thelia/backoffice-default-twig-template": "<1.1.2",
         "thelia/thelia-library-module": "2.0.10"
     },
     "extra": {
