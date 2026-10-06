@@ -11,6 +11,9 @@
 ## Fixed
 
 - `maintenance:purge --dry-run` no longer deletes the export cache files; it counts them.
+## Checkout and payment
+
+- Delivery dates and slots. A delivery module that implements `Thelia\Module\DeliveryDateAwareInterface` lets the buyer pick the day, or a slot of a day, they are delivered on or collect the order. Per carrier the merchant sets the shape of the choice, a minimum delay, a horizon, closed days of the week (or the shop's, in `delivery_closed_weekdays`), exceptional closures (of the shop or of one carrier) and slots with a capacity in orders. The choice is judged by the server against what the carrier offers at that moment (`delivery-date-missing`, `delivery-date-unavailable`, `delivery-slot-full`), the place in a slot is taken by a conditional update in the order transaction, a cancelled order gives it back, and the day and the hours are copied on the order (`DELIVERY_DATE`, `DELIVERY_SLOT_START`, `DELIVERY_SLOT_END` in the `order` loop, `deliveryDate`, `deliverySlotStart`, `deliverySlotEnd` on the front API). New front operations: `GET /front/delivery_modules/{moduleId}/delivery_dates` and `POST /front/account/checkout/{cartId}/delivery_date`. `3.3.0.sql` creates `delivery_date_rule`, `delivery_slot`, `delivery_slot_i18n`, `delivery_closure` and `delivery_slot_booking`, adds the columns to `cart`, `order` and `order_version`, and the `admin.configuration.delivery-date` permission; no carrier offers a date until the merchant sets one. See `docs/delivery-dates.md`.
 
 ## Behaviour changes
 
@@ -80,7 +83,6 @@ The first pattern finds a server-executable extension anywhere in a file name (`
 For each file listed under `local/media/`, delete the image or the document from the back office, on the Images or Documents tab of its product, category, content, folder or brand, so its row goes too. Then run the command again with `-delete` in place of `-print` to remove the files left behind.
 
 Deleting an image or a document over the admin API removes its row and leaves its files, and deleting it from the back office leaves its copy under `public/cache/`. A file deleted that way is still served at its URL: the command lists it as well, and `-delete` removes it.
-
 # 3.2.0
 
 Second minor of the 3.x line. 221 commits since 3.1.0. The version number follows the update script this release ships, `setup/update/sql/3.2.0.sql`, which carries the tables behind the catalog price rules and creates those of the second factor of the administrators, the product videos, the purchase lists, the gift wrappings and the order history, next to the VAT verification columns of the address, cart address and order address tables.
