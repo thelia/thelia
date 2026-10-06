@@ -211,6 +211,15 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertSame(3, $envelope->last(RedeliveryStamp::class)?->getRetryCount());
     }
 
+    public function testAJobThatDoesNotSayWhatItIsIsKeptAsAnUnreadableJob(): void
+    {
+        $envelope = $this->serializer()->decode(['body' => '{"anything":1}', 'headers' => ['Content-Type' => 'application/json']]);
+
+        self::assertInstanceOf(UndecodableJob::class, $envelope->getMessage());
+        self::assertSame('{"anything":1}', $envelope->getMessage()->originalBody);
+        self::assertSame(0, $this->inner->decoded);
+    }
+
     private function assertReadAsUndecodable(string $originalType): void
     {
         self::assertSame(1, $this->inner->decoded, 'Only the stand-in is built.');

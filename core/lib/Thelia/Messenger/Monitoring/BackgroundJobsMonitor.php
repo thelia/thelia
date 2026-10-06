@@ -31,6 +31,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Log\Tlog;
 use Thelia\Messenger\Message\UndecodableJob;
 
 /**
@@ -122,7 +123,15 @@ final readonly class BackgroundJobsMonitor
         try {
             $this->bus->dispatch(new Envelope($envelope->getMessage(), [new TransportNamesStamp([$transport])]));
         } catch (\Throwable $exception) {
-            $this->failureTransport->send($envelope->withoutAll(TransportMessageIdStamp::class));
+            try {
+                $this->failureTransport->send($envelope->withoutAll(TransportMessageIdStamp::class));
+            } catch (\Throwable $putBackFailure) {
+                // Neither replayed nor set aside again: the log is the last place the job
+                // is written to, so whoever reads it can dispatch it again by hand.
+                Tlog::getInstance()->addCritical(\sprintf('The failed job %s could be neither replayed nor set aside again, it is lost from the queues: %s', $id, json_encode(['class' => $envelope->getMessage()::class, 'message' => (array) $envelope->getMessage()], \JSON_PARTIAL_OUTPUT_ON_ERROR)));
+
+                throw new \RuntimeException(\sprintf('The job could not be replayed (%s), nor set aside again (%s).', $exception->getMessage(), $putBackFailure->getMessage()), 0, $exception);
+            }
 
             throw $exception;
         }

@@ -25,7 +25,10 @@ use Thelia\Config\DatabaseConfiguration;
  * while it still runs. The status is switched to running by a single conditional
  * UPDATE, so the second one finds the job taken and leaves it alone. A job left
  * running by a worker that died is taken again once it has run for longer than the
- * redeliver timeout, the delay after which the transport hands it again.
+ * redeliver timeout, the delay after which the transport hands it again. That time is
+ * counted from the last sign of life of the job, which its handler gives as it goes,
+ * not from its start: a long export that is still writing is never taken from under
+ * the worker running it.
  */
 final class JobClaim
 {
@@ -43,7 +46,7 @@ final class JobClaim
 
         $statement = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->prepare(
             'UPDATE `'.$table.'` SET `status` = :running, `started_at` = :now, `finished_at` = NULL, `error` = NULL, `updated_at` = :updated'
-            .' WHERE `id` = :id AND (`status` IN (:queued, :failed) OR (`status` = :stillRunning AND `started_at` < :stale))',
+            .' WHERE `id` = :id AND (`status` IN (:queued, :failed) OR (`status` = :stillRunning AND `updated_at` < :stale))',
         );
         $statement->execute([
             'running' => JobStatus::RUNNING->value,

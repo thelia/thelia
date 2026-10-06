@@ -30,7 +30,12 @@ class ImportJobQuery extends BaseImportJobQuery
         $query = self::create()->filterByCreatedAt(new \DateTime(\sprintf('-%d days', $days)), Criteria::LESS_THAN);
 
         if (null !== $failedDays) {
-            $query->where(\sprintf('%s <> ? OR %s < ?', ImportJobTableMap::COL_STATUS, ImportJobTableMap::COL_CREATED_AT), [JobStatus::FAILED->value, (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s')]);
+            // A job past the first period goes unless it failed; a failed one waits
+            // for the second. Two named conditions, so the OR is parenthesized.
+            $query
+                ->condition('notFailed', ImportJobTableMap::COL_STATUS.' <> ?', JobStatus::FAILED->value)
+                ->condition('failureExpired', ImportJobTableMap::COL_CREATED_AT.' < ?', (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s'))
+                ->where(['notFailed', 'failureExpired'], Criteria::LOGICAL_OR);
         }
 
         return $query;

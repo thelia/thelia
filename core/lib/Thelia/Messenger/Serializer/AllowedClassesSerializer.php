@@ -73,7 +73,7 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
         $headers = $encodedEnvelope['headers'] ?? null;
 
         if (!\is_array($headers) || !\is_string($headers['type'] ?? null)) {
-            throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
+            return new Envelope(new UndecodableJob('', 'The queued job does not say what class it is.', (string) ($encodedEnvelope['body'] ?? '')));
         }
 
         try {

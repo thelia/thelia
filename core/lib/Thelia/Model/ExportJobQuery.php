@@ -30,7 +30,12 @@ class ExportJobQuery extends BaseExportJobQuery
         $query = self::create()->filterByCreatedAt(new \DateTime(\sprintf('-%d days', $days)), Criteria::LESS_THAN);
 
         if (null !== $failedDays) {
-            $query->where(\sprintf('%s <> ? OR %s < ?', ExportJobTableMap::COL_STATUS, ExportJobTableMap::COL_CREATED_AT), [JobStatus::FAILED->value, (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s')]);
+            // A job past the first period goes unless it failed; a failed one waits
+            // for the second. Two named conditions, so the OR is parenthesized.
+            $query
+                ->condition('notFailed', ExportJobTableMap::COL_STATUS.' <> ?', JobStatus::FAILED->value)
+                ->condition('failureExpired', ExportJobTableMap::COL_CREATED_AT.' < ?', (new \DateTime(\sprintf('-%d days', $failedDays)))->format('Y-m-d H:i:s'))
+                ->where(['notFailed', 'failureExpired'], Criteria::LOGICAL_OR);
         }
 
         return $dryRun ? $query->count() : $query->delete();
