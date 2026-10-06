@@ -22,6 +22,9 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Mime\Email;
+use Thelia\Core\DependencyInjection\Compiler\HandledMessageClassesPass;
+use Thelia\Domain\DataTransfer\Job\DataTransferJobMessage;
+use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 use Thelia\Model\ModuleQuery;
@@ -167,7 +170,7 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
 
     public function testAProjectCanLetAClassThrough(): void
     {
-        (new AllowedClassesSerializer($this->inner, [RunCommandMessage::class]))->decode($this->encoded(RunCommandMessage::class));
+        (new AllowedClassesSerializer($this->inner, [RunCommandMessage::class], []))->decode($this->encoded(RunCommandMessage::class));
 
         self::assertSame(1, $this->inner->decoded);
     }
@@ -220,6 +223,43 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertSame(0, $this->inner->decoded);
     }
 
+    /**
+     * The core has many classes; a queue may only build the ones a handler takes, and
+     * none of the others, whatever their constructor does.
+     */
+    public function testAClassOfTheCoreNoHandlerTakesIsNeverBuilt(): void
+    {
+        $this->serializer([SendEmailMessage::class])->decode($this->encoded(ProbeMessage::class));
+
+        $this->assertReadAsUndecodable(ProbeMessage::class);
+    }
+
+    public function testAClassNoHandlerTakesCannotBeQueued(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('no handler takes it');
+
+        $this->serializer([SendEmailMessage::class])->encode(new Envelope(new ProbeMessage('nobody')));
+    }
+
+    public function testAClassHandledThroughItsInterfaceIsLetThrough(): void
+    {
+        $this->serializer([DataTransferJobMessage::class])->decode($this->encoded(RunExportJob::class));
+
+        self::assertSame(1, $this->inner->decoded);
+    }
+
+    public function testTheContainerListsTheClassesItsHandlersTake(): void
+    {
+        $handled = static::getContainer()->getParameter(HandledMessageClassesPass::PARAMETER);
+        \assert(\is_array($handled));
+
+        self::assertContains(SendEmailMessage::class, $handled);
+        self::assertContains(RunExportJob::class, $handled);
+        self::assertContains(UndecodableJob::class, $handled);
+        self::assertNotContains(ProbeMessage::class, $handled);
+    }
+
     private function assertReadAsUndecodable(string $originalType): void
     {
         self::assertSame(1, $this->inner->decoded, 'Only the stand-in is built.');
@@ -228,9 +268,13 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertSame($originalType, $body['originalType'] ?? null);
     }
 
-    private function serializer(): AllowedClassesSerializer
+    /**
+     * @param list<string> $handledMessageClasses by default, every class is taken by a
+     *                                            handler: the namespaces alone decide
+     */
+    private function serializer(array $handledMessageClasses = ['*']): AllowedClassesSerializer
     {
-        return new AllowedClassesSerializer($this->inner);
+        return new AllowedClassesSerializer($this->inner, [], $handledMessageClasses);
     }
 
     /**

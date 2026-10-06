@@ -31,6 +31,9 @@ return static function (ContainerConfigurator $container): void {
         // Message classes, outside the core and the active modules, that a
         // project lets through its queues (see AllowedClassesSerializer).
         ->set('thelia.messenger.allowed_message_classes', [])
+        // The message classes a handler takes, filled in when the container is
+        // built (see HandledMessageClassesPass).
+        ->set('thelia.messenger.handled_message_classes', [])
         // The recurring tasks of the core (see TheliaSchedule), as cron
         // expressions read when a worker consumes scheduler_thelia. Empty leaves
         // the task out. The currency rates are left out by default: the update
