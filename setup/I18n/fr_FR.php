@@ -317,6 +317,7 @@ return [
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration checkout consents' => 'Configuration des consentements du tunnel de commande',
     'Configuration gift wrappings' => 'Configuration des emballages cadeaux',
+    'Configuration delivery dates' => 'Configuration des dates de livraison',
     'Configuration checkout steps' => 'Configuration des étapes du tunnel de commande',
     'Catalog price rules' => 'Règles de prix catalogue',
     'Configuration variables' => 'Variables de configuration',
