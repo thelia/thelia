@@ -319,4 +319,106 @@ CREATE TABLE IF NOT EXISTS `messenger_messages`
     INDEX `idx_messenger_messages_queue_name_available_at` (`queue_name`, `available_at`, `delivered_at`, `id`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- An export asked for in the back office, run in the background: what it is
+-- written with, how far it got, and where its file is once done.
+CREATE TABLE IF NOT EXISTS `export_job`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `export_id` INTEGER NOT NULL,
+    `admin_id` INTEGER COMMENT 'the admin who asked for the export, NULL once that admin is gone',
+    `status` VARCHAR(20) DEFAULT 'queued' NOT NULL COMMENT 'queued, running, done or failed',
+    `serializer` VARCHAR(100) NOT NULL COMMENT 'the id of the serializer the file is written with',
+    `archiver` VARCHAR(100) COMMENT 'the id of the archiver the file is packed with, NULL for none',
+    `lang_id` INTEGER,
+    `include_images` TINYINT DEFAULT 0 NOT NULL,
+    `include_documents` TINYINT DEFAULT 0 NOT NULL,
+    `range_start` DATETIME,
+    `range_end` DATETIME,
+    `processed_rows` INTEGER DEFAULT 0 NOT NULL COMMENT 'the rows written so far',
+    `file_path` VARCHAR(255) COMMENT 'where the finished file is, on the server',
+    `file_name` VARCHAR(255) COMMENT 'the name the file is downloaded under',
+    `error` TEXT COMMENT 'why the export failed, as shown to the administrator',
+    `started_at` DATETIME,
+    `finished_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_export_job_export_id` (`export_id`),
+    INDEX `idx_export_job_created_at` (`created_at`),
+    INDEX `fi_export_job_admin_id` (`admin_id`),
+    INDEX `fi_export_job_lang_id` (`lang_id`),
+    CONSTRAINT `fk_export_job_export_id`
+        FOREIGN KEY (`export_id`)
+        REFERENCES `export` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_export_job_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_export_job_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- An import asked for in the back office, run in the background: the uploaded
+-- file it reads, how many rows it changed and which ones it refused.
+CREATE TABLE IF NOT EXISTS `import_job`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `import_id` INTEGER NOT NULL,
+    `admin_id` INTEGER COMMENT 'the admin who asked for the import, NULL once that admin is gone',
+    `status` VARCHAR(20) DEFAULT 'queued' NOT NULL COMMENT 'queued, running, done or failed',
+    `lang_id` INTEGER,
+    `file_path` VARCHAR(255) NOT NULL COMMENT 'where the uploaded file waits for the import, on the server',
+    `file_name` VARCHAR(255) NOT NULL COMMENT 'the name the file was uploaded under',
+    `imported_rows` INTEGER DEFAULT 0 NOT NULL COMMENT 'the rows the import changed',
+    `row_errors` TEXT COMMENT 'the rows the import refused and why, as a JSON list',
+    `error` TEXT COMMENT 'why the import failed, as shown to the administrator',
+    `started_at` DATETIME,
+    `finished_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_import_job_import_id` (`import_id`),
+    INDEX `idx_import_job_created_at` (`created_at`),
+    INDEX `fi_import_job_admin_id` (`admin_id`),
+    INDEX `fi_import_job_lang_id` (`lang_id`),
+    CONSTRAINT `fk_import_job_import_id`
+        FOREIGN KEY (`import_id`)
+        REFERENCES `import` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_import_job_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_import_job_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The background jobs screen shows why a job failed, and the reason may carry
+-- personal data: it answers to a resource of its own, granted to a profile.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.background-jobs', NOW(), NOW());
+
+SET @background_jobs_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.background-jobs');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@background_jobs_resource_id, 'cs_CZ', 'Konfigurace úloh na pozadí', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'de_DE', 'Konfiguration der Hintergrundaufgaben', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'en_US', 'Configuration background jobs', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'es_ES', 'Configuración de tareas en segundo plano', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'fr_FR', 'Configuration des tâches en arrière-plan', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'it_IT', 'Configurazione delle attività in background', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'nl_NL', 'Configuratie van achtergrondtaken', NULL, NULL, NULL),
+    (@background_jobs_resource_id, 'ru_RU', 'Настройка фоновых задач', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
