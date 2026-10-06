@@ -1,27 +1,67 @@
-# 3.2.1 (unreleased)
+# 3.2.1
+
+Security and maintenance release of the 3.2 line, without any breaking change. It ships `setup/update/sql/3.2.1.sql`, which renames the tax types a shop migrated from Thelia 2 still stores under their Thelia 2 class, declares the back-office hooks the Twig templates call, and records the new version. `thelia/setup` ships as 3.2.1 with this core; `thelia/config` does not change and stays at 3.2.0. Update the back-office theme `thelia/backoffice-default-twig-template` to 1.2.2 and the front theme `thelia/flexy` to 1.2.1 at the same time.
 
 ## Security
 
-- GHSA-5524-qfxp-33v9 — the upload policy checked the file name the client sent, while storage keeps only its letters, digits, dashes, underscores and dots. A document named `report.php ` (trailing space), `report.ph p` or `report.ph#p` passed both the extension blacklist and the server-executable floor, was stored as `report-1.php` and published under `public/cache/documents/`, where a web server that runs PHP in the document root executed it. The policy now checks the name the file is stored under as well as the name it was sent with, and storage itself refuses a server-executable name, so a caller that skips the policy cannot store one either. The SVG sanitizer also recognises an SVG by its stored name, and `MediaFacade::uploadImage()` and `MediaFacade::uploadDocument()` apply the upload policy, as the video upload already did. After the update, look for files with a server-executable extension (`.php`, `.phtml`, `.phar`…) under `local/media/` and `public/cache/` and remove them.
+- [GHSA-5524-qfxp-33v9](https://github.com/thelia/thelia/security/advisories/GHSA-5524-qfxp-33v9) — the upload policy checked the file name the client sent, while storage keeps only its letters, digits, dashes, underscores and dots. A document named `report.php ` (trailing space), `report.ph p` or `report.ph#p` passed both the extension blacklist and the server-executable floor, was stored as `report-1.php` and published under `public/cache/documents/`, where a web server that runs PHP in the document root executed it. The policy now checks the name the file is stored under as well as the name it was sent with, and storage itself refuses a server-executable name, so a caller that skips the policy cannot store one either. The SVG sanitizer also recognises an SVG by its stored name, and `MediaFacade::uploadImage()` and `MediaFacade::uploadDocument()` apply the upload policy, as the video upload already did. Files already stored under such a name stay in place after the update: see the upgrade notes.
 
-- GHSA-7wrm-pcw6-4g9m — a document upload accepted HTML and the other types a browser opens as a page or runs as a script, and the shop published them under `public/cache/documents/`, so a script carried by a document ran on the shop origin for anyone opening its link. Documents with an HTML, XHTML, XML, XSL, JavaScript or compressed SVG extension are now refused, whatever `document_upload_forbidden_extensions` says; the list is `FileConfiguration::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS`. The file endpoints of the API serve a document as a download, with `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`. On Apache, the document cache gets an `.htaccess`, written by `update.php` for the documents already published and before any document is published, that sends `nosniff` for every document and `attachment` for all but PDF, raster image and plain text files, which still open in the browser. It needs the `FileInfo` override that `public/.htaccess` already needs. nginx does not read it; add this block to the server block, where the `^~` prefix also keeps the PHP location away from the document cache. Documents uploaded before the update stay published: look for such files under `local/media/documents/` and `public/cache/documents/` and remove them.
+- [GHSA-7wrm-pcw6-4g9m](https://github.com/thelia/thelia/security/advisories/GHSA-7wrm-pcw6-4g9m) — a document upload accepted HTML and the other types a browser opens as a page or runs as a script, and the shop published them under `public/cache/documents/`, so a script carried by a document ran on the shop origin for anyone opening its link. Documents with an HTML, XHTML, XML, XSL, JavaScript or compressed SVG extension are now refused, whatever `document_upload_forbidden_extensions` says; the list is `FileConfiguration::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS`. The file endpoints of the API serve a document as a download, with `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`. On Apache, the document cache gets an `.htaccess`, written by `update.php` for the documents already published and before any document is published, that sends `nosniff` for every document and `attachment` for all but PDF, raster image and plain text files, which still open in the browser. It needs the `FileInfo` override that `public/.htaccess` already needs. nginx does not read it: the upgrade notes give the equivalent block. Documents uploaded before the update stay published until they are removed, as the upgrade notes describe.
 
-  ```nginx
-  location ^~ /cache/documents/ {
-      add_header X-Content-Type-Options "nosniff" always;
-      add_header Content-Disposition "attachment" always;
-
-      location ~* \.(?:pdf|jpe?g|png|gif|webp|avif|txt)$ {
-          add_header X-Content-Type-Options "nosniff" always;
-      }
-  }
-  ```
-
-- GHSA-gcgv-f8rf-w2wc — the CSV exports wrote customer and newsletter subscriber names, addresses and phone numbers exactly as typed, so a value starting with `=`, `+`, `-` or `@` reached the file as a formula that ran in the spreadsheet of the administrator who opened it. Any text cell of a CSV export, from the core or from a module, that starts with one of these characters, a tab or a carriage return now gets a leading `'` and stays text. A plain number such as `-5.00` or `+33612345678` is written unchanged. A cell holding `,` or `;` is also enclosed in quotes, so a spreadsheet that splits lines on the other separator cannot start a formula halfway through it. JSON, XML and YAML exports are unchanged.
+- [GHSA-gcgv-f8rf-w2wc](https://github.com/thelia/thelia/security/advisories/GHSA-gcgv-f8rf-w2wc) — the CSV exports wrote customer and newsletter subscriber names, addresses and phone numbers exactly as typed, so a value starting with `=`, `+`, `-` or `@` reached the file as a formula that ran in the spreadsheet of the administrator who opened it. Any text cell of a CSV export, from the core or from a module, that starts with one of these characters, a tab or a carriage return now gets a leading `'` and stays text. A plain number such as `-5.00` or `+33612345678` is written unchanged. A cell holding `,` or `;` is also enclosed in quotes, so a spreadsheet that splits lines on the other separator cannot start a formula halfway through it. JSON, XML and YAML exports are unchanged. The back-office theme 1.2.2 writes the newsletter subscriber export the same way.
 
 ## Fixed
 
+- A shop migrated from Thelia 2 with a fixed amount tax or a feature amount tax (eco-tax) prices the products under these taxes again. The migration only moved the percentage tax type to its Thelia 3 class, so the other two kept a class name no tax type answers to, and computing a price failed with "Recorded type ... does not exists". `3.2.1.sql` renames them on a shop already migrated, and `3.0.0-alpha1.sql` on a shop migrated from now on.
+- A feature amount tax returns its amount as a number. `FeatureFixAmountTaxType` returned the text of the feature value, which strict types turned into a `TypeError`.
+- The 105 back-office hooks the Twig templates call without declaring them, `customer.tab`, `customer.tab-content` and `customer-edit.actions` among them, are seeded on a fresh install and added by `3.2.1.sql` on an installed shop. A module subscribing to one of them was dropped when the container was built ("Hook customer.tab is unknown."), and its section never showed. A hook a module already created keeps its id and its titles.
+- `setup/update.php` no longer dies when the cache of the previous release belongs to the web server user. It moves `var/cache/<env>` and `var/propel/<env>` aside before deleting what it can, prints the command that deletes the rest as its owner, and stops with code `8`, before touching the database, when it cannot even move them. See `UPDATE.md`.
+- The pickup location provider reads its search parameters (radius, address, country, module ids) from the filters of the operation context before the request, so a caller that is not an HTTP request, such as `resources()` in a front theme, can pass them.
+- The state field of the address form is translated.
 - A `Thelia\Core\File\Exception\FileException` built from a message alone threw a `TypeError` instead of itself.
+- The `/file` endpoints of the front and admin API serve the file to a client whose `Accept` header puts `text/html` first, as a browser opening the URL does. They answered 500.
+- The customer export writes the first and last names under their own column labels; they were swapped.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+The update script writes the `.htaccess` of the document cache (`public/cache/documents/` by default), so on Apache the documents already published are served with the download headers from then on. If it cannot write the file, it prints a warning naming `Thelia\Core\File\DocumentCacheProtection`, which writes it. nginx does not read `.htaccess`: add this block to the server block of the shop. The `^~` prefix also keeps the PHP location away from the document cache.
+
+```nginx
+location ^~ /cache/documents/ {
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Content-Disposition "attachment" always;
+
+    location ~* \.(?:pdf|jpe?g|png|gif|webp|avif|txt)$ {
+        add_header X-Content-Type-Options "nosniff" always;
+    }
+}
+```
+
+### Files uploaded before the update
+
+The update refuses such uploads from now on, but it leaves the files already stored where they are. Look for an image or a document stored under a name a web server runs (GHSA-5524-qfxp-33v9), and for a document a browser opens as a page or runs as a script (GHSA-7wrm-pcw6-4g9m). From the root of the project, with GNU find:
+
+```bash
+find local/media public/cache -regextype posix-extended \
+  ! -type d ! -path public/cache/documents/.htaccess \
+  \( -iregex '.*/[^/]*\.(ph(p[3-8st]?|t(ml?)?|ar)|s(html?|tm)|ht(access|passwd))(\.[^/]*)?' \
+  -o -iregex '[^/]+/[^/]+/documents/.*\.(html?|x(ht(ml?)?|ml|slt?|spf|ul)|m(ht(ml)?|ml)|r(df|ss)|atom|kml|svgz|[cm]?js)' \) \
+  -print
+```
+
+The first pattern finds a server-executable extension anywhere in a file name (`report-1.php`, `shell.php.jpg`), among images and documents; the second finds an HTML, XML, XSL, JavaScript or compressed SVG document. The command only lists files. It skips the `.htaccess` the update writes, and it lists the links of the cache whose target is already gone. If the shop keeps its media or its document cache elsewhere (`document_cache_dir_from_web_root`), change the paths.
+
+For each file listed under `local/media/`, delete the image or the document from the back office, on the Images or Documents tab of its product, category, content, folder or brand, so its row goes too. Then run the command again with `-delete` in place of `-print` to remove the files left behind.
+
+Deleting an image or a document over the admin API removes its row and leaves its files, and deleting it from the back office leaves its copy under `public/cache/`. A file deleted that way is still served at its URL: the command lists it as well, and `-delete` removes it.
 
 # 3.2.0
 
@@ -197,19 +237,15 @@ Second minor of the 3.x line. 221 commits since 3.1.0. The version number follow
 - API Platform is pinned to 4.3.x. `core/composer.json` declares a conflict with `api-platform/symfony` and with its split packages (`documentation`, `http-cache`, `hydra`, `json-schema`, `jsonld`, `metadata`, `openapi`, `serializer`, `state`, `validator`) from 4.4.0 up to, and excluding, 5.0. The 4.4 upgrade command breaks the console on a shop without Doctrine, and the split packages, which `api-platform/symfony` 4.3 accepts in `^4.3`, resolved to 4.4 and raised a filter declaration deprecation for every operation. A project or a module that requires API Platform 4.4 cannot be installed next to the core.
 - In the `default-twig` back-office theme, `BackOfficeDefaultTwigBundle\Service\Dashboard\DashboardStatsProvider::__construct()` takes `PeriodOptions`, which now builds the period presets the dashboard and the reports share. A module instantiating the provider itself has to pass it.
 - The core requires the 1.2 line of the Flexy and default-twig themes: `thelia/core` conflicts with `thelia/flexy` and `thelia/backoffice-default-twig-template` below 1.2, since Flexy 1.1 listens to `ORDER_CART_CLEAR`, which the core no longer raises, and the 1.1 back-office theme sends none of the form tokens the core now checks. Composer refuses an update that would keep a 1.1 theme and says why.
+- `Thelia\Action\Cart`, `Thelia\Action\Tax`, `Thelia\Api\Bridge\Propel\Serializer\CartNormalizer` and `Thelia\Api\Service\DataAccess\AttributeAccessService` take `VatExemptionResolver`, and `Thelia\Domain\Order\OrderFacade` takes `VatExemptionResolver` and `ExemptedVatCalculator`. `Thelia\Domain\Order\Service\OrderAddressPersister::prepareOrderAddresses()` takes `bool $vatExempted` before the connection. A module instantiating one of them itself has to follow; a module reading it from the container has nothing to do. In the back-office theme, `BackOfficeDefaultTwigBundle\Controller\Customer\AddressController` takes `VatVerificationAvailability`.
+- Saving an `Address` whose VAT number or country changed clears `vat_verified_at` and `vat_verified_name`, unless the same save writes the verification. Saving an `OrderAddress` with a new VAT number does the same.
+- `Cart::getPostage()` and `Cart::getPostageTax()` hold the quote of the delivery module. What the buyer owes is read from `Cart::getTaxedPostage()`, `Cart::getUntaxedPostage()` and `Cart::getPostageTaxAmount()`, which take the exemption into account; the front API `Cart.postage` and `Cart.postageTax` and the Flexy `postage` and `postage_tax` cart attributes follow them.
 
 ## Security
 
 - GHSA-cfvv-2jvw-x2hp — the back-office toggle and position actions inherited from `AbstractCrudController` changed data without checking the session token, and a deletion read its token from the URL only, where access logs, browser history and Referer headers keep it. These actions now check the token, look for it in the request body or the `X-CSRF-Token` header before the URL, and compare it in constant time.
 
 - GHSA-gvcv-hvpp-89gx — an SVG store logo or banner reached the web space as it was uploaded: the image cache linked to it or copied it into `public/cache/images/`, so a script or an event handler it carried ran on the shop origin for anyone opening its URL, which every front page advertises in `og:image`. The image cache now publishes an SVG only as a copy stripped of its active content, whatever `original_image_delivery_mode` says, replaces the links earlier versions left there and publishes nothing for an SVG it cannot read. The SVG sanitizer applied to uploads also drops processing instructions, the document type declaration and its entities, XHTML elements, and javascript: or data: URIs behind any attribute prefix, and refuses a file whose root is not an SVG element; a raster image embedded as base64 is kept. Run `php bin/console image-cache:clear` after the update to drop resized copies made from an unsanitized SVG.
-- In the `default-twig` back-office theme, `BackOfficeDefaultTwigBundle\Service\Dashboard\DashboardStatsProvider::__construct()` takes `PeriodOptions`, which now builds the period presets the dashboard and the reports share. A module instantiating the provider itself has to pass it.
-- `Thelia\Action\Cart`, `Thelia\Action\Tax`, `Thelia\Api\Bridge\Propel\Serializer\CartNormalizer` and `Thelia\Api\Service\DataAccess\AttributeAccessService` take `VatExemptionResolver`, and `Thelia\Domain\Order\OrderFacade` takes `VatExemptionResolver` and `ExemptedVatCalculator`. `Thelia\Domain\Order\Service\OrderAddressPersister::prepareOrderAddresses()` takes `bool $vatExempted` before the connection. A module instantiating one of them itself has to follow; a module reading it from the container has nothing to do. In the back-office theme, `BackOfficeDefaultTwigBundle\Controller\Customer\AddressController` takes `VatVerificationAvailability`.
-- `Thelia\Action\Tax` and `Thelia\Api\Service\DataAccess\AttributeAccessService` take `VatExemptionResolver`, and `Thelia\Domain\Order\OrderFacade` takes `ExemptedVatCalculator`. `Thelia\Domain\Order\Service\OrderAddressPersister::prepareOrderAddresses()` takes `bool $vatExempted` before the connection. A module instantiating one of them itself has to follow; a module reading it from the container has nothing to do. In the back-office theme, `BackOfficeDefaultTwigBundle\Controller\Customer\AddressController` takes `VatVerificationAvailability`.
-- Saving an `Address` whose VAT number or country changed clears `vat_verified_at` and `vat_verified_name`, unless the same save writes the verification. Saving an `OrderAddress` with a new VAT number does the same.
-- `Cart::getPostage()` and `Cart::getPostageTax()` hold the quote of the delivery module. What the buyer owes is read from `Cart::getTaxedPostage()`, `Cart::getUntaxedPostage()` and `Cart::getPostageTaxAmount()`, which take the exemption into account; the front API `Cart.postage` and `Cart.postageTax` and the Flexy `postage` and `postage_tax` cart attributes follow them.
-- GHSA-cfvv-2jvw-x2hp: the back-office toggle and position actions inherited from `AbstractCrudController` changed data without checking the session token, and a deletion read its token from the URL only, where access logs, browser history and Referer headers keep it. These actions now check the token, look for it in the request body or the `X-CSRF-Token` header before the URL, and compare it in constant time.
-- GHSA-gvcv-hvpp-89gx: an SVG store logo or banner reached the web space as it was uploaded: the image cache linked to it or copied it into `public/cache/images/`, so a script or an event handler it carried ran on the shop origin for anyone opening its URL, which every front page advertises in `og:image`. The image cache now publishes an SVG only as a copy stripped of its active content, whatever `original_image_delivery_mode` says, replaces the links earlier versions left there and publishes nothing for an SVG it cannot read. The SVG sanitizer applied to uploads also drops processing instructions, the document type declaration and its entities, XHTML elements, and javascript: or data: URIs behind any attribute prefix, and refuses a file whose root is not an SVG element; a raster image embedded as base64 is kept. Run `php bin/console image-cache:clear` after the update to drop resized copies made from an unsanitized SVG.
 
 # 3.1.1
 
