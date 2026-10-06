@@ -34,6 +34,7 @@ use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
+use Thelia\Api\State\Processor\ItemFileRemoveProcessor;
 use Thelia\Model\Map\ProductDocumentTableMap;
 
 #[ApiResource(
@@ -72,6 +73,7 @@ use Thelia\Model\Map\ProductDocumentTableMap;
         ),
         new Delete(
             uriTemplate: '/admin/product_documents/{id}',
+            processor: ItemFileRemoveProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
