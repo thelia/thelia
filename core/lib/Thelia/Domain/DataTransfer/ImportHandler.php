@@ -204,9 +204,12 @@ class ImportHandler
      * before anything is written to disk. Callers get the same policy the back office
      * displays, so the promise made by the interface is the one that is enforced.
      *
+     * Given the file, its content is checked too: the name is chosen by whoever
+     * uploads it, the content is what gets stored and read.
+     *
      * @throws FormValidationException when the file may not be imported
      */
-    public function validateUpload(string $fileName): void
+    public function validateUpload(string $fileName, ?File $file = null): void
     {
         $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
 
@@ -220,6 +223,40 @@ class ImportHandler
         if (!\in_array($extension, $acceptedExtensions, true)) {
             throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
         }
+
+        if (null !== $file && !$this->contentMatchesExtension($file, $fileName)) {
+            throw new FormValidationException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
+        }
+    }
+
+    /**
+     * An archive must be an archive of its kind; anything else must be text, the only
+     * thing a serializer reads.
+     */
+    private function contentMatchesExtension(File $file, string $fileName): bool
+    {
+        $detected = (new \finfo(\FILEINFO_MIME_TYPE))->file($file->getPathname());
+
+        if (false === $detected) {
+            return false;
+        }
+
+        $archiver = $this->matchArchiverByExtension($fileName);
+
+        if ($archiver instanceof AbstractArchiver) {
+            return self::withoutVendorPrefix($detected) === self::withoutVendorPrefix($archiver->getMimeType());
+        }
+
+        return str_starts_with($detected, 'text/')
+            || \in_array($detected, ['application/json', 'application/xml', 'application/csv', 'application/x-empty', 'inode/x-empty'], true);
+    }
+
+    /**
+     * application/x-gzip and application/gzip name the same format.
+     */
+    private static function withoutVendorPrefix(string $mimeType): string
+    {
+        return str_replace('/x-', '/', strtolower($mimeType));
     }
 
     public function matchArchiverByExtension(string $fileName): ?AbstractArchiver

@@ -47,7 +47,7 @@ final readonly class ImportJobLauncher
     public function launch(Import $import, File $file, string $originalName, ?Lang $language = null, ?int $adminId = null): ImportJob
     {
         // Refused here, in the request, rather than by a worker minutes later.
-        $this->importHandler->validateUpload($originalName);
+        $this->importHandler->validateUpload($originalName, $file);
 
         $relativeDirectory = self::STORAGE_DIRECTORY.'/'.(new \DateTime())->format('Ymd');
         $stored = $file->move(

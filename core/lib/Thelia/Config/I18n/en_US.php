@@ -573,6 +573,7 @@ return [
     'The brand name or title' => 'The brand name or title',
     'The cart item count should match the condition' => 'The cart item count should match the condition',
     'The category title' => 'The category title',
+    'The content of the file is not a "%extension" file.' => 'The content of the file is not a "%extension" file.',
     'The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.',
     'The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.' => 'The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.',
     'The class "%class" doesn\'t exist' => 'The class "%class" doesn\'t exist',
