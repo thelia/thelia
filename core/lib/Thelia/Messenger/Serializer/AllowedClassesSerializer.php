@@ -31,8 +31,9 @@ use Thelia\Module\BaseModule;
  * the queue chooses their classes. The envelope is JSON, never PHP serialization, and
  * before anything is built from it the message class and every stamp class are
  * checked: the message is a class of the core, of an active module or one of the
- * few Symfony messages the shop sends (an e-mail); a stamp is a Messenger stamp or
- * one of those same namespaces. A stamp carrying serializer context is refused, as
+ * few Symfony messages the shop sends (an e-mail), and one a handler of the
+ * application takes, so no other class of those namespaces is ever built from a
+ * queue; a stamp is a Messenger stamp or one of those same namespaces. A stamp carrying serializer context is refused, as
  * it would let the queue reconfigure how the rest of the envelope is read.
  *
  * The same check runs when a job is queued, so a module that dispatches a class the
@@ -58,13 +59,17 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
     private const CORE_NAMESPACE = 'Thelia\\';
 
     /**
-     * @param list<string> $extraAllowedClasses classes a project adds, by exact name
+     * @param list<string> $extraAllowedClasses   classes a project adds, by exact name
+     * @param list<string> $handledMessageClasses the message classes (or their parents
+     *                                            and interfaces) a handler takes
      */
     public function __construct(
         #[Autowire(service: 'messenger.transport.symfony_serializer')]
         private SerializerInterface $inner,
         #[Autowire(param: 'thelia.messenger.allowed_message_classes')]
-        private array $extraAllowedClasses = [],
+        private array $extraAllowedClasses,
+        #[Autowire(param: 'thelia.messenger.handled_message_classes')]
+        private array $handledMessageClasses,
     ) {
     }
 
@@ -146,14 +151,34 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
      */
     private function assertAllowedMessage(string $class, string $exceptionClass): void
     {
-        if (\in_array($class, self::ALLOWED_SYMFONY_MESSAGES, true)
-            || \in_array($class, $this->extraAllowedClasses, true)
-            || $this->isInShopNamespace($class)
-        ) {
+        if (\in_array($class, $this->extraAllowedClasses, true)) {
             return;
         }
 
-        throw new $exceptionClass(\sprintf('The message class "%s" is not one the shop queues: only classes of the core, of an active module, or listed in thelia.messenger.allowed_message_classes are.', $class));
+        if (!\in_array($class, self::ALLOWED_SYMFONY_MESSAGES, true) && !$this->isInShopNamespace($class)) {
+            throw new $exceptionClass(\sprintf('The message class "%s" is not one the shop queues: only classes of the core, of an active module, or listed in thelia.messenger.allowed_message_classes are.', $class));
+        }
+
+        if (!$this->isHandled($class)) {
+            throw new $exceptionClass(\sprintf('The message class "%s" is not one the shop queues: no handler takes it.', $class));
+        }
+    }
+
+    /**
+     * Only called once the class is known to be of the shop: loading it to read its
+     * parents runs no code a queue chose.
+     */
+    private function isHandled(string $class): bool
+    {
+        if (\in_array('*', $this->handledMessageClasses, true) || \in_array($class, $this->handledMessageClasses, true)) {
+            return true;
+        }
+
+        if (!class_exists($class)) {
+            return false;
+        }
+
+        return [] !== array_intersect([...class_parents($class), ...class_implements($class)], $this->handledMessageClasses);
     }
 
     /**

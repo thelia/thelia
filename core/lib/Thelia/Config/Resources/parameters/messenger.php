@@ -25,9 +25,15 @@ return static function (ContainerConfigurator $container): void {
         // database by default, whatever MESSENGER_TRANSPORT_DSN names, so the
         // back office has one place to read the failures from.
         ->set('env(MESSENGER_FAILURE_TRANSPORT_DSN)', 'doctrine://default?queue_name=failed')
+        // The queue of the heavy jobs, when it must not be derived from
+        // MESSENGER_TRANSPORT_DSN (see HeavyTransportDsnProcessor).
+        ->set('env(MESSENGER_HEAVY_TRANSPORT_DSN)', '')
         // Message classes, outside the core and the active modules, that a
         // project lets through its queues (see AllowedClassesSerializer).
         ->set('thelia.messenger.allowed_message_classes', [])
+        // The message classes a handler takes, filled in when the container is
+        // built (see HandledMessageClassesPass).
+        ->set('thelia.messenger.handled_message_classes', [])
         // The recurring tasks of the core (see TheliaSchedule), as cron
         // expressions read when a worker consumes scheduler_thelia. Empty leaves
         // the task out. The currency rates are left out by default: the update

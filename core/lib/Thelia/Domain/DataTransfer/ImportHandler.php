@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -97,11 +98,31 @@ class ImportHandler
     public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
+        $extractedDirectory = null;
 
         if ($archiver instanceof AbstractArchiver) {
-            $file = $this->extractArchive($file, $archiver);
+            $extracted = $this->extractArchive($file, $archiver);
+
+            if ($extracted !== $file) {
+                $extractedDirectory = \dirname($extracted->getPathname());
+            }
+
+            $file = $extracted;
         }
 
+        // The extracted copy is only read here: it goes once the import is over,
+        // whatever came of it, rather than piling up next to the uploads.
+        try {
+            return $this->importFile($import, $file, $language, $onProgress);
+        } finally {
+            if (null !== $extractedDirectory) {
+                (new Filesystem())->remove($extractedDirectory);
+            }
+        }
+    }
+
+    private function importFile(Import $import, File $file, ?Lang $language, ?\Closure $onProgress): ImportEvent
+    {
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {

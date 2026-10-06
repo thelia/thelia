@@ -23,8 +23,6 @@ use Thelia\Messenger\FailedMessagePurger;
 #[AsCommand(name: 'thelia:messenger:purge-failed', description: 'Delete the jobs set aside in the failure transport for longer than a number of days.')]
 class MessengerFailedPurgeCommand extends ContainerAwareCommand
 {
-    public const DEFAULT_RETENTION_DAYS = 30;
-
     public function __construct(private readonly FailedMessagePurger $purger)
     {
         parent::__construct();
@@ -39,7 +37,7 @@ class MessengerFailedPurgeCommand extends ContainerAwareCommand
                 .'This deletes those set aside for longer than --older-than days, so the transport does not keep '
                 .'personal data forever. Run it every day; use --dry-run to count them first.',
             )
-            ->addOption('older-than', null, InputOption::VALUE_REQUIRED, 'Age in days from which a failed job is deleted', (string) self::DEFAULT_RETENTION_DAYS)
+            ->addOption('older-than', null, InputOption::VALUE_REQUIRED, 'Age in days from which a failed job is deleted', (string) FailedMessagePurger::RETENTION_DAYS)
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Count the jobs that would be deleted, and delete nothing');
     }
 

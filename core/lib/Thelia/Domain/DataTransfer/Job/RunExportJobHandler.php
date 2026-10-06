@@ -20,7 +20,6 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\ExportHandler;
-use Thelia\Log\Tlog;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\Map\ExportJobTableMap;
@@ -32,7 +31,7 @@ use Thelia\Model\Map\ExportJobTableMap;
  * at once ({@see JobClaim}), so a job delivered twice writes one file. A job left
  * running by a worker that died, or one that failed and is replayed, starts over from
  * the first row. A failure is recorded on the row and the job goes
- * straight to the failure transport: running the same export again without changing
+ * straight to the failure transport ({@see JobLifecycle}): running the same export again without changing
  * anything fails the same way, so it is not retried on its own.
  */
 #[AsMessageHandler]
@@ -42,6 +41,7 @@ final readonly class RunExportJobHandler
         private ExportHandler $exportHandler,
         private SerializerManager $serializerManager,
         private ArchiverManager $archiverManager,
+        private JobLifecycle $lifecycle,
     ) {
     }
 
@@ -55,25 +55,16 @@ final readonly class RunExportJobHandler
             throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
         }
 
-        if (!JobClaim::claim(ExportJobTableMap::TABLE_NAME, $job->getId())) {
-            // Done already, or being run by another worker right now.
+        if (!$this->lifecycle->claim($job, ExportJobTableMap::TABLE_NAME, $message)) {
             return;
         }
 
-        $job->reload();
         $job->setProcessedRows(0)->save();
 
         try {
             $this->run($job);
         } catch (\Throwable $exception) {
-            Tlog::getInstance()->addError(\sprintf('Export job %d failed: %s', $job->getId(), $exception->getMessage()));
-
-            $job->setStatus(JobStatus::FAILED->value)
-                ->setError(mb_substr($exception->getMessage(), 0, 2000))
-                ->setFinishedAt(new \DateTime())
-                ->save();
-
-            throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d failed: %s', $job->getId(), $exception->getMessage()), 0, $exception);
+            $this->lifecycle->fail($job, $exception);
         }
     }
 

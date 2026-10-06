@@ -24,12 +24,17 @@ namespace Thelia\Messenger\Message;
  * was, why it cannot be read and what it held, it runs into a failure on purpose,
  * and an administrator sees it among the failed jobs and deletes it.
  */
-final readonly class UndecodableJob
+final readonly class UndecodableJob implements DescribedJob
 {
     public function __construct(
         public string $originalType = '',
         public string $reason = '',
         public string $originalBody = '',
     ) {
+    }
+
+    public function describe(): string
+    {
+        return \sprintf('Unreadable job: %s', $this->reason);
     }
 }
