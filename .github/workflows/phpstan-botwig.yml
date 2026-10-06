@@ -12,9 +12,9 @@ name: phpstan-botwig
 # were found"). A .env.test.local points it at the runner's MySQL.
 on:
   push:
-    branches: [ main ]
+    branches: [ '3.2' ]
   pull_request:
-    branches: [ main ]
+    branches: [ '3.2' ]
 
 jobs:
   phpstan-botwig:
@@ -40,30 +40,25 @@ jobs:
           ini-values: post_max_size=20M
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
-      - name: Resolve the back-office theme from its development branch
-        # The analysed code has to be the branch phpstan-baseline-botwig.neon was
-        # written against. This used to be a `git clone` over the installed package,
-        # which kept the released tag's dependencies while analysing the branch's
-        # code; resolving the branch through Composer keeps the two in step.
+      - name: Resolve the back-office theme from its 1.2 maintenance branch
+        # This is the 3.2 maintenance line: the analysed theme is the tip of its `1.2`
+        # branch, the one released with the core patches. Its `main` follows the next
+        # minor of the core and does not run on 3.2. The other themes stay on their
+        # published 1.2 releases, as composer.json requires.
         run: |
           composer require --no-update --no-scripts --no-audit \
-            "thelia/flexy:dev-main as 1.99.0" \
-            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
-            "thelia/email-default-template:dev-main as 1.99.0" \
-            "thelia/pdf-default-template:dev-main as 1.99.0"
+            "thelia/backoffice-default-twig-template:1.2.x-dev"
 
       - name: Install Composer dependencies
         run: composer update --no-progress --prefer-dist --optimize-autoloader
 
-      - name: Check that the analysed theme is the branch tip
-        # A development version, not `dev-main`: a package that declares a
-        # branch-alias reports its alias instead.
+      - name: Check that the analysed theme is the tip of its 1.2 branch
         run: |
           info=$(composer show thelia/backoffice-default-twig-template --format=json)
           version=$(php -r 'echo json_decode(stream_get_contents(STDIN), true)["versions"][0];' <<< "$info")
           reference=$(php -r '$p = json_decode(stream_get_contents(STDIN), true); echo $p["source"]["reference"] ?? $p["dist"]["reference"] ?? "unknown";' <<< "$info")
           echo "thelia/backoffice-default-twig-template -> $version ($reference)"
-          case "$version" in dev-*|*-dev) ;; *) echo "::error::the theme resolved to $version, expected a development version"; exit 1 ;; esac
+          [ "$version" = '1.2.x-dev' ] || { echo "::error::the theme resolved to $version, expected 1.2.x-dev"; exit 1; }
 
       - name: Prepare test env (builds the Propel models via App\Kernel)
         run: |
