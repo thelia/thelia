@@ -69,6 +69,8 @@ class FileManager
      */
     public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile): UploadedFile
     {
+        $this->assertStorable($uploadedFile);
+
         $fileSystem = new Filesystem();
 
         $directory = $model->getUploadDir();
@@ -135,6 +137,27 @@ class FileManager
         @unlink(str_replace('..', '', $url));
 
         $model->delete();
+    }
+
+    /**
+     * Refuses a file whose stored name carries a server-executable segment
+     * (FileConfiguration::SERVER_EXECUTABLE_EXTENSIONS).
+     *
+     * The upload policy (FileProcessorService::validateUpload()) is the first check;
+     * this one holds for a caller that stores a file without asking it. Callers that
+     * remove the file being replaced call it before the removal.
+     *
+     * @throws FileException
+     */
+    public function assertStorable(UploadedFile $uploadedFile): void
+    {
+        // The model id only adds digits before the extension: 0 stands for the id to come.
+        $storedName = $this->renameFile(0, $uploadedFile);
+        $executableExtension = FileConfiguration::findExecutableExtension($storedName);
+
+        if (null !== $executableExtension) {
+            throw new FileException(\sprintf('The file "%s" cannot be stored: its name would carry the server-executable extension "%s".', $uploadedFile->getClientOriginalName(), $executableExtension));
+        }
     }
 
     public function renameFile(int $modelId, UploadedFile $uploadedFile): string
