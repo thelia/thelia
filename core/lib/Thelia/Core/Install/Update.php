@@ -24,6 +24,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Thelia\Config\DatabaseConfigurationSource;
+use Thelia\Core\File\DocumentCacheProtection;
 use Thelia\Core\Install\Exception\UpdateException;
 use Thelia\Core\Install\Exception\UpToDateException;
 use Thelia\Core\TheliaKernel;
@@ -289,9 +290,49 @@ class Update
             throw $ex;
         }
 
+        $this->protectDocumentCache();
+
         $this->log('debug', 'end of update processing');
 
         return $this->updatedVersions;
+    }
+
+    /**
+     * Documents published by an earlier version are served by the web server as they
+     * are: the document cache gets its .htaccess (see DocumentCacheProtection) now,
+     * rather than when the shop next publishes a document. A failure here does not
+     * undo the update; it is reported, since Apache keeps serving those documents
+     * without the download headers until the file exists.
+     */
+    public function protectDocumentCache(): void
+    {
+        try {
+            $statement = $this->connection->prepare('SELECT `value` FROM `config` WHERE `name` = ?');
+            $statement->execute(['document_cache_dir_from_web_root']);
+            $configured = $statement->fetchColumn();
+            $fromWebRoot = false === $configured || null === $configured ? 'cache'.DS.'documents' : (string) $configured;
+
+            $webRoot = realpath(THELIA_WEB_DIR);
+            $directory = realpath(THELIA_WEB_DIR.$fromWebRoot);
+
+            // Nothing published yet, or a directory outside the web space or the web root
+            // itself, whose .htaccess belongs to the shop: nothing to write.
+            if (false === $webRoot || false === $directory || !str_starts_with($directory, $webRoot.DS)) {
+                return;
+            }
+
+            if (DocumentCacheProtection::protect($directory)) {
+                return;
+            }
+
+            $failure = \sprintf('%s could not be written', $directory.DS.'.htaccess');
+        } catch (\Throwable $throwable) {
+            $failure = $throwable->getMessage();
+        }
+
+        $message = \sprintf('The document cache is not protected (%s). Apache serves the documents already published without the download headers until its .htaccess exists: write it from %s.', $failure, DocumentCacheProtection::class);
+        $this->log('warning', $message);
+        $this->setMessage($message, 'warning');
     }
 
     /**
