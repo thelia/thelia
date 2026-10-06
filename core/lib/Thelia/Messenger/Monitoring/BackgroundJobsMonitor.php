@@ -139,9 +139,10 @@ final readonly class BackgroundJobsMonitor
             try {
                 $this->failureTransport->send($envelope->withoutAll(TransportMessageIdStamp::class));
             } catch (\Throwable $putBackFailure) {
-                // Neither replayed nor set aside again: the log is the last place the job
-                // is written to, so whoever reads it can dispatch it again by hand.
-                Tlog::getInstance()->addCritical(\sprintf('The failed job %s could be neither replayed nor set aside again, it is lost from the queues: %s', $id, json_encode(['class' => $envelope->getMessage()::class, 'message' => (array) $envelope->getMessage()], \JSON_PARTIAL_OUTPUT_ON_ERROR)));
+                // Neither replayed nor set aside again: the log says which job it was, by
+                // its class and description, never by its content, which may hold the
+                // address and the order of a customer.
+                Tlog::getInstance()->addCritical(\sprintf('The failed job %s (%s: %s) could be neither replayed nor set aside again, it is lost from the queues.', $id, $envelope->getMessage()::class, self::describe($envelope->getMessage())));
 
                 throw new \RuntimeException(\sprintf('The job could not be replayed (%s), nor set aside again (%s).', $exception->getMessage(), $putBackFailure->getMessage()), 0, $exception);
             }
