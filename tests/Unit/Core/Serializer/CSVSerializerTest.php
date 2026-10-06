@@ -71,6 +71,50 @@ final class CSVSerializerTest extends TestCase
     }
 
     /**
+     * A spreadsheet set to the other list separator, as French ones are, splits a bare
+     * `Rue;=1+2` into two cells and runs the second one.
+     */
+    public function testACellHoldingAListSeparatorIsEnclosed(): void
+    {
+        self::assertSame("\"Rue;=1+2\",Paris\n", (new CSVSerializer())->serialize(['address' => 'Rue;=1+2', 'city' => 'Paris']));
+    }
+
+    public function testACellHoldingTheOtherListSeparatorIsEnclosedWhateverTheDelimiter(): void
+    {
+        self::assertSame("\"Rue,=1+2\";Paris\n", (new CSVSerializer())->setDelimiter(';')->serialize(['address' => 'Rue,=1+2', 'city' => 'Paris']));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function rowsWithoutFormulaNorListSeparator(): iterable
+    {
+        yield 'bare' => [['ref' => 'PROD001', 'title' => 'Chair']];
+        yield 'space' => [['title' => 'Blue chair']];
+        yield 'enclosure' => [['title' => 'The "best" chair']];
+        yield 'line break' => [['title' => "Blue\nchair"]];
+        yield 'tab' => [['title' => "Blue\tchair"]];
+        yield 'backslash' => [['title' => 'C:\\path\\"x"']];
+        yield 'scalars' => [['a' => 12, 'b' => 1.5, 'c' => null, 'd' => false, 'e' => '']];
+        yield 'utf-8' => [['title' => 'Chaise éléphant']];
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    #[DataProvider('rowsWithoutFormulaNorListSeparator')]
+    public function testAnyOtherRowIsWrittenAsFputcsvWritesIt(array $row): void
+    {
+        $handle = fopen('php://memory', 'w+');
+        fputcsv($handle, $row, ',', '"', '');
+        rewind($handle);
+        $expected = stream_get_contents($handle);
+        fclose($handle);
+
+        self::assertSame($expected, (new CSVSerializer())->serialize($row));
+    }
+
+    /**
      * @return list<string|null>
      */
     private function readBack(string $line): array
