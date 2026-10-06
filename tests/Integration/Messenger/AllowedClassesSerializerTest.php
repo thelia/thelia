@@ -17,11 +17,12 @@ namespace Thelia\Tests\Integration\Messenger;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Mime\Email;
+use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -62,17 +63,14 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
 
     /**
      * Symfony ships handlers that run a console command or a process: a queue that
-     * could carry their messages would run whatever its writer wanted.
+     * could carry their messages would run whatever its writer wanted. Such a job is
+     * never built: what reaches the serializer is an UndecodableJob saying what it was.
      */
-    public function testASymfonyMessageThatRunsACommandIsRefusedBeforeAnythingIsBuilt(): void
+    public function testASymfonyMessageThatRunsACommandIsNeverBuilt(): void
     {
-        try {
-            $this->serializer()->decode($this->encoded(RunCommandMessage::class));
-            self::fail('A command message must not be read off a queue.');
-        } catch (MessageDecodingFailedException) {
-        }
+        $this->serializer()->decode($this->encoded(RunCommandMessage::class));
 
-        self::assertSame(0, $this->inner->decoded);
+        $this->assertReadAsUndecodable(RunCommandMessage::class);
     }
 
     public function testAClassOfAnActiveModuleIsLetThrough(): void
@@ -82,38 +80,61 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         $this->serializer()->decode($this->encoded($module.'\\Message\\SomeJob'));
 
         self::assertSame(1, $this->inner->decoded);
+        self::assertSame($module.'\\Message\\SomeJob', $this->inner->lastDecoded['headers']['type'] ?? null);
     }
 
-    public function testAClassOfAModuleTurnedOffIsRefused(): void
+    /**
+     * A job of a module turned off is kept, as an UndecodableJob, instead of being
+     * deleted by Symfony as a message it cannot read.
+     */
+    public function testAClassOfAModuleTurnedOffIsKeptAsAnUnreadableJob(): void
     {
         $module = $this->activeModuleCode();
         ModuleQuery::create()->findOneByCode($module)
             ?->setActivate(BaseModule::IS_NOT_ACTIVATED)
             ->save($this->getPropelConnection());
 
-        $this->expectException(MessageDecodingFailedException::class);
-
         $this->serializer()->decode($this->encoded($module.'\\Message\\SomeJob'));
+
+        $this->assertReadAsUndecodable($module.'\\Message\\SomeJob');
     }
 
-    public function testAStampCarryingSerializerContextIsRefused(): void
+    public function testAStampCarryingSerializerContextIsNeverRead(): void
     {
+        $header = 'X-Message-Stamp-'.SerializerStamp::class;
         $encoded = $this->encoded(SendEmailMessage::class);
-        $encoded['headers']['X-Message-Stamp-'.SerializerStamp::class] = '[{"context":{}}]';
-
-        $this->expectException(MessageDecodingFailedException::class);
+        $encoded['headers'][$header] = '[{"context":{}}]';
 
         $this->serializer()->decode($encoded);
+
+        $this->assertReadAsUndecodable(SendEmailMessage::class);
+        self::assertArrayNotHasKey($header, $this->inner->lastDecoded['headers'] ?? []);
     }
 
-    public function testAStampOfAnUnknownClassIsRefused(): void
+    public function testAStampOfAnUnknownClassIsNeverRead(): void
     {
+        $header = 'X-Message-Stamp-Some\\Vendor\\Stamp';
         $encoded = $this->encoded(SendEmailMessage::class);
-        $encoded['headers']['X-Message-Stamp-Some\\Vendor\\Stamp'] = '[{}]';
-
-        $this->expectException(MessageDecodingFailedException::class);
+        $encoded['headers'][$header] = '[{}]';
 
         $this->serializer()->decode($encoded);
+
+        $this->assertReadAsUndecodable(SendEmailMessage::class);
+        self::assertArrayNotHasKey($header, $this->inner->lastDecoded['headers'] ?? []);
+    }
+
+    /**
+     * The stamps the shop reads survive, so the failure keeps its date and attempts.
+     */
+    public function testAnUnreadableJobKeepsTheMessengerStamps(): void
+    {
+        $header = 'X-Message-Stamp-'.BusNameStamp::class;
+        $encoded = $this->encoded(RunCommandMessage::class);
+        $encoded['headers'][$header] = '[{"busName":"messenger.bus.default"}]';
+
+        $this->serializer()->decode($encoded);
+
+        self::assertArrayHasKey($header, $this->inner->lastDecoded['headers'] ?? []);
     }
 
     public function testTheStampsOfMessengerAreLetThrough(): void
@@ -164,6 +185,38 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         $this->expectExceptionMessage('is not one the shop queues');
 
         $serializer->encode(new Envelope(new RunCommandMessage('cache:clear')));
+    }
+
+    /**
+     * Through the serializer the queues really use: the refused job comes back as an
+     * UndecodableJob that still carries its attempts.
+     */
+    public function testTheQueuesReadARefusedJobAsAnUnreadableOneWithItsAttempts(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+
+        $envelope = $serializer->decode([
+            'body' => '{"input":"cache:clear"}',
+            'headers' => [
+                'type' => RunCommandMessage::class,
+                'X-Message-Stamp-'.RedeliveryStamp::class => '[{"retryCount":3,"redeliveredAt":"2026-10-01T10:00:00+00:00"}]',
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        $message = $envelope->getMessage();
+        self::assertInstanceOf(UndecodableJob::class, $message);
+        self::assertSame(RunCommandMessage::class, $message->originalType);
+        self::assertSame('{"input":"cache:clear"}', $message->originalBody);
+        self::assertSame(3, $envelope->last(RedeliveryStamp::class)?->getRetryCount());
+    }
+
+    private function assertReadAsUndecodable(string $originalType): void
+    {
+        self::assertSame(1, $this->inner->decoded, 'Only the stand-in is built.');
+        self::assertSame(UndecodableJob::class, $this->inner->lastDecoded['headers']['type'] ?? null);
+        $body = json_decode((string) ($this->inner->lastDecoded['body'] ?? ''), true);
+        self::assertSame($originalType, $body['originalType'] ?? null);
     }
 
     private function serializer(): AllowedClassesSerializer

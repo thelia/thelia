@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Mime\Email;
+use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 use Thelia\Messenger\Transport\ShopDatabaseTransportFactory;
@@ -129,6 +130,22 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertSame(0, $this->monitor()->failedCount());
         self::assertFalse($this->monitor()->remove($id));
         self::assertFalse($this->monitor()->retry($id));
+    }
+
+    /**
+     * A failed job whose class can no longer be read (a module turned off) is listed
+     * and deleted like any other, instead of failing the screen.
+     */
+    public function testAnUnreadableFailedJobIsListedAndCanBeDeleted(): void
+    {
+        $id = $this->setAside(new UndecodableJob('RemovedModule\\Message\\SyncStock', 'The message class is not one the shop queues.', '{}'), 'The job cannot be read');
+
+        $jobs = $this->monitor()->failedJobs();
+        self::assertSame('RemovedModule\\Message\\SyncStock', $jobs[0]->messageClass);
+        self::assertStringStartsWith('Unreadable job', $jobs[0]->description);
+
+        self::assertTrue($this->monitor()->remove($id));
+        self::assertSame(0, $this->monitor()->failedCount());
     }
 
     private function monitor(): BackgroundJobsMonitor

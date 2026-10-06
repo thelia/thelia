@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Mailer\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mime\Message;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
@@ -27,41 +29,67 @@ use Thelia\Log\Tlog;
  * leave: the history is therefore written on the transport's own word that the mail
  * is out, in the request when there is no queue and in the worker when there is one.
  * {@see \Thelia\Mailer\MailerFactory} names the order and the message code in two
- * headers of the mail; nothing else of the mail is read.
+ * headers of the mail, which travel with it through the queue. They are taken off
+ * right before the mail is handed to the mail server, so the customer never receives
+ * them, and kept aside against the envelope of that delivery until it is confirmed.
  */
-final readonly class OrderEmailHistoryListener
+final class OrderEmailHistoryListener
 {
     public const ORDER_ID_HEADER = 'X-Thelia-Order-Id';
     public const MESSAGE_CODE_HEADER = 'X-Thelia-Message-Code';
 
+    /** @var \WeakMap<Envelope, array{int, string}> */
+    private \WeakMap $pending;
+
     public function __construct(
-        private OrderHistoryRecorder $orderHistoryRecorder,
+        private readonly OrderHistoryRecorder $orderHistoryRecorder,
     ) {
+        $this->pending = new \WeakMap();
     }
 
-    #[AsEventListener]
-    public function onSentMessage(SentMessageEvent $event): void
+    /**
+     * Before a signing listener, so the signature covers the mail as it leaves.
+     */
+    #[AsEventListener(priority: 1024)]
+    public function onMessage(MessageEvent $event): void
     {
-        $message = $event->getMessage()->getOriginalMessage();
+        $message = $event->getMessage();
 
-        if (!$message instanceof Message) {
+        // Queued: the headers have to travel with the mail to the worker.
+        if ($event->isQueued() || !$message instanceof Message) {
             return;
         }
 
         $headers = $message->getHeaders();
         $orderId = $headers->get(self::ORDER_ID_HEADER)?->getBodyAsString() ?? '';
         $messageCode = $headers->get(self::MESSAGE_CODE_HEADER)?->getBodyAsString() ?? '';
+        $headers->remove(self::ORDER_ID_HEADER);
+        $headers->remove(self::MESSAGE_CODE_HEADER);
 
-        if (!ctype_digit($orderId) || '' === $messageCode) {
+        if (ctype_digit($orderId) && '' !== $messageCode) {
+            $this->pending[$event->getEnvelope()] = [(int) $orderId, $messageCode];
+        }
+    }
+
+    #[AsEventListener]
+    public function onSentMessage(SentMessageEvent $event): void
+    {
+        $envelope = $event->getMessage()->getEnvelope();
+        $pending = $this->pending[$envelope] ?? null;
+
+        if (null === $pending) {
             return;
         }
 
+        unset($this->pending[$envelope]);
+        [$orderId, $messageCode] = $pending;
+
         try {
-            $this->orderHistoryRecorder->recordEmailSent((int) $orderId, $messageCode);
+            $this->orderHistoryRecorder->recordEmailSent($orderId, $messageCode);
         } catch (\Throwable $exception) {
             // The mail is out. Letting this through would report it as not sent, and
             // a worker would send it again.
-            Tlog::getInstance()->addError(\sprintf('The mail %s about order %s left, but its order history line could not be written: %s', $messageCode, $orderId, $exception->getMessage()));
+            Tlog::getInstance()->addError(\sprintf('The mail %s about order %d left, but its order history line could not be written: %s', $messageCode, $orderId, $exception->getMessage()));
         }
     }
 }

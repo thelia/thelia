@@ -213,7 +213,10 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
 
         $queued = $queue->kept[0];
         self::assertInstanceOf(SendEmailMessage::class, $queued);
-        (new NullTransport($dispatcher))->send($queued->getMessage(), $queued->getEnvelope());
+        $sent = (new NullTransport($dispatcher))->send($queued->getMessage(), $queued->getEnvelope());
+
+        self::assertNotNull($sent);
+        self::assertStringNotContainsString('X-Thelia-', $sent->toString(), 'The customer never receives the headers naming the order.');
 
         $entry = $this->emailEntry($order);
         self::assertNotNull($entry, 'The mail has left: it belongs in the history now.');

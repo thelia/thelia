@@ -21,12 +21,14 @@ use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Log\Tlog;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportJobQuery;
+use Thelia\Model\Map\ImportJobTableMap;
 
 /**
  * Reads the file of one import job into the shop, and records what came of it.
  *
- * A finished import is never run again: a queue may deliver a job twice, and an import
- * changes the catalog. A failed one goes straight to the failure transport and runs
+ * A finished import is never run again, and one being run is not run a second time at
+ * once ({@see JobClaim}): a queue may deliver a job twice, and an import changes the
+ * catalog. A failed one goes straight to the failure transport and runs
  * again from the first row when it is replayed; each row is written on its own, so the
  * rows written before the failure are written a second time, with the same values.
  * The uploaded file is deleted once the import is done, and kept while it may be
@@ -44,26 +46,26 @@ final readonly class RunImportJobHandler
     {
         $job = ImportJobQuery::create()->findPk($message->importJobId);
 
-        if (!$job instanceof ImportJob || JobStatus::DONE === $job->getJobStatus()) {
+        if (!$job instanceof ImportJob) {
+            throw new UnrecoverableMessageHandlingException(\sprintf('Import job %d no longer exists.', $message->importJobId));
+        }
+
+        if (!JobClaim::claim(ImportJobTableMap::TABLE_NAME, $job->getId())) {
+            // Done already, or being run by another worker right now.
             return;
         }
 
-        $job->setStatus(JobStatus::RUNNING->value)
-            ->setStartedAt(new \DateTime())
-            ->setFinishedAt(null)
-            ->setImportedRows(0)
-            ->setRowErrors(null)
-            ->setError(null)
-            ->save();
+        $job->reload();
+        $job->setImportedRows(0)->setRowErrors(null)->save();
 
         try {
             $import = $job->getImport() ?? throw new \RuntimeException('The import of this job no longer exists.');
 
-            if (!is_file($job->getFilePath())) {
+            if (!is_file($job->getStoredFilePath())) {
                 throw new \RuntimeException('The uploaded file of this import is no longer on the server.');
             }
 
-            $event = $this->importHandler->import($import, new File($job->getFilePath()), $job->getLang());
+            $event = $this->importHandler->import($import, new File($job->getStoredFilePath()), $job->getLang());
         } catch (\Throwable $exception) {
             Tlog::getInstance()->addError(\sprintf('Import job %d failed: %s', $job->getId(), $exception->getMessage()));
 
@@ -81,8 +83,8 @@ final readonly class RunImportJobHandler
             ->setFinishedAt(new \DateTime())
             ->save();
 
-        if (is_file($job->getFilePath())) {
-            unlink($job->getFilePath());
+        if (is_file($job->getStoredFilePath())) {
+            unlink($job->getStoredFilePath());
         }
     }
 }

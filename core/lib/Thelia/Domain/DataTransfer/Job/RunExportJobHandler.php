@@ -23,13 +23,15 @@ use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Log\Tlog;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
+use Thelia\Model\Map\ExportJobTableMap;
 
 /**
  * Writes the file of one export job, and keeps its row telling how far it got.
  *
- * A finished export is never run again, so a job delivered twice writes one file. A
- * job left running by a worker that was stopped, or one that failed and is replayed,
- * starts over from the first row. A failure is recorded on the row and the job goes
+ * A finished export is never run again, and one being run is not run a second time
+ * at once ({@see JobClaim}), so a job delivered twice writes one file. A job left
+ * running by a worker that died, or one that failed and is replayed, starts over from
+ * the first row. A failure is recorded on the row and the job goes
  * straight to the failure transport: running the same export again without changing
  * anything fails the same way, so it is not retried on its own.
  */
@@ -47,16 +49,19 @@ final readonly class RunExportJobHandler
     {
         $job = ExportJobQuery::create()->findPk($message->exportJobId);
 
-        if (!$job instanceof ExportJob || JobStatus::DONE === $job->getJobStatus()) {
+        if (!$job instanceof ExportJob) {
+            // Replayed after the purge took its row: nothing can run, and saying so
+            // keeps the job among the failures instead of reporting it done.
+            throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
+        }
+
+        if (!JobClaim::claim(ExportJobTableMap::TABLE_NAME, $job->getId())) {
+            // Done already, or being run by another worker right now.
             return;
         }
 
-        $job->setStatus(JobStatus::RUNNING->value)
-            ->setStartedAt(new \DateTime())
-            ->setFinishedAt(null)
-            ->setProcessedRows(0)
-            ->setError(null)
-            ->save();
+        $job->reload();
+        $job->setProcessedRows(0)->save();
 
         try {
             $this->run($job);

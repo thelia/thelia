@@ -81,6 +81,14 @@ final readonly class ExportJobLauncher
             $this->bus->dispatch(new RunExportJob($job->getId()));
         } catch (HandlerFailedException) {
             // Run at once, without a queue: the handler has written why on the row.
+        } catch (\Throwable $exception) {
+            // The queue refused the job: the row would wait forever for a worker.
+            $job->setStatus(JobStatus::FAILED->value)
+                ->setError(mb_substr('The export could not be queued: '.$exception->getMessage(), 0, 2000))
+                ->setFinishedAt(new \DateTime())
+                ->save();
+
+            throw $exception;
         }
 
         $job->reload();

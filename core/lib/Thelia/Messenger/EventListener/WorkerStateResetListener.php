@@ -14,9 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\EventListener;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Core\Translation\Translator;
@@ -49,9 +52,24 @@ final readonly class WorkerStateResetListener
     ) {
     }
 
+    /**
+     * A worker keeps every model it ever read in Propel's instance pool, and hands a
+     * later job the copy an earlier one loaded: pooling is off for its whole life,
+     * as it is in the tests.
+     */
+    #[AsEventListener]
+    public function onWorkerStarted(WorkerStartedEvent $event): void
+    {
+        Propel::disableInstancePooling();
+    }
+
     #[AsEventListener(priority: 4096)]
     public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event): void
     {
+        // MySQL closes a connection left idle past wait_timeout, and a worker waits
+        // for jobs: the connection is checked, and reopened when it is gone.
+        self::reconnectWhenGone();
+
         // The settings are read again from the shared entry, which a write in the
         // back office empties: a change made since the previous job is seen.
         ConfigQuery::resetCache();
@@ -66,5 +84,14 @@ final readonly class WorkerStateResetListener
         // There is no request in a worker, so the translator answers with the
         // locale it was last given: the one of the previous job, if it set one.
         $this->translator->setLocale(Lang::getDefaultLanguage()->getLocale());
+    }
+
+    private static function reconnectWhenGone(): void
+    {
+        try {
+            Propel::getConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->query('SELECT 1');
+        } catch (\PDOException) {
+            Propel::getServiceContainer()->getConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME)->closeConnections();
+        }
     }
 }
