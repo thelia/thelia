@@ -260,4 +260,15 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Version
+--
+-- The update moves the database to the last script it finds, not to the
+-- code version: these statements record 3.2.1.
+-- ---------------------------------------------------------------------
+
+UPDATE `config` SET `value`='3.2.1' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='1' WHERE `name`='thelia_release_version';
+UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
+
 SET FOREIGN_KEY_CHECKS = 1;

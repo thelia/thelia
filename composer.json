@@ -22,7 +22,7 @@
             "url": "core/",
             "options": {
                 "versions": {
-                    "thelia/core": "3.2.0"
+                    "thelia/core": "3.2.1"
                 }
             }
         }
