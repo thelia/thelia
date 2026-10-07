@@ -162,6 +162,7 @@
 - Removing a country from a delivery zone (`TheliaEvents::AREA_REMOVE_COUNTRY`) deletes the postal code rules the zone had for that country, once no row of the zone holds it any more (a country kept through another of its states keeps its rules). A rule written for a country applies to no one while the country is out of the zone, and would have applied again, unnoticed, the day the country came back; the rules written for every country of the zone stay.
 - `DeliveryModuleResourceBuilder::build()` called with `$onlyValid` (the checkout and API lists of carriers) returns `null` for a carrier that does not serve the address before asking its price: `TheliaEvents::MODULE_DELIVERY_GET_POSTAGE` is no longer dispatched for such a carrier by `ShippingFacade::listValidMethodsAsResourceApi()`, and `listValidMethods()` judges each carrier once instead of twice. The lists are the same.
 - `AreaDeliveryModuleQuery::findByCountryAndModule()`, `DeliveryModuleEligibilityChecker::isEligible()`, `DeliveryModuleResourceBuilder::build()` and `PostageEstimator::estimatePostageForCountry()` take an optional postal code as their last argument. A caller that does not pass one gets the former answer, except `estimatePostageForCountry()`, which uses the postal code of the cart's delivery address when that address is in the country estimated for.
+- Launching an import from the back office takes the `UPDATE` right on `admin.import`; the `VIEW` right used to be enough, and now only shows the imports and their jobs. Review the profiles of the administrators who import.
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 - The name of a cached image rendition covers all its options, so each rendition already in the image cache is generated again once, on its first request after the update. The previous files stay on disk until `image-cache:clear` or `thelia:cache:clear` empties the cache.
 - The `customer_account_created` and `customer_account_changed` messages no longer receive the customer's password. `Thelia\Action\Customer::create()` and `modify()` used to pass it in clear as the `password` parameter, so a template that printed it, such as `account_created_by_admin` and `account_changed_by_admin` of the default e-mail theme, mailed the password to the customer. Those templates test `password is defined` and keep rendering without it. A template or a module that reads `password` from these two messages gets nothing; the customer chooses a password through the lost password link.
@@ -255,6 +256,10 @@ location ^~ /cache/documents/ {
     }
 }
 ```
+
+### Symfony Messenger recipe
+
+The core now requires `symfony/messenger`. When Composer applies its Symfony recipe instead of the Thelia one, it writes `config/packages/messenger.yaml` and adds `MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0` to `.env`: every mail then waits for a worker that may not run. Delete that file after the update: the core configures Messenger itself. Unless a worker runs, also delete that line, so `async` stays synchronous.
 
 ### Files uploaded before the update
 
