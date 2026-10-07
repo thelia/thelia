@@ -257,6 +257,22 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertSame('invoice.txt', $email->getAttachments()[0]->getFilename());
     }
 
+    /**
+     * What Symfony says of content it cannot read may quote that content: the reason
+     * kept with the job says only that it no longer fits its class.
+     */
+    public function testAJobWhoseContentNoLongerFitsItsClassQuotesNoneOfIt(): void
+    {
+        $message = $this->getService(AllowedClassesSerializer::class)->decode([
+            'body' => '{"exportJobId":"buyer@example.com"}',
+            'headers' => ['type' => RunExportJob::class, 'Content-Type' => 'application/json'],
+        ])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+        self::assertStringNotContainsString('exportJobId', $message->reason);
+        self::assertStringContainsString(RunExportJob::class, $message->reason);
+    }
+
     public function testAJobThatDoesNotSayWhatItIsIsKeptAsAnUnreadableJob(): void
     {
         $envelope = $this->serializer()->decode(['body' => '{"anything":1}', 'headers' => ['Content-Type' => 'application/json']]);

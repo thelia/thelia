@@ -145,7 +145,15 @@ final readonly class JobLifecycle
         Tlog::getInstance()->addError(\sprintf('%s %d failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
 
         $reason = JobFailureMessage::forAdministrator($exception);
-        $job->markFailed($reason);
+
+        try {
+            // Read again first: what the run wrote in memory went with its transaction.
+            $job->refresh();
+            $job->markFailed($reason);
+        } catch (\Throwable $notRecorded) {
+            // The job is set aside all the same: the failure transport still lists it.
+            Tlog::getInstance()->addError(\sprintf('%s %d could not be marked failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($notRecorded)));
+        }
 
         // The failure transport keeps this exception and the back office lists it.
         // Symfony stores the whole chain of an exception it sets aside, so the cause
