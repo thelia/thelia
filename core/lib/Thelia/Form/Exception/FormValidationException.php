@@ -14,11 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Form\Exception;
 
-use Thelia\Messenger\UserFacingFailure;
-
-/**
- * Its message tells the person who filled the form what to change.
- */
-class FormValidationException extends \RuntimeException implements UserFacingFailure
+class FormValidationException extends \RuntimeException
 {
 }

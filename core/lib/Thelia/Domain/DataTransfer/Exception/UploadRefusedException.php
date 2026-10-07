@@ -15,7 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Exception;
 
 use Thelia\Exception\UserFacingFailure;
+use Thelia\Form\Exception\FormValidationException;
 
-class DataTransferNoDataFoundException extends \Exception implements UserFacingFailure
+/**
+ * A file the shop refuses to import, and why: its name, its content, or what an
+ * archive would hold once extracted. A form validation error, so a caller that
+ * catches those still does.
+ */
+class UploadRefusedException extends FormValidationException implements UserFacingFailure
 {
 }

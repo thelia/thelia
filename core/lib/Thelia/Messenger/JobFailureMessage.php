@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger;
 
+use Thelia\Exception\UserFacingFailure;
+
 /**
  * What an administrator, and the server log, read of a failed job.
  *
@@ -45,7 +47,8 @@ final class JobFailureMessage
         $userFacing = self::userFacingCause($exception);
 
         if (null !== $userFacing) {
-            return $userFacing->getMessage();
+            // On one line: a message may quote what was typed, line breaks included.
+            return (string) preg_replace('/\s+/', ' ', $userFacing->getMessage());
         }
 
         $cause = $exception;

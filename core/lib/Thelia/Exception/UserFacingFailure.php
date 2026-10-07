@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Messenger;
+namespace Thelia\Exception;
 
 /**
  * An exception whose message is written for the administrator: the reason a job
