@@ -30,9 +30,11 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Exception\UserFacingFailure;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\TransportCredentials;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\ReplayableJob;
@@ -60,6 +62,7 @@ final readonly class BackgroundJobsMonitor
         #[Autowire(service: 'messenger.transport.async_heavy')]
         private ?TransportInterface $heavyTransport = null,
         private ?ConfiguredQueues $queues = null,
+        private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
@@ -151,8 +154,16 @@ final readonly class BackgroundJobsMonitor
         $transport = $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName() ?? self::DEFAULT_TRANSPORT;
 
         // Taken out first, so a second click on the same job finds nothing to replay
-        // instead of sending it twice; put back as it was when the replay fails.
-        $this->failureTransport->reject($envelope);
+        // instead of sending it twice; put back as it was when the replay fails. In
+        // the shop database the row is deleted on a condition: of two replays that
+        // read the job at once, only the one that deleted it sends it again.
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null === $queue) {
+            $this->failureTransport->reject($envelope);
+        } elseif (!$queue->take($id)) {
+            return false;
+        }
 
         try {
             $message = $envelope->getMessage();
@@ -186,7 +197,18 @@ final readonly class BackgroundJobsMonitor
             return false;
         }
 
-        $this->failureTransport->reject($envelope);
+        // In the shop database the row is deleted on a condition: a job a replay took
+        // meanwhile is not deleted, nor is what it kept for the replay.
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null === $queue) {
+            $this->failureTransport->reject($envelope);
+        } elseif (!$queue->take($id)) {
+            return false;
+        }
+
+        // Never replayed now: what was kept for the replay can go.
+        $this->dispatcher?->dispatch(new FailedJobRemovedEvent($envelope->getMessage()));
 
         return true;
     }

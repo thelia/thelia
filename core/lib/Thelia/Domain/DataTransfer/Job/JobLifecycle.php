@@ -107,7 +107,7 @@ final readonly class JobLifecycle
         if ($message->postponements() >= self::MAX_POSTPONEMENTS) {
             // Set aside rather than dropped: the failed jobs show it, and replaying it
             // takes the job over once its worker has gone quiet.
-            throw new JobSetAsideException(\sprintf('%s %d is still running after %d checks: it is set aside with the failed jobs.', $job::class, $job->getId(), $message->postponements()));
+            throw new JobSetAsideException(\sprintf('%s is still running after %d checks: it is set aside with the failed jobs.', self::nameOf($job), $message->postponements()));
         }
 
         $this->bus->dispatch($message->postponed(), [new DelayStamp(self::POSTPONE_DELAY_SECONDS * 1000)]);
@@ -158,6 +158,14 @@ final readonly class JobLifecycle
         // The failure transport keeps this exception and the back office lists it.
         // Symfony stores the whole chain of an exception it sets aside, so the cause
         // is not chained: its text may quote a customer, the log names it.
-        throw new JobSetAsideException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason));
+        throw new JobSetAsideException(\sprintf('%s failed: %s', self::nameOf($job), $reason));
+    }
+
+    /**
+     * The job as the failed jobs screen names it: "Export #4", "Import #12".
+     */
+    private static function nameOf(DataTransferJob $job): string
+    {
+        return \sprintf('%s #%d', 'export_job' === $job->tableName() ? 'Export' : 'Import', (int) $job->getId());
     }
 }

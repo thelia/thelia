@@ -18,7 +18,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
 /**
  * One queue of the shop database, read in SQL where the transport only offers to
- * decode every job it holds: listing the newest first, deleting by age.
+ * decode every job it holds: listing the newest first, taking one job out once,
+ * deleting by age.
  *
  * Only for a DSN that names the shop database; any other queue goes through its
  * transport.
@@ -29,6 +30,7 @@ final readonly class ShopDatabaseQueue
         private ShopDatabaseConnection $connection,
         private string $table,
         private string $queueName,
+        private int $redeliverTimeout,
     ) {
     }
 
@@ -44,7 +46,7 @@ final readonly class ShopDatabaseQueue
             return null;
         }
 
-        return new self($connection, (string) $configuration['table_name'], (string) $configuration['queue_name']);
+        return new self($connection, (string) $configuration['table_name'], (string) $configuration['queue_name'], (int) $configuration['redeliver_timeout']);
     }
 
     /**
@@ -56,6 +58,25 @@ final readonly class ShopDatabaseQueue
             'SELECT id FROM '.$this->quotedTable().' WHERE queue_name = ? ORDER BY id DESC LIMIT '.max(0, $limit),
             [$this->queueName],
         ));
+    }
+
+    /**
+     * Takes one job out of the queue, if it is still there and no worker holds it.
+     *
+     * A worker, `messenger:failed:retry` among them, holds the job it received until
+     * its redeliver timeout: taken from under it, the job would be sent twice.
+     *
+     * @return bool false when another process took it first, or holds it
+     */
+    public function take(string $id): bool
+    {
+        // The transport writes its dates in UTC.
+        $heldSince = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->modify(\sprintf('-%d seconds', $this->redeliverTimeout));
+
+        return 1 === (int) $this->connection->get()->executeStatement(
+            'DELETE FROM '.$this->quotedTable().' WHERE id = ? AND queue_name = ? AND (delivered_at IS NULL OR delivered_at < ?)',
+            [$id, $this->queueName, $heldSince->format('Y-m-d H:i:s')],
+        );
     }
 
     /**
