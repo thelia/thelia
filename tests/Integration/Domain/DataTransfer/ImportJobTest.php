@@ -215,6 +215,10 @@ final class ImportJobTest extends IntegrationTestCase
      */
     public function testAFailedImportWhoseFileCannotBeDeletedStillSaysItFailed(): void
     {
+        if (\function_exists('posix_geteuid') && 0 === posix_geteuid()) {
+            self::markTestSkipped('Run as root, the file can always be deleted.');
+        }
+
         $path = sys_get_temp_dir().'/import-job-'.uniqid('', true).'.csv';
         file_put_contents($path, "id,quantity\n1,2\n");
         $this->files[] = $path;
@@ -227,14 +231,14 @@ final class ImportJobTest extends IntegrationTestCase
             $this->storage(),
         );
 
-        chmod($directory, 0555);
+        chmod($directory, 0o555);
 
         try {
             $handler(new RunImportJob($job->getId()));
             self::fail('A failed import must reach the failure transport.');
         } catch (UnrecoverableMessageHandlingException) {
         } finally {
-            chmod($directory, 0755);
+            chmod($directory, 0o755);
             $this->storage()->discardFileOf($job);
         }
 
