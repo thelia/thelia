@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\DataTransfer\Exception\MissingColumnsException;
 use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
@@ -31,6 +32,7 @@ use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJobHandler;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Import;
@@ -297,6 +299,20 @@ final class ImportJobTest extends IntegrationTestCase
         $job->reload();
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertSame(0, (int) $job->getImportedRows());
+    }
+
+    /**
+     * An import whose failure an administrator deleted cannot be replayed any more: its
+     * uploaded file, personal data, goes at once rather than with the purge.
+     */
+    public function testTheFileOfAnImportDeletedFromTheFailedJobsGoesAtOnce(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        self::assertFileExists($this->storage()->pathOf($job));
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunImportJob((int) $job->getId())));
+
+        self::assertFileDoesNotExist($this->storage()->pathOf($job));
     }
 
     public function testAVeryLongFileNameStillFitsTheRow(): void

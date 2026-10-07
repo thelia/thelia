@@ -30,9 +30,11 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Exception\UserFacingFailure;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\TransportCredentials;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\ReplayableJob;
@@ -60,6 +62,7 @@ final readonly class BackgroundJobsMonitor
         #[Autowire(service: 'messenger.transport.async_heavy')]
         private ?TransportInterface $heavyTransport = null,
         private ?ConfiguredQueues $queues = null,
+        private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
@@ -187,6 +190,9 @@ final readonly class BackgroundJobsMonitor
         }
 
         $this->failureTransport->reject($envelope);
+
+        // Never replayed now: what was kept for the replay can go.
+        $this->dispatcher?->dispatch(new FailedJobRemovedEvent($envelope->getMessage()));
 
         return true;
     }
