@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\Export;
@@ -37,6 +38,9 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
+    /** Told the rows written while export() runs: processExport() keeps its signature. */
+    private ?\Closure $onProgress = null;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected ExportCachePurger $exportCachePurger,
@@ -116,7 +120,13 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
-        $filePath = $this->processExport($event->getExport(), $event->getSerializer(), $onProgress);
+        $this->onProgress = $onProgress;
+
+        try {
+            $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+        } finally {
+            $this->onProgress = null;
+        }
 
         $event->setFilePath($filePath);
 
@@ -163,39 +173,49 @@ class ExportHandler
             return null;
         }
 
-        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
-            $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
-            $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
-            $rangeDate['start'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $startYear.'-'.$startMonth.'-1 00:00:00',
-            );
-        }
-
-        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
-            $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
-            $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
-            $rangeDate['end'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $endYear.'-'.$endMonth.'-1 23:59:59',
-            );
-
-            if ($rangeDate['end'] instanceof \DateTime) {
-                $rangeDate['end']
-                    ->add(new \DateInterval('P1M'))
-                    ->sub(new \DateInterval('P1D'));
-            }
-        }
-
-        return $rangeDate;
+        return [
+            'start' => self::boundOf($rangeDate['start'] ?? null, false),
+            'end' => self::boundOf($rangeDate['end'] ?? null, true),
+        ];
     }
 
     /**
-     * @param (\Closure(int): void)|null $onProgress told the number of rows written, every
-     *                                               DataTransferProgress::STEP rows and once at the end
+     * A bound given as a date stays as it is; one given as the year and month of the
+     * back-office form becomes the first, or the last, moment of that month.
      */
-    protected function processExport(AbstractExport $export, SerializerInterface $serializer, ?\Closure $onProgress = null): string
+    private static function boundOf(mixed $bound, bool $endOfMonth): mixed
     {
+        if (!$bound || $bound instanceof \DateTimeInterface) {
+            return $bound;
+        }
+
+        $year = \is_array($bound) ? (string) ($bound['year'] ?? '') : '';
+        $month = \is_array($bound) ? (string) ($bound['month'] ?? '') : '';
+
+        if (!\is_array($bound) || ('' !== $year && !ctype_digit($year)) || ('' !== $month && !ctype_digit($month))) {
+            throw new JobRefusedException(Translator::getInstance()->trans('The dates of the export are not valid.'));
+        }
+
+        $date = \DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            ('' !== $year ? $year : (new \DateTime())->format('Y')).'-'.('' !== $month ? $month : (new \DateTime())->format('m')).($endOfMonth ? '-1 23:59:59' : '-1 00:00:00'),
+        );
+
+        if ($endOfMonth && $date instanceof \DateTime) {
+            $date->add(new \DateInterval('P1M'))->sub(new \DateInterval('P1D'));
+        }
+
+        return $date;
+    }
+
+    /**
+     * Tells the progress callback given to export(), if any, the number of rows written
+     * every DataTransferProgress::STEP rows and once at the end.
+     */
+    protected function processExport(AbstractExport $export, SerializerInterface $serializer): string
+    {
+        $onProgress = $this->onProgress;
+
         $filename = \sprintf(
             '%s-%s-%s.%s',
             (new \DateTime())->format('Ymd'),

@@ -22,6 +22,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 
 /**
  * Adds a mail to the history of the order it is about once the mail server has taken it.
@@ -96,7 +97,7 @@ final class OrderEmailHistoryListener
         } catch (\Throwable $exception) {
             // The mail is out. Letting this through would report it as not sent, and
             // a worker would send it again.
-            Tlog::getInstance()->addError(\sprintf('The mail %s about order %d left, but its order history line could not be written: %s', $messageCode, $orderId, $exception->getMessage()));
+            Tlog::getInstance()->addError(\sprintf('The mail %s about order %d left, but its order history line could not be written: %s', $messageCode, $orderId, JobFailureMessage::forLog($exception)));
         }
     }
 }

@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 
 /**
@@ -86,38 +86,54 @@ final readonly class JobLifecycle
     /**
      * Takes the job for this run, or, when another run holds it, sends the message
      * again to look at it later (set aside after twelve hours).
-     *
-     * @param 'export_job'|'import_job' $table
-     *
-     * @return bool true when this run owns the job; false when it is done, or running
-     *              elsewhere and looked at again later
      */
-    public function claimOrPostpone(DataTransferJob $job, string $table, DataTransferJobMessage $message): bool
+    public function claimOrPostpone(DataTransferJob $job, DataTransferJobMessage $message): ClaimOutcome
     {
         // Only the message first sent, or replayed by an administrator, may restart a
         // failed job: one looking again leaves it to the administrator.
-        $claimed = $this->jobClaim->claim($table, (int) $job->getId(), 0 === $message->postponements());
+        $claimed = $this->jobClaim->claim($job->tableName(), (int) $job->getId(), 0 === $message->postponements());
         $job->refresh();
 
-        if ($claimed || JobStatus::RUNNING !== $job->getJobStatus()) {
-            return $claimed;
+        if ($claimed) {
+            return ClaimOutcome::Owned;
         }
 
-        if ($this->queues->heavyJobsRunInline()) {
-            // Without a queue, looking again would run at once, in this very call,
-            // over and over: the run that holds the job finishes it.
-            return false;
+        if (JobStatus::RUNNING !== $job->getJobStatus() || $this->queues->heavyJobsRunInline()) {
+            // Over, or without a queue: looking again would run at once, in this very
+            // call, over and over, and the run that holds the job finishes it.
+            return ClaimOutcome::Finished;
         }
 
         if ($message->postponements() >= self::MAX_POSTPONEMENTS) {
             // Set aside rather than dropped: the failed jobs show it, and replaying it
             // takes the job over once its worker has gone quiet.
-            throw new UnrecoverableMessageHandlingException(\sprintf('%s %d is still running after %d checks: it is set aside with the failed jobs.', $job::class, $job->getId(), $message->postponements()));
+            throw new JobSetAsideException(\sprintf('%s %d is still running after %d checks: it is set aside with the failed jobs.', $job::class, $job->getId(), $message->postponements()));
         }
 
         $this->bus->dispatch($message->postponed(), [new DelayStamp(self::POSTPONE_DELAY_SECONDS * 1000)]);
 
-        return false;
+        return ClaimOutcome::Postponed;
+    }
+
+    /**
+     * Sets a message aside without touching its row: the row may be unreadable, or
+     * held by another run. What the failure transport keeps says no more than
+     * JobFailureMessage allows; the log names the exception.
+     */
+    public function reject(string $job, \Throwable $exception): never
+    {
+        Tlog::getInstance()->addError(\sprintf('%s could not be taken: %s', $job, JobFailureMessage::forLog($exception)));
+
+        throw new JobSetAsideException(\sprintf('%s could not be taken: %s', $job, JobFailureMessage::forAdministrator($exception)));
+    }
+
+    /**
+     * False without a queue: a job that fails is not kept anywhere it could be replayed
+     * from, so what it holds (an uploaded file) is not kept for it either.
+     */
+    public function keepsFailedJobs(): bool
+    {
+        return !$this->queues->heavyJobsRunInline();
     }
 
     /**
@@ -134,6 +150,6 @@ final readonly class JobLifecycle
         // The failure transport keeps this exception and the back office lists it.
         // Symfony stores the whole chain of an exception it sets aside, so the cause
         // is not chained: its text may quote a customer, the log names it.
-        throw new UnrecoverableMessageHandlingException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason));
+        throw new JobSetAsideException(\sprintf('%s %d failed: %s', $job::class, $job->getId(), $reason));
     }
 }

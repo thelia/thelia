@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Model\ImportJob;
 
 /**
@@ -77,8 +78,9 @@ final readonly class ImportStorage
     {
         $path = $this->pathOf($job);
 
+        // Gone meanwhile (another run, the purge) is as good as deleted.
         if ($this->holds($path)) {
-            unlink($path);
+            (new Filesystem())->remove($path);
         }
     }
 }
