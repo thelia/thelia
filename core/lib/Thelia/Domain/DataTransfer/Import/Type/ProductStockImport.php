@@ -70,9 +70,11 @@ class ProductStockImport extends AbstractImport
         }
 
         // A code that is not a GTIN refuses this row only, with the reason, and the
-        // import carries on with the next one.
+        // import carries on with the next one. Checked before saving: refused by
+        // save(), it would roll back a transaction nested in the import's, which
+        // could then not be committed.
         try {
-            $pse->save();
+            $pse->assertIdentifiersAreValid();
         } catch (InvalidGtinException|InvalidMpnException $refusal) {
             // The refused values would otherwise stay on the pooled instance and come
             // back with a later row of the same combination.
@@ -80,6 +82,8 @@ class ProductStockImport extends AbstractImport
 
             return $refusal->getMessage();
         }
+
+        $pse->save();
 
         ++$this->importedRows;
 

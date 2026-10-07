@@ -38,6 +38,9 @@ use Thelia\Model\Lang;
  */
 class ExportHandler
 {
+    /** Told the rows written while export() runs: processExport() keeps its signature. */
+    private ?\Closure $onProgress = null;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected ExportCachePurger $exportCachePurger,
@@ -117,7 +120,13 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
-        $filePath = $this->processExport($event->getExport(), $event->getSerializer(), $onProgress);
+        $this->onProgress = $onProgress;
+
+        try {
+            $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+        } finally {
+            $this->onProgress = null;
+        }
 
         $event->setFilePath($filePath);
 
@@ -200,11 +209,13 @@ class ExportHandler
     }
 
     /**
-     * @param (\Closure(int): void)|null $onProgress told the number of rows written, every
-     *                                               DataTransferProgress::STEP rows and once at the end
+     * Tells the progress callback given to export(), if any, the number of rows written
+     * every DataTransferProgress::STEP rows and once at the end.
      */
-    protected function processExport(AbstractExport $export, SerializerInterface $serializer, ?\Closure $onProgress = null): string
+    protected function processExport(AbstractExport $export, SerializerInterface $serializer): string
     {
+        $onProgress = $this->onProgress;
+
         $filename = \sprintf(
             '%s-%s-%s.%s',
             (new \DateTime())->format('Ymd'),

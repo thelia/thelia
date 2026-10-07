@@ -201,6 +201,22 @@ class ProductSaleElements extends BaseProductSaleElements
      */
     public function preSave(?ConnectionInterface $con = null): bool
     {
+        $this->assertIdentifiersAreValid();
+
+        return parent::preSave($con);
+    }
+
+    /**
+     * Checks, and normalizes, the GTIN and the part number about to be saved, as
+     * save() does. A caller that refuses a single row of a batch checks first: a
+     * refusal thrown by save() rolls back a transaction nested in the batch's, and
+     * leaves the whole batch unable to commit.
+     *
+     * @throws InvalidGtinException
+     * @throws InvalidMpnException
+     */
+    public function assertIdentifiersAreValid(): void
+    {
         if ($this->isColumnModified(ProductSaleElementsTableMap::COL_EAN_CODE) && null !== $this->ean_code) {
             $violation = Gtin::violationOfTypedCode($this->ean_code);
 
@@ -220,8 +236,6 @@ class ProductSaleElements extends BaseProductSaleElements
 
             $this->mpn = '' === $mpn ? null : $mpn;
         }
-
-        return parent::preSave($con);
     }
 
     /**
