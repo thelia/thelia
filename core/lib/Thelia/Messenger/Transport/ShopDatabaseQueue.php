@@ -63,8 +63,10 @@ final readonly class ShopDatabaseQueue
     /**
      * Takes one job out of the queue, if it is still there and no worker holds it.
      *
-     * A worker, `messenger:failed:retry` among them, holds the job it received until
-     * its redeliver timeout: taken from under it, the job would be sent twice.
+     * A worker consuming the queue (`messenger:consume failed`) holds the job it
+     * received until its redeliver timeout: taken from under it, the job would be sent
+     * twice. `messenger:failed:retry` reads a job without holding it, so it is not
+     * told apart here.
      *
      * @return bool false when another process took it first, or holds it
      */

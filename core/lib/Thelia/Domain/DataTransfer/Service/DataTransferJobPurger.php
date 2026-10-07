@@ -17,7 +17,9 @@ namespace Thelia\Domain\DataTransfer\Service;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Thelia\Domain\DataTransfer\Job\ImportStorage;
+use Thelia\Log\Tlog;
 use Thelia\Messenger\FailedMessagePurger;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ImportJobQuery;
 
@@ -68,8 +70,10 @@ final readonly class DataTransferJobPurger
 
             foreach ($jobs as $job) {
                 // An import that never ran still holds the file it was given. The path
-                // comes from the row: nothing outside the import storage is deleted.
-                $this->storage->discardFileOf($job);
+                // comes from the row: nothing outside the import storage is deleted. A
+                // file that cannot go (written by another system user) is left to the
+                // sweep: the row goes, so the next batch never reads it again.
+                $this->discard(fn () => $this->storage->discardFileOf($job), \sprintf('the file of import job %d', $job->getId()));
                 $job->delete();
                 ++$deleted;
             }
@@ -101,16 +105,39 @@ final readonly class DataTransferJobPurger
         }
 
         $filesystem = new Filesystem();
-        $filesystem->remove($files);
+        $deleted = 0;
+
+        // One by one: a file that cannot go stops neither the others nor the purge.
+        foreach ($files as $file) {
+            if ($this->discard(static fn () => $filesystem->remove($file->getPathname()), 'a file left in the import storage')) {
+                ++$deleted;
+            }
+        }
 
         // The day directories, and the directories of extracted archives, once empty
         // and a day old: a fresh one may be about to receive an upload.
         foreach (iterator_to_array((new Finder())->directories()->in($directory)->date('before 1 day ago')->sortByName()->reverseSorting(), false) as $emptyCandidate) {
             if ([] === array_diff((array) scandir($emptyCandidate->getPathname()), ['.', '..'])) {
-                $filesystem->remove($emptyCandidate->getPathname());
+                $this->discard(static fn () => $filesystem->remove($emptyCandidate->getPathname()), 'an empty directory of the import storage');
             }
         }
 
-        return \count($files);
+        return $deleted;
+    }
+
+    /**
+     * @return bool false when what was to be deleted is left, and logged
+     */
+    private function discard(\Closure $deletion, string $what): bool
+    {
+        try {
+            $deletion();
+
+            return true;
+        } catch (\Throwable $leftBehind) {
+            Tlog::getInstance()->addWarning(\sprintf('The purge left %s behind: %s', $what, JobFailureMessage::forLog($leftBehind)));
+
+            return false;
+        }
     }
 }

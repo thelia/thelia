@@ -89,6 +89,18 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * A job whose language is gone (deleted while the job waited, its row then holds no
+     * language) is written in the default language.
+     */
+    public function testAnExportWithoutALanguageIsWrittenInTheDefaultOne(): void
+    {
+        $job = $this->getService(ExportJobLauncher::class)->launch($this->ordersExport(), self::SERIALIZER);
+        $this->files[] = (string) $job->getFilePath();
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
+    }
+
+    /**
      * With a queue, the request only records the job: nothing is written until a
      * worker runs it.
      */
