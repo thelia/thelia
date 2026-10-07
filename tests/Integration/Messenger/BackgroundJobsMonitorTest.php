@@ -230,61 +230,49 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $id = $this->setAside($this->mail(), 'SMTP down');
         $readBeforeTheOtherReplay = $this->failed->find($id);
         self::assertNotNull($readBeforeTheOtherReplay);
-        $failures = new class($this->failed, $readBeforeTheOtherReplay) implements TransportInterface, ListableReceiverInterface, MessageCountAwareInterface {
-            public function __construct(private readonly DoctrineTransport $inner, private readonly Envelope $read)
-            {
-            }
-
-            public function get(): iterable
-            {
-                return $this->inner->get();
-            }
-
-            public function ack(Envelope $envelope): void
-            {
-                $this->inner->ack($envelope);
-            }
-
-            public function reject(Envelope $envelope): void
-            {
-                $this->inner->reject($envelope);
-            }
-
-            public function send(Envelope $envelope): Envelope
-            {
-                return $this->inner->send($envelope);
-            }
-
-            public function all(?int $limit = null): iterable
-            {
-                return $this->inner->all($limit);
-            }
-
-            public function find(mixed $id): ?Envelope
-            {
-                return $this->read;
-            }
-
-            public function getMessageCount(): int
-            {
-                return $this->inner->getMessageCount();
-            }
-        };
-        $bus = new class implements MessageBusInterface {
-            public int $dispatched = 0;
-
-            public function dispatch(object $message, array $stamps = []): Envelope
-            {
-                ++$this->dispatched;
-
-                return Envelope::wrap($message, $stamps);
-            }
-        };
+        $failures = $this->failuresReadBefore($readBeforeTheOtherReplay);
+        $bus = $this->recordingBus();
         $monitor = new BackgroundJobsMonitor($this->jobs, $failures, $bus, null, $this->queues());
 
         self::assertTrue($monitor->retry($id));
         self::assertFalse($monitor->retry($id), 'The second replay finds the job taken.');
         self::assertSame(1, $bus->dispatched);
+    }
+
+    /**
+     * A job replayed while another administrator deletes it: the replay took it, the
+     * deletion finds nothing and lets nothing go, the file of an import included.
+     */
+    public function testAJobReplayedAsItIsDeletedIsNotDeletedUnderTheReplay(): void
+    {
+        $id = $this->setAside(new RunImportJob(42), 'Import #42 failed.', JobSetAsideException::class);
+        $readBeforeTheReplay = $this->failed->find($id);
+        self::assertNotNull($readBeforeTheReplay);
+        $removed = 0;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(FailedJobRemovedEvent::class, static function () use (&$removed): void {
+            ++$removed;
+        });
+        $replaying = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->recordingBus(), null, $this->queues());
+        $deleting = new BackgroundJobsMonitor($this->jobs, $this->failuresReadBefore($readBeforeTheReplay), $this->recordingBus(), null, $this->queues(), $dispatcher);
+
+        self::assertTrue($replaying->retry($id));
+        self::assertFalse($deleting->remove($id));
+        self::assertSame(0, $removed);
+    }
+
+    /**
+     * A job `messenger:failed:retry` is running holds its row: a replay from the screen
+     * at the same time leaves it to the command.
+     */
+    public function testAJobTheCommandIsReplayingIsLeftToIt(): void
+    {
+        $id = $this->setAside($this->mail(), 'SMTP down');
+        $this->getService(ShopDatabaseConnection::class)->get()->executeStatement('UPDATE messenger_messages SET delivered_at = UTC_TIMESTAMP() WHERE id = ?', [$id]);
+        $bus = $this->recordingBus();
+
+        self::assertFalse((new BackgroundJobsMonitor($this->jobs, $this->failed, $bus, null, $this->queues()))->retry($id));
+        self::assertSame(0, $bus->dispatched);
     }
 
     public function testAReplayedExportStartsAfresh(): void
@@ -444,6 +432,71 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             self::assertStringNotContainsString('unreachable', $exception->getMessage());
             self::assertStringNotContainsString('read only', $exception->getMessage());
         }
+    }
+
+    /**
+     * The failure transport as a process saw it before another one took the job out:
+     * it still finds the envelope it read.
+     */
+    private function failuresReadBefore(Envelope $read): TransportInterface&ListableReceiverInterface&MessageCountAwareInterface
+    {
+        return new class($this->failed, $read) implements TransportInterface, ListableReceiverInterface, MessageCountAwareInterface {
+            public function __construct(private readonly DoctrineTransport $inner, private readonly Envelope $read)
+            {
+            }
+
+            public function get(): iterable
+            {
+                return $this->inner->get();
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+                $this->inner->ack($envelope);
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+                $this->inner->reject($envelope);
+            }
+
+            public function send(Envelope $envelope): Envelope
+            {
+                return $this->inner->send($envelope);
+            }
+
+            public function all(?int $limit = null): iterable
+            {
+                return $this->inner->all($limit);
+            }
+
+            public function find(mixed $id): ?Envelope
+            {
+                return $this->read;
+            }
+
+            public function getMessageCount(): int
+            {
+                return $this->inner->getMessageCount();
+            }
+        };
+    }
+
+    /**
+     * @return MessageBusInterface&object{dispatched: int}
+     */
+    private function recordingBus(): MessageBusInterface
+    {
+        return new class implements MessageBusInterface {
+            public int $dispatched = 0;
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                ++$this->dispatched;
+
+                return Envelope::wrap($message, $stamps);
+            }
+        };
     }
 
     private function monitor(): BackgroundJobsMonitor

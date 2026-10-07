@@ -197,7 +197,15 @@ final readonly class BackgroundJobsMonitor
             return false;
         }
 
-        $this->failureTransport->reject($envelope);
+        // In the shop database the row is deleted on a condition: a job a replay took
+        // meanwhile is not deleted, nor is what it kept for the replay.
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null === $queue) {
+            $this->failureTransport->reject($envelope);
+        } elseif (!$queue->take($id)) {
+            return false;
+        }
 
         // Never replayed now: what was kept for the replay can go.
         $this->dispatcher?->dispatch(new FailedJobRemovedEvent($envelope->getMessage()));
