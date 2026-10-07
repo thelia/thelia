@@ -126,6 +126,35 @@ final readonly class ArchiveInspector
     }
 
     /**
+     * The name a pax header gives the entry that follows: records of "<length>
+     * <key>=<value>\n", read one after the other by their length, so a name quoted in
+     * the value of another record is never taken for it.
+     */
+    private static function paxPath(string $records): ?string
+    {
+        $path = null;
+        $offset = 0;
+
+        while (1 === preg_match('/\G(\d+) /', $records, $match, 0, $offset)) {
+            $length = (int) $match[1];
+
+            if ($length <= \strlen($match[0]) || $offset + $length > \strlen($records)) {
+                break;
+            }
+
+            $record = substr($records, $offset + \strlen($match[0]), $length - \strlen($match[0]) - 1);
+
+            if (str_starts_with($record, 'path=')) {
+                $path = substr($record, 5);
+            }
+
+            $offset += $length;
+        }
+
+        return $path;
+    }
+
+    /**
      * Reads the headers of a tar, through its compression, one block at a time: the
      * archive is never held in memory, as PharData would hold it.
      *
@@ -174,9 +203,7 @@ final readonly class ArchiveInspector
                 }
 
                 if ('x' === $type || 'g' === $type) {
-                    if (1 === preg_match('/\d+ path=([^\n]*)\n/', (string) self::skipOrRead($stream, $size, true), $match)) {
-                        $longName = $match[1];
-                    }
+                    $longName = self::paxPath((string) self::skipOrRead($stream, $size, true)) ?? $longName;
 
                     continue;
                 }
