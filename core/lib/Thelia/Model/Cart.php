@@ -354,7 +354,7 @@ class Cart extends BaseCart
         }
 
         return round(
-            $this->createTaxCalculator()
+            $this->createCartTaxCalculator($this)
                 ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
                 ->getTaxedPrice($untaxedPrice),
             2,

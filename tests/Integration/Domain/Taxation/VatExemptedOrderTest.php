@@ -30,6 +30,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
+use Thelia\Domain\Checkout\Service\GiftWrappingProvider;
 use Thelia\Domain\Order\Service\OrderFingerprint;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Cart;
@@ -38,6 +39,7 @@ use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\GiftWrapping;
 use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Map\OrderTableMap;
@@ -178,6 +180,41 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         $this->skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder();
 
         self::assertSame('20 %', $this->postageTaxRateOnTheInvoiceOf($this->orderWithPostageBilledTo('BE', null)));
+    }
+
+    public function testTheInvoiceStatesTheRateOfAPostageQuotedInWholeCents(): void
+    {
+        $this->skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder();
+
+        self::assertSame(
+            '20 %',
+            $this->postageTaxRateOnTheInvoiceOf($this->orderWithPostageBilledTo('BE', null, new OrderPostage(5.0, 0.83, 'VAT 20'))),
+            'A postage of 4.17 plus 0.83 of tax is a 20 % postage, not a 19.9 % one.',
+        );
+    }
+
+    public function testEveryLocaleOfThePdfTemplateTranslatesTheReverseCharge(): void
+    {
+        $this->skipUnlessThePdfTemplateStatesTheReverseCharge();
+
+        $files = glob($this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.'translations'.\DIRECTORY_SEPARATOR.'pdf.*.php');
+        self::assertNotEmpty($files);
+
+        $english = require $this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.'translations'.\DIRECTORY_SEPARATOR.'pdf.en_US.php';
+        if (!\array_key_exists(self::REVERSE_CHARGE_MENTION, $english)) {
+            self::markTestSkipped('The installed PDF template does not translate the reverse charge yet.');
+        }
+
+        foreach ($files as $file) {
+            $messages = require $file;
+
+            foreach ([self::REVERSE_CHARGE_MENTION, 'Customer VAT: '] as $key) {
+                self::assertArrayHasKey($key, $messages, basename($file));
+                if (!str_ends_with($file, 'pdf.en_US.php')) {
+                    self::assertNotSame($key, $messages[$key], basename($file).' prints the English wording.');
+                }
+            }
+        }
     }
 
     public function testTheInvoiceOfATaxedOrderSaysNothingOfTheSort(): void
@@ -567,6 +604,70 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testAGiftWrappingOnAnExemptOrderCarriesNoVatAndItsVatIsFrozenOnTheInvoiceAddress(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        $wrapping = (new GiftWrapping())
+            ->setCode('gift-box')
+            ->setPrice('5.000000')
+            ->setTaxRuleId($this->taxRuleTaxingAt($this->countryOf('FR'), '20')->getId())
+            ->setActive(1);
+        $wrapping->setLocale('en_US')->setTitle('Gift box');
+        $wrapping->save($this->getPropelConnection());
+        $this->getService(GiftWrappingProvider::class)->forgetCache();
+        $fixtures['cart']->setGiftWrappingId($wrapping->getId())->save($this->getPropelConnection());
+
+        self::assertEqualsWithDelta(
+            5.0,
+            $fixtures['cart']->getTaxedGiftWrapping($this->countryOf('FR')),
+            0.0001,
+            'The cart is exempt: the wrapping is not taxed either.',
+        );
+
+        $order = $this->checkout($fixtures);
+
+        self::assertSame(0, $this->taxLinesOf($order), 'An exempt order carries no tax line, the wrapping included.');
+        self::assertEqualsWithDelta(
+            2.0 + 1.0,
+            (float) $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExemptedAmount(),
+            0.0001,
+            'The VAT of the 10.00 line and of the 5.00 wrapping, at 20 %.',
+        );
+        $tax = 0.0;
+        self::assertEqualsWithDelta(15.0, (float) $order->getTotalAmount($tax), 0.0001);
+        self::assertEqualsWithDelta(0.0, $tax, 0.0001);
+    }
+
+    public function testAnOrderBuiltOnExistingOrderAddressesIsNeverExempted(): void
+    {
+        $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
+        $fixtures = $this->createCheckoutReadyCart('BE', new \DateTime('-10 days'));
+        self::assertTrue($fixtures['cart']->isVatExempted(), 'Control: the cart itself is exempt.');
+
+        $sessionOrder = (new Order())
+            ->setDeliveryOrderAddressId($this->factory->orderAddress($this->countryOf('FR'))->getId())
+            ->setInvoiceOrderAddressId($this->factory->orderAddress($this->countryOf('BE'))->getId())
+            ->setStatusId(\Thelia\Model\OrderStatusQuery::getNotPaidStatus()->getId())
+            ->setDeliveryModuleId($fixtures['deliveryModule']->getId())
+            ->setPaymentModuleId($fixtures['paymentModule']->getId())
+            ->setPostage('0')
+            ->setPostageTax('0');
+
+        $order = $this->getService(\Thelia\Domain\Order\OrderFacade::class)->createOrder(
+            $this->kernelDispatcher(),
+            $sessionOrder,
+            $fixtures['currency'],
+            $this->factory->lang(),
+            $fixtures['cart'],
+            $fixtures['customer'],
+            useOrderDefinedAddresses: true,
+        );
+
+        self::assertSame(0, $order->getOrderAddressRelatedByInvoiceOrderAddressId()->getVatExempted());
+        self::assertGreaterThan(0, $this->taxLinesOf($order), 'No verification covers these addresses: the order is taxed.');
+    }
+
     public function testTheFingerprintOfACartFollowsItsExemption(): void
     {
         $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
@@ -891,11 +992,11 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         }
     }
 
-    private function orderWithPostageBilledTo(string $billingCountryCode, ?\DateTime $verifiedAt): Order
+    private function orderWithPostageBilledTo(string $billingCountryCode, ?\DateTime $verifiedAt, ?OrderPostage $quote = null): Order
     {
         $this->configure(VatExemptionMode::VERIFIED_VAT_NUMBER);
         $fixtures = $this->createCheckoutReadyCart($billingCountryCode, $verifiedAt);
-        [$action, $dispatcher] = $this->postageQuotedAt(new OrderPostage(12.0, 2.0, 'VAT 20'));
+        [$action, $dispatcher] = $this->postageQuotedAt($quote ?? new OrderPostage(12.0, 2.0, 'VAT 20'));
         $action->calculatePostage(new CartCheckoutEvent($fixtures['cart']), TheliaEvents::CART_SET_POSTAGE, $dispatcher);
         $fixtures['cart']->reload();
 

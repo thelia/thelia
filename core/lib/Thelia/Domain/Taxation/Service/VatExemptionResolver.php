@@ -80,8 +80,14 @@ final class VatExemptionResolver implements ResetInterface
             return VatExemptionState::NOT_APPLICABLE;
         }
 
-        if (!$this->crossesABorderOfTheUnion($this->isoCodeOf($invoiceAddress->getCountryId()))) {
+        $buyerCountryCode = $this->isoCodeOf($invoiceAddress->getCountryId());
+
+        if (!$this->crossesABorderOfTheUnion($buyerCountryCode)) {
             return VatExemptionState::NOT_APPLICABLE;
+        }
+
+        if (!$this->numberBelongsTo((string) $invoiceAddress->getVatNumber(), (string) $buyerCountryCode)) {
+            return VatExemptionState::NOT_VERIFIED;
         }
 
         $verifiedAt = $invoiceAddress->getVatVerifiedAt();
@@ -91,6 +97,23 @@ final class VatExemptionResolver implements ResetInterface
         }
 
         return $this->hasExpired($verifiedAt) ? VatExemptionState::VERIFICATION_EXPIRED : VatExemptionState::EXEMPTED;
+    }
+
+    /**
+     * A verification vouches for a number in the country that issued it: a verifier that
+     * ignores the country it is given must not be able to exempt an address of another.
+     */
+    private function numberBelongsTo(string $vatNumber, string $countryCode): bool
+    {
+        $normalized = strtoupper(preg_replace('/\s+/', '', $vatNumber) ?? '');
+
+        foreach ($this->europeanUnionCountries->vatPrefixesFor($countryCode) as $prefix) {
+            if (str_starts_with($normalized, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function crossesABorderOfTheUnion(?string $buyerCountryCode): bool
@@ -125,7 +148,11 @@ final class VatExemptionResolver implements ResetInterface
         $storeCountry = (string) ConfigQuery::getStoreCountry();
 
         if (!\array_key_exists($storeCountry, $this->shopIsoCodeByStoreCountry)) {
-            $this->shopIsoCodeByStoreCountry[$storeCountry] = Country::getShopLocation()->getIsoalpha2();
+            try {
+                $this->shopIsoCodeByStoreCountry[$storeCountry] = Country::getShopLocation()->getIsoalpha2();
+            } catch (\LogicException) {
+                $this->shopIsoCodeByStoreCountry[$storeCountry] = null;
+            }
         }
 
         return $this->shopIsoCodeByStoreCountry[$storeCountry];
