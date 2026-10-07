@@ -28,8 +28,8 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Import;
 use Thelia\Model\ImportCategory;
 use Thelia\Model\ImportCategoryQuery;
@@ -47,6 +47,7 @@ class ImportHandler
         protected EventDispatcherInterface $eventDispatcher,
         protected SerializerManager $serializerManager,
         protected ArchiverManager $archiverManager,
+        protected ArchiveInspector $archiveInspector = new ArchiveInspector(),
     ) {
     }
 
@@ -102,7 +103,7 @@ class ImportHandler
         $extractedDirectory = null;
 
         if ($archiver instanceof AbstractArchiver) {
-            (new ArchiveInspector())->assertExtractable($file->getPathname(), $archiver->getExtension());
+            $this->archiveInspector->assertExtractable($file->getPathname(), $archiver->getExtension());
             $extractedDirectory = $file->getPath().DS.uniqid('', true);
         }
 
@@ -126,7 +127,7 @@ class ImportHandler
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
         if (!$import->isHandlerAvailable()) {
@@ -207,21 +208,21 @@ class ImportHandler
      * Given the file, its content is checked too: the name is chosen by whoever
      * uploads it, the content is what gets stored and read.
      *
-     * @throws FormValidationException when the file may not be imported
+     * @throws UploadRefusedException when the file may not be imported (a FormValidationException)
      */
     public function validateUpload(string $fileName, ?File $file = null): void
     {
         $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
 
         if (null !== $dangerousExtension) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
         }
 
         $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
         $acceptedExtensions = $this->getAcceptedExtensions();
 
         if (!\in_array($extension, $acceptedExtensions, true)) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
         }
 
         if (null === $file) {
@@ -229,11 +230,11 @@ class ImportHandler
         }
 
         if (!$this->contentMatchesExtension($file, $fileName)) {
-            throw new FormValidationException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
         }
 
         if ($this->matchArchiverByExtension($fileName) instanceof AbstractArchiver) {
-            (new ArchiveInspector())->assertExtractable($file->getPathname(), $extension);
+            $this->archiveInspector->assertExtractable($file->getPathname(), $extension);
         }
     }
 
@@ -309,6 +310,16 @@ class ImportHandler
         $archiver->open($file->getPathname());
         $archiver->extract($extractPath);
 
+        // An archive with nothing in it creates no folder.
+        if (!is_dir($extractPath)) {
+            return $file;
+        }
+
+        // The sizes an archive declares are written by whoever made it: what was
+        // really written is measured, and too much is refused (the folder is then
+        // removed with the rest of the extraction).
+        $this->archiveInspector->assertExtractedSize($extractPath);
+
         /** @var \DirectoryIterator $item */
         foreach (new \DirectoryIterator($extractPath) as $item) {
             if (!$item->isDot() && $item->isFile()) {
@@ -326,7 +337,15 @@ class ImportHandler
         $errors = [];
         $read = 0;
 
-        $import->setData($serializer->unserialize($import->getFile()->openFile('r')));
+        // A file that does not parse (broken JSON, XML or YAML) is the administrator's to
+        // fix: said as such, not as a server error.
+        try {
+            $data = $serializer->unserialize($import->getFile()->openFile('r'));
+        } catch (\Throwable $unreadable) {
+            throw new UploadRefusedException(Translator::getInstance()->trans('The file cannot be read as a "%format" file: check its content.', ['%format' => $serializer->getExtension()]), 0, $unreadable);
+        }
+
+        $import->setData($data);
 
         foreach ($import as $data) {
             $import->checkMandatoryColumns($data);

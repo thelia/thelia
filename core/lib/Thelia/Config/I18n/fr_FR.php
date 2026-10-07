@@ -574,6 +574,8 @@ return [
     'The HTML TITLE element is the most important element on your web page.' => 'L\'élément HTML TITLE est le plus important dans votre page',
     'The consent "%code" is required by the shop and cannot be deleted. It can still be turned off, or made optional.' => 'Le consentement « %code » est requis par la boutique et ne peut pas être supprimé. Il reste possible de le désactiver ou de le rendre facultatif.',
     'The content of the file is not a "%extension" file.' => 'Le contenu du fichier n\'est pas celui d\'un fichier "%extension".',
+    'The dates of the export are not valid.' => 'Les dates de l\'export ne sont pas valides.',
+    'The file cannot be read as a "%format" file: check its content.' => 'Le fichier ne peut pas être lu comme un fichier « %format » : vérifiez son contenu.',
     'The product relation type "%code" is required by the shop and cannot be deleted. It can still be hidden.' => 'Le type de relation « %code » est requis par la boutique et ne peut pas être supprimé. Il reste possible de le masquer.',
     'The product relation type "%code" still holds %count relations and cannot be deleted. Remove them first, or hide the type.' => "Le type de relation « %code » porte encore %count relations et ne peut pas être supprimé. Retirez-les d'abord, ou masquez le type.",
     'A product relation type with the code "%code" already exists.' => 'Un type de relation portant le code « %code » existe déjà.',
