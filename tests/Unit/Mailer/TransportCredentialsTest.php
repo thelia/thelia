@@ -43,6 +43,14 @@ final class TransportCredentialsTest extends TestCase
         self::assertStringNotContainsString('pass2', $logged);
     }
 
+    public function testAPasswordHoldingAnAtSignIsHiddenWhole(): void
+    {
+        $logged = $this->sanitize('Connection to smtp://postmaster:p@ss@mail.example.com:587 refused');
+
+        self::assertStringNotContainsString('ss@', $logged);
+        self::assertStringContainsString('smtp://***@mail.example.com:587', $logged);
+    }
+
     public function testAReasonWithNoCredentialsIsLeftAsItIs(): void
     {
         $reason = 'Unable to write body to stream, mailbox unavailable for contact@example.com';
