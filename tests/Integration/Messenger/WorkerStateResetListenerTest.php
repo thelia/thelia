@@ -36,9 +36,9 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Messenger\EventListener\WorkerStateResetListener;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use Thelia\Tools\URL;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Messenger\ProbeMessage;
+use Thelia\Tools\URL;
 
 /**
  * A worker handles job after job in one process: each of them starts from what a
@@ -172,6 +172,13 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
 
             self::assertSame('/shop', $requestStack->getMainRequest()?->getBaseUrl());
             self::assertStringEndsWith('/shop', $this->getService(URL::class)->getBaseUrl());
+            $this->finishTheJob();
+
+            // At the root of its site, a shop has no folder in its links.
+            $context->setBaseUrl('');
+            $this->getService(EventDispatcherInterface::class)->dispatch(new WorkerMessageReceivedEvent(new Envelope(new ProbeMessage('next job')), 'async'));
+
+            self::assertSame('', $requestStack->getMainRequest()?->getBaseUrl());
         } finally {
             $this->finishTheJob();
             $context->setBaseUrl($baseUrl);
