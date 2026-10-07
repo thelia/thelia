@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\Serializer;
 
+use Symfony\Bridge\Twig\Mime\NotificationEmail;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Mime\Email;
@@ -50,6 +52,14 @@ final class QueuedMailFiles
         RawMessage::class,
         Message::class,
         Email::class,
+    ];
+
+    /**
+     * The templated mails, queued once rendered: the worker then renders nothing.
+     */
+    private const TEMPLATED_MAILS = [
+        TemplatedEmail::class,
+        NotificationEmail::class,
     ];
 
     /**
@@ -110,8 +120,10 @@ final class QueuedMailFiles
     private static function mailReadsAFile(RawMessage $mail): bool
     {
         // Another class may do more when it is sent than send itself: a templated mail
-        // renders the template it names.
-        if (!\in_array($mail::class, self::MAILS, true)) {
+        // renders the template it names, unless it was rendered before it was queued.
+        $renderedTemplatedMail = \in_array($mail::class, self::TEMPLATED_MAILS, true) && $mail instanceof TemplatedEmail && $mail->isRendered();
+
+        if (!$renderedTemplatedMail && !\in_array($mail::class, self::MAILS, true)) {
             return true;
         }
 

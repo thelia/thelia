@@ -331,6 +331,22 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
     }
 
     /**
+     * A templated mail rendered before it is sent renders nothing more in the worker: it
+     * is queued as any other.
+     */
+    public function testARenderedTemplatedMailIsQueued(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $mail = (new TemplatedEmail())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->text('Rendered');
+        $mail->markAsRendered();
+
+        $message = $serializer->decode($serializer->encode(new Envelope(new SendEmailMessage($mail))))->getMessage();
+
+        self::assertInstanceOf(SendEmailMessage::class, $message);
+        self::assertInstanceOf(TemplatedEmail::class, $message->getMessage());
+    }
+
+    /**
      * Whatever a part of a forged mail throws when it is looked at, the job is kept as
      * unreadable and the worker goes on.
      */
