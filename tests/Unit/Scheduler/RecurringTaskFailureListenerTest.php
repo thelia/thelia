@@ -21,6 +21,8 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Exception\RunCommandFailedException;
 use Symfony\Component\Console\Messenger\RunCommandContext;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -41,7 +43,7 @@ final class RecurringTaskFailureListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->failures = new RecurringTaskFailures(new ArrayAdapter());
+        $this->failures = new RecurringTaskFailures(new ArrayAdapter(), new LockFactory(new InMemoryStore()));
         $this->listener = new RecurringTaskFailureListener($this->failures, new NullLogger());
     }
 
@@ -78,12 +80,44 @@ final class RecurringTaskFailureListenerTest extends TestCase
     public function testAFailureIsForgottenAfterAMonth(): void
     {
         $clock = new MockClock();
-        $failures = new RecurringTaskFailures(new ArrayAdapter(clock: $clock));
+        $failures = new RecurringTaskFailures(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $clock);
         $failures->record('currency:update-rates', 'Failed.');
 
         $clock->sleep(31 * 86400);
 
         self::assertSame([], $failures->all());
+    }
+
+    /**
+     * The failures share one entry, written again whenever any task fails: each one
+     * still goes a month after its own date.
+     */
+    public function testAFailureIsForgottenAfterAMonthWhileAnotherTaskKeepsFailing(): void
+    {
+        $clock = new MockClock();
+        $failures = new RecurringTaskFailures(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $clock);
+        $failures->record('currency:update-rates', 'Failed.');
+
+        $clock->sleep(20 * 86400);
+        $failures->record('maintenance:purge', 'Failed.');
+        $clock->sleep(11 * 86400);
+        $failures->record('maintenance:purge', 'Failed again.');
+
+        self::assertSame(['maintenance:purge'], array_map(static fn ($failure): string => $failure->task, $failures->all()));
+    }
+
+    /**
+     * Two workers may finish tasks at the same moment: the list is changed under a lock,
+     * given back once written.
+     */
+    public function testTheListIsChangedUnderALockGivenBackOnceWritten(): void
+    {
+        $store = new InMemoryStore();
+        $failures = new RecurringTaskFailures(new ArrayAdapter(), new LockFactory($store));
+
+        $failures->record('maintenance:purge', 'Failed.');
+
+        self::assertTrue((new LockFactory($store))->createLock('thelia_schedule_failures')->acquire(false));
     }
 
     public function testAJobOfAQueueIsLeftToTheFailedJobs(): void
