@@ -19,8 +19,10 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Messenger\WorkerRestartSignal;
 
 /**
  * Class Cache.
@@ -47,6 +49,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
     public function __construct(
         protected AdapterInterface $adapter,
         protected string $environment,
+        protected ?WorkerRestartSignal $workerRestartSignal = null,
     ) {
     }
 
@@ -80,8 +83,26 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
     public function onTerminate(): void
     {
-        foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
+        // A worker runs one command after another in the same process: a clear is done
+        // once, not again at the end of every command that follows.
+        $cacheEvents = $this->onTerminateCacheClearEvents;
+        $this->onTerminateCacheClearEvents = [];
+
+        foreach ($cacheEvents as $cacheEvent) {
             $this->execCacheClear($cacheEvent);
+        }
+    }
+
+    /**
+     * A worker ends no command between two jobs: a clear a job asked for stops the
+     * worker, and runs when its command ends. It cannot run as the job ends: the job is
+     * not acknowledged yet, and the worker still loads its own listeners from the
+     * container files the clear deletes.
+     */
+    public function stopTheWorkerOnAPendingClear(WorkerRunningEvent $event): void
+    {
+        if ([] !== $this->onTerminateCacheClearEvents) {
+            $event->getWorker()->stop();
         }
     }
 
@@ -91,6 +112,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
         $fs->remove($event->getDir());
+
+        // Only once the directory is gone: a worker started again before would boot
+        // on the container being deleted.
+        $this->workerRestartSignal?->sendIfItHeldTheContainer($event->getDir());
 
         if (!$event->invalidatesPropelSchema()) {
             return;
@@ -108,6 +133,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
             ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
         ];
     }
 }
