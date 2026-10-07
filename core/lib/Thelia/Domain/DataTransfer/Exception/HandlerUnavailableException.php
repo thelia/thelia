@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Exception;
 
-use Thelia\Messenger\UserFacingFailure;
+use Thelia\Exception\UserFacingFailure;
 
 /**
  * An export or an import whose handler class is gone with the module that provided it.

@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Messenger\JobFailureMessage;
 
@@ -33,7 +34,7 @@ final class JobFailureMessageTest extends TestCase
     public function testTheReasonAJobGivesItselfIsShownAsItIs(): void
     {
         self::assertSame('No data found for your export.', JobFailureMessage::forAdministrator(new DataTransferNoDataFoundException('No data found for your export.')));
-        self::assertSame('The extension "exe" is not allowed', JobFailureMessage::forAdministrator(new FormValidationException('The extension "exe" is not allowed')));
+        self::assertSame('The extension "exe" is not allowed', JobFailureMessage::forAdministrator(new UploadRefusedException('The extension "exe" is not allowed')));
         self::assertSame('The export "x" cannot be run.', JobFailureMessage::forAdministrator(new HandlerUnavailableException('The export "x" cannot be run.')));
     }
 
@@ -46,7 +47,7 @@ final class JobFailureMessageTest extends TestCase
 
     public function testALongReasonIsCut(): void
     {
-        self::assertSame(2000, mb_strlen(JobFailureMessage::forAdministrator(new FormValidationException(str_repeat('é', 3000)))));
+        self::assertSame(2000, mb_strlen(JobFailureMessage::forAdministrator(new UploadRefusedException(str_repeat('é', 3000)))));
     }
 
     /**
@@ -62,6 +63,8 @@ final class JobFailureMessageTest extends TestCase
             new \ErrorException('unlink(/var/www/html/var/data-transfer/import/x.csv): No such file or directory', 0, \E_WARNING),
             new FileException('Could not move the file "/tmp/phpA1" to "/var/www/html/var/data-transfer/import/x.csv".'),
             new \RuntimeException('File /var/www/html/var/x.zip doesn\'t exists'),
+            // Thelia wraps other texts in it, a rewritten URL among them.
+            new FormValidationException('The URL "/buyer-name" is already used.'),
         ] as $exception) {
             self::assertSame(JobFailureMessage::SERVER_ERROR, JobFailureMessage::forAdministrator($exception), $exception::class);
         }
@@ -80,5 +83,14 @@ final class JobFailureMessageTest extends TestCase
     public function testTheLogKeepsTheWordsWrittenForTheAdministrator(): void
     {
         self::assertSame('No data found for your export.', JobFailureMessage::forLog(new DataTransferNoDataFoundException('No data found for your export.')));
+    }
+
+    /**
+     * Words written for the screen may quote what was typed: the log keeps them on one
+     * line, so they cannot forge a line of their own.
+     */
+    public function testTheLogKeepsTheWordsOnOneLine(): void
+    {
+        self::assertSame('The extension "csv ERROR forged" is not allowed', JobFailureMessage::forLog(new UploadRefusedException("The extension \"csv\nERROR forged\" is not allowed")));
     }
 }
