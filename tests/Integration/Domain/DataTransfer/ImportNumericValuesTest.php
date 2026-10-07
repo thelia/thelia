@@ -90,4 +90,26 @@ final class ImportNumericValuesTest extends IntegrationTestCase
             self::assertStringContainsString('price', $error);
         }
     }
+
+    /**
+     * A row refused for its price leaves nothing on the combination: in a request the
+     * combination is pooled, and a price left on it would be saved at 0 with the next
+     * row of the same combination.
+     */
+    public function testARefusedPriceLeavesNoPriceBehind(): void
+    {
+        $other = $this->createFixtureFactory()->currency(['code' => 'XTS', 'symbol' => 'X', 'byDefault' => 0]);
+        $pooling = \Propel\Runtime\Propel::isInstancePoolingEnabled();
+        \Propel\Runtime\Propel::enableInstancePooling();
+
+        try {
+            $import = new ProductPricesImport();
+            self::assertNotNull($import->importData(['id' => $this->combination->getId(), 'currency' => 'XTS', 'price' => '12,50']));
+            self::assertNull($import->importData(['id' => $this->combination->getId(), 'price' => '9.90', 'promo' => 1]));
+        } finally {
+            $pooling ? \Propel\Runtime\Propel::enableInstancePooling() : \Propel\Runtime\Propel::disableInstancePooling();
+        }
+
+        self::assertNull(ProductPriceQuery::create()->filterByProductSaleElementsId($this->combination->getId())->findOneByCurrencyId($other->getId()));
+    }
 }

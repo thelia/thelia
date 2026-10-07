@@ -101,6 +101,16 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertStringNotContainsString('s3cr3t', implode(' ', $reasons));
     }
 
+    public function testAReasonIsShownWithinTheLengthOfAnyOther(): void
+    {
+        $this->setAside(new ProbeMessage('unreadable'), 'Unreadable job: '.str_repeat('x', 10000), JobSetAsideException::class);
+        $this->setAside($this->mail(), 'Mail server answered: '.str_repeat('y', 10000));
+
+        foreach ($this->monitor()->failedJobs() as $job) {
+            self::assertSame(JobFailureMessage::MAX_LENGTH, mb_strlen($job->error));
+        }
+    }
+
     public function testTheJobsWaitingForAWorkerAreCounted(): void
     {
         $this->jobs->send(new Envelope(new ProbeMessage('waiting')));

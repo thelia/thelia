@@ -26,6 +26,7 @@ final class TransportCredentials
 {
     public static function hide(string $message): string
     {
-        return preg_replace('#://[^@/\s]+@#', '://***@', $message) ?? $message;
+        // Up to the last @ before the path: a password may hold one of its own.
+        return preg_replace('#://[^/\s]*@#', '://***@', $message) ?? $message;
     }
 }
