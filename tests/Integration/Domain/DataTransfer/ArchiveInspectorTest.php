@@ -161,6 +161,21 @@ final class ArchiveInspectorTest extends IntegrationTestCase
         (new ArchiveInspector(maxExtractedBytes: 1000))->assertExtractable($path, 'bz2');
     }
 
+    /**
+     * A long-name record is read through like any entry: it counts against the limits.
+     */
+    public function testTheRecordsNamingAnEntryCountAgainstTheLimits(): void
+    {
+        $long = (string) file_get_contents($this->tar(['././@LongLink' => str_repeat('a', 300)."\0"], type: 'L'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/long.tar';
+        file_put_contents($path, substr($long, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector(maxEntries: 1))->assertExtractable($path, 'tar');
+    }
+
     public function testAnEmptyTarIsAccepted(): void
     {
         (new ArchiveInspector())->assertExtractable($this->tar([]), 'tar');

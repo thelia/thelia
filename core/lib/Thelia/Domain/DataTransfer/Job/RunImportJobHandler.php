@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -22,6 +23,8 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Core\Event\ImportEvent;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\JobSetAsideException;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportJobQuery;
@@ -104,7 +107,13 @@ final readonly class RunImportJobHandler
             $this->lifecycle->fail($job, $exception);
         }
 
-        $this->storage->discardFileOf($job);
+        // The import is done: a file that cannot be deleted is the purge's to sweep, not
+        // a reason to report the job failed.
+        try {
+            $this->storage->discardFileOf($job);
+        } catch (\Throwable $leftBehind) {
+            Tlog::getInstance()->addWarning(\sprintf('The file of import job %d was left behind: %s', $job->getId(), JobFailureMessage::forLog($leftBehind)));
+        }
     }
 
     private function run(ImportJob $job): ImportEvent
@@ -147,8 +156,18 @@ final readonly class RunImportJobHandler
 
     private static function rollBackOwned(ConnectionInterface $connection, bool $ownsTransaction): void
     {
-        if ($ownsTransaction && $connection->inTransaction()) {
-            $connection->rollBack();
+        if (!$ownsTransaction || !$connection->inTransaction()) {
+            return;
         }
+
+        // The whole of it: a module's import may have left a nested transaction open,
+        // which a plain rollBack() would only count down.
+        if ($connection instanceof ConnectionWrapper) {
+            $connection->forceRollBack();
+
+            return;
+        }
+
+        $connection->rollBack();
     }
 }
