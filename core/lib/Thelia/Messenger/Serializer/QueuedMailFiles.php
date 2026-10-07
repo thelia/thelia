@@ -19,9 +19,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
+use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
+use Symfony\Component\Mime\Part\MessagePart;
+use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\Multipart\DigestPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
+use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\RawMessage;
 
 /**
  * Keeps the files of the server out of the queued mails.
@@ -29,10 +37,23 @@ use Symfony\Component\Mime\Part\TextPart;
  * A mail part may name a file, read only when the mail is sent: queued as it is, the
  * mail holds a path, and whoever writes a mail into the queue has the worker mail any
  * file of the server to any address. An attachment given by its path is queued with
- * its content instead, and a queued mail naming a file is never read back.
+ * its content instead, and a queued mail naming a file, in any of its parts or in a
+ * mail it carries, or holding a part Symfony does not build a mail with, is never
+ * read back.
  */
 final class QueuedMailFiles
 {
+    /**
+     * The parts made of other parts that Symfony builds a mail with.
+     */
+    private const MULTIPARTS = [
+        AlternativePart::class,
+        DigestPart::class,
+        FormDataPart::class,
+        MixedPart::class,
+        RelatedPart::class,
+    ];
+
     /**
      * The envelope with every attachment of its mail given by its content.
      */
@@ -64,12 +85,17 @@ final class QueuedMailFiles
     }
 
     /**
-     * True when sending the mail would read a file of the server.
+     * True when sending the mail would read a file of the server, or when it holds a
+     * part the shop does not know: a class of its own may keep a file anywhere.
      */
     public static function readsAFile(SendEmailMessage $message): bool
     {
-        $mail = $message->getMessage();
+        return self::mailReadsAFile($message->getMessage());
+    }
 
+    private static function mailReadsAFile(RawMessage $mail): bool
+    {
+        // A raw message is text already: nothing in it is read when it is sent.
         if (!$mail instanceof Message) {
             return false;
         }
@@ -81,7 +107,7 @@ final class QueuedMailFiles
         }
 
         foreach ($parts as $part) {
-            if (self::holdsAFile($part)) {
+            if (null !== $part && self::holdsAFile($part)) {
                 return true;
             }
         }
@@ -89,21 +115,28 @@ final class QueuedMailFiles
         return false;
     }
 
-    private static function holdsAFile(mixed $part): bool
+    private static function holdsAFile(AbstractPart $part): bool
     {
-        if ($part instanceof TextPart) {
+        // A mail attached to the mail: its own parts are sent with it.
+        if (MessagePart::class === $part::class) {
+            return self::mailReadsAFile((new \ReflectionProperty(MessagePart::class, 'message'))->getValue($part));
+        }
+
+        if (TextPart::class === $part::class || DataPart::class === $part::class) {
             return self::namesAFile($part);
         }
 
-        if ($part instanceof AbstractMultipartPart) {
+        if ($part instanceof AbstractMultipartPart && \in_array($part::class, self::MULTIPARTS, true)) {
             foreach ($part->getParts() as $child) {
                 if (self::holdsAFile($child)) {
                     return true;
                 }
             }
+
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private static function namesAFile(TextPart $part): bool
