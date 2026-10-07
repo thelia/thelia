@@ -38,12 +38,12 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  *
  * @implements TransportFactoryInterface<DoctrineTransport>
  */
-final class ShopDatabaseTransportFactory implements TransportFactoryInterface
+final readonly class ShopDatabaseTransportFactory implements TransportFactoryInterface
 {
     public const CONNECTION_NAME = 'default';
 
     public function __construct(
-        private readonly ShopDatabaseConnection $connection,
+        private ShopDatabaseConnection $connection,
     ) {
     }
 

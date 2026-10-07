@@ -77,13 +77,19 @@ class ProductPricesImport extends AbstractImport
 
         // A price is stored as a decimal string; JSON and XML files give numbers. A
         // cell that is not a number refuses this row only.
+        // A JSON file may give a null price, a list or an object: refused too, rather than
+        // written as an empty price the database refuses for the whole import.
         foreach (['price', 'promo_price'] as $column) {
-            if (isset($data[$column]) && !is_numeric($data[$column])) {
-                return Translator::getInstance()->trans(
-                    'The value "%value" of the column %column is not a number (product sale element id %id)',
-                    ['%value' => $data[$column], '%column' => $column, '%id' => $data['id']],
-                );
+            $required = 'price' === $column;
+
+            if ((!$required && !isset($data[$column])) || (\is_scalar($data[$column] ?? null) && is_numeric($data[$column]))) {
+                continue;
             }
+
+            return Translator::getInstance()->trans(
+                'The value "%value" of the column %column is not a number (product sale element id %id)',
+                ['%value' => \is_scalar($data[$column] ?? null) ? (string) $data[$column] : '', '%column' => $column, '%id' => \is_scalar($data['id'] ?? null) ? (string) $data['id'] : ''],
+            );
         }
 
         $price->setPrice((string) $data['price']);

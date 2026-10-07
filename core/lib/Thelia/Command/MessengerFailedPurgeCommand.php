@@ -45,8 +45,10 @@ class MessengerFailedPurgeCommand extends ContainerAwareCommand
     {
         $days = $input->getOption('older-than');
 
-        if (!\is_string($days) || !ctype_digit($days)) {
-            $output->writeln('<error>--older-than takes a whole number of days.</error>');
+        // Zero would delete the failures of this very minute, and a figure past ten
+        // years is a typing mistake.
+        if (!\is_string($days) || !ctype_digit($days) || (int) $days < 1 || (int) $days > 3650) {
+            $output->writeln('<error>--older-than takes a whole number of days, from 1 to 3650.</error>');
 
             return self::INVALID;
         }
