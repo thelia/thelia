@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\Serializer;
 
+use Propel\Runtime\ActiveQuery\QueryExecutor\QueryExecutionException;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -237,8 +240,23 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
 
         // A module lives under the namespace named after its code. Read each time: a
         // worker outlives the activation and the deactivation of modules.
+        $code = substr($class, 0, $separator);
+
+        try {
+            return self::isActiveModule($code);
+        } catch (\PDOException|QueryExecutionException) {
+            // A job is read before anything else runs for it: after a long wait, the
+            // server may have closed the connection of the worker. Opened again once.
+            Propel::getServiceContainer()->getConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME)->closeConnections();
+
+            return self::isActiveModule($code);
+        }
+    }
+
+    private static function isActiveModule(string $code): bool
+    {
         return ModuleQuery::create()
-            ->filterByCode(substr($class, 0, $separator))
+            ->filterByCode($code)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
             ->exists();
     }
