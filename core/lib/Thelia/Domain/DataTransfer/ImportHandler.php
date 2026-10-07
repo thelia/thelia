@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
@@ -28,13 +30,17 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\Import;
 use Thelia\Model\ImportCategory;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\Map\ImportTableMap;
 
 /**
  * Class ImportHandler.
@@ -43,6 +49,9 @@ use Thelia\Model\Lang;
  */
 class ImportHandler
 {
+    /** Told the rows read while import() runs: processImport() keeps its signature. */
+    private ?\Closure $onProgress = null;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected SerializerManager $serializerManager,
@@ -148,7 +157,13 @@ class ImportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_BEGIN);
 
-        $errors = $this->processImport($event->getImport(), $event->getSerializer(), $onProgress);
+        $this->onProgress = $onProgress;
+
+        try {
+            $errors = $this->processImport($event->getImport(), $event->getSerializer());
+        } finally {
+            $this->onProgress = null;
+        }
 
         $event->setErrors($errors);
 
@@ -332,8 +347,13 @@ class ImportHandler
         return $file;
     }
 
-    protected function processImport(AbstractImport $import, SerializerInterface $serializer, ?\Closure $onProgress = null): array
+    /**
+     * Tells the progress callback given to import(), if any, the number of rows read
+     * every DataTransferProgress::STEP rows and once at the end.
+     */
+    protected function processImport(AbstractImport $import, SerializerInterface $serializer): array
     {
+        $onProgress = $this->onProgress;
         $errors = [];
         $read = 0;
 
@@ -342,15 +362,28 @@ class ImportHandler
         try {
             $data = $serializer->unserialize($import->getFile()->openFile('r'));
         } catch (\Throwable $unreadable) {
+            Tlog::getInstance()->addWarning(\sprintf('An imported %s file could not be read: %s', $serializer->getExtension(), JobFailureMessage::forLog($unreadable)));
+
             throw new UploadRefusedException(Translator::getInstance()->trans('The file cannot be read as a "%format" file: check its content.', ['%format' => $serializer->getExtension()]), 0, $unreadable);
         }
 
         $import->setData($data);
 
+        $connection = Propel::getWriteConnection(ImportTableMap::DATABASE_NAME);
+        $row = 0;
+
         foreach ($import as $data) {
+            ++$row;
             $import->checkMandatoryColumns($data);
 
             $error = $import->importData($data);
+
+            // A row whose save failed inside the import's transaction leaves it unable to
+            // commit, whatever the import did with the exception: said at that row, with
+            // nothing imported, rather than as a server error at the end.
+            if ($connection instanceof ConnectionWrapper && $connection->isInTransaction() && !$connection->isCommitable()) {
+                throw new JobRefusedException(Translator::getInstance()->trans('Row %row could not be saved: nothing was imported.', ['%row' => $row]));
+            }
 
             if (null !== $error) {
                 $errors[] = $error;

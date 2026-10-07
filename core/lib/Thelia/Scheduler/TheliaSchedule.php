@@ -39,6 +39,10 @@ use Symfony\Contracts\Cache\CacheInterface;
  *
  * The schedule is stateful and locked: a worker restarted after a missed run catches
  * up the last one only, and two workers consuming it never run a task twice.
+ * Both hold across servers only when they are shared: LOCK_DSN must name a store all
+ * the workers reach (not the default flock), and the application cache a server they
+ * all use (THELIA_CACHE_DSN), or each host runs the tasks on its own and a cache
+ * clear forgets the last runs.
  */
 #[AsSchedule(self::NAME)]
 final readonly class TheliaSchedule implements ScheduleProviderInterface

@@ -76,4 +76,18 @@ final class ImportNumericValuesTest extends IntegrationTestCase
         self::assertNotNull($error);
         self::assertStringContainsString('price', $error);
     }
+
+    /**
+     * A JSON file may give a null price, or a list: the row is refused with its reason
+     * rather than written as an empty price the database refuses.
+     */
+    public function testAMissingOrStructuredPriceRefusesTheRow(): void
+    {
+        foreach ([null, [1, 2], ['amount' => 3]] as $price) {
+            $error = (new ProductPricesImport())->importData(['id' => $this->combination->getId(), 'price' => $price]);
+
+            self::assertNotNull($error, json_encode($price, \JSON_THROW_ON_ERROR));
+            self::assertStringContainsString('price', $error);
+        }
+    }
 }

@@ -19,8 +19,11 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
@@ -383,6 +386,78 @@ final class ExportJobTest extends IntegrationTestCase
 
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertSame(JobFailureMessage::SERVER_ERROR, $job->getError());
+    }
+
+    /**
+     * Taking the job may fail before the job runs (the database gone, the queue
+     * refusing the message that looks again): what is set aside then says no more
+     * than any other failure, and the row is left to the run that holds it.
+     */
+    public function testAFailureBeforeTheJobRunsNeverQuotesItsCause(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->save($this->getPropelConnection());
+        $refusing = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new \PDOException("SQLSTATE[23000]: Duplicate entry 'buyer@example.com'");
+            }
+        };
+
+        try {
+            $this->handlerWith($refusing)(new RunExportJob($job->getId()));
+            self::fail('The message must be set aside.');
+        } catch (UnrecoverableMessageHandlingException $exception) {
+            self::assertStringContainsString(JobFailureMessage::SERVER_ERROR, $exception->getMessage());
+            self::assertStringNotContainsString('buyer@example.com', $exception->getMessage());
+            self::assertNull($exception->getPrevious());
+        }
+
+        $job->reload();
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+    }
+
+    /**
+     * The format may have gone with its module since the export was asked for.
+     */
+    public function testAnExportWhoseFormatIsGoneSaysSo(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setSerializer('thelia.gone')->save($this->getPropelConnection());
+
+        try {
+            $this->handler()(new RunExportJob($job->getId()));
+        } catch (UnrecoverableMessageHandlingException) {
+        }
+
+        $job->reload();
+        self::assertSame('The format "thelia.gone" is no longer available on this server.', $job->getError());
+    }
+
+    /**
+     * messenger:failed:retry hands the bus the envelope it read from the failure
+     * transport: through the real bus, the job looked at again three times restarts.
+     */
+    public function testAJobReplayedFromTheFailureTransportRestartsThroughTheBus(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::FAILED->value)->save($this->getPropelConnection());
+
+        $this->getService(MessageBusInterface::class)->dispatch(new Envelope(new RunExportJob($job->getId(), 3), [
+            new SentToFailureTransportStamp('async_heavy'),
+            new ReceivedStamp('failed'),
+        ]));
+        $job->reload();
+        $this->files[] = (string) $job->getFilePath();
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus());
+    }
+
+    public function testDatesTheExportFormCannotHaveSentAreRefused(): void
+    {
+        $this->expectException(JobRefusedException::class);
+
+        $this->getService(ExportHandler::class)->resolveRangeDate(['start' => ['year' => '2026; DROP', 'month' => '1'], 'end' => null]);
     }
 
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
