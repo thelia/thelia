@@ -37,6 +37,8 @@ final readonly class ArchiveInspector
 
     public const MAX_EXTRACTED_BYTES = 512 * 1024 * 1024;
 
+    private const MAX_HEADER_RECORD_BYTES = 65536;
+
     private const UNIX_FILE_TYPE = 0o170000;
 
     private const UNIX_SYMBOLIC_LINK = 0o120000;
@@ -252,6 +254,12 @@ final readonly class ArchiveInspector
      */
     private static function skipOrRead($stream, int $size, bool $keep): ?string
     {
+        // A name is read whole or not at all: cut, a record would hide the name it ends
+        // with.
+        if ($keep && $size > self::MAX_HEADER_RECORD_BYTES) {
+            throw self::unreadable();
+        }
+
         $padded = (int) (ceil($size / 512) * 512);
         $kept = '';
 
@@ -262,7 +270,7 @@ final readonly class ArchiveInspector
                 throw self::unreadable();
             }
 
-            if ($keep && \strlen($kept) < 65536) {
+            if ($keep) {
                 $kept .= $chunk;
             }
         }
