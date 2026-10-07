@@ -10,6 +10,7 @@
 
 ## Behaviour changes
 
+- Launching an import from the back office takes the `UPDATE` right on `admin.import`; the `VIEW` right used to be enough, and now only shows the imports and their jobs. Review the profiles of the administrators who import.
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 
 ## Background jobs
@@ -88,6 +89,10 @@ location ^~ /cache/documents/ {
     }
 }
 ```
+
+### Symfony Messenger recipe
+
+The core now requires `symfony/messenger`. When Composer applies its Symfony recipe instead of the Thelia one, it writes `config/packages/messenger.yaml` and adds `MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0` to `.env`: every mail then waits for a worker that may not run. Delete that file after the update: the core configures Messenger itself. Unless a worker runs, also delete that line, so `async` stays synchronous.
 
 ### Files uploaded before the update
 
