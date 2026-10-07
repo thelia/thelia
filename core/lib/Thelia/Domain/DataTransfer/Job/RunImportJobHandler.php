@@ -101,14 +101,21 @@ final readonly class RunImportJobHandler
 
             // Kept while the job can be replayed; without a queue it never can be.
             if (!$this->lifecycle->keepsFailedJobs()) {
-                $this->storage->discardFileOf($job);
+                $this->discardFileOf($job);
             }
 
             $this->lifecycle->fail($job, $exception);
         }
 
-        // The import is done: a file that cannot be deleted is the purge's to sweep, not
-        // a reason to report the job failed.
+        $this->discardFileOf($job);
+    }
+
+    /**
+     * A file that cannot be deleted is the purge's to sweep, not a reason to say
+     * anything else of the job than how it ended.
+     */
+    private function discardFileOf(ImportJob $job): void
+    {
         try {
             $this->storage->discardFileOf($job);
         } catch (\Throwable $leftBehind) {

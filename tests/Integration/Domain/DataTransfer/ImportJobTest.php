@@ -209,6 +209,74 @@ final class ImportJobTest extends IntegrationTestCase
         self::assertFileDoesNotExist($this->storage()->pathOf($job));
     }
 
+    /**
+     * Without a queue nobody replays the import: a file that cannot be deleted is left to
+     * the purge, and the job still says it failed instead of running for ever.
+     */
+    public function testAFailedImportWhoseFileCannotBeDeletedStillSaysItFailed(): void
+    {
+        $path = sys_get_temp_dir().'/import-job-'.uniqid('', true).'.csv';
+        file_put_contents($path, "id,quantity\n1,2\n");
+        $this->files[] = $path;
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), new File($path), 'stock.csv');
+        $directory = \dirname($this->storage()->pathOf($job));
+        $handler = new RunImportJobHandler(
+            $this->getService(ImportHandler::class),
+            $this->getService(JobHeartbeat::class),
+            $this->inlineLifecycle(),
+            $this->storage(),
+        );
+
+        chmod($directory, 0555);
+
+        try {
+            $handler(new RunImportJob($job->getId()));
+            self::fail('A failed import must reach the failure transport.');
+        } catch (UnrecoverableMessageHandlingException) {
+        } finally {
+            chmod($directory, 0755);
+            $this->storage()->discardFileOf($job);
+        }
+
+        $job->reload();
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+    }
+
+    /**
+     * A failure the row cannot record (the row is gone, the database refuses) still sets
+     * the job aside, with a reason that quotes no SQL.
+     */
+    public function testAFailureTheRowCannotRecordStillSetsTheJobAside(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        $this->storage()->discardFileOf($job);
+        $job->delete();
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+
+        $this->lifecycle($this->queue())->fail($job, new \RuntimeException('SQLSTATE[23000]: buyer@example.com'));
+    }
+
+    /**
+     * The outcome a run wrote in memory before failing went with its transaction: the
+     * failed row says nothing of it.
+     */
+    public function testAFailedJobKeepsNothingItsRunLeftInMemory(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        $this->storage()->discardFileOf($job);
+        $job->setImportedRows(42)->setStatus(JobStatus::DONE->value);
+
+        try {
+            $this->lifecycle($this->queue())->fail($job, new \RuntimeException('rolled back'));
+        } catch (UnrecoverableMessageHandlingException) {
+        }
+
+        $job->reload();
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(0, (int) $job->getImportedRows());
+    }
+
     public function testAVeryLongFileNameStillFitsTheRow(): void
     {
         $name = str_repeat('inventaire-entrepot-', 15).'stock.csv';
@@ -472,6 +540,11 @@ final class ImportJobTest extends IntegrationTestCase
     private function lifecycle(MessageBusInterface $bus): JobLifecycle
     {
         return new JobLifecycle(new JobClaim(), $bus, new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), 'doctrine://default', 'doctrine://default?queue_name=heavy', 'doctrine://default?queue_name=failed'));
+    }
+
+    private function inlineLifecycle(): JobLifecycle
+    {
+        return new JobLifecycle(new JobClaim(), $this->queue(), new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), 'sync://', 'sync://', 'doctrine://default?queue_name=failed'));
     }
 
     private function storage(): ImportStorage
