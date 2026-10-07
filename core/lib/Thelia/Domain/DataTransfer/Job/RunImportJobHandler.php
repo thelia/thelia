@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Core\Event\ImportEvent;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportJobQuery;
 use Thelia\Model\Map\ImportJobTableMap;
@@ -61,7 +62,7 @@ final readonly class RunImportJobHandler
         }
 
         if (!$job instanceof ImportJob) {
-            throw new UnrecoverableMessageHandlingException(\sprintf('Import job %d no longer exists.', $message->importJobId));
+            throw new JobSetAsideException(\sprintf('Import job %d no longer exists.', $message->importJobId));
         }
 
         if (ClaimOutcome::Owned !== $outcome) {
@@ -94,6 +95,12 @@ final readonly class RunImportJobHandler
             }
         } catch (\Throwable $exception) {
             self::rollBackOwned($connection, $ownsTransaction);
+
+            // Kept while the job can be replayed; without a queue it never can be.
+            if (!$this->lifecycle->keepsFailedJobs()) {
+                $this->storage->discardFileOf($job);
+            }
+
             $this->lifecycle->fail($job, $exception);
         }
 

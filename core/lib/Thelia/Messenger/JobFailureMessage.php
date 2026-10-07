@@ -23,7 +23,8 @@ use Thelia\Exception\UserFacingFailure;
  * as it is. Any other may quote SQL, the values of a row, paths or host names: the
  * administrator reads that the job failed and that the details are in the server
  * log, and the log names the exception by its class, code and place, never by a text
- * that may hold the personal data of a customer.
+ * that may hold the personal data of a customer: the logs of the workers too, where
+ * Messenger itself writes what failed ({@see Log\FailedJobLogProcessor}).
  */
 final class JobFailureMessage
 {
