@@ -176,6 +176,23 @@ final class ArchiveInspectorTest extends IntegrationTestCase
         (new ArchiveInspector(maxEntries: 1))->assertExtractable($path, 'tar');
     }
 
+    /**
+     * A pax header is a list of records: a name quoted inside the value of another one
+     * is not the name of the entry.
+     */
+    public function testThePaxNameOfAnEntryIsTheRecordThatSaysSo(): void
+    {
+        $records = self::paxRecord('comment', '1 path=stock.csv').self::paxRecord('path', '../../public/stock.php');
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => $records], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/pax.tar';
+        file_put_contents($path, substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
     public function testAnEmptyTarIsAccepted(): void
     {
         (new ArchiveInspector())->assertExtractable($this->tar([]), 'tar');
@@ -218,6 +235,21 @@ final class ArchiveInspectorTest extends IntegrationTestCase
         file_put_contents($path, $tar.str_repeat("\0", 1024));
 
         return $path;
+    }
+
+    /**
+     * "<length> <key>=<value>" and its line break, the length counting all of it.
+     */
+    private static function paxRecord(string $key, string $value): string
+    {
+        $body = ' '.$key.'='.$value."\n";
+        $length = \strlen($body) + 1;
+
+        while (\strlen((string) $length) + \strlen($body) !== $length) {
+            ++$length;
+        }
+
+        return $length.$body;
     }
 
     /**
