@@ -62,13 +62,13 @@ class ProductPricesImport extends AbstractImport
         foreach (['price', 'promo_price'] as $column) {
             $required = 'price' === $column;
 
-            if ((!$required && !isset($data[$column])) || (\is_scalar($data[$column] ?? null) && is_numeric($data[$column]))) {
+            if ((!$required && !isset($data[$column])) || self::isStorableNumber($data[$column] ?? null)) {
                 continue;
             }
 
             return Translator::getInstance()->trans(
                 'The value "%value" of the column %column is not a number (product sale element id %id)',
-                ['%value' => \is_scalar($data[$column] ?? null) ? (string) $data[$column] : '', '%column' => $column, '%id' => \is_scalar($data['id'] ?? null) ? (string) $data['id'] : ''],
+                ['%value' => self::cellText($data[$column] ?? null), '%column' => $column, '%id' => self::cellText($data['id'] ?? null)],
             );
         }
 

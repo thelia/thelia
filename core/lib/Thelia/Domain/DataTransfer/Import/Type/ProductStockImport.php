@@ -52,10 +52,10 @@ class ProductStockImport extends AbstractImport
 
         // A spreadsheet gives every cell as text: the stock is read as a number, and
         // a cell that is not one refuses this row only.
-        if (!is_numeric($data['stock'])) {
+        if (!self::isStorableNumber($data['stock'])) {
             return Translator::getInstance()->trans(
                 'The value "%value" of the column %column is not a number (product sale element id %id)',
-                ['%value' => $data['stock'], '%column' => 'stock', '%id' => $data['id']],
+                ['%value' => self::cellText($data['stock']), '%column' => 'stock', '%id' => self::cellText($data['id'])],
             );
         }
 
