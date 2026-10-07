@@ -295,6 +295,22 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertStringContainsString(RunExportJob::class, $message->reason);
     }
 
+    /**
+     * Content Symfony builds into objects may refuse to be built in its own words (an
+     * address that is not one): the job is kept as unreadable, the worker goes on.
+     */
+    public function testAJobWhoseContentCannotBeBuiltIsKeptAsAnUnreadableJob(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->text('Hi'))));
+        $forged = str_replace('"address":"buyer@example.com"', '"address":"not an address"', $encoded['body'], $replaced);
+        self::assertSame(1, $replaced, 'The address is where the test expects it.');
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
     public function testAJobThatDoesNotSayWhatItIsIsKeptAsAnUnreadableJob(): void
     {
         $envelope = $this->serializer()->decode(['body' => '{"anything":1}', 'headers' => ['Content-Type' => 'application/json']]);
