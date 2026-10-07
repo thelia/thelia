@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\MessagePart;
 use Thelia\Core\DependencyInjection\Compiler\HandledMessageClassesPass;
 use Thelia\Domain\DataTransfer\Job\DataTransferJobMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
@@ -231,6 +232,27 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
             foreach ($message->getMessage() instanceof Email ? $message->getMessage()->getAttachments() : [] as $attachment) {
                 self::assertStringNotContainsString('testAQueuedMailNeverReadsAFileOfTheServer', $attachment->getBody(), 'The worker read a file of the server into the mail.');
             }
+        }
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
+     * A mail carried as the body of a mail has parts of its own: a file named there is
+     * never read either.
+     */
+    public function testAMailCarriedByAQueuedMailNeverReadsAFileOfTheServer(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $carried = (new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Carried')->text('Hi')->attach('PLACEHOLDER', 'invoice.txt', 'text/plain');
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->setBody(new MessagePart($carried)))));
+        $forged = str_replace('"body":"PLACEHOLDER"', '"body":'.json_encode(['path' => __FILE__, 'contentType' => 'text/plain', 'size' => null, 'filename' => 'invoice.txt'], \JSON_THROW_ON_ERROR), $encoded['body'], $replaced);
+        self::assertSame(1, $replaced, 'The body of the carried attachment is where the test expects it.');
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        if ($message instanceof SendEmailMessage) {
+            self::assertStringNotContainsString(base64_encode(substr((string) file_get_contents(__FILE__), 0, 300)), str_replace("\r\n", '', $message->getMessage()->toString()), 'The worker read a file of the server into the mail.');
         }
 
         self::assertInstanceOf(UndecodableJob::class, $message);
