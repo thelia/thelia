@@ -30,6 +30,7 @@ final readonly class ShopDatabaseQueue
         private ShopDatabaseConnection $connection,
         private string $table,
         private string $queueName,
+        private int $redeliverTimeout,
     ) {
     }
 
@@ -45,7 +46,7 @@ final readonly class ShopDatabaseQueue
             return null;
         }
 
-        return new self($connection, (string) $configuration['table_name'], (string) $configuration['queue_name']);
+        return new self($connection, (string) $configuration['table_name'], (string) $configuration['queue_name'], (int) $configuration['redeliver_timeout']);
     }
 
     /**
@@ -60,15 +61,21 @@ final readonly class ShopDatabaseQueue
     }
 
     /**
-     * Takes one job out of the queue, if it is still there.
+     * Takes one job out of the queue, if it is still there and no worker holds it.
      *
-     * @return bool false when another process took it first
+     * A worker, `messenger:failed:retry` among them, holds the job it received until
+     * its redeliver timeout: taken from under it, the job would be sent twice.
+     *
+     * @return bool false when another process took it first, or holds it
      */
     public function take(string $id): bool
     {
+        // The transport writes its dates in UTC.
+        $heldSince = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->modify(\sprintf('-%d seconds', $this->redeliverTimeout));
+
         return 1 === (int) $this->connection->get()->executeStatement(
-            'DELETE FROM '.$this->quotedTable().' WHERE id = ? AND queue_name = ?',
-            [$id, $this->queueName],
+            'DELETE FROM '.$this->quotedTable().' WHERE id = ? AND queue_name = ? AND (delivered_at IS NULL OR delivered_at < ?)',
+            [$id, $this->queueName, $heldSince->format('Y-m-d H:i:s')],
         );
     }
 
