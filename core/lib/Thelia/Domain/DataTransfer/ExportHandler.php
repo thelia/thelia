@@ -192,14 +192,21 @@ class ExportHandler
         $year = \is_array($bound) ? (string) ($bound['year'] ?? '') : '';
         $month = \is_array($bound) ? (string) ($bound['month'] ?? '') : '';
 
-        if (!\is_array($bound) || ('' !== $year && !ctype_digit($year)) || ('' !== $month && !ctype_digit($month))) {
-            throw new JobRefusedException(Translator::getInstance()->trans('The dates of the export are not valid.'));
-        }
+        // A year of four digits and a month of the year: anything else would not parse,
+        // or would roll over into another date, and the export would quietly cover
+        // another period.
+        $valid = \is_array($bound)
+            && ('' === $year || (ctype_digit($year) && 4 === \strlen($year)))
+            && ('' === $month || (ctype_digit($month) && (int) $month >= 1 && (int) $month <= 12));
 
-        $date = \DateTime::createFromFormat(
+        $date = $valid ? \DateTime::createFromFormat(
             'Y-m-d H:i:s',
             ('' !== $year ? $year : (new \DateTime())->format('Y')).'-'.('' !== $month ? $month : (new \DateTime())->format('m')).($endOfMonth ? '-1 23:59:59' : '-1 00:00:00'),
-        );
+        ) : false;
+
+        if (false === $date) {
+            throw new JobRefusedException(Translator::getInstance()->trans('The dates of the export are not valid.'));
+        }
 
         if ($endOfMonth && $date instanceof \DateTime) {
             $date->add(new \DateInterval('P1M'))->sub(new \DateInterval('P1D'));

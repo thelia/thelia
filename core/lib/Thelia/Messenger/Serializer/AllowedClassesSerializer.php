@@ -36,6 +36,9 @@ use Thelia\Module\BaseModule;
  * queue; a stamp is a Messenger stamp or one of those same namespaces. A stamp carrying serializer context is refused, as
  * it would let the queue reconfigure how the rest of the envelope is read.
  *
+ * A queued mail holds the content of its attachments, never the path of a file the
+ * worker would read ({@see QueuedMailFiles}).
+ *
  * The same check runs when a job is queued, so a module that dispatches a class the
  * workers would refuse learns it on dispatch, not from a queue that never empties.
  *
@@ -57,6 +60,8 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
     ];
 
     private const CORE_NAMESPACE = 'Thelia\\';
+
+    private const MAIL_READING_A_FILE = 'A queued mail cannot name a file of the server to read: only the content of an attachment is queued.';
 
     /**
      * @param list<string> $extraAllowedClasses   classes a project adds, by exact name
@@ -90,10 +95,18 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
                 }
             }
 
-            return $this->inner->decode($encodedEnvelope);
+            $envelope = $this->inner->decode($encodedEnvelope);
         } catch (MessageDecodingFailedException $exception) {
             return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
         }
+
+        $message = $envelope->getMessage();
+
+        if ($message instanceof SendEmailMessage && QueuedMailFiles::readsAFile($message)) {
+            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), self::MAIL_READING_A_FILE);
+        }
+
+        return $envelope;
     }
 
     /**
@@ -138,6 +151,13 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
     public function encode(Envelope $envelope): array
     {
         $this->assertAllowedMessage($envelope->getMessage()::class, \LogicException::class);
+
+        $envelope = QueuedMailFiles::inline($envelope);
+        $message = $envelope->getMessage();
+
+        if ($message instanceof SendEmailMessage && QueuedMailFiles::readsAFile($message)) {
+            throw new \LogicException(self::MAIL_READING_A_FILE);
+        }
 
         foreach (array_keys($envelope->all()) as $stampClass) {
             $this->assertAllowedStamp($stampClass, \LogicException::class);
