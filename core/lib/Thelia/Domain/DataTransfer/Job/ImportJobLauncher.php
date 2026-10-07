@@ -91,6 +91,8 @@ final readonly class ImportJobLauncher
         $extension = pathinfo($name, \PATHINFO_EXTENSION);
         $stem = '' === $extension ? $name : substr($name, 0, -\strlen($extension) - 1);
 
-        return mb_substr($stem, 0, self::MAX_NAME_LENGTH).('' === $extension ? '' : '.'.mb_substr($extension, 0, 10));
+        // Cut in bytes, on a whole character: a name of a hundred Chinese characters
+        // would otherwise go past what the file system takes.
+        return mb_strcut($stem, 0, self::MAX_NAME_LENGTH, 'UTF-8').('' === $extension ? '' : '.'.mb_strcut($extension, 0, 10, 'UTF-8'));
     }
 }

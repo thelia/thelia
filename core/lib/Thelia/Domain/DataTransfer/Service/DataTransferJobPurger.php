@@ -56,19 +56,26 @@ final readonly class DataTransferJobPurger
      */
     public function purgeImportJobs(bool $dryRun = false): int
     {
-        $jobs = ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS)->find();
+        if ($dryRun) {
+            return ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS)->count();
+        }
 
-        if (!$dryRun) {
+        $deleted = 0;
+
+        // By batches: a shop that never purged may hold years of jobs.
+        do {
+            $jobs = ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS)->limit(500)->find();
+
             foreach ($jobs as $job) {
                 // An import that never ran still holds the file it was given. The path
                 // comes from the row: nothing outside the import storage is deleted.
                 $this->storage->discardFileOf($job);
-
                 $job->delete();
+                ++$deleted;
             }
-        }
+        } while (500 === \count($jobs));
 
-        return \count($jobs);
+        return $deleted;
     }
 
     /**

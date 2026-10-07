@@ -179,6 +179,36 @@ final class ImportJobTest extends IntegrationTestCase
      * However long the name it was uploaded under, the path the row keeps fits its
      * column, relative to the project.
      */
+    /**
+     * A name of a hundred Chinese characters is three hundred bytes: cut in bytes, on a
+     * whole character, it still fits what a file system takes.
+     */
+    public function testANameInAnotherScriptIsCutInBytes(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), str_repeat('库存', 60).'.csv');
+        $this->files[] = $this->storage()->pathOf($job);
+
+        self::assertFileExists($this->storage()->pathOf($job));
+        self::assertLessThanOrEqual(255, \strlen(basename($this->storage()->pathOf($job))));
+        self::assertTrue(mb_check_encoding((string) $job->getFileName(), 'UTF-8'));
+    }
+
+    /**
+     * Without a queue a failed import is kept nowhere it could be replayed from: its
+     * file goes at once rather than a month later.
+     */
+    public function testWithoutAQueueTheFileOfAFailedImportGoesAtOnce(): void
+    {
+        $path = sys_get_temp_dir().'/import-job-'.uniqid('', true).'.csv';
+        file_put_contents($path, "id,quantity\n1,2\n");
+        $this->files[] = $path;
+
+        $job = $this->getService(ImportJobLauncher::class)->launch($this->stockImport(), new File($path), 'stock.csv');
+
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertFileDoesNotExist($this->storage()->pathOf($job));
+    }
+
     public function testAVeryLongFileNameStillFitsTheRow(): void
     {
         $name = str_repeat('inventaire-entrepot-', 15).'stock.csv';
