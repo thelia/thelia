@@ -49,17 +49,30 @@ final readonly class RunImportJobHandler
 
     public function __invoke(RunImportJob $message): void
     {
-        $job = ImportJobQuery::create()->findPk($message->importJobId);
+        // Reading the row and taking it may fail too (the database gone): what is set
+        // aside then says no more than any other failure.
+        try {
+            $job = ImportJobQuery::create()->findPk($message->importJobId);
+            $outcome = $job instanceof ImportJob ? $this->lifecycle->claimOrPostpone($job, $message) : null;
+        } catch (UnrecoverableMessageHandlingException $setAside) {
+            throw $setAside;
+        } catch (\Throwable $exception) {
+            $this->lifecycle->reject($message->describe(), $exception);
+        }
 
         if (!$job instanceof ImportJob) {
             throw new UnrecoverableMessageHandlingException(\sprintf('Import job %d no longer exists.', $message->importJobId));
         }
 
-        if (!$this->lifecycle->claimOrPostpone($job, ImportJobTableMap::TABLE_NAME, $message)) {
+        if (ClaimOutcome::Owned !== $outcome) {
             return;
         }
 
-        $job->setImportedRows(0)->setRowErrors(null)->save();
+        try {
+            $job->setImportedRows(0)->setRowErrors(null)->save();
+        } catch (\Throwable $exception) {
+            $this->lifecycle->fail($job, $exception);
+        }
 
         // The whole import is one transaction, which also records its outcome: stopped
         // half way (an error, a worker killed, a deployment), it leaves the catalog as
@@ -94,6 +107,11 @@ final readonly class RunImportJobHandler
 
         if (!is_file($path)) {
             throw new JobRefusedException('The uploaded file of this import is no longer on the server.');
+        }
+
+        // The path comes from the row: only a file of the import storage is read.
+        if (!$this->storage->holds($path)) {
+            throw new JobRefusedException('The file of this import is not in the import storage.');
         }
 
         $jobId = (int) $job->getId();

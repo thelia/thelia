@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\Export;
@@ -163,31 +164,39 @@ class ExportHandler
             return null;
         }
 
-        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
-            $startYear = '' !== $rangeDate['start']['year'] ? $rangeDate['start']['year'] : (new \DateTime())->format('Y');
-            $startMonth = '' !== $rangeDate['start']['month'] ? $rangeDate['start']['month'] : (new \DateTime())->format('m');
-            $rangeDate['start'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $startYear.'-'.$startMonth.'-1 00:00:00',
-            );
+        return [
+            'start' => self::boundOf($rangeDate['start'] ?? null, false),
+            'end' => self::boundOf($rangeDate['end'] ?? null, true),
+        ];
+    }
+
+    /**
+     * A bound given as a date stays as it is; one given as the year and month of the
+     * back-office form becomes the first, or the last, moment of that month.
+     */
+    private static function boundOf(mixed $bound, bool $endOfMonth): mixed
+    {
+        if (!$bound || $bound instanceof \DateTimeInterface) {
+            return $bound;
         }
 
-        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
-            $endYear = '' !== $rangeDate['end']['year'] ? $rangeDate['end']['year'] : (new \DateTime())->format('Y');
-            $endMonth = '' !== $rangeDate['end']['month'] ? $rangeDate['end']['month'] : (new \DateTime())->format('m');
-            $rangeDate['end'] = \DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                $endYear.'-'.$endMonth.'-1 23:59:59',
-            );
+        $year = \is_array($bound) ? (string) ($bound['year'] ?? '') : '';
+        $month = \is_array($bound) ? (string) ($bound['month'] ?? '') : '';
 
-            if ($rangeDate['end'] instanceof \DateTime) {
-                $rangeDate['end']
-                    ->add(new \DateInterval('P1M'))
-                    ->sub(new \DateInterval('P1D'));
-            }
+        if (!\is_array($bound) || ('' !== $year && !ctype_digit($year)) || ('' !== $month && !ctype_digit($month))) {
+            throw new JobRefusedException(Translator::getInstance()->trans('The dates of the export are not valid.'));
         }
 
-        return $rangeDate;
+        $date = \DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            ('' !== $year ? $year : (new \DateTime())->format('Y')).'-'.('' !== $month ? $month : (new \DateTime())->format('m')).($endOfMonth ? '-1 23:59:59' : '-1 00:00:00'),
+        );
+
+        if ($endOfMonth && $date instanceof \DateTime) {
+            $date->add(new \DateInterval('P1M'))->sub(new \DateInterval('P1D'));
+        }
+
+        return $date;
     }
 
     /**

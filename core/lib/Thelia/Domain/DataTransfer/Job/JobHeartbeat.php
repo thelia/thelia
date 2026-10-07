@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 
 /**
@@ -49,7 +50,7 @@ final readonly class JobHeartbeat
                 [(new \DateTimeImmutable())->format('Y-m-d H:i:s'), $jobId],
             );
         } catch (\Throwable $exception) {
-            Tlog::getInstance()->addDebug(\sprintf('No sign of life written for %s %d: %s', $table, $jobId, $exception->getMessage()));
+            Tlog::getInstance()->addDebug(\sprintf('No sign of life written for %s %d: %s', $table, $jobId, JobFailureMessage::forLog($exception)));
         } finally {
             try {
                 $connection->executeStatement('SET SESSION innodb_lock_wait_timeout = DEFAULT');

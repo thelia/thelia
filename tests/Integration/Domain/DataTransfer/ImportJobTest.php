@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\ImportStorage;
@@ -296,6 +297,63 @@ final class ImportJobTest extends IntegrationTestCase
         }
 
         self::assertSame(['stock.zip'], $left);
+    }
+
+    /**
+     * The path comes from the row: a file outside the import storage is never read.
+     */
+    public function testAFileOutsideTheImportStorageIsNeverRead(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(17), 'stock.csv');
+        $this->files[] = $this->storage()->pathOf($job);
+        $outside = (string) tempnam(sys_get_temp_dir(), 'import-outside');
+        file_put_contents($outside, "id,stock\n".$this->combination->getId().",99\n");
+        $this->files[] = $outside;
+        $job->setFilePath($outside)->save($this->getPropelConnection());
+
+        try {
+            $this->handler()(new RunImportJob($job->getId()));
+        } catch (UnrecoverableMessageHandlingException) {
+        }
+
+        $job->reload();
+        self::assertSame('The file of this import is not in the import storage.', $job->getError());
+        self::assertSame(5.0, $this->reloadedQuantity());
+    }
+
+    public function testAFileThatDoesNotParseIsTheAdministratorsToFix(): void
+    {
+        $path = sys_get_temp_dir().'/import-broken-'.uniqid('', true).'.json';
+        file_put_contents($path, '[{"id": 1, "stock": ');
+        $this->files[] = $path;
+
+        $this->expectException(UploadRefusedException::class);
+        $this->expectExceptionMessage('check its content');
+
+        $this->getService(ImportHandler::class)->import($this->stockImport(), new File($path));
+    }
+
+    /**
+     * An archive with nothing in it says it holds nothing the shop reads, not a
+     * server error.
+     */
+    public function testAnEmptyArchiveIsRefusedForWhatItIs(): void
+    {
+        $directory = sys_get_temp_dir().'/import-archive-'.uniqid('', true);
+        mkdir($directory);
+        $archive = new \ZipArchive();
+        $archive->open($directory.'/stock.zip', \ZipArchive::CREATE);
+        $archive->addEmptyDir('nothing');
+        $archive->close();
+
+        try {
+            $this->getService(ImportHandler::class)->import($this->stockImport(), new File($directory.'/stock.zip'));
+            self::fail('An empty archive cannot be imported.');
+        } catch (UploadRefusedException) {
+            $this->addToAssertionCount(1);
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
     }
 
     public function testAJobWhoseRowIsGoneFailsForGood(): void

@@ -15,11 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 /**
- * What the messages of the export and import jobs share: the id of the row comes
- * first in their constructor, the number of times the job was looked at again second.
+ * What the messages of the export and import jobs share. A class using it declares a
+ * promoted \$postponements property and a constructor taking the id of the row first
+ * and the number of times the job was looked at again second, as postponed() and
+ * forReplay() build it again that way.
  */
 trait DataTransferJobMessageTrait
 {
+    abstract public function jobId(): int;
+
     public function postponements(): int
     {
         return $this->postponements;

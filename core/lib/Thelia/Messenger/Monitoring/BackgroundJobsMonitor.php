@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\ReplayableJob;
 use Thelia\Messenger\Message\UndecodableJob;
@@ -158,9 +159,9 @@ final readonly class BackgroundJobsMonitor
                 // Neither replayed nor set aside again: the log says which job it was, by
                 // its id and class only. Its description and its content may name a
                 // customer, and the log is kept far longer than the failed jobs.
-                Tlog::getInstance()->addCritical(\sprintf('The failed job %s (%s) could be neither replayed nor set aside again, it is lost from the queues.', $id, $envelope->getMessage()::class));
+                Tlog::getInstance()->addCritical(\sprintf('The failed job %s (%s) could be neither replayed (%s) nor set aside again (%s), it is lost from the queues.', $id, $envelope->getMessage()::class, JobFailureMessage::forLog($exception), JobFailureMessage::forLog($putBackFailure)));
 
-                throw new \RuntimeException(\sprintf('The job could not be replayed (%s), nor set aside again (%s).', $exception->getMessage(), $putBackFailure->getMessage()), 0, $exception);
+                throw new \RuntimeException(\sprintf('The failed job %s could be neither replayed nor set aside again: it is lost from the queues.', $id), 0, $exception);
             }
 
             throw $exception;

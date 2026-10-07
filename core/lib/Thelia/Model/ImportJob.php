@@ -16,11 +16,17 @@ namespace Thelia\Model;
 
 use Thelia\Domain\DataTransfer\Job\DataTransferJob;
 use Thelia\Model\Base\ImportJob as BaseImportJob;
+use Thelia\Model\Map\ImportJobTableMap;
 use Thelia\Model\Tools\DataTransferJobTrait;
 
 class ImportJob extends BaseImportJob implements DataTransferJob
 {
     use DataTransferJobTrait;
+
+    public function tableName(): string
+    {
+        return ImportJobTableMap::TABLE_NAME;
+    }
 
     /**
      * Keeps the rows the import refused, each with its reason. A reason quotes the cell

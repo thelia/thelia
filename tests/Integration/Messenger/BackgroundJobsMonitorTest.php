@@ -249,10 +249,10 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
 
     /**
      * The queue is down: the replay fails, and so does setting the job aside again.
-     * The caller learns both, and the job is written to the log rather than lost
-     * without a word.
+     * The caller learns the job is lost, and the log names it and both causes rather
+     * than losing it without a word; their texts, which may quote a customer, stay out.
      */
-    public function testAReplayThatCannotPutTheJobBackSaysBoth(): void
+    public function testAReplayThatCannotPutTheJobBackSaysItIsLost(): void
     {
         $id = $this->setAside($this->mail(), 'SMTP down');
         $refusingBus = new class implements MessageBusInterface {
@@ -306,8 +306,10 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             (new BackgroundJobsMonitor($this->jobs, $failedThatRefusesWrites, $refusingBus))->retry($id);
             self::fail('The caller must learn the job is neither replayed nor set aside.');
         } catch (\RuntimeException $exception) {
-            self::assertStringContainsString('unreachable', $exception->getMessage());
-            self::assertStringContainsString('read only', $exception->getMessage());
+            // The caller learns the job is lost; why goes to the log, by class and place.
+            self::assertStringContainsString('lost from the queues', $exception->getMessage());
+            self::assertStringNotContainsString('unreachable', $exception->getMessage());
+            self::assertStringNotContainsString('read only', $exception->getMessage());
         }
     }
 
