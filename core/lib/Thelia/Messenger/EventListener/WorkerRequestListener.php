@@ -47,12 +47,26 @@ final readonly class WorkerRequestListener
     #[AsEventListener(priority: 4096)]
     public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event): void
     {
+        // A job the worker skipped (messenger:failed:retry answered "skip") ends with
+        // no event: its request is let go here, so no job starts on another's.
+        $this->forgetTheRequest();
+
         if (null !== $this->requestStack->getMainRequest()) {
             return;
         }
 
-        $request = Request::create($this->shopAddress());
-        $request->setSession(new Session(new MockArraySessionStorage()));
+        // Created without a script, a request has no base path: the folder of a shop
+        // installed below the root of its site would be lost from every link.
+        $basePath = rtrim($this->requestContext->getBaseUrl(), '/');
+        $request = Request::create($this->shopAddress(), 'GET', [], [], [], [
+            'SCRIPT_NAME' => $basePath.'/index.php',
+            'SCRIPT_FILENAME' => 'index.php',
+        ]);
+        $session = new Session(new MockArraySessionStorage());
+        // The cart a session makes before it is saved is held in a static: the job
+        // starts without the one a previous job made.
+        $session->setSessionCart(null);
+        $request->setSession($session);
         $request->attributes->set(self::WORKER_REQUEST, true);
 
         $this->requestStack->push($request);
@@ -72,9 +86,13 @@ final readonly class WorkerRequestListener
 
     private function forgetTheRequest(): void
     {
-        // Only the request given here: a job run inside a page keeps the page's.
-        while (true === $this->requestStack->getCurrentRequest()?->attributes->get(self::WORKER_REQUEST)) {
-            $this->requestStack->pop();
+        // Only the request given here, with what a handler left above it: a job run
+        // inside a page keeps the page's.
+        if (true !== $this->requestStack->getMainRequest()?->attributes->get(self::WORKER_REQUEST)) {
+            return;
+        }
+
+        while (null !== $this->requestStack->pop()) {
         }
     }
 
