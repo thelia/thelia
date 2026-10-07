@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
@@ -22,6 +23,8 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\MessagePart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Thelia\Core\DependencyInjection\Compiler\HandledMessageClassesPass;
 use Thelia\Domain\DataTransfer\Job\DataTransferJobMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
@@ -237,6 +240,27 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
     }
 
     /**
+     * A mail carried as the body of a mail has parts of its own: a file named there is
+     * never read either.
+     */
+    public function testAMailCarriedByAQueuedMailNeverReadsAFileOfTheServer(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $carried = (new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Carried')->text('Hi')->attach('PLACEHOLDER', 'invoice.txt', 'text/plain');
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->setBody(new MessagePart($carried)))));
+        $forged = str_replace('"body":"PLACEHOLDER"', '"body":'.json_encode(['path' => __FILE__, 'contentType' => 'text/plain', 'size' => null, 'filename' => 'invoice.txt'], \JSON_THROW_ON_ERROR), $encoded['body'], $replaced);
+        self::assertSame(1, $replaced, 'The body of the carried attachment is where the test expects it.');
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        if ($message instanceof SendEmailMessage) {
+            self::assertStringNotContainsString(base64_encode(substr((string) file_get_contents(__FILE__), 0, 300)), str_replace("\r\n", '', $message->getMessage()->toString()), 'The worker read a file of the server into the mail.');
+        }
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
      * An attachment given by its path is queued with its content: the worker reads no
      * file, and may run on another server than the one the file is on.
      */
@@ -271,6 +295,54 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertInstanceOf(UndecodableJob::class, $message);
         self::assertStringNotContainsString('exportJobId', $message->reason);
         self::assertStringContainsString(RunExportJob::class, $message->reason);
+    }
+
+    /**
+     * Content Symfony builds into objects may refuse to be built in its own words (an
+     * address that is not one): the job is kept as unreadable, the worker goes on.
+     */
+    public function testAJobWhoseContentCannotBeBuiltIsKeptAsAnUnreadableJob(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->text('Hi'))));
+        $forged = str_replace('"address":"buyer@example.com"', '"address":"not an address"', $encoded['body'], $replaced);
+        self::assertSame(1, $replaced, 'The address is where the test expects it.');
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
+     * A mail of a class the shop does not send may do more when it is sent than send
+     * itself (a templated mail renders a template the queue would choose).
+     */
+    public function testAQueuedMailOfAClassTheShopDoesNotSendIsNeverRead(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->text('Hi'))));
+        $position = strrpos($encoded['body'], '"class":"Symfony\\\\Component\\\\Mime\\\\Email"');
+        self::assertNotFalse($position, 'The class of the mail is where the test expects it.');
+        $forged = substr_replace($encoded['body'], '"htmlTemplate":"email/default/order_confirmation.html.twig","class":'.json_encode(TemplatedEmail::class, \JSON_THROW_ON_ERROR), $position, \strlen('"class":"Symfony\\\\Component\\\\Mime\\\\Email"'));
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
+     * Whatever a part of a forged mail throws when it is looked at, the job is kept as
+     * unreadable and the worker goes on.
+     */
+    public function testAMailPartThatThrowsWhenLookedAtIsKeptAsAnUnreadableJob(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Form')->setBody(new FormDataPart(['field' => 'PLACEHOLDER'])))));
+        $forged = str_replace(['"field":"PLACEHOLDER"', '"boundary":null'], ['"field":5', '"boundary":"forged"'], $encoded['body'], $replaced);
+        self::assertSame(2, $replaced, 'The field and the boundary are where the test expects them.');
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
     }
 
     public function testAJobThatDoesNotSayWhatItIsIsKeptAsAnUnreadableJob(): void
