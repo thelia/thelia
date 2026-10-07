@@ -519,6 +519,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             // 200 runs before Action\Order::create (128), so the order is built from a
             // cart whose discount and offered lines are the ones that still hold.
             TheliaEvents::ORDER_PAY => ['reconcileBeforeOrder', 200],
+            // A verification answer can flip the exemption of the cart already priced:
+            // 10 runs after Action\VatVerification::record (128) has written it.
+            TheliaEvents::VAT_NUMBER_VERIFIED => ['reconcileWithVatExemption', 10],
         ];
     }
 
