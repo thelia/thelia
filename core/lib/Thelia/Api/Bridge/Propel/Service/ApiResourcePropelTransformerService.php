@@ -454,6 +454,10 @@ readonly class ApiResourcePropelTransformerService
                 continue;
             }
 
+            if ($operation instanceof Put && $this->isReadOnlyFor($property, $operation)) {
+                continue;
+            }
+
             if (method_exists($propelModel, $propelSetter)) {
                 $value = $this->getPropertyValue($data, $property);
                 $value = $this->getRelationValue($value, $propelSetter, $setterForced, $operation);
@@ -505,6 +509,32 @@ readonly class ApiResourcePropelTransformerService
                 $propelModel->{$propelSetter}($value);
             }
         }
+    }
+
+    /**
+     * A PUT builds a fresh resource from the payload: a property the operation does not
+     * let the client write still reaches the transformer, at its default. Copying it would
+     * blank what the payload never carried.
+     */
+    private function isReadOnlyFor(\ReflectionProperty $property, Operation $operation): bool
+    {
+        $writeGroups = $operation->getDenormalizationContext()['groups'] ?? [];
+        $declared = $property->getAttributes(Groups::class);
+
+        if ([] === $writeGroups || [] === $declared) {
+            return false;
+        }
+
+        foreach ($declared as $groupAttribute) {
+            $arguments = $groupAttribute->getArguments();
+            $propertyGroups = (array) ($arguments['groups'] ?? $arguments[0] ?? []);
+
+            if ([] !== array_intersect((array) $writeGroups, $propertyGroups)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
