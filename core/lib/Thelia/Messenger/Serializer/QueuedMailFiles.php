@@ -38,11 +38,20 @@ use Symfony\Component\Mime\RawMessage;
  * mail holds a path, and whoever writes a mail into the queue has the worker mail any
  * file of the server to any address. An attachment given by its path is queued with
  * its content instead, and a queued mail naming a file, in any of its parts or in a
- * mail it carries, or holding a part Symfony does not build a mail with, is never
- * read back.
+ * mail it carries, or of a class or holding a part the shop does not send mails with,
+ * is never read back.
  */
 final class QueuedMailFiles
 {
+    /**
+     * The mails the shop sends.
+     */
+    private const MAILS = [
+        RawMessage::class,
+        Message::class,
+        Email::class,
+    ];
+
     /**
      * The parts made of other parts that Symfony builds a mail with.
      */
@@ -85,16 +94,27 @@ final class QueuedMailFiles
     }
 
     /**
-     * True when sending the mail would read a file of the server, or when it holds a
-     * part the shop does not know: a class of its own may keep a file anywhere.
+     * True when sending the mail would read a file of the server, or when it is or holds
+     * a class the shop does not send: a class of its own may keep a file anywhere.
      */
     public static function readsAFile(SendEmailMessage $message): bool
     {
-        return self::mailReadsAFile($message->getMessage());
+        try {
+            return self::mailReadsAFile($message->getMessage());
+        } catch (\Throwable) {
+            // A part that cannot even be looked at is not sent.
+            return true;
+        }
     }
 
     private static function mailReadsAFile(RawMessage $mail): bool
     {
+        // Another class may do more when it is sent than send itself: a templated mail
+        // renders the template it names.
+        if (!\in_array($mail::class, self::MAILS, true)) {
+            return true;
+        }
+
         // A raw message is text already: nothing in it is read when it is sent.
         if (!$mail instanceof Message) {
             return false;

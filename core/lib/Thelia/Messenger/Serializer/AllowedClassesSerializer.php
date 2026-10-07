@@ -66,7 +66,7 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
 
     private const CORE_NAMESPACE = 'Thelia\\';
 
-    private const MAIL_READING_A_FILE = 'A queued mail cannot name a file of the server to read: only the content of an attachment is queued.';
+    private const MAIL_READING_A_FILE = 'A queued mail is an Email, a Message or a raw message built of the parts Symfony sends, and names no file of the server to read: only the content of an attachment is queued, and a templated mail is rendered before.';
 
     /**
      * @param list<string> $extraAllowedClasses   classes a project adds, by exact name
