@@ -23,6 +23,8 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Thelia\Config\DatabaseConfiguration;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -97,10 +99,18 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
                     $this->assertAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)), MessageDecodingFailedException::class);
                 }
             }
-
-            $envelope = $this->inner->decode($encodedEnvelope);
         } catch (MessageDecodingFailedException $exception) {
             return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
+        }
+
+        try {
+            $envelope = $this->inner->decode($encodedEnvelope);
+        } catch (MessageDecodingFailedException $exception) {
+            // What Symfony says of content it cannot read may quote it: the log names the
+            // exception, the job keeps a reason of its own.
+            Tlog::getInstance()->addError(\sprintf('A queued %s could not be read: %s', $headers['type'], JobFailureMessage::forLog($exception)));
+
+            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), \sprintf('Its content no longer fits the class %s.', $headers['type']));
         }
 
         $message = $envelope->getMessage();
