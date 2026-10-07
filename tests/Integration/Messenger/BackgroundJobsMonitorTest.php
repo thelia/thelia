@@ -221,6 +221,72 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
      * A job that was looked at again a few times before it was set aside is replayed
      * afresh: carrying its count, it could never restart a job that failed.
      */
+    /**
+     * Two administrators, or a double click, replaying the same job at once: both read
+     * it before either took it out, and only one sends it again.
+     */
+    public function testAJobReplayedTwiceAtOnceRunsOnce(): void
+    {
+        $id = $this->setAside($this->mail(), 'SMTP down');
+        $readBeforeTheOtherReplay = $this->failed->find($id);
+        self::assertNotNull($readBeforeTheOtherReplay);
+        $failures = new class($this->failed, $readBeforeTheOtherReplay) implements TransportInterface, ListableReceiverInterface, MessageCountAwareInterface {
+            public function __construct(private readonly DoctrineTransport $inner, private readonly Envelope $read)
+            {
+            }
+
+            public function get(): iterable
+            {
+                return $this->inner->get();
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+                $this->inner->ack($envelope);
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+                $this->inner->reject($envelope);
+            }
+
+            public function send(Envelope $envelope): Envelope
+            {
+                return $this->inner->send($envelope);
+            }
+
+            public function all(?int $limit = null): iterable
+            {
+                return $this->inner->all($limit);
+            }
+
+            public function find(mixed $id): ?Envelope
+            {
+                return $this->read;
+            }
+
+            public function getMessageCount(): int
+            {
+                return $this->inner->getMessageCount();
+            }
+        };
+        $bus = new class implements MessageBusInterface {
+            public int $dispatched = 0;
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                ++$this->dispatched;
+
+                return Envelope::wrap($message, $stamps);
+            }
+        };
+        $monitor = new BackgroundJobsMonitor($this->jobs, $failures, $bus, null, $this->queues());
+
+        self::assertTrue($monitor->retry($id));
+        self::assertFalse($monitor->retry($id), 'The second replay finds the job taken.');
+        self::assertSame(1, $bus->dispatched);
+    }
+
     public function testAReplayedExportStartsAfresh(): void
     {
         $id = $this->setAside(new RunExportJob(12, 3), 'The export failed.');

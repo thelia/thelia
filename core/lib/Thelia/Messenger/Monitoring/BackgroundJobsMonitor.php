@@ -154,8 +154,16 @@ final readonly class BackgroundJobsMonitor
         $transport = $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName() ?? self::DEFAULT_TRANSPORT;
 
         // Taken out first, so a second click on the same job finds nothing to replay
-        // instead of sending it twice; put back as it was when the replay fails.
-        $this->failureTransport->reject($envelope);
+        // instead of sending it twice; put back as it was when the replay fails. In
+        // the shop database the row is deleted on a condition: of two replays that
+        // read the job at once, only the one that deleted it sends it again.
+        $queue = $this->queues?->failureQueueInTheShopDatabase();
+
+        if (null === $queue) {
+            $this->failureTransport->reject($envelope);
+        } elseif (!$queue->take($id)) {
+            return false;
+        }
 
         try {
             $message = $envelope->getMessage();

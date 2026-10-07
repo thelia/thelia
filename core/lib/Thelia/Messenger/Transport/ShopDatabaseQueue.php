@@ -18,7 +18,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
 /**
  * One queue of the shop database, read in SQL where the transport only offers to
- * decode every job it holds: listing the newest first, deleting by age.
+ * decode every job it holds: listing the newest first, taking one job out once,
+ * deleting by age.
  *
  * Only for a DSN that names the shop database; any other queue goes through its
  * transport.
@@ -56,6 +57,19 @@ final readonly class ShopDatabaseQueue
             'SELECT id FROM '.$this->quotedTable().' WHERE queue_name = ? ORDER BY id DESC LIMIT '.max(0, $limit),
             [$this->queueName],
         ));
+    }
+
+    /**
+     * Takes one job out of the queue, if it is still there.
+     *
+     * @return bool false when another process took it first
+     */
+    public function take(string $id): bool
+    {
+        return 1 === (int) $this->connection->get()->executeStatement(
+            'DELETE FROM '.$this->quotedTable().' WHERE id = ? AND queue_name = ?',
+            [$id, $this->queueName],
+        );
     }
 
     /**
