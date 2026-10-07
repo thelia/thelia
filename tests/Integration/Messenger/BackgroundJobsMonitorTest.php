@@ -262,10 +262,10 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
     }
 
     /**
-     * A job `messenger:failed:retry` is running holds its row: a replay from the screen
-     * at the same time leaves it to the command.
+     * A worker consuming the failure queue (`messenger:consume failed`) holds the job it
+     * received: a replay from the screen at the same time leaves it to that worker.
      */
-    public function testAJobTheCommandIsReplayingIsLeftToIt(): void
+    public function testAJobAWorkerHoldsIsLeftToIt(): void
     {
         $id = $this->setAside($this->mail(), 'SMTP down');
         $this->getService(ShopDatabaseConnection::class)->get()->executeStatement('UPDATE messenger_messages SET delivered_at = UTC_TIMESTAMP() WHERE id = ?', [$id]);

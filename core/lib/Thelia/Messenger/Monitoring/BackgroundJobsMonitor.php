@@ -139,7 +139,8 @@ final readonly class BackgroundJobsMonitor
      * attempts. Without a queue it runs at once: when it fails again, the exception
      * reaches the caller and the job is set aside again, as it was.
      *
-     * @return bool false when no failed job has this id
+     * @return bool false when no failed job has this id, or a worker consuming the failure
+     *              queue holds it (until its redeliver timeout)
      */
     public function retry(string $id): bool
     {
@@ -187,7 +188,8 @@ final readonly class BackgroundJobsMonitor
     }
 
     /**
-     * @return bool false when no failed job has this id
+     * @return bool false when no failed job has this id, or a worker consuming the failure
+     *              queue holds it (until its redeliver timeout)
      */
     public function remove(string $id): bool
     {
