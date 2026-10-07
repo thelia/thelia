@@ -53,6 +53,25 @@ class ProductPricesImport extends AbstractImport
             );
         }
 
+        // A price is stored as a decimal string; JSON and XML files give numbers. A
+        // cell that is not a number refuses this row only, checked before anything is
+        // attached to the combination: a new price left on it would be saved, at 0,
+        // with the next row of the same combination.
+        // A JSON file may give a null price, a list or an object: refused too, rather than
+        // written as an empty price the database refuses for the whole import.
+        foreach (['price', 'promo_price'] as $column) {
+            $required = 'price' === $column;
+
+            if ((!$required && !isset($data[$column])) || (\is_scalar($data[$column] ?? null) && is_numeric($data[$column]))) {
+                continue;
+            }
+
+            return Translator::getInstance()->trans(
+                'The value "%value" of the column %column is not a number (product sale element id %id)',
+                ['%value' => \is_scalar($data[$column] ?? null) ? (string) $data[$column] : '', '%column' => $column, '%id' => \is_scalar($data['id'] ?? null) ? (string) $data['id'] : ''],
+            );
+        }
+
         $currency = null;
 
         if (isset($data['currency'])) {
@@ -73,23 +92,6 @@ class ProductPricesImport extends AbstractImport
             $price
                 ->setProductSaleElements($pse)
                 ->setCurrency($currency);
-        }
-
-        // A price is stored as a decimal string; JSON and XML files give numbers. A
-        // cell that is not a number refuses this row only.
-        // A JSON file may give a null price, a list or an object: refused too, rather than
-        // written as an empty price the database refuses for the whole import.
-        foreach (['price', 'promo_price'] as $column) {
-            $required = 'price' === $column;
-
-            if ((!$required && !isset($data[$column])) || (\is_scalar($data[$column] ?? null) && is_numeric($data[$column]))) {
-                continue;
-            }
-
-            return Translator::getInstance()->trans(
-                'The value "%value" of the column %column is not a number (product sale element id %id)',
-                ['%value' => \is_scalar($data[$column] ?? null) ? (string) $data[$column] : '', '%column' => $column, '%id' => \is_scalar($data['id'] ?? null) ? (string) $data['id'] : ''],
-            );
         }
 
         $price->setPrice((string) $data['price']);
