@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Routing\RequestContext;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\EventListener\ActiveLangsCacheListener;
@@ -35,6 +36,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Messenger\EventListener\WorkerStateResetListener;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
+use Thelia\Tools\URL;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Messenger\ProbeMessage;
 
@@ -139,6 +141,76 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
             $this->finishTheJob();
             self::assertNull($requestStack->getCurrentRequest(), 'The next job starts without the request of this one.');
         } finally {
+            while (null !== $requestStack->pop()) {
+            }
+
+            foreach (array_reverse($requests) as $request) {
+                $requestStack->push($request);
+            }
+        }
+    }
+
+    /**
+     * A shop in a folder of its site (DEFAULT_URI=https://example.com/shop) keeps that
+     * folder in the links a job writes.
+     */
+    public function testTheRequestOfAJobKeepsTheFolderOfTheShop(): void
+    {
+        $context = $this->getService(RequestContext::class);
+        $baseUrl = $context->getBaseUrl();
+        $requestStack = $this->getService(RequestStack::class);
+        $requests = [];
+
+        while (null !== $request = $requestStack->pop()) {
+            $requests[] = $request;
+        }
+
+        $context->setBaseUrl('/shop');
+
+        try {
+            $this->getService(EventDispatcherInterface::class)->dispatch(new WorkerMessageReceivedEvent(new Envelope(new ProbeMessage('next job')), 'async'));
+
+            self::assertSame('/shop', $requestStack->getMainRequest()?->getBaseUrl());
+            self::assertStringEndsWith('/shop', $this->getService(URL::class)->getBaseUrl());
+        } finally {
+            $this->finishTheJob();
+            $context->setBaseUrl($baseUrl);
+
+            while (null !== $requestStack->pop()) {
+            }
+
+            foreach (array_reverse($requests) as $request) {
+                $requestStack->push($request);
+            }
+        }
+    }
+
+    /**
+     * A job the worker skipped (messenger:failed:retry, answered "skip") ends with no
+     * event: the next job still starts on a request of its own.
+     */
+    public function testAJobNeverStartsOnTheRequestOfAnother(): void
+    {
+        $requestStack = $this->getService(RequestStack::class);
+        $requests = [];
+
+        while (null !== $request = $requestStack->pop()) {
+            $requests[] = $request;
+        }
+
+        try {
+            $dispatcher = $this->getService(EventDispatcherInterface::class);
+            $dispatcher->dispatch(new WorkerMessageReceivedEvent(new Envelope(new ProbeMessage('skipped job')), 'failed'));
+            $skipped = $requestStack->getMainRequest();
+            $skipped?->getSession()->set('left_by', 'the skipped job');
+
+            $dispatcher->dispatch(new WorkerMessageReceivedEvent(new Envelope(new ProbeMessage('next job')), 'failed'));
+
+            self::assertNotSame($skipped, $requestStack->getMainRequest());
+            self::assertNull($requestStack->getMainRequest()?->getSession()->get('left_by'));
+        } finally {
+            $this->finishTheJob();
+
             while (null !== $requestStack->pop()) {
             }
 
