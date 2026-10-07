@@ -160,7 +160,13 @@ final readonly class ArchiveInspector
                 $size = (int) octdec(trim(substr($header, 124, 12), "\0 "));
                 $type = $header[156];
 
-                // GNU long names and pax records name the entry that follows.
+                // GNU long names and pax records name the entry that follows. They are
+                // read through too, so they count against the limits like any entry,
+                // told before their content is read.
+                if (\in_array($type, ['L', 'x', 'g'], true)) {
+                    yield ['', $size, false];
+                }
+
                 if ('L' === $type) {
                     $longName = rtrim((string) self::skipOrRead($stream, $size, true), "\0");
 
