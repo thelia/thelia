@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Scheduler;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\NativeClock;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Lock\LockFactory;
@@ -39,7 +41,8 @@ final readonly class RecurringTaskFailures
     public function __construct(
         #[Autowire(service: 'cache.app')]
         private CacheItemPoolInterface $cache,
-        private ?LockFactory $lockFactory = null,
+        private LockFactory $lockFactory,
+        private ClockInterface $clock = new NativeClock(),
     ) {
     }
 
@@ -55,8 +58,10 @@ final readonly class RecurringTaskFailures
         };
     }
 
-    public function record(string $task, string $error, \DateTimeImmutable $failedAt = new \DateTimeImmutable()): void
+    public function record(string $task, string $error, ?\DateTimeImmutable $failedAt = null): void
     {
+        $failedAt ??= $this->clock->now();
+
         $this->change(static function (array $failures) use ($task, $error, $failedAt): array {
             $failures[$task] = ['failedAt' => $failedAt->format(\DATE_ATOM), 'error' => $error];
 
@@ -82,13 +87,13 @@ final readonly class RecurringTaskFailures
      */
     private function change(\Closure $change): void
     {
-        $lock = $this->lockFactory?->createLock(self::CACHE_KEY, 10);
-        $lock?->acquire(true);
+        $lock = $this->lockFactory->createLock(self::CACHE_KEY, 10);
+        $lock->acquire(true);
 
         try {
             $this->write($change($this->read()));
         } finally {
-            $lock?->release();
+            $lock->release();
         }
     }
 
@@ -114,8 +119,14 @@ final readonly class RecurringTaskFailures
     private function read(): array
     {
         $value = $this->cache->getItem(self::CACHE_KEY)->get();
+        $limit = $this->clock->now()->modify(\sprintf('-%d seconds', self::KEPT_FOR_SECONDS));
 
-        return \is_array($value) ? $value : [];
+        // Each failure keeps for a month from its own date: the entry they share is
+        // written again whenever any task fails.
+        return array_filter(
+            \is_array($value) ? $value : [],
+            static fn (array $failure): bool => new \DateTimeImmutable($failure['failedAt']) >= $limit,
+        );
     }
 
     /**
