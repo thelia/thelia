@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Thelia\Domain\DataTransfer\Exception\MissingColumnsException;
 use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Domain\DataTransfer\Job\ImportJobLauncher;
@@ -259,6 +260,23 @@ final class ImportJobTest extends IntegrationTestCase
         $this->expectException(UnrecoverableMessageHandlingException::class);
 
         $this->lifecycle($this->queue())->fail($job, new \RuntimeException('SQLSTATE[23000]: buyer@example.com'));
+    }
+
+    /**
+     * The failed jobs screen shows the reason as it is set aside: it names the job as the
+     * administrator knows it, not by the class of its row.
+     */
+    public function testAFailedJobIsNamedAsTheAdministratorKnowsIt(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        $this->storage()->discardFileOf($job);
+
+        try {
+            $this->lifecycle($this->queue())->fail($job, new MissingColumnsException('The following columns are missing: stock'));
+            self::fail('A failed job is set aside.');
+        } catch (UnrecoverableMessageHandlingException $setAside) {
+            self::assertSame(\sprintf('Import #%d failed: The following columns are missing: stock', $job->getId()), $setAside->getMessage());
+        }
     }
 
     /**
