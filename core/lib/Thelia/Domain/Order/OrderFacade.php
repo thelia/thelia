@@ -259,6 +259,7 @@ readonly class OrderFacade
                 OrderAddressQuery::create()->findPk($placedOrder->getDeliveryOrderAddressId())?->getState(),
                 (string) $lang->getLocale(),
                 $connection,
+                $vatExempted,
             );
 
             // Allocate the ref from the gapless sequence as the very last

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Taxation\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Checkout\Service\GiftWrappingProvider;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -23,6 +24,7 @@ use Thelia\Model\Country;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
+use Thelia\Model\TaxRule;
 
 /**
  * The VAT a cart would have carried had it not been exempted.
@@ -40,6 +42,7 @@ readonly class ExemptedVatCalculator
 {
     public function __construct(
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
+        private GiftWrappingProvider $giftWrappingProvider,
     ) {
     }
 
@@ -77,9 +80,27 @@ readonly class ExemptedVatCalculator
             $vat -= $vat * $discount / $untaxedTotal;
         }
 
-        $vat += $postageVat;
+        $vat += $postageVat + $this->giftWrappingVat($cart, $country, $state);
 
         return round(max(0.0, $vat), 2);
+    }
+
+    private function giftWrappingVat(Cart $cart, Country $country, ?State $state): float
+    {
+        $giftWrapping = $this->giftWrappingProvider->findActive(
+            null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId()
+        );
+        $taxRule = $giftWrapping?->getTaxRule();
+
+        if (!$taxRule instanceof TaxRule) {
+            return 0.0;
+        }
+
+        $untaxedPrice = (float) $giftWrapping->getPrice();
+
+        return $this->taxCalculatorFactory->createTaxCalculator()
+            ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
+            ->getTaxedPrice($untaxedPrice) - $untaxedPrice;
     }
 
     private function lineTotal(float $unitPrice, float $quantity): float

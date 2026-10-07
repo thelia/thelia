@@ -356,7 +356,7 @@ class AttributeAccessService
                 $result = $cart->getGiftMessage();
                 break;
             case 'is_vat_exempted':
-                $result = $this->vatExemptionResolver->isExemptedForCart($cart);
+                $result = $cart->isVatExempted();
                 break;
             case 'vat_exemption_state':
                 $result = $this->vatExemptionResolver->stateForCart($cart)->value;
