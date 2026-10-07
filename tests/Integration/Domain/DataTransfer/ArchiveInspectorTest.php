@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Domain\DataTransfer\ArchiveInspector;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Test\IntegrationTestCase;
 
@@ -88,6 +89,120 @@ final class ArchiveInspectorTest extends IntegrationTestCase
         $this->expectExceptionMessage('once extracted');
 
         (new ArchiveInspector(maxExtractedBytes: 1000))->assertExtractable($this->directory.'/phpUpload', 'tar');
+    }
+
+    public function testALinkInAZipIsRefused(): void
+    {
+        $path = $this->zip(['stock.csv' => '/etc/passwd']);
+        $zip = new \ZipArchive();
+        $zip->open($path);
+        $zip->setExternalAttributesName('stock.csv', \ZipArchive::OPSYS_UNIX, 0o120777 << 16);
+        $zip->close();
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'zip');
+    }
+
+    public function testAnOrdinaryTarIsAccepted(): void
+    {
+        (new ArchiveInspector())->assertExtractable($this->tar(['stock.csv' => "id,stock\n1,2\n"]), 'tar');
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testATarClimbingOutOfItsFolderIsRefused(): void
+    {
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($this->tar(['../../public/stock.php' => '<?php']), 'tar');
+    }
+
+    public function testALinkInATarIsRefused(): void
+    {
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($this->tar(['stock.csv' => ''], type: '2'), 'tar');
+    }
+
+    public function testATarWithTooManyFilesIsRefused(): void
+    {
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector(maxEntries: 2))->assertExtractable($this->tar(['a.csv' => 'a', 'b.csv' => 'b', 'c.csv' => 'c']), 'tar');
+    }
+
+    /**
+     * Read through its compression, block after block: a gzip bomb is refused at its
+     * first header, never held in memory.
+     */
+    public function testACompressedTarIsReadThroughItsCompression(): void
+    {
+        $path = $this->directory.'/upload';
+        file_put_contents($path, (string) gzencode((string) file_get_contents($this->tar(['stock.csv' => str_repeat('0', 5000)]))));
+
+        $this->expectException(UploadRefusedException::class);
+        $this->expectExceptionMessage('once extracted');
+
+        (new ArchiveInspector(maxExtractedBytes: 1000))->assertExtractable($path, 'tgz');
+    }
+
+    public function testABzip2TarIsReadThroughItsCompression(): void
+    {
+        if (!\function_exists('bzcompress')) {
+            self::markTestSkipped('bz2 is not installed.');
+        }
+
+        $path = $this->directory.'/upload';
+        file_put_contents($path, (string) bzcompress((string) file_get_contents($this->tar(['stock.csv' => str_repeat('0', 5000)]))));
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector(maxExtractedBytes: 1000))->assertExtractable($path, 'bz2');
+    }
+
+    public function testAnEmptyTarIsAccepted(): void
+    {
+        (new ArchiveInspector())->assertExtractable($this->tar([]), 'tar');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * What an archive declares is written by whoever made it: what was really
+     * written is measured too.
+     */
+    public function testWhatWasReallyExtractedIsMeasured(): void
+    {
+        mkdir($this->directory.'/extracted');
+        file_put_contents($this->directory.'/extracted/stock.csv', str_repeat('0', 5000));
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector(maxExtractedBytes: 1000))->assertExtractedSize($this->directory.'/extracted');
+    }
+
+    /**
+     * A tar written block by block, as tar writes it, whatever the names it holds.
+     *
+     * @param array<string, string> $files
+     */
+    private function tar(array $files, string $type = '0'): string
+    {
+        $tar = '';
+        foreach ($files as $name => $content) {
+            $header = str_pad($name, 100, "\0").str_pad('0000644', 8, "\0").str_pad('0000000', 8, "\0").str_pad('0000000', 8, "\0")
+                .str_pad(\sprintf('%011o', \strlen($content)), 12, "\0").str_pad(\sprintf('%011o', time()), 12, "\0").str_repeat(' ', 8)
+                .$type.str_repeat("\0", 100).str_pad("ustar\0", 6, "\0").'00'.str_repeat("\0", 247);
+            $checksum = array_sum(array_map(ord(...), str_split($header)));
+            $header = substr_replace($header, str_pad(\sprintf('%06o', $checksum), 7, "\0")."\0", 148, 8);
+            $tar .= $header.str_pad($content, (int) (ceil(\strlen($content) / 512) * 512), "\0");
+        }
+
+        $path = $this->directory.'/'.uniqid().'.tar';
+        file_put_contents($path, $tar.str_repeat("\0", 1024));
+
+        return $path;
     }
 
     /**
