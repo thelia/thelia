@@ -23,7 +23,6 @@ use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
-use Thelia\Model\Map\ExportJobTableMap;
 
 /**
  * Writes the file of one export job, and keeps its row telling how far it got.
@@ -48,7 +47,16 @@ final readonly class RunExportJobHandler
 
     public function __invoke(RunExportJob $message): void
     {
-        $job = ExportJobQuery::create()->findPk($message->exportJobId);
+        // Reading the row and taking it may fail too (the database gone): what is set
+        // aside then says no more than any other failure.
+        try {
+            $job = ExportJobQuery::create()->findPk($message->exportJobId);
+            $outcome = $job instanceof ExportJob ? $this->lifecycle->claimOrPostpone($job, $message) : null;
+        } catch (UnrecoverableMessageHandlingException $setAside) {
+            throw $setAside;
+        } catch (\Throwable $exception) {
+            $this->lifecycle->reject($message->describe(), $exception);
+        }
 
         if (!$job instanceof ExportJob) {
             // Replayed after the purge took its row: nothing can run, and saying so
@@ -56,13 +64,12 @@ final readonly class RunExportJobHandler
             throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
         }
 
-        if (!$this->lifecycle->claimOrPostpone($job, ExportJobTableMap::TABLE_NAME, $message)) {
+        if (ClaimOutcome::Owned !== $outcome) {
             return;
         }
 
-        $job->setProcessedRows(0)->save();
-
         try {
+            $job->setProcessedRows(0)->save();
             $this->run($job);
         } catch (\Throwable $exception) {
             $this->lifecycle->fail($job, $exception);
@@ -72,6 +79,11 @@ final readonly class RunExportJobHandler
     private function run(ExportJob $job): void
     {
         $export = $job->getExport() ?? throw new JobRefusedException('The export of this job no longer exists.');
+        // The format may have gone with its module since the export was asked for.
+        if (!$this->serializerManager->has($job->getSerializer())) {
+            throw new JobRefusedException(\sprintf('The format "%s" is no longer available on this server.', $job->getSerializer()));
+        }
+
         $serializer = $this->serializerManager->get($job->getSerializer());
         $archiver = null;
 

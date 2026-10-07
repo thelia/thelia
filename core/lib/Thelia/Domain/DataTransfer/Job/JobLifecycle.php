@@ -86,27 +86,22 @@ final readonly class JobLifecycle
     /**
      * Takes the job for this run, or, when another run holds it, sends the message
      * again to look at it later (set aside after twelve hours).
-     *
-     * @param 'export_job'|'import_job' $table
-     *
-     * @return bool true when this run owns the job; false when it is done, or running
-     *              elsewhere and looked at again later
      */
-    public function claimOrPostpone(DataTransferJob $job, string $table, DataTransferJobMessage $message): bool
+    public function claimOrPostpone(DataTransferJob $job, DataTransferJobMessage $message): ClaimOutcome
     {
         // Only the message first sent, or replayed by an administrator, may restart a
         // failed job: one looking again leaves it to the administrator.
-        $claimed = $this->jobClaim->claim($table, (int) $job->getId(), 0 === $message->postponements());
+        $claimed = $this->jobClaim->claim($job->tableName(), (int) $job->getId(), 0 === $message->postponements());
         $job->refresh();
 
-        if ($claimed || JobStatus::RUNNING !== $job->getJobStatus()) {
-            return $claimed;
+        if ($claimed) {
+            return ClaimOutcome::Owned;
         }
 
-        if ($this->queues->heavyJobsRunInline()) {
-            // Without a queue, looking again would run at once, in this very call,
-            // over and over: the run that holds the job finishes it.
-            return false;
+        if (JobStatus::RUNNING !== $job->getJobStatus() || $this->queues->heavyJobsRunInline()) {
+            // Over, or without a queue: looking again would run at once, in this very
+            // call, over and over, and the run that holds the job finishes it.
+            return ClaimOutcome::Finished;
         }
 
         if ($message->postponements() >= self::MAX_POSTPONEMENTS) {
@@ -117,7 +112,19 @@ final readonly class JobLifecycle
 
         $this->bus->dispatch($message->postponed(), [new DelayStamp(self::POSTPONE_DELAY_SECONDS * 1000)]);
 
-        return false;
+        return ClaimOutcome::Postponed;
+    }
+
+    /**
+     * Sets a message aside without touching its row: the row may be unreadable, or
+     * held by another run. What the failure transport keeps says no more than
+     * JobFailureMessage allows; the log names the exception.
+     */
+    public function reject(string $job, \Throwable $exception): never
+    {
+        Tlog::getInstance()->addError(\sprintf('%s could not be taken: %s', $job, JobFailureMessage::forLog($exception)));
+
+        throw new UnrecoverableMessageHandlingException(\sprintf('%s could not be taken: %s', $job, JobFailureMessage::forAdministrator($exception)));
     }
 
     /**
