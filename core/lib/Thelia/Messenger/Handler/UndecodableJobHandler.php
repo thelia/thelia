@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Messenger\Handler;
 
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Message\UndecodableJob;
 
 /**
@@ -27,6 +27,6 @@ final readonly class UndecodableJobHandler
 {
     public function __invoke(UndecodableJob $job): never
     {
-        throw new UnrecoverableMessageHandlingException(\sprintf('The job %s cannot be read: %s', $job->originalType, $job->reason));
+        throw new JobSetAsideException(\sprintf('The job %s cannot be read: %s', $job->originalType, $job->reason));
     }
 }

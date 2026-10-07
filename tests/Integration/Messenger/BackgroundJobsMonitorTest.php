@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Symfony\Component\Mailer\Exception\TransportException as MailerTransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
@@ -27,6 +28,8 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
+use Thelia\Messenger\JobFailureMessage;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
 use Thelia\Messenger\Transport\ConfiguredQueues;
@@ -77,6 +80,25 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertSame(1, $jobs[0]->attempts);
         self::assertNotNull($jobs[0]->failedAt);
         self::assertSame(1, $this->monitor()->failedCount());
+    }
+
+    /**
+     * Only a reason written for the administrator, or the answer of the mail server,
+     * is shown: what any other handler threw may quote a customer.
+     */
+    public function testAFailureIsShownOnlyWhenItsReasonIsMeantToBe(): void
+    {
+        $this->setAside(new ProbeMessage('module job'), "SQLSTATE[23000]: Duplicate entry 'buyer@example.com'", \PDOException::class);
+        $this->setAside($this->mail(), 'Failed to authenticate on SMTP server with smtp://shop:s3cr3t@mail.example.com');
+        $this->setAside(new ProbeMessage('import'), 'Import #3 failed: The following columns are missing: stock', JobSetAsideException::class);
+
+        $reasons = array_map(static fn ($job): string => $job->error, $this->monitor()->failedJobs());
+
+        self::assertContains(JobFailureMessage::SERVER_ERROR, $reasons);
+        self::assertContains('Failed to authenticate on SMTP server with smtp://***@mail.example.com', $reasons);
+        self::assertContains('Import #3 failed: The following columns are missing: stock', $reasons);
+        self::assertStringNotContainsString('buyer@example.com', implode(' ', $reasons));
+        self::assertStringNotContainsString('s3cr3t', implode(' ', $reasons));
     }
 
     public function testTheJobsWaitingForAWorkerAreCounted(): void
@@ -130,9 +152,9 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
      */
     public function testTheNewestFailuresAreListedFirstAndKeptWithinTheLimit(): void
     {
-        $this->setAside(new ProbeMessage('oldest'), 'first');
-        $this->setAside(new ProbeMessage('middle'), 'second');
-        $this->setAside(new ProbeMessage('newest'), 'third');
+        $this->setAside(new ProbeMessage('oldest'), 'first', JobSetAsideException::class);
+        $this->setAside(new ProbeMessage('middle'), 'second', JobSetAsideException::class);
+        $this->setAside(new ProbeMessage('newest'), 'third', JobSetAsideException::class);
 
         $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), null, $this->queues());
 
@@ -218,6 +240,18 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         } catch (\Throwable) {
         }
 
+        self::assertSame(1, $this->monitor()->failedCount());
+    }
+
+    /**
+     * Replayed, a job the shop cannot read fails the same way: whatever is posted, it
+     * is not replayed.
+     */
+    public function testAnUnreadableJobIsNeverReplayed(): void
+    {
+        $id = $this->setAside(new UndecodableJob('Vendor\\Gone\\Job', 'The class no longer exists.', '{}'), 'Unreadable', JobSetAsideException::class);
+
+        self::assertFalse($this->monitor()->retry($id));
         self::assertSame(1, $this->monitor()->failedCount());
     }
 
@@ -323,12 +357,16 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         return new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), $jobDsn, $heavyDsn, 'doctrine://default?queue_name=test_monitor_failed');
     }
 
-    private function setAside(object $message, string $reason): string
+    /**
+     * @param class-string<\Throwable> $exceptionClass what the job threw: a mail refused by
+     *                                                 the server unless said otherwise
+     */
+    private function setAside(object $message, string $reason, string $exceptionClass = MailerTransportException::class): string
     {
         $this->failed->send(new Envelope($message, [
             new SentToFailureTransportStamp('async'),
             new RedeliveryStamp(0, new \DateTimeImmutable('-1 hour')),
-            new ErrorDetailsStamp(\RuntimeException::class, 0, $reason),
+            new ErrorDetailsStamp($exceptionClass, 0, $reason),
         ]));
 
         $jobs = $this->monitor()->failedJobs();

@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Mailer;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
@@ -59,12 +61,30 @@ class MailerFactory
         private readonly TemplateHelperInterface $templateHelper,
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
+        #[Autowire(service: 'mailer.transports')]
+        private readonly ?TransportInterface $transport = null,
     ) {
     }
 
     public function send(Email $message): void
     {
         $this->mailer->send($message);
+    }
+
+    /**
+     * Hands the message to the mail server now, whether the shop has a queue or not:
+     * for a test of the mail configuration, whose only point is the server's answer.
+     * Any refusal is thrown to the caller.
+     */
+    public function sendNow(Email $message): void
+    {
+        if (null === $this->transport) {
+            $this->mailer->send($message);
+
+            return;
+        }
+
+        $this->transport->send($message);
     }
 
     /**
@@ -196,6 +216,9 @@ class MailerFactory
      * is logged here, with everything the server may need; what the exception carries
      * is what a caller may show, and names neither a recipient nor a transport.
      *
+     * With a queue, "sent" means queued: only a mail that could not be built or queued
+     * throws here. One the mail server refuses later is set aside with the failed jobs.
+     *
      * @param array       $from              From addresses. An array of (email-address => name)
      * @param array       $to                To addresses. An array of (email-address => name)
      * @param array       $messageParameters an array of (name => value) parameters that will be available in the message
@@ -240,24 +263,11 @@ class MailerFactory
             // The raw reason names the recipient: the server log is the only place
             // for it. The credentials of the transport are not even wanted there.
             Tlog::getInstance()->addError(
-                \sprintf('Error while sending email message %s: ', $messageCode).self::withoutTransportCredentials($ex->getMessage()),
+                \sprintf('Error while sending email message %s: ', $messageCode).TransportCredentials::hide($ex->getMessage()),
             );
 
             throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
-    }
-
-    /**
-     * Hides the credentials a transport puts in the reason it refuses a message.
-     *
-     * A mailer names the DSN it was configured with when it fails, password
-     * included: `smtp://user:s3cr3t@mail.example.com`. The log of a shop is read,
-     * shipped and archived far more widely than its configuration, so the
-     * userinfo part of any URL is replaced before the reason is written.
-     */
-    private static function withoutTransportCredentials(string $message): string
-    {
-        return preg_replace('#://[^@/\s]+@#', '://***@', $message) ?? $message;
     }
 
     /**

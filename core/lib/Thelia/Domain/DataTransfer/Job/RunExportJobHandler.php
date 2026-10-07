@@ -21,6 +21,7 @@ use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -61,7 +62,7 @@ final readonly class RunExportJobHandler
         if (!$job instanceof ExportJob) {
             // Replayed after the purge took its row: nothing can run, and saying so
             // keeps the job among the failures instead of reporting it done.
-            throw new UnrecoverableMessageHandlingException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
+            throw new JobSetAsideException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
         }
 
         if (ClaimOutcome::Owned !== $outcome) {

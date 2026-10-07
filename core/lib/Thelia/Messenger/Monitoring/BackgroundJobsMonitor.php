@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Messenger\Monitoring;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface as MailerTransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,7 +30,9 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Thelia\Exception\UserFacingFailure;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\TransportCredentials;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\DescribedJob;
 use Thelia\Messenger\Message\ReplayableJob;
@@ -139,7 +142,9 @@ final readonly class BackgroundJobsMonitor
     {
         $envelope = $this->failureTransport()->find($id);
 
-        if (null === $envelope) {
+        // A job the shop cannot read fails the same way when replayed: it can only be
+        // deleted, whatever was posted.
+        if (null === $envelope || $envelope->getMessage() instanceof UndecodableJob) {
             return false;
         }
 
@@ -206,11 +211,32 @@ final readonly class BackgroundJobsMonitor
             self::describe($message),
             $envelope->last(RedeliveryStamp::class)?->getRedeliveredAt(),
             \count($envelope->all(RedeliveryStamp::class)),
-            $error instanceof ErrorDetailsStamp ? $error->getExceptionMessage() : '',
+            self::reasonOf($error),
             $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName(),
             // Replayed, a job the shop cannot read fails the same way.
             !$message instanceof UndecodableJob,
         );
+    }
+
+    /**
+     * Why the job failed, as the administrator may read it: a reason written for them
+     * (a job of the shop, an unreadable one), or what the mail server answered, its
+     * credentials hidden. Anything else, a database error quoting a customer among
+     * them, reads as a server error.
+     */
+    private static function reasonOf(?ErrorDetailsStamp $error): string
+    {
+        if (null === $error) {
+            return '';
+        }
+
+        $class = $error->getExceptionClass();
+
+        return match (true) {
+            is_a($class, UserFacingFailure::class, true) => $error->getExceptionMessage(),
+            is_a($class, MailerTransportException::class, true) => TransportCredentials::hide($error->getExceptionMessage()),
+            default => JobFailureMessage::SERVER_ERROR,
+        };
     }
 
     private static function describe(object $message): string
