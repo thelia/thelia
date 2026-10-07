@@ -39,6 +39,7 @@
 ## Breaking changes
 
 - The back-office theme now needs this core: its `composer.json` requires `thelia/core ^3.3`. Update both together.
+- `ExportHandler::export()`, `ImportHandler::import()` and `ImportHandler::validateUpload()` take a new optional last argument (the progress callback, the uploaded file): a module that overrides them must declare it. `processExport()` and `processImport()` keep their signature. `ImportHandler::import()` extracts an archive through a private method now, so an override of `extractArchive()` is no longer called by it.
 - The line an order history gets for a mail (`email_sent`) is written once the mail server has taken the mail, by `Thelia\Mailer\EventListener\OrderEmailHistoryListener` on `SentMessageEvent`, and no longer by `MailerFactory` right after handing it over. Without a queue this is the same request; with one, it is the worker, later, and the author of the line is `system`. `MailerFactory` names the order in two headers of the mail, `X-Thelia-Order-Id` and `X-Thelia-Message-Code`, which travel through the queue and are taken off right before the mail is handed to the mail server. It no longer takes an `OrderHistoryRecorder`: its constructor has three arguments. With a queue, `sendEmailMessageOrFail()` and the methods built on it only throw when the mail could not be built or queued; a delivery failure is set aside in `failed` instead.
 
 # 3.2.1
