@@ -14,12 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Messenger\Serializer;
 
+use Propel\Runtime\ActiveQuery\QueryExecutor\QueryExecutionException;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -94,10 +99,18 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
                     $this->assertAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)), MessageDecodingFailedException::class);
                 }
             }
-
-            $envelope = $this->inner->decode($encodedEnvelope);
         } catch (MessageDecodingFailedException $exception) {
             return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
+        }
+
+        try {
+            $envelope = $this->inner->decode($encodedEnvelope);
+        } catch (MessageDecodingFailedException $exception) {
+            // What Symfony says of content it cannot read may quote it: the log names the
+            // exception, the job keeps a reason of its own.
+            Tlog::getInstance()->addError(\sprintf('A queued %s could not be read: %s', $headers['type'], JobFailureMessage::forLog($exception)));
+
+            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), \sprintf('Its content no longer fits the class %s.', $headers['type']));
         }
 
         $message = $envelope->getMessage();
@@ -237,8 +250,23 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
 
         // A module lives under the namespace named after its code. Read each time: a
         // worker outlives the activation and the deactivation of modules.
+        $code = substr($class, 0, $separator);
+
+        try {
+            return self::isActiveModule($code);
+        } catch (\PDOException|QueryExecutionException) {
+            // A job is read before anything else runs for it: after a long wait, the
+            // server may have closed the connection of the worker. Opened again once.
+            Propel::getServiceContainer()->getConnectionManager(DatabaseConfiguration::THELIA_CONNECTION_NAME)->closeConnections();
+
+            return self::isActiveModule($code);
+        }
+    }
+
+    private static function isActiveModule(string $code): bool
+    {
         return ModuleQuery::create()
-            ->filterByCode(substr($class, 0, $separator))
+            ->filterByCode($code)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
             ->exists();
     }
