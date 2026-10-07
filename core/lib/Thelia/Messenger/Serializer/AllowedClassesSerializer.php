@@ -105,9 +105,11 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
 
         try {
             $envelope = $this->inner->decode($encodedEnvelope);
-        } catch (MessageDecodingFailedException $exception) {
-            // What Symfony says of content it cannot read may quote it: the log names the
-            // exception, the job keeps a reason of its own.
+        } catch (\Throwable $exception) {
+            // Anything thrown here would stop the worker, and again each time the job is
+            // delivered: a class built from the content may refuse it in its own words
+            // (an address that is not one). What Symfony says of content it cannot read
+            // may quote it: the log names the exception, the job keeps a reason of its own.
             Tlog::getInstance()->addError(\sprintf('A queued %s could not be read: %s', $headers['type'], JobFailureMessage::forLog($exception)));
 
             return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), \sprintf('Its content no longer fits the class %s.', $headers['type']));
