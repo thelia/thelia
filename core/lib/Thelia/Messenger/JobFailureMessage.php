@@ -30,7 +30,7 @@ final class JobFailureMessage
 {
     public const SERVER_ERROR = 'The job failed because of a server error. The details are in the server log.';
 
-    private const MAX_LENGTH = 2000;
+    public const MAX_LENGTH = 2000;
 
     public static function forAdministrator(\Throwable $exception): string
     {

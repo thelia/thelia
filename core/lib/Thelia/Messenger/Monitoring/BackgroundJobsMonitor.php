@@ -232,9 +232,10 @@ final readonly class BackgroundJobsMonitor
 
         $class = $error->getExceptionClass();
 
+        // Bounded as any other reason: an unreadable job quotes what the queue held.
         return match (true) {
-            is_a($class, UserFacingFailure::class, true) => $error->getExceptionMessage(),
-            is_a($class, MailerTransportException::class, true) => TransportCredentials::hide($error->getExceptionMessage()),
+            is_a($class, UserFacingFailure::class, true) => mb_substr($error->getExceptionMessage(), 0, JobFailureMessage::MAX_LENGTH),
+            is_a($class, MailerTransportException::class, true) => mb_substr(TransportCredentials::hide($error->getExceptionMessage()), 0, JobFailureMessage::MAX_LENGTH),
             default => JobFailureMessage::SERVER_ERROR,
         };
     }
