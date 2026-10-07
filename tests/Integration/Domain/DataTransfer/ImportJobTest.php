@@ -33,6 +33,7 @@ use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJobHandler;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
+use Thelia\Messenger\Monitoring\BackgroundJobsMonitor;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Import;
@@ -313,6 +314,31 @@ final class ImportJobTest extends IntegrationTestCase
         $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunImportJob((int) $job->getId())));
 
         self::assertFileDoesNotExist($this->storage()->pathOf($job));
+    }
+
+    /**
+     * An import set aside while it still ran (its worker silent for twelve hours) may
+     * be running yet: deleting its failure leaves its file to it.
+     */
+    public function testTheFileOfAnImportStillRunningIsKeptWhenItsFailureIsDeleted(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        $job->setStatus(JobStatus::RUNNING->value)->save();
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunImportJob((int) $job->getId())));
+
+        self::assertFileExists($this->storage()->pathOf($job));
+        $this->storage()->discardFileOf($job);
+    }
+
+    /**
+     * The monitor the back office uses tells the shop a failed job was deleted.
+     */
+    public function testTheMonitorOfTheBackOfficeTellsAFailedJobWasDeleted(): void
+    {
+        $monitor = $this->getService(BackgroundJobsMonitor::class);
+
+        self::assertInstanceOf(EventDispatcherInterface::class, (new \ReflectionProperty(BackgroundJobsMonitor::class, 'dispatcher'))->getValue($monitor));
     }
 
     public function testAVeryLongFileNameStillFitsTheRow(): void

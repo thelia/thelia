@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Domain\DataTransfer\Job\ImportStorage;
+use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
@@ -41,17 +42,19 @@ final readonly class RemovedImportFileListener
             return;
         }
 
-        $job = ImportJobQuery::create()->findPk($event->message->importJobId);
-
-        if (null === $job) {
-            return;
-        }
-
         // The failure is deleted already: a file left behind is the purge's to sweep.
         try {
+            $job = ImportJobQuery::create()->findPk($event->message->importJobId);
+
+            // Set aside while it still ran, an import may be running yet: its file is
+            // left to it, and to the purge.
+            if (null === $job || JobStatus::RUNNING === $job->getJobStatus()) {
+                return;
+            }
+
             $this->storage->discardFileOf($job);
         } catch (\Throwable $leftBehind) {
-            Tlog::getInstance()->addWarning(\sprintf('The file of import job %d was left behind: %s', $job->getId(), JobFailureMessage::forLog($leftBehind)));
+            Tlog::getInstance()->addWarning(\sprintf('The file of import job %d was left behind: %s', $event->message->importJobId, JobFailureMessage::forLog($leftBehind)));
         }
     }
 }
