@@ -453,11 +453,20 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertSame(JobStatus::DONE, $job->getJobStatus());
     }
 
+    /**
+     * Anything but a year of four digits and a month of the year is refused, rather
+     * than read as another date or as no bound at all.
+     */
     public function testDatesTheExportFormCannotHaveSentAreRefused(): void
     {
-        $this->expectException(JobRefusedException::class);
-
-        $this->getService(ExportHandler::class)->resolveRangeDate(['start' => ['year' => '2026; DROP', 'month' => '1'], 'end' => null]);
+        foreach ([['year' => '2026; DROP', 'month' => '1'], ['year' => '99999', 'month' => '1'], ['year' => '26', 'month' => '1'], ['year' => '2026', 'month' => '13'], ['year' => '2026', 'month' => '0']] as $bound) {
+            try {
+                $this->getService(ExportHandler::class)->resolveRangeDate(['start' => $bound, 'end' => null]);
+                self::fail('Refused: '.json_encode($bound, \JSON_THROW_ON_ERROR));
+            } catch (JobRefusedException) {
+                $this->addToAssertionCount(1);
+            }
+        }
     }
 
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
