@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Exception\TransportException as MailerTransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
@@ -28,6 +29,8 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
+use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Message\UndecodableJob;
@@ -273,6 +276,26 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertSame(0, $this->monitor()->failedCount());
         self::assertFalse($this->monitor()->remove($id));
         self::assertFalse($this->monitor()->retry($id));
+    }
+
+    /**
+     * A failed job deleted from the screen can never be replayed: what it kept for the
+     * replay, the uploaded file of an import, goes with it.
+     */
+    public function testADeletedJobLetsGoOfWhatItKeptForTheReplay(): void
+    {
+        $id = $this->setAside(new RunImportJob(42), 'Import #42 failed: The following columns are missing: stock', JobSetAsideException::class);
+        $removed = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(FailedJobRemovedEvent::class, static function (FailedJobRemovedEvent $event) use (&$removed): void {
+            $removed[] = $event->message;
+        });
+
+        self::assertTrue((new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), dispatcher: $dispatcher))->remove($id));
+
+        self::assertCount(1, $removed);
+        self::assertInstanceOf(RunImportJob::class, $removed[0]);
+        self::assertSame(42, $removed[0]->importJobId);
     }
 
     /**
