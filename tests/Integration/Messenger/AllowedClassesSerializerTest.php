@@ -214,6 +214,49 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         self::assertSame(3, $envelope->last(RedeliveryStamp::class)?->getRetryCount());
     }
 
+    /**
+     * A mail part may name a file to read when the mail is sent: written into a queue,
+     * it would have the worker mail any file of the server to any address.
+     */
+    public function testAQueuedMailNeverReadsAFileOfTheServer(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->attach('PLACEHOLDER', 'invoice.txt', 'text/plain'))));
+        $forged = str_replace('"body":"PLACEHOLDER"', '"body":'.json_encode(['path' => __FILE__, 'contentType' => 'text/plain', 'size' => null, 'filename' => 'invoice.txt'], \JSON_THROW_ON_ERROR), $encoded['body'], $replaced);
+        self::assertSame(1, $replaced, 'The body of the attachment is where the test expects it.');
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        if ($message instanceof SendEmailMessage) {
+            foreach ($message->getMessage() instanceof Email ? $message->getMessage()->getAttachments() : [] as $attachment) {
+                self::assertStringNotContainsString('testAQueuedMailNeverReadsAFileOfTheServer', $attachment->getBody(), 'The worker read a file of the server into the mail.');
+            }
+        }
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
+     * An attachment given by its path is queued with its content: the worker reads no
+     * file, and may run on another server than the one the file is on.
+     */
+    public function testAMailAttachingAFileIsQueuedWithItsContent(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Invoice')->attachFromPath(__FILE__, 'invoice.txt', 'text/plain'))));
+
+        self::assertStringNotContainsString('"path"', $encoded['body']);
+
+        $message = $serializer->decode($encoded)->getMessage();
+        self::assertInstanceOf(SendEmailMessage::class, $message);
+        $email = $message->getMessage();
+        self::assertInstanceOf(Email::class, $email);
+        self::assertCount(1, $email->getAttachments());
+        self::assertSame(file_get_contents(__FILE__), $email->getAttachments()[0]->getBody());
+        self::assertSame('invoice.txt', $email->getAttachments()[0]->getFilename());
+    }
+
     public function testAJobThatDoesNotSayWhatItIsIsKeptAsAnUnreadableJob(): void
     {
         $envelope = $this->serializer()->decode(['body' => '{"anything":1}', 'headers' => ['Content-Type' => 'application/json']]);
