@@ -88,6 +88,21 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
     }
 
     /**
+     * A failed job ages from the day it was set aside, which may come half a day after
+     * the row (twelve hours of looking again): the row outlives the failure by a margin.
+     */
+    public function testAJobSetAsideLateStaysAsLongAsItsFailure(): void
+    {
+        $setAsideLate = $this->importJob('-30 days -12 hours', '/nowhere.csv', JobStatus::FAILED);
+        $expired = $this->exportJob('-32 days', JobStatus::FAILED);
+
+        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+
+        self::assertNotNull(ImportJobQuery::create()->findPk($setAsideLate));
+        self::assertNull(ExportJobQuery::create()->findPk($expired));
+    }
+
+    /**
      * A job stuck waiting or running was set aside with the failed jobs, and may be
      * replayed for as long: its row stays as long too.
      */
