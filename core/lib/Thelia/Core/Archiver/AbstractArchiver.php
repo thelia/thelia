@@ -79,4 +79,15 @@ abstract class AbstractArchiver implements ArchiverInterface
     {
         $this->archive->extractTo($toPath);
     }
+
+    /**
+     * Lets go of the archive once it is read or written: a worker that opened it keeps
+     * no file open between two jobs.
+     */
+    public function close(): bool
+    {
+        $this->archive = null;
+
+        return true;
+    }
 }
