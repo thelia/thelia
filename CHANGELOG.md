@@ -3,6 +3,7 @@
 ## Catalog
 
 - GTIN and manufacturer part number of a combination. The code kept in `ean_code` is a GTIN of the GS1 family (EAN-8, UPC-A, EAN-13 with ISBN-13, or GTIN-14) and is checked wherever a combination is saved, back office, API, stock import and modules alike: spaces and hyphens are dropped, the length and the check digit verified, and a refusal (`Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException`) says which rule the code breaks. An empty code is still accepted, and a code stored before the check is never re-checked until it changes, so editing the stock of a product whose old code would not pass is not blocked. `product_sale_elements` gains `mpn` and `manufacturer_brand_id` (the brand of the product applies when it is null), `order_product` gains `mpn`, frozen when the order is placed like the GTIN. A GTIN shared by two combinations is saved and reported, never refused: `GtinDuplicateFinder` lists the other carriers. `ProductIdentifierReader::forSaleElements()` reads the codes of a batch of combinations in one query for the modules that build merchant feeds. The property keeps its name `eanCode` on the API; `mpn`, `manufacturerBrand` and, for administrators, `gtinSharedWith` are added, and `eanCode` and `mpn` are exact filters on `/admin/product_sale_elements` and, through `productSaleElements.eanCode` and `productSaleElements.mpn`, on the products. The `product_sale_elements` and `order_product` loops output `MPN`. See `docs/product-identifiers.md`.
+- Three more facets on the product listings, set per category and per template in the back office like the others. Availability splits the listing between the products in stock (virtual, or with a visible combination in stock; everything when the shop does not check stock) and the ones on order or out of stock. Customer rating keeps the products rated 4, 3 or 2 stars and up; the core holds no review, so the facet only shows when a review module implements `Thelia\Domain\Catalog\Product\ProductRatingSourceInterface`, and the back office hides it otherwise. Price is a slider on the price the product card shows: default combination, promotional or catalog rule price, currency browsed, taxes of the delivery country included; it leaves the sort order alone. See `docs/product-listing-facets.md`.
 
 ## Exports and imports
 
@@ -11,6 +12,7 @@
 ## Behaviour changes
 
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
+- A shop updated to 3.3.0 gets the availability, customer rating and price facets visible on every category listing that already shows facets, the way a fresh install does. A merchant who does not want one hides it from the "Filters" section of the category or of the template.
 
 # 3.2.1
 
