@@ -36,6 +36,7 @@ use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Transport\ConfiguredQueues;
@@ -46,6 +47,7 @@ use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\DataTransfer\ImageHeavyExport;
+use Thelia\Tests\Support\DataTransfer\ModuleWrittenExportHandler;
 
 /**
  * An export asked for in the back office is a job: without a queue it runs in the
@@ -445,6 +447,36 @@ final class ExportJobTest extends IntegrationTestCase
         (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
         // Once for the rows, then every DataTransferProgress::STEP images, with the same count.
         self::assertSame([2, 2, 2], $told);
+    }
+
+    /**
+     * A worker runs export after export on the same handler: the rows of the previous
+     * one are never told for the next, written by a module that tells none.
+     */
+    public function testAnExportNeverTellsTheRowsOfThePreviousOne(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $handler = new ModuleWrittenExportHandler($this->getService(EventDispatcherInterface::class), $this->getService(ExportCachePurger::class));
+        $serializer = $this->getService(SerializerManager::class)->get(self::SERIALIZER);
+        $handler->export($export, $serializer, null, Lang::getDefaultLanguage(), onProgress: static function (): void {});
+        $handler->writesItsOwnWay = true;
+        $told = [];
+
+        $handler->export(
+            $export,
+            $serializer,
+            $this->archiverKeepingNothing(),
+            Lang::getDefaultLanguage(),
+            includeImages: true,
+            onProgress: static function (int $rows) use (&$told): void {
+                $told[] = $rows;
+            },
+        );
+
+        (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+        self::assertSame([0, 0], $told);
     }
 
     /**
