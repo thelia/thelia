@@ -22,7 +22,12 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Cache;
@@ -212,20 +217,105 @@ final class CacheTest extends TestCase
     }
 
     /**
-     * A worker ends no command between two jobs: a clear a job asked for runs once
-     * that job is over, not when the worker exits.
+     * A worker ends no command between two jobs: a clear a job asked for stops the
+     * worker once the job is acknowledged, and runs when the command ends. Clearing
+     * right after the job would delete the lazy listener files the worker has not
+     * loaded yet, before the transport even acknowledges the job.
      */
-    public function testAClearAJobAskedForRunsOnceTheJobIsOver(): void
+    public function testAClearAJobAskedForStopsTheWorkerAndRunsOnceTheCommandEnds(): void
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($this->action());
+        $this->addALazyWorkerListenerStoredIn($dispatcher, $this->clearedDir);
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+        $transport->send(new Envelope(new \stdClass()));
 
-        $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+        $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+            $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+        })->run();
+
+        self::assertCount(1, $transport->getAcknowledged(), 'The job that asked for the clear is acknowledged.');
+        self::assertCount(1, iterator_to_array($transport->get()), 'The worker stops before the next job.');
         self::assertDirectoryExists($this->clearedDir);
 
-        $dispatcher->dispatch(new WorkerMessageHandledEvent(new Envelope(new \stdClass()), 'async'));
+        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
 
         self::assertDirectoryDoesNotExist($this->clearedDir);
+    }
+
+    public function testAClearThatFailsNeverLeavesTheJobUnacknowledged(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new Cache($this->failingAdapter(), self::ENVIRONMENT));
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+
+        $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+            $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+        })->run();
+
+        self::assertCount(1, $transport->getAcknowledged());
+    }
+
+    public function testAClearAFailedJobAskedForStopsTheWorkerToo(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+        $this->addALazyWorkerListenerStoredIn($dispatcher, $this->clearedDir);
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+        $transport->send(new Envelope(new \stdClass()));
+
+        $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+            $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+
+            throw new \RuntimeException('The job failed after asking for a clear.');
+        })->run();
+
+        self::assertCount(1, $transport->getRejected());
+        self::assertCount(1, iterator_to_array($transport->get()));
+        self::assertDirectoryExists($this->clearedDir);
+    }
+
+    private function worker(InMemoryTransport $transport, EventDispatcher $dispatcher, \Closure $handler): Worker
+    {
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([\stdClass::class => [$handler]]))]);
+        // Stops an idle worker, as nothing else would in a test.
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event): void {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        return new Worker(['async' => $transport], $bus, $dispatcher);
+    }
+
+    /**
+     * Outside debug mode, the container loads a worker listener from its own file the
+     * first time the event it listens to is dispatched.
+     */
+    private function addALazyWorkerListenerStoredIn(EventDispatcher $dispatcher, string $containerDir): void
+    {
+        $listenerFile = $containerDir.'/getWorkerListenerService.php';
+        $this->filesystem->dumpFile($listenerFile, '<?php return static function (): void {};');
+
+        $dispatcher->addListener(WorkerRunningEvent::class, [
+            static fn (): \Closure => is_file($listenerFile)
+                ? require $listenerFile
+                : throw new \LogicException('The worker listener was loaded after its container file was deleted.'),
+            '__invoke',
+        ]);
+    }
+
+    private function failingAdapter(): NullAdapter
+    {
+        return new class extends NullAdapter {
+            public function clear(string $prefix = ''): bool
+            {
+                throw new \RuntimeException('The cache could not be cleared.');
+            }
+        };
     }
 
     private function action(): Cache

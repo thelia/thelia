@@ -19,8 +19,7 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
-use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Messenger\WorkerRestartSignal;
@@ -94,6 +93,19 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * A worker ends no command between two jobs: a clear a job asked for stops the
+     * worker, and runs when its command ends. It cannot run as the job ends: the job is
+     * not acknowledged yet, and the worker still loads its own listeners from the
+     * container files the clear deletes.
+     */
+    public function stopTheWorkerOnAPendingClear(WorkerRunningEvent $event): void
+    {
+        if ([] !== $this->onTerminateCacheClearEvents) {
+            $event->getWorker()->stop();
+        }
+    }
+
     protected function execCacheClear(CacheEvent $event): void
     {
         $this->adapter->clear();
@@ -121,10 +133,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
             ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
-            // A worker ends no command between two jobs: a clear a job asked for runs
-            // once that job is over, not when the worker exits.
-            WorkerMessageHandledEvent::class => ['onTerminate', self::TERMINATE_PRIORITY],
-            WorkerMessageFailedEvent::class => ['onTerminate', self::TERMINATE_PRIORITY],
+            WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
         ];
     }
 }
