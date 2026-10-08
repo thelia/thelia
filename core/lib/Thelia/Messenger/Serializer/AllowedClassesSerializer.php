@@ -59,6 +59,18 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
 
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
+    /**
+     * Messages that run a command or a process, call a URL or dispatch any other
+     * message: never built from a queue, whatever a project lists, since whoever
+     * writes to the queue would run anything on the server.
+     */
+    private const NEVER_QUEUED_NAMESPACES = [
+        'Symfony\\Component\\Console\\Messenger\\',
+        'Symfony\\Component\\Process\\Messenger\\',
+        'Symfony\\Component\\HttpClient\\Messenger\\',
+        'Symfony\\Component\\Messenger\\Message\\',
+    ];
+
     private const ALLOWED_STAMP_NAMESPACES = [
         'Symfony\\Component\\Messenger\\Stamp\\',
         'Symfony\\Component\\Messenger\\Bridge\\',
@@ -101,6 +113,12 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
             }
         } catch (MessageDecodingFailedException $exception) {
             return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
+        }
+
+        // Told before any part is built: a part built from a path looks at that path at
+        // once, and whether it exists would show in the reason kept with the job.
+        if (SendEmailMessage::class === $headers['type'] && QueuedMailFiles::namesAFileBeforeBuilding((string) ($encodedEnvelope['body'] ?? ''))) {
+            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), self::MAIL_READING_A_FILE);
         }
 
         try {
@@ -186,6 +204,12 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
      */
     private function assertAllowedMessage(string $class, string $exceptionClass): void
     {
+        foreach (self::NEVER_QUEUED_NAMESPACES as $namespace) {
+            if (str_starts_with($class, $namespace)) {
+                throw new $exceptionClass(\sprintf('The message class "%s" is not one the shop queues: it runs a command, a process or a request on the server, and is never queued whatever a project lists.', $class));
+            }
+        }
+
         if (\in_array($class, $this->extraAllowedClasses, true)) {
             return;
         }

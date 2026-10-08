@@ -117,6 +117,38 @@ final class QueuedMailFiles
         }
     }
 
+    /**
+     * True when the encoded mail names a file, told from its JSON before any part is
+     * built: Symfony writes a part kept as a file as an object with a "path" key, and
+     * nothing else of a mail is keyed so.
+     */
+    public static function namesAFileBeforeBuilding(string $encodedBody): bool
+    {
+        try {
+            $decoded = json_decode($encodedBody, true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            // Not JSON: nothing is built from it either way.
+            return false;
+        }
+
+        return self::holdsAPathKey($decoded);
+    }
+
+    private static function holdsAPathKey(mixed $value): bool
+    {
+        if (!\is_array($value)) {
+            return false;
+        }
+
+        foreach ($value as $key => $child) {
+            if ('path' === $key || self::holdsAPathKey($child)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static function mailReadsAFile(RawMessage $mail): bool
     {
         // Another class may do more when it is sent than send itself: a templated mail
