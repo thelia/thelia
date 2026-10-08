@@ -15,14 +15,18 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Action;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Cache;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Messenger\WorkerRestartSignal;
 
 /**
  * The combined Propel schema depends on the active modules and on their
@@ -122,6 +126,48 @@ final class CacheTest extends TestCase
 
         self::assertTrue($clearedDirWasStillThere, 'The cache directory must outlive every other terminate listener.');
         self::assertDirectoryDoesNotExist($this->clearedDir);
+    }
+
+    /**
+     * A worker keeps the container it booted with: its mail settings, the handlers
+     * of the modules active then, and lazy service files the clear deletes.
+     */
+    public function testAClearAsksTheWorkersToRestartOnceTheDirectoryIsGone(): void
+    {
+        $clearedDir = $this->clearedDir;
+        $signals = new class($clearedDir) extends ArrayAdapter {
+            public ?bool $directoryWasGone = null;
+
+            public function __construct(private readonly string $clearedDir)
+            {
+                parent::__construct();
+            }
+
+            public function save(CacheItemInterface $item): bool
+            {
+                $this->directoryWasGone = !is_dir($this->clearedDir);
+
+                return parent::save($item);
+            }
+        };
+
+        (new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals)))
+            ->cacheClear(new CacheEvent($this->clearedDir, false));
+
+        self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+        self::assertTrue($signals->directoryWasGone, 'A worker started again before the clear would boot on the old container.');
+    }
+
+    public function testADeferredClearAsksTheWorkersToRestartOnlyWhenItRuns(): void
+    {
+        $signals = new ArrayAdapter();
+        $action = new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals));
+
+        $action->cacheClear(new CacheEvent($this->clearedDir, true));
+        self::assertFalse($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+
+        $action->onTerminate();
+        self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
     }
 
     private function action(): Cache
