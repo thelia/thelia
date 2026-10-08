@@ -208,6 +208,28 @@ An administrator authenticated by a JWT holds no back-office session:
 has no admin, so the line is the administrator's, for the payment journal and
 the order history alike.
 
+## Back office
+
+The payment card of the order sheet (`order/detail.html.twig` of the Twig
+theme) includes `order/_payment_journal.html.twig`: the totals when an
+authorization exists or the module can capture, the *Capture payment* button,
+and the journal table, newest first. `OrderPaymentContextBuilder` composes it
+from `OrderPaymentTransactionRepository` (the reads), `OrderPaymentLinePresenter`
+(labels, badges, author in clear) and the core totals reader; it returns an
+empty, disabled block to an administrator without the orders permission, the
+way the history block does. The button, and the dialog
+`order/_payment_capture_modal.html.twig`, only exist for an administrator
+holding the capture right (create on `admin.order.payment-capture`) when the
+module supports deferred capture and something is left.
+
+`OrderController::capturePayment()` answers `POST
+/admin/order/update/{order_id}/payment-capture`: the capture right first, then
+the shape of the typed amount (a comma counts as a decimal separator, empty
+means the remainder), then `AdminFormAction::tokenAction()` with the CSRF
+token, the `ORDER_PAYMENT_CAPTURE` event and an administration log line naming
+the order, the amount and the outcome. A refusal from the core (above the
+authorization, nothing to capture) comes back as the usual error flash.
+
 ## Installation and update
 
 A fresh install creates the table and seeds the status and the right
@@ -235,6 +257,10 @@ render an empty one without error.
   authorization puts the order on hold, the capture from the back office pays
   it, a partial capture leaves the rest, a provider refusal leaves it unpaid,
   an amount above the authorization is refused before the module is called.
+- `tests/Http/BackOffice/OrderPaymentBackOfficeTest.php` — the payment card:
+  the cheque line, the empty journal, the totals and the prefilled dialog, the
+  capture from the dialog and its log line, a partial capture typed with a
+  comma, the refusals, and who sees or may use the button.
 - `tests/Api/Admin/OrderPaymentApiTest.php` — the three admin operations:
   shape of a line, scope, the totals, the capture and its refusals, the repeat
   guard, and who is refused (anonymous, order readers without the capture
