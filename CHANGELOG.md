@@ -44,6 +44,7 @@
 
 ## Breaking changes
 
+- `ImportHandler` requires its `ArchiveInspector` (fourth constructor argument, no default any more), `MailerFactory` its `TransportInterface` (fourth argument), and `BackgroundJobsMonitor` its heavy transport, `ConfiguredQueues` and event dispatcher. A module that builds or extends one of them passes them. `DataTransferJobMessage` gains `describe()`, the name the failed jobs screen gives the job.
 - The core requires `doctrine/dbal ^4.2` (the queue in the shop database goes through it): a project or a module held on DBAL 3 must move to DBAL 4.
 - The back-office theme now needs this core: its `composer.json` requires `thelia/core ^3.3`. Update both together.
 - `ExportHandler::export()`, `ImportHandler::import()` and `ImportHandler::validateUpload()` take a new optional last argument (the progress callback, the uploaded file): a module that overrides them must declare it. `processExport()` and `processImport()` keep their signature. `ImportHandler::import()` extracts an archive through a private method now, so an override of `extractArchive()` is no longer called by it.
