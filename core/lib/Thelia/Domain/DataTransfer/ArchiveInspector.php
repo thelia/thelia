@@ -59,7 +59,7 @@ final readonly class ArchiveInspector
         $count = 0;
         $bytes = 0;
 
-        foreach ($entries as [$name, $size, $isLink]) {
+        foreach ($entries as [$names, $size, $isLink]) {
             if (++$count > $this->maxEntries) {
                 throw new UploadRefusedException(Translator::getInstance()->trans('The archive holds more than %count files.', ['%count' => $this->maxEntries]));
             }
@@ -69,10 +69,15 @@ final readonly class ArchiveInspector
                 throw self::tooLarge($this->maxExtractedBytes);
             }
 
-            if ($isLink || str_starts_with($name, '/') || \in_array('..', explode('/', str_replace('\\', '/', $name)), true)) {
+            if ($isLink || array_filter($names, self::leavesItsFolder(...)) !== []) {
                 throw new UploadRefusedException(Translator::getInstance()->trans('The archive holds a file outside its own folder.'));
             }
         }
+    }
+
+    private static function leavesItsFolder(string $name): bool
+    {
+        return str_starts_with($name, '/') || \in_array('..', explode('/', str_replace('\\', '/', $name)), true);
     }
 
     /**
@@ -97,8 +102,8 @@ final readonly class ArchiveInspector
     }
 
     /**
-     * @return \Generator<int, array{string, int, bool}> the name, the extracted size and
-     *                                                   whether each entry is a link
+     * @return \Generator<int, array{list<string>, int, bool}> the names, the extracted size
+     *                                                         and whether each entry is a link
      */
     private static function zipEntries(string $path): \Generator
     {
@@ -120,7 +125,7 @@ final readonly class ArchiveInspector
                 $zip->getExternalAttributesIndex($index, $system, $attributes);
                 $isLink = \ZipArchive::OPSYS_UNIX === $system && self::UNIX_SYMBOLIC_LINK === (($attributes >> 16) & self::UNIX_FILE_TYPE);
 
-                yield [(string) $stat['name'], (int) $stat['size'], $isLink];
+                yield [[(string) $stat['name']], (int) $stat['size'], $isLink];
             }
         } finally {
             $zip->close();
@@ -160,8 +165,8 @@ final readonly class ArchiveInspector
      * Reads the headers of a tar, through its compression, one block at a time: the
      * archive is never held in memory, as PharData would hold it.
      *
-     * @return \Generator<int, array{string, int, bool}> the name, the extracted size and
-     *                                                   whether each entry is a link
+     * @return \Generator<int, array{list<string>, int, bool}> the names, the extracted size
+     *                                                         and whether each entry is a link
      */
     private static function tarEntries(string $path, string $extension): \Generator
     {
@@ -195,7 +200,7 @@ final readonly class ArchiveInspector
                 // read through too, so they count against the limits like any entry,
                 // told before their content is read.
                 if (\in_array($type, ['L', 'x', 'g'], true)) {
-                    yield ['', $size, false];
+                    yield [[], $size, false];
                 }
 
                 if ('L' === $type) {
@@ -210,13 +215,16 @@ final readonly class ArchiveInspector
                     continue;
                 }
 
-                $fullName = $longName ?? ('' === $prefix ? $name : $prefix.'/'.$name);
+                // An extractor that reads only the header block writes the entry under its
+                // ustar name, one that reads the records under the long name: both are
+                // checked, whichever is written.
+                $names = array_values(array_unique(array_filter([$longName, '' === $prefix ? $name : $prefix.'/'.$name], static fn (?string $candidate): bool => null !== $candidate && '' !== $candidate)));
                 $longName = null;
 
                 // Told before its content is read: an entry over the limits stops the
                 // reading there. Directories hold nothing; links point elsewhere.
                 if ('5' !== $type) {
-                    yield [$fullName, $size, '1' === $type || '2' === $type];
+                    yield [$names, $size, '1' === $type || '2' === $type];
                 }
 
                 self::skipOrRead($stream, $size, false);

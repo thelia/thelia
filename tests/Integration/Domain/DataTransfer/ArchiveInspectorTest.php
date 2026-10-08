@@ -194,6 +194,22 @@ final class ArchiveInspectorTest extends IntegrationTestCase
     }
 
     /**
+     * A pax record names the entry for an extractor that reads it, the header block for
+     * one that does not: a harmless name in one cannot cover the other.
+     */
+    public function testTheHeaderNameOfAnEntryIsCheckedBesideItsPaxName(): void
+    {
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => self::paxRecord('path', 'stock.csv')], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['../../public/stock.php' => 'a']));
+        $path = $this->directory.'/pax-header.tar';
+        file_put_contents($path, substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    /**
      * A name is read whole or not at all: a header record past what is read of it would
      * hide the name it ends with.
      */
