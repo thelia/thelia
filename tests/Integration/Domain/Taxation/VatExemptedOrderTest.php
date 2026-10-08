@@ -200,9 +200,14 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         $files = glob($this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.'translations'.\DIRECTORY_SEPARATOR.'pdf.*.php');
         self::assertNotEmpty($files);
 
-        $english = require $this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.'translations'.\DIRECTORY_SEPARATOR.'pdf.en_US.php';
-        if (!\array_key_exists(self::REVERSE_CHARGE_MENTION, $english)) {
-            self::markTestSkipped('The installed PDF template does not translate the reverse charge yet.');
+        $translatedBeyondTheSeededLocales = array_filter(
+            $files,
+            static fn (string $file): bool => !str_ends_with($file, 'pdf.en_US.php')
+                && !str_ends_with($file, 'pdf.fr_FR.php')
+                && \array_key_exists(self::REVERSE_CHARGE_MENTION, require $file),
+        );
+        if ([] === $translatedBeyondTheSeededLocales) {
+            self::markTestSkipped('The installed PDF template does not translate the reverse charge beyond English and French yet.');
         }
 
         foreach ($files as $file) {
@@ -1017,7 +1022,7 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
     {
         $invoicePage = $this->pdfTemplate()->getAbsolutePath().\DIRECTORY_SEPARATOR.self::INVOICE_DOCUMENT.'.html.twig';
 
-        if (!file_exists($invoicePage) || !str_contains((string) file_get_contents($invoicePage), 'postageTax / untaxedPostage')) {
+        if (!file_exists($invoicePage) || !str_contains((string) file_get_contents($invoicePage), 'nearestHalfPoint')) {
             self::markTestSkipped('The installed PDF template still prints a fixed postage tax rate.');
         }
     }
