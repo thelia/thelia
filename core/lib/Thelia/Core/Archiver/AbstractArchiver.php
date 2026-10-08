@@ -50,11 +50,13 @@ abstract class AbstractArchiver implements ArchiverInterface
 
     public function add(string $path, ?string $pathInArchive = null): self
     {
-        $path = realpath($path);
+        $resolved = realpath($path);
 
-        if (!file_exists($path)) {
+        if (false === $resolved || !file_exists($resolved)) {
             throw new \RuntimeException('File '.$path." doesn't exists");
         }
+
+        $path = $resolved;
 
         if (null === $pathInArchive) {
             $pathInArchive = basename($path);
