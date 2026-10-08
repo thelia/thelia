@@ -183,6 +183,31 @@ forcing a status transition already is.
 - The capture amount is checked in the service, against the journal, not in
   the screen.
 
+## Admin API
+
+Three operations, none of them on the front API — a customer sees whether the
+order is paid, which the order already exposes:
+
+- `GET /api/admin/orders/{orderId}/payment_transactions` — the journal, latest
+  first, twenty per page (`Thelia\Api\Resource\OrderPaymentTransaction`, read
+  only, `admin.order` right).
+- `GET /api/admin/orders/{orderId}/payment` — the totals and whether the module
+  `supportsCapture` (`OrderPaymentSummary`, `admin.order` right).
+- `POST /api/admin/orders/{orderId}/capture` with `{"amount": 50}` or `{}` —
+  the capture, answered 201 with the journal line
+  (`OrderPaymentCapture`, mapped to the `admin.order.payment-capture` right
+  with create access). The processor goes through `ORDER_PAYMENT_CAPTURE`, so a
+  module listening to the event sees the back office and the API alike. A
+  `PaymentException` is a 422; the same explicit amount asked again on the
+  order within a minute, after a capture that did not fail, is a 409 rather
+  than a second capture — the client that retried a timed-out call reads the
+  journal instead. The global admin API rate limit applies on top.
+
+An administrator authenticated by a JWT holds no back-office session:
+`OrderHistoryActorResolver` reads the Symfony security token when the session
+has no admin, so the line is the administrator's, for the payment journal and
+the order history alike.
+
 ## Installation and update
 
 A fresh install creates the table and seeds the status and the right
@@ -210,3 +235,7 @@ render an empty one without error.
   authorization puts the order on hold, the capture from the back office pays
   it, a partial capture leaves the rest, a provider refusal leaves it unpaid,
   an amount above the authorization is refused before the module is called.
+- `tests/Api/Admin/OrderPaymentApiTest.php` — the three admin operations:
+  shape of a line, scope, the totals, the capture and its refusals, the repeat
+  guard, and who is refused (anonymous, order readers without the capture
+  right, the capture right alone).

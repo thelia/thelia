@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Service;
 
+use Symfony\Bundle\SecurityBundle\Security;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Order\DTO\OrderHistoryActor;
@@ -38,14 +39,27 @@ use Thelia\Model\Customer;
  */
 final readonly class OrderHistoryActorResolver
 {
+    /**
+     * The Symfony security token is where an administrator authenticated on the admin
+     * API by a JWT is found: that administrator holds no back-office session. Optional
+     * so that the resolver still works where the security bundle is not wired.
+     */
     public function __construct(
         private SecurityContext $securityContext,
+        private ?Security $security = null,
     ) {
     }
 
     public function resolve(?string $moduleCode = null): OrderHistoryActor
     {
         $adminUser = $this->securityContext->getAdminUser();
+
+        if (!$adminUser instanceof UserInterface) {
+            // Only an administrator: a customer holding a front API token is the
+            // customer, and is looked at below, after a module that names itself.
+            $tokenUser = $this->security?->getUser();
+            $adminUser = $tokenUser instanceof Admin ? $tokenUser : null;
+        }
 
         if ($adminUser instanceof UserInterface) {
             return new OrderHistoryActor(
