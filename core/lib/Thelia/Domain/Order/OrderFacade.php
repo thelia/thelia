@@ -355,7 +355,9 @@ readonly class OrderFacade
             return null;
         }
 
-        return $liveOrder->isPaid(false) || $liveOrder->isRefunded(false) ? null : $liveOrder;
+        // An authorized order is not waiting for a payment either: handing it back would
+        // present it to its module again, or cancel it, and reserve the amount twice.
+        return $liveOrder->isPaymentSecured() ? null : $liveOrder;
     }
 
     /**

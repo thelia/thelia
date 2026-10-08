@@ -23,6 +23,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
@@ -490,6 +491,31 @@ class Order extends BaseOrder
     public function isPaid(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isPaid($exact);
+    }
+
+    /**
+     * Whether the buyer has done what paying asks of them: the order is paid or refunded,
+     * or its payment is authorized and only waits for the merchant's capture.
+     *
+     * An order on hold for capture answers false to isPaid() — its status stands for
+     * "not paid" so that nothing ships and nothing is invoiced — yet the amount is
+     * reserved on the buyer's card. The checkout reads this, not isPaid(): an authorized
+     * order presented again to its module, or cancelled to place a new one, would reserve
+     * the amount a second time.
+     */
+    public function isPaymentSecured(): bool
+    {
+        if ($this->isPaid(false) || $this->isRefunded(false)) {
+            return true;
+        }
+
+        if (OrderStatus::CODE_AWAITING_CAPTURE === $this->getOrderStatus()->getCode()) {
+            return true;
+        }
+
+        $totals = (new PaymentTransactionTotalsReader())->forOrder((int) $this->getId());
+
+        return $totals->hasSomethingLeftToCapture() || $totals->hasPendingCapture();
     }
 
     /**
