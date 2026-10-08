@@ -16020,18 +16020,22 @@ breadcrumb of the theme read "Your cart", so that is what the cart step is calle
 A shop that upgrades has to read exactly what it read yesterday.
 */
 INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'de_DE', 'Ihr Warenkorb'),
     (1, 'en_US', 'Your cart'),
     (1, 'es_ES', 'Tu carrito'),
     (1, 'fr_FR', 'Votre panier'),
     (1, 'it_IT', 'Il tuo carrello'),
+    (2, 'de_DE', 'Lieferung'),
     (2, 'en_US', 'Delivery'),
     (2, 'es_ES', 'Envío'),
     (2, 'fr_FR', 'Livraison'),
     (2, 'it_IT', 'Consegna'),
+    (3, 'de_DE', 'Zahlung'),
     (3, 'en_US', 'Payment'),
     (3, 'es_ES', 'Pago'),
     (3, 'fr_FR', 'Paiement'),
     (3, 'it_IT', 'Pagamento'),
+    (4, 'de_DE', 'Bestätigung'),
     (4, 'en_US', 'Confirmation'),
     (4, 'es_ES', 'Confirmación'),
     (4, 'fr_FR', 'Confirmation'),
