@@ -21,6 +21,8 @@ use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Cache;
@@ -207,6 +209,23 @@ final class CacheTest extends TestCase
             ->cacheClear(new CacheEvent($this->clearedDir.'/', false));
 
         self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+    }
+
+    /**
+     * A worker ends no command between two jobs: a clear a job asked for runs once
+     * that job is over, not when the worker exits.
+     */
+    public function testAClearAJobAskedForRunsOnceTheJobIsOver(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+
+        $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+        self::assertDirectoryExists($this->clearedDir);
+
+        $dispatcher->dispatch(new WorkerMessageHandledEvent(new Envelope(new \stdClass()), 'async'));
+
+        self::assertDirectoryDoesNotExist($this->clearedDir);
     }
 
     private function action(): Cache

@@ -19,6 +19,8 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Messenger\WorkerRestartSignal;
@@ -119,6 +121,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
             ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            // A worker ends no command between two jobs: a clear a job asked for runs
+            // once that job is over, not when the worker exits.
+            WorkerMessageHandledEvent::class => ['onTerminate', self::TERMINATE_PRIORITY],
+            WorkerMessageFailedEvent::class => ['onTerminate', self::TERMINATE_PRIORITY],
         ];
     }
 }
