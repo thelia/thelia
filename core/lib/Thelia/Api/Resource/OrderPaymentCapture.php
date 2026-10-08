@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Positive;
 use Thelia\Api\State\Processor\OrderPaymentCaptureProcessor;
 
@@ -44,8 +45,9 @@ use Thelia\Api\State\Processor\OrderPaymentCaptureProcessor;
                     '201' => new OpenApiResponse(description: 'The journal line of the capture, succeeded, failed with the provider\'s code and message, or pending when the provider answers later.'),
                     '403' => new OpenApiResponse(description: 'The administrator does not hold the payment capture right.'),
                     '404' => new OpenApiResponse(description: 'No such order.'),
-                    '409' => new OpenApiResponse(description: 'The same amount was captured on this order a moment ago: a repeated call, not a second capture.'),
-                    '422' => new OpenApiResponse(description: 'The module takes the price at once, nothing is left to capture, or the amount is not positive or exceeds what the authorization holds.'),
+                    '409' => new OpenApiResponse(description: 'The same amount was captured on this order within the last minute, or another capture of the order is being written: a repeated call, not a second capture.'),
+                    '422' => new OpenApiResponse(description: 'The module takes the price at once, nothing is left to capture (a capture waiting for the provider\'s answer counts as taken), the amount is not positive, has more decimals than the currency, or exceeds what the authorization holds, or the provider refused.'),
+                    '502' => new OpenApiResponse(description: 'The payment module could not get an answer from the provider: the capture stays pending in the journal until the provider confirms it.'),
                 ],
             ),
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE]],
@@ -66,6 +68,7 @@ final class OrderPaymentCapture
         example: 50.0,
     )]
     #[Positive(groups: [self::GROUP_ADMIN_WRITE])]
+    #[LessThanOrEqual(value: 9999999999.99, groups: [self::GROUP_ADMIN_WRITE])]
     #[Groups([self::GROUP_ADMIN_WRITE])]
     public ?float $amount = null;
 }

@@ -39,6 +39,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     /** @var list<array{order: int, amount: float, transaction: int}> */
     public static array $captureCalls = [];
 
+    /** @var list<int> ids of the orders whose authorization was released */
+    public static array $voidCalls = [];
+
     private static int $referenceCounter = 0;
 
     public static function reset(): void
@@ -46,6 +49,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$deferredCapture = true;
         self::$nextCaptureAnswer = null;
         self::$captureCalls = [];
+        self::$voidCalls = [];
         self::$referenceCounter = 0;
     }
 
@@ -80,6 +84,8 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function voidAuthorization(Order $order, OrderPaymentTransaction $transaction): PaymentOperationResult
     {
+        self::$voidCalls[] = (int) $order->getId();
+
         return PaymentOperationResult::succeeded('VOID-'.++self::$referenceCounter);
     }
 }

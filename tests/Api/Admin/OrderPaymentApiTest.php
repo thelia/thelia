@@ -197,6 +197,42 @@ final class OrderPaymentApiTest extends ApiTestCase
         self::assertSame('90.000000', $this->summaryOf($order)['remainingToCapture']);
     }
 
+    public function testAskingForTheRemainderAgainWhileTheFirstCaptureIsPendingTakesNothingMore(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ASYNC');
+
+        $first = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsAdmin());
+        $retry = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsAdmin());
+
+        self::assertSame(Response::HTTP_CREATED, $first->getStatusCode());
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $retry->getStatusCode());
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testAnAmountBeyondWhatTheJournalCanHoldIsRefused(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+
+        $response = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => 18446744073714.553], token: $this->authenticateAsAdmin());
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testACustomerTokenCannotCapture(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $factory->order($customer, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-C', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $response = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsCustomer($customer));
+
+        self::assertContains($response->getStatusCode(), [Response::HTTP_UNAUTHORIZED, Response::HTTP_FORBIDDEN]);
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+    }
+
     public function testAnUnknownOrderIsNotFound(): void
     {
         $token = $this->authenticateAsAdmin();
