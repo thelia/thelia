@@ -21,6 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Messenger\WorkerRestartSignal;
 
 /**
  * Class Cache.
@@ -47,6 +48,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
     public function __construct(
         protected AdapterInterface $adapter,
         protected string $environment,
+        protected ?WorkerRestartSignal $workerRestartSignal = null,
     ) {
     }
 
@@ -91,6 +93,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
         $fs->remove($event->getDir());
+
+        // Only once the directory is gone: a worker started again before would boot
+        // on the container being deleted.
+        $this->workerRestartSignal?->send();
 
         if (!$event->invalidatesPropelSchema()) {
             return;
