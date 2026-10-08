@@ -33,4 +33,7 @@ return [
     'Newness' => 'Novinka',
     'Your order {{ order_ref }} has been shipped' => 'Vaše objednávka {{ order_ref }} byla odeslána',
     'Partially shipped' => 'Částečně odesláno',
+    'Availability' => 'Dostupnost',
+    'Customer rating' => 'Hodnocení zákazníků',
+    'Price' => 'Cena',
 ];
