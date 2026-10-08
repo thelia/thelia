@@ -173,9 +173,20 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
 
     public function testAProjectCanLetAClassThrough(): void
     {
-        (new AllowedClassesSerializer($this->inner, [RunCommandMessage::class], []))->decode($this->encoded(RunCommandMessage::class));
+        (new AllowedClassesSerializer($this->inner, [ProbeMessage::class], []))->decode($this->encoded(ProbeMessage::class));
 
         self::assertSame(1, $this->inner->decoded);
+    }
+
+    /**
+     * Listed or not: a message that runs a command on the server is never built from a
+     * queue, or whoever writes to the queue runs anything.
+     */
+    public function testAMessageThatRunsACommandIsNeverBuiltEvenWhenListed(): void
+    {
+        (new AllowedClassesSerializer($this->inner, [RunCommandMessage::class], []))->decode($this->encoded(RunCommandMessage::class));
+
+        $this->assertReadAsUndecodable(RunCommandMessage::class);
     }
 
     /**
@@ -237,6 +248,24 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         }
 
         self::assertInstanceOf(UndecodableJob::class, $message);
+    }
+
+    /**
+     * A part built from a path looks at that path at once, and a folder or an unreadable
+     * file would refuse to be built: the reason kept with the job would then tell
+     * whether the path exists. The file is told from the JSON, before any part is built.
+     */
+    public function testAFileNamedInAQueuedMailIsToldBeforeAnyPartIsBuilt(): void
+    {
+        $serializer = $this->getService(AllowedClassesSerializer::class);
+        $encoded = $serializer->encode(new Envelope(new SendEmailMessage((new Email())->from('shop@example.com')->to('buyer@example.com')->subject('Order')->attach('PLACEHOLDER', 'invoice.txt', 'text/plain'))));
+        $forged = str_replace('"body":"PLACEHOLDER"', '"body":'.json_encode(['path' => sys_get_temp_dir(), 'contentType' => 'text/plain', 'size' => null, 'filename' => 'invoice.txt'], \JSON_THROW_ON_ERROR), $encoded['body'], $replaced);
+        self::assertSame(1, $replaced);
+
+        $message = $serializer->decode(['body' => $forged, 'headers' => $encoded['headers']])->getMessage();
+
+        self::assertInstanceOf(UndecodableJob::class, $message);
+        self::assertStringContainsString('names no file of the server', $message->reason);
     }
 
     /**
