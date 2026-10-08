@@ -38,6 +38,15 @@ class Currency extends BaseCurrency
         return self::$defaultCurrency;
     }
 
+    /**
+     * Forget the default currency read once: a worker would otherwise keep the one it
+     * read first after another one became the default.
+     */
+    public static function resetDefaultCurrencyCache(): void
+    {
+        self::$defaultCurrency = null;
+    }
+
     public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
