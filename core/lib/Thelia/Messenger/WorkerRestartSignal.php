@@ -34,10 +34,25 @@ final readonly class WorkerRestartSignal
     public function __construct(
         #[Autowire(service: 'cache.messenger.restart_workers_signal')]
         private CacheItemPoolInterface $pool,
+        #[Autowire(param: 'kernel.cache_dir')]
+        private string $containerCacheDir,
     ) {
     }
 
-    public function send(): void
+    /**
+     * Sent when the cleared directory holds the container the workers run on: a clear of
+     * the image or document cache leaves them alone.
+     */
+    public function sendIfItHeldTheContainer(string $clearedDir): void
+    {
+        $cleared = rtrim($clearedDir, '/\\').\DIRECTORY_SEPARATOR;
+
+        if (str_starts_with(rtrim($this->containerCacheDir, '/\\').\DIRECTORY_SEPARATOR, $cleared)) {
+            $this->send();
+        }
+    }
+
+    private function send(): void
     {
         // The cache is cleared already: a signal that cannot be written leaves the
         // workers to their time limit, it does not undo the clear.

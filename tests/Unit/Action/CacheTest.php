@@ -151,7 +151,7 @@ final class CacheTest extends TestCase
             }
         };
 
-        (new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals)))
+        (new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals, $this->clearedDir)))
             ->cacheClear(new CacheEvent($this->clearedDir, false));
 
         self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
@@ -161,12 +161,51 @@ final class CacheTest extends TestCase
     public function testADeferredClearAsksTheWorkersToRestartOnlyWhenItRuns(): void
     {
         $signals = new ArrayAdapter();
-        $action = new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals));
+        $action = new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals, $this->clearedDir));
 
         $action->cacheClear(new CacheEvent($this->clearedDir, true));
         self::assertFalse($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
 
         $action->onTerminate();
+        self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+    }
+
+    public function testADeferredClearRunsOnceInAProcessThatEndsSeveralCommands(): void
+    {
+        $signals = new ArrayAdapter();
+        $action = new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals, $this->clearedDir));
+
+        $action->cacheClear(new CacheEvent($this->clearedDir, true));
+        $action->onTerminate();
+        $signals->clear();
+
+        // The next command a worker runs ends too.
+        $action->onTerminate();
+
+        self::assertFalse($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+    }
+
+    /**
+     * The image and document caches hold nothing a worker runs on.
+     */
+    public function testAClearOfAnotherCacheLeavesTheWorkersAlone(): void
+    {
+        $signals = new ArrayAdapter();
+        $containerDir = $this->clearedDir.'-container';
+
+        (new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals, $containerDir)))
+            ->cacheClear(new CacheEvent($this->clearedDir, false));
+
+        self::assertFalse($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
+    }
+
+    public function testAClearOfTheDirectoryAboveTheContainerAsksTheWorkersToRestart(): void
+    {
+        $signals = new ArrayAdapter();
+
+        (new Cache(new NullAdapter(), self::ENVIRONMENT, new WorkerRestartSignal($signals, $this->clearedDir.'/dev')))
+            ->cacheClear(new CacheEvent($this->clearedDir.'/', false));
+
         self::assertTrue($signals->hasItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY));
     }
 
