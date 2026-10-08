@@ -1,0 +1,85 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Tests\Support\Payment;
+
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentTransaction;
+use Thelia\Module\AbstractPaymentModule;
+use Thelia\Module\PaymentModuleWithCaptureInterface;
+
+/**
+ * A payment module that reserves the amount first and takes it later, the way a
+ * card provider with a capture delay does, with the provider played by static state
+ * the test sets before calling.
+ *
+ * Registered under a `module` row by the tests that need it; the core instantiates it
+ * from that row's namespace, so it needs no container.
+ */
+final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleWithCaptureInterface
+{
+    public static bool $deferredCapture = true;
+
+    /** @var PaymentOperationResult|\Throwable|null what the next capture answers, or throws */
+    public static PaymentOperationResult|\Throwable|null $nextCaptureAnswer = null;
+
+    /** @var list<array{order: int, amount: float, transaction: int}> */
+    public static array $captureCalls = [];
+
+    private static int $referenceCounter = 0;
+
+    public static function reset(): void
+    {
+        self::$deferredCapture = true;
+        self::$nextCaptureAnswer = null;
+        self::$captureCalls = [];
+        self::$referenceCounter = 0;
+    }
+
+    public function pay(Order $order): ?Response
+    {
+        return null;
+    }
+
+    public function isValidPayment(): bool
+    {
+        return true;
+    }
+
+    public function supportsDeferredCapture(): bool
+    {
+        return self::$deferredCapture;
+    }
+
+    public function capture(Order $order, float $amount, OrderPaymentTransaction $transaction): PaymentOperationResult
+    {
+        self::$captureCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId()];
+
+        $answer = self::$nextCaptureAnswer;
+        self::$nextCaptureAnswer = null;
+
+        if ($answer instanceof \Throwable) {
+            throw $answer;
+        }
+
+        return $answer ?? PaymentOperationResult::succeeded('CAP-'.++self::$referenceCounter);
+    }
+
+    public function voidAuthorization(Order $order, OrderPaymentTransaction $transaction): PaymentOperationResult
+    {
+        return PaymentOperationResult::succeeded('VOID-'.++self::$referenceCounter);
+    }
+}

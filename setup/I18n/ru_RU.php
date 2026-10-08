@@ -1047,6 +1047,8 @@ return [
     'Order failed - at the bottom' => 'Ошибка заказа - внизу',
     'Order failed - at the top' => 'Ошибка заказа - вверху',
     'Order status transition override' => 'Принудительное изменение статуса заказа',
+    'Order payment capture' => 'Списание оплаты заказа',
+    'Awaiting capture' => 'Ожидает списания',
     'Orders - JavaScript' => 'Заказы - JavaScript',
     'Orders - at the top' => 'Заказы - вверху',
     'Orders - bottom' => 'Заказы - внизу',
