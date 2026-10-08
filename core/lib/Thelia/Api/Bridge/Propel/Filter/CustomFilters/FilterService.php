@@ -19,14 +19,19 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\AvailabilityFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\BrandFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\CategoryFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggregatedFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaChoiceFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaOptionalFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\NewnessFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PriceFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PromoFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\RatingFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\DeltaType;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
@@ -83,6 +88,29 @@ readonly class FilterService
         }
 
         return $filters;
+    }
+
+    /**
+     * The names of the filters of a resource that are withheld for want of the data they read,
+     * for instance the rating filter on a shop without any review module. The back-office
+     * screen of the facets hides their rows: a facet that can never show is not one to arrange.
+     *
+     * @return list<string>
+     */
+    public function withheldFilterNames(string $resourceType): array
+    {
+        $names = [];
+
+        foreach ($this->filters as $filter) {
+            if ($filter instanceof TheliaOptionalFilterInterface
+                && !$filter->isOffered()
+                && \in_array($resourceType, $filter->getResourceType(), true)
+            ) {
+                $names = [...$names, ...$filter::getFilterName()];
+            }
+        }
+
+        return array_values(array_unique($names));
     }
 
     public function filterTFilterWithRequest($request, ?ModelCriteria $query = null): iterable
@@ -701,9 +729,20 @@ readonly class FilterService
         if ($filter instanceof NewnessFilter) {
             $mainTitle = $this->translator->trans(id: 'Newness', locale: $locale);
         }
+        if ($filter instanceof AvailabilityFilter) {
+            $mainTitle = $this->translator->trans(id: 'Availability', locale: $locale);
+        }
+        if ($filter instanceof RatingFilter) {
+            $mainTitle = $this->translator->trans(id: 'Customer rating', locale: $locale);
+        }
+        if ($filter instanceof PriceFilter) {
+            $mainTitle = $this->translator->trans(id: 'Price', locale: $locale);
+        }
         $position = null;
         $isVisible = true;
-        $fieldType = CheckboxType::getName();
+        // The price facet offers the two bounds of a slider: as a list of checkboxes they
+        // would read as two prices to pick from.
+        $fieldType = $filter instanceof PriceFilter ? DeltaType::getName() : CheckboxType::getName();
         if ($choiceFilter) {
             $position = $choiceFilter->getPosition();
             // A row carried over from Thelia 2 has no display type: that version had no such
