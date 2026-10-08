@@ -54,13 +54,58 @@ class OrderPaymentTransactionQuery extends BaseOrderPaymentTransactionQuery
             ->findOne($con);
     }
 
-    public function hasSucceededCapture(int $orderId, ?ConnectionInterface $con = null): bool
+    /**
+     * Whether the journal holds, for one of these movements, a line that happened or may
+     * have happened — succeeded or still pending.
+     *
+     * @param list<PaymentTransactionType> $types
+     */
+    public function holdsMovement(int $orderId, array $types, ?ConnectionInterface $con = null): bool
+    {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->filterByType(array_map(static fn (PaymentTransactionType $type): string => $type->value, $types), Criteria::IN)
+            ->filterByState([PaymentTransactionState::SUCCEEDED->value, PaymentTransactionState::PENDING->value], Criteria::IN)
+            ->exists($con);
+    }
+
+    /**
+     * The line without a provider reference written since $since for this movement, with
+     * this outcome and this amount: the same report arriving again.
+     */
+    public function findRecentWithoutReference(
+        int $orderId,
+        PaymentTransactionType $type,
+        PaymentTransactionState $state,
+        string $amount,
+        \DateTimeInterface $since,
+        ?ConnectionInterface $con = null,
+    ): ?OrderPaymentTransaction {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->filterByTypeEnum($type)
+            ->filterByState($state->value)
+            ->filterByPspReference(null, Criteria::ISNULL)
+            ->filterByAmount($amount)
+            ->filterByCreatedAt($since, Criteria::GREATER_EQUAL)
+            ->orderById(Criteria::DESC)
+            ->findOne($con);
+    }
+
+    /**
+     * The capture of this amount asked since $since that did not fail: a repeated click
+     * or a retried call is answered with it rather than sent to the provider again.
+     */
+    public function findRecentCaptureOf(int $orderId, string $amount, \DateTimeInterface $since, ?ConnectionInterface $con = null): ?OrderPaymentTransaction
     {
         return self::create()
             ->filterByOrderId($orderId)
             ->filterByTypeEnum(PaymentTransactionType::CAPTURE)
-            ->filterSucceeded()
-            ->exists($con);
+            ->filterByState([PaymentTransactionState::SUCCEEDED->value, PaymentTransactionState::PENDING->value], Criteria::IN)
+            ->filterByAmount($amount)
+            ->filterByCreatedAt($since, Criteria::GREATER_EQUAL)
+            ->orderById(Criteria::DESC)
+            ->findOne($con);
     }
 
     /**
