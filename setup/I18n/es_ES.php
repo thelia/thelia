@@ -1153,4 +1153,7 @@ return [
     'Shipping notice sent to the customer' => 'Aviso de envío enviado al cliente',
     'Your order {{ order_ref }} has been shipped' => 'Tu pedido {{ order_ref }} ha sido enviado',
     'Partially shipped' => 'Enviado parcialmente',
+    'Availability' => 'Disponibilidad',
+    'Customer rating' => 'Valoración de clientes',
+    'Price' => 'Precio',
 ];
