@@ -10,7 +10,7 @@
 
 ## Behaviour changes
 
-- An import is one transaction: a row that cannot be saved cancels the whole import, which says which row, instead of leaving the catalog half imported.
+- An import is one transaction. A row its rules refuse (an unknown combination, a value that is not a number) is reported and the import goes on, as before; a row the database cannot save cancels the whole import, which says which row, instead of leaving the catalog half imported.
 - An uploaded file is checked by its content as well as its name (a file that is not text, or not an archive of its kind, is refused), and an archive is refused when it holds more than 1000 files, more than 512 MB once extracted, a link, or a name outside its folder (`Thelia\Domain\DataTransfer\ArchiveInspector`).
 - The new `admin.configuration.background-jobs` resource (Configuration > Background jobs) is given to no existing profile: only super administrators see the screen until a profile is granted it.
 - `maintenance:purge` also deletes the failed jobs older than 30 days, as `thelia:messenger:purge-failed` does.

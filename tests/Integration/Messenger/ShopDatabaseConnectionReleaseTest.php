@@ -42,10 +42,6 @@ final class ShopDatabaseConnectionReleaseTest extends IntegrationTestCase
     }
 
     /**
-     * Dispatched for real, the failure would go on to the retry and failure listeners:
-     * the listener is checked to be there, then called.
-     */
-    /**
      * A failed job sent back for a retry goes through a connection opened afresh: the
      * connection is let go before Messenger sends it back.
      */
@@ -67,6 +63,10 @@ final class ShopDatabaseConnectionReleaseTest extends IntegrationTestCase
         self::assertLessThan($positionOf(SendFailedMessageForRetryListener::class), $positionOf(ShopDatabaseConnectionReleaseListener::class));
     }
 
+    /**
+     * Dispatched for real, the failure would go on to the retry and failure listeners:
+     * the listener is checked to be there, then called.
+     */
     public function testTheQueueConnectionIsLetGoOnceAJobHasFailed(): void
     {
         $listener = $this->getService(ShopDatabaseConnectionReleaseListener::class);
