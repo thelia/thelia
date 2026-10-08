@@ -38,6 +38,13 @@ final readonly class DataTransferJobPurger
 {
     public const JOB_RETENTION_DAYS = 7;
 
+    /**
+     * A failed job ages from the day it was set aside, its row and its file from the
+     * day it was asked for: set aside late (twelve hours of looking again, a long
+     * import), it would be replayable a little longer than its row and file exist.
+     */
+    public const REPLAY_MARGIN_DAYS = 1;
+
     public function __construct(
         private ImportStorage $storage,
     ) {
@@ -48,7 +55,7 @@ final readonly class DataTransferJobPurger
      */
     public function purgeExportJobs(bool $dryRun = false): int
     {
-        $query = ExportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS);
+        $query = ExportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS + self::REPLAY_MARGIN_DAYS);
 
         return $dryRun ? $query->count() : $query->delete();
     }
@@ -59,14 +66,14 @@ final readonly class DataTransferJobPurger
     public function purgeImportJobs(bool $dryRun = false): int
     {
         if ($dryRun) {
-            return ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS)->count();
+            return ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS + self::REPLAY_MARGIN_DAYS)->count();
         }
 
         $deleted = 0;
 
         // By batches: a shop that never purged may hold years of jobs.
         do {
-            $jobs = ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS)->limit(500)->find();
+            $jobs = ImportJobQuery::create()->filterExpired(self::JOB_RETENTION_DAYS, FailedMessagePurger::RETENTION_DAYS + self::REPLAY_MARGIN_DAYS)->limit(500)->find();
 
             foreach ($jobs as $job) {
                 // An import that never ran still holds the file it was given. The path
@@ -96,7 +103,7 @@ final readonly class DataTransferJobPurger
         }
 
         $files = iterator_to_array(
-            (new Finder())->files()->in($directory)->ignoreDotFiles(false)->date(\sprintf('before %d days ago', FailedMessagePurger::RETENTION_DAYS)),
+            (new Finder())->files()->in($directory)->ignoreDotFiles(false)->date(\sprintf('before %d days ago', FailedMessagePurger::RETENTION_DAYS + self::REPLAY_MARGIN_DAYS)),
             false,
         );
 
