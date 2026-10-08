@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Messenger\FailedMessagePurger;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
