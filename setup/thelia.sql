@@ -2213,6 +2213,64 @@ CREATE TABLE `order_history`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_payment_transaction
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_payment_transaction`;
+
+CREATE TABLE `order_payment_transaction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `type` VARCHAR(20) NOT NULL COMMENT 'the movement: authorization, capture, refund or void',
+    `state` VARCHAR(20) NOT NULL COMMENT 'the outcome: pending, succeeded or failed',
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the amount moved, in the currency of the line',
+    `currency_id` INTEGER NOT NULL,
+    `psp_reference` VARCHAR(100) COMMENT 'the reference the payment provider gave this movement, as it gave it',
+    `parent_id` INTEGER COMMENT 'the authorization a capture or a void applies to',
+    `payment_module_id` INTEGER COMMENT 'the payment module behind the movement, NULL once that module is gone',
+    `actor_type` VARCHAR(20) NOT NULL COMMENT 'which kind of author acted: admin, module or system',
+    `actor_label` VARCHAR(255) COMMENT 'the author label snapshot (admin login, module code), kept when the author is deleted',
+    `admin_id` INTEGER COMMENT 'the administrator who triggered the movement, NULL once that admin is gone',
+    `error_code` VARCHAR(50) COMMENT 'the error code the provider answered, when the movement failed',
+    `error_message` TEXT COMMENT 'the error message the provider answered, kept for the back office, never for the customer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_payment_transaction_reference_UNIQUE` (`order_id`, `type`, `psp_reference`),
+    INDEX `idx_order_payment_transaction_order_id` (`order_id`),
+    INDEX `fi_order_payment_transaction_currency_id` (`currency_id`),
+    INDEX `fi_order_payment_transaction_parent_id` (`parent_id`),
+    INDEX `fi_order_payment_transaction_payment_module_id` (`payment_module_id`),
+    INDEX `fi_order_payment_transaction_admin_id` (`admin_id`),
+    CONSTRAINT `fk_order_payment_transaction_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_payment_transaction_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_payment_transaction_parent_id`
+        FOREIGN KEY (`parent_id`)
+        REFERENCES `order_payment_transaction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_payment_transaction_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_payment_transaction_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- newsletter
 -- ---------------------------------------------------------------------
 
