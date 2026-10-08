@@ -188,8 +188,8 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             $replayable[$job->error] = $job->replayable;
         }
 
-        self::assertSame(false, $replayable['Unreadable'] ?? null);
-        self::assertSame(true, $replayable['SMTP down'] ?? null);
+        self::assertFalse($replayable['Unreadable'] ?? null);
+        self::assertTrue($replayable['SMTP down'] ?? null);
     }
 
     /**
