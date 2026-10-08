@@ -42,6 +42,9 @@ use Thelia\Model\ImportQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
+use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Core\Archiver\AbstractArchiver;
 
 /**
  * An import asked for in the back office is a job: its uploaded file is kept out of
@@ -332,6 +335,22 @@ final class ImportJobTest extends IntegrationTestCase
     }
 
     /**
+     * An import set aside before it was taken kept its row waiting: once its failure is
+     * deleted, the row says so instead of waiting for a worker until the purge.
+     */
+    public function testARemovedFailureOfAnImportStillWaitingMarksItsRow(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->stockImport(), $this->upload(3), 'stock.csv');
+        self::assertSame(JobStatus::QUEUED, $job->getJobStatus());
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunImportJob((int) $job->getId())));
+
+        $job->reload();
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(RemovedJobRowListener::DELETED, $job->getError());
+    }
+
+    /**
      * The monitor the back office uses tells the shop a failed job was deleted.
      */
     public function testTheMonitorOfTheBackOfficeTellsAFailedJobWasDeleted(): void
@@ -431,6 +450,8 @@ final class ImportJobTest extends IntegrationTestCase
 
             self::assertSame(23.0, $this->reloadedQuantity());
             self::assertSame(['stock.zip'], array_values(array_diff((array) scandir($directory), ['.', '..'])));
+            // The archiver is shared: a worker keeps no archive open between two jobs.
+            self::assertNull((new \ReflectionProperty(AbstractArchiver::class, 'archive'))->getValue($this->getService(ArchiverManager::class)->get('thelia.zip')));
         } finally {
             (new Filesystem())->remove($directory);
         }

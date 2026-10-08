@@ -77,6 +77,13 @@ class ZipArchiver extends AbstractArchiver
 
     public function close(): bool
     {
-        return $this->archive->close();
+        if (null === $this->archive) {
+            return true;
+        }
+
+        $closed = $this->archive->close();
+        $this->archive = null;
+
+        return $closed;
     }
 }

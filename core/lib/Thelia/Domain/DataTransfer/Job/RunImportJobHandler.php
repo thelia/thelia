@@ -19,13 +19,11 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Core\Event\ImportEvent;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
-use Thelia\Messenger\JobSetAsideException;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportJobQuery;
 use Thelia\Model\Map\ImportJobTableMap;
@@ -53,22 +51,9 @@ final readonly class RunImportJobHandler
 
     public function __invoke(RunImportJob $message): void
     {
-        // Reading the row and taking it may fail too (the database gone): what is set
-        // aside then says no more than any other failure.
-        try {
-            $job = ImportJobQuery::create()->findPk($message->importJobId);
-            $outcome = $job instanceof ImportJob ? $this->lifecycle->claimOrPostpone($job, $message) : null;
-        } catch (UnrecoverableMessageHandlingException $setAside) {
-            throw $setAside;
-        } catch (\Throwable $exception) {
-            $this->lifecycle->reject($message->describe(), $exception);
-        }
+        $job = $this->lifecycle->take($message, static fn (int $id): ?ImportJob => ImportJobQuery::create()->findPk($id));
 
         if (!$job instanceof ImportJob) {
-            throw new JobSetAsideException(\sprintf('Import job %d no longer exists.', $message->importJobId));
-        }
-
-        if (ClaimOutcome::Owned !== $outcome) {
             return;
         }
 
