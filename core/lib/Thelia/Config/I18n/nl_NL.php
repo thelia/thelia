@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 return [
+    '%stars% stars & up' => '%stars% sterren en meer',
     'A currency with code "%name" already exists.' => 'Een valuta met de code  "%name" bestaat al.',
     'A message with name "%name" already exists.' => 'Er bestaat al een bericht met de naam "%name".',
     'A product with reference %ref already exists. Please choose another reference.' => 'Er bestaat al een product met referentie %ref. Kies aub een andere referentie.',
@@ -27,10 +28,15 @@ return [
     'Address ID not found' => 'Adres ID niet gevonden',
     'All countries' => 'Alle landen',
     'All shipping methods' => 'Alle verzendmethoden',
+    'Availability' => 'Beschikbaarheid',
     'Back Office' => 'Backoffice',
+    'Customer rating' => 'Klantbeoordeling',
     'Error occured while processing order ref. %ref, ID %id: %err' => 'Error occured while processing order ref. %ref, ID %id: %err',
+    'In stock' => 'Op voorraad',
     'Message content: %message%' => 'Berichtinhoud: %message%',
     'Newness' => 'Nieuw',
+    'On order or out of stock' => 'Op bestelling of uitverkocht',
+    'Price' => 'Prijs',
     'Promotion' => 'Promotie',
     "Sender's e-mail address: %email%" => 'E-mailadres afzender: %email%',
     'Sender name: %name%' => 'Naam afzender: %name%',
