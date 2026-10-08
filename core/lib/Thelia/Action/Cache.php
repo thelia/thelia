@@ -82,7 +82,12 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
     public function onTerminate(): void
     {
-        foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
+        // A worker runs one command after another in the same process: a clear is done
+        // once, not again at the end of every command that follows.
+        $cacheEvents = $this->onTerminateCacheClearEvents;
+        $this->onTerminateCacheClearEvents = [];
+
+        foreach ($cacheEvents as $cacheEvent) {
             $this->execCacheClear($cacheEvent);
         }
     }
@@ -96,7 +101,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         // Only once the directory is gone: a worker started again before would boot
         // on the container being deleted.
-        $this->workerRestartSignal?->send();
+        $this->workerRestartSignal?->sendIfItHeldTheContainer($event->getDir());
 
         if (!$event->invalidatesPropelSchema()) {
             return;
