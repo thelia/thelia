@@ -17,7 +17,9 @@ namespace Thelia\Messenger\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\Tlog;
 use Thelia\Messenger\FailedMessagePurger;
+use Thelia\Messenger\JobFailureMessage;
 
 /**
  * Purges the failed jobs with the rest of the shop.
@@ -37,7 +39,18 @@ final readonly class FailedJobsMaintenancePurgeListener
     public function onMaintenancePurge(MaintenancePurgeEvent $event): void
     {
         $dryRun = $event->isDryRun();
-        $purged = $this->purger->purgeSetAsideBefore(new \DateTimeImmutable(\sprintf('-%d days', FailedMessagePurger::RETENTION_DAYS)), $dryRun);
+
+        // A failure transport that cannot list its jobs (a queue server set by
+        // MESSENGER_FAILURE_TRANSPORT_DSN) is skipped: the rest of the purge still runs,
+        // and thelia:messenger:purge-failed keeps saying why.
+        try {
+            $purged = $this->purger->purgeSetAsideBefore(new \DateTimeImmutable(\sprintf('-%d days', FailedMessagePurger::RETENTION_DAYS)), $dryRun);
+        } catch (\LogicException $cannotList) {
+            Tlog::getInstance()->addWarning(\sprintf('The failed jobs were not purged: %s', JobFailureMessage::forLog($cannotList)));
+            $event->addResult('<comment>Failed jobs:</comment> <info>skipped, the failure transport cannot list its jobs</info>');
+
+            return;
+        }
 
         $event->addResult(\sprintf('<comment>Failed jobs (>%d days):</comment> <info>%d %s</info>', FailedMessagePurger::RETENTION_DAYS, $purged, $dryRun ? 'to delete' : 'deleted'));
     }
