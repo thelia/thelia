@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
@@ -98,10 +99,17 @@ final readonly class RunExportJobHandler
 
         $extension = $archiver instanceof ArchiverInterface ? $archiver->getExtension() : $serializer->getExtension();
 
-        $job->setStatus(JobStatus::DONE->value)
-            ->setFilePath($event->getFilePath())
-            ->setFileName($event->getExport()->getFileName().'.'.$extension)
-            ->setFinishedAt(new \DateTime())
-            ->save();
+        // A file its row cannot record holds customer data nobody will download.
+        try {
+            $job->setStatus(JobStatus::DONE->value)
+                ->setFilePath($event->getFilePath())
+                ->setFileName($event->getExport()->getFileName().'.'.$extension)
+                ->setFinishedAt(new \DateTime())
+                ->save();
+        } catch (\Throwable $notRecorded) {
+            (new Filesystem())->remove($event->getFilePath());
+
+            throw $notRecorded;
+        }
     }
 }

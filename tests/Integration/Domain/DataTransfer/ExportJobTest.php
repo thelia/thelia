@@ -14,6 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Propel\Runtime\Propel;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Domain\DataTransfer\DataTransferProgress;
+use Thelia\Messenger\JobSetAsideException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -451,6 +455,67 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * The rows are told once written, then again with the same count while the images
+     * are added: the row is written all the same, so a long archive is never taken for
+     * a job a dead worker left running.
+     */
+    public function testAJobAddingItsImagesStaysAlive(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $archiver = $this->archiverKeepingNothing();
+        $archivers = $this->getService(ArchiverManager::class);
+        $archivers->add($archiver);
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, $archiver->getId(), Lang::getDefaultLanguage(), includeImages: true);
+        $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
+        $added = 0;
+        $lastSignOfLife = null;
+        $archiver->onAdd = static function () use ($connection, $job, &$added, &$lastSignOfLife): void {
+            ++$added;
+
+            if (1 === $added) {
+                $connection->exec(\sprintf("UPDATE export_job SET updated_at = DATE_SUB(NOW(), INTERVAL 2 HOUR) WHERE id = %d", $job->getId()));
+            }
+
+            if (DataTransferProgress::STEP + 1 === $added) {
+                $lastSignOfLife = $connection->query(\sprintf('SELECT updated_at FROM export_job WHERE id = %d', $job->getId()))->fetchColumn();
+            }
+        };
+
+        try {
+            ($this->handler())(new RunExportJob((int) $job->getId()));
+        } finally {
+            $archivers->remove($archiver->getId());
+            (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+        }
+
+        self::assertIsString($lastSignOfLife);
+        self::assertGreaterThan((new \DateTimeImmutable('-1 hour'))->format('Y-m-d H:i:s'), $lastSignOfLife);
+    }
+
+    /**
+     * The export is written and its row cannot record it: the file holds customer data
+     * nobody will ever download, and goes with the failure.
+     */
+    public function testAnExportItsRowCannotRecordLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        // Too long for the row once the folder is in front of it.
+        ImageHeavyExport::$fileName = 'unrecorded-'.uniqid().'-'.str_repeat('x', 190);
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        try {
+            ($this->handler())(new RunExportJob((int) $job->getId()));
+            self::fail('The row cannot hold the path of the file.');
+        } catch (JobSetAsideException) {
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
      * A worker runs export after export on the same handler: the rows of the previous
      * one are never told for the next, written by a module that tells none.
      */
@@ -730,12 +795,15 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * @return ArchiverInterface&object{refusesToSave: bool}
+     * @return ArchiverInterface&object{refusesToSave: bool, onAdd: ?\Closure}
      */
     private function archiverKeepingNothing(): ArchiverInterface
     {
         return new class implements ArchiverInterface {
             public bool $refusesToSave = false;
+
+            /** @var (\Closure(): void)|null told of every file added */
+            public ?\Closure $onAdd = null;
             private string $archivePath = '';
 
             public function getId(): string
@@ -790,6 +858,10 @@ final class ExportJobTest extends IntegrationTestCase
 
             public function add(string $path, ?string $pathInArchive = null): self
             {
+                if (null !== $this->onAdd) {
+                    ($this->onAdd)();
+                }
+
                 return $this;
             }
 
