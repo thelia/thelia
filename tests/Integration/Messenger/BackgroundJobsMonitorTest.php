@@ -135,7 +135,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             $heavy->send(new Envelope(new ProbeMessage('an export')));
             $heavy->send(new Envelope(new ProbeMessage('an import')));
 
-            $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $heavy);
+            $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $heavy, $this->queues(), new EventDispatcher());
 
             self::assertSame(3, $monitor->pendingCount());
         } finally {
@@ -154,7 +154,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $sameQueue = $this->transport('test_monitor_jobs');
         $this->jobs->send(new Envelope(new ProbeMessage('an export')));
 
-        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $sameQueue, $this->queues(heavyDsn: 'doctrine://default?queue_name=test_monitor_jobs'));
+        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $sameQueue, $this->queues(heavyDsn: 'doctrine://default?queue_name=test_monitor_jobs'), new EventDispatcher());
 
         self::assertSame(1, $monitor->pendingCount());
     }
@@ -169,7 +169,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $this->setAside(new ProbeMessage('middle'), 'second', JobSetAsideException::class);
         $this->setAside(new ProbeMessage('newest'), 'third', JobSetAsideException::class);
 
-        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), null, $this->queues());
+        $monitor = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $this->jobs, $this->queues(), new EventDispatcher());
 
         self::assertSame(['third', 'second'], array_map(static fn ($job): string => $job->error, $monitor->failedJobs(2)));
     }
@@ -188,7 +188,8 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             $replayable[$job->error] = $job->replayable;
         }
 
-        self::assertSame(['Unreadable' => false, 'SMTP down' => true], array_intersect_key($replayable, ['Unreadable' => 1, 'SMTP down' => 1]));
+        self::assertSame(false, $replayable['Unreadable'] ?? null);
+        self::assertSame(true, $replayable['SMTP down'] ?? null);
     }
 
     /**
@@ -197,7 +198,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
      */
     public function testWithoutAQueueNothingIsSaidToWait(): void
     {
-        $monitor = new BackgroundJobsMonitor(new SyncTransport(static::getContainer()->get('messenger.bus.default')), $this->failed, $this->getService(MessageBusInterface::class));
+        $monitor = new BackgroundJobsMonitor(new SyncTransport(static::getContainer()->get('messenger.bus.default')), $this->failed, $this->getService(MessageBusInterface::class), $this->jobs, $this->queues(), new EventDispatcher());
 
         self::assertFalse($monitor->hasQueue());
         self::assertNull($monitor->pendingCount());
@@ -232,7 +233,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         self::assertNotNull($readBeforeTheOtherReplay);
         $failures = $this->failuresReadBefore($readBeforeTheOtherReplay);
         $bus = $this->recordingBus();
-        $monitor = new BackgroundJobsMonitor($this->jobs, $failures, $bus, null, $this->queues());
+        $monitor = new BackgroundJobsMonitor($this->jobs, $failures, $bus, $this->jobs, $this->queues(), new EventDispatcher());
 
         self::assertTrue($monitor->retry($id));
         self::assertFalse($monitor->retry($id), 'The second replay finds the job taken.');
@@ -253,8 +254,8 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $dispatcher->addListener(FailedJobRemovedEvent::class, static function () use (&$removed): void {
             ++$removed;
         });
-        $replaying = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->recordingBus(), null, $this->queues());
-        $deleting = new BackgroundJobsMonitor($this->jobs, $this->failuresReadBefore($readBeforeTheReplay), $this->recordingBus(), null, $this->queues(), $dispatcher);
+        $replaying = new BackgroundJobsMonitor($this->jobs, $this->failed, $this->recordingBus(), $this->jobs, $this->queues(), new EventDispatcher());
+        $deleting = new BackgroundJobsMonitor($this->jobs, $this->failuresReadBefore($readBeforeTheReplay), $this->recordingBus(), $this->jobs, $this->queues(), $dispatcher);
 
         self::assertTrue($replaying->retry($id));
         self::assertFalse($deleting->remove($id));
@@ -271,7 +272,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         $this->getService(ShopDatabaseConnection::class)->get()->executeStatement('UPDATE messenger_messages SET delivered_at = UTC_TIMESTAMP() WHERE id = ?', [$id]);
         $bus = $this->recordingBus();
 
-        self::assertFalse((new BackgroundJobsMonitor($this->jobs, $this->failed, $bus, null, $this->queues()))->retry($id));
+        self::assertFalse((new BackgroundJobsMonitor($this->jobs, $this->failed, $bus, $this->jobs, $this->queues(), new EventDispatcher()))->retry($id));
         self::assertSame(0, $bus->dispatched);
     }
 
@@ -291,7 +292,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             }
         };
 
-        (new BackgroundJobsMonitor($this->jobs, $this->failed, $bus))->retry($id);
+        (new BackgroundJobsMonitor($this->jobs, $this->failed, $bus, $this->jobs, $this->queues(), new EventDispatcher()))->retry($id);
 
         self::assertEquals([new RunExportJob(12)], $bus->dispatched);
     }
@@ -345,7 +346,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
             $removed[] = $event->message;
         });
 
-        self::assertTrue((new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), dispatcher: $dispatcher))->remove($id));
+        self::assertTrue((new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $this->jobs, $this->queues(), $dispatcher))->remove($id));
 
         self::assertCount(1, $removed);
         self::assertInstanceOf(RunImportJob::class, $removed[0]);
@@ -424,7 +425,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
         };
 
         try {
-            (new BackgroundJobsMonitor($this->jobs, $failedThatRefusesWrites, $refusingBus))->retry($id);
+            (new BackgroundJobsMonitor($this->jobs, $failedThatRefusesWrites, $refusingBus, $this->jobs, $this->queues(), new EventDispatcher()))->retry($id);
             self::fail('The caller must learn the job is neither replayed nor set aside.');
         } catch (\RuntimeException $exception) {
             // The caller learns the job is lost; why goes to the log, by class and place.
@@ -501,7 +502,7 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
 
     private function monitor(): BackgroundJobsMonitor
     {
-        return new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class));
+        return new BackgroundJobsMonitor($this->jobs, $this->failed, $this->getService(MessageBusInterface::class), $this->jobs, $this->queues(), new EventDispatcher());
     }
 
     private function queues(string $jobDsn = 'doctrine://default?queue_name=test_monitor_jobs', string $heavyDsn = 'doctrine://default?queue_name=test_monitor_heavy'): ConfiguredQueues
@@ -546,10 +547,11 @@ final class BackgroundJobsMonitorTest extends IntegrationTestCase
 
     private function empty(): void
     {
-        foreach ([$this->jobs, $this->failed] as $transport) {
-            foreach ($transport->all() as $envelope) {
-                $transport->reject($envelope);
-            }
-        }
+        // In SQL: a row a test left held by a "worker" is not listed by all(), and
+        // the screen reads the rows in SQL.
+        $this->getService(ShopDatabaseConnection::class)->get()->executeStatement(
+            'DELETE FROM messenger_messages WHERE queue_name IN (?, ?, ?)',
+            ['test_monitor_jobs', 'test_monitor_failed', 'test_monitor_heavy'],
+        );
     }
 }

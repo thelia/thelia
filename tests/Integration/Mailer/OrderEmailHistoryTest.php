@@ -163,6 +163,7 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $refusingTransport,
+            new NullTransport(),
         );
 
         $factoryWithARefusingTransport->sendEmailMessage(
@@ -202,6 +203,7 @@ final class OrderEmailHistoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             new Mailer(new NullTransport($dispatcher), $queue, $dispatcher),
+            new NullTransport(),
         );
         $queuingFactory->sendEmailMessageOrFail(
             self::MESSAGE_CODE,

@@ -15,7 +15,12 @@ declare(strict_types=1);
 namespace Thelia\Tests\Support\Order;
 
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
+use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Mailer\MailerFactory;
 
 /**
@@ -25,6 +30,14 @@ use Thelia\Mailer\MailerFactory;
 final class LeakingMailerFactory extends MailerFactory
 {
     public const LEAKED_SECRET = 's3cr3t';
+
+    /**
+     * The transport is never reached: a null one stands in unless the test gives one.
+     */
+    public function __construct(TemplateHelperInterface $templateHelper, ParserResolver $parserResolver, MailerInterface $mailer, ?TransportInterface $transport = null)
+    {
+        parent::__construct($templateHelper, $parserResolver, $mailer, $transport ?? new NullTransport());
+    }
 
     public function send(Email $message): void
     {

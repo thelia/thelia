@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -38,6 +39,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
+            new NullTransport(),
         );
     }
 
@@ -228,6 +230,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverReturning($parser),
             $this->getService(MailerInterface::class),
+            new NullTransport(),
         );
 
         $wasAdminEnvironment = Request::$isAdminEnv;
@@ -280,6 +283,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
+            new NullTransport(),
         );
 
         $email = $mailerFactory->createEmailMessage(
@@ -381,6 +385,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
+            new NullTransport(),
         );
     }
 
