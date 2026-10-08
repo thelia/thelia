@@ -264,7 +264,7 @@ class ExportHandler
             $serializer->getExtension(),
         );
 
-        $filePath = THELIA_CACHE_DIR.'export'.DS.$filename;
+        $filePath = ExportCachePurger::directory().DS.$filename;
 
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
