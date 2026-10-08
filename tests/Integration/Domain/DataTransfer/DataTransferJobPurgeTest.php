@@ -162,6 +162,9 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $leftBehind = $this->storedFile('extracted/stock.csv');
         touch($leftBehind, (int) strtotime('-40 days'));
         $recent = $this->storedFile();
+        // The file of a job set aside late may still be replayed: kept as long as its row.
+        $replayable = $this->storedFile('set-aside-late.csv');
+        touch($replayable, (int) strtotime('-30 days -12 hours'));
 
         $purger = $this->getService(DataTransferJobPurger::class);
 
@@ -172,6 +175,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
 
         self::assertFileDoesNotExist($leftBehind);
         self::assertFileExists($recent);
+        self::assertFileExists($replayable);
 
         // An empty directory goes once a day old, never while an upload may be about
         // to land in it.
