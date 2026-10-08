@@ -16,8 +16,8 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -26,26 +26,20 @@ use Thelia\Api\Resource\OrderPaymentCapture;
 use Thelia\Api\Resource\OrderPaymentTransaction;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\PaymentException;
-use Thelia\Domain\Payment\Service\PaymentAmount;
+use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
 use Thelia\Model\Order;
-use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
 
 /**
  * Captures through ORDER_PAYMENT_CAPTURE, the way the back office does, so a module
- * listening to that event sees both.
- *
- * A capture is not idempotent by nature: the provider takes the money each time it is
- * asked. The same amount asked again on the same order within a minute is answered 409
- * rather than taken twice — a client that retried a timed-out call gets told the first
- * one went through, and reads the journal.
+ * listening to that event sees both, and both share the guards of the capture service:
+ * a capture waiting for its answer reserves what it asked for, and the same amount asked
+ * again within a minute is a repetition, answered 409 rather than taken twice.
  */
 final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
 {
-    private const int REPEAT_WINDOW_SECONDS = 60;
-
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
@@ -58,21 +52,22 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
             throw new \LogicException(\sprintf('Expected a %s, got %s.', OrderPaymentCapture::class, get_debug_type($data)));
         }
 
-        $order = $this->order($uriVariables);
-
-        if ($this->wasJustCaptured($order, $data->amount)) {
-            throw new ConflictHttpException('The same amount was captured on this order a moment ago. Read the payment journal before asking again.');
-        }
-
-        $event = new OrderPaymentCaptureEvent($order, $data->amount);
+        $event = new OrderPaymentCaptureEvent($this->order($uriVariables), $data->amount);
 
         try {
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_PAYMENT_CAPTURE);
+        } catch (DuplicateCaptureException|PaymentJournalBusyException $exception) {
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         } catch (PaymentException $exception) {
             // Nothing to capture, a module that takes the price at once, an amount the
-            // authorization does not hold: the request is well formed and the shop
-            // refuses it, which is what 422 says.
+            // authorization does not hold, a refusal of the provider: the request is well
+            // formed and the shop refuses it, which is what 422 says.
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (\Throwable $exception) {
+            // The module could not reach the provider: the capture stays pending in the
+            // journal until the provider confirms it. The technical message is logged by
+            // the capture service, not sent back.
+            throw new HttpException(502, 'The payment provider did not answer. The capture stays pending in the payment journal until the provider confirms it.', $exception);
         }
 
         return $this->transformer->modelToResource(
@@ -92,33 +87,5 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
         }
 
         return $order;
-    }
-
-    /**
-     * Whether a capture of the same amount — or of the whole remainder, when no amount
-     * is given twice — was written on this order within the last minute and did not fail.
-     */
-    private function wasJustCaptured(Order $order, ?float $amount): bool
-    {
-        $latest = OrderPaymentTransactionQuery::create()
-            ->filterByOrderId((int) $order->getId())
-            ->filterByTypeEnum(PaymentTransactionType::CAPTURE)
-            ->orderById(Criteria::DESC)
-            ->findOne();
-
-        if (null === $latest || $latest->isFailed()) {
-            return false;
-        }
-
-        $createdAt = $latest->getCreatedAt();
-
-        if (!$createdAt instanceof \DateTimeInterface || time() - $createdAt->getTimestamp() > self::REPEAT_WINDOW_SECONDS) {
-            return false;
-        }
-
-        // Without an amount the caller asks for the remainder, and after the first
-        // capture the remainder changed: the recorder settles that case by refusing a
-        // capture of nothing. The repeat is the explicit same figure.
-        return null !== $amount && 0 === PaymentAmount::compare($amount, (string) $latest->getAmount());
     }
 }

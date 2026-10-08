@@ -226,6 +226,51 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
     }
 
+    public function testACaptureWithoutTheFormTokenTakesNothing(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $this->sheet($order);
+
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => 'forged', 'amount' => '120']);
+
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
+    public function testADoubleSubmitOfTheDialogCapturesOnce(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $token = $this->tokenOf($this->sheet($order));
+
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $token, 'amount' => '50']);
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $token, 'amount' => '50']);
+
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testTheSheetWarnsThatMarkingPaidByHandTakesNothingWhileAnAuthorizationHolds(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+
+        self::assertCount(1, $crawler->filter('[data-testid="order-payment-hold-notice"]'));
+    }
+
+    public function testTheDialogNeverPrefillsMoreThanTheAuthorizationHolds(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+        $this->recorder->recordAuthorization($order, 100.005, 'AUTH-ODD', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $crawler = $this->sheet($order);
+
+        self::assertSame('100.00', $crawler->filter('[data-testid="order-payment-capture-amount"]')->attr('value'));
+    }
+
     private function authorizedOrder(float $total): Order
     {
         $order = $this->factory->order(null, ['postage' => $total, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);

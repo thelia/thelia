@@ -14,13 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
+use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
@@ -30,6 +33,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Payment\DeferredCapturePaymentModule;
@@ -140,27 +144,128 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertTrue($order->isNotPaid(false));
     }
 
-    public function testAModuleThatThrowsLeavesAFailedLineAndRethrows(): void
+    public function testAModuleThatThrowsLeavesTheLinePendingBecauseTheOutcomeIsUnknown(): void
     {
+        // A call that timed out may have taken the money: the line stays pending and keeps
+        // what it asked for out of reach of a second capture, until the provider says.
         [$order] = $this->authorizedOrder(120);
-        DeferredCapturePaymentModule::$nextCaptureAnswer = new \RuntimeException('Connection timed out');
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new \RuntimeException('cURL error 28: timeout on https://psp.example/capture?api_key=SECRET');
 
         try {
             $this->service->capture($order);
             self::fail('The module exception must reach the caller.');
         } catch (\RuntimeException $exception) {
-            self::assertSame('Connection timed out', $exception->getMessage());
+            self::assertStringContainsString('timeout', $exception->getMessage());
         }
 
-        $journal = OrderPaymentTransactionQuery::create()->findJournal($order->getId());
-        self::assertCount(2, $journal);
-
-        /** @var OrderPaymentTransaction $line */
-        $line = $journal[0];
-        self::assertTrue($line->isFailed());
+        $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        self::assertTrue($line->isPending());
         self::assertSame('exception', $line->getErrorCode());
-        self::assertSame('Connection timed out', $line->getErrorMessage());
+        self::assertStringNotContainsString('SECRET', (string) $line->getErrorMessage(), 'The raw technical message is logged, not stored.');
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
+    public function testAModuleThatRefusesWithAPaymentExceptionLeavesAFailedLineWithItsMessage(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new PaymentException('Authorization expired');
+
+        try {
+            $this->service->capture($order);
+            self::fail('The refusal must reach the caller.');
+        } catch (PaymentException) {
+        }
+
+        $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        self::assertTrue($line->isFailed());
+        self::assertSame('Authorization expired', $line->getErrorMessage());
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+    }
+
+    public function testAPendingCaptureKeepsASecondCaptureFromCallingTheProviderAgain(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ASYNC');
+        $this->service->capture($order);
+
+        try {
+            $this->service->capture($order);
+            self::fail('Nothing is left to capture while the first capture is pending.');
+        } catch (InvalidPaymentAmountException) {
+        }
+
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testTheSameAmountAskedTwiceInARowIsNotTakenTwice(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        $this->service->capture($order, 50.0);
+
+        try {
+            $this->service->capture($order, 50.0);
+            self::fail('A repeated capture of the same amount is refused.');
+        } catch (DuplicateCaptureException) {
+        }
+
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+        self::assertSame('70.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+    }
+
+    public function testAnAmountWithMoreDecimalsThanTheCurrencyIsRefused(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+
+        try {
+            $this->service->capture($order, 10.005);
+            self::fail('Half a cent cannot be captured.');
+        } catch (InvalidPaymentAmountException) {
+        }
+
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testAVoidDuringAPendingCaptureReleasesOnlyWhatThatCaptureDidNotAskFor(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ASYNC');
+        $this->service->capture($order, 50.0);
+
+        $void = $this->service->voidAuthorization($order);
+
+        self::assertSame('70.000000', $void->getAmount());
+    }
+
+    public function testCancellingAnOrderReleasesWhatItsAuthorizationStillHolds(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+
+        $event = (new OrderEvent($order))->setStatus((int) OrderStatusQuery::getCancelledStatus()->getId());
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+
+        self::assertSame([$order->getId()], DeferredCapturePaymentModule::$voidCalls);
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_CANCELED, $this->statusCodeOf($order));
+    }
+
+    public function testAModuleThatCannotBeInstantiatedIsReportedNotDisguisedAsUnsupported(): void
+    {
+        $broken = (new Module())
+            ->setCode('BrokenPayment')
+            ->setFullNamespace('Thelia\\Tests\\Support\\Payment\\NoSuchModule')
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->setCategory('payment')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $broken->save($this->getPropelConnection());
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'BrokenPayment']);
+
+        self::assertFalse($this->service->supportsCapture($order), 'The order sheet still renders.');
+
+        $this->expectException(\ReflectionException::class);
+
+        $this->service->capture($order);
     }
 
     public function testAModuleThatAnswersPendingLeavesTheLinePendingWithItsReference(): void
@@ -172,7 +277,10 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
 
         self::assertTrue($capture->isPending());
         self::assertSame('CAP-ASYNC', $capture->getPspReference());
-        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture, 'A pending capture counts for nothing yet.');
+        $totals = $this->totals->forOrder($order->getId());
+        self::assertSame('0.000000', $totals->captured, 'A pending capture is not reported as captured.');
+        self::assertSame('120.000000', $totals->pendingCapture);
+        self::assertSame('0.000000', $totals->remainingToCapture, 'What it asked for is out of reach of another capture.');
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
     }
 

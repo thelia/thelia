@@ -28,6 +28,16 @@ use Thelia\Model\OrderPaymentTransaction;
  * Thelia\Domain\Payment\Service\PaymentTransactionRecorder, when the provider confirms
  * it; the core then offers the capture in the back office and the admin API, and
  * records each capture around the call made here.
+ *
+ * What the journal expects from such a module:
+ * - every movement it reports carries the reference the provider gave it, and a new
+ *   attempt carries a new reference: the journal answers a known reference with the line
+ *   it already holds, and refuses it for another outcome or another amount;
+ * - the recorder is never called inside a database transaction the module opened: the
+ *   lock of the journal would be released before that transaction commits;
+ * - while the authorization still holds an amount, a capture the module switches off
+ *   (supportsDeferredCapture() turning false) leaves that amount to be captured at the
+ *   provider: marking the order paid takes nothing.
  */
 interface PaymentModuleWithCaptureInterface extends PaymentModuleInterface
 {
@@ -41,9 +51,12 @@ interface PaymentModuleWithCaptureInterface extends PaymentModuleInterface
     /**
      * Takes $amount from what the order's authorization still holds.
      *
-     * The core has already checked the amount against the authorization and written
-     * $transaction as pending; the module calls the provider and reports the outcome.
-     * An exception thrown here settles the line as failed and is rethrown.
+     * The core has already checked the amount against the authorization and the
+     * smallest coin of the currency, and written $transaction as pending; the module
+     * calls the provider and reports the outcome. A PaymentException thrown here is a
+     * refusal: the line is settled as failed with its message. Any other exception
+     * leaves the line pending — the call may have reached the provider — until the
+     * provider's notification settles it; both are rethrown.
      */
     public function capture(Order $order, float $amount, OrderPaymentTransaction $transaction): PaymentOperationResult;
 
