@@ -21,10 +21,10 @@ use Thelia\Core\Translation\Translator;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractArchiver implements ArchiverInterface
+abstract class AbstractArchiver implements ArchiverInterface, ClosableArchiverInterface
 {
     /** @var mixed The archive resource */
-    protected mixed $archive;
+    protected mixed $archive = null;
 
     /** @var string Path to archive */
     protected string $archivePath;
@@ -91,5 +91,10 @@ abstract class AbstractArchiver implements ArchiverInterface
         $this->archive = null;
 
         return true;
+    }
+
+    public function discard(): void
+    {
+        $this->archive = null;
     }
 }

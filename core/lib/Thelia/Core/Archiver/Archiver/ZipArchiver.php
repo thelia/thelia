@@ -86,4 +86,19 @@ class ZipArchiver extends AbstractArchiver
 
         return $closed;
     }
+
+    /**
+     * A zip is written when it is closed: what it was given is dropped first, so a
+     * failed export never writes a whole archive only to remove it.
+     */
+    public function discard(): void
+    {
+        if (null === $this->archive) {
+            return;
+        }
+
+        $this->archive->unchangeAll();
+        $this->archive->close();
+        $this->archive = null;
+    }
 }
