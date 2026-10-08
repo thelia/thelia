@@ -40,7 +40,7 @@ final readonly class FailedMessagePurger
     public function __construct(
         #[Autowire(service: 'messenger.transport.failed')]
         private TransportInterface $failureTransport,
-        private ?ConfiguredQueues $queues = null,
+        private ConfiguredQueues $queues,
     ) {
     }
 
@@ -49,7 +49,7 @@ final readonly class FailedMessagePurger
      */
     public function purgeSetAsideBefore(\DateTimeImmutable $limit, bool $dryRun = false): int
     {
-        $queue = $this->queues?->failureQueueInTheShopDatabase();
+        $queue = $this->queues->failureQueueInTheShopDatabase();
 
         if (null !== $queue) {
             return $queue->deleteQueuedBefore($limit, $dryRun);

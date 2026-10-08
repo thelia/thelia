@@ -68,4 +68,28 @@ final readonly class JobClaim
 
         return 1 === $statement->rowCount();
     }
+
+    /**
+     * Marks a job failed only while it still waits for a worker: a worker that took it
+     * meanwhile keeps it running.
+     *
+     * @param 'export_job'|'import_job' $table
+     *
+     * @return bool true when the job was still waiting
+     */
+    public function abandonIfQueued(string $table, int $jobId, string $reason): bool
+    {
+        $statement = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->prepare(
+            'UPDATE `'.$table.'` SET `status` = :failed, `error` = :reason, `finished_at` = :now WHERE `id` = :id AND `status` = :queued',
+        );
+        $statement->execute([
+            'failed' => JobStatus::FAILED->value,
+            'reason' => $reason,
+            'now' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'id' => $jobId,
+            'queued' => JobStatus::QUEUED->value,
+        ]);
+
+        return 1 === $statement->rowCount();
+    }
 }

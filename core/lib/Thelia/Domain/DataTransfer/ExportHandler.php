@@ -16,8 +16,8 @@ namespace Thelia\Domain\DataTransfer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
+use Thelia\Core\Archiver\ClosableArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerInterface;
@@ -26,6 +26,8 @@ use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -98,9 +100,58 @@ class ExportHandler
             throw new HandlerUnavailableException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
         }
 
-        $instance = $export->getHandleClassInstance();
+        $instance = $this->configuredInstance($export, $archiver, $language, $includeImages, $includeDocuments, $rangeDate);
+        $event = new ExportEvent($instance, $serializer, $archiver);
 
-        // Configure handle class
+        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
+
+        $this->onProgress = $onProgress;
+        $this->rowsWritten = 0;
+        $written = [];
+
+        // A file left behind by a failure holds customer data: whatever fails, a listener
+        // of the export included, what was written goes with it.
+        try {
+            $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+            $written[] = $filePath;
+            $event->setFilePath($filePath);
+
+            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
+
+            $eventArchiver = $event->getArchiver();
+
+            if ($eventArchiver instanceof ArchiverInterface) {
+                $eventArchiver->create($filePath);
+                $written[] = $eventArchiver->getArchivePath();
+                $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
+            }
+
+            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
+        } catch (\Throwable $exception) {
+            $this->discard($event->getArchiver(), $written);
+
+            throw $exception;
+        } finally {
+            // The handler outlives the export in a worker: nothing is told to the next one.
+            $this->onProgress = null;
+            $this->rowsWritten = 0;
+        }
+
+        return $event;
+    }
+
+    /**
+     * @param array{start?: mixed, end?: mixed}|null $rangeDate
+     */
+    private function configuredInstance(
+        Export $export,
+        ?ArchiverInterface $archiver,
+        ?Lang $language,
+        bool $includeImages,
+        bool $includeDocuments,
+        ?array $rangeDate,
+    ): AbstractExport {
+        $instance = $export->getHandleClassInstance();
         $instance->setLang($language);
 
         if ($archiver instanceof ArchiverInterface) {
@@ -119,46 +170,25 @@ class ExportHandler
             $instance->setRangeDate($rangeDate);
         }
 
-        // Process export
-        $event = new ExportEvent($instance, $serializer, $archiver);
+        return $instance;
+    }
 
-        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
-
-        $this->onProgress = $onProgress;
-        $written = [];
-
-        // A file left behind by a failure holds customer data: whatever fails, a listener
-        // of the export included, what was written goes with it.
-        try {
-            $filePath = $this->processExport($event->getExport(), $event->getSerializer());
-            $written[] = $filePath;
-            $event->setFilePath($filePath);
-
-            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
-
-            if ($event->getArchiver() instanceof ArchiverInterface) {
-                $this->archive($event, $filePath, $includeImages, $includeDocuments, $written);
+    /**
+     * @param list<string> $written the files the failed export wrote
+     */
+    private function discard(?ArchiverInterface $archiver, array $written): void
+    {
+        // A zip still open writes what it holds when it is let go: dropped first, so
+        // nothing comes back once the files are removed.
+        if ($archiver instanceof ClosableArchiverInterface) {
+            try {
+                $archiver->discard();
+            } catch (\Throwable $notDiscarded) {
+                Tlog::getInstance()->addWarning(\sprintf('The archive of a failed export could not be let go: %s', JobFailureMessage::forLog($notDiscarded)));
             }
-
-            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
-        } catch (\Throwable $exception) {
-            // A zip still open writes what it holds when it is let go: closed first, so
-            // nothing comes back once the files are removed.
-            if ($event->getArchiver() instanceof AbstractArchiver) {
-                try {
-                    $event->getArchiver()->close();
-                } catch (\Throwable) {
-                }
-            }
-
-            (new Filesystem())->remove($written);
-
-            throw $exception;
-        } finally {
-            $this->onProgress = null;
         }
 
-        return $event;
+        (new Filesystem())->remove($written);
     }
 
     /**
@@ -287,15 +317,8 @@ class ExportHandler
         return $filePath;
     }
 
-    /**
-     * @param list<string> $written the files written so far, the archive added once created
-     */
-    private function archive(ExportEvent $event, string $filePath, bool $includeImages, bool $includeDocuments, array &$written): void
+    private function archive(ExportEvent $event, ArchiverInterface $archiver, string $filePath, bool $includeImages, bool $includeDocuments): void
     {
-        $archiver = $event->getArchiver();
-        $archiver->create($filePath);
-        $written[] = $archiver->getArchivePath();
-
         if ($includeImages && $event->getExport()->hasImages()) {
             $this->processExportImages($event->getExport(), $archiver);
         }
@@ -307,7 +330,7 @@ class ExportHandler
         $archiver->add($filePath)->save();
 
         // A tar writes as it goes and keeps its handle: let go once the archive is whole.
-        if ($archiver instanceof AbstractArchiver) {
+        if ($archiver instanceof ClosableArchiverInterface) {
             $archiver->close();
         }
 
