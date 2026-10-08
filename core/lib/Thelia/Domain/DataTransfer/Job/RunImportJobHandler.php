@@ -60,7 +60,7 @@ final readonly class RunImportJobHandler
         try {
             $job->setImportedRows(0)->setRowErrors(null)->save();
         } catch (\Throwable $exception) {
-            $this->lifecycle->fail($job, $exception);
+            $this->lifecycle->fail($message, $job, $exception);
         }
 
         // The whole import is one transaction, which also records its outcome: stopped
@@ -89,7 +89,7 @@ final readonly class RunImportJobHandler
                 $this->discardFileOf($job);
             }
 
-            $this->lifecycle->fail($job, $exception);
+            $this->lifecycle->fail($message, $job, $exception);
         }
 
         $this->discardFileOf($job);

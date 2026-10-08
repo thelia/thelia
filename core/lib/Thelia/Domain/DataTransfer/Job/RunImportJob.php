@@ -38,8 +38,8 @@ final readonly class RunImportJob implements DataTransferJobMessage, DescribedJo
         return $this->importJobId;
     }
 
-    public function describe(): string
+    public function jobTable(): string
     {
-        return \sprintf('Import #%d', $this->importJobId);
+        return 'import_job';
     }
 }

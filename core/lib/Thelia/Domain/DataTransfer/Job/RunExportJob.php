@@ -38,8 +38,8 @@ final readonly class RunExportJob implements DataTransferJobMessage, DescribedJo
         return $this->exportJobId;
     }
 
-    public function describe(): string
+    public function jobTable(): string
     {
-        return \sprintf('Export #%d', $this->exportJobId);
+        return 'export_job';
     }
 }

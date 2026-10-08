@@ -56,7 +56,7 @@ final readonly class RunExportJobHandler
             $job->setProcessedRows(0)->save();
             $this->run($job);
         } catch (\Throwable $exception) {
-            $this->lifecycle->fail($job, $exception);
+            $this->lifecycle->fail($message, $job, $exception);
         }
     }
 

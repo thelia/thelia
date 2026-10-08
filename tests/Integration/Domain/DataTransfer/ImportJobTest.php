@@ -265,7 +265,7 @@ final class ImportJobTest extends IntegrationTestCase
 
         $this->expectException(UnrecoverableMessageHandlingException::class);
 
-        $this->lifecycle($this->queue())->fail($job, new \RuntimeException('SQLSTATE[23000]: buyer@example.com'));
+        $this->lifecycle($this->queue())->fail(new RunImportJob((int) $job->getId()), $job, new \RuntimeException('SQLSTATE[23000]: buyer@example.com'));
     }
 
     /**
@@ -278,7 +278,7 @@ final class ImportJobTest extends IntegrationTestCase
         $this->storage()->discardFileOf($job);
 
         try {
-            $this->lifecycle($this->queue())->fail($job, new MissingColumnsException('The following columns are missing: stock'));
+            $this->lifecycle($this->queue())->fail(new RunImportJob((int) $job->getId()), $job, new MissingColumnsException('The following columns are missing: stock'));
             self::fail('A failed job is set aside.');
         } catch (UnrecoverableMessageHandlingException $setAside) {
             self::assertSame(\sprintf('Import #%d failed: The following columns are missing: stock', $job->getId()), $setAside->getMessage());
@@ -296,7 +296,7 @@ final class ImportJobTest extends IntegrationTestCase
         $job->setImportedRows(42)->setStatus(JobStatus::DONE->value);
 
         try {
-            $this->lifecycle($this->queue())->fail($job, new \RuntimeException('rolled back'));
+            $this->lifecycle($this->queue())->fail(new RunImportJob((int) $job->getId()), $job, new \RuntimeException('rolled back'));
         } catch (UnrecoverableMessageHandlingException) {
         }
 

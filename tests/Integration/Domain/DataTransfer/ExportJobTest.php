@@ -405,6 +405,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job->reload();
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertSame(RemovedJobRowListener::DELETED, $job->getError());
+        self::assertNotNull($job->getFinishedAt());
     }
 
     /**
@@ -582,7 +583,7 @@ final class ExportJobTest extends IntegrationTestCase
         $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
 
         try {
-            $this->lifecycle($this->queue())->fail($job, new \PDOException("SQLSTATE[23000]: Duplicate entry 'buyer@example.com'"));
+            $this->lifecycle($this->queue())->fail(new RunExportJob((int) $job->getId()), $job, new \PDOException("SQLSTATE[23000]: Duplicate entry 'buyer@example.com'"));
         } catch (UnrecoverableMessageHandlingException $exception) {
             self::assertStringNotContainsString('buyer@example.com', $exception->getMessage());
             self::assertStringContainsString(JobFailureMessage::SERVER_ERROR, $exception->getMessage());
@@ -611,6 +612,27 @@ final class ExportJobTest extends IntegrationTestCase
 
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertSame(JobFailureMessage::SERVER_ERROR, $job->getError());
+    }
+
+    /**
+     * Without a queue, the job failed before it started and its row cannot be read
+     * again either (the database is what went): the failure is logged, and what the
+     * caller is told comes from the row, never from a database error.
+     */
+    public function testWithoutAQueueAJobThatFailsBeforeItStartsLeavesAnUnreadableRowAlone(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->delete();
+        $failingAtOnce = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new HandlerFailedException(Envelope::wrap($message), [new \PDOException('SQLSTATE[HY000] [2002] Connection refused')]);
+            }
+        };
+
+        $this->lifecycle($failingAtOnce)->dispatch($job, new RunExportJob((int) $job->getId()));
+
+        self::assertNull(ExportJobQuery::create()->findPk($job->getId()));
     }
 
     /**

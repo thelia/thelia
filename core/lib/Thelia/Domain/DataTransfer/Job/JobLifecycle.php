@@ -65,24 +65,29 @@ final readonly class JobLifecycle
             $this->bus->dispatch($message);
         } catch (HandlerFailedException $exception) {
             // Run at once, without a queue. The handler wrote why on the row, unless it
-            // failed before taking the job: then the row would wait for nobody.
-            $job->refresh();
+            // failed before taking the job: then the row would wait for nobody. The
+            // database may be what failed: the row is marked when it can be.
+            try {
+                $job->refresh();
 
-            if (JobStatus::QUEUED === $job->getJobStatus()) {
-                Tlog::getInstance()->addError(\sprintf('%s %d failed before it started: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
-                $job->markFailed(JobFailureMessage::forAdministrator($exception));
+                if (JobStatus::QUEUED === $job->getJobStatus()) {
+                    Tlog::getInstance()->addError(\sprintf('%s failed before it started: %s', $message->describe(), JobFailureMessage::forLog($exception)));
+                    $job->markFailed(JobFailureMessage::forAdministrator($exception));
+                }
+            } catch (\Throwable $notRecorded) {
+                Tlog::getInstance()->addError(\sprintf('%s failed before it started and could not be marked failed: %s, then %s', $message->describe(), JobFailureMessage::forLog($exception), JobFailureMessage::forLog($notRecorded)));
             }
 
             return;
         } catch (\Throwable $exception) {
-            Tlog::getInstance()->addError(\sprintf('%s %d could not be queued: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
+            Tlog::getInstance()->addError(\sprintf('%s could not be queued: %s', $message->describe(), JobFailureMessage::forLog($exception)));
 
             // The database may be what refused: the row is marked when it can be, and
             // the caller is told why the queue refused either way.
             try {
                 $job->markFailed(self::NOT_QUEUED);
             } catch (\Throwable $notRecorded) {
-                Tlog::getInstance()->addError(\sprintf('%s %d could not be marked failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($notRecorded)));
+                Tlog::getInstance()->addError(\sprintf('%s could not be marked failed: %s', $message->describe(), JobFailureMessage::forLog($notRecorded)));
             }
 
             throw $exception;
@@ -128,11 +133,11 @@ final readonly class JobLifecycle
      * Takes the job for this run, or, when another run holds it, sends the message
      * again to look at it later (set aside after twelve hours).
      */
-    public function claimOrPostpone(DataTransferJob $job, DataTransferJobMessage $message): ClaimOutcome
+    private function claimOrPostpone(DataTransferJob $job, DataTransferJobMessage $message): ClaimOutcome
     {
         // Only the message first sent, or replayed by an administrator, may restart a
         // failed job: one looking again leaves it to the administrator.
-        $claimed = $this->jobClaim->claim($job->tableName(), (int) $job->getId(), 0 === $message->postponements());
+        $claimed = $this->jobClaim->claim($message->jobTable(), $message->jobId(), 0 === $message->postponements());
         $job->refresh();
 
         if ($claimed) {
@@ -148,7 +153,7 @@ final readonly class JobLifecycle
         if ($message->postponements() >= self::MAX_POSTPONEMENTS) {
             // Set aside rather than dropped: the failed jobs show it, and replaying it
             // takes the job over once its worker has gone quiet.
-            throw new JobSetAsideException(\sprintf('%s is still running after %d checks: it is set aside with the failed jobs.', self::nameOf($job), $message->postponements()));
+            throw new JobSetAsideException(\sprintf('%s is still running after %d checks: it is set aside with the failed jobs.', $message->describe(), $message->postponements()));
         }
 
         $this->bus->dispatch($message->postponed(), [new DelayStamp(self::POSTPONE_DELAY_SECONDS * 1000)]);
@@ -161,7 +166,7 @@ final readonly class JobLifecycle
      * held by another run. What the failure transport keeps says no more than
      * JobFailureMessage allows; the log names the exception.
      */
-    public function reject(string $job, \Throwable $exception): never
+    private function reject(string $job, \Throwable $exception): never
     {
         Tlog::getInstance()->addError(\sprintf('%s could not be taken: %s', $job, JobFailureMessage::forLog($exception)));
 
@@ -181,9 +186,9 @@ final readonly class JobLifecycle
      * Records why the job failed and sends it to the failure transport, without
      * retries: running it again unchanged fails the same way.
      */
-    public function fail(DataTransferJob $job, \Throwable $exception): never
+    public function fail(DataTransferJobMessage $message, DataTransferJob $job, \Throwable $exception): never
     {
-        Tlog::getInstance()->addError(\sprintf('%s %d failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
+        Tlog::getInstance()->addError(\sprintf('%s failed: %s', $message->describe(), JobFailureMessage::forLog($exception)));
 
         $reason = JobFailureMessage::forAdministrator($exception);
 
@@ -193,20 +198,12 @@ final readonly class JobLifecycle
             $job->markFailed($reason);
         } catch (\Throwable $notRecorded) {
             // The job is set aside all the same: the failure transport still lists it.
-            Tlog::getInstance()->addError(\sprintf('%s %d could not be marked failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($notRecorded)));
+            Tlog::getInstance()->addError(\sprintf('%s could not be marked failed: %s', $message->describe(), JobFailureMessage::forLog($notRecorded)));
         }
 
         // The failure transport keeps this exception and the back office lists it.
         // Symfony stores the whole chain of an exception it sets aside, so the cause
         // is not chained: its text may quote a customer, the log names it.
-        throw new JobSetAsideException(\sprintf('%s failed: %s', self::nameOf($job), $reason));
-    }
-
-    /**
-     * The job as the failed jobs screen names it: "Export #4", "Import #12".
-     */
-    private static function nameOf(DataTransferJob $job): string
-    {
-        return \sprintf('%s #%d', 'export_job' === $job->tableName() ? 'Export' : 'Import', (int) $job->getId());
+        throw new JobSetAsideException(\sprintf('%s failed: %s', $message->describe(), $reason));
     }
 }
