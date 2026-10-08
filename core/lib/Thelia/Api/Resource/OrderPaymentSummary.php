@@ -66,7 +66,11 @@ final class OrderPaymentSummary
     #[Groups([self::GROUP_ADMIN_READ])]
     public string $refunded = '0.000000';
 
-    #[ApiProperty(description: 'What the authorization still holds; zero when the module took the price at once.', example: '70.000000')]
+    #[ApiProperty(description: 'Sum of the captures waiting for the provider\'s answer: not captured yet, but out of reach of another capture.', example: '0.000000')]
+    #[Groups([self::GROUP_ADMIN_READ])]
+    public string $pendingCapture = '0.000000';
+
+    #[ApiProperty(description: 'What the authorization still holds once the captures waiting for their answer are set aside; zero when the module took the price at once.', example: '70.000000')]
     #[Groups([self::GROUP_ADMIN_READ])]
     public string $remainingToCapture = '0.000000';
 
