@@ -63,7 +63,7 @@ class MailerFactory
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
         #[Autowire(service: 'mailer.transports')]
-        private readonly ?TransportInterface $transport = null,
+        private readonly TransportInterface $transport,
         private readonly ?SaleUnitConfigService $saleUnitConfig = null,
     ) {
     }
@@ -80,12 +80,6 @@ class MailerFactory
      */
     public function sendNow(Email $message): void
     {
-        if (null === $this->transport) {
-            $this->mailer->send($message);
-
-            return;
-        }
-
         $this->transport->send($message);
     }
 

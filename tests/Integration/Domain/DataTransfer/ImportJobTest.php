@@ -20,6 +20,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Archiver\AbstractArchiver;
+use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\MissingColumnsException;
 use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\ImportHandler;
@@ -42,9 +45,6 @@ use Thelia\Model\ImportQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\IntegrationTestCase;
-use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
-use Thelia\Core\Archiver\ArchiverManager;
-use Thelia\Core\Archiver\AbstractArchiver;
 
 /**
  * An import asked for in the back office is a job: its uploaded file is kept out of

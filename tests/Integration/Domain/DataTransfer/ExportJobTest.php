@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -21,8 +22,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
@@ -31,6 +35,7 @@ use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
@@ -40,11 +45,6 @@ use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\DataTransfer\ImageHeavyExport;
-use Thelia\Messenger\Event\FailedJobRemovedEvent;
-use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
-use Thelia\Core\Archiver\ArchiverInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * An export asked for in the back office is a job: without a queue it runs in the

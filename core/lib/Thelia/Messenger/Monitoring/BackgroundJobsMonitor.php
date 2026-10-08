@@ -60,9 +60,9 @@ final readonly class BackgroundJobsMonitor
         private TransportInterface $failureTransport,
         private MessageBusInterface $bus,
         #[Autowire(service: 'messenger.transport.async_heavy')]
-        private ?TransportInterface $heavyTransport = null,
-        private ?ConfiguredQueues $queues = null,
-        private ?EventDispatcherInterface $dispatcher = null,
+        private TransportInterface $heavyTransport,
+        private ConfiguredQueues $queues,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -88,7 +88,7 @@ final readonly class BackgroundJobsMonitor
         // The heavy jobs wait on a queue of their own, unless it is the same one.
         if ($this->heavyTransport instanceof MessageCountAwareInterface
             && $this->heavyTransport !== $this->jobTransport
-            && true !== $this->queues?->heavyJobsShareTheJobQueue()
+            && !$this->queues->heavyJobsShareTheJobQueue()
         ) {
             $count += $this->heavyTransport->getMessageCount();
         }
@@ -108,7 +108,7 @@ final readonly class BackgroundJobsMonitor
      */
     public function failedJobs(int $limit = 100): array
     {
-        $queue = $this->queues?->failureQueueInTheShopDatabase();
+        $queue = $this->queues->failureQueueInTheShopDatabase();
 
         if (null !== $queue) {
             // Read in SQL: the transport lists the oldest first, and past the limit the
@@ -158,7 +158,7 @@ final readonly class BackgroundJobsMonitor
         // instead of sending it twice; put back as it was when the replay fails. In
         // the shop database the row is deleted on a condition: of two replays that
         // read the job at once, only the one that deleted it sends it again.
-        $queue = $this->queues?->failureQueueInTheShopDatabase();
+        $queue = $this->queues->failureQueueInTheShopDatabase();
 
         if (null === $queue) {
             $this->failureTransport->reject($envelope);
@@ -201,7 +201,7 @@ final readonly class BackgroundJobsMonitor
 
         // In the shop database the row is deleted on a condition: a job a replay took
         // meanwhile is not deleted, nor is what it kept for the replay.
-        $queue = $this->queues?->failureQueueInTheShopDatabase();
+        $queue = $this->queues->failureQueueInTheShopDatabase();
 
         if (null === $queue) {
             $this->failureTransport->reject($envelope);
@@ -210,7 +210,7 @@ final readonly class BackgroundJobsMonitor
         }
 
         // Never replayed now: what was kept for the replay can go.
-        $this->dispatcher?->dispatch(new FailedJobRemovedEvent($envelope->getMessage()));
+        $this->dispatcher->dispatch(new FailedJobRemovedEvent($envelope->getMessage()));
 
         return true;
     }

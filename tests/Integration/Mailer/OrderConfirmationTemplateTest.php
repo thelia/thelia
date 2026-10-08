@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 use Thelia\Action\Order as OrderAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Security\SecurityContext;
@@ -124,6 +125,7 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
+            new NullTransport(),
         );
 
         return $mailerFactory->createEmailMessage(
