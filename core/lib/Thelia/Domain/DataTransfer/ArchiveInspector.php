@@ -182,7 +182,11 @@ final readonly class ArchiveInspector
         }
 
         try {
-            $longName = null;
+            // Every name an extractor may write an entry under is checked: the GNU long
+            // names and pax paths before it, a global pax path, which applies to every
+            // entry after it, and the header name, with its prefix and without.
+            $pendingNames = [];
+            $globalName = null;
 
             while (true) {
                 $header = self::readBlock($stream, 512);
@@ -204,28 +208,29 @@ final readonly class ArchiveInspector
                 }
 
                 if ('L' === $type) {
-                    $longName = rtrim((string) self::skipOrRead($stream, $size, true), "\0");
+                    $pendingNames[] = rtrim((string) self::skipOrRead($stream, $size, true), "\0");
 
                     continue;
                 }
 
-                if ('x' === $type || 'g' === $type) {
-                    $longName = self::paxPath((string) self::skipOrRead($stream, $size, true)) ?? $longName;
+                if ('x' === $type) {
+                    $pendingNames[] = self::paxPath((string) self::skipOrRead($stream, $size, true));
 
                     continue;
                 }
 
-                // An extractor that reads only the header block writes the entry under its
-                // ustar name, one that reads the records under the long name: both are
-                // checked, whichever is written.
-                $names = array_values(array_unique(array_filter([$longName, '' === $prefix ? $name : $prefix.'/'.$name], static fn (?string $candidate): bool => null !== $candidate && '' !== $candidate)));
-                $longName = null;
+                if ('g' === $type) {
+                    $globalName = self::paxPath((string) self::skipOrRead($stream, $size, true)) ?? $globalName;
+
+                    continue;
+                }
+
+                $names = [...$pendingNames, $globalName, $name, '' === $prefix ? null : $prefix.'/'.$name];
+                $pendingNames = [];
 
                 // Told before its content is read: an entry over the limits stops the
-                // reading there. Directories hold nothing; links point elsewhere.
-                if ('5' !== $type) {
-                    yield [$names, $size, '1' === $type || '2' === $type];
-                }
+                // reading there. A directory is checked like a file; links point elsewhere.
+                yield [array_values(array_unique(array_filter($names, static fn (?string $candidate): bool => null !== $candidate && '' !== $candidate))), $size, '1' === $type || '2' === $type];
 
                 self::skipOrRead($stream, $size, false);
             }

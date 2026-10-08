@@ -210,6 +210,68 @@ final class ArchiveInspectorTest extends IntegrationTestCase
     }
 
     /**
+     * A GNU long name and a pax path may both precede an entry: an extractor reading only
+     * one of them writes the entry under it.
+     */
+    public function testAGnuLongNameIsCheckedBesideThePaxPathAfterIt(): void
+    {
+        $long = (string) file_get_contents($this->tar(['././@LongLink' => "../../public/stock.php\0"], type: 'L'));
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => self::paxRecord('path', 'stock.csv')], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/long-then-pax.tar';
+        file_put_contents($path, substr($long, 0, -1024).substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    /**
+     * A global pax path names every entry after it, a directory first.
+     */
+    public function testAGlobalPaxPathBeforeADirectoryIsChecked(): void
+    {
+        $global = (string) file_get_contents($this->tar(['././@PaxHeader' => self::paxRecord('path', '../../public/')], type: 'g'));
+        $directory = (string) file_get_contents($this->tar(['data/' => ''], type: '5'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/global.tar';
+        file_put_contents($path, substr($global, 0, -1024).substr($directory, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    public function testADirectoryClimbingOutOfItsFolderIsRefused(): void
+    {
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($this->tar(['../../public/' => ''], type: '5'), 'tar');
+    }
+
+    /**
+     * An extractor that ignores the prefix reads the header name alone.
+     */
+    public function testAnAbsoluteHeaderNameBehindAPrefixIsRefused(): void
+    {
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($this->tar(['/etc/stock.csv' => 'a'], prefix: 'data'), 'tar');
+    }
+
+    public function testAnOrdinaryTarWithAPrefixAndADirectoryIsAccepted(): void
+    {
+        $directory = (string) file_get_contents($this->tar(['data/' => ''], type: '5'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a'], prefix: 'data'));
+        $path = $this->directory.'/prefix.tar';
+        file_put_contents($path, substr($directory, 0, -1024).$file);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * A name is read whole or not at all: a header record past what is read of it would
      * hide the name it ends with.
      */
@@ -252,13 +314,13 @@ final class ArchiveInspectorTest extends IntegrationTestCase
      *
      * @param array<string, string> $files
      */
-    private function tar(array $files, string $type = '0'): string
+    private function tar(array $files, string $type = '0', string $prefix = ''): string
     {
         $tar = '';
         foreach ($files as $name => $content) {
             $header = str_pad($name, 100, "\0").str_pad('0000644', 8, "\0").str_pad('0000000', 8, "\0").str_pad('0000000', 8, "\0")
                 .str_pad(\sprintf('%011o', \strlen($content)), 12, "\0").str_pad(\sprintf('%011o', time()), 12, "\0").str_repeat(' ', 8)
-                .$type.str_repeat("\0", 100).str_pad("ustar\0", 6, "\0").'00'.str_repeat("\0", 247);
+                .$type.str_repeat("\0", 100).str_pad("ustar\0", 6, "\0").'00'.str_repeat("\0", 80).str_pad($prefix, 155, "\0").str_repeat("\0", 12);
             $checksum = array_sum(array_map(ord(...), str_split($header)));
             $header = substr_replace($header, str_pad(\sprintf('%06o', $checksum), 7, "\0")."\0", 148, 8);
             $tar .= $header.str_pad($content, (int) (ceil(\strlen($content) / 512) * 512), "\0");
