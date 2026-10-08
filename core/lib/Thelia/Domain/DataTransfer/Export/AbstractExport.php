@@ -227,7 +227,9 @@ abstract class AbstractExport implements \Iterator
      */
     public function setLang(?Lang $language = null)
     {
-        $this->language = $language;
+        // A job whose language was deleted while it waited holds none: it is written in
+        // the default language, as an import is.
+        $this->language = $language ?? Lang::getDefaultLanguage();
 
         if (null === $this->originalOrderAndAliases) {
             $this->originalOrderAndAliases = $this->orderAndAliases;
