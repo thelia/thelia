@@ -17,6 +17,7 @@ namespace Thelia\Core\Template\Element;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
@@ -60,8 +61,7 @@ abstract class BaseI18nLoop extends BaseLoop
         bool $forceReturn = false,
     ): void {
         /* manage translations */
-        /** @var Lang $lang */
-        $lang = $this->getMainRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
+        $lang = $this->requestedLang() ?? $this->getMainRequest()->getSession()->getLang() ?? Lang::getDefaultLanguage();
         $this->locale = ModelCriteriaTools::getI18n(
             $this->getBackendContext(),
             $lang->getId(),
@@ -72,6 +72,24 @@ abstract class BaseI18nLoop extends BaseLoop
             $foreignKey,
             $this->getForceReturn(),
         );
+    }
+
+    /**
+     * The language the `lang` argument asks for, by id or by locale: a document printed for a customer (an invoice,
+     * a delivery note) reads its texts in the customer's language, whatever the language of whoever prints it.
+     *
+     * @throws \InvalidArgumentException when the argument names no language
+     */
+    private function requestedLang(): ?Lang
+    {
+        $requested = $this->getLang();
+
+        if (null === $requested || '' === (string) $requested) {
+            return null;
+        }
+
+        return LangQuery::create()->findByIdOrLocale($requested)
+            ?? throw new \InvalidArgumentException(\sprintf('Incorrect lang argument given : lang %s not found', $requested));
     }
 
     /**
