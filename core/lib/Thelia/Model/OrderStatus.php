@@ -29,6 +29,16 @@ class OrderStatus extends BaseOrderStatus
     public const CODE_REFUNDED = 'refunded';
 
     /**
+     * The status of an order whose payment is authorized and not yet captured.
+     *
+     * Not a canonical status: it is seeded at install as a custom status equivalent to
+     * not_paid, so that isPaid(false) and every module reading it stay as they are. A
+     * merchant may rename or delete it; the core looks it up by this code and leaves the
+     * order where it is when it is gone.
+     */
+    public const CODE_AWAITING_CAPTURE = 'awaiting_capture';
+
+    /**
      * The canonical status codes, the only values a custom status may declare as its equivalence.
      */
     public const CANONICAL_CODES = [

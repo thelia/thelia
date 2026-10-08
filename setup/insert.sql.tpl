@@ -2128,13 +2128,16 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', '#dc3545', 1, 1, NOW(), NOW()),
-(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
-(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
-(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
-(5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
-(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', NULL, '#dc3545', 1, 1, NOW(), NOW()),
+(2, 'paid', NULL, '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', NULL, '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', NULL, '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', NULL, '#6c757d', 5, 1, NOW(), NOW()),
+(6, 'refunded', NULL, '#986dff', 6, 1, NOW(), NOW()),
+-- The payment is authorized and not yet taken: a custom status, equivalent to not_paid,
+-- that the core moves an order to when a payment module records an authorization.
+(7, 'awaiting_capture', 'not_paid', '#ffc107', 7, 0, NOW(), NOW());
 
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
@@ -2222,7 +2225,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (55, 'admin.order.status-force', NOW(), NOW()),
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
-(58, 'admin.configuration.gift-wrapping', NOW(), NOW())
+(58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
+(59, 'admin.order.payment-capture', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3936,7 +3940,8 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (3, '{{ locale }}', {{ intl('Processing', locale) }}, '', '', ''),
     (4, '{{ locale }}', {{ intl('Sent', locale) }}, '', '', ''),
     (5, '{{ locale }}', {{ intl('Canceled', locale) }}, '', '', ''),
-    (6, '{{ locale }}', {{ intl('Refunded', locale) }}, '', '', ''){% if not loop.last %},{% endif %}
+    (6, '{{ locale }}', {{ intl('Refunded', locale) }}, '', '', ''),
+    (7, '{{ locale }}', {{ intl('Awaiting capture', locale) }}, '', '', ''){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4023,7 +4028,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (55, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL),
     (56, '{{ locale }}', {{ intl('Configuration / Tag', locale) }}, NULL, NULL, NULL),
     (57, '{{ locale }}', {{ intl('Catalog price rules', locale) }}, NULL, NULL, NULL),
-    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL),
+    (59, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

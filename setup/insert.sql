@@ -2128,13 +2128,16 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', '#dc3545', 1, 1, NOW(), NOW()),
-(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
-(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
-(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
-(5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
-(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', NULL, '#dc3545', 1, 1, NOW(), NOW()),
+(2, 'paid', NULL, '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', NULL, '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', NULL, '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', NULL, '#6c757d', 5, 1, NOW(), NOW()),
+(6, 'refunded', NULL, '#986dff', 6, 1, NOW(), NOW()),
+-- The payment is authorized and not yet taken: a custom status, equivalent to not_paid,
+-- that the core moves an order to when a payment module records an authorization.
+(7, 'awaiting_capture', 'not_paid', '#ffc107', 7, 0, NOW(), NOW());
 
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
@@ -2222,7 +2225,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (55, 'admin.order.status-force', NOW(), NOW()),
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
-(58, 'admin.configuration.gift-wrapping', NOW(), NOW())
+(58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
+(59, 'admin.order.payment-capture', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15215,48 +15219,56 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (4, 'cs_CZ', NULL, '', '', ''),
     (5, 'cs_CZ', NULL, '', '', ''),
     (6, 'cs_CZ', NULL, '', '', ''),
+    (7, 'cs_CZ', 'Čeká na stržení platby', '', '', ''),
     (1, 'de_DE', 'Nicht bezahlt', '', '', ''),
     (2, 'de_DE', 'Bezahlt', '', '', ''),
     (3, 'de_DE', 'Bearbeitung', '', '', ''),
     (4, 'de_DE', 'Gesendet', '', '', ''),
     (5, 'de_DE', 'Storniert', '', '', ''),
     (6, 'de_DE', 'Zrückerstattet', '', '', ''),
+    (7, 'de_DE', 'Warten auf Einzug', '', '', ''),
     (1, 'en_US', 'Not paid', '', '', ''),
     (2, 'en_US', 'Paid', '', '', ''),
     (3, 'en_US', 'Processing', '', '', ''),
     (4, 'en_US', 'Sent', '', '', ''),
     (5, 'en_US', 'Canceled', '', '', ''),
     (6, 'en_US', 'Refunded', '', '', ''),
+    (7, 'en_US', 'Awaiting capture', '', '', ''),
     (1, 'es_ES', 'No pagados', '', '', ''),
     (2, 'es_ES', 'Pagado', '', '', ''),
     (3, 'es_ES', 'Procesando', '', '', ''),
     (4, 'es_ES', 'Enviado', '', '', ''),
     (5, 'es_ES', 'Cancelado', '', '', ''),
     (6, 'es_ES', 'Reembolsado', '', '', ''),
+    (7, 'es_ES', 'Pendiente de captura', '', '', ''),
     (1, 'fr_FR', 'Non payée', '', '', ''),
     (2, 'fr_FR', 'Payée', '', '', ''),
     (3, 'fr_FR', 'Traitement', '', '', ''),
     (4, 'fr_FR', 'Envoyée', '', '', ''),
     (5, 'fr_FR', 'Annulée', '', '', ''),
     (6, 'fr_FR', 'Remboursé', '', '', ''),
+    (7, 'fr_FR', 'En attente de capture', '', '', ''),
     (1, 'it_IT', NULL, '', '', ''),
     (2, 'it_IT', NULL, '', '', ''),
     (3, 'it_IT', NULL, '', '', ''),
     (4, 'it_IT', NULL, '', '', ''),
     (5, 'it_IT', NULL, '', '', ''),
     (6, 'it_IT', NULL, '', '', ''),
+    (7, 'it_IT', 'In attesa di cattura', '', '', ''),
     (1, 'nl_NL', 'Niet betaald', '', '', ''),
     (2, 'nl_NL', 'Betaald', '', '', ''),
     (3, 'nl_NL', 'In behandeling', '', '', ''),
     (4, 'nl_NL', 'Verzonden', '', '', ''),
     (5, 'nl_NL', 'Geannuleerd', '', '', ''),
     (6, 'nl_NL', 'Terugbetaald', '', '', ''),
+    (7, 'nl_NL', 'Wacht op incasso', '', '', ''),
     (1, 'ru_RU', 'Не оплачен', '', '', ''),
     (2, 'ru_RU', 'Оплачен', '', '', ''),
     (3, 'ru_RU', 'В обработке', '', '', ''),
     (4, 'ru_RU', 'Выслан', '', '', ''),
     (5, 'ru_RU', 'Отменен', '', '', ''),
-    (6, 'ru_RU', 'Возвращен', '', '', '')
+    (6, 'ru_RU', 'Возвращен', '', '', ''),
+    (7, 'ru_RU', 'Ожидает списания', '', '', '')
 ;
 
 INSERT INTO `order_return_status_i18n`(`id`, `locale`, `title`) VALUES
@@ -15419,6 +15431,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'cs_CZ', NULL, NULL, NULL, NULL),
     (57, 'cs_CZ', NULL, NULL, NULL, NULL),
     (58, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (59, 'cs_CZ', 'Stržení platby objednávky', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15476,6 +15489,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'de_DE', NULL, NULL, NULL, NULL),
     (57, 'de_DE', 'Katalogpreisregeln', NULL, NULL, NULL),
     (58, 'de_DE', NULL, NULL, NULL, NULL),
+    (59, 'de_DE', 'Einzug der Bestellzahlung', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15533,6 +15547,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'en_US', 'Configuration / Tag', NULL, NULL, NULL),
     (57, 'en_US', 'Catalog price rules', NULL, NULL, NULL),
     (58, 'en_US', 'Configuration gift wrappings', NULL, NULL, NULL),
+    (59, 'en_US', 'Order payment capture', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15590,6 +15605,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'es_ES', NULL, NULL, NULL, NULL),
     (57, 'es_ES', 'Reglas de precios del catálogo', NULL, NULL, NULL),
     (58, 'es_ES', NULL, NULL, NULL, NULL),
+    (59, 'es_ES', 'Captura del pago del pedido', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15647,6 +15663,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'fr_FR', 'Configuration / Étiquette', NULL, NULL, NULL),
     (57, 'fr_FR', 'Règles de prix catalogue', NULL, NULL, NULL),
     (58, 'fr_FR', 'Configuration des emballages cadeaux', NULL, NULL, NULL),
+    (59, 'fr_FR', 'Capture du paiement d\'une commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15704,6 +15721,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'it_IT', NULL, NULL, NULL, NULL),
     (57, 'it_IT', 'Regole di prezzo del catalogo', NULL, NULL, NULL),
     (58, 'it_IT', NULL, NULL, NULL, NULL),
+    (59, 'it_IT', 'Cattura del pagamento dell\'ordine', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15761,6 +15779,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'nl_NL', NULL, NULL, NULL, NULL),
     (57, 'nl_NL', 'Catalogusprijsregels', NULL, NULL, NULL),
     (58, 'nl_NL', NULL, NULL, NULL, NULL),
+    (59, 'nl_NL', 'Incasso van de orderbetaling', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15817,7 +15836,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (55, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL),
     (56, 'ru_RU', NULL, NULL, NULL, NULL),
     (57, 'ru_RU', 'Правила цен каталога', NULL, NULL, NULL),
-    (58, 'ru_RU', NULL, NULL, NULL, NULL)
+    (58, 'ru_RU', NULL, NULL, NULL, NULL),
+    (59, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL)
 ;
 
 

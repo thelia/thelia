@@ -290,6 +290,19 @@ final class TheliaEvents
     public const ORDER_UPDATE_DELIVERY_REF = 'action.order.updateDeliveryRef';
     public const ORDER_UPDATE_TRANSACTION_REF = 'action.order.updateTransactionRef';
     public const ORDER_UPDATE_ADDRESS = 'action.order.updateAddress';
+
+    /**
+     * Sent once a line of the payment journal of an order is written, or a pending
+     * line settled: the event carries the order and the line (OrderPaymentTransactionEvent).
+     */
+    public const ORDER_PAYMENT_TRANSACTION_RECORDED = 'action.order.paymentTransactionRecorded';
+
+    /**
+     * Sent to take all or part of what an order's authorization still holds
+     * (OrderPaymentCaptureEvent); the core listener asks the payment module and writes
+     * the journal line.
+     */
+    public const ORDER_PAYMENT_CAPTURE = 'action.order.paymentCapture';
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';
     public const ORDER_PRODUCT_AFTER_CREATE = 'action.orderProduct.afterCreate';
 

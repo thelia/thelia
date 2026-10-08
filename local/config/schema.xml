@@ -1951,6 +1951,53 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <!-- The payment journal of an order: one line per money movement a payment module,
+       an administrator or the shop itself made on it. Lines are only ever added, with one
+       exception: a line written as pending before a call to the provider is settled once,
+       to succeeded or failed, when that call comes back. order.transaction_ref keeps the
+       reference of the main payment for the modules and themes that read it there. -->
+  <table name="order_payment_transaction" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column description="the movement: authorization, capture, refund or void" name="type" required="true" size="20" type="VARCHAR" />
+    <column description="the outcome: pending, succeeded or failed" name="state" required="true" size="20" type="VARCHAR" />
+    <column defaultValue="0.000000" description="the amount moved, in the currency of the line" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column description="the reference the payment provider gave this movement, as it gave it" name="psp_reference" size="100" type="VARCHAR" />
+    <column description="the authorization a capture or a void applies to" name="parent_id" type="INTEGER" />
+    <column description="the payment module behind the movement, NULL once that module is gone" name="payment_module_id" type="INTEGER" />
+    <column description="which kind of author acted: admin, module or system" name="actor_type" required="true" size="20" type="VARCHAR" />
+    <column description="the author label snapshot (admin login, module code), kept when the author is deleted" name="actor_label" size="255" type="VARCHAR" />
+    <column description="the administrator who triggered the movement, NULL once that admin is gone" name="admin_id" type="INTEGER" />
+    <column description="the error code the provider answered, when the movement failed" name="error_code" size="50" type="VARCHAR" />
+    <column description="the error message the provider answered, kept for the back office, never for the customer" name="error_message" type="LONGVARCHAR" />
+    <foreign-key foreignTable="order" name="fk_order_payment_transaction_order_id" onDelete="CASCADE" onUpdate="RESTRICT" refPhpName="PaymentTransaction">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_order_payment_transaction_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_payment_transaction" name="fk_order_payment_transaction_parent_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="Parent" refPhpName="Child">
+      <reference foreign="id" local="parent_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_order_payment_transaction_payment_module_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="PaymentModule">
+      <reference foreign="id" local="payment_module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="admin" name="fk_order_payment_transaction_admin_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="admin_id" />
+    </foreign-key>
+    <!-- A provider notification replayed for the same movement writes nothing twice:
+         the same reference, for the same movement type on the same order, is one line. -->
+    <unique name="order_payment_transaction_reference_UNIQUE">
+      <unique-column name="order_id" />
+      <unique-column name="type" />
+      <unique-column name="psp_reference" />
+    </unique>
+    <index name="idx_order_payment_transaction_order_id">
+      <index-column name="order_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />
