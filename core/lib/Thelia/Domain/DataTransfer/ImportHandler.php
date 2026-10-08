@@ -56,7 +56,7 @@ class ImportHandler
         protected EventDispatcherInterface $eventDispatcher,
         protected SerializerManager $serializerManager,
         protected ArchiverManager $archiverManager,
-        protected ArchiveInspector $archiveInspector = new ArchiveInspector(),
+        protected ArchiveInspector $archiveInspector,
     ) {
     }
 
@@ -323,7 +323,16 @@ class ImportHandler
     private function extractInto(File $file, ArchiverInterface $archiver, string $extractPath): File
     {
         $archiver->open($file->getPathname());
-        $archiver->extract($extractPath);
+
+        try {
+            $archiver->extract($extractPath);
+        } finally {
+            // The archiver is a shared service: the archive is let go here, not held
+            // open until the next import of a worker.
+            if ($archiver instanceof AbstractArchiver) {
+                $archiver->close();
+            }
+        }
 
         // An archive with nothing in it creates no folder.
         if (!is_dir($extractPath)) {

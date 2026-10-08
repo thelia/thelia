@@ -22,6 +22,11 @@ interface DataTransferJobMessage
     public function jobId(): int;
 
     /**
+     * The job as the failed jobs screen names it: "Export #4", "Import #12".
+     */
+    public function describe(): string;
+
+    /**
      * How many times the job was found running elsewhere and looked at again later.
      */
     public function postponements(): int;

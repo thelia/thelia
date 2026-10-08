@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -40,6 +41,9 @@ class ExportHandler
 {
     /** Told the rows written while export() runs: processExport() keeps its signature. */
     private ?\Closure $onProgress = null;
+
+    /** The rows the last export wrote: told again while its images and documents are added. */
+    private int $rowsWritten = 0;
 
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
@@ -121,39 +125,38 @@ class ExportHandler
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
         $this->onProgress = $onProgress;
+        $written = [];
 
+        // A file left behind by a failure holds customer data: whatever fails, a listener
+        // of the export included, what was written goes with it.
         try {
             $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+            $written[] = $filePath;
+            $event->setFilePath($filePath);
+
+            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
+
+            if ($event->getArchiver() instanceof ArchiverInterface) {
+                $this->archive($event, $filePath, $includeImages, $includeDocuments, $written);
+            }
+
+            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
+        } catch (\Throwable $exception) {
+            // A zip still open writes what it holds when it is let go: closed first, so
+            // nothing comes back once the files are removed.
+            if ($event->getArchiver() instanceof AbstractArchiver) {
+                try {
+                    $event->getArchiver()->close();
+                } catch (\Throwable) {
+                }
+            }
+
+            (new Filesystem())->remove($written);
+
+            throw $exception;
         } finally {
             $this->onProgress = null;
         }
-
-        $event->setFilePath($filePath);
-
-        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
-
-        if ($event->getArchiver() instanceof ArchiverInterface) {
-            // Create archive
-            $event->getArchiver()->create($filePath);
-
-            // Add images
-            if ($includeImages && $event->getExport()->hasImages()) {
-                $this->processExportImages($event->getExport(), $event->getArchiver());
-            }
-
-            // Add documents
-            if ($includeDocuments && $event->getExport()->hasDocuments()) {
-                $this->processExportDocuments($event->getExport(), $event->getArchiver());
-            }
-
-            // Finalize archive
-            $event->getArchiver()->add($filePath)->save();
-
-            // Change returned file path
-            $event->setFilePath($event->getArchiver()->getArchivePath());
-        }
-
-        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
 
         return $event;
     }
@@ -239,31 +242,41 @@ class ExportHandler
         $this->exportCachePurger->purgeOldExportFiles(\dirname($filePath));
 
         $file = new \SplFileObject($filePath, 'w+b');
-
-        $serializer->prepareFile($file);
         $written = 0;
 
-        foreach ($export as $idx => $data) {
-            if (!\is_array($data) || empty($data)) {
-                continue;
-            }
-            $data = $export->beforeSerialize($data);
-            $data = $export->applyOrderAndAliases($data);
-            $data = $serializer->serialize($data);
-            $data = $export->afterSerialize($data);
+        // A file left half written holds customer data: it goes with the failure.
+        try {
+            $serializer->prepareFile($file);
 
-            if ($idx > 0) {
-                $data = $serializer->separator().$data;
+            foreach ($export as $idx => $data) {
+                if (!\is_array($data) || empty($data)) {
+                    continue;
+                }
+                $data = $export->beforeSerialize($data);
+                $data = $export->applyOrderAndAliases($data);
+                $data = $serializer->serialize($data);
+                $data = $export->afterSerialize($data);
+
+                if ($idx > 0) {
+                    $data = $serializer->separator().$data;
+                }
+
+                $file->fwrite($data);
+
+                if (null !== $onProgress && 0 === ++$written % DataTransferProgress::STEP) {
+                    $onProgress($written);
+                }
             }
 
-            $file->fwrite($data);
+            $serializer->finalizeFile($file);
+        } catch (\Throwable $exception) {
+            unset($file);
+            (new Filesystem())->remove($filePath);
 
-            if (null !== $onProgress && 0 === ++$written % DataTransferProgress::STEP) {
-                $onProgress($written);
-            }
+            throw $exception;
         }
 
-        $serializer->finalizeFile($file);
+        $this->rowsWritten = $written;
 
         if (null !== $onProgress) {
             $onProgress($written);
@@ -274,17 +287,62 @@ class ExportHandler
         return $filePath;
     }
 
+    /**
+     * @param list<string> $written the files written so far, the archive added once created
+     */
+    private function archive(ExportEvent $event, string $filePath, bool $includeImages, bool $includeDocuments, array &$written): void
+    {
+        $archiver = $event->getArchiver();
+        $archiver->create($filePath);
+        $written[] = $archiver->getArchivePath();
+
+        if ($includeImages && $event->getExport()->hasImages()) {
+            $this->processExportImages($event->getExport(), $archiver);
+        }
+
+        if ($includeDocuments && $event->getExport()->hasDocuments()) {
+            $this->processExportDocuments($event->getExport(), $archiver);
+        }
+
+        $archiver->add($filePath)->save();
+
+        // A tar writes as it goes and keeps its handle: let go once the archive is whole.
+        if ($archiver instanceof AbstractArchiver) {
+            $archiver->close();
+        }
+
+        $event->setFilePath($archiver->getArchivePath());
+    }
+
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void
     {
+        $added = 0;
+
         foreach ($export->getImagesPaths() as $imagePath) {
             $archiver->add($imagePath);
+            $this->signOfLife(++$added);
         }
     }
 
     protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver): void
     {
+        $added = 0;
+
         foreach ($export->getDocumentsPaths() as $documentPath) {
             $archiver->add($documentPath);
+            $this->signOfLife(++$added);
+        }
+    }
+
+    /**
+     * The files added to an archive are not rows: the caller is told the rows written
+     * again, every DataTransferProgress::STEP files, so a long archive is never taken for
+     * a dead one.
+     */
+    private function signOfLife(int $added): void
+    {
+        if (null !== $this->onProgress && 0 === $added % DataTransferProgress::STEP) {
+            ($this->onProgress)($this->rowsWritten);
         }
     }
 }

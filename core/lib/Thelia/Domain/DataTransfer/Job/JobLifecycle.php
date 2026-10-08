@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Log\Tlog;
@@ -75,12 +76,52 @@ final readonly class JobLifecycle
             return;
         } catch (\Throwable $exception) {
             Tlog::getInstance()->addError(\sprintf('%s %d could not be queued: %s', $job::class, $job->getId(), JobFailureMessage::forLog($exception)));
-            $job->markFailed(self::NOT_QUEUED);
+
+            // The database may be what refused: the row is marked when it can be, and
+            // the caller is told why the queue refused either way.
+            try {
+                $job->markFailed(self::NOT_QUEUED);
+            } catch (\Throwable $notRecorded) {
+                Tlog::getInstance()->addError(\sprintf('%s %d could not be marked failed: %s', $job::class, $job->getId(), JobFailureMessage::forLog($notRecorded)));
+            }
 
             throw $exception;
         }
 
         $job->refresh();
+    }
+
+    /**
+     * Reads the row of a message and takes its job for this run: the job when this run
+     * owns it, null when another run holds it or finished it. A row that is gone sets
+     * the message aside, and so does a read or a claim that fails.
+     *
+     * @template T of DataTransferJob
+     *
+     * @param \Closure(int): ?T $find the row of the job, by its id
+     *
+     * @return T|null
+     */
+    public function take(DataTransferJobMessage $message, \Closure $find): ?DataTransferJob
+    {
+        // Reading the row and taking it may fail too (the database gone): what is set
+        // aside then says no more than any other failure.
+        try {
+            $job = $find($message->jobId());
+            $outcome = $job instanceof DataTransferJob ? $this->claimOrPostpone($job, $message) : null;
+        } catch (UnrecoverableMessageHandlingException $setAside) {
+            throw $setAside;
+        } catch (\Throwable $exception) {
+            $this->reject($message->describe(), $exception);
+        }
+
+        if (!$job instanceof DataTransferJob) {
+            // Replayed after the purge took its row: nothing can run, and saying so
+            // keeps the job among the failures instead of reporting it done.
+            throw new JobSetAsideException(\sprintf('%s no longer exists.', $message->describe()));
+        }
+
+        return ClaimOutcome::Owned === $outcome ? $job : null;
     }
 
     /**
