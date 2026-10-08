@@ -33,8 +33,10 @@ final readonly class ShopDatabaseConnectionReleaseListener
     ) {
     }
 
+    // On a failure, after Messenger stamps what failed (200) and before it sends the job
+    // back for a retry (100), so the retry is written through the fresh connection.
     #[AsEventListener(event: WorkerMessageHandledEvent::class)]
-    #[AsEventListener(event: WorkerMessageFailedEvent::class)]
+    #[AsEventListener(event: WorkerMessageFailedEvent::class, priority: 150)]
     public function onJobOver(): void
     {
         $this->connection->close();
