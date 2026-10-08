@@ -166,6 +166,38 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         self::assertDirectoryDoesNotExist(\dirname($leftBehind));
     }
 
+    /**
+     * A file the purge cannot delete (written by another system user) is logged and
+     * left: the other jobs, and the files after it, are purged all the same.
+     */
+    public function testAFileThePurgeCannotDeleteStopsNothing(): void
+    {
+        if (\function_exists('posix_geteuid') && 0 === posix_geteuid()) {
+            self::markTestSkipped('Run as root, every file can be deleted.');
+        }
+
+        $locked = $this->storedFile('locked/stock.csv');
+        $free = $this->storedFile();
+        $lockedImport = $this->importJob('-8 days', $locked, JobStatus::DONE);
+        $freeImport = $this->importJob('-8 days', $free, JobStatus::DONE);
+        $leftBehind = $this->storedFile('locked/left-behind.csv');
+        touch($leftBehind, (int) strtotime('-40 days'));
+        $sweepable = $this->storedFile('old.csv');
+        touch($sweepable, (int) strtotime('-40 days'));
+        chmod(\dirname($locked), 0o555);
+
+        try {
+            $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+        } finally {
+            chmod(\dirname($locked), 0o755);
+        }
+
+        self::assertNull(ImportJobQuery::create()->findPk($lockedImport));
+        self::assertNull(ImportJobQuery::create()->findPk($freeImport));
+        self::assertFileDoesNotExist($free);
+        self::assertFileDoesNotExist($sweepable);
+    }
+
     private function storedFile(string $name = ''): string
     {
         $path = $this->storage.'/'.('' === $name ? uniqid().'.csv' : $name);
