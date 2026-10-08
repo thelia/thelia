@@ -60,15 +60,18 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
     /**
-     * Messages that run a command or a process, call a URL or dispatch any other
-     * message: never built from a queue, whatever a project lists, since whoever
-     * writes to the queue would run anything on the server.
+     * Messages that run a command or a process, call a URL or a service method, or
+     * dispatch any other message: never built from a queue, whatever a project lists,
+     * since whoever writes to the queue would run anything on the server. In lower
+     * case, as PHP finds a class whatever the case of its name.
      */
     private const NEVER_QUEUED_NAMESPACES = [
-        'Symfony\\Component\\Console\\Messenger\\',
-        'Symfony\\Component\\Process\\Messenger\\',
-        'Symfony\\Component\\HttpClient\\Messenger\\',
-        'Symfony\\Component\\Messenger\\Message\\',
+        'symfony\\component\\console\\messenger\\',
+        'symfony\\component\\process\\messenger\\',
+        'symfony\\component\\httpclient\\messenger\\',
+        'symfony\\component\\messenger\\message\\',
+        'symfony\\component\\scheduler\\messenger\\',
+        'symfony\\component\\cache\\messenger\\',
     ];
 
     private const ALLOWED_STAMP_NAMESPACES = [
@@ -204,8 +207,10 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
      */
     private function assertAllowedMessage(string $class, string $exceptionClass): void
     {
+        $lowerCaseClass = strtolower(ltrim($class, '\\'));
+
         foreach (self::NEVER_QUEUED_NAMESPACES as $namespace) {
-            if (str_starts_with($class, $namespace)) {
+            if (str_starts_with($lowerCaseClass, $namespace)) {
                 throw new $exceptionClass(\sprintf('The message class "%s" is not one the shop queues: it runs a command, a process or a request on the server, and is never queued whatever a project lists.', $class));
             }
         }

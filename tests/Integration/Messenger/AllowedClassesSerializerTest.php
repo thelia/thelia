@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
@@ -182,11 +184,24 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
      * Listed or not: a message that runs a command on the server is never built from a
      * queue, or whoever writes to the queue runs anything.
      */
-    public function testAMessageThatRunsACommandIsNeverBuiltEvenWhenListed(): void
+    #[DataProvider('messagesThatRunSomethingOnTheServer')]
+    public function testAMessageThatRunsACommandIsNeverBuiltEvenWhenListed(string $class): void
     {
-        (new AllowedClassesSerializer($this->inner, [RunCommandMessage::class], []))->decode($this->encoded(RunCommandMessage::class));
+        (new AllowedClassesSerializer($this->inner, [$class], []))->decode($this->encoded($class));
 
-        $this->assertReadAsUndecodable(RunCommandMessage::class);
+        $this->assertReadAsUndecodable($class);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function messagesThatRunSomethingOnTheServer(): iterable
+    {
+        yield 'a console command' => [RunCommandMessage::class];
+        // Calls any public method of a recurring task service, with any arguments.
+        yield 'a call to a scheduled service' => [ServiceCallMessage::class];
+        // PHP finds a class whatever the case of its name.
+        yield 'a console command named in lower case' => [strtolower(RunCommandMessage::class)];
     }
 
     /**
