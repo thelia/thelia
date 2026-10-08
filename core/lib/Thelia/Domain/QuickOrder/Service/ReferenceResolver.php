@@ -17,13 +17,13 @@ namespace Thelia\Domain\QuickOrder\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
 use Thelia\Domain\QuickOrder\Enum\LineStatus;
-use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvI18n;
@@ -61,15 +61,16 @@ use Thelia\Model\TaxRuleQuery;
  * The number of statements does not grow with the number of lines: two lookups,
  * the titles, the attributes of the ambiguous lines, and the prices.
  *
- * Products hidden by a reserved sale are left out for the visitor of the current
- * request, whatever customer is given: ReservedSaleVisibility reads the signed-in
- * customer itself. The API and the theme always resolve for that customer; on the
- * command line nobody is signed in and every hidden product stays hidden.
+ * Products hidden from the visitor of the current request (a reserved sale, a
+ * module rule) are left out, whatever customer is given: ProductVisibility reads
+ * the signed-in customer itself. The API and the theme always resolve for that customer; on the
+ * command line nobody is signed in and every product hidden from an anonymous
+ * visitor stays hidden.
  */
 final readonly class ReferenceResolver
 {
     public function __construct(
-        private ReservedSaleVisibility $reservedSaleVisibility,
+        private ProductVisibility $productVisibility,
         private EffectivePriceCatalog $effectivePriceCatalog,
         private TaxEngine $taxEngine,
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
@@ -287,7 +288,7 @@ final readonly class ReferenceResolver
             ->orderByPosition()
             ->orderById();
 
-        $this->reservedSaleVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
+        $this->productVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
 
         $grouped = [];
 
@@ -328,7 +329,7 @@ final readonly class ReferenceResolver
             ->orderByPosition()
             ->orderById();
 
-        $this->reservedSaleVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
+        $this->productVisibility->applyTo($query, ProductSaleElementsTableMap::COL_PRODUCT_ID);
 
         $byReference = [];
 

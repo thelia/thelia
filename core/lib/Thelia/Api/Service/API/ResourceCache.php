@@ -16,6 +16,7 @@ namespace Thelia\Api\Service\API;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 
 /**
@@ -32,7 +33,9 @@ use Thelia\Domain\Pricing\PricingActivityChecker;
  * A running reserved operation breaks that for the catalog: two visitors asking
  * for the same product are owed two different prices. Those paths are therefore
  * bypassed for as long as such an operation runs, and cached again the moment
- * none does, so a shop that never runs one keeps every bit of its cache.
+ * none does, so a shop that never runs one keeps every bit of its cache. A
+ * product visibility rule declared by a module narrows the catalog per visitor
+ * too, and bypasses the same paths for as long as it is declared.
  */
 readonly class ResourceCache
 {
@@ -52,6 +55,7 @@ readonly class ResourceCache
         #[Autowire(param: 'thelia.api.data_access.cache.visitor_dependent_price_prefixes')]
         private array $visitorDependentPricePrefixes,
         private PricingActivityChecker $pricingActivityChecker,
+        private ?ProductVisibility $productVisibility = null,
     ) {
     }
 
@@ -109,7 +113,8 @@ readonly class ResourceCache
     {
         foreach ($this->visitorDependentPricePrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
-                return $this->pricingActivityChecker->hasVisitorDependentPricing();
+                return $this->pricingActivityChecker->hasVisitorDependentPricing()
+                    || true === $this->productVisibility?->hasModuleRules();
             }
         }
 
