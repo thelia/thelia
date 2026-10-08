@@ -27,6 +27,9 @@ final class ImageHeavyExport extends ArrayAbstractExport
 
     public static string $fileName = 'image-heavy';
 
+    /** @var list<string>|null the images, or as many missing ones as */
+    public static ?array $paths = null;
+
     public function getFileName(): string
     {
         return self::$fileName;
@@ -44,7 +47,7 @@ final class ImageHeavyExport extends ArrayAbstractExport
 
     public function getImagesPaths(): ?array
     {
-        return array_map(static fn (int $i): string => '/nowhere/image-'.$i.'.png', range(1, self::$images));
+        return self::$paths ?? array_map(static fn (int $i): string => '/nowhere/image-'.$i.'.png', range(1, self::$images));
     }
 
     public function beforeSerialize(array $data): array

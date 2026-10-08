@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -124,21 +125,38 @@ class ExportHandler
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
         $this->onProgress = $onProgress;
+        $written = [];
 
+        // A file left behind by a failure holds customer data: whatever fails, a listener
+        // of the export included, what was written goes with it.
         try {
             $filePath = $this->processExport($event->getExport(), $event->getSerializer());
+            $written[] = $filePath;
             $event->setFilePath($filePath);
 
             $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
 
             if ($event->getArchiver() instanceof ArchiverInterface) {
-                $this->archive($event, $filePath, $includeImages, $includeDocuments);
+                $this->archive($event, $filePath, $includeImages, $includeDocuments, $written);
             }
+
+            $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
+        } catch (\Throwable $exception) {
+            // A zip still open writes what it holds when it is let go: closed first, so
+            // nothing comes back once the files are removed.
+            if ($event->getArchiver() instanceof AbstractArchiver) {
+                try {
+                    $event->getArchiver()->close();
+                } catch (\Throwable) {
+                }
+            }
+
+            (new Filesystem())->remove($written);
+
+            throw $exception;
         } finally {
             $this->onProgress = null;
         }
-
-        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
 
         return $event;
     }
@@ -270,34 +288,30 @@ class ExportHandler
     }
 
     /**
-     * An archive left half written holds customer data: it goes with the failure, and
-     * so does the file it was to hold.
+     * @param list<string> $written the files written so far, the archive added once created
      */
-    private function archive(ExportEvent $event, string $filePath, bool $includeImages, bool $includeDocuments): void
+    private function archive(ExportEvent $event, string $filePath, bool $includeImages, bool $includeDocuments, array &$written): void
     {
         $archiver = $event->getArchiver();
-        $archivePath = null;
+        $archiver->create($filePath);
+        $written[] = $archiver->getArchivePath();
 
-        try {
-            $archiver->create($filePath);
-            $archivePath = $archiver->getArchivePath();
-
-            if ($includeImages && $event->getExport()->hasImages()) {
-                $this->processExportImages($event->getExport(), $archiver);
-            }
-
-            if ($includeDocuments && $event->getExport()->hasDocuments()) {
-                $this->processExportDocuments($event->getExport(), $archiver);
-            }
-
-            $archiver->add($filePath)->save();
-        } catch (\Throwable $exception) {
-            (new Filesystem())->remove(array_filter([$filePath, $archivePath]));
-
-            throw $exception;
+        if ($includeImages && $event->getExport()->hasImages()) {
+            $this->processExportImages($event->getExport(), $archiver);
         }
 
-        $event->setFilePath($archivePath);
+        if ($includeDocuments && $event->getExport()->hasDocuments()) {
+            $this->processExportDocuments($event->getExport(), $archiver);
+        }
+
+        $archiver->add($filePath)->save();
+
+        // A tar writes as it goes and keeps its handle: let go once the archive is whole.
+        if ($archiver instanceof AbstractArchiver) {
+            $archiver->close();
+        }
+
+        $event->setFilePath($archiver->getArchivePath());
     }
 
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void
