@@ -133,32 +133,43 @@ final readonly class ArchiveInspector
     }
 
     /**
-     * The name a pax header gives the entry that follows: records of "<length>
+     * The names a pax header gives the entry that follows: records of "<length>
      * <key>=<value>\n", read one after the other by their length, so a name quoted in
-     * the value of another record is never taken for it.
+     * the value of another record is never taken for it. Every "path" record counts,
+     * whichever an extractor keeps, and a record that cannot be read to its end refuses
+     * the archive, since an extractor more lenient than this might still read a name
+     * past it.
+     *
+     * @return list<string>
+     *
+     * @throws UploadRefusedException
      */
-    private static function paxPath(string $records): ?string
+    private static function paxPaths(string $records): array
     {
-        $path = null;
+        $paths = [];
         $offset = 0;
 
-        while (1 === preg_match('/\G(\d+) /', $records, $match, 0, $offset)) {
+        while ($offset < \strlen($records)) {
+            if (1 !== preg_match('/\G(\d+) /', $records, $match, 0, $offset)) {
+                throw self::unreadable();
+            }
+
             $length = (int) $match[1];
 
-            if ($length <= \strlen($match[0]) || $offset + $length > \strlen($records)) {
-                break;
+            if ($length <= \strlen($match[0]) || $offset + $length > \strlen($records) || "\n" !== $records[$offset + $length - 1]) {
+                throw self::unreadable();
             }
 
             $record = substr($records, $offset + \strlen($match[0]), $length - \strlen($match[0]) - 1);
 
             if (str_starts_with($record, 'path=')) {
-                $path = substr($record, 5);
+                $paths[] = substr($record, 5);
             }
 
             $offset += $length;
         }
 
-        return $path;
+        return $paths;
     }
 
     /**
@@ -186,7 +197,7 @@ final readonly class ArchiveInspector
             // names and pax paths before it, a global pax path, which applies to every
             // entry after it, and the header name, with its prefix and without.
             $pendingNames = [];
-            $globalName = null;
+            $globalNames = [];
 
             while (true) {
                 $header = self::readBlock($stream, 512);
@@ -214,18 +225,18 @@ final readonly class ArchiveInspector
                 }
 
                 if ('x' === $type) {
-                    $pendingNames[] = self::paxPath((string) self::skipOrRead($stream, $size, true));
+                    array_push($pendingNames, ...self::paxPaths((string) self::skipOrRead($stream, $size, true)));
 
                     continue;
                 }
 
                 if ('g' === $type) {
-                    $globalName = self::paxPath((string) self::skipOrRead($stream, $size, true)) ?? $globalName;
+                    array_push($globalNames, ...self::paxPaths((string) self::skipOrRead($stream, $size, true)));
 
                     continue;
                 }
 
-                $names = [...$pendingNames, $globalName, $name, '' === $prefix ? null : $prefix.'/'.$name];
+                $names = [...$pendingNames, ...$globalNames, $name, '' === $prefix ? null : $prefix.'/'.$name];
                 $pendingNames = [];
 
                 // Told before its content is read: an entry over the limits stops the

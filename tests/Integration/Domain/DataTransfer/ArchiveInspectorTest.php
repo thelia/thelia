@@ -272,6 +272,40 @@ final class ArchiveInspectorTest extends IntegrationTestCase
     }
 
     /**
+     * Two path records in one header: an extractor keeping the first writes the entry
+     * under a name the last would hide.
+     */
+    public function testEveryPaxPathOfAnEntryIsChecked(): void
+    {
+        $records = self::paxRecord('path', '../../public/stock.php').self::paxRecord('path', 'stock.csv');
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => $records], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/two-paths.tar';
+        file_put_contents($path, substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    /**
+     * A record that cannot be read to its end may hide a name an extractor more lenient
+     * than the inspector still reads: the archive is refused.
+     */
+    public function testAPaxRecordThatCannotBeReadToItsEndIsRefused(): void
+    {
+        $records = self::paxRecord('path', 'stock.csv').'99 path=../../public/stock.php';
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => $records], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/cut-record.tar';
+        file_put_contents($path, substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    /**
      * A name is read whole or not at all: a header record past what is read of it would
      * hide the name it ends with.
      */
