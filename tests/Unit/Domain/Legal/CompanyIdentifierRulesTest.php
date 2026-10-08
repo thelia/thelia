@@ -177,5 +177,20 @@ final class CompanyIdentifierRulesTest extends TestCase
             'FR44732829320',
             CompanyIdentifierViolation::FIELD_VAT_NUMBER,
         ];
+        yield 'VAT too short to carry a SIREN' => [
+            '30326504500003',
+            'FR12',
+            CompanyIdentifierViolation::FIELD_VAT_NUMBER,
+        ];
+        yield 'VAT with a SIREN one digit short' => [
+            '30326504500003',
+            'FR4030326504',
+            CompanyIdentifierViolation::FIELD_VAT_NUMBER,
+        ];
+    }
+
+    public function testAFrenchVatNumberWithALetterKeyIsLeftAlone(): void
+    {
+        self::assertSame([], CompanyIdentifierRules::violationsFor('Acme', null, 'FRAB303265045', 'FR'));
     }
 }

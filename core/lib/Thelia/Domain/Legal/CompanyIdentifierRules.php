@@ -135,6 +135,15 @@ final class CompanyIdentifierRules
             return null;
         }
 
+        // The key check below leaves alone a number it cannot read a SIREN from, which is
+        // meant for the old letter keys, not for a number with digits missing.
+        if (null === CompanyIdentifier::sirenOfVatNumber($vatNumber)) {
+            return new CompanyIdentifierViolation(
+                CompanyIdentifierViolation::FIELD_VAT_NUMBER,
+                'A French VAT number is FR, a two character key, then the 9 digits of the SIREN.',
+            );
+        }
+
         if (!CompanyIdentifier::hasValidFrenchVatKey($vatNumber)) {
             return new CompanyIdentifierViolation(
                 CompanyIdentifierViolation::FIELD_VAT_NUMBER,
