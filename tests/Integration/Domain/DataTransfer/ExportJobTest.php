@@ -39,6 +39,12 @@ use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\DataTransfer\ImageHeavyExport;
+use Thelia\Messenger\Event\FailedJobRemovedEvent;
+use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
+use Thelia\Core\Archiver\ArchiverInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * An export asked for in the back office is a job: without a queue it runs in the
@@ -361,6 +367,109 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * The queue refused and the row cannot be marked either (the database is what
+     * went): the caller still learns why the queue refused.
+     */
+    public function testAQueueRefusalReachesTheCallerEvenWhenTheRowCannotBeMarked(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->delete();
+
+        $refusingQueue = new class implements MessageBusInterface {
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                throw new \RuntimeException('The queue server is unreachable.');
+            }
+        };
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The queue server is unreachable.');
+
+        $this->lifecycle($refusingQueue)->dispatch($job, new RunExportJob((int) $job->getId()));
+    }
+
+    /**
+     * A job set aside before it was taken kept its row waiting: once its failure is
+     * deleted, the row says so instead of waiting for a worker until the purge.
+     */
+    public function testARemovedFailureOfAJobStillWaitingMarksItsRow(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        self::assertSame(JobStatus::QUEUED, $job->getJobStatus());
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunExportJob((int) $job->getId())));
+
+        $job->reload();
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertSame(RemovedJobRowListener::DELETED, $job->getError());
+    }
+
+    /**
+     * The images and documents added to an archive are not rows: the export still gives
+     * a sign of life while it adds them, or a long archive would be taken for a dead job.
+     */
+    public function testAnExportStillGivesASignOfLifeWhileItAddsItsImages(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $told = [];
+
+        $event = $this->getService(ExportHandler::class)->export(
+            $export,
+            $this->getService(SerializerManager::class)->get(self::SERIALIZER),
+            $this->archiverKeepingNothing(),
+            Lang::getDefaultLanguage(),
+            includeImages: true,
+            onProgress: static function (int $rows) use (&$told): void {
+                $told[] = $rows;
+            },
+        );
+
+        (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+        // Once for the rows, then every DataTransferProgress::STEP images, with the same count.
+        self::assertSame([2, 2, 2], $told);
+    }
+
+    /**
+     * A file left half written holds customer data: it goes with the failure.
+     */
+    public function testAnExportThatBreaksHalfWayLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        ImageHeavyExport::$breaksOnTheSecondRow = true;
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+            self::fail('The export breaks on its second row.');
+        } catch (\RuntimeException) {
+        } finally {
+            ImageHeavyExport::$breaksOnTheSecondRow = false;
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $archiver = $this->archiverKeepingNothing();
+        $archiver->refusesToSave = true;
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
+            self::fail('The archive cannot be written.');
+        } catch (\RuntimeException) {
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
      * The failure transport keeps what the job says of its failure, and the back
      * office lists it: never the text of a database error.
      */
@@ -492,6 +601,85 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         self::assertSame($before, ExportJobQuery::create()->count());
+    }
+
+    /**
+     * @return ArchiverInterface&object{refusesToSave: bool}
+     */
+    private function archiverKeepingNothing(): ArchiverInterface
+    {
+        return new class implements ArchiverInterface {
+            public bool $refusesToSave = false;
+            private string $archivePath = '';
+
+            public function getId(): string
+            {
+                return 'nothing';
+            }
+
+            public function getName(): string
+            {
+                return 'Nothing';
+            }
+
+            public function getExtension(): string
+            {
+                return 'nothing';
+            }
+
+            public function getMimeType(): string
+            {
+                return 'application/octet-stream';
+            }
+
+            public function isAvailable(): bool
+            {
+                return true;
+            }
+
+            public function getArchivePath(): string
+            {
+                return $this->archivePath;
+            }
+
+            public function setArchivePath(string $archivePath): self
+            {
+                $this->archivePath = $archivePath;
+
+                return $this;
+            }
+
+            public function create(string $baseName): self
+            {
+                $this->archivePath = $baseName.'.nothing';
+                touch($this->archivePath);
+
+                return $this;
+            }
+
+            public function open(string $path): self
+            {
+                return $this;
+            }
+
+            public function add(string $path, ?string $pathInArchive = null): self
+            {
+                return $this;
+            }
+
+            public function save(): bool
+            {
+                if ($this->refusesToSave) {
+                    throw new \RuntimeException('The archive cannot be written.');
+                }
+
+                return true;
+            }
+
+            public function extract(string $toPath): void
+            {
+            }
+        };
     }
 
     private function ordersExport(): Export
