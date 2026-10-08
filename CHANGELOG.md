@@ -77,9 +77,18 @@
 - Only the Anthropic adapter translates it, into `output_config.effort`. A native `effort` or `output_config.effort` in `providerOptions` still wins. The default on thinking is unchanged (off from `low` to `high`, kept at `xhigh` and `max`); on a model that cannot stop thinking (claude-opus-5-5, claude-fable-5), the effort of the tier now replaces the lowest effort the adapter used to force, so such a model thinks at the effort set.
 - OpenAI, Mistral, Ollama and the OpenAI-compatible providers ignore it and send nothing. OpenAI is left out until the accepted values and the models that take `reasoning.effort` are known: the catalogue flags no reasoning model, and a blind send would break `gpt-4o` and `gpt-4.1` calls. `AiEffort::isTranslatedFor()` tells a screen whether a provider uses the setting.
 
+## API
+
+- `Thelia\Api\Bridge\Propel\FrontOperation::isFront()` tells whether an API Platform operation is served under `/front/`, for a processor, a provider or an extension that behaves differently there than on the admin side.
+- The payment journal of an order is read on `GET /api/admin/orders/{orderId}/payment_transactions`, latest movement first, paginated by twenty, with the fields of the line (`type`, `state`, `amount` as a decimal string, `currencyId`, `pspReference`, `parentId`, `paymentModuleId`, `actorType`, `actorLabel`, `adminId`, `errorCode`, `errorMessage`, `createdAt`). `GET /api/admin/orders/{orderId}/payment` adds it up — `authorized`, `captured`, `voided`, `refunded`, `remainingToCapture` — and says whether the module `supportsCapture`. Both answer to the `admin.order` right. Nothing of it is exposed on the front API.
+- `POST /api/admin/orders/{orderId}/capture`, with an optional `amount` (`{}` or `{"amount": null}` for everything still held), captures through the module and answers 201 with the journal line, succeeded, failed with the provider's code and message, or pending. It answers to the `admin.order.payment-capture` right (create), not to the order one; 404 for an unknown order, 422 when the module takes the price at once, when nothing is left to capture or when the amount is not positive or exceeds the authorization, and 409 when the same amount was captured on the order within the last minute, so a client that retries a timed-out call does not take the money twice. An administrator authenticated by a JWT is now the author of the journal and order history lines it writes, where the session-less call used to be attributed to the module or the system. The ActorResolver reads the security token when no back-office session holds an administrator.
+
 ## Tests
 
 - `FixtureFactory::customerGroup()`, `assignCustomerGroup()` and `customerGroupProductPrice()` create a group, move a customer into it and give it a price of its own, and `FixtureFactory::customer()` takes a `customerGroup` option. A customer made without one is in the default group.
+## Themes
+
+- Back-office theme: the payment card of the order sheet shows the payment journal — each movement with its date, its amount, its outcome, the provider reference, the author and, when it failed, the provider's code and message — and, for a module that separates the authorization from the capture, what was authorized, what was captured, what is left, and a *Capture payment* dialog prefilled with the remainder that accepts a smaller amount. The dialog only appears to an administrator holding the `admin.order.payment-capture` right (create) while something is left to capture; the capture goes through `POST /admin/order/update/{order_id}/payment-capture` with the CSRF token and is written to the administration log. An order without a journal, such as every order placed before the update, shows an empty journal.
 
 ## Security
 
