@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
-use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Map\AccessoryTableMap;
 use Thelia\Model\Map\ProductAssociationTypeTableMap;
@@ -37,7 +37,8 @@ use Thelia\Model\ProductAssociationTypeQuery;
  * Three rules, because there are three ways for a block not to be offered: one of
  * the two products is offline, the merchant has hidden the type, or one of the two
  * products belongs to a private drop the visitor is not part of — the same rule
- * `/front/products` applies through ReservedSaleVisibility. The product rules hold
+ * `/front/products` applies through ProductVisibility, which also holds the
+ * rules of the modules. The product rules hold
  * on both ends of the relation, since a relation carries both products whole: the
  * relations of a product taken offline would hand it out as surely as a relation
  * pointing at it. All are applied in the query, so the collection and the item
@@ -50,7 +51,7 @@ use Thelia\Model\ProductAssociationTypeQuery;
 final readonly class ProductAssociationVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private ReservedSaleVisibility $reservedSaleVisibility,
+        private ProductVisibility $productVisibility,
     ) {
     }
 
@@ -87,8 +88,8 @@ final readonly class ProductAssociationVisibilityExtension implements QueryColle
                 ProductAssociationTypeTableMap::COL_VISIBLE,
             ));
 
-            $this->reservedSaleVisibility->applyTo($query, AccessoryTableMap::COL_PRODUCT_ID);
-            $this->reservedSaleVisibility->applyTo($query, AccessoryTableMap::COL_ACCESSORY);
+            $this->productVisibility->applyTo($query, AccessoryTableMap::COL_PRODUCT_ID);
+            $this->productVisibility->applyTo($query, AccessoryTableMap::COL_ACCESSORY);
 
             return;
         }
