@@ -70,7 +70,7 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         $this->setAside('five days ago', new \DateTimeImmutable('-5 days'));
         $this->setAside('never dated', null);
 
-        $purged = (new FailedMessagePurger($this->failureTransport))->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'));
+        $purged = (new FailedMessagePurger($this->failureTransport, $this->queuesFailingElsewhere()))->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'));
 
         self::assertSame(1, $purged);
         self::assertEqualsCanonicalizing(['five days ago', 'never dated'], $this->labelsLeft());
@@ -80,7 +80,7 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
     {
         $this->setAside('forty days ago', new \DateTimeImmutable('-40 days'));
 
-        $purged = (new FailedMessagePurger($this->failureTransport))->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'), dryRun: true);
+        $purged = (new FailedMessagePurger($this->failureTransport, $this->queuesFailingElsewhere()))->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'), dryRun: true);
 
         self::assertSame(1, $purged);
         self::assertSame(['forty days ago'], $this->labelsLeft());
@@ -133,7 +133,7 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         $event = new MaintenancePurgeEvent(false);
         $cannotList = new SyncTransport($this->getService(MessageBusInterface::class));
 
-        (new FailedJobsMaintenancePurgeListener(new FailedMessagePurger($cannotList)))->onMaintenancePurge($event);
+        (new FailedJobsMaintenancePurgeListener(new FailedMessagePurger($cannotList, $this->queuesFailingElsewhere())))->onMaintenancePurge($event);
 
         self::assertNotEmpty(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, 'Failed jobs') && str_contains($line, 'cannot list')));
     }
@@ -166,5 +166,13 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         foreach ($this->failureTransport->all() as $envelope) {
             $this->failureTransport->reject($envelope);
         }
+    }
+
+    /**
+     * Failed jobs kept outside the shop database: read one by one through the transport.
+     */
+    private function queuesFailingElsewhere(): ConfiguredQueues
+    {
+        return new ConfiguredQueues($this->getService(ShopDatabaseConnection::class), 'sync://', 'sync://', 'in-memory://');
     }
 }
