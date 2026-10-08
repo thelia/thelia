@@ -31,11 +31,18 @@ use Thelia\Core\EventListener\ActiveLangsCacheListener;
 use Thelia\Core\EventListener\DefaultCountryCacheListener;
 use Thelia\Core\EventListener\ModuleConfigCacheListener;
 use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Translation\Translator;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Messenger\EventListener\WorkerStateResetListener;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\OrderReturnStatusQuery;
+use Thelia\Model\TaxRuleCountryQuery;
+use Thelia\Model\TaxRuleQuery;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Messenger\ProbeMessage;
 use Thelia\Tools\URL;
@@ -86,6 +93,82 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
         $this->receiveAJob();
 
         self::assertSame('The shop as it is now', ConfigQuery::read('store_name'));
+    }
+
+    public function testADefaultCurrencyChangedSinceThePreviousJobIsSeenByTheNext(): void
+    {
+        $previous = Currency::getDefaultCurrency();
+        $next = CurrencyQuery::create()->filterById($previous->getId(), '<>')->findOne();
+        self::assertNotNull($next);
+
+        CurrencyQuery::create()->update(['ByDefault' => 0]);
+        CurrencyQuery::create()->filterById($next->getId())->update(['ByDefault' => 1]);
+
+        try {
+            $this->receiveAJob();
+
+            self::assertSame($next->getId(), Currency::getDefaultCurrency()->getId());
+        } finally {
+            Currency::resetDefaultCurrencyCache();
+        }
+    }
+
+    public function testATaxRuleChangedSinceThePreviousJobIsSeenByTheNext(): void
+    {
+        $line = TaxRuleCountryQuery::create()->findOne();
+        self::assertNotNull($line);
+        $taxRule = $line->getTaxRule();
+        $country = CountryQuery::create()->findPk($line->getCountryId());
+        self::assertNotNull($country);
+
+        self::assertNotEmpty(TaxRuleQuery::create()->getTaxCalculatorCollection($taxRule, $country));
+
+        // The rule no longer taxes that country.
+        TaxRuleCountryQuery::create()->filterByTaxRuleId($taxRule->getId())->filterByCountryId($country->getId())->delete();
+
+        try {
+            $this->receiveAJob();
+
+            self::assertEmpty(TaxRuleQuery::create()->getTaxCalculatorCollection($taxRule, $country));
+        } finally {
+            TaxRuleQuery::resetCache();
+        }
+    }
+
+    public function testAReturnStatusRenamedSinceThePreviousJobIsSeenByTheNext(): void
+    {
+        $status = OrderReturnStatusQuery::create()->findOne();
+        self::assertNotNull($status);
+        $code = (string) $status->getCode();
+
+        self::assertSame($status->getId(), OrderReturnStatusQuery::create()->findIdByCode($code));
+
+        OrderReturnStatusQuery::create()->filterById($status->getId())->update(['Code' => $code.'_renamed']);
+
+        try {
+            $this->receiveAJob();
+
+            self::assertNull(OrderReturnStatusQuery::create()->findIdByCode($code));
+        } finally {
+            OrderReturnStatusQuery::resetCache();
+        }
+    }
+
+    /**
+     * Loops do not cache under test: what a worker forgets is read on the class.
+     */
+    public function testTheResultsOfTheLoopsOfThePreviousJobAreForgotten(): void
+    {
+        $results = new \ReflectionProperty(BaseLoop::class, 'cacheLoopResult');
+        $results->setValue(null, ['a loop of the previous job' => 'its rows']);
+
+        try {
+            $this->receiveAJob();
+
+            self::assertSame([], $results->getValue());
+        } finally {
+            BaseLoop::resetCachedResults();
+        }
     }
 
     public function testTheLanguageOfThePreviousJobIsNotHandedToTheNext(): void

@@ -79,6 +79,17 @@ abstract class BaseLoop implements LoopInterface
     /** @var array cache of event to dispatch */
     protected static array $dispatchCache = [];
 
+    /**
+     * Forget the results of the loops already run: they last as long as the process,
+     * a page, or days for a worker that renders a template job after job.
+     */
+    public static function resetCachedResults(): void
+    {
+        self::$cacheLoopResult = [];
+        self::$cacheLoopPagination = [];
+        self::$cacheCount = [];
+    }
+
     protected RequestStack $requestStack;
     protected array $theliaParserLoops;
     protected string $kernelEnvironment;
