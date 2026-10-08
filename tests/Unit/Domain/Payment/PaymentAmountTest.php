@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Payment;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Service\PaymentAmount;
 
 final class PaymentAmountTest extends TestCase
@@ -45,6 +46,27 @@ final class PaymentAmountTest extends TestCase
         self::assertSame('0.000000', PaymentAmount::subtract('50.000000', '50.000000'));
         self::assertSame('-5.000000', PaymentAmount::subtract(45, 50));
         self::assertSame('120.000000', PaymentAmount::add('100.000000', 20));
+    }
+
+    public function testAnAmountBeyondWhatTheColumnHoldsIsRefusedRatherThanWrappedAround(): void
+    {
+        // Read as millionths in a 64-bit integer, this figure wraps around to 5.005312
+        // and would pass any ceiling.
+        $this->expectException(InvalidPaymentAmountException::class);
+
+        PaymentAmount::compare(18446744073714.553, '100.000000');
+    }
+
+    public function testANonFiniteAmountIsRefused(): void
+    {
+        $this->expectException(InvalidPaymentAmountException::class);
+
+        PaymentAmount::normalize(\INF);
+    }
+
+    public function testTheLargestAmountTheColumnHoldsIsAccepted(): void
+    {
+        self::assertSame('9999999999.999999', PaymentAmount::normalize('9999999999.999999'));
     }
 
     public function testIsPositiveIgnoresNoiseBelowAMillionth(): void
