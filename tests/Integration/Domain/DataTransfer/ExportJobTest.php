@@ -15,9 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Propel\Runtime\Propel;
-use Thelia\Config\DatabaseConfiguration;
-use Thelia\Domain\DataTransfer\DataTransferProgress;
-use Thelia\Messenger\JobSetAsideException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -27,10 +24,12 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\DataTransferProgress;
 use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
@@ -43,6 +42,7 @@ use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
+use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Export;
@@ -475,7 +475,7 @@ final class ExportJobTest extends IntegrationTestCase
             ++$added;
 
             if (1 === $added) {
-                $connection->exec(\sprintf("UPDATE export_job SET updated_at = DATE_SUB(NOW(), INTERVAL 2 HOUR) WHERE id = %d", $job->getId()));
+                $connection->exec(\sprintf('UPDATE export_job SET updated_at = DATE_SUB(NOW(), INTERVAL 2 HOUR) WHERE id = %d', $job->getId()));
             }
 
             if (DataTransferProgress::STEP + 1 === $added) {

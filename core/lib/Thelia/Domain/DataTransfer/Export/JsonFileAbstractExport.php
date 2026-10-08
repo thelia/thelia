@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Export;
 
-use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Propel\Runtime\Connection\StatementInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 
 /**
  * Class JsonFileAbstractExport.

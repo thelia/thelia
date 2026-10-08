@@ -11,11 +11,12 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Thelia\Tests\Support\DataTransfer;
 
+use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\ExportHandler;
-use Thelia\Core\Serializer\SerializerInterface;
 
 /**
  * An export handler a module extended to write the file its own way, as the
