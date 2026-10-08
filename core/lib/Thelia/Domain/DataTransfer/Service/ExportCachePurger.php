@@ -21,6 +21,14 @@ class ExportCachePurger
 {
     private const EXPORT_CACHE_MAX_AGE_DAYS = 1;
 
+    /**
+     * Where the exports are written, and the only folder an export is ever served from.
+     */
+    public static function directory(): string
+    {
+        return THELIA_CACHE_DIR.'export';
+    }
+
     public function purgeOldExportFiles(string $directory): int
     {
         $deletedCount = 0;

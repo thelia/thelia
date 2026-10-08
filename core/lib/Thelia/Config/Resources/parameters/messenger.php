@@ -29,7 +29,10 @@ return static function (ContainerConfigurator $container): void {
         // MESSENGER_TRANSPORT_DSN (see HeavyTransportDsnProcessor).
         ->set('env(MESSENGER_HEAVY_TRANSPORT_DSN)', '')
         // Message classes, outside the core and the active modules, that a
-        // project lets through its queues (see AllowedClassesSerializer).
+        // project lets through its queues (see AllowedClassesSerializer). A mail is
+        // checked for files it would make the worker read only when it travels as
+        // Symfony's SendEmailMessage: a listed class that carries an Email of its
+        // own must refuse attachments by path itself.
         ->set('thelia.messenger.allowed_message_classes', [])
         // The message classes a handler takes, filled in when the container is
         // built (see HandledMessageClassesPass).

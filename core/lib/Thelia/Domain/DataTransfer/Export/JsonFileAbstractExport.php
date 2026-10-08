@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Export;
 use Propel\Runtime\Connection\StatementInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 
 /**
  * Class JsonFileAbstractExport.
@@ -110,7 +111,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     protected function getDataJsonCache(StatementInterface $statement, string $exportName): string
     {
-        $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
+        $filename = ExportCachePurger::directory().DS.$exportName.'.json';
 
         if (0 === $statement->rowCount()) {
             throw new DataTransferNoDataFoundException(Translator::getInstance()->trans('No data found for your export.'));
