@@ -14,17 +14,21 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
@@ -228,17 +232,197 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertSame(2, $captures);
     }
 
-    public function testAVoidSendsAnOrderOnHoldBackToUnpaid(): void
+    public function testAVoidOfAnUntouchedAuthorizationSendsTheOrderBackToUnpaid(): void
     {
         $order = $this->order(120);
         $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
-        $this->recorder->recordCapture($order, 20, 'CAP-1', moduleCode: 'Cheque');
 
         $void = $this->recorder->recordVoid($order, 'VOID-1', moduleCode: 'Cheque');
 
-        self::assertSame('100.000000', $void->getAmount(), 'A void releases what was still held.');
+        self::assertSame('120.000000', $void->getAmount(), 'A void releases what was still held.');
         self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_NOT_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testAPendingCaptureReservesWhatItAskedFor(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1');
+        $this->recorder->recordCapture($order, 100, null, PaymentTransactionState::PENDING);
+
+        $this->expectException(CaptureExceedsAuthorizationException::class);
+
+        $this->recorder->recordCapture($order, 1, 'CAP-2');
+    }
+
+    public function testAnAuthorizationNeedsTheProviderReference(): void
+    {
+        // Without a reference a replayed authorization cannot be told from a second one,
+        // and the authorized amount would double.
+        $this->expectException(MissingProviderReferenceException::class);
+
+        $this->recorder->recordAuthorization($this->order(100), 100);
+    }
+
+    public function testAReplayedReferenceLessCaptureIsTheSameLine(): void
+    {
+        $order = $this->order(120);
+
+        $first = $this->recorder->recordCapture($order, 120, moduleCode: 'Cheque');
+        $replayed = $this->recorder->recordCapture($order, 120, moduleCode: 'Cheque');
+
+        self::assertSame($first->getId(), $replayed->getId());
+        self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+    }
+
+    public function testAReplayAfterAListenerFailureMovesTheOrderAtLast(): void
+    {
+        $order = $this->order(100);
+        $failOnce = static function (): void {
+            static $failed = false;
+
+            if (!$failed) {
+                $failed = true;
+
+                throw new \RuntimeException('Listener down');
+            }
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $failOnce, 255);
+
+        try {
+            $this->recorder->recordAuthorization($order, 100, 'AUTH-1');
+            self::fail('The first notification fails on the listener.');
+        } catch (\RuntimeException) {
+        }
+
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->reload($order)->getOrderStatus()->getCode());
+
+        // The provider replays the same notification.
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1');
+        $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $failOnce);
+
+        self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testASuccessReportedUnderTheReferenceOfAFailureIsRefusedExplicitly(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'PI-1', PaymentTransactionState::FAILED, errorCode: '05');
+
+        $this->expectException(PaymentException::class);
+
+        $this->recorder->recordAuthorization($order, 100, 'PI-1');
+    }
+
+    public function testAReplayWithAnotherAmountIsRefusedExplicitly(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordCapture($order, 100, 'CAP-1');
+
+        $this->expectException(PaymentException::class);
+
+        $this->recorder->recordCapture($order, 60, 'CAP-1');
+    }
+
+    public function testAnOutcomeReportedForAPendingLineSettlesIt(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1');
+        $pending = $this->recorder->recordCapture($order, 100, null, PaymentTransactionState::PENDING);
+        $this->recorder->attachReference($pending, 'CAP-ASYNC');
+
+        $notified = $this->recorder->recordCapture($order, 100, 'CAP-ASYNC');
+
+        self::assertSame($pending->getId(), $notified->getId());
+        self::assertTrue($notified->isSucceeded());
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testSettlingOnAReferenceAnotherLineCarriesIsRefusedExplicitly(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1');
+        $this->recorder->recordCapture($order, 40, 'CAP-1');
+        $pending = $this->recorder->recordCapture($order, 60, null, PaymentTransactionState::PENDING);
+
+        $this->expectException(PaymentException::class);
+
+        $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'CAP-1');
+    }
+
+    public function testProviderReferencesAreCaseSensitive(): void
+    {
+        $order = $this->order(100);
+
+        $this->recorder->recordRefund($this->paid($order), 10, 'Ab1');
+        $this->recorder->recordRefund($order, 10, 'aB1');
+
+        self::assertSame(2, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+    }
+
+    public function testAPendingRefundCountsAgainstWhatCanBeGivenBack(): void
+    {
+        $order = $this->paid($this->order(100));
+        $this->recorder->recordRefund($order, 80, null, PaymentTransactionState::PENDING);
+
+        $this->expectException(InvalidPaymentAmountException::class);
+
+        $this->recorder->recordRefund($order, 30, 'REF-2');
+    }
+
+    public function testReleasingTheRestOfAPartlyCapturedAuthorizationPaysTheOrder(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1', moduleCode: 'Cheque');
+        $this->recorder->recordCapture($order, 40, 'CAP-1', moduleCode: 'Cheque');
+
+        $this->recorder->recordVoid($order, 'VOID-1', moduleCode: 'Cheque');
+
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode(), 'What was taken is the payment.');
+    }
+
+    public function testARemainderBelowTheSmallestCoinPaysTheOrder(): void
+    {
+        $order = $this->order(100);
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-1', moduleCode: 'Cheque');
+
+        $this->recorder->recordCapture($order, 99.995, 'CAP-1', moduleCode: 'Cheque');
+
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testATransitionTheGraphRefusesLeavesTheLineAndTheStatusAndDoesNotFailTheNotification(): void
+    {
+        $notPaid = OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID);
+        $this->getService(OrderStatusTransitionWriter::class)->replaceTargets(
+            (int) $notPaid->getId(),
+            [(int) OrderStatusQuery::getPaidStatus()->getId(), (int) OrderStatusQuery::getCancelledStatus()->getId()],
+        );
+        $order = $this->order(100);
+
+        $line = $this->recorder->recordAuthorization($order, 100, 'AUTH-1', moduleCode: 'Cheque');
+
+        self::assertTrue($line->isSucceeded());
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testALateAuthorizationLeavesAnOrderInACustomCancelledStatus(): void
+    {
+        $customCancelled = $this->factory->orderStatus(['equivalentCode' => OrderStatus::CODE_CANCELED]);
+        $order = $this->order(100);
+        $order->setStatusId($customCancelled->getId())->save();
+
+        $this->recorder->recordAuthorization($order, 100, 'AUTH-LATE', moduleCode: 'Cheque');
+
+        self::assertSame($customCancelled->getId(), $this->reload($order)->getStatusId());
+    }
+
+    private function paid(Order $order): Order
+    {
+        $this->recorder->recordCapture($order, 100, 'CAP-PAID');
+
+        return $order;
     }
 
     private function order(float $total): Order

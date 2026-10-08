@@ -18,6 +18,8 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\EventListener\RecordImmediateCaptureListener;
+use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -158,6 +160,52 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         $this->dispatch($secondEvent, TheliaEvents::ORDER_UPDATE_STATUS);
 
         self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+    }
+
+    public function testMarkingPaidAnOrderAnAuthorizationStillHoldsWritesNoCaptureNobodyTook(): void
+    {
+        // The module took its deferred capture off while an authorization was open; an
+        // administrator then marks the order paid by hand. No provider took anything.
+        $this->registerTheDeferredCaptureModule();
+        DeferredCapturePaymentModule::reset();
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+        $this->getService(PaymentTransactionRecorder::class)->recordAuthorization($order, 100, 'AUTH-1');
+        DeferredCapturePaymentModule::$deferredCapture = false;
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(OrderStatus::CODE_PAID, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode(), 'The status change goes through.');
+        self::assertSame(
+            0,
+            OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::CAPTURE)->count(),
+            'No capture is invented on top of an open authorization.',
+        );
+    }
+
+    public function testAModuleThatWroteItsOwnCaptureGetsNoSecondLine(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120]);
+        $order->setTransactionRef('ORDER-LEVEL-REF')->save();
+        $this->getService(PaymentTransactionRecorder::class)->recordCapture($order, 120, 'PSP-OWN-REF', moduleCode: 'Cheque');
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+    }
+
+    public function testTheCaptureLineIsWrittenAfterTheCoreListenersOfThePaidStatus(): void
+    {
+        $listeners = $this->dispatcher->getListeners(TheliaEvents::ORDER_UPDATE_STATUS);
+        $priority = null;
+
+        foreach ($listeners as $listener) {
+            if (\is_array($listener) && $listener[0] instanceof RecordImmediateCaptureListener) {
+                $priority = $this->dispatcher->getListenerPriority(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+            }
+        }
+
+        self::assertNotNull($priority);
+        self::assertLessThan(5, $priority, 'Below the status action runner, so a failure here cannot cut it off.');
     }
 
     private function registerTheDeferredCaptureModule(): void

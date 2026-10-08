@@ -61,6 +61,24 @@ final class PaymentTransactionTotalsTest extends TestCase
         self::assertSame('100.000000', $totals->netCaptured());
     }
 
+    public function testAPendingCaptureIsAlreadyCountedAgainstTheAuthorization(): void
+    {
+        // A capture the provider has not answered yet may well have taken the money:
+        // what it asked for is no longer available to another capture.
+        $totals = new PaymentTransactionTotals(authorized: '100.000000', captured: '0.000000', voided: '0.000000', refunded: '0.000000', pendingCapture: '100.000000');
+
+        self::assertSame('0.000000', $totals->remainingToCapture);
+        self::assertFalse($totals->hasSomethingLeftToCapture());
+        self::assertSame('0.000000', $totals->captured, 'What is pending is not reported as captured.');
+    }
+
+    public function testAPendingRefundIsAlreadyCountedAgainstWhatCanBeGivenBack(): void
+    {
+        $totals = new PaymentTransactionTotals(authorized: '0.000000', captured: '120.000000', voided: '0.000000', refunded: '20.000000', pendingRefund: '30.000000');
+
+        self::assertSame('70.000000', $totals->refundable());
+    }
+
     public function testEmptyTotalsReadZeroEverywhere(): void
     {
         $totals = PaymentTransactionTotals::empty();

@@ -18,6 +18,8 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
+use Thelia\Exception\TheliaProcessException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\PaymentModuleWithCaptureInterface;
@@ -27,13 +29,18 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  *
  * A module that takes the price at once tells the core nothing but "paid", through
  * the order status. The first time an order reaches a paid status, a succeeded capture
- * of its total is written, carrying the transaction reference the module saved on
- * the order, so that Cheque, FreeOrder and every published module show one movement
- * without a line of code. A module that authorizes first and captures later writes
- * its own lines and is left alone.
+ * of its total is written, carrying the transaction reference the module saved on the
+ * order, so that Cheque, FreeOrder and every published module show one movement without
+ * a line of code. Nothing is written for a module that authorizes first and captures
+ * later, nor when the journal already holds an authorization or a capture: whatever
+ * wrote them told the story, and an open authorization was not taken by marking the
+ * order paid.
  *
- * Priority 64: after Thelia\Action\Order::updateStatus (128) has saved the status,
- * alongside the invoice numbering and the history, which also read a paid order.
+ * Priority 4: after Thelia\Action\Order::updateStatus (128) has saved the status, and
+ * after every core listener of the paid status — history and invoice numbering (64),
+ * coupons (10), status actions (5) — so that nothing here can cut them off. A failure is
+ * logged and the status change goes on: the status is already committed, and a provider
+ * notification answered with an error would be retried on an order already paid.
  */
 final readonly class RecordImmediateCaptureListener
 {
@@ -42,7 +49,7 @@ final readonly class RecordImmediateCaptureListener
     ) {
     }
 
-    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 64)]
+    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 4)]
     public function onOrderStatusUpdate(OrderEvent $event): void
     {
         $order = $event->getOrder();
@@ -53,23 +60,31 @@ final readonly class RecordImmediateCaptureListener
 
         // Paid to processing, processing to sent: the order was paid already, and the
         // capture written then.
-        if ($this->wasAlreadyPaid($event, $order)) {
+        if ($this->wasAlreadyPaid($event)) {
             return;
         }
 
-        if ($this->moduleKeepsItsOwnJournal($order)) {
+        if ($this->moduleCapturesByHand($order)) {
             return;
         }
 
-        $this->recorder->recordImmediateCaptureIfNone(
-            $order,
-            $order->getTotalAmount(),
-            $order->getTransactionRef(),
-            $event->getSourceModuleCode() ?? $this->paymentModuleCodeOf($order),
-        );
+        try {
+            $this->recorder->recordImmediateCaptureIfNone(
+                $order,
+                $order->getTotalAmount(),
+                $order->getTransactionRef(),
+                $event->getSourceModuleCode() ?? $this->paymentModuleCodeOf($order),
+            );
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->error(\sprintf(
+                'The capture of order %s, paid, could not be written to its payment journal: %s',
+                (string) $order->getRef(),
+                $throwable->getMessage(),
+            ));
+        }
     }
 
-    private function wasAlreadyPaid(OrderEvent $event, Order $order): bool
+    private function wasAlreadyPaid(OrderEvent $event): bool
     {
         $previousStatusId = $event->getPreviousStatusId();
 
@@ -82,13 +97,17 @@ final readonly class RecordImmediateCaptureListener
         return null !== $previousStatus && $previousStatus->isPaid(false);
     }
 
-    private function moduleKeepsItsOwnJournal(Order $order): bool
+    private function moduleCapturesByHand(Order $order): bool
     {
         try {
             $module = $order->getPaymentModuleInstance();
-        } catch (\Throwable) {
+        } catch (TheliaProcessException) {
             // The module is gone: whoever marks the order paid now is the author of
             // the movement, and the line is still worth writing.
+            return false;
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->warning(\sprintf('The payment module of order %s cannot be instantiated: %s', (string) $order->getRef(), $throwable->getMessage()));
+
             return false;
         }
 
