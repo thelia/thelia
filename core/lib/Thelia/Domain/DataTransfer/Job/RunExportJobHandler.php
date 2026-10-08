@@ -15,13 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
-use Thelia\Messenger\JobSetAsideException;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -48,24 +46,9 @@ final readonly class RunExportJobHandler
 
     public function __invoke(RunExportJob $message): void
     {
-        // Reading the row and taking it may fail too (the database gone): what is set
-        // aside then says no more than any other failure.
-        try {
-            $job = ExportJobQuery::create()->findPk($message->exportJobId);
-            $outcome = $job instanceof ExportJob ? $this->lifecycle->claimOrPostpone($job, $message) : null;
-        } catch (UnrecoverableMessageHandlingException $setAside) {
-            throw $setAside;
-        } catch (\Throwable $exception) {
-            $this->lifecycle->reject($message->describe(), $exception);
-        }
+        $job = $this->lifecycle->take($message, static fn (int $id): ?ExportJob => ExportJobQuery::create()->findPk($id));
 
         if (!$job instanceof ExportJob) {
-            // Replayed after the purge took its row: nothing can run, and saying so
-            // keeps the job among the failures instead of reporting it done.
-            throw new JobSetAsideException(\sprintf('Export job %d no longer exists.', $message->exportJobId));
-        }
-
-        if (ClaimOutcome::Owned !== $outcome) {
             return;
         }
 
@@ -106,8 +89,10 @@ final readonly class RunExportJobHandler
             1 === $job->getIncludeImages(),
             1 === $job->getIncludeDocuments(),
             $rangeDate,
+            // Told again with the same count while the images and documents are added:
+            // the row is written all the same, as a sign of life.
             static function (int $rows) use ($job): void {
-                $job->setProcessedRows($rows)->save();
+                $job->setProcessedRows($rows)->setUpdatedAt(new \DateTime())->save();
             },
         );
 
