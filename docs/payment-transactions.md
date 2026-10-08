@@ -50,8 +50,13 @@ not touched: it still carries the reference of the main payment, for the
 modules, the themes and the PDF documents that read it there.
 
 Amounts are DECIMAL strings on the model and floats in the rest of the core.
-`Thelia\Domain\Payment\Service\PaymentAmount` compares and adds them in whole
-millionths, so neither representation is ever compared to the other with `===`.
+`Thelia\Domain\Payment\Service\PaymentAmount` carries them as whole millionths in
+an integer — a decimal string parsed digit by digit, a float rounded to six
+decimals first — so neither representation is ever compared to the other with
+`===`. An amount the column cannot hold (more than ten digits before the point)
+or that is not a finite number is refused with `InvalidPaymentAmountException`
+rather than wrapped around. `CurrencyMinorUnit` reads the decimals of the order
+currency from its ISO code through intl (two for EUR, none for JPY, three for KWD).
 
 ## How a line gets written
 
@@ -59,48 +64,75 @@ millionths, so neither representation is ever compared to the other with `===`.
 It has one method per movement rather than a generic save, because each one
 knows what it has to check:
 
-- `recordAuthorization()` needs a positive amount.
+- `recordAuthorization()` needs a positive amount **and the provider
+  reference** (`MissingProviderReferenceException`): without it a replayed
+  notification cannot be told from a second authorization.
 - `recordCapture()` refuses, with `CaptureExceedsAuthorizationException`, a
   pending or succeeded capture above what the authorization still holds. An
   order with no authorization is a module that took the price at once: its
   capture is the payment itself and is not checked against anything. Zero is a
   valid capture — an order that costs nothing is paid without taking anything.
 - `recordRefund()` refuses an amount above what was taken and not yet given
-  back. The refund itself, towards the provider, belongs to another feature;
-  this is only the line.
-- `recordVoid()` writes what the authorization still held, so the totals read
-  zero afterwards.
-- `settle()` gives a pending line its outcome. It is the only change a line
-  ever receives: a line written before the provider is called, so that a call
-  that never comes back still leaves its trace, is settled once with the answer.
+  back, refunds still pending counted as given. The refund itself, towards the
+  provider, belongs to another feature; this is only the line.
+- `recordVoid()` writes what the authorization still held, captures still
+  pending set aside, so the totals read zero left afterwards.
+- `settle()` gives a pending line its outcome, `attachReference()` the reference
+  the provider answered with, `markOutcomeUnknown()` the reason its outcome is
+  not known. These are the only changes a line ever receives.
 
-A provider reference already in the journal for the same movement type on the
-same order writes nothing: the line that carries it is answered instead. The
-check is backed by the unique index on `(order_id, type, psp_reference)`, so two
-notifications of the same movement handled at the same instant leave one line
-whichever wins the race. A line without a reference — the capture written for a
-module that keeps no journal — is guarded by a named database lock on the
-order, taken for two seconds at most and not insisted on.
+**Pending lines reserve.** `PaymentTransactionTotalsReader` adds up the
+succeeded lines and, apart, the pending ones. A pending capture is not reported
+as captured, but what it asked for is out of the remainder: a capture whose
+provider has not answered may already have taken the money.
 
-Every write, and every settlement, raises `ORDER_PAYMENT_TRANSACTION_RECORDED`
-with an `OrderPaymentTransactionEvent` carrying the order and the line.
+**Every check runs under the lock of the order's journal** (`PaymentJournalLock`,
+a named database lock `thelia_order_payment:<order id>` taken through the
+shared `Thelia\Domain\Order\Service\OrderLock`), with the write that depends on
+it. The lock is insisted on: a worker that does not get it within five seconds
+writes nothing and gets `PaymentJournalBusyException`. The server counts a lock
+taken twice by the same connection, so code holding it calls code that takes it.
+
+**Replays.** A movement reported again is answered with the line already
+written, and `ORDER_PAYMENT_TRANSACTION_RECORDED` is raised again for it, so a
+notification that failed half way — the line written, the order not moved —
+heals when the provider replays it. A line with a reference is found by it, the
+unique index `(order_id, type, psp_reference)` backing the lookup; the column
+has a binary collation, provider references being case-sensitive. A settled line
+without a reference is found by type, outcome and amount within the last
+minute. A pending line that a notification reports with an outcome is settled.
+A reference the journal holds with another outcome or another amount is refused
+with `ConflictingPaymentReferenceException`: a new attempt carries a new
+reference.
+
+Every write, settlement and replay raises `ORDER_PAYMENT_TRANSACTION_RECORDED`
+with an `OrderPaymentTransactionEvent` carrying the order and the line. Its
+listeners must stand being called twice for the same line.
 
 A failure of the recorder is **not** swallowed, unlike an order history entry: a
 payment whose trace cannot be written is a payment the merchant cannot account
-for.
+for. The recorder is not called inside a database transaction the caller
+opened: the lock would be released before that transaction commits.
 
 ## Modules that declare nothing
 
 A module that takes the price at once tells the core nothing but "paid",
 through the order status. `RecordImmediateCaptureListener` listens to
-`ORDER_UPDATE_STATUS` at priority 64 — after the core has saved the status —
-and, the first time an order reaches a paid status coming from an unpaid one,
-writes a succeeded capture of the order total, carrying the transaction
-reference the module saved on the order, authored by the module (or by the
-administrator who marked the order paid). Cheque, FreeOrder and every published
-module get their line without a line of code. A module that implements the
-capture interface and answers `supportsDeferredCapture()` is left alone: it
-writes its own lines.
+`ORDER_UPDATE_STATUS` at priority 4 — after the core has saved the status and
+after every core listener of it (history and invoice numbering at 64, coupons at
+10, status actions at 5) — and, the first time an order reaches a paid status
+coming from an unpaid one, writes a succeeded capture of the order total,
+carrying the transaction reference the module saved on the order, authored by
+the module (or by the administrator who marked the order paid). Cheque,
+FreeOrder and every published module get their line without a line of code.
+
+Nothing is written for a module that implements the capture interface and
+answers `supportsDeferredCapture()`, nor when the journal already holds an
+authorization or a capture, succeeded or pending, whatever wrote them: an open
+authorization is not taken by marking the order paid, and a module that writes
+its own captures keeps a single line. A failure here is logged and the status
+change goes on: the status is committed, and a notification answered with an
+error would be retried on an order already paid.
 
 ## Deferred capture
 
@@ -112,22 +144,31 @@ published module implements would break them all.
 - `supportsDeferredCapture()` says whether, as currently configured, the module
   authorizes first. A module can expose that choice to the merchant.
 - The module writes the **authorization** itself, through the recorder, when
-  the provider confirms it — typically from its notification controller.
+  the provider confirms it — typically from its notification controller — with
+  the provider reference.
 - `capture(Order, float $amount, OrderPaymentTransaction $pending)` and
   `voidAuthorization(Order, OrderPaymentTransaction $pending)` call the
   provider and answer a `PaymentOperationResult`: succeeded with the provider
   reference, failed with the provider's code and message, or pending when the
-  outcome will only come with a later notification — the module then settles the
-  line itself.
+  outcome will only come with a later notification — the module then reports it
+  through the recorder under the reference it answered with, which settles the
+  pending line.
+- A `PaymentException` thrown by the module is a refusal: the line is settled
+  as failed with its message. Any other exception — a timeout, a broken
+  connection — leaves the line **pending**: the call may have reached the
+  provider. The technical message goes to the log, never to the journal every
+  order reader sees, which gets a generic one. Both are rethrown.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
 is what the back office and the admin API call, through the
 `ORDER_PAYMENT_CAPTURE` event (`OrderPaymentCaptureEvent`, null amount for the
-whole remainder). It checks the module, reads the totals, refuses an amount
-above the remainder **before anything leaves the shop**, writes the capture as
-pending with the latest authorization as its parent, calls the module, and
-settles the line with the answer — as failed, with the exception message, when
-the module throws, and the exception is rethrown.
+whole remainder, rounded down to the smallest coin). Under the journal lock it
+reads the totals, refuses an amount that is not positive, has more decimals than
+the currency or exceeds the remainder **before anything leaves the shop**,
+refuses the same amount asked again within a minute (`DuplicateCaptureException`),
+and writes the capture as pending with the latest authorization as its parent.
+Outside the lock it calls the module, then settles the line with the answer.
+`voidAuthorization()` works the same way.
 
 ```mermaid
 sequenceDiagram
@@ -138,33 +179,51 @@ sequenceDiagram
     participant L as MoveOrderOnPaymentTransactionListener
 
     BO->>S: capture(order, 50.00)
-    S->>R: recordCapture(pending, parent = authorization)
+    S->>R: under the lock: totals, repeat guard, recordCapture(pending)
     S->>M: capture(order, 50.00, pending line)
     M-->>S: PaymentOperationResult::succeeded("PSP-REF")
     S->>R: settle(line, succeeded, "PSP-REF")
     R-->>L: ORDER_PAYMENT_TRANSACTION_RECORDED
-    L->>L: remaining to capture = 0 ? move to paid
+    L->>L: nothing held any more ? move to paid
 ```
 
 ## Statuses
 
 `MoveOrderOnPaymentTransactionListener` moves the order along with the money,
-through `ORDER_UPDATE_STATUS`, so the transition graph, the stock, the invoice
-numbering and the history see each move like any other:
+through `ORDER_UPDATE_STATUS`, so the stock, the invoice numbering and the
+history see each move like any other:
 
-- a succeeded **authorization** puts an unpaid order (not cancelled, not
-  refunded) in `awaiting_capture`;
-- the succeeded **capture** of the last amount held makes it `paid`; a capture
-  on an order with no authorization moves nothing, that module says "paid"
-  itself;
-- a succeeded **void** sends an order in `awaiting_capture` back to `not_paid`.
+- a succeeded **authorization** puts an unpaid order (not paid, cancelled or
+  refunded, custom equivalents included) in `awaiting_capture`;
+- once the authorization holds nothing more — everything captured, or the rest
+  released by a succeeded **void** — and no capture or void waits for its
+  answer, the order is `paid` if anything was taken and back to `not_paid` if it
+  was all released. A remainder smaller than the smallest coin of the currency
+  counts as nothing left;
+- a capture on an order with no authorization moves nothing: that module says
+  "paid" itself.
+
+The journal is the truth and the status follows it. A move the transition graph
+refuses is logged and not made, and a status listener that fails is logged: the
+line stays written and the provider's notification is answered.
+
+Cancelling an order whose authorization still holds an amount releases it
+through the module (`VoidAuthorizationOnCancelListener`, priority 3); a module
+that cannot is logged for the merchant to release it at the provider.
 
 `awaiting_capture` (`OrderStatus::CODE_AWAITING_CAPTURE`) is **not** a canonical
 status. It is seeded at install, and by `3.3.0.sql`, as a custom status
-equivalent to `not_paid`, so `isPaid(false)`, `isNotPaid(false)` and every
-module reading them keep their answer, and `OrderStatus::CANONICAL_CODES` is
+equivalent to `not_paid`, so `isPaid(false)`, `isNotPaid(false)` and the
+modules reading them keep their answer, and `OrderStatus::CANONICAL_CODES` is
 unchanged. A merchant may rename it or delete it; the core looks it up by code
 and leaves an authorized order unpaid when it is gone.
+
+The checkout does not read `isPaid()` for this: `Order::isPaymentSecured()`
+answers true for an order paid, refunded, on hold for capture, or whose journal
+still holds an authorized or pending amount. `OrderFacade::findUnpaidOrderOf()`
+and the session's paid-cart check read it, so an authorized order is neither
+presented to its module again nor cancelled for a new one — which would reserve
+the amount twice on the buyer's card — and its cart is consumed.
 
 ## Rights
 
@@ -191,17 +250,18 @@ order is paid, which the order already exposes:
 - `GET /api/admin/orders/{orderId}/payment_transactions` — the journal, latest
   first, twenty per page (`Thelia\Api\Resource\OrderPaymentTransaction`, read
   only, `admin.order` right).
-- `GET /api/admin/orders/{orderId}/payment` — the totals and whether the module
-  `supportsCapture` (`OrderPaymentSummary`, `admin.order` right).
+- `GET /api/admin/orders/{orderId}/payment` — the totals (`pendingCapture`
+  apart) and whether the module `supportsCapture` (`OrderPaymentSummary`,
+  `admin.order` right).
 - `POST /api/admin/orders/{orderId}/capture` with `{"amount": 50}` or `{}` —
   the capture, answered 201 with the journal line
   (`OrderPaymentCapture`, mapped to the `admin.order.payment-capture` right
-  with create access). The processor goes through `ORDER_PAYMENT_CAPTURE`, so a
-  module listening to the event sees the back office and the API alike. A
-  `PaymentException` is a 422; the same explicit amount asked again on the
-  order within a minute, after a capture that did not fail, is a 409 rather
-  than a second capture — the client that retried a timed-out call reads the
-  journal instead. The global admin API rate limit applies on top.
+  with create access). The processor goes through `ORDER_PAYMENT_CAPTURE`, so it
+  shares every guard of the capture service with the back office. A repeated
+  amount within a minute, or a journal another worker is writing, is a 409; any
+  other `PaymentException` a 422; a module that could not reach its provider a
+  502 with a generic message, the capture staying pending. `amount` is bounded
+  by what the column holds. The global admin API rate limit applies on top.
 
 An administrator authenticated by a JWT holds no back-office session:
 `OrderHistoryActorResolver` reads the Symfony security token when the session
@@ -212,23 +272,27 @@ the order history alike.
 
 The payment card of the order sheet (`order/detail.html.twig` of the Twig
 theme) includes `order/_payment_journal.html.twig`: the totals when an
-authorization exists or the module can capture, the *Capture payment* button,
-and the journal table, newest first. `OrderPaymentContextBuilder` composes it
-from `OrderPaymentTransactionRepository` (the reads), `OrderPaymentLinePresenter`
+authorization exists or the module can capture, what waits for the provider, a
+notice that marking the order paid by hand takes nothing while the
+authorization still holds an amount, the *Capture payment* button, and the
+journal table, newest first. `OrderPaymentContextBuilder` composes it from
+`OrderPaymentTransactionRepository` (the reads), `OrderPaymentLinePresenter`
 (labels, badges, author in clear) and the core totals reader; it returns an
 empty, disabled block to an administrator without the orders permission, the
 way the history block does. The button, and the dialog
 `order/_payment_capture_modal.html.twig`, only exist for an administrator
 holding the capture right (create on `admin.order.payment-capture`) when the
-module supports deferred capture and something is left.
+module supports deferred capture and at least a smallest coin is left; the
+dialog is prefilled with the remainder rounded down to it.
 
 `OrderController::capturePayment()` answers `POST
 /admin/order/update/{order_id}/payment-capture`: the capture right first, then
 the shape of the typed amount (a comma counts as a decimal separator, empty
 means the remainder), then `AdminFormAction::tokenAction()` with the CSRF
 token, the `ORDER_PAYMENT_CAPTURE` event and an administration log line naming
-the order, the amount and the outcome. A refusal from the core (above the
-authorization, nothing to capture) comes back as the usual error flash.
+the order, the amount and the outcome. A double submit is refused by the
+capture service as a repetition; a refusal from the core comes back as the
+usual error flash.
 
 ## Installation and update
 
@@ -243,25 +307,34 @@ render an empty one without error.
 ## Test suites
 
 - `tests/Unit/Domain/Payment/PaymentAmountTest.php` — comparisons at the
-  precision of the column.
+  precision of the column, the overflow refused.
+- `tests/Unit/Domain/Payment/CurrencyMinorUnitTest.php` — decimals per
+  currency, the smallest coin.
 - `tests/Unit/Domain/Payment/PaymentTransactionTotalsTest.php` — what is left
-  to capture.
+  to capture or to refund, pending lines reserving.
 - `tests/Integration/Domain/Payment/PaymentTransactionRecorderTest.php` — one
-  line per movement, the capture ceiling, partial capture then balance, replayed
-  references, a failed line that moves nothing, the actor.
+  line per movement, the capture and refund ceilings, partial capture then
+  balance, replays (healing after a listener failure, conflicting references,
+  a pending line settled by its notification), case-sensitive references, the
+  status rules, a transition the graph refuses, the actor.
 - `tests/Integration/Domain/Payment/ImmediateCaptureTest.php` — Cheque and
   FreeOrder get their line; `order.transaction_ref` is untouched; paid to
-  processing writes nothing more.
+  processing writes nothing more; no line on top of an open authorization or a
+  module's own capture; the listener priority.
 - `tests/Integration/Domain/Payment/PaymentCaptureServiceTest.php` — a module
   that defers its capture, through `tests/Support/Payment/DeferredCapturePaymentModule.php`:
-  authorization puts the order on hold, the capture from the back office pays
-  it, a partial capture leaves the rest, a provider refusal leaves it unpaid,
-  an amount above the authorization is refused before the module is called.
+  hold, capture, partial capture, refusal, unknown outcome left pending,
+  pending reserving, repetition, currency precision, void during a pending
+  capture, release on cancellation, a module that cannot load.
+- `tests/Integration/Domain/Payment/AuthorizedOrderCheckoutTest.php` — an
+  authorized order is not the unpaid order of its cart.
 - `tests/Http/BackOffice/OrderPaymentBackOfficeTest.php` — the payment card:
-  the cheque line, the empty journal, the totals and the prefilled dialog, the
-  capture from the dialog and its log line, a partial capture typed with a
-  comma, the refusals, and who sees or may use the button.
+  the cheque line, the empty journal, the totals, the prefilled dialog and its
+  rounding, the hold notice, the capture from the dialog and its log line, a
+  partial capture typed with a comma, the refusals, a forged token, a double
+  submit, and who sees or may use the button.
 - `tests/Api/Admin/OrderPaymentApiTest.php` — the three admin operations:
   shape of a line, scope, the totals, the capture and its refusals, the repeat
-  guard, and who is refused (anonymous, order readers without the capture
-  right, the capture right alone).
+  guard, a retried capture while the first is pending, the amount bound, and
+  who is refused (anonymous, a customer token, order readers without the
+  capture right, the capture right alone).
