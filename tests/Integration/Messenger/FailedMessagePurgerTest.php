@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -103,6 +106,19 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'), dryRun: true));
         self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days')));
         self::assertSame(['set aside today'], $this->labelsLeft());
+    }
+
+    /**
+     * A shop that already runs maintenance:purge (from its crontab or the schedule)
+     * purges the failed jobs with it: they may hold personal data.
+     */
+    public function testTheMaintenancePurgePurgesTheFailedJobs(): void
+    {
+        $event = new MaintenancePurgeEvent(true);
+
+        $this->getService(EventDispatcherInterface::class)->dispatch($event, TheliaEvents::MAINTENANCE_PURGE);
+
+        self::assertNotEmpty(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, \sprintf('Failed jobs (>%d days)', FailedMessagePurger::RETENTION_DAYS))));
     }
 
     private function setAside(string $label, ?\DateTimeImmutable $setAsideAt): void
