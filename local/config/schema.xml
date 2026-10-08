@@ -1963,7 +1963,13 @@
     <column description="the outcome: pending, succeeded or failed" name="state" required="true" size="20" type="VARCHAR" />
     <column defaultValue="0.000000" description="the amount moved, in the currency of the line" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="currency_id" required="true" type="INTEGER" />
-    <column description="the reference the payment provider gave this movement, as it gave it" name="psp_reference" size="100" type="VARCHAR" />
+    <!-- Binary collation: providers issue case-sensitive references ("aB1" and "Ab1" are two
+         movements), and the unique index below would otherwise take one for the other. -->
+    <column description="the reference the payment provider gave this movement, as it gave it" name="psp_reference" size="100" type="VARCHAR">
+      <vendor type="mysql">
+        <parameter name="Collate" value="utf8mb4_bin" />
+      </vendor>
+    </column>
     <column description="the authorization a capture or a void applies to" name="parent_id" type="INTEGER" />
     <column description="the payment module behind the movement, NULL once that module is gone" name="payment_module_id" type="INTEGER" />
     <column description="which kind of author acted: admin, module or system" name="actor_type" required="true" size="20" type="VARCHAR" />
@@ -1987,15 +1993,13 @@
       <reference foreign="id" local="admin_id" />
     </foreign-key>
     <!-- A provider notification replayed for the same movement writes nothing twice:
-         the same reference, for the same movement type on the same order, is one line. -->
+         the same reference, for the same movement type on the same order, is one line.
+         order_id leads the index, which also serves the journal of an order. -->
     <unique name="order_payment_transaction_reference_UNIQUE">
       <unique-column name="order_id" />
       <unique-column name="type" />
       <unique-column name="psp_reference" />
     </unique>
-    <index name="idx_order_payment_transaction_order_id">
-      <index-column name="order_id" />
-    </index>
     <behavior name="timestampable" />
   </table>
   <table name="newsletter" namespace="Thelia\Model">

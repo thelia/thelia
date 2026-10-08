@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Service;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Propel\Runtime\Propel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -26,10 +24,10 @@ use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
+use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentException;
-use Thelia\Log\Tlog;
-use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
@@ -39,21 +37,32 @@ use Thelia\Model\OrderPaymentTransactionQuery;
  *
  * One method per movement rather than a generic save: each one knows what it has to
  * check. A capture never exceeds what the authorization still holds, a refund never
- * exceeds what was taken, and a provider reference already in the journal for the
- * same movement writes nothing — the line that carries it is answered instead.
+ * exceeds what was taken, once the movements still waiting for the provider's answer are
+ * counted as done. Every check runs with the write that depends on it under the lock of
+ * the order's journal, so two workers can never both pass it.
  *
- * A failure here is not swallowed, unlike an order history entry: a payment whose
- * trace cannot be written is a payment the merchant cannot account for.
+ * A movement reported again is answered with the line already written, and the
+ * ORDER_PAYMENT_TRANSACTION_RECORDED event is raised again for it, so a notification that
+ * failed half way — the line written, the order not moved — heals when the provider
+ * replays it. The listeners of that event must therefore stand being called twice for
+ * the same line. A line with a provider reference is found by it; a settled line without
+ * one by its type, outcome and amount within the last minute. A reference the journal
+ * holds with another outcome or another amount is refused: a new attempt carries a new
+ * reference.
+ *
+ * A failure here is not swallowed, unlike an order history entry: a payment whose trace
+ * cannot be written is a payment the merchant cannot account for.
+ *
+ * Not to be called inside a database transaction the caller opened: the lock is released
+ * before that transaction commits, and the event is raised for rows its rollback erases.
  */
 final readonly class PaymentTransactionRecorder
 {
-    private const LOCK_NAME_PREFIX = 'thelia_order_payment:';
-
     /**
-     * How long a worker waits, in seconds, for the worker already writing the journal
-     * of the same order.
+     * How long, in seconds, a settled line without a provider reference stands for the
+     * same movement reported again.
      */
-    private const LOCK_TIMEOUT = 2;
+    private const REPLAY_WINDOW_SECONDS = 60;
 
     private const DUPLICATE_KEY_SQLSTATE = '23000';
 
@@ -61,9 +70,13 @@ final readonly class PaymentTransactionRecorder
         private OrderHistoryActorResolver $actorResolver,
         private PaymentTransactionTotalsReader $totalsReader,
         private EventDispatcherInterface $eventDispatcher,
+        private PaymentJournalLock $journalLock,
     ) {
     }
 
+    /**
+     * @param string $pspReference the reference the provider gave the authorization; required, it is what tells a replayed notification from a second authorization
+     */
     public function recordAuthorization(
         Order $order,
         float|string $amount,
@@ -75,6 +88,10 @@ final readonly class PaymentTransactionRecorder
     ): OrderPaymentTransaction {
         if (!PaymentAmount::isPositive($amount)) {
             throw new InvalidPaymentAmountException(\sprintf('Order %s: an authorization needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
+        }
+
+        if (null === $this->cleanReference($pspReference)) {
+            throw new MissingProviderReferenceException(\sprintf('Order %s: an authorization is recorded with the reference the provider gave it.', (string) $order->getRef()));
         }
 
         return $this->record($order, PaymentTransactionType::AUTHORIZATION, $amount, $state, $pspReference, null, $moduleCode, $errorCode, $errorMessage);
@@ -95,11 +112,11 @@ final readonly class PaymentTransactionRecorder
             throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture cannot be negative, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
         }
 
-        if (PaymentTransactionState::FAILED !== $state) {
-            $this->assertCaptureFitsAuthorization($order, $amount);
-        }
+        $guard = PaymentTransactionState::FAILED === $state
+            ? null
+            : fn (): null => $this->assertCaptureFitsAuthorization($order, $amount);
 
-        return $this->record($order, PaymentTransactionType::CAPTURE, $amount, $state, $pspReference, $authorization, $moduleCode, $errorCode, $errorMessage);
+        return $this->record($order, PaymentTransactionType::CAPTURE, $amount, $state, $pspReference, $authorization, $moduleCode, $errorCode, $errorMessage, $guard);
     }
 
     public function recordRefund(
@@ -116,20 +133,25 @@ final readonly class PaymentTransactionRecorder
             throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
         }
 
-        if (PaymentTransactionState::FAILED !== $state) {
-            $netCaptured = $this->totalsReader->forOrder((int) $order->getId())->netCaptured();
+        $guard = PaymentTransactionState::FAILED === $state
+            ? null
+            : function () use ($order, $amount): null {
+                $refundable = $this->totalsReader->forOrder((int) $order->getId())->refundable();
 
-            if (PaymentAmount::compare($amount, $netCaptured) > 0) {
-                throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund of %s exceeds the %s taken and not yet given back.', (string) $order->getRef(), PaymentAmount::normalize($amount), $netCaptured));
-            }
-        }
+                if (PaymentAmount::compare($amount, $refundable) > 0) {
+                    throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund of %s exceeds the %s taken and not yet given back.', (string) $order->getRef(), PaymentAmount::normalize($amount), $refundable));
+                }
 
-        return $this->record($order, PaymentTransactionType::REFUND, $amount, $state, $pspReference, $capture, $moduleCode, $errorCode, $errorMessage);
+                return null;
+            };
+
+        return $this->record($order, PaymentTransactionType::REFUND, $amount, $state, $pspReference, $capture, $moduleCode, $errorCode, $errorMessage, $guard);
     }
 
     /**
-     * Releases what the authorization still holds. The amount is what is left to
-     * capture at that moment, so the totals read zero afterwards.
+     * Releases what the authorization still holds once the captures awaiting their
+     * answer are set aside. The amount is read under the lock, so the totals read zero
+     * left to capture afterwards.
      */
     public function recordVoid(
         Order $order,
@@ -140,22 +162,31 @@ final readonly class PaymentTransactionRecorder
         ?string $errorCode = null,
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
-        $remaining = $this->totalsReader->forOrder((int) $order->getId())->remainingToCapture;
+        return $this->journalLock->withOrder((int) $order->getId(), function () use ($order, $pspReference, $state, $authorization, $moduleCode, $errorCode, $errorMessage): OrderPaymentTransaction {
+            $remaining = $this->totalsReader->forOrder((int) $order->getId())->remainingToCapture;
 
-        if (PaymentTransactionState::FAILED !== $state && !PaymentAmount::isPositive($remaining)) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: no authorization holds anything to release.', (string) $order->getRef()));
-        }
+            if (PaymentTransactionState::FAILED !== $state && !PaymentAmount::isPositive($remaining)) {
+                $replayed = null === $this->cleanReference($pspReference)
+                    ? null
+                    : OrderPaymentTransactionQuery::create()->findByReference((int) $order->getId(), PaymentTransactionType::VOID, (string) $this->cleanReference($pspReference));
 
-        return $this->record($order, PaymentTransactionType::VOID, $remaining, $state, $pspReference, $authorization, $moduleCode, $errorCode, $errorMessage);
+                if (null === $replayed) {
+                    throw new InvalidPaymentAmountException(\sprintf('Order %s: no authorization holds anything to release.', (string) $order->getRef()));
+                }
+            }
+
+            return $this->record($order, PaymentTransactionType::VOID, $remaining, $state, $pspReference, $authorization, $moduleCode, $errorCode, $errorMessage);
+        });
     }
 
     /**
-     * The capture line of an order paid by a module that does not keep a journal:
-     * written once, when the order first reaches a paid status, and never again.
+     * The capture line of an order paid by a module that keeps no journal: written once,
+     * when the order first reaches a paid status, and only when the journal holds no
+     * authorization and no capture yet, whatever wrote them.
      *
-     * The check and the write run under a lock on the order, so two notifications of
-     * the same payment handled at the same instant leave one line. A lock that cannot
-     * be had is not waited on: the line is then written after an unguarded check.
+     * No ceiling applies: the order was paid by whoever marked it so, and the line says
+     * so. Nothing is written when the journal already tells the story, which keeps a
+     * capture nobody took off an order whose authorization is still open.
      */
     public function recordImmediateCaptureIfNone(
         Order $order,
@@ -164,25 +195,19 @@ final readonly class PaymentTransactionRecorder
         ?string $moduleCode = null,
     ): ?OrderPaymentTransaction {
         $orderId = (int) $order->getId();
-        $connection = Propel::getConnection(OrderPaymentTransactionTableMap::DATABASE_NAME);
-        $lockName = self::LOCK_NAME_PREFIX.$orderId;
-        $lockHeld = $this->acquireLock($connection, $lockName);
 
-        try {
-            if (OrderPaymentTransactionQuery::create()->hasSucceededCapture($orderId, $connection)) {
+        return $this->journalLock->withOrder($orderId, function () use ($order, $orderId, $amount, $pspReference, $moduleCode): ?OrderPaymentTransaction {
+            if (OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::AUTHORIZATION, PaymentTransactionType::CAPTURE])) {
                 return null;
             }
 
-            return $this->recordCapture($order, $amount, $pspReference, moduleCode: $moduleCode);
-        } finally {
-            if ($lockHeld) {
-                $this->releaseLock($connection, $lockName);
-            }
-        }
+            return $this->record($order, PaymentTransactionType::CAPTURE, $amount, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null);
+        });
     }
 
     /**
-     * Gives a pending line its outcome. The only change a line ever receives.
+     * Gives a pending line its outcome. The only change a line ever receives, with the
+     * reference the provider gave it when the line was written without one.
      */
     public function settle(
         OrderPaymentTransaction $transaction,
@@ -192,36 +217,93 @@ final readonly class PaymentTransactionRecorder
         ?string $errorMessage = null,
         ?string $moduleCode = null,
     ): OrderPaymentTransaction {
-        if (!$transaction->isPending()) {
-            throw new PaymentException(\sprintf('Payment transaction #%d is already %s and cannot be settled again.', (int) $transaction->getId(), (string) $transaction->getState()));
-        }
-
         if (!$state->isSettled()) {
             throw new \InvalidArgumentException('A pending line is settled to succeeded or failed, not left pending.');
         }
 
+        return $this->journalLock->withOrder((int) $transaction->getOrderId(), function () use ($transaction, $state, $pspReference, $errorCode, $errorMessage, $moduleCode): OrderPaymentTransaction {
+            $transaction->reload();
+
+            if (!$transaction->isPending()) {
+                throw new PaymentException(\sprintf('Payment transaction #%d is already %s and cannot be settled again.', (int) $transaction->getId(), (string) $transaction->getState()));
+            }
+
+            $pspReference = $this->cleanReference($pspReference);
+
+            $transaction->setState($state->value);
+
+            if (null !== $pspReference) {
+                $transaction->setPspReference($pspReference);
+            }
+
+            $transaction
+                ->setErrorCode($errorCode)
+                ->setErrorMessage($errorMessage);
+
+            $this->save($transaction);
+            $this->announce($transaction->getOrder(), $transaction, $moduleCode);
+
+            return $transaction;
+        });
+    }
+
+    /**
+     * Gives a pending line the reference the provider answered with, so that the
+     * notification bringing its outcome finds it.
+     */
+    public function attachReference(OrderPaymentTransaction $transaction, string $pspReference): OrderPaymentTransaction
+    {
         $pspReference = $this->cleanReference($pspReference);
 
-        $transaction->setState($state->value);
+        if (null === $pspReference || !$transaction->isPending()) {
+            return $transaction;
+        }
 
-        if (null !== $pspReference) {
+        return $this->journalLock->withOrder((int) $transaction->getOrderId(), function () use ($transaction, $pspReference): OrderPaymentTransaction {
             $transaction->setPspReference($pspReference);
+            $this->save($transaction);
+
+            return $transaction;
+        });
+    }
+
+    /**
+     * Notes on a pending line why its outcome is not known — a call that threw or timed
+     * out may have reached the provider. The line stays pending, keeping what it asked
+     * for out of reach of another movement, until the provider's notification settles it.
+     */
+    public function markOutcomeUnknown(OrderPaymentTransaction $transaction, string $errorCode, string $errorMessage): OrderPaymentTransaction
+    {
+        if (!$transaction->isPending()) {
+            return $transaction;
         }
 
         $transaction
             ->setErrorCode($errorCode)
             ->setErrorMessage($errorMessage);
-
-        $this->save($transaction, Propel::getConnection(OrderPaymentTransactionTableMap::DATABASE_NAME));
-
-        $this->eventDispatcher->dispatch(
-            new OrderPaymentTransactionEvent($transaction->getOrder(), $transaction, $moduleCode),
-            TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
-        );
+        $transaction->save();
 
         return $transaction;
     }
 
+    /**
+     * Runs $work with the journal of the order locked, so that what it reads still holds
+     * when it writes.
+     *
+     * @template T
+     *
+     * @param callable(): T $work
+     *
+     * @return T
+     */
+    public function withOrderLock(Order $order, callable $work): mixed
+    {
+        return $this->journalLock->withOrder((int) $order->getId(), $work);
+    }
+
+    /**
+     * @param (callable(): null)|null $guard the check that has to hold when the line is written, run under the lock
+     */
     private function record(
         Order $order,
         PaymentTransactionType $type,
@@ -232,73 +314,113 @@ final readonly class PaymentTransactionRecorder
         ?string $moduleCode,
         ?string $errorCode,
         ?string $errorMessage,
+        ?callable $guard = null,
     ): OrderPaymentTransaction {
         $orderId = (int) $order->getId();
         $pspReference = $this->cleanReference($pspReference);
-        $connection = Propel::getConnection(OrderPaymentTransactionTableMap::DATABASE_NAME);
-
-        if (null !== $pspReference) {
-            $existing = OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference, $connection);
-
-            if (null !== $existing) {
-                return $existing;
-            }
-        }
+        $amount = PaymentAmount::normalize($amount);
 
         if (null !== $parent && (int) $parent->getOrderId() !== $orderId) {
             throw new \InvalidArgumentException(\sprintf('Payment transaction #%d belongs to another order than %s.', (int) $parent->getId(), (string) $order->getRef()));
         }
 
-        $actor = $this->actorOf($moduleCode);
+        return $this->journalLock->withOrder($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard): OrderPaymentTransaction {
+            $existing = null !== $pspReference
+                ? OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference)
+                : $this->replayedReferenceLessLine($orderId, $type, $state, $amount);
 
-        $transaction = new OrderPaymentTransaction();
-        $transaction
-            ->setOrderId($orderId)
-            ->setType($type->value)
-            ->setState($state->value)
-            ->setAmount(PaymentAmount::normalize($amount))
-            ->setCurrencyId((int) $order->getCurrencyId())
-            ->setPspReference($pspReference)
-            ->setParentId($parent?->getId())
-            ->setPaymentModuleId($order->getPaymentModuleId())
-            ->setActorType($actor->actorType->value)
-            ->setActorLabel($actor->label)
-            ->setAdminId($actor->adminId)
-            ->setErrorCode($errorCode)
-            ->setErrorMessage($errorMessage);
-
-        try {
-            $this->save($transaction, $connection);
-        } catch (PropelException $exception) {
-            // The unique index caught a notification replayed between the check above
-            // and this write: the line it wrote is the one to answer.
-            if (null !== $pspReference && $this->isDuplicateKey($exception)) {
-                $existing = OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference, $connection);
-
-                if (null !== $existing) {
-                    return $existing;
-                }
+            if (null !== $existing) {
+                return $this->answerReplay($order, $existing, $amount, $state, $pspReference, $errorCode, $errorMessage, $moduleCode);
             }
 
-            throw $exception;
-        }
+            if (null !== $guard) {
+                $guard();
+            }
 
-        $this->eventDispatcher->dispatch(
-            new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
-            TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
-        );
+            $actor = $this->actorOf($moduleCode);
 
-        return $transaction;
+            $transaction = new OrderPaymentTransaction();
+            $transaction
+                ->setOrderId($orderId)
+                ->setType($type->value)
+                ->setState($state->value)
+                ->setAmount($amount)
+                ->setCurrencyId((int) $order->getCurrencyId())
+                ->setPspReference($pspReference)
+                ->setParentId($parent?->getId())
+                ->setPaymentModuleId($order->getPaymentModuleId())
+                ->setActorType($actor->actorType->value)
+                ->setActorLabel($actor->label)
+                ->setAdminId($actor->adminId)
+                ->setErrorCode($errorCode)
+                ->setErrorMessage($errorMessage);
+
+            $this->save($transaction);
+            $this->announce($order, $transaction, $moduleCode);
+
+            return $transaction;
+        });
     }
 
-    private function assertCaptureFitsAuthorization(Order $order, float|string $amount): void
+    /**
+     * The same movement reported again: a pending line gets the outcome the report brings,
+     * a line with the same outcome and amount is answered as is and announced again, so
+     * that whatever failed after it was first written runs this time. Anything else is a
+     * reference the provider reused for another movement, and is refused.
+     */
+    private function answerReplay(
+        Order $order,
+        OrderPaymentTransaction $existing,
+        string $amount,
+        PaymentTransactionState $state,
+        ?string $pspReference,
+        ?string $errorCode,
+        ?string $errorMessage,
+        ?string $moduleCode,
+    ): OrderPaymentTransaction {
+        $sameAmount = 0 === PaymentAmount::compare($amount, (string) $existing->getAmount());
+
+        if ($existing->isPending() && $state->isSettled() && $sameAmount) {
+            return $this->settle($existing, $state, $pspReference, $errorCode, $errorMessage, $moduleCode);
+        }
+
+        if ($sameAmount && ($existing->getState() === $state->value || PaymentTransactionState::PENDING === $state)) {
+            $this->announce($order, $existing, $moduleCode);
+
+            return $existing;
+        }
+
+        throw new ConflictingPaymentReferenceException(\sprintf('Order %s: the %s %s is already recorded as %s of %s; a new attempt is reported with a new reference.', (string) $order->getRef(), (string) $existing->getType(), (string) ($existing->getPspReference() ?? '#'.$existing->getId()), (string) $existing->getState(), (string) $existing->getAmount()));
+    }
+
+    /**
+     * A settled line without a provider reference stands for the same movement reported
+     * within the last minute with the same outcome and amount. A pending line is never
+     * matched this way: it is written by the core before a call, and two calls are two.
+     */
+    private function replayedReferenceLessLine(int $orderId, PaymentTransactionType $type, PaymentTransactionState $state, string $amount): ?OrderPaymentTransaction
+    {
+        if (!$state->isSettled()) {
+            return null;
+        }
+
+        return OrderPaymentTransactionQuery::create()->findRecentWithoutReference(
+            $orderId,
+            $type,
+            $state,
+            $amount,
+            new \DateTimeImmutable('-'.self::REPLAY_WINDOW_SECONDS.' seconds'),
+        );
+    }
+
+    private function assertCaptureFitsAuthorization(Order $order, float|string $amount): null
     {
         $totals = $this->totalsReader->forOrder((int) $order->getId());
 
         // Without an authorization the capture is the payment itself: the module took
         // the price at once, there is no reservation to stay within.
         if (!$totals->hasAuthorization()) {
-            return;
+            return null;
         }
 
         $normalizedAmount = PaymentAmount::normalize($amount);
@@ -306,6 +428,16 @@ final readonly class PaymentTransactionRecorder
         if (!$totals->allows($normalizedAmount)) {
             throw new CaptureExceedsAuthorizationException((string) $order->getRef(), $normalizedAmount, $totals->remainingToCapture);
         }
+
+        return null;
+    }
+
+    private function announce(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode): void
+    {
+        $this->eventDispatcher->dispatch(
+            new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
+            TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
+        );
     }
 
     /**
@@ -320,9 +452,23 @@ final readonly class PaymentTransactionRecorder
         return OrderHistoryActorType::CUSTOMER === $actor->actorType ? OrderHistoryActor::system() : $actor;
     }
 
-    private function save(OrderPaymentTransaction $transaction, ConnectionInterface $connection): void
+    /**
+     * Under the lock a duplicate key can only mean a reference another line of the same
+     * movement already carries: settling or naming a line with it is refused.
+     */
+    private function save(OrderPaymentTransaction $transaction): void
     {
-        $transaction->save($connection);
+        try {
+            $transaction->save();
+        } catch (PropelException|\RuntimeException $exception) {
+            // Propel raises an insert or an update the server refused as a
+            // QueryExecutionException, which is not a PropelException.
+            if (!$this->isDuplicateKey($exception)) {
+                throw $exception;
+            }
+
+            throw new ConflictingPaymentReferenceException(\sprintf('The reference %s is already carried by another %s of this order.', (string) $transaction->getPspReference(), (string) $transaction->getType()), 0, $exception);
+        }
     }
 
     private function cleanReference(?string $pspReference): ?string
@@ -336,9 +482,9 @@ final readonly class PaymentTransactionRecorder
         return '' === $pspReference ? null : $pspReference;
     }
 
-    private function isDuplicateKey(PropelException $exception): bool
+    private function isDuplicateKey(\Throwable $exception): bool
     {
-        $previous = $exception->getPrevious();
+        $previous = $exception;
 
         while (null !== $previous) {
             if ($previous instanceof \PDOException && self::DUPLICATE_KEY_SQLSTATE === (string) $previous->getCode()) {
@@ -349,38 +495,5 @@ final readonly class PaymentTransactionRecorder
         }
 
         return false;
-    }
-
-    private function acquireLock(ConnectionInterface $connection, string $lockName): bool
-    {
-        try {
-            $statement = $connection->prepare('SELECT GET_LOCK(?, ?)');
-            $statement->bindValue(1, $lockName, \PDO::PARAM_STR);
-            $statement->bindValue(2, self::LOCK_TIMEOUT, \PDO::PARAM_INT);
-            $statement->execute();
-
-            return '1' === (string) $statement->fetchColumn();
-        } catch (\Throwable $throwable) {
-            Tlog::getInstance()->warning(
-                'Payment journal lock {lock} could not be requested, writing unchecked: {ex}',
-                ['lock' => $lockName, 'ex' => $throwable],
-            );
-
-            return false;
-        }
-    }
-
-    private function releaseLock(ConnectionInterface $connection, string $lockName): void
-    {
-        try {
-            $statement = $connection->prepare('SELECT RELEASE_LOCK(?)');
-            $statement->bindValue(1, $lockName, \PDO::PARAM_STR);
-            $statement->execute();
-        } catch (\Throwable $throwable) {
-            Tlog::getInstance()->warning(
-                'Payment journal lock {lock} could not be released: {ex}',
-                ['lock' => $lockName, 'ex' => $throwable],
-            );
-        }
     }
 }
