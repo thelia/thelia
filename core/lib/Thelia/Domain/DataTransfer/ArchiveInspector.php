@@ -59,7 +59,7 @@ final readonly class ArchiveInspector
         $count = 0;
         $bytes = 0;
 
-        foreach ($entries as [$name, $size, $isLink]) {
+        foreach ($entries as [$names, $size, $isLink]) {
             if (++$count > $this->maxEntries) {
                 throw new UploadRefusedException(Translator::getInstance()->trans('The archive holds more than %count files.', ['%count' => $this->maxEntries]));
             }
@@ -69,10 +69,15 @@ final readonly class ArchiveInspector
                 throw self::tooLarge($this->maxExtractedBytes);
             }
 
-            if ($isLink || str_starts_with($name, '/') || \in_array('..', explode('/', str_replace('\\', '/', $name)), true)) {
+            if ($isLink || array_filter($names, self::leavesItsFolder(...)) !== []) {
                 throw new UploadRefusedException(Translator::getInstance()->trans('The archive holds a file outside its own folder.'));
             }
         }
+    }
+
+    private static function leavesItsFolder(string $name): bool
+    {
+        return str_starts_with($name, '/') || \in_array('..', explode('/', str_replace('\\', '/', $name)), true);
     }
 
     /**
@@ -97,8 +102,8 @@ final readonly class ArchiveInspector
     }
 
     /**
-     * @return \Generator<int, array{string, int, bool}> the name, the extracted size and
-     *                                                   whether each entry is a link
+     * @return \Generator<int, array{list<string>, int, bool}> the names, the extracted size
+     *                                                         and whether each entry is a link
      */
     private static function zipEntries(string $path): \Generator
     {
@@ -120,7 +125,7 @@ final readonly class ArchiveInspector
                 $zip->getExternalAttributesIndex($index, $system, $attributes);
                 $isLink = \ZipArchive::OPSYS_UNIX === $system && self::UNIX_SYMBOLIC_LINK === (($attributes >> 16) & self::UNIX_FILE_TYPE);
 
-                yield [(string) $stat['name'], (int) $stat['size'], $isLink];
+                yield [[(string) $stat['name']], (int) $stat['size'], $isLink];
             }
         } finally {
             $zip->close();
@@ -128,40 +133,51 @@ final readonly class ArchiveInspector
     }
 
     /**
-     * The name a pax header gives the entry that follows: records of "<length>
+     * The names a pax header gives the entry that follows: records of "<length>
      * <key>=<value>\n", read one after the other by their length, so a name quoted in
-     * the value of another record is never taken for it.
+     * the value of another record is never taken for it. Every "path" record counts,
+     * whichever an extractor keeps, and a record that cannot be read to its end refuses
+     * the archive, since an extractor more lenient than this might still read a name
+     * past it.
+     *
+     * @return list<string>
+     *
+     * @throws UploadRefusedException
      */
-    private static function paxPath(string $records): ?string
+    private static function paxPaths(string $records): array
     {
-        $path = null;
+        $paths = [];
         $offset = 0;
 
-        while (1 === preg_match('/\G(\d+) /', $records, $match, 0, $offset)) {
+        while ($offset < \strlen($records)) {
+            if (1 !== preg_match('/\G(\d+) /', $records, $match, 0, $offset)) {
+                throw self::unreadable();
+            }
+
             $length = (int) $match[1];
 
-            if ($length <= \strlen($match[0]) || $offset + $length > \strlen($records)) {
-                break;
+            if ($length <= \strlen($match[0]) || $offset + $length > \strlen($records) || "\n" !== $records[$offset + $length - 1]) {
+                throw self::unreadable();
             }
 
             $record = substr($records, $offset + \strlen($match[0]), $length - \strlen($match[0]) - 1);
 
             if (str_starts_with($record, 'path=')) {
-                $path = substr($record, 5);
+                $paths[] = substr($record, 5);
             }
 
             $offset += $length;
         }
 
-        return $path;
+        return $paths;
     }
 
     /**
      * Reads the headers of a tar, through its compression, one block at a time: the
      * archive is never held in memory, as PharData would hold it.
      *
-     * @return \Generator<int, array{string, int, bool}> the name, the extracted size and
-     *                                                   whether each entry is a link
+     * @return \Generator<int, array{list<string>, int, bool}> the names, the extracted size
+     *                                                         and whether each entry is a link
      */
     private static function tarEntries(string $path, string $extension): \Generator
     {
@@ -177,7 +193,11 @@ final readonly class ArchiveInspector
         }
 
         try {
-            $longName = null;
+            // Every name an extractor may write an entry under is checked: the GNU long
+            // names and pax paths before it, a global pax path, which applies to every
+            // entry after it, and the header name, with its prefix and without.
+            $pendingNames = [];
+            $globalNames = [];
 
             while (true) {
                 $header = self::readBlock($stream, 512);
@@ -195,29 +215,33 @@ final readonly class ArchiveInspector
                 // read through too, so they count against the limits like any entry,
                 // told before their content is read.
                 if (\in_array($type, ['L', 'x', 'g'], true)) {
-                    yield ['', $size, false];
+                    yield [[], $size, false];
                 }
 
                 if ('L' === $type) {
-                    $longName = rtrim((string) self::skipOrRead($stream, $size, true), "\0");
+                    $pendingNames[] = rtrim((string) self::skipOrRead($stream, $size, true), "\0");
 
                     continue;
                 }
 
-                if ('x' === $type || 'g' === $type) {
-                    $longName = self::paxPath((string) self::skipOrRead($stream, $size, true)) ?? $longName;
+                if ('x' === $type) {
+                    array_push($pendingNames, ...self::paxPaths((string) self::skipOrRead($stream, $size, true)));
 
                     continue;
                 }
 
-                $fullName = $longName ?? ('' === $prefix ? $name : $prefix.'/'.$name);
-                $longName = null;
+                if ('g' === $type) {
+                    array_push($globalNames, ...self::paxPaths((string) self::skipOrRead($stream, $size, true)));
+
+                    continue;
+                }
+
+                $names = [...$pendingNames, ...$globalNames, $name, '' === $prefix ? null : $prefix.'/'.$name];
+                $pendingNames = [];
 
                 // Told before its content is read: an entry over the limits stops the
-                // reading there. Directories hold nothing; links point elsewhere.
-                if ('5' !== $type) {
-                    yield [$fullName, $size, '1' === $type || '2' === $type];
-                }
+                // reading there. A directory is checked like a file; links point elsewhere.
+                yield [array_values(array_unique(array_filter($names, static fn (?string $candidate): bool => null !== $candidate && '' !== $candidate))), $size, '1' === $type || '2' === $type];
 
                 self::skipOrRead($stream, $size, false);
             }
