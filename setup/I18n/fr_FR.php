@@ -1558,4 +1558,7 @@ return [
     'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)' => 'Cache partagé des pages publiques anonymes : disabled (désactivé), announce (la page annonce combien de temps un cache partagé peut la garder, cookies inchangés) ou enabled (retire aussi les cookies d\'une page anonyme pour qu\'un proxy puisse la garder)',
     'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)' => 'Secondes pendant lesquelles un cache partagé peut garder une page publique (entre 1 et 86400, 300 si invalide)',
     'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)' => 'Nombre de jours pendant lesquels une commande impayée retient les usages de coupon avec lesquels elle a été passée (0 : une commande impayée n\'en retient aucun)',
+    'Availability' => 'Disponibilité',
+    'Customer rating' => 'Note client',
+    'Price' => 'Prix',
 ];

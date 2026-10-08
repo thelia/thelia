@@ -55,6 +55,7 @@ final class UpdateScriptTest extends TestCase
         'order_return_reason_i18n',
         'message_i18n',
         'resource_i18n',
+        'choice_filter_other_i18n',
     ];
 
     public function testNoUpdateScriptUsesConditionalDdlMySqlRefuses(): void
