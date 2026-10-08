@@ -16051,24 +16051,51 @@ never by a fresh install, and repairing that is its own change.
 */
 INSERT INTO `choice_filter_other` (`id`, `type`, `visible`) VALUES
     (4, 'promo', 1),
-    (5, 'new', 1)
+    (5, 'new', 1),
+    (6, 'availability', 1),
+    (7, 'rating', 1),
+    (8, 'price', 1)
 ;
 
 INSERT INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
     (4, 'cs_CZ', 'Akce', NULL),
     (5, 'cs_CZ', 'Novinka', NULL),
+    (6, 'cs_CZ', 'Dostupnost', NULL),
+    (7, 'cs_CZ', 'Hodnocení zákazníků', NULL),
+    (8, 'cs_CZ', 'Cena', NULL),
     (4, 'de_DE', 'Aktion', NULL),
     (5, 'de_DE', 'Neuheit', NULL),
+    (6, 'de_DE', 'Verfügbarkeit', NULL),
+    (7, 'de_DE', 'Kundenbewertung', NULL),
+    (8, 'de_DE', 'Preis', NULL),
     (4, 'en_US', 'Promotion', NULL),
     (5, 'en_US', 'Newness', NULL),
+    (6, 'en_US', 'Availability', NULL),
+    (7, 'en_US', 'Customer rating', NULL),
+    (8, 'en_US', 'Price', NULL),
     (4, 'es_ES', 'Promoción', NULL),
     (5, 'es_ES', 'Novedad', NULL),
+    (6, 'es_ES', 'Disponibilidad', NULL),
+    (7, 'es_ES', 'Valoración de clientes', NULL),
+    (8, 'es_ES', 'Precio', NULL),
     (4, 'fr_FR', 'Promotion', NULL),
     (5, 'fr_FR', 'Nouveauté', NULL),
+    (6, 'fr_FR', 'Disponibilité', NULL),
+    (7, 'fr_FR', 'Note client', NULL),
+    (8, 'fr_FR', 'Prix', NULL),
     (4, 'it_IT', 'Promozione', NULL),
     (5, 'it_IT', 'Novità', NULL),
+    (6, 'it_IT', 'Disponibilità', NULL),
+    (7, 'it_IT', 'Valutazione dei clienti', NULL),
+    (8, 'it_IT', 'Prezzo', NULL),
     (4, 'nl_NL', 'Promotie', NULL),
     (5, 'nl_NL', 'Nieuw', NULL),
+    (6, 'nl_NL', 'Beschikbaarheid', NULL),
+    (7, 'nl_NL', 'Klantbeoordeling', NULL),
+    (8, 'nl_NL', 'Prijs', NULL),
     (4, 'ru_RU', 'Акция', NULL),
-    (5, 'ru_RU', 'Новинка', NULL)
+    (5, 'ru_RU', 'Новинка', NULL),
+    (6, 'ru_RU', 'Наличие', NULL),
+    (7, 'ru_RU', 'Оценка покупателей', NULL),
+    (8, 'ru_RU', 'Цена', NULL)
 ;

@@ -31,4 +31,7 @@ return [
     'Your subscription to %store newsletter' => 'Váš odběr novinek z obchodu {{ config("store_name") }}',
     'Promotion' => 'Akce',
     'Newness' => 'Novinka',
+    'Availability' => 'Dostupnost',
+    'Customer rating' => 'Hodnocení zákazníků',
+    'Price' => 'Cena',
 ];

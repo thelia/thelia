@@ -1117,4 +1117,7 @@ return [
     'Catalog price rules' => 'Katalogpreisregeln',
     'Promotion' => 'Aktion',
     'Newness' => 'Neuheit',
+    'Availability' => 'Verfügbarkeit',
+    'Customer rating' => 'Kundenbewertung',
+    'Price' => 'Preis',
 ];

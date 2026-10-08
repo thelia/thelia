@@ -1149,4 +1149,7 @@ return [
     'Catalog price rules' => 'Reglas de precios del catálogo',
     'Promotion' => 'Promoción',
     'Newness' => 'Novedad',
+    'Availability' => 'Disponibilidad',
+    'Customer rating' => 'Valoración de clientes',
+    'Price' => 'Precio',
 ];

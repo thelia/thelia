@@ -41,7 +41,7 @@ final class UpdateScriptTest extends TestCase
      * The script a released shop has not run yet, and the only one still open
      * to being fixed: the ones before it are already applied in the field.
      */
-    private const string PENDING_SCRIPT = '3.2.0.sql';
+    private const string PENDING_SCRIPT = '3.3.0.sql';
 
     /**
      * The reference tables whose rows a shop reads by their translated label: a row
@@ -55,6 +55,7 @@ final class UpdateScriptTest extends TestCase
         'order_return_reason_i18n',
         'message_i18n',
         'resource_i18n',
+        'choice_filter_other_i18n',
     ];
 
     public function testNoUpdateScriptUsesConditionalDdlMySqlRefuses(): void

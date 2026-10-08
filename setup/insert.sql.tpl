@@ -4170,13 +4170,19 @@ never by a fresh install, and repairing that is its own change.
 */
 INSERT INTO `choice_filter_other` (`id`, `type`, `visible`) VALUES
     (4, 'promo', 1),
-    (5, 'new', 1)
+    (5, 'new', 1),
+    (6, 'availability', 1),
+    (7, 'rating', 1),
+    (8, 'price', 1)
 ;
 
 INSERT INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
 {% for locale in locales %}
     (4, '{{ locale }}', {{ intl('Promotion', locale) }}, NULL),
-    (5, '{{ locale }}', {{ intl('Newness', locale) }}, NULL){% if not loop.last %},{% endif %}
+    (5, '{{ locale }}', {{ intl('Newness', locale) }}, NULL),
+    (6, '{{ locale }}', {{ intl('Availability', locale) }}, NULL),
+    (7, '{{ locale }}', {{ intl('Customer rating', locale) }}, NULL),
+    (8, '{{ locale }}', {{ intl('Price', locale) }}, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
