@@ -16,7 +16,13 @@ namespace Thelia\Tests\Integration\Messenger;
 
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Messenger\EventListener\FailedJobsMaintenancePurgeListener;
 use Thelia\Messenger\FailedMessagePurger;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
@@ -103,6 +109,33 @@ final class FailedMessagePurgerTest extends IntegrationTestCase
         self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days'), dryRun: true));
         self::assertSame(1, $purger->purgeSetAsideBefore(new \DateTimeImmutable('-30 days')));
         self::assertSame(['set aside today'], $this->labelsLeft());
+    }
+
+    /**
+     * A shop that already runs maintenance:purge (from its crontab or the schedule)
+     * purges the failed jobs with it: they may hold personal data.
+     */
+    public function testTheMaintenancePurgePurgesTheFailedJobs(): void
+    {
+        $event = new MaintenancePurgeEvent(true);
+
+        $this->getService(EventDispatcherInterface::class)->dispatch($event, TheliaEvents::MAINTENANCE_PURGE);
+
+        self::assertNotEmpty(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, \sprintf('Failed jobs (>%d days)', FailedMessagePurger::RETENTION_DAYS))));
+    }
+
+    /**
+     * A failure transport that cannot list its jobs (a queue server set by
+     * MESSENGER_FAILURE_TRANSPORT_DSN) is skipped: the rest of the purge still runs.
+     */
+    public function testAFailureTransportThatCannotListLeavesTheMaintenancePurgeGoing(): void
+    {
+        $event = new MaintenancePurgeEvent(false);
+        $cannotList = new SyncTransport($this->getService(MessageBusInterface::class));
+
+        (new FailedJobsMaintenancePurgeListener(new FailedMessagePurger($cannotList)))->onMaintenancePurge($event);
+
+        self::assertNotEmpty(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, 'Failed jobs') && str_contains($line, 'cannot list')));
     }
 
     private function setAside(string $label, ?\DateTimeImmutable $setAsideAt): void

@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Thelia\Messenger\EventListener\ShopDatabaseConnectionReleaseListener;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Test\IntegrationTestCase;
@@ -38,6 +39,28 @@ final class ShopDatabaseConnectionReleaseTest extends IntegrationTestCase
 
         self::assertFalse($connection->get()->isConnected());
         self::assertSame(1, (int) $connection->get()->fetchOne('SELECT 1'), 'The next query opens a new connection.');
+    }
+
+    /**
+     * A failed job sent back for a retry goes through a connection opened afresh: the
+     * connection is let go before Messenger sends it back.
+     */
+    public function testTheConnectionIsLetGoBeforeAFailedJobIsSentForARetry(): void
+    {
+        $listeners = $this->getService(EventDispatcherInterface::class)->getListeners(WorkerMessageFailedEvent::class);
+        $positionOf = static function (string $class) use ($listeners): int {
+            foreach ($listeners as $position => $listener) {
+                $object = \is_array($listener) ? $listener[0] : $listener;
+
+                if ($object instanceof $class) {
+                    return $position;
+                }
+            }
+
+            self::fail($class.' does not listen to the failed jobs.');
+        };
+
+        self::assertLessThan($positionOf(SendFailedMessageForRetryListener::class), $positionOf(ShopDatabaseConnectionReleaseListener::class));
     }
 
     /**
