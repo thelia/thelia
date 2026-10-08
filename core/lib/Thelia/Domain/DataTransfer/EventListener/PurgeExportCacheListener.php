@@ -34,7 +34,7 @@ readonly class PurgeExportCacheListener
         $dryRun = $event->isDryRun();
         $verb = $dryRun ? 'to delete' : 'deleted';
 
-        $event->addResult(\sprintf('<comment>Export cache files:</comment> <info>%d %s</info>', $dryRun ? $this->exportCachePurger->countOldExportFiles(THELIA_CACHE_DIR.'export'.DS) : $this->exportCachePurger->purgeOldExportFiles(THELIA_CACHE_DIR.'export'.DS), $verb));
+        $event->addResult(\sprintf('<comment>Export cache files:</comment> <info>%d %s</info>', $dryRun ? $this->exportCachePurger->countOldExportFiles(ExportCachePurger::directory()) : $this->exportCachePurger->purgeOldExportFiles(ExportCachePurger::directory()), $verb));
         $event->addResult(\sprintf('<comment>Export jobs (>%d days):</comment> <info>%d %s</info>', DataTransferJobPurger::JOB_RETENTION_DAYS, $this->jobPurger->purgeExportJobs($dryRun), $verb));
         $event->addResult(\sprintf('<comment>Import jobs (>%d days):</comment> <info>%d %s</info>', DataTransferJobPurger::JOB_RETENTION_DAYS, $this->jobPurger->purgeImportJobs($dryRun), $verb));
         $event->addResult(\sprintf('<comment>Import files left behind:</comment> <info>%d %s</info>', $this->jobPurger->sweepImportStorage($dryRun), $verb));
