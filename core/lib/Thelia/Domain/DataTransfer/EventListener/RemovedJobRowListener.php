@@ -15,15 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Thelia\Domain\DataTransfer\Job\DataTransferJob;
 use Thelia\Domain\DataTransfer\Job\DataTransferJobMessage;
-use Thelia\Domain\DataTransfer\Job\JobStatus;
-use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Domain\DataTransfer\Job\JobClaim;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
-use Thelia\Model\ExportJobQuery;
-use Thelia\Model\ImportJobQuery;
 
 /**
  * A job set aside before it was taken (the database gone at that moment) kept its row
@@ -33,6 +29,11 @@ use Thelia\Model\ImportJobQuery;
 final readonly class RemovedJobRowListener
 {
     public const DELETED = 'Deleted from the failed jobs before it ran.';
+
+    public function __construct(
+        private JobClaim $jobClaim,
+    ) {
+    }
 
     #[AsEventListener]
     public function onFailedJobRemoved(FailedJobRemovedEvent $event): void
@@ -45,13 +46,7 @@ final readonly class RemovedJobRowListener
 
         // The failure is deleted already: a row left waiting is the purge's to sweep.
         try {
-            $job = $message instanceof RunImportJob
-                ? ImportJobQuery::create()->findPk($message->jobId())
-                : ExportJobQuery::create()->findPk($message->jobId());
-
-            if ($job instanceof DataTransferJob && JobStatus::QUEUED === $job->getJobStatus()) {
-                $job->markFailed(self::DELETED);
-            }
+            $this->jobClaim->abandonIfQueued($message->jobTable(), $message->jobId(), self::DELETED);
         } catch (\Throwable $notRecorded) {
             Tlog::getInstance()->addWarning(\sprintf('%s was deleted from the failed jobs but its row could not be marked failed: %s', $message->describe(), JobFailureMessage::forLog($notRecorded)));
         }
