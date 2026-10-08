@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
@@ -405,6 +406,21 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * A worker that took the job meanwhile keeps it running: only a row still waiting
+     * is marked.
+     */
+    public function testARemovedFailureLeavesAJobAWorkerTookRunning(): void
+    {
+        $job = $this->launcherWith($this->queue())->launch($this->ordersExport(), self::SERIALIZER, language: Lang::getDefaultLanguage());
+        $job->setStatus(JobStatus::RUNNING->value)->save();
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(new FailedJobRemovedEvent(new RunExportJob((int) $job->getId())));
+
+        $job->reload();
+        self::assertSame(JobStatus::RUNNING, $job->getJobStatus());
+    }
+
+    /**
      * The images and documents added to an archive are not rows: the export still gives
      * a sign of life while it adds them, or a long archive would be taken for a dead job.
      */
@@ -464,6 +480,62 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
             self::fail('The archive cannot be written.');
         } catch (\RuntimeException) {
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * A zip still open writes the files it holds when it is let go: a failed archive
+     * must not come back once its files are removed.
+     */
+    public function testAZipThatFailsHalfWayDoesNotComeBack(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $image = THELIA_CACHE_DIR.'export-test-image-'.uniqid().'.png';
+        file_put_contents($image, 'png');
+        ImageHeavyExport::$paths = [$image, '/nowhere/missing.png'];
+        $archiver = $this->getService(ArchiverManager::class)->get('thelia.zip');
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage(), includeImages: true);
+            self::fail('An image of the export is missing.');
+        } catch (\RuntimeException) {
+        } finally {
+            ImageHeavyExport::$paths = null;
+        }
+
+        // The zip of the archiver service is let go when it is replaced or the process
+        // ends: it would then write the image it holds, still on disk.
+        $archiver->create(THELIA_CACHE_DIR.'export-test-other-'.uniqid());
+        $archiver->close();
+        array_map('unlink', [$image, ...(glob(THELIA_CACHE_DIR.'export-test-other-*') ?: [])]);
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * A listener of the export that fails still leaves no file behind.
+     */
+    public function testAnExportWhoseListenerFailsLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $failing = static function (): void {
+            throw new \RuntimeException('A listener of the export failed.');
+        };
+        $dispatcher->addListener(TheliaEvents::EXPORT_SUCCESS, $failing);
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+            self::fail('The listener fails.');
+        } catch (\RuntimeException) {
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::EXPORT_SUCCESS, $failing);
         }
 
         self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
