@@ -162,8 +162,11 @@ final readonly class ArchiveInspector
 
             $record = substr($records, $offset + \strlen($match[0]), $length - \strlen($match[0]) - 1);
 
-            if (str_starts_with($record, 'path=')) {
-                $paths[] = substr($record, 5);
+            // GNU tar and libarchive also rename an entry by its sparse name.
+            foreach (['path=', 'GNU.sparse.name='] as $key) {
+                if (str_starts_with($record, $key)) {
+                    $paths[] = substr($record, \strlen($key));
+                }
             }
 
             $offset += $length;

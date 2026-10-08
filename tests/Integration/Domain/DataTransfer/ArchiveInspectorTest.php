@@ -289,6 +289,23 @@ final class ArchiveInspectorTest extends IntegrationTestCase
     }
 
     /**
+     * GNU tar and libarchive also rename an entry by its sparse name: an extractor that
+     * reads it writes the entry there.
+     */
+    public function testTheGnuSparseNameOfAnEntryIsChecked(): void
+    {
+        $records = self::paxRecord('GNU.sparse.name', '../../public/stock.php');
+        $pax = (string) file_get_contents($this->tar(['././@PaxHeader' => $records], type: 'x'));
+        $file = (string) file_get_contents($this->tar(['stock.csv' => 'a']));
+        $path = $this->directory.'/sparse-name.tar';
+        file_put_contents($path, substr($pax, 0, -1024).$file);
+
+        $this->expectException(UploadRefusedException::class);
+
+        (new ArchiveInspector())->assertExtractable($path, 'tar');
+    }
+
+    /**
      * A record that cannot be read to its end may hide a name an extractor more lenient
      * than the inspector still reads: the archive is refused.
      */
