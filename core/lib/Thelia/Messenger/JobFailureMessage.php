@@ -20,7 +20,10 @@ use Thelia\Exception\UserFacingFailure;
  * What an administrator, and the server log, read of a failed job.
  *
  * Only an exception written for the administrator ({@see UserFacingFailure}) is shown
- * as it is. Any other may quote SQL, the values of a row, paths or host names: the
+ * as it is; the one exception is what a mail server answered, which the failed jobs
+ * screen shows with its credentials hidden, since it is what an administrator needs to
+ * fix the mail settings ({@see Monitoring\BackgroundJobsMonitor}). Any other may quote
+ * SQL, the values of a row, paths or host names: the
  * administrator reads that the job failed and that the details are in the server
  * log, and the log names the exception by its class, code and place, never by a text
  * that may hold the personal data of a customer: the logs of the workers too, where
