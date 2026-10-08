@@ -31,6 +31,7 @@ return [
     '%type% visibility updated' => 'La visibilité de %type% mise à jour',
     'A company registration number is required as soon as a company name is given.' => 'Un numéro d\'immatriculation est obligatoire dès qu\'une raison sociale est renseignée.',
     'A company registration number may only contain up to 20 letters and digits.' => 'Un numéro d\'immatriculation ne peut contenir que 20 lettres et chiffres au maximum.',
+    'A French VAT number is FR, a two character key, then the 9 digits of the SIREN.' => 'Un numéro de TVA français se compose de FR, d\'une clé de deux caractères, puis des 9 chiffres du SIREN.',
     'A Hook with code %name already exists. Please choose another code.' => 'Le code %name est déjà utilisé par un autre Hook. Merci d\'en choisir un autre.',
     'A comma separated list of email addresses' => 'Une liste d\'adresses e-mail séparées par des virgules',
     'A currency with code "%name" already exists.' => 'Une devise avec la code "%name" existe déjà',
