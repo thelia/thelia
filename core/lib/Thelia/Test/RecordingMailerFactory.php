@@ -14,6 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Test;
 
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Thelia\Core\Template\Parser\ParserResolver;
+use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigService;
 use Thelia\Mailer\MailerFactory;
 
 /**
@@ -28,6 +34,14 @@ use Thelia\Mailer\MailerFactory;
  */
 class RecordingMailerFactory extends MailerFactory
 {
+    /**
+     * The transport is never reached: a null one stands in unless the test gives one.
+     */
+    public function __construct(TemplateHelperInterface $templateHelper, ParserResolver $parserResolver, MailerInterface $mailer, ?TransportInterface $transport = null, ?SaleUnitConfigService $saleUnitConfig = null)
+    {
+        parent::__construct($templateHelper, $parserResolver, $mailer, $transport ?? new NullTransport(), $saleUnitConfig);
+    }
+
     /**
      * @var list<array{
      *     code: string,

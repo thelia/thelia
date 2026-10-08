@@ -30,7 +30,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\EventListener\ModuleConfigCacheListener;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigService;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
@@ -372,8 +371,7 @@ final class SaleUnitConfigTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
-            $this->saleUnitConfig,
+            saleUnitConfig: $this->saleUnitConfig,
         );
     }
 
