@@ -16,16 +16,20 @@ namespace Thelia\Domain\DataTransfer\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 
 class ExportCachePurger
 {
     private const EXPORT_CACHE_MAX_AGE_DAYS = 1;
 
     /**
-     * @param bool $dryRun count the files that would be deleted, and delete nothing
+     * @param string|null $directory the export folder by default
+     * @param bool        $dryRun    count the files that would be deleted, and delete nothing
      */
-    public function purgeOldExportFiles(string $directory, bool $dryRun = false): int
+    public function purgeOldExportFiles(?string $directory = null, bool $dryRun = false): int
     {
+        $directory ??= ExportStorage::directory();
+
         if (!is_dir($directory)) {
             return 0;
         }
