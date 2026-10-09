@@ -27,6 +27,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\DataTransferProgress;
@@ -513,6 +514,38 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * The file a listener of the export pointed elsewhere is not the export's to delete
+     * when its row cannot record it: only a file of the export folder goes.
+     */
+    public function testARowThatCannotRecordAFileOutsideTheExportFolderLeavesItAlone(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        // Longer than the row can hold.
+        $elsewhere = sys_get_temp_dir().'/'.uniqid('elsewhere-').'/'.str_repeat('d', 120).'/'.str_repeat('e', 120).'/kept.csv';
+        (new Filesystem())->dumpFile($elsewhere, 'kept');
+        $pointsElsewhere = static function (ExportEvent $event) use ($elsewhere): void {
+            $event->setFilePath($elsewhere);
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::EXPORT_SUCCESS, $pointsElsewhere);
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        try {
+            ($this->handler())(new RunExportJob((int) $job->getId()));
+            self::fail('The row cannot hold the path of the file.');
+        } catch (JobSetAsideException) {
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::EXPORT_SUCCESS, $pointsElsewhere);
+            (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+        }
+
+        self::assertFileExists($elsewhere);
+        (new Filesystem())->remove(\dirname($elsewhere, 3));
     }
 
     /**

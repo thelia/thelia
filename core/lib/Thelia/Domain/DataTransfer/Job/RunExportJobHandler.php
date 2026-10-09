@@ -21,6 +21,7 @@ use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -107,9 +108,21 @@ final readonly class RunExportJobHandler
                 ->setFinishedAt(new \DateTime())
                 ->save();
         } catch (\Throwable $notRecorded) {
-            (new Filesystem())->remove($event->getFilePath());
+            // Only a file of the export folder: a listener may have pointed the export
+            // at a file that is not the export's to delete.
+            if (self::isInTheExportFolder($event->getFilePath())) {
+                (new Filesystem())->remove($event->getFilePath());
+            }
 
             throw $notRecorded;
         }
+    }
+
+    private static function isInTheExportFolder(string $path): bool
+    {
+        $directory = realpath(ExportCachePurger::directory());
+        $file = realpath($path);
+
+        return false !== $directory && false !== $file && str_starts_with($file, $directory.\DIRECTORY_SEPARATOR);
     }
 }
