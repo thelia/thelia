@@ -129,7 +129,8 @@ with an `OrderPaymentTransactionEvent` carrying the order and the line. Its
 listeners must stand being called twice for the same line. The event is raised
 once the outermost lock of the journal is released, with the order read afresh
 in an object of its own — the caller's object, and what it has not saved yet, are
-left alone:
+left alone, and it is not refreshed either: a caller that reads the status after
+recording a line reads the order again:
 its listeners call payment modules and move the order. A listener that fails
 surfaces as `PaymentAnnouncementFailedException`, which carries the line — still
 written — and is not a `PaymentException`: a notification ending on it is
@@ -197,7 +198,9 @@ published module implements would break them all.
   worker holds past the wait leaves the line pending, annotated `journal_busy`
   with the provider's answer, for the notification to settle. A module that
   answers succeeded without the provider reference leaves it pending as well,
-  annotated `missing_reference`.
+  annotated `missing_reference`, and one whose reference is longer than the
+  100 characters the journal holds, annotated `invalid_reference`, for the
+  merchant to settle by hand.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
 is what the back office and the admin API call, through the
@@ -249,7 +252,13 @@ reads the status under a row lock before writing, and drops — stopping the
 event — a move whose status another worker has changed since, so two
 notifications never pay the order twice nor put a cancelled order back on hold.
 Every status change is now decided on the status read under that lock, not on
-the object the caller loaded. A move the transition graph
+the object the caller loaded, and the history records the status the order left
+as read there. A refusal of the graph writes nothing and closes the transaction
+without rolling it back. `ORDER_UPDATE_STATUS` is not meant to be dispatched
+inside a transaction the caller holds open: the row lock would last until that
+caller commits, while the payment listeners take the journal lock — a worker
+recording a line on the same order then waits up to five seconds and the
+immediate capture line is lost (logged). A move the transition graph
 refuses is logged and not made, and a status listener that fails is logged: the
 line stays written and the provider's notification is answered.
 
@@ -279,7 +288,11 @@ The checkout does not read `isPaid()` for this: `Order::isPaymentSecured()`
 answers true for an order paid, refunded, on hold for capture, or whose journal
 still holds an authorized or pending amount, an authorization awaiting its
 answer included, or money taken and not given back whatever the status says;
-never for a cancelled order. The failed-payment cancellation of
+never for a cancelled order. A payment marked paid by mistake is therefore
+corrected by a refund line, not by setting the order back to not paid, which
+leaves the capture counted; and an authorization a module writes as pending
+before redirecting the buyer keeps the cart consumed until the provider
+answers or the merchant settles it. The failed-payment cancellation of
 the checkout refuses a secured order. `OrderFacade::findUnpaidOrderOf()`
 and the session's paid-cart check read it, so an authorized order is neither
 presented to its module again nor cancelled for a new one — which would reserve
@@ -359,7 +372,10 @@ office, with its reference: `OrderController::settlePaymentTransaction()`
 answers `POST /admin/order/update/{order_id}/payment-transaction/{id}/settle`
 through the `ORDER_PAYMENT_TRANSACTION_SETTLE` event
 (`OrderPaymentSettlementEvent`); the line is annotated `settled_by_hand`, its note
-names the administrator, and the administration log keeps the same. A bulk
+names the administrator, and the administration log keeps the same. That note
+is free text: it stays when the administrator account is deleted. A listener of
+the journal that fails afterwards is logged; the settlement is reported, and
+logged, as done. A bulk
 cancellation that meets an order still holding an authorization, without the
 capture right, leaves it and says why. Amounts are read and typed in the decimals
 of the order currency.
