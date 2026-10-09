@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Exception;
 
+use Thelia\Domain\Payment\Service\PaymentAmount;
+
 final class CaptureExceedsAuthorizationException extends PaymentException
 {
     public function __construct(
@@ -24,8 +26,8 @@ final class CaptureExceedsAuthorizationException extends PaymentException
         parent::__construct(\sprintf(
             'Order %s: a capture of %s exceeds the %s its authorization still holds.',
             $orderRef,
-            $requestedAmount,
-            $remainingToCapture,
+            PaymentAmount::forMessage($requestedAmount),
+            PaymentAmount::forMessage($remainingToCapture),
         ));
     }
 

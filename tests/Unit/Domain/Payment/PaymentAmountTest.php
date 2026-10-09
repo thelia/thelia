@@ -69,6 +69,15 @@ final class PaymentAmountTest extends TestCase
         self::assertSame('9999999999.999999', PaymentAmount::normalize('9999999999.999999'));
     }
 
+    public function testAnAmountReadsInAMessageWithoutItsTrailingZeros(): void
+    {
+        self::assertSame('2000.00', PaymentAmount::forMessage('2000.000000'));
+        self::assertSame('1022.80', PaymentAmount::forMessage('1022.800000'));
+        self::assertSame('10.005', PaymentAmount::forMessage(10.005));
+        self::assertSame('0.00', PaymentAmount::forMessage(0));
+        self::assertSame('-5.00', PaymentAmount::forMessage(-5));
+    }
+
     public function testIsPositiveIgnoresNoiseBelowAMillionth(): void
     {
         self::assertTrue(PaymentAmount::isPositive('0.000001'));

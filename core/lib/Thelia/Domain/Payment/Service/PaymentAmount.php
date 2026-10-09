@@ -75,6 +75,18 @@ final class PaymentAmount
     }
 
     /**
+     * The amount as a message shows it to a merchant: the trailing zeros of the column
+     * dropped, at least two decimals kept — "2000.00", "1022.80", "10.005".
+     */
+    public static function forMessage(float|int|string $amount): string
+    {
+        $text = rtrim(self::normalize($amount), '0');
+        [$integer, $fraction] = explode('.', $text);
+
+        return $integer.'.'.str_pad($fraction, 2, '0');
+    }
+
+    /**
      * The amount in millionths.
      *
      * @throws InvalidPaymentAmountException when the amount is not a finite number or
