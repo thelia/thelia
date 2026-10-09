@@ -24,6 +24,7 @@ use Thelia\Domain\Payment\DTO\PaymentTransactionTotals;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\CurrencyMinorUnit;
 use Thelia\Domain\Payment\Service\PaymentAmount;
+use Thelia\Domain\Payment\Service\PaymentModuleLocator;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
@@ -59,6 +60,7 @@ final readonly class MoveOrderOnPaymentTransactionListener
         private PaymentTransactionTotalsReader $totalsReader,
         private EventDispatcherInterface $eventDispatcher,
         private OrderStatusTransitionGuard $transitionGuard,
+        private PaymentModuleLocator $moduleLocator,
     ) {
     }
 
@@ -84,7 +86,7 @@ final readonly class MoveOrderOnPaymentTransactionListener
     private function moduleMovesTheStatus(Order $order): bool
     {
         try {
-            $module = $order->getPaymentModuleInstance();
+            $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (\Throwable) {
             return false;
         }

@@ -79,6 +79,7 @@ final readonly class PaymentCaptureService
     public function __construct(
         private PaymentTransactionRecorder $recorder,
         private PaymentTransactionTotalsReader $totalsReader,
+        private PaymentModuleLocator $moduleLocator,
     ) {
     }
 
@@ -202,7 +203,7 @@ final readonly class PaymentCaptureService
     private function captureModuleOf(Order $order): PaymentModuleWithCaptureInterface
     {
         try {
-            $module = $order->getPaymentModuleInstance();
+            $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (TheliaProcessException) {
             throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $order->getPaymentModuleTitle());
         }
