@@ -99,6 +99,51 @@ final class ModuleDescriptorValidatorTest extends TestCase
         }
     }
 
+    /**
+     * The refusal names the module when the descriptor is at its place in one, the file
+     * alone anywhere else (a descriptor checked on its own, as here): never the folder the
+     * server happened to unpack it in.
+     */
+    public function testARefusedDescriptorIsNamedByItsModuleOnlyAtItsPlaceInOne(): void
+    {
+        $validator = new ModuleDescriptorValidator();
+
+        try {
+            $validator->validate($this->writeDescriptor('<enabled-by-default>maybe</enabled-by-default>'));
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringStartsWith('The module.xml is not a valid file', $refusal->getMessage());
+        }
+
+        $inModule = $this->workDir.'/DescriptorSample/Config/module.xml';
+        (new Filesystem())->mkdir(\dirname($inModule));
+        rename($this->writeDescriptor('<enabled-by-default>maybe</enabled-by-default>'), $inModule);
+
+        try {
+            $validator->validate($inModule);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringStartsWith('The module.xml of DescriptorSample is not a valid file', $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A descriptor that is not XML at all is refused with a reason, not with nothing.
+     */
+    public function testADescriptorThatIsNotXmlIsRefusedWithAReason(): void
+    {
+        $path = $this->workDir.'/module.xml';
+        file_put_contents($path, '<module><unclosed></module>');
+
+        try {
+            (new ModuleDescriptorValidator())->validate($path);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringStartsWith('The module.xml is not a valid file: it is not well-formed XML (', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+        }
+    }
+
     private function writeDescriptor(string $trailingElements): string
     {
         $path = $this->workDir.'/module.xml';
