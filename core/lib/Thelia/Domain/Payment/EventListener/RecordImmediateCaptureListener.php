@@ -17,6 +17,7 @@ namespace Thelia\Domain\Payment\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Payment\Service\PaymentModuleLocator;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
@@ -46,6 +47,7 @@ final readonly class RecordImmediateCaptureListener
 {
     public function __construct(
         private PaymentTransactionRecorder $recorder,
+        private PaymentModuleLocator $moduleLocator,
     ) {
     }
 
@@ -100,7 +102,7 @@ final readonly class RecordImmediateCaptureListener
     private function moduleCapturesByHand(Order $order): bool
     {
         try {
-            $module = $order->getPaymentModuleInstance();
+            $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (TheliaProcessException) {
             // The module is gone: whoever marks the order paid now is the author of
             // the movement, and the line is still worth writing.

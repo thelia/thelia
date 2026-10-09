@@ -71,6 +71,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function managesOrderStatus(): bool
     {
+        // A real module reaches its services through the container.
+        $this->getContainer();
+
         return self::$managesOrderStatus;
     }
 
@@ -81,6 +84,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function capture(Order $order, float $amount, OrderPaymentTransaction $transaction): PaymentOperationResult
     {
+        // A real module reaches its services through the container.
+        $this->getContainer();
+
         self::$captureCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId()];
 
         if (null !== self::$whileCapturing) {
@@ -101,6 +107,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function voidAuthorization(Order $order, OrderPaymentTransaction $transaction): PaymentOperationResult
     {
+        // A real module reaches its services through the container.
+        $this->getContainer();
+
         self::$voidCalls[] = (int) $order->getId();
 
         return PaymentOperationResult::succeeded('VOID-'.$transaction->getId());
