@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Routing\RequestContext;
+use Thelia\Action\Cache;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\EventListener\ActiveLangsCacheListener;
@@ -66,7 +67,9 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
         foreach ($dispatcher->getListeners(ConsoleEvents::COMMAND) as $listener) {
             $class = \is_array($listener) && \is_object($listener[0]) ? $listener[0]::class : null;
 
-            if (null !== $class && str_starts_with($class, 'Thelia\\')) {
+            // The cache action counts the commands running, so that one a worker runs
+            // never clears the cache under it: no state a job starts afresh from.
+            if (null !== $class && str_starts_with($class, 'Thelia\\') && Cache::class !== $class) {
                 $coreListeners[] = $class;
             }
         }
