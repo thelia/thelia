@@ -90,7 +90,7 @@ final readonly class PaymentTransactionRecorder
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
         if (!PaymentAmount::isPositive($amount)) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: an authorization needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: an authorization needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
 
         if (null === $this->cleanReference($pspReference)) {
@@ -112,7 +112,7 @@ final readonly class PaymentTransactionRecorder
     ): OrderPaymentTransaction {
         // Zero is a capture: an order that costs nothing is paid without taking anything.
         if (PaymentAmount::compare($amount, 0) < 0) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture cannot be negative, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture cannot be negative, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
 
         $guard = PaymentTransactionState::FAILED === $state
@@ -133,7 +133,7 @@ final readonly class PaymentTransactionRecorder
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
         if (!PaymentAmount::isPositive($amount)) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
 
         $guard = PaymentTransactionState::FAILED === $state
@@ -142,7 +142,7 @@ final readonly class PaymentTransactionRecorder
                 $refundable = $this->totalsReader->forOrder((int) $order->getId())->refundable();
 
                 if (PaymentAmount::compare($amount, $refundable) > 0) {
-                    throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund of %s exceeds the %s taken and not yet given back.', (string) $order->getRef(), PaymentAmount::normalize($amount), $refundable));
+                    throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund of %s exceeds the %s taken and not yet given back.', (string) $order->getRef(), PaymentAmount::forMessage($amount), PaymentAmount::forMessage($refundable)));
                 }
 
                 return null;
@@ -406,7 +406,7 @@ final readonly class PaymentTransactionRecorder
             return $existing;
         }
 
-        throw new ConflictingPaymentReferenceException(\sprintf('Order %s: the %s %s is already recorded as %s of %s; a new attempt is reported with a new reference.', (string) $order->getRef(), (string) $existing->getType(), (string) ($existing->getPspReference() ?? '#'.$existing->getId()), (string) $existing->getState(), (string) $existing->getAmount()));
+        throw new ConflictingPaymentReferenceException(\sprintf('Order %s: the %s %s is already recorded as %s of %s; a new attempt is reported with a new reference.', (string) $order->getRef(), (string) $existing->getType(), (string) ($existing->getPspReference() ?? '#'.$existing->getId()), (string) $existing->getState(), PaymentAmount::forMessage(PaymentAmount::forMessage((string) $existing->getAmount()))));
     }
 
     /**
