@@ -27,6 +27,7 @@ use Thelia\Api\Resource\OrderStatus as OrderStatusResource;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
+use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -42,6 +43,7 @@ final readonly class OrderProcessor implements ProcessorInterface
         private PropelPersistProcessor $persistProcessor,
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
+        private OrderStatusTransitionGuard $transitionGuard,
     ) {
     }
 
@@ -59,31 +61,25 @@ final readonly class OrderProcessor implements ProcessorInterface
 
         // Every write of an order goes down the locked road, whatever the request says of the
         // status: the resource carries the status the provider read, which may be older than
-        // the row, and the persistence writes it back. One transaction around the write and
-        // the event: a refused transition must not leave the other fields of the request
-        // written while the client is told the write failed.
+        // the row, and the persistence writes it back. A transition the graph refuses is
+        // refused under that lock, before anything of the request is written.
         $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
         $connection->beginTransaction();
-        $event = null;
 
         try {
-            // The first statement of the transaction: the listeners of the status event (the
-            // release of the payment parts asks the modules to give back what they hold) then
-            // read what another request committed before the lock was granted.
             $lockedStatusId = OrderQuery::create()->lockStatusIdForUpdate((int) $uriVariables['id'], $connection) ?? throw new NotFoundHttpException('No such order.');
             $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
+
+            if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
+                $order->setStatusId($lockedStatusId);
+                $this->transitionGuard->assertAllowed($order, $requestedStatusId);
+            }
 
             // The status written back is always the one read under the lock: the column itself is
             // moved through the event only, and a status another request committed since the
             // provider read the order is not undone by a request that never spoke of the status.
             $data->setOrderStatus((new OrderStatusResource())->setId($lockedStatusId));
             $resource = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-
-            if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
-                $order->reload();
-                $event = (new OrderEvent($order))->setStatus($requestedStatusId);
-                $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-            }
 
             $connection->commit();
         } catch (OrderStatusTransitionRefusedException $exception) {
@@ -96,8 +92,21 @@ final readonly class OrderProcessor implements ProcessorInterface
             throw $throwable;
         }
 
-        if (null === $event) {
+        if (null === $requestedStatusId || $requestedStatusId === $lockedStatusId) {
             return $resource;
+        }
+
+        // The status moves through the event once the other fields are committed, as the back
+        // office does: its listeners call payment modules and write the payment journal under
+        // its own lock, which a transaction held open around them would outlive. The status
+        // change itself rereads the status under a row lock and checks the transition again.
+        $order->reload();
+        $event = (new OrderEvent($order))->setStatus($requestedStatusId);
+
+        try {
+            $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        } catch (OrderStatusTransitionRefusedException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 
         return $this->transformer->modelToResource(

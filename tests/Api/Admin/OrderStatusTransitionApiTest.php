@@ -15,7 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Admin;
 
 use Propel\Runtime\Connection\ConnectionWrapper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
@@ -55,7 +58,7 @@ final class OrderStatusTransitionApiTest extends ApiTestCase
         self::assertSame(OrderStatus::CODE_REFUNDED, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
     }
 
-    public function testARefusedStatusRollsTheWholeRequestBack(): void
+    public function testARefusedStatusWritesNothingOfTheRequest(): void
     {
         $token = $this->authenticateAsAdmin();
         $order = $this->sentOrderWithOneLine();
@@ -67,16 +70,38 @@ final class OrderStatusTransitionApiTest extends ApiTestCase
         $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $body, $token);
 
         self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
-        // The test itself wraps every request in a transaction, so the processor's
-        // rollback is nested: Propel cannot undo the rows here and marks the outer
-        // transaction as no longer committable instead. That mark is the proof that
-        // the processor asked for the rollback of everything it wrote.
+        OrderTableMap::clearInstancePool();
+        self::assertNotSame('PARCEL-REFUSED-WITH-STATUS', OrderQuery::create()->findPk($order->getId())->getDeliveryRef(), 'A refused status is refused before the other fields are written.');
+    }
+
+    /**
+     * The listeners of a status change call payment modules and write the payment
+     * journal under its own lock: they run once the other fields are committed, as they
+     * do from the back office, never inside a transaction the request still holds open.
+     */
+    public function testTheStatusChangeRunsOutsideTheTransactionOfTheOtherFields(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->sentOrderWithOneLine();
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
         $connection = $this->getPropelConnection();
         self::assertInstanceOf(ConnectionWrapper::class, $connection);
-        self::assertTrue(
-            (new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection),
-            'A refused status must roll back the other fields written by the same request.',
-        );
+        $depthOutsideTheRequest = $connection->getNestedTransactionCount();
+        $depthSeenByTheListener = null;
+        $listener = static function () use ($connection, &$depthSeenByTheListener): void {
+            $depthSeenByTheListener = $connection->getNestedTransactionCount();
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener, 1024);
+
+        try {
+            $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $this->bodyWithStatus($token, $order->getId(), OrderStatus::CODE_REFUNDED), $token);
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+        }
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame($depthOutsideTheRequest, $depthSeenByTheListener);
     }
 
     /**
