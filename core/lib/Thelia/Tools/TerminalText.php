@@ -25,11 +25,12 @@ final class TerminalText
     /**
      * The text with every character a terminal, a log or a page would obey or hide replaced
      * by "?", in three steps, each of which leaves nothing rather than the text it was to
-     * clean when it fails. A backtrack limit proves it for the second step; the lowest limit
-     * reaches the first step too, but the second fails at the same time, so its own
-     * fallback stands by construction (and a text left invalid would fail the third step,
-     * in Unicode mode, anyway); the third step and the run of blanks of onOneLine() are
-     * never stopped on their own, and stand by construction too:
+     * clean when it fails. A backtrack limit proves it for the second step. It cannot for
+     * the first: the lowest limit stops it, but had it given the text back, the same limit
+     * would stop the second step on that text; and a text left invalid would fail the
+     * third step, in Unicode mode, anyway. It cannot for the third step nor for the run of
+     * blanks of onOneLine() either: no limit stops them without stopping an earlier step
+     * first. These three stand by construction.
      *
      * 1. A text that is not valid UTF-8 has each byte outside a well-formed sequence
      *    replaced: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that is
@@ -44,9 +45,9 @@ final class TerminalText
      *    format controls (U+206A to U+206F), the byte order mark (U+FEFF), the interlinear
      *    annotation marks (U+FFF9 to U+FFFB), the Mongolian free variation selectors and
      *    vowel separator (U+180B to U+180F), the combining grapheme joiner (U+034F), the
-     *    variation selectors (U+FE00 to
-     *    U+FE0F, U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the
-     *    blank fillers (U+115F, U+1160, U+2800, U+3164, U+FFA0), the tags block and the
+     *    variation selectors (U+FE00 to U+FE0F, U+E0100 to U+E01FF), the musical format
+     *    controls (U+1D173 to U+1D17A), the blank fillers (U+115F, U+1160, U+2800, U+3164,
+     *    U+FFA0), the tags block and the
      *    unassigned code points that follow it (U+E0000 to U+E00FF), the Khmer inherent
      *    vowels (U+17B4, U+17B5), the shorthand format controls (U+1BCA0 to U+1BCA3) and
      *    the Egyptian hieroglyph format controls (U+13430 to U+1343F, format characters

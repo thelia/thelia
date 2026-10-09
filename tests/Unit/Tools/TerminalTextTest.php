@@ -22,7 +22,7 @@ use Thelia\Tools\TerminalText;
 final class TerminalTextTest extends TestCase
 {
     #[DataProvider('texts')]
-    public function testControlCharactersAreReplaced(string $text, string $expected): void
+    public function testTheTextIsCleanedAsExpected(string $text, string $expected): void
     {
         self::assertSame($expected, TerminalText::withoutControlCharacters($text));
     }
@@ -74,7 +74,7 @@ final class TerminalTextTest extends TestCase
         $tried = 0;
 
         try {
-            foreach (['C.UTF-8', 'C'] as $candidate) {
+            foreach (['C.UTF-8', 'en_US.UTF-8'] as $candidate) {
                 if (false === setlocale(\LC_CTYPE, $candidate)) {
                     continue;
                 }
@@ -120,9 +120,10 @@ final class TerminalTextTest extends TestCase
      * Under a backtrack limit, the text comes out cleaned or not at all, never as it was.
      * Which step a given limit stops depends on the build of PCRE: the lowest refuses even
      * the check that the text is UTF-8, so the first step runs and fails on a valid text
-     * too; the next ones let the check pass and stop the second step (limits 2 to 9 on
-     * PCRE 10.46 and 10.47); none stops the third step or the run of blanks on their own.
-     * So the limits are swept, each result is held to the two outcomes allowed, and the
+     * too; the next ones let the check pass and stop the second step (limits 2 to 9,
+     * measured on PCRE 10.46 and 10.47); none stops the third step or the run of blanks
+     * without stopping an earlier step first. So the limits are swept, each result is held
+     * to the two outcomes allowed, and the
      * test is only worth something once a limit has let the check pass and given nothing:
      * it says so, or skips. What it proves is the fallback of the second step, through the
      * text that carries a character the second step alone replaces (U+034F): a fallback
@@ -145,7 +146,7 @@ final class TerminalTextTest extends TestCase
         $secondStepStopped = 0;
 
         try {
-            foreach (range(1, 12) as $backtrackLimit) {
+            foreach (range(1, 32) as $backtrackLimit) {
                 ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
                 $checkPasses = 1 === preg_match('//u', $secondStepOnly);
 
@@ -163,7 +164,7 @@ final class TerminalTextTest extends TestCase
         }
 
         if (0 === $secondStepStopped) {
-            self::markTestSkipped('No limit from 1 to 12 lets the UTF-8 check pass and stops the second step on this build of PCRE: the fallback of the second step is not proven here.');
+            self::markTestSkipped('No limit from 1 to 32 lets the UTF-8 check pass and stops the second step on this build of PCRE: the fallback of the second step is not proven here.');
         }
     }
 
@@ -183,7 +184,7 @@ final class TerminalTextTest extends TestCase
         }
 
         foreach ([$first - 1, $last + 1] as $neighbour) {
-            if ($neighbour < 0 || $neighbour > 0x10FFFF || ($neighbour >= 0xD800 && $neighbour <= 0xDFFF) || self::isReplacedByItself($neighbour)) {
+            if (!self::isACodePoint($neighbour) || self::isReplacedByItself($neighbour)) {
                 continue;
             }
 
@@ -313,6 +314,11 @@ final class TerminalTextTest extends TestCase
         }
 
         return $ranges;
+    }
+
+    private static function isACodePoint(int $value): bool
+    {
+        return $value >= 0 && $value <= 0x10FFFF && ($value < 0xD800 || $value > 0xDFFF);
     }
 
     private static function isReplacedByItself(int $codePoint): bool
