@@ -244,6 +244,32 @@ final class CacheTest extends TestCase
         self::assertDirectoryDoesNotExist($this->clearedDir);
     }
 
+    /**
+     * A recurring task runs its command inside the worker, and that command ends with a
+     * console terminate of its own: the clear it asked for still waits for the worker
+     * to stop, not for the command to end.
+     */
+    public function testAClearAScheduledCommandAskedForWaitsForTheWorkerToStop(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+        $this->addALazyWorkerListenerStoredIn($dispatcher, $this->clearedDir);
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+
+        $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+            $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+            $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+        })->run();
+
+        self::assertCount(1, $transport->getAcknowledged());
+        self::assertDirectoryExists($this->clearedDir);
+
+        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+
+        self::assertDirectoryDoesNotExist($this->clearedDir);
+    }
+
     public function testAClearThatFailsNeverLeavesTheJobUnacknowledged(): void
     {
         $dispatcher = new EventDispatcher();
