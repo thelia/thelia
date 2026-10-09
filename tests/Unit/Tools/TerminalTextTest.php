@@ -40,8 +40,9 @@ final class TerminalTextTest extends TestCase
         self::assertSame('| ??', TerminalText::onOneLine("|\n\f\x88"));
         // The result is the same the second time.
         self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
-        // A tab at either end is shown, never dropped.
+        // A tab at either end that no line break touches is shown; one a line break touches goes with it.
         self::assertSame('?a?', TerminalText::onOneLine("\ta\t"));
+        self::assertSame('a', TerminalText::onOneLine("\t\na\n\t"));
         // A lone carriage return is a line break, never a return to the start of the line.
         self::assertSame('Acme OK', TerminalText::onOneLine("Acme\rOK"));
     }
@@ -91,9 +92,9 @@ final class TerminalTextTest extends TestCase
     /**
      * A run of thousands of blanks (a value libxml cites from a descriptor) is read once,
      * even without the PCRE JIT, the slower path: a pattern that looked for a line break
-     * after the blanks was tried again from each blank of the run, and took five seconds on
-     * thirty thousand, minutes on this one. In a process of its own, as PCRE keeps a pattern
-     * compiled once, with the JIT it had.
+     * after the blanks was tried again from each blank of the run: five seconds on thirty
+     * thousand (measured), and the time grows with the square of the run. In a process of
+     * its own, as PCRE keeps a pattern compiled once, with the JIT it had.
      */
     #[RunInSeparateProcess]
     public function testALongRunOfBlanksIsReadOnce(): void
@@ -111,6 +112,25 @@ final class TerminalTextTest extends TestCase
 
         self::assertSame('a'.str_repeat(' ', 200000).'b'.str_repeat('?', 100000).'c d', $printed);
         self::assertLessThan(2_000_000_000, hrtime(true) - $started);
+    }
+
+    /**
+     * A step that fails leaves nothing rather than the text it was to clean.
+     */
+    #[RunInSeparateProcess]
+    public function testAStepThatFailsLeavesNothing(): void
+    {
+        $jit = \ini_get('pcre.jit');
+        $limit = \ini_get('pcre.backtrack_limit');
+        ini_set('pcre.jit', '0');
+        ini_set('pcre.backtrack_limit', '1');
+
+        try {
+            self::assertSame('', TerminalText::withoutControlCharacters(str_repeat("\xFFa\u{200B}", 2000)));
+        } finally {
+            ini_set('pcre.jit', (string) $jit);
+            ini_set('pcre.backtrack_limit', (string) $limit);
+        }
     }
 
     /**
@@ -133,14 +153,6 @@ final class TerminalTextTest extends TestCase
             }
 
             self::assertSame('a'.mb_chr($neighbour).'b', TerminalText::withoutControlCharacters('a'.mb_chr($neighbour).'b'), \sprintf('U+%04X', $neighbour));
-        }
-    }
-
-    /** @return iterable<string, array{int, int}> */
-    public static function ranges(): iterable
-    {
-        foreach (self::replacedRanges() as [$first, $last]) {
-            yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
         }
     }
 
@@ -178,9 +190,20 @@ final class TerminalTextTest extends TestCase
         yield 'U+3FFFD, an unassigned four-byte character, next to an invalid byte' => ["\xFF\u{3FFFD}", "?\u{3FFFD}"];
         yield 'U+10FFFD, the last private use character, next to an invalid byte' => ["\xFF\u{10FFFD}", '??'];
         yield 'U+FFFD, the replacement character, next to an invalid byte' => ["\xFF\u{FFFD}", "?\u{FFFD}"];
+        yield 'U+07FF, the last two-byte character, next to an invalid byte' => ["\xFF\u{7FF}", "?\u{7FF}"];
+        yield 'U+1000, the first character of the E1 lead byte, next to an invalid byte' => ["\xFF\u{1000}", "?\u{1000}"];
+        yield 'U+CFFF, the last character of the EC lead byte, next to an invalid byte' => ["\xFF\u{CFFF}", "?\u{CFFF}"];
+        yield 'U+E000, private use behind the EE lead byte, next to an invalid byte' => ["\xFF\u{E000}", '??'];
+        yield 'U+40000, the first character of the F1 lead byte, next to an invalid byte' => ["\xFF\u{40000}", "?\u{40000}"];
+        yield 'U+FFFFF, a noncharacter behind the F3 lead byte, next to an invalid byte' => ["\xFF\u{FFFFF}", '??'];
+        yield 'an Egyptian hieroglyph format control' => ["Acme\u{13437}", 'Acme?'];
+        yield 'the hieroglyph after that range is kept' => ["Acme\u{13440}", "Acme\u{13440}"];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
         yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
-        yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
+        // U+2069, U+2029, U+115F and their neighbours are covered by the bounds test too: they
+        // stay here as the inner bounds of two ranges the pattern writes apart (U+2066 to
+        // U+2069 and U+206A to U+206F, U+2028 to U+2029 and U+202A to U+202E).
+        yield 'the narrow no-break space next to the embeddings range (U+2028 to U+202E) is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
         yield 'the paragraph separator (bound of a range)' => ["Ac\u{2029}me", 'Ac?me'];
         yield 'the hair space next to the zero-width range is kept' => ["Ac\u{200A}me", "Ac\u{200A}me"];
         yield 'the first Hangul filler (bound of a range)' => ["Ac\u{115F}me", 'Ac?me'];
@@ -224,6 +247,14 @@ final class TerminalTextTest extends TestCase
         yield 'a khmer vowel sign is kept' => ["Ac\u{17B6}me", "Ac\u{17B6}me"];
     }
 
+    /** @return iterable<string, array{int, int}> */
+    public static function ranges(): iterable
+    {
+        foreach (self::replacedRanges() as [$first, $last]) {
+            yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
+        }
+    }
+
     /**
      * The ranges the docblock of withoutControlCharacters() lists, and the two noncharacters
      * of each of the 17 planes.
@@ -237,7 +268,7 @@ final class TerminalTextTest extends TestCase
             [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
             [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
             [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
-            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
+            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
         ];
 
         for ($plane = 0; $plane <= 16; ++$plane) {
