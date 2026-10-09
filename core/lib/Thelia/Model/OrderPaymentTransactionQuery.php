@@ -93,6 +93,23 @@ class OrderPaymentTransactionQuery extends BaseOrderPaymentTransactionQuery
     }
 
     /**
+     * The pending lines of this movement and amount that do not carry a provider reference
+     * yet: written before a call whose answer never came back with one.
+     *
+     * @return \Propel\Runtime\Collection\ObjectCollection<OrderPaymentTransaction>
+     */
+    public function findPendingWithoutReference(int $orderId, PaymentTransactionType $type, string $amount, ?ConnectionInterface $con = null): \Propel\Runtime\Collection\ObjectCollection
+    {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->filterByTypeEnum($type)
+            ->filterByState(PaymentTransactionState::PENDING->value)
+            ->filterByPspReference(null, Criteria::ISNULL)
+            ->filterByAmount($amount)
+            ->find($con);
+    }
+
+    /**
      * The capture of this amount asked since $since that did not fail: a repeated click
      * or a retried call is answered with it rather than sent to the provider again.
      */

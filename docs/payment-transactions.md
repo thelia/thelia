@@ -101,6 +101,10 @@ unique index `(order_id, type, psp_reference)` backing the lookup; the column
 has a binary collation, provider references being case-sensitive. A settled line
 without a reference is found by type, outcome and amount within the last
 minute. A pending line that a notification reports with an outcome is settled.
+A notification whose reference the journal does not know settles the one
+pending line of the same movement and amount still waiting for a reference — a
+call that timed out, or whose answer could not be recorded, leaves exactly
+that — and is never guessed between two such lines.
 A reference the journal holds with another outcome or another amount is refused
 with `ConflictingPaymentReferenceException`: a new attempt carries a new
 reference.
@@ -158,6 +162,10 @@ published module implements would break them all.
   connection — leaves the line **pending**: the call may have reached the
   provider. The technical message goes to the log, never to the journal every
   order reader sees, which gets a generic one. Both are rethrown.
+- A module that answers with a reference another line of the order already
+  carries leaves the line pending as well, annotated `conflicting_reference`:
+  whether the provider took the money that time cannot be told, and the
+  notification bringing the real reference settles it.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
 is what the back office and the admin API call, through the
