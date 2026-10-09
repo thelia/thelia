@@ -21,6 +21,7 @@ use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\InvalidProviderReferenceException;
 use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
@@ -64,6 +65,8 @@ final readonly class PaymentCaptureService
     private const ERROR_CODE_JOURNAL_BUSY = 'journal_busy';
 
     private const ERROR_CODE_MISSING_REFERENCE = 'missing_reference';
+
+    private const ERROR_CODE_INVALID_REFERENCE = 'invalid_reference';
 
     private const UNKNOWN_OUTCOME_MESSAGE = 'The payment module could not get an answer from the provider: the outcome is known once the provider confirms it.';
 
@@ -323,6 +326,21 @@ final readonly class PaymentCaptureService
             ));
 
             throw $conflict;
+        } catch (InvalidProviderReferenceException $invalid) {
+            // The answer cannot be written as it came: the line stays pending, reserving
+            // what it asked for, and says why, for the merchant to settle it by hand.
+            Tlog::getInstance()->error(\sprintf(
+                'Payment module %s answered transaction #%d with a reference the journal cannot hold: %s',
+                $moduleCode,
+                (int) $transaction->getId(),
+                $invalid->getMessage(),
+            ));
+
+            return $this->recorder->markOutcomeUnknown(
+                $transaction,
+                self::ERROR_CODE_INVALID_REFERENCE,
+                'The payment module answered with a provider reference longer than the journal holds: read the outcome at the provider and record it by hand.',
+            );
         } catch (MissingProviderReferenceException $missing) {
             // The module says the money was taken but not under which reference: a line
             // counted as taken that no notification can find would be written twice. It
