@@ -257,8 +257,9 @@ readonly class CheckoutPaymentService
         // "cancel" is a back-office decision with money already moved behind it, and this
         // entry point is reachable by whoever holds a tracking token — a guest coming
         // back from a payment page that did not go through. Without this, that token
-        // cancelled a paid, or shipped, or already refunded order.
-        if (!$failedOrder->isNotPaid()) {
+        // cancelled a paid, or shipped, or already refunded order. An authorized order on
+        // hold for capture reads as not paid, yet its payment went through.
+        if (!$failedOrder->isNotPaid() || $failedOrder->isPaymentSecured()) {
             throw new \InvalidArgumentException(Translator::getInstance()->trans('This order is no longer waiting for its payment and cannot be cancelled here.'));
         }
 
