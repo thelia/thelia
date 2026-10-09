@@ -150,16 +150,29 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        $missing = $this->workDir.'/Sample/Config/module.xml';
-
-        try {
-            (new ModuleDescriptorValidator())->validate($missing);
-            self::fail('The descriptor is refused.');
-        } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringStartsWith('The module.xml of Sample is not a valid file: it is not well-formed XML (', $refusal->getMessage());
-            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
-            self::assertStringContainsString('module.xml', substr($refusal->getMessage(), 60));
+        // As given, and as a path libxml resolves before quoting it.
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', $this->workDir.'/Other/../Sample/Config/module.xml'] as $missing) {
+            try {
+                (new ModuleDescriptorValidator())->validate($missing);
+                self::fail('The descriptor is refused.');
+            } catch (InvalidXmlDocumentException $refusal) {
+                self::assertMatchesRegularExpression('#^The module\.xml of Sample is not a valid file: it is not well-formed XML \(.*"module\.xml".*\)$#', $refusal->getMessage());
+                self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+                self::assertStringNotContainsString('/', $refusal->getMessage());
+            }
         }
+    }
+
+    /**
+     * A version is given as text, and the table of schemas is read back with integer keys:
+     * the version a descriptor is checked against is the one asked for.
+     */
+    public function testADescriptorIsCheckedAgainstTheVersionAskedFor(): void
+    {
+        $validator = new ModuleDescriptorValidator();
+
+        self::assertTrue($validator->validate($this->writeDescriptor(''), (string) self::DESCRIPTOR_VERSION_2_2));
+        self::assertSame(self::DESCRIPTOR_VERSION_2_2, (int) $validator->getModuleVersion());
     }
 
     /**
