@@ -43,9 +43,9 @@ abstract class AbstractExport implements \Iterator
     public const USE_RANGE_DATE = false;
 
     /**
-     * @var \SplFileObject|PropelModelPager Data to export
+     * @var \SplFileObject|PropelModelPager|array<mixed>|null Data to export, read on the first rewind
      */
-    private \SplFileObject|PropelModelPager $data;
+    private \SplFileObject|PropelModelPager|array|null $data = null;
 
     /** @var bool True if data is array, false otherwise */
     private ?bool $dataIsArray = null;
