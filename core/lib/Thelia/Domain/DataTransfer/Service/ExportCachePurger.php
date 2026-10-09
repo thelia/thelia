@@ -16,18 +16,24 @@ namespace Thelia\Domain\DataTransfer\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 
 class ExportCachePurger
 {
     private const EXPORT_CACHE_MAX_AGE_DAYS = 1;
 
-    public function purgeOldExportFiles(string $directory): int
+    /**
+     * Deletes the export files older than a day, and tells how many went. A link in the
+     * folder goes by itself, never the file it points to.
+     *
+     * @param string|null $directory the export folder by default
+     */
+    public function purgeOldExportFiles(?string $directory = null): int
     {
         $deletedCount = 0;
         $fileSystem = new Filesystem();
 
-        foreach ($this->oldExportFiles($directory) as $oldExportFile) {
-            // The link itself, never the file it points to.
+        foreach ($this->oldExportFiles($directory ?? ExportStorage::directory()) as $oldExportFile) {
             $fileSystem->remove($oldExportFile->getPathname());
             ++$deletedCount;
         }
@@ -35,9 +41,14 @@ class ExportCachePurger
         return $deletedCount;
     }
 
-    public function countOldExportFiles(string $directory): int
+    /**
+     * How many files a purge would delete, for a dry run: nothing is written.
+     *
+     * @param string|null $directory the export folder by default
+     */
+    public function countOldExportFiles(?string $directory = null): int
     {
-        return iterator_count($this->oldExportFiles($directory));
+        return iterator_count($this->oldExportFiles($directory ?? ExportStorage::directory()));
     }
 
     /**
