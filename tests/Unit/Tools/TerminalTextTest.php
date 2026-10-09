@@ -177,8 +177,8 @@ final class TerminalTextTest extends TestCase
      * holed range of the second step that the third step covers too (the format characters,
      * the Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15, and the tags
      * and variation selectors of plane 14 among them), as the third step stands behind it.
-     * The one range of plane 14, U+E0000 to U+E0FFF, is for that reason only sampled, one
-     * point in sixty-four and its last.
+     * The large range of plane 14, U+E0000 to U+E0FFF, is for that reason only sampled,
+     * one point in sixty-four and its last.
      */
     #[DataProvider('ranges')]
     public function testEveryPointOfARangeIsReplacedAndItsNeighboursKept(int $first, int $last): void
