@@ -75,13 +75,14 @@ final class XmlDescriptorTest extends TestCase
 
         // A path PHP refuses before libxml sees it.
         $refused = XmlDescriptor::schemaErrors($conforming, $this->workDir."/a\0.xsd");
-        self::assertSame('the descriptor could not be checked against a .xsd', $refused[0]);
+        self::assertSame('the descriptor could not be checked against a?.xsd', $refused[0]);
         self::assertStringContainsString('null bytes', $refused[1]);
     }
 
     /**
-     * The error handler, the error mode and the error buffer of libxml are the caller's:
-     * given back as they were, whatever libxml answered.
+     * The error handler and the error mode of libxml are the caller's, given back as they
+     * were whatever libxml answered; the error buffer of libxml is emptied, what the
+     * caller left in it included.
      */
     public function testTheErrorHandlingOfTheCallerIsGivenBack(): void
     {
@@ -95,6 +96,11 @@ final class XmlDescriptorTest extends TestCase
             $previousMode = libxml_use_internal_errors($mode);
 
             try {
+                libxml_use_internal_errors(true);
+                (new \DOMDocument())->loadXML('<a>');
+                self::assertCount(1, libxml_get_errors());
+                libxml_use_internal_errors($mode);
+
                 XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/good.xml');
                 XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/bad.xml');
                 $dom = new \DOMDocument();
@@ -143,9 +149,22 @@ final class XmlDescriptorTest extends TestCase
         self::assertStringContainsString('( new )', XmlDescriptor::matchingSchemaVersion($neither, $schemas, $tenth, null, $check)['errors'][0]);
     }
 
+    /**
+     * A reason is printed on one line, whatever a value or a path carried: a control
+     * character (C0 or C1), a mark that reorders or hides text, a line separator, or a
+     * byte that is not UTF-8 (a regular expression made for UTF-8 would give nothing).
+     */
     public function testAReasonIsPrintable(): void
     {
-        self::assertSame('a b c d e', XmlDescriptor::printable("a\nb\tc\x7Fd\u{202E}e"));
         self::assertSame('plain', XmlDescriptor::printable('plain'));
+        self::assertSame('a b?c?d?e', XmlDescriptor::printable("a\nb\tc\x7Fd\u{202E}e"));
+        self::assertSame('a?b?c?d?e?f', XmlDescriptor::printable("a\u{85}b\u{9B}c\u{200F}d\u{2028}e\u{2066}f"));
+        self::assertSame('Mod?', XmlDescriptor::printable("Mod\xE9"));
+        self::assertNotSame('', XmlDescriptor::printable("\xE9"));
+
+        file_put_contents($this->workDir."/ga\xE9rbage.xsd", 'garbage');
+        $dom = new \DOMDocument();
+        $dom->loadXML('<a/>');
+        self::assertSame('the descriptor could not be checked against ga?rbage.xsd', XmlDescriptor::schemaErrors($dom, $this->workDir."/ga\xE9rbage.xsd")[0]);
     }
 }

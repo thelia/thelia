@@ -117,6 +117,31 @@ final class TemplateDescriptorValidatorTest extends TestCase
         }
     }
 
+    /**
+     * A value of the descriptor quoted by the schema, or the path of the descriptor, is
+     * shown without what would make a log or a page obey it, and never as nothing.
+     */
+    public function testARefusalIsPrintable(): void
+    {
+        $path = $this->workDir.'/template.xml';
+        file_put_contents($path, str_replace('<stability>prod</stability>', "<stability>a\nb\u{202E}c</stability>", (string) file_get_contents($this->writeDescriptor())));
+
+        try {
+            (new TemplateDescriptorValidator($path))->validate();
+            self::fail('The descriptor is refused.');
+        } catch (InvalidDescriptorException $refusal) {
+            self::assertStringContainsString("'a b?c'", $refusal->getMessage());
+            self::assertSame(0, preg_match('/[\x00-\x1F\x7F\x{202E}]/u', $refusal->getMessage()));
+        }
+
+        try {
+            (new TemplateDescriptorValidator($this->workDir."/th\xE8me/template.xml"))->validate();
+            self::fail('The descriptor is refused.');
+        } catch (InvalidDescriptorException $refusal) {
+            self::assertStringEndsWith('th?me/template.xml file is not a valid template descriptor : it is not a readable file', $refusal->getMessage());
+        }
+    }
+
     private function writeDescriptor(): string
     {
         $path = $this->workDir.'/template.xml';

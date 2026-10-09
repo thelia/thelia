@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\File;
 
+use Thelia\Tools\TerminalText;
+
 /**
  * Reads an XML descriptor (module.xml, template.xml) and checks it against a schema,
  * closed: what libxml has to say is the reason given, never a warning of PHP, and a
@@ -106,13 +108,14 @@ final class XmlDescriptor
     }
 
     /**
-     * The text fit to print in a reason: a value of the descriptor or a name of a file
-     * may carry a control character, or a mark that reverses the direction of what
-     * follows, that a log or a page would obey.
+     * The text fit to print in a reason, on one line: a value of the descriptor or a name
+     * of a file may carry a control character, a mark that reorders or hides what follows,
+     * a line break, or a byte that is not UTF-8, that a log, a terminal or a page would
+     * obey. TerminalText knows them all.
      */
     public static function printable(string $text): string
     {
-        return (string) preg_replace('/[\x00-\x1F\x7F\x{202A}-\x{202E}\x{2066}-\x{2069}]/u', ' ', $text);
+        return TerminalText::onOneLine($text);
     }
 
     /**
@@ -142,10 +145,10 @@ final class XmlDescriptor
 
             $said = self::saidByLibxml();
 
-            return [] === $said ? [$refusal] : $said;
+            return [] === $said ? [self::printable($refusal)] : $said;
         } catch (\ErrorException|\ValueError|\TypeError $notAnswered) {
             // The refusal, then what libxml and PHP had to say, each on its own.
-            return array_values(array_unique([$refusal, ...self::saidByLibxml(), trim($notAnswered->getMessage())]));
+            return array_values(array_unique(array_map(self::printable(...), [$refusal, ...self::saidByLibxml(), trim($notAnswered->getMessage())])));
         } finally {
             restore_error_handler();
             libxml_clear_errors();
@@ -154,14 +157,14 @@ final class XmlDescriptor
     }
 
     /**
-     * What libxml said, each error by its message, its code and its line.
+     * What libxml said, each error by its message, its code and its line, fit to print.
      *
      * @return list<string>
      */
     private static function saidByLibxml(): array
     {
         return array_values(array_filter(array_map(
-            static fn (\LibXMLError $error): string => '' === trim($error->message) ? '' : \sprintf('%s (Code %d) on line %d', trim($error->message), $error->code, $error->line),
+            static fn (\LibXMLError $error): string => '' === trim($error->message) ? '' : self::printable(\sprintf('%s (Code %d) on line %d', trim($error->message), $error->code, $error->line)),
             libxml_get_errors(),
         )));
     }
