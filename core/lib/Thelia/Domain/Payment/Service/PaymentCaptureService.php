@@ -24,6 +24,8 @@ use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
+use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
+use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
@@ -42,9 +44,11 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  * asked again within a minute is refused as a repetition. The provider is called outside
  * the lock and the line settled with its answer.
  *
- * A module that refuses with a PaymentException leaves a failed line. Any other
- * exception — a timeout, a broken connection — leaves the line pending: the call may have
- * reached the provider, and only its notification can say whether the money was taken.
+ * A module that refuses with a PaymentRefusedException leaves a failed line. Any other
+ * exception — a timeout, a broken connection, an answer it could not read — leaves the
+ * line pending: the call may have reached the provider, and only its notification can say
+ * whether the money was taken. The caller then gets a PaymentProviderUnreachableException,
+ * whose message says so without repeating what the module sent the provider.
  *
  * Once the provider has answered, nothing that follows reports the movement as failed:
  * a listener of the journal that breaks is logged, and a journal another worker holds
@@ -75,7 +79,7 @@ final readonly class PaymentCaptureService
     /**
      * @param float|null $amount what to take, in the order currency; null takes everything still held
      *
-     * @throws PaymentException when the shop refuses the capture or the module refuses it
+     * @throws PaymentException when the shop or the provider refuses the capture, or the outcome is unknown (PaymentProviderUnreachableException)
      */
     public function capture(Order $order, ?float $amount = null): OrderPaymentTransaction
     {
@@ -211,7 +215,7 @@ final readonly class PaymentCaptureService
     {
         try {
             return $call();
-        } catch (PaymentException $refusal) {
+        } catch (PaymentRefusedException $refusal) {
             $this->keepTheOriginal($refusal, fn (): OrderPaymentTransaction => $this->recorder->settle(
                 $transaction,
                 PaymentTransactionState::FAILED,
@@ -240,7 +244,7 @@ final readonly class PaymentCaptureService
                 self::UNKNOWN_OUTCOME_MESSAGE,
             ));
 
-            throw $throwable;
+            throw new PaymentProviderUnreachableException(self::UNKNOWN_OUTCOME_MESSAGE, 0, $throwable);
         }
     }
 

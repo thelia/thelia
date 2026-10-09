@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
@@ -26,11 +27,12 @@ use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\PaymentException;
+use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
+use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentJournalLock;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
-use Propel\Runtime\Propel;
 use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -158,9 +160,10 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
 
         try {
             $this->service->capture($order);
-            self::fail('The module exception must reach the caller.');
-        } catch (\RuntimeException $exception) {
-            self::assertStringContainsString('timeout', $exception->getMessage());
+            self::fail('The caller must learn that the outcome is unknown.');
+        } catch (PaymentProviderUnreachableException $exception) {
+            self::assertStringNotContainsString('SECRET', $exception->getMessage(), 'What the caller shows says what happened, not what the module sent.');
+            self::assertStringContainsString('timeout', (string) $exception->getPrevious()?->getMessage());
         }
 
         $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
@@ -169,6 +172,22 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertStringNotContainsString('SECRET', (string) $line->getErrorMessage(), 'The raw technical message is logged, not stored.');
         self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
+    public function testAPaymentExceptionThatIsNotARefusalLeavesTheLinePending(): void
+    {
+        // Only a refusal says the provider took nothing. Any other failure of the module,
+        // even one it words as a payment failure, may come after the provider was called.
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new PaymentException('Could not parse the provider answer');
+
+        try {
+            $this->service->capture($order);
+            self::fail('The caller must learn that the outcome is unknown.');
+        } catch (PaymentProviderUnreachableException) {
+        }
+
+        self::assertTrue(OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0]->isPending());
     }
 
     public function testAListenerFailingAfterTheProviderTookTheMoneyDoesNotFailTheCapture(): void
@@ -221,15 +240,15 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertTrue($capture->isSucceeded());
     }
 
-    public function testAModuleThatRefusesWithAPaymentExceptionLeavesAFailedLineWithItsMessage(): void
+    public function testAModuleThatRefusesLeavesAFailedLineWithItsMessage(): void
     {
         [$order] = $this->authorizedOrder(120);
-        DeferredCapturePaymentModule::$nextCaptureAnswer = new PaymentException('Authorization expired');
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new PaymentRefusedException('Authorization expired');
 
         try {
             $this->service->capture($order);
             self::fail('The refusal must reach the caller.');
-        } catch (PaymentException) {
+        } catch (PaymentRefusedException) {
         }
 
         $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];

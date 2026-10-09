@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
@@ -182,6 +184,37 @@ final class OrderPaymentApiTest extends ApiTestCase
         self::assertSame('05', $line['errorCode']);
         self::assertSame('Do not honor', $line['errorMessage']);
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
+    public function testAProviderThatDoesNotAnswerIsABadGatewayAndTheLineWaits(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new \RuntimeException('cURL error 28');
+
+        $response = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsAdmin());
+
+        self::assertSame(Response::HTTP_BAD_GATEWAY, $response->getStatusCode());
+        self::assertStringNotContainsString('cURL', (string) $response->getContent());
+        self::assertSame('120.000000', $this->summaryOf($order)['pendingCapture']);
+    }
+
+    public function testAFaultOfTheShopIsNotPassedOffAsTheProvidersSilence(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $fault = static function (): void {
+            throw new \LogicException('A bug in a listener of the shop');
+        };
+        $dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_CAPTURE, $fault, 1024);
+
+        try {
+            $response = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsAdmin());
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_CAPTURE, $fault);
+        }
+
+        self::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
     }
 
     public function testTheSameAmountAskedAgainRightAwayIsNotTakenTwice(): void

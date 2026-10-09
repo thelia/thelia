@@ -16,6 +16,7 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
+use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 
@@ -58,17 +60,19 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_PAYMENT_CAPTURE);
         } catch (DuplicateCaptureException|PaymentJournalBusyException $exception) {
             throw new ConflictHttpException($exception->getMessage(), $exception);
+        } catch (PaymentProviderUnreachableException $exception) {
+            // The module could not get an answer from the provider: the capture stays
+            // pending in the journal until the provider confirms it. The technical message
+            // is logged by the capture service, not sent back.
+            throw new HttpException(Response::HTTP_BAD_GATEWAY, $exception->getMessage(), $exception);
         } catch (PaymentException $exception) {
             // Nothing to capture, a module that takes the price at once, an amount the
             // authorization does not hold, a refusal of the provider: the request is well
             // formed and the shop refuses it, which is what 422 says.
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        } catch (\Throwable $exception) {
-            // The module could not reach the provider: the capture stays pending in the
-            // journal until the provider confirms it. The technical message is logged by
-            // the capture service, not sent back.
-            throw new HttpException(502, 'The payment provider did not answer. The capture stays pending in the payment journal until the provider confirms it.', $exception);
         }
+        // Anything else is a fault of the shop, not the provider's silence: it surfaces as
+        // a 500, with its trace in the log.
 
         return $this->transformer->modelToResource(
             resourceClass: OrderPaymentTransaction::class,
