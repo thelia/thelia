@@ -56,17 +56,61 @@ final class XmlDescriptor
             return ['the schema is missing'];
         }
 
+        // The schema is named: never with a control character its path may carry.
         return self::askingLibxml(
             static fn (): bool => $dom->schemaValidate($schemaFile),
-            'the descriptor could not be checked against '.basename($schemaFile),
+            'the descriptor could not be checked against '.preg_replace('/[\x00-\x1F\x7F]/', '', basename($schemaFile)),
         );
     }
 
     /**
+     * Checks the loaded descriptor against the schemas of the versions it may be written
+     * in, the latest version first: the first schema that accepts it tells its version,
+     * with no error. Otherwise the errors are those of the latest schema tried, or the
+     * one reason that none was.
+     *
+     * @param iterable<\SplFileInfo>                             $schemas  the schema files
+     * @param array<string, string>                              $versions the schema file name of each version
+     * @param \Closure(\DOMDocument, \SplFileInfo): list<string> $check    the errors of the descriptor against a schema
+     *
+     * @return array{version: int|string|null, errors: list<string>}
+     */
+    public static function versionOf(\DOMDocument $dom, iterable $schemas, array $versions, ?string $version, \Closure $check): array
+    {
+        $known = [];
+
+        foreach ($schemas as $schemaFile) {
+            $schemaVersion = array_search($schemaFile->getBasename(), $versions, true);
+
+            // The keys of the table are read back as integers: a version is compared as text.
+            if (false !== $schemaVersion && (null === $version || $version === (string) $schemaVersion)) {
+                $known[(string) $schemaVersion] = [$schemaVersion, $schemaFile];
+            }
+        }
+
+        // The file system lists the schemas in no order: the latest version is tried first,
+        // and its errors are the ones told.
+        uksort($known, static fn (string $a, string $b): int => strnatcmp($b, $a));
+        $errors = [];
+
+        foreach ($known as [$schemaVersion, $schemaFile]) {
+            $said = $check($dom, $schemaFile);
+
+            if ([] === $said) {
+                return ['version' => $schemaVersion, 'errors' => []];
+            }
+
+            $errors = [] === $errors ? $said : $errors;
+        }
+
+        return ['version' => null, 'errors' => [] === $errors ? [\sprintf('no descriptor schema matches version %s', $version ?? 'any')] : $errors];
+    }
+
+    /**
      * Runs $ask with the errors of libxml kept for us, and any warning of PHP turned into
-     * an exception, whatever the environment does with a warning: what either has to say
-     * is the reason. The error mode and the buffer of libxml, and the error handler, are
-     * given back as they were.
+     * an exception (whatever the environment does with a warning, and whether the call
+     * was silenced with @): what either has to say is the reason. The error mode and the
+     * buffer of libxml, and the error handler, are given back as they were.
      *
      * @param \Closure(): bool $ask
      *
@@ -90,7 +134,8 @@ final class XmlDescriptor
 
             return [] === $said ? [$refusal] : $said;
         } catch (\ErrorException|\ValueError|\TypeError $notAnswered) {
-            return [\sprintf('%s (%s)', $refusal, implode(', ', [...self::saidByLibxml(), trim($notAnswered->getMessage())]))];
+            // The refusal, then what libxml and PHP had to say, each on its own.
+            return array_values(array_unique([$refusal, ...self::saidByLibxml(), trim($notAnswered->getMessage())]));
         } finally {
             restore_error_handler();
             libxml_clear_errors();

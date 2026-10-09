@@ -69,7 +69,73 @@ final class XmlDescriptorTest extends TestCase
         self::assertStringContainsString("'c'", $notConforming[0]);
 
         $notChecked = XmlDescriptor::schemaErrors($conforming, $this->workDir.'/garbage.xsd');
-        self::assertCount(1, $notChecked);
-        self::assertStringStartsWith('the descriptor could not be checked against garbage.xsd (', $notChecked[0]);
+        self::assertGreaterThan(1, \count($notChecked));
+        self::assertSame('the descriptor could not be checked against garbage.xsd', $notChecked[0]);
+        self::assertStringContainsString('Invalid Schema', end($notChecked));
+
+        // A path PHP refuses before libxml sees it.
+        $refused = XmlDescriptor::schemaErrors($conforming, $this->workDir."/a\0.xsd");
+        self::assertSame('the descriptor could not be checked against a.xsd', $refused[0]);
+        self::assertStringContainsString('null bytes', $refused[1]);
+    }
+
+    /**
+     * The error handler, the error mode and the error buffer of libxml are the caller's:
+     * given back as they were, whatever libxml answered.
+     */
+    public function testTheErrorHandlingOfTheCallerIsGivenBack(): void
+    {
+        file_put_contents($this->workDir.'/good.xml', '<a><b/></a>');
+        file_put_contents($this->workDir.'/bad.xml', '<a><b></a>');
+        file_put_contents($this->workDir.'/garbage.xsd', 'garbage');
+        $handler = static fn (): bool => false;
+
+        foreach ([true, false] as $mode) {
+            set_error_handler($handler);
+            $previousMode = libxml_use_internal_errors($mode);
+
+            try {
+                XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/good.xml');
+                XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/bad.xml');
+                $dom = new \DOMDocument();
+                $dom->loadXML('<a/>');
+                XmlDescriptor::schemaErrors($dom, $this->workDir.'/garbage.xsd');
+
+                self::assertSame($mode, libxml_use_internal_errors());
+                self::assertSame([], libxml_get_errors());
+                self::assertSame($handler, set_error_handler(null));
+                restore_error_handler();
+            } finally {
+                libxml_use_internal_errors($previousMode);
+                restore_error_handler();
+            }
+        }
+    }
+
+    /**
+     * The schemas are tried from the latest version down: a descriptor of an older version
+     * is accepted by its schema, and one no schema accepts is refused with what the latest
+     * schema said, whatever order the file system lists the schemas in.
+     */
+    public function testTheLatestVersionIsTriedFirstAndTellsTheErrors(): void
+    {
+        file_put_contents($this->workDir.'/v1.xsd', '<?xml version="1.0"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:element name="a"><xs:complexType><xs:sequence><xs:element name="old"/></xs:sequence></xs:complexType></xs:element></xs:schema>');
+        file_put_contents($this->workDir.'/v2.xsd', '<?xml version="1.0"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:element name="a"><xs:complexType><xs:sequence><xs:element name="new"/></xs:sequence></xs:complexType></xs:element></xs:schema>');
+        $schemas = [new \SplFileInfo($this->workDir.'/v1.xsd'), new \SplFileInfo($this->workDir.'/v2.xsd')];
+        $versions = ['1' => 'v1.xsd', '2' => 'v2.xsd'];
+        $check = static fn (\DOMDocument $dom, \SplFileInfo $schema): array => XmlDescriptor::schemaErrors($dom, $schema->getPathname());
+        $old = new \DOMDocument();
+        $old->loadXML('<a><old/></a>');
+        $neither = new \DOMDocument();
+        $neither->loadXML('<a><other/></a>');
+
+        self::assertSame(1, XmlDescriptor::versionOf($old, $schemas, $versions, null, $check)['version']);
+        self::assertSame(1, XmlDescriptor::versionOf($old, array_reverse($schemas), $versions, null, $check)['version']);
+
+        $refused = XmlDescriptor::versionOf($neither, $schemas, $versions, null, $check);
+        self::assertNull($refused['version']);
+        self::assertStringContainsString('( new )', $refused['errors'][0]);
+        self::assertSame($refused, XmlDescriptor::versionOf($neither, array_reverse($schemas), $versions, null, $check));
+        self::assertSame(['version' => null, 'errors' => ['no descriptor schema matches version 9']], XmlDescriptor::versionOf($old, $schemas, $versions, '9', $check));
     }
 }
