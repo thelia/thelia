@@ -19,6 +19,7 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ClosableArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\FolderFile;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
@@ -121,9 +122,13 @@ class ExportHandler
             $eventArchiver = $event->getArchiver();
 
             if ($eventArchiver instanceof ArchiverInterface) {
-                $eventArchiver->create($filePath);
-                $written[] = $eventArchiver->getArchivePath();
-                $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
+                // An archiver writes under the umask of the process, as it goes or when it
+                // saves: the archive is private from its first byte, as the export is.
+                FolderFile::writingPrivately(function () use ($event, $eventArchiver, $filePath, $includeImages, $includeDocuments, &$written): void {
+                    $eventArchiver->create($filePath);
+                    $written[] = $eventArchiver->getArchivePath();
+                    $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
+                });
             }
 
             $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
@@ -303,7 +308,7 @@ class ExportHandler
             $archiver->close();
         }
 
-        // Written by the archiver under the umask of the process: as private as the export.
+        // The belt, as the umask is the process's: as private as the export.
         ExportStorage::makePrivate($archiver->getArchivePath());
         $event->setFilePath($archiver->getArchivePath());
 

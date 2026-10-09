@@ -115,4 +115,57 @@ final class FolderFileTest extends TestCase
 
         self::assertFalse(FolderFile::isRemovable($this->folder, $this->folder.'/gone/a.csv'));
     }
+
+    /**
+     * A folder the shop makes lets its group write, whatever the umask of the process:
+     * the web server and a worker under two users of one group write where the other did.
+     * A folder made before keeps its mode.
+     */
+    public function testAFolderIsMadeForItsGroupAndAnExistingOneKeepsItsMode(): void
+    {
+        $umask = umask(0o077);
+
+        try {
+            FolderFile::ensureFolder($this->root.'/made/deep');
+            chmod($this->folder, 0o700);
+            FolderFile::ensureFolder($this->folder);
+            self::assertSame(0o077, umask());
+        } finally {
+            umask($umask);
+        }
+
+        self::assertSame(0o770, fileperms($this->root.'/made/deep') & 0o777);
+        self::assertSame(0o770, fileperms($this->root.'/made') & 0o777);
+        self::assertSame(0o700, fileperms($this->folder) & 0o777);
+    }
+
+    /**
+     * What is written privately is private from its creation, under any umask, and the
+     * umask of the process is given back, whatever happened.
+     */
+    public function testWritingPrivatelyMakesAPrivateFileAndGivesTheUmaskBack(): void
+    {
+        $umask = umask(0);
+
+        try {
+            $written = FolderFile::writingPrivately(fn (): int|false => file_put_contents($this->folder.'/a.csv', 'a'));
+            self::assertSame(1, $written);
+            self::assertSame(0o640, fileperms($this->folder.'/a.csv') & 0o777);
+            self::assertSame(0, umask());
+
+            try {
+                FolderFile::writingPrivately(static fn () => throw new \RuntimeException('refused'));
+                self::fail('The write threw.');
+            } catch (\RuntimeException) {
+                self::assertSame(0, umask());
+            }
+
+            file_put_contents($this->folder.'/b.csv', 'b');
+            self::assertSame(0o666, fileperms($this->folder.'/b.csv') & 0o777);
+            FolderFile::makePrivate($this->folder.'/b.csv');
+            self::assertSame(0o640, fileperms($this->folder.'/b.csv') & 0o777);
+        } finally {
+            umask($umask);
+        }
+    }
 }

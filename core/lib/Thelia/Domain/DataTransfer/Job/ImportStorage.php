@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\File\FolderFile;
 use Thelia\Model\ImportJob;
@@ -44,24 +44,23 @@ final readonly class ImportStorage
     }
 
     /**
-     * Moves an uploaded file into the storage, in the folder of the day, readable by the
-     * owner and the group of the shop only: it holds what was uploaded, personal data
-     * included.
+     * Moves an uploaded file into the storage, in the folder of the day, as private as
+     * the files of the shop (FolderFile::FILE_MODE): it holds what was uploaded, personal
+     * data included. A file that could not be made so is not left behind.
      */
     public function store(File $upload, string $name): File
     {
         $folder = $this->directory().\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd');
-        $filesystem = new Filesystem();
-        $previousUmask = umask(0o027);
+        FolderFile::ensureFolder($folder);
+        $stored = FolderFile::writingPrivately(static fn (): File => $upload->move($folder, $name));
 
         try {
-            $filesystem->mkdir($folder, 0o750);
-            $stored = $upload->move($folder, $name);
-        } finally {
-            umask($previousUmask);
-        }
+            FolderFile::makePrivate($stored->getPathname());
+        } catch (IOExceptionInterface $notPrivate) {
+            @unlink($stored->getPathname());
 
-        $filesystem->chmod($stored->getPathname(), 0o640);
+            throw $notPrivate;
+        }
 
         return $stored;
     }

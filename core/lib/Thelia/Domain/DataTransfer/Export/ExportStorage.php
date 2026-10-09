@@ -16,7 +16,6 @@ namespace Thelia\Domain\DataTransfer\Export;
 
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\File\FolderFile;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
@@ -60,48 +59,46 @@ final class ExportStorage
         self::ensureFolder();
         $path = self::directory().\DIRECTORY_SEPARATOR.$name;
 
-        // Created private, never made private afterwards: an account that opened it
-        // in between would keep reading. "x" never opens a file or a link already there.
-        $previousUmask = umask(0o027);
-
-        try {
-            $handle = @fopen($path, 'x');
-        } finally {
-            umask($previousUmask);
-        }
+        // Created private: "x" never opens a file or a link already there.
+        $handle = FolderFile::writingPrivately(static fn () => @fopen($path, 'x'));
 
         if (false === $handle) {
             throw new IOException(\sprintf('The export file %s could not be created.', $name));
         }
 
         fclose($handle);
-        // The umask is the process's: a thread of a threaded server may have changed it.
-        (new Filesystem())->chmod($path, 0o640);
+
+        // The belt, as the umask is the process's: a file it cannot buckle on is not left.
+        try {
+            FolderFile::makePrivate($path);
+        } catch (IOExceptionInterface $notPrivate) {
+            @unlink($path);
+
+            throw $notPrivate;
+        }
 
         return $path;
     }
 
     /**
-     * The export folder, made readable by its owner and its group only when it does not
-     * exist yet. One made before keeps the mode its owner gave it: the files inside are
-     * private by their own mode, and the account running the exports may not be the one
-     * that owns the folder.
+     * The export folder, made when it does not exist yet (FolderFile::FOLDER_MODE); one
+     * made before keeps its mode.
      */
     public static function ensureFolder(): void
     {
-        (new Filesystem())->mkdir(self::directory(), 0o750);
+        FolderFile::ensureFolder(self::directory());
     }
 
     /**
-     * A file of the export folder that another tool wrote (an archiver), made readable
-     * by its owner and its group only.
+     * A file of the export folder that another tool wrote (an archiver), made as private
+     * as the exports.
      */
     public static function makePrivate(string $path): void
     {
         $file = FolderFile::resolve(self::directory(), $path);
 
         if (null !== $file) {
-            (new Filesystem())->chmod($file, 0o640);
+            FolderFile::makePrivate($file);
         }
     }
 
