@@ -233,6 +233,9 @@ final readonly class PaymentTransactionRecorder
     /**
      * Gives a pending line its outcome. The only change a line ever receives, with the
      * reference the provider gave it when the line was written without one.
+     *
+     * A line already settled the same way, under the same reference, is answered as it is:
+     * the module's answer and the provider's notification may both bring the outcome.
      */
     public function settle(
         OrderPaymentTransaction $transaction,
@@ -248,12 +251,17 @@ final readonly class PaymentTransactionRecorder
 
         return $this->locked((int) $transaction->getOrderId(), function () use ($transaction, $state, $pspReference, $errorCode, $errorMessage, $moduleCode): OrderPaymentTransaction {
             $transaction->reload();
+            $pspReference = $this->cleanReference($pspReference);
 
             if (!$transaction->isPending()) {
+                if ($transaction->getState() === $state->value && (null === $pspReference || $pspReference === $transaction->getPspReference())) {
+                    $this->announce($transaction->getOrder(), $transaction, $moduleCode);
+
+                    return $transaction;
+                }
+
                 throw new PaymentException(\sprintf('Payment transaction #%d is already %s and cannot be settled again.', (int) $transaction->getId(), (string) $transaction->getState()));
             }
-
-            $pspReference = $this->cleanReference($pspReference);
 
             $transaction->setState($state->value);
 
