@@ -250,6 +250,23 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
     }
 
+    public function testCancellingAnAuthorizedOrderWithoutTheCaptureRightIsRefused(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status', [
+            '_token' => $this->tokenOf($crawler),
+            'status_id' => OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId(),
+        ]);
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('needs the right to capture payments', $crawler->text());
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+        self::assertSame([], DeferredCapturePaymentModule::$voidCalls);
+    }
+
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
     {
         $this->loginAs($this->factory->admin());
