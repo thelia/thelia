@@ -17,6 +17,7 @@ namespace Thelia\Api\Service\API;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -39,11 +40,14 @@ readonly class ResourceService
         private ResourceMemoizer $memoizer,
         private ResourceCache $resourceCache,
         private PublicUrlPreloader $publicUrlPreloader,
+        private SharedCacheKeyCollector $sharedCacheKeys,
     ) {
     }
 
     public function resources(string $path, array $parameters = [], ?string $format = null): object|array|null
     {
+        $this->sharedCacheKeys->record($path);
+
         $currentLocale = $this->localeService->getLocale();
         $cacheKey = $this->buildCacheKey($path, $parameters, $format, $currentLocale);
 
