@@ -42,15 +42,12 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     /** @var list<int> ids of the orders whose authorization was released */
     public static array $voidCalls = [];
 
-    private static int $referenceCounter = 0;
-
     public static function reset(): void
     {
         self::$deferredCapture = true;
         self::$nextCaptureAnswer = null;
         self::$captureCalls = [];
         self::$voidCalls = [];
-        self::$referenceCounter = 0;
     }
 
     public function pay(Order $order): ?Response
@@ -79,13 +76,15 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
             throw $answer;
         }
 
-        return $answer ?? PaymentOperationResult::succeeded('CAP-'.++self::$referenceCounter);
+        // The reference names the journal line: unique across requests, as a provider's is.
+        // A counter would restart at each HTTP request and hand out CAP-1 twice.
+        return $answer ?? PaymentOperationResult::succeeded('CAP-'.$transaction->getId());
     }
 
     public function voidAuthorization(Order $order, OrderPaymentTransaction $transaction): PaymentOperationResult
     {
         self::$voidCalls[] = (int) $order->getId();
 
-        return PaymentOperationResult::succeeded('VOID-'.++self::$referenceCounter);
+        return PaymentOperationResult::succeeded('VOID-'.$transaction->getId());
     }
 }

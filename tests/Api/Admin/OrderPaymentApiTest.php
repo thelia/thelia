@@ -122,7 +122,7 @@ final class OrderPaymentApiTest extends ApiTestCase
         self::assertSame(PaymentTransactionType::CAPTURE->value, $line['type']);
         self::assertSame(PaymentTransactionState::SUCCEEDED->value, $line['state']);
         self::assertSame('120.000000', $line['amount']);
-        self::assertSame('CAP-1', $line['pspReference']);
+        self::assertSame('CAP-'.$line['id'], $line['pspReference']);
         self::assertSame($authorization->getId(), $line['parentId']);
         self::assertSame(OrderHistoryActorType::ADMIN->value, $line['actorType'], 'The administrator who asked is the author.');
 
