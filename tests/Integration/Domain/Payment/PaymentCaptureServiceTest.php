@@ -77,7 +77,7 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertTrue($capture->isSucceeded());
         self::assertSame(PaymentTransactionType::CAPTURE->value, $capture->getType());
         self::assertSame('120.000000', $capture->getAmount());
-        self::assertSame('CAP-1', $capture->getPspReference());
+        self::assertSame('CAP-'.$capture->getId(), $capture->getPspReference());
         self::assertSame($authorization->getId(), $capture->getParentId());
         self::assertSame(DeferredCapturePaymentModule::getModuleCode(), $capture->getActorLabel());
 
