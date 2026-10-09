@@ -50,34 +50,19 @@ class ModuleDescriptorValidator
     {
         $this->moduleVersion = null;
         $dom = new \DOMDocument();
-        $errors = [];
         $notLoaded = XmlDescriptor::loadingErrors($dom, (string) $xml_file);
 
-        if ([] === $notLoaded) {
-            /** @var \SplFileInfo $xsdFile */
-            foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
+        if ([] !== $notLoaded) {
+            $reason = implode(', ', array_map(static fn (string $said): string => self::withoutPath($said, (string) $xml_file), $notLoaded));
+        } else {
+            ['version' => $this->moduleVersion, 'errors' => $errors] = XmlDescriptor::versionOf($dom, $this->xsdFinder, self::$versions, null === $version ? null : (string) $version, $this->schemaValidate(...));
 
-                // The keys of the table are read back as integers: a version is compared as text.
-                if (false === $xsdVersion || (null !== $version && (string) $version !== (string) $xsdVersion)) {
-                    continue;
-                }
-
-                $errors = $this->schemaValidate($dom, $xsdFile);
-
-                if ([] === $errors) {
-                    $this->moduleVersion = $xsdVersion;
-
-                    return true;
-                }
+            if (null !== $this->moduleVersion) {
+                return true;
             }
-        }
 
-        $reason = match (true) {
-            [] !== $notLoaded => implode(', ', array_map(static fn (string $said): string => self::withoutPath($said, (string) $xml_file), $notLoaded)),
-            [] === $errors => \sprintf('no descriptor schema matches version %s', null === $version ? 'any' : (string) $version),
-            default => implode(', ', $errors),
-        };
+            $reason = implode(', ', $errors);
+        }
 
         // Shown to the administrator who uploads the module: the module it is about, never
         // where the server unpacked it.
@@ -90,7 +75,14 @@ class ModuleDescriptorValidator
      */
     private static function describe(string $xmlFile): string
     {
+        // A name is printed: never a control character a path may carry.
+        $xmlFile = (string) preg_replace('/[\x00-\x1F\x7F]/', '', $xmlFile);
         $file = basename($xmlFile);
+
+        if ('' === $file) {
+            return 'descriptor';
+        }
+
         $configFolder = \dirname($xmlFile);
 
         if ('Config' !== basename($configFolder) || \in_array(basename(\dirname($configFolder)), ['', '.', '..'], true)) {
@@ -119,13 +111,13 @@ class ModuleDescriptorValidator
         $message = (string) preg_replace_callback('#(failed to load external entity )".*"#s', static fn (array $found): string => $found[1].'"'.$file.'"', $message);
         $message = strtr($message, self::namesOf($xmlFile));
 
-        return (string) preg_replace('#"[^"]*/([^"/]+)"#', '"$1"', $message);
+        return (string) preg_replace('#(["\'])[^"\']*/([^"\'/]+)\1#', '$1$2$1', $message);
     }
 
     /**
-     * The path as given and as the file system resolves it, each standing for the name of
-     * the file (strtr() takes the longest first, so that the shorter one never eats a part
-     * of the longer).
+     * The path as given, as the file system resolves it and as libxml encodes it (a URI,
+     * "%20" for a space), each standing for the name of the file (strtr() takes the
+     * longest first, so that the shorter one never eats a part of the longer).
      *
      * @return array<string, string>
      */
@@ -136,13 +128,20 @@ class ModuleDescriptorValidator
         }
 
         $resolvedFolder = realpath(\dirname($path));
-        $names = [$path => basename($path)];
+        $forms = [$path, rawurldecode($path)];
 
         if (false !== $resolvedFolder) {
-            $names[$resolvedFolder.\DIRECTORY_SEPARATOR.basename($path)] = basename($path);
+            $forms[] = $resolvedFolder.\DIRECTORY_SEPARATOR.basename($path);
         }
 
-        return $names;
+        $names = [];
+
+        foreach ($forms as $form) {
+            $names[$form] = basename(rawurldecode($form));
+            $names[implode('/', array_map('rawurlencode', explode('/', $form)))] = basename(rawurldecode($form));
+        }
+
+        return array_filter($names, static fn (string $form): bool => '' !== $form, \ARRAY_FILTER_USE_KEY);
     }
 
     /**
