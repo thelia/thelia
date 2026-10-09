@@ -97,6 +97,32 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
         self::assertFalse((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
     }
 
+    public function testADatabaseFailureBeforeTheMoveIsRolledBackNotCommitted(): void
+    {
+        // Unlike a refusal, a failure of the database — a deadlock, a lost connection —
+        // may have cost the caller what it wrote already: its transaction must not commit
+        // as if nothing happened. The statement timeout stands for that failure here.
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $connection = $this->getPropelConnection();
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        $interrupt = static function () use ($connection): void {
+            $connection->exec('SET SESSION max_statement_time = 0.000001');
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt, 129);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+            self::fail('The interrupted read of the status must fail the move.');
+        } catch (\Throwable $failure) {
+            self::assertNotInstanceOf(OrderStatusTransitionRefusedException::class, $failure);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt);
+            $connection->exec('SET SESSION max_statement_time = 0');
+        }
+
+        self::assertTrue((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
+    }
+
     public function testAnOrderDeletedMeanwhileIsSaidToBeGone(): void
     {
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
