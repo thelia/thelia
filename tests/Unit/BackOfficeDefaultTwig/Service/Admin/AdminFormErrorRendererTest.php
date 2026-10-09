@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
+use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
+use Thelia\Domain\Payment\Exception\PaymentException;
 
 /**
  * What a back-office action that failed shows the administrator: the refusal of a rule
@@ -83,6 +85,33 @@ final class AdminFormErrorRendererTest extends TestCase
         $this->renderer()->setup('Order payment captured', $failure->getMessage(), null, $failure);
 
         self::assertStringNotContainsString('/var/www/html', $this->session->getFlashBag()->get('danger')[0]);
+    }
+
+    public function testATrustedFailureIsShownEvenWhenItWrapsATechnicalOne(): void
+    {
+        if (!method_exists(AdminFormErrorRenderer::class, 'isTrusted')) {
+            self::markTestSkipped('The installed back-office theme predates the trusted failures.');
+        }
+
+        // The rule worded its own message; what it wraps only goes to the log.
+        $refusal = new ConflictingPaymentReferenceException('The reference PSP-1 is already carried by another capture of this order.', 0, new \PDOException('SQLSTATE[23000]: Duplicate entry'));
+
+        $this->renderer()->setup('Payment movement recorded by hand', $refusal->getMessage(), null, $refusal, [PaymentException::class]);
+
+        self::assertSame([$refusal->getMessage()], $this->session->getFlashBag()->get('danger'));
+    }
+
+    public function testAnUntrustedFailureIsNotShownOnAScreenThatNamesItsOwn(): void
+    {
+        if (!method_exists(AdminFormErrorRenderer::class, 'isTrusted')) {
+            self::markTestSkipped('The installed back-office theme predates the trusted failures.');
+        }
+
+        $failure = new \RuntimeException('Partner hook refused https://hook.example/?key=SECRET');
+
+        $this->renderer()->setup('Order payment captured', $failure->getMessage(), null, $failure, [PaymentException::class]);
+
+        self::assertStringNotContainsString('SECRET', $this->session->getFlashBag()->get('danger')[0]);
     }
 
     private function renderer(?LoggerInterface $logger = null): AdminFormErrorRenderer
