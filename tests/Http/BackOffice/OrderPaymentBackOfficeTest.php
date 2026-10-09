@@ -271,6 +271,29 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('100.00', $crawler->filter('[data-testid="order-payment-capture-amount"]')->attr('value'));
     }
 
+    public function testAJournalWithMovementsReplacesTheNoTransactionMention(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+
+        self::assertStringNotContainsString('No transaction for this order', $crawler->filter('[data-testid="order-payment"]')->text());
+    }
+
+    public function testAProviderMessageIsReadOnItsOwnLineNotInAColumn(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::failed('05', 'Do not honor');
+        $this->getService(\Thelia\Domain\Payment\Service\PaymentCaptureService::class)->capture($order);
+
+        $crawler = $this->sheet($order);
+
+        self::assertCount(0, $crawler->filter('[data-testid="order-payment"] table'), 'The narrow card holds no wide table.');
+        self::assertStringContainsString('Do not honor', $crawler->filter('[data-testid="order-payment-line"][data-payment-state="failed"] [data-testid="order-payment-line-error"]')->text());
+    }
+
     private function authorizedOrder(float $total): Order
     {
         $order = $this->factory->order(null, ['postage' => $total, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
