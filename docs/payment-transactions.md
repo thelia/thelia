@@ -235,6 +235,44 @@ sequenceDiagram
     L->>L: nothing held any more ? move to paid
 ```
 
+## Refunds
+
+A module that gives money back through its provider implements
+`Thelia\Module\PaymentModuleWithRefundInterface` (`supportsRefund()`,
+`refund(Order, float $amount, OrderPaymentTransaction $pending, RefundReason $reason, ?string $comment)`),
+optional like the capture. `Thelia\Domain\Payment\Service\PaymentRefundService`
+is what the back office calls, through the `ORDER_PAYMENT_REFUND` event
+(`OrderPaymentRefundEvent`, null amount for everything still refundable):
+
+- what can be given back is read in the journal — captured, less refunded, less
+  the refunds waiting for their answer — never in the order total, which a partly
+  captured order does not match;
+- under the journal lock it refuses an amount that is not positive, has more
+  decimals than the currency or exceeds what is refundable, and the same amount
+  asked again within a minute (`DuplicateRefundException`), then writes the
+  refund as pending with the latest capture as its parent;
+- the module is called outside the lock and its answer recorded as for a capture
+  (`ProviderCallRunner`): a `PaymentRefusedException` leaves a failed line, any
+  other exception leaves it pending;
+- a module that cannot refund is refused with `RefundNotSupportedException`,
+  which names it.
+
+A refund made outside the provider — a bank transfer, a cheque — is recorded with
+`recordOfflineRefund()` (the event with `$offline` true), whatever the module: a
+succeeded refund line with a reference of its own (`offline-…`), the error code
+`PaymentRefundService::ERROR_CODE_OFFLINE` and the merchant's comment. The reason
+is one of a short fixed list (`RefundReason`: returned, missing or damaged,
+commercial gesture, cancellation, other); the comment is cleaned and cut to 255
+characters before it reaches the provider.
+
+`ORDER_REFUNDED` (`OrderRefundedEvent`: the order, the line, the reason, the
+comment, whether it was made outside the provider) is sent once money was given
+back, for credit note and accounting modules. The service never moves the order:
+once everything collected was given back and no refund waits for its answer, the
+journal moves a paid order to `refunded`, through the transition graph, as it
+moves it to `paid` after a capture. A partial refund leaves the order as it is.
+Giving money back is a right of its own, `admin.order.payment-refund`.
+
 ## Statuses
 
 `MoveOrderOnPaymentTransactionListener` moves the order along with the money,
@@ -316,6 +354,10 @@ presented to its module again nor cancelled for a new one — which would reserv
 the amount twice on the buyer's card — and its cart is consumed.
 
 ## Rights
+
+The refund is a third right, `admin.order.payment-refund`
+(`AdminResources::ORDER_PAYMENT_REFUND`), granted to no profile by the update.
+
 
 Reading the journal goes with reading orders (`admin.order`). Taking money is
 a right of its own, `admin.order.payment-capture`
