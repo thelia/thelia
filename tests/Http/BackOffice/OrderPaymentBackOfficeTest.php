@@ -314,6 +314,22 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertTrue(OrderPaymentTransactionQuery::create()->findPk($lineId)->isPending());
     }
 
+    public function testTheDialogFollowsTheDecimalsOfTheOrderCurrency(): void
+    {
+        // A yen has no smaller coin: the dialog neither offers nor prefills a fraction of
+        // one, which the shop would refuse anyway.
+        $this->loginAs($this->factory->admin());
+        $yen = $this->factory->currency(['code' => 'JPY', 'symbol' => '¥']);
+        $order = $this->factory->order(null, ['postage' => 1200, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+        $order->setCurrencyId($yen->getId())->save();
+        $this->recorder->recordAuthorization($order, 1200, 'AUTH-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $input = $this->sheet($order)->filter('[data-testid="order-payment-capture-amount"]');
+
+        self::assertSame('1', $input->attr('step'));
+        self::assertSame('1200', $input->attr('value'));
+    }
+
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
     {
         $this->loginAs($this->factory->admin());
@@ -374,7 +390,7 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         $this->loginAs($this->factory->admin());
         $order = $this->authorizedOrder(120);
         DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::failed('05', 'Do not honor');
-        $this->getService(\Thelia\Domain\Payment\Service\PaymentCaptureService::class)->capture($order);
+        $this->getService(PaymentCaptureService::class)->capture($order);
 
         $crawler = $this->sheet($order);
 
