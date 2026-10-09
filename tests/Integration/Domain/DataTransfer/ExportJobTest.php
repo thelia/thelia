@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Config\DatabaseConfiguration;
+use Thelia\Core\Archiver\Archiver\TarArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\ExportEvent;
@@ -916,6 +917,49 @@ final class ExportJobTest extends IntegrationTestCase
         // whatever the folder: one made before keeps the mode its owner gave it.
         self::assertSame(0o640, fileperms($event->getFilePath()) & 0o777);
         self::assertSame(0o775, fileperms(ExportStorage::directory()) & 0o777);
+    }
+
+    /**
+     * A tar creates its file at the first file added, an image maybe, long before the
+     * export is added and the archive made private at the end: it is private from that
+     * first file, whatever the umask of the process.
+     */
+    public function testATarIsPrivateFromTheFirstImageAdded(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'tar-private-'.uniqid();
+        $images = [sys_get_temp_dir().'/'.uniqid('image-').'.png', sys_get_temp_dir().'/'.uniqid('image-').'.png'];
+        foreach ($images as $image) {
+            file_put_contents($image, 'png');
+        }
+        ImageHeavyExport::$paths = $images;
+        $archiver = new class extends TarArchiver {
+            /** @var list<int> the mode of the archive after each file added */
+            public array $modes = [];
+
+            public function add(string $path, ?string $pathInArchive = null): self
+            {
+                parent::add($path, $pathInArchive);
+                clearstatcache();
+                $this->modes[] = fileperms($this->archivePath) & 0o777;
+
+                return $this;
+            }
+        };
+        $umask = umask(0);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage(), includeImages: true);
+        } finally {
+            umask($umask);
+            ImageHeavyExport::$paths = null;
+            (new Filesystem())->remove($images);
+            (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+        }
+
+        self::assertStringEndsWith('.tar', $event->getFilePath());
+        self::assertSame([0o640, 0o640, 0o640], $archiver->modes);
     }
 
     /**
