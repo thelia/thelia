@@ -162,11 +162,8 @@ abstract class AbstractExport implements \Iterator
                 && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
-                $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(\SplFileObject::READ_AHEAD);
+                $this->data = JsonFileAbstractExport::openAndForget($data);
                 $this->dataIsJSONFile = true;
-
-                $this->data->rewind();
 
                 return;
             }

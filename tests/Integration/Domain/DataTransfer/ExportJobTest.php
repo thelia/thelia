@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
@@ -33,6 +34,7 @@ use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\DataTransferProgress;
 use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
+use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
@@ -695,6 +697,45 @@ final class ExportJobTest extends IntegrationTestCase
 
         self::assertSame($elsewhere, $event->getFilePath());
         self::assertSame([], $left);
+    }
+
+    /**
+     * The order export reads its rows through a JSON file of its own, which holds the
+     * addresses and the orders of the customers: nothing of it outlives the export.
+     */
+    public function testAnExportLeavesNoneOfTheRowsItReadBehind(): void
+    {
+        (new Filesystem())->remove(glob(ExportCachePurger::directory().'/order*.json') ?: []);
+
+        $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+        $this->files[] = $event->getFilePath();
+
+        self::assertSame([], glob(ExportCachePurger::directory().'/order*.json'));
+    }
+
+    /**
+     * Two workers may run the same export at once: each reads the rows it selected,
+     * through a file of its own.
+     */
+    public function testTwoExportsOfTheSameKindReadThroughFilesOfTheirOwn(): void
+    {
+        $first = new class extends OrderExport {
+            public function rowsFile(StatementInterface $statement): string
+            {
+                return $this->getDataJsonCache($statement, 'order');
+            }
+        };
+        $statement = static function (): StatementInterface {
+            $statement = Propel::getConnection()->prepare('SELECT 1 AS id');
+            $statement->execute();
+
+            return $statement;
+        };
+
+        $paths = [$first->rowsFile($statement()), $first->rowsFile($statement())];
+        (new Filesystem())->remove($paths);
+
+        self::assertNotSame($paths[0], $paths[1]);
     }
 
     public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
