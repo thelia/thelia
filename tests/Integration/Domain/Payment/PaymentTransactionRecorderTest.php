@@ -317,6 +317,17 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertSame('PSP-SETTLED', $stored);
     }
 
+    public function testTheOrderOfTheCallerKeepsWhatItHasNotSavedYet(): void
+    {
+        // A module sets the transaction reference, records the authorization, then saves.
+        $order = $this->order(120);
+        $order->setTransactionRef('TX-NOT-SAVED-YET');
+
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+
+        self::assertSame('TX-NOT-SAVED-YET', $order->getTransactionRef());
+    }
+
     public function testAStatusChangeDecidedOnAStatusThatHasSinceChangedIsDropped(): void
     {
         // Two workers decide on the same status; the second must not undo the first.
