@@ -290,7 +290,7 @@ final readonly class PaymentTransactionRecorder
             }
 
             if (PaymentTransactionState::SUCCEEDED === $state && null === ($pspReference ?? $carried)) {
-                throw new MissingProviderReferenceException(\sprintf('Payment transaction #%d is settled as succeeded with the reference the provider gave it.', (int) $transaction->getId()));
+                throw new MissingProviderReferenceException(\sprintf('Payment transaction #%d cannot be settled as succeeded without the reference the provider gave it.', (int) $transaction->getId()));
             }
 
             $transaction->setState($state->value);
