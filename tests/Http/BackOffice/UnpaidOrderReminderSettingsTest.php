@@ -16,7 +16,9 @@ namespace Thelia\Tests\Http\BackOffice;
 
 use BackOfficeDefaultTwigBundle\Controller\Configuration\UnpaidOrderReminderController;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderSettings;
+use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
@@ -120,6 +122,17 @@ final class UnpaidOrderReminderSettingsTest extends WebIntegrationTestCase
 
         $crawler = $this->client->request('GET', '/admin/orders');
         self::assertGreaterThan(0, $crawler->filter('.bo-order-urgent:contains("'.$order->getRef().'")')->count(), 'An order in a status equivalent to not paid is followed up like one.');
+    }
+
+    public function testTheOrderHistoryNamesTheRemindersSent(): void
+    {
+        $order = $this->orderAged(30, OrderStatus::CODE_NOT_PAID);
+        $this->getService(OrderHistoryRecorder::class)->record((int) $order->getId(), OrderHistoryEventType::PAYMENT_REMINDER_SENT->value, ['step' => 24, 'message' => 'order_payment_reminder']);
+
+        $this->client->request('GET', '/admin/order/update/'.$order->getId());
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringContainsString('Payment reminder sent (24 h step)', (string) $this->client->getResponse()->getContent());
     }
 
     private function orderAged(int $hours, string $statusCode): Order
