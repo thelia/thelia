@@ -48,8 +48,8 @@ final class ExportStorage
     }
 
     /**
-     * A new file of the export folder, readable by its owner only from its very
-     * creation: it holds the data of the customers.
+     * A new file of the export folder, readable by its owner and its group only from its
+     * very creation: it holds the data of the customers.
      */
     public static function newPrivateFile(string $name): string
     {
@@ -57,12 +57,12 @@ final class ExportStorage
             throw new \InvalidArgumentException('The name of an export file is letters, digits, ".", "-" and "_", inside the export folder.');
         }
 
-        self::closeFolder();
+        self::ensureFolder();
         $path = self::directory().\DIRECTORY_SEPARATOR.$name;
 
         // Created private, never made private afterwards: an account that opened it
         // in between would keep reading. "x" never opens a file or a link already there.
-        $previousUmask = umask(0o077);
+        $previousUmask = umask(0o027);
 
         try {
             $handle = @fopen($path, 'x');
@@ -75,32 +75,33 @@ final class ExportStorage
         }
 
         fclose($handle);
+        // The umask is the process's: a thread of a threaded server may have changed it.
+        (new Filesystem())->chmod($path, 0o640);
 
         return $path;
     }
 
     /**
-     * The export folder, made or closed to every other account of the server: a folder
-     * made before, or under another umask, is closed too, and with it every file inside,
-     * archives included, whatever mode they were created with.
+     * The export folder, made readable by its owner and its group only when it does not
+     * exist yet. One made before keeps the mode its owner gave it: the files inside are
+     * private by their own mode, and the account running the exports may not be the one
+     * that owns the folder.
      */
-    public static function closeFolder(): void
+    public static function ensureFolder(): void
     {
-        $filesystem = new Filesystem();
-        $filesystem->mkdir(self::directory(), 0o700);
-        $filesystem->chmod(self::directory(), 0o700);
+        (new Filesystem())->mkdir(self::directory(), 0o750);
     }
 
     /**
      * A file of the export folder that another tool wrote (an archiver), made readable
-     * by its owner only.
+     * by its owner and its group only.
      */
     public static function makePrivate(string $path): void
     {
         $file = FolderFile::resolve(self::directory(), $path);
 
         if (null !== $file) {
-            (new Filesystem())->chmod($file, 0o600);
+            (new Filesystem())->chmod($file, 0o640);
         }
     }
 
@@ -110,7 +111,9 @@ final class ExportStorage
      */
     public static function safeName(string $name): string
     {
-        $safe = trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '_', $name), '_-');
+        // Cut to leave room, within the 255 bytes of a file name, for the date, the unique
+        // part and the extension.
+        $safe = trim(substr((string) preg_replace('/[^A-Za-z0-9_-]+/', '_', $name), 0, 100), '_-');
 
         return '' === $safe ? 'export' : $safe;
     }
@@ -119,7 +122,7 @@ final class ExportStorage
      * A new file for the rows an export reads: a name of its own, as two workers may
      * run the same export at once.
      */
-    public static function rowsFile(string $exportName): string
+    public static function newRowsFile(string $exportName): string
     {
         return self::newPrivateFile(self::safeName($exportName).'-'.bin2hex(random_bytes(8)).'.json');
     }
