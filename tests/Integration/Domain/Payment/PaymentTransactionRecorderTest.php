@@ -203,6 +203,20 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         $this->recorder->settle($settled, PaymentTransactionState::FAILED);
     }
 
+    public function testSettlingALineAgainWithTheSameOutcomeAnswersWithIt(): void
+    {
+        // The module's answer and the provider's notification can both settle the line;
+        // whichever comes second finds it settled the same way.
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+        $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'CAP-TWICE');
+
+        $again = $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'CAP-TWICE');
+
+        self::assertSame($pending->getId(), $again->getId());
+        self::assertTrue($again->isSucceeded());
+    }
+
     public function testTheListenersRunOnceTheJournalIsReleased(): void
     {
         // A listener may call a payment module or write another order's journal: it must
