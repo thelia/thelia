@@ -153,21 +153,34 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        $unreadable = $this->workDir.'/Unreadable/Config/module.xml';
-        (new Filesystem())->mkdir(\dirname($unreadable));
-        file_put_contents($unreadable, '<module/>');
-        chmod($unreadable, 0);
-        // The account running the tests may read anything: then only the missing ones count.
-        $cases = [$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', ...(is_readable($unreadable) ? [] : [$unreadable])];
-
-        foreach ($cases as $notReadable) {
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', '', "a\0b"] as $notReadable) {
             try {
                 (new ModuleDescriptorValidator())->validate($notReadable);
                 self::fail('The descriptor is refused.');
             } catch (InvalidXmlDocumentException $refusal) {
                 self::assertStringEndsWith(' is not a valid file: it is not a readable file', $refusal->getMessage());
                 self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+                self::assertSame(0, preg_match('/[\x00-\x1F\x7F]|The  is/', $refusal->getMessage()));
             }
+        }
+    }
+
+    public function testADescriptorTheAccountCannotReadIsRefusedAsSuch(): void
+    {
+        $unreadable = $this->workDir.'/Unreadable/Config/module.xml';
+        (new Filesystem())->mkdir(\dirname($unreadable));
+        file_put_contents($unreadable, '<module/>');
+        chmod($unreadable, 0);
+
+        if (is_readable($unreadable)) {
+            self::markTestSkipped('The account running the tests reads anything: a file nobody may read cannot be made.');
+        }
+
+        try {
+            (new ModuleDescriptorValidator())->validate($unreadable);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertSame('The module.xml of Unreadable is not a valid file: it is not a readable file', $refusal->getMessage());
         }
     }
 
@@ -256,8 +269,21 @@ final class ModuleDescriptorValidatorTest extends TestCase
             $this->validatorWithSchemasIn($schemas)->validate($descriptor);
             self::fail('A schema that cannot be read validates nothing.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringContainsString('could not be checked against module-2_2.xsd (', $refusal->getMessage());
+            self::assertStringContainsString('could not be checked against module-2_2.xsd', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+        }
+    }
+
+    /**
+     * Without a version asked for, the refusal tells what the latest schema said.
+     */
+    public function testARefusalTellsWhatTheLatestSchemaSaid(): void
+    {
+        try {
+            (new ModuleDescriptorValidator())->validate($this->writeDescriptor('<enabled-by-default>7</enabled-by-default>'));
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString("not an element of the set {'0', '1'}", $refusal->getMessage());
         }
     }
 

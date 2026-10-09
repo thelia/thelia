@@ -45,8 +45,12 @@ final class TemplateDescriptorValidatorTest extends TestCase
 
         self::assertSame($validator, $validator->validate('1'));
 
-        $this->expectException(InvalidDescriptorException::class);
-        $validator->validate('no-such-version');
+        try {
+            $validator->validate('no-such-version');
+            self::fail('No schema matches.');
+        } catch (InvalidDescriptorException $refusal) {
+            self::assertStringEndsWith(' : no descriptor schema matches version no-such-version', $refusal->getMessage());
+        }
     }
 
     /**
@@ -74,7 +78,7 @@ final class TemplateDescriptorValidatorTest extends TestCase
             $validator->validate();
             self::fail('A schema that cannot be read validates nothing.');
         } catch (InvalidDescriptorException $refusal) {
-            self::assertStringContainsString('could not be checked against template-1_0.xsd (', $refusal->getMessage());
+            self::assertStringContainsString('could not be checked against template-1_0.xsd', $refusal->getMessage());
             // The error handler, the error mode and the error buffer of libxml are the
             // caller's: given back as they were.
             self::assertTrue(libxml_use_internal_errors());

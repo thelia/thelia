@@ -57,20 +57,10 @@ class TemplateDescriptorValidator
         $errors = XmlDescriptor::loadingErrors($dom, $this->xmlDescriptorPath);
 
         if ([] === $errors) {
-            /** @var \SplFileInfo $xsdFile */
-            foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
+            ['version' => $found, 'errors' => $errors] = XmlDescriptor::versionOf($dom, $this->xsdFinder, self::$versions, $version, $this->schemaValidate(...));
 
-                // The keys of the table are read back as integers: a version is compared as text.
-                if (false === $xsdVersion || (null !== $version && $version !== (string) $xsdVersion)) {
-                    continue;
-                }
-
-                $errors = $this->schemaValidate($dom, $xsdFile);
-
-                if ([] === $errors) {
-                    return $this;
-                }
+            if (null !== $found) {
+                return $this;
             }
         }
 
@@ -102,7 +92,7 @@ class TemplateDescriptorValidator
         if (file_exists($this->xmlDescriptorPath)) {
             $this->validate();
 
-            return @simplexml_load_file($this->xmlDescriptorPath);
+            return @simplexml_load_file($this->xmlDescriptorPath, \SimpleXMLElement::class, \LIBXML_NONET);
         }
 
         Tlog::getInstance()->addWarning(\sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));
