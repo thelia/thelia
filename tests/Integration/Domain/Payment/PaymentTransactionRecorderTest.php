@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
@@ -314,6 +315,24 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
 
         $stored = OrderPaymentTransactionQuery::create()->filterById($pending->getId())->select(['PspReference'])->findOne();
         self::assertSame('PSP-SETTLED', $stored);
+    }
+
+    public function testAStatusChangeDecidedOnAStatusThatHasSinceChangedIsDropped(): void
+    {
+        // Two workers decide on the same status; the second must not undo the first.
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $order = $this->reload($order);
+        $awaitingCapture = (int) $order->getStatusId();
+        $staleView = clone $order;
+
+        $this->recorder->recordCapture($order, 120, 'CAP-1', moduleCode: 'Cheque');
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
+
+        $event = (new OrderEvent($staleView))->setStatus((int) OrderStatusQuery::getNotPaidStatus()->getId())->expectStatus($awaitingCapture);
+        $this->dispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
     }
 
     public function testAnAuthorizationPutsAnUnpaidOrderOnHoldForCapture(): void
