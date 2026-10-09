@@ -156,7 +156,7 @@ final class SalesPieceBuilder
                 continue;
             }
 
-            $rate = $this->rateOf($chart, $unitPrice > 0 ? $unitTax / $unitPrice * 100 : 0.0);
+            $rate = $this->rateOf($chart, $unitPrice, $unitTax);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitPrice;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitTax;
         }
@@ -165,15 +165,12 @@ final class SalesPieceBuilder
     }
 
     /**
-     * The rate the chart files an amount under: the closest of its rates, so that amounts
-     * rounded to the cent do not miss it; the computed rate itself when the chart has none
-     * that close, for the refusal to name it.
+     * The rate the chart files an amount and its tax under (AccountingChart::rateFor()); the
+     * rate the two amounts make when the chart has none that fits, for the refusal to name it.
      */
-    private function rateOf(AccountingChart $chart, float $percent): string
+    private function rateOf(AccountingChart $chart, float $amount, float $tax): string
     {
-        $rate = AccountingChart::rateKey($percent);
-
-        return $chart->closestRate($rate) ?? $rate;
+        return $chart->rateFor($amount, $tax) ?? AccountingChart::rateKey($amount > 0 ? $tax / $amount * 100 : 0.0);
     }
 
     /**
@@ -186,13 +183,13 @@ final class SalesPieceBuilder
 
         foreach (OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->find() as $share) {
             $untaxed = (float) $share->getUntaxedAmount();
-            $rate = $this->rateOf($chart, $untaxed > 0 ? (float) $share->getAmount() / $untaxed * 100 : 0.0);
+            $rate = $this->rateOf($chart, $untaxed, (float) $share->getAmount());
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $untaxed;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $share->getAmount();
         }
 
         if ([] === $amounts) {
-            $rate = $this->rateOf($chart, $untaxedPostage > 0 ? $postageTax / $untaxedPostage * 100 : 0.0);
+            $rate = $this->rateOf($chart, $untaxedPostage, $postageTax);
             $amounts[$rate] = $untaxedPostage;
             $taxes[$rate] = $postageTax;
         }

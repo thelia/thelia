@@ -68,13 +68,15 @@ final class AccountingChartTest extends TestCase
         self::assertNotNull($chart->accountsOf($key));
     }
 
-    public function testARateIsFoundWithinATenthOfAPoint(): void
+    public function testARateIsFoundFromAnAmountAndItsRoundedTax(): void
     {
-        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720,5.5:706055:445705');
+        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720,5.5:706055:445705,0:706000');
 
-        self::assertSame('20.00', $chart->closestRate('19.90'));
-        self::assertSame('5.50', $chart->closestRate('5.46'));
-        self::assertNull($chart->closestRate('19.80'));
+        self::assertSame('20.00', $chart->rateFor(4.17, 0.83), '19.90%, a tenth of a point off.');
+        self::assertSame('20.00', $chart->rateFor(0.99, 0.20), '20.20%, but 0.198 rounds to 0.20.');
+        self::assertSame('5.50', $chart->rateFor(1.00, 0.06), '6%, but 0.055 rounds to 0.06.');
+        self::assertSame('0.00', $chart->rateFor(10.00, 0.0));
+        self::assertNull($chart->rateFor(100.0, 10.0), '10% is no rate of this chart.');
     }
 
     public function testAJournalCodeOrLabelTheFileCannotCarryIsRefused(): void

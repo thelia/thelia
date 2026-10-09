@@ -163,6 +163,34 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
         self::assertSame(83, $this->creditsOn($piece, '445720'));
     }
 
+    public function testACheapLineIsFiledUnderTheRateItsTaxWasRoundedFrom(): void
+    {
+        // 0.20 of tax on 0.99 makes 20.20%, 0.06 on 1.00 makes 6%: both a cent off the
+        // 20% and 5.5% the chart knows, as rounding to the cent leaves them.
+        $order = $this->invoicedOrder();
+        $this->line($order, 0.99, 3, [0.20]);
+        $this->line($order, 1.00, 2, [0.06]);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        $this->assertBalanced($piece);
+        self::assertSame(297, $this->creditsOn($piece, '706200'));
+        self::assertSame(200, $this->creditsOn($piece, '706055'));
+    }
+
+    public function testRatesRoundedDifferentlyAreBookedTogether(): void
+    {
+        $order = $this->invoicedOrder(postage: 11.93, postageTax: 1.98);
+        $this->line($order, 4.17, 1, [0.83]);
+        $this->line($order, 100.0, 1, [20.0]);
+        $this->postageShare($order, 9.95, 1.98);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        $this->assertBalanced($piece);
+        self::assertSame([['411000', 13693, 0], ['706200', 0, 10417], ['708500', 0, 995], ['445720', 0, 2281]], $this->summary($piece), 'One line per account: 19.90%, 20% and the shipping at 19.90% are all the 20% of the chart.');
+    }
+
     public function testALineTaxedTwiceIsFiledUnderTheSumOfItsRates(): void
     {
         $order = $this->invoicedOrder();

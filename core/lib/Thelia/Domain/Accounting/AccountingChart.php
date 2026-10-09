@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -43,8 +44,7 @@ final readonly class AccountingChart
 
     /**
      * How far, in points, a rate the frozen amounts of an order make may be from the rate of
-     * the chart it is filed under: a unit price and its tax are each rounded to the cent, and
-     * 0.83 of tax on 4.17 makes 19.90%.
+     * the chart it is filed under, when the tax itself is more than a cent away.
      */
     public const RATE_TOLERANCE = 0.1;
 
@@ -85,17 +85,19 @@ final readonly class AccountingChart
         $journalLabel = trim($journalLabel);
 
         if ('' !== $journalCode && 1 !== preg_match(self::ACCOUNT_PATTERN, $journalCode)) {
-            throw new InvalidAccountingChartException(\sprintf('The journal code "%s" is not a code: letters and digits only, 20 at most.', $journalCode));
+            throw new InvalidAccountingChartException(self::trans('The journal code "%code" is not a code: letters and digits only, 20 at most.', ['%code' => $journalCode]));
         }
 
         if (mb_strlen($journalLabel) > self::JOURNAL_LABEL_MAX_LENGTH || 1 === preg_match('/[\x00-\x1F]/', $journalLabel)) {
-            throw new InvalidAccountingChartException(\sprintf('The journal label holds %d characters at most, on one line.', self::JOURNAL_LABEL_MAX_LENGTH));
+            throw new InvalidAccountingChartException(self::trans('The journal label holds %max characters at most, on one line.', ['%max' => (string) self::JOURNAL_LABEL_MAX_LENGTH]));
         }
 
-        foreach (['customer' => $customerAccount, 'shipping' => $shippingAccount] as $role => $account) {
-            if ('' !== $account && 1 !== preg_match(self::ACCOUNT_PATTERN, $account)) {
-                throw new InvalidAccountingChartException(\sprintf('The %s account "%s" is not an account number: letters and digits only, 20 at most.', $role, $account));
-            }
+        if ('' !== $customerAccount && 1 !== preg_match(self::ACCOUNT_PATTERN, $customerAccount)) {
+            throw new InvalidAccountingChartException(self::trans('The customer account "%account" is not an account number: letters and digits only, 20 at most.', ['%account' => $customerAccount]));
+        }
+
+        if ('' !== $shippingAccount && 1 !== preg_match(self::ACCOUNT_PATTERN, $shippingAccount)) {
+            throw new InvalidAccountingChartException(self::trans('The shipping account "%account" is not an account number: letters and digits only, 20 at most.', ['%account' => $shippingAccount]));
         }
 
         $rates = [];
@@ -110,22 +112,22 @@ final readonly class AccountingChart
             $parts = array_map('trim', explode(':', $rawRate));
 
             if (!is_numeric($parts[0]) || (float) $parts[0] < 0 || !isset($parts[1]) || 1 !== preg_match(self::ACCOUNT_PATTERN, $parts[1])) {
-                throw new InvalidAccountingChartException(\sprintf('"%s" is not the accounts of a tax rate: write the rate in percent, the product account, then the tax account, as in "20:706200:445720".', $rawRate));
+                throw new InvalidAccountingChartException(self::trans('"%rate" is not the accounts of a tax rate: write the rate in percent, the product account, then the tax account, as in "20:706200:445720".', ['%rate' => $rawRate]));
             }
 
             $key = self::rateKey((float) $parts[0]);
             $taxAccount = isset($parts[2]) && '' !== $parts[2] ? $parts[2] : null;
 
             if (null !== $taxAccount && 1 !== preg_match(self::ACCOUNT_PATTERN, $taxAccount)) {
-                throw new InvalidAccountingChartException(\sprintf('The tax account "%s" of the %s%% rate is not an account number.', $taxAccount, $key));
+                throw new InvalidAccountingChartException(self::trans('The tax account "%account" of the %rate rate is not an account number.', ['%account' => $taxAccount, '%rate' => $key.'%']));
             }
 
             if (null === $taxAccount && (float) $key > 0) {
-                throw new InvalidAccountingChartException(\sprintf('The %s%% rate needs the account of the tax it collects.', $key));
+                throw new InvalidAccountingChartException(self::trans('The %rate rate needs the account of the tax it collects.', ['%rate' => $key.'%']));
             }
 
             if (isset($rates[$key])) {
-                throw new InvalidAccountingChartException(\sprintf('The %s%% rate is given twice.', $key));
+                throw new InvalidAccountingChartException(self::trans('The %rate rate is given twice.', ['%rate' => $key.'%']));
             }
 
             $rates[$key] = ['product' => $parts[1], 'tax' => $taxAccount];
@@ -185,24 +187,34 @@ final readonly class AccountingChart
     }
 
     /**
-     * The rate of the chart a rate of an order is filed under: the closest one within
-     * RATE_TOLERANCE, or null when the chart has none that close.
+     * The rate of the chart an amount and its frozen tax are filed under: a rate whose tax on
+     * that amount, rounded to the cent, is within a cent of the frozen tax (the tax of 0.99
+     * at 20% was rounded to 0.20, which makes 20.20%), or else a rate within RATE_TOLERANCE
+     * of the one the two amounts make. The closest wins; null when none fits.
      */
-    public function closestRate(string $rateKey): ?string
+    public function rateFor(float $amount, float $tax): ?string
     {
-        $closest = null;
-        $distance = self::RATE_TOLERANCE + 0.0001;
+        $computed = $amount > 0 ? $tax / $amount * 100 : 0.0;
+        $best = null;
+        $bestGap = \PHP_FLOAT_MAX;
 
         foreach (array_keys($this->rates) as $chartRate) {
-            $gap = abs((float) $chartRate - (float) $rateKey);
+            $chartRate = (string) $chartRate;
+            $taxGap = abs($tax - round($amount * (float) $chartRate / 100, 2));
+            $rateGap = abs((float) $chartRate - $computed);
 
-            if ($gap < $distance) {
-                $closest = (string) $chartRate;
-                $distance = $gap;
+            if ($taxGap > 0.0101 && $rateGap > self::RATE_TOLERANCE + 0.0001) {
+                continue;
+            }
+
+            // Two rates that fit: the one closest to what the amounts make.
+            if ($rateGap < $bestGap) {
+                $best = $chartRate;
+                $bestGap = $rateGap;
             }
         }
 
-        return $closest;
+        return $best;
     }
 
     public function rateAccountsSetting(): string
@@ -214,5 +226,18 @@ final readonly class AccountingChart
         }
 
         return implode(',', $parts);
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private static function trans(string $message, array $parameters): string
+    {
+        try {
+            return Translator::getInstance()->trans($message, $parameters);
+        } catch (\RuntimeException) {
+            // Read outside a booted shop (a unit test, a script): the English wording.
+            return strtr($message, $parameters);
+        }
     }
 }
