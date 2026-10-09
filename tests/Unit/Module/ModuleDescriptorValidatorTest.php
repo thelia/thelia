@@ -144,6 +144,38 @@ final class ModuleDescriptorValidatorTest extends TestCase
         }
     }
 
+    /**
+     * A descriptor the server could not open is refused by its name: libxml quotes the
+     * path it failed on, the refusal never does.
+     */
+    public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
+    {
+        $missing = $this->workDir.'/Sample/Config/module.xml';
+
+        try {
+            (new ModuleDescriptorValidator())->validate($missing);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringStartsWith('The module.xml of Sample is not a valid file: it is not well-formed XML (', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+            self::assertStringContainsString('module.xml', substr($refusal->getMessage(), 60));
+        }
+    }
+
+    /**
+     * A well-formed descriptor checked against a version no schema has is told so, never
+     * that it is not XML.
+     */
+    public function testAVersionWithoutASchemaIsNamedAsTheReason(): void
+    {
+        try {
+            (new ModuleDescriptorValidator())->validate($this->writeDescriptor(''), 'no-such-version');
+            self::fail('No schema matches.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertSame('The module.xml is not a valid file: no descriptor schema matches version no-such-version', $refusal->getMessage());
+        }
+    }
+
     private function writeDescriptor(string $trailingElements): string
     {
         $path = $this->workDir.'/module.xml';

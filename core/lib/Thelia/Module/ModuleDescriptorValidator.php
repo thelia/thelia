@@ -56,8 +56,13 @@ class ModuleDescriptorValidator
         $previousErrorHandling = libxml_use_internal_errors(true);
 
         try {
+            libxml_clear_errors();
             $loaded = $dom->load($xml_file, \LIBXML_NONET);
-            $notXml = array_map(static fn (\LibXMLError $error): string => trim($error->message), libxml_get_errors());
+            // libxml quotes the path of a file it could not open: the name of the file stands for it.
+            $notXml = array_map(
+                static fn (\LibXMLError $error): string => str_replace((string) $xml_file, basename((string) $xml_file), trim($error->message)),
+                libxml_get_errors(),
+            );
             libxml_clear_errors();
         } finally {
             libxml_use_internal_errors($previousErrorHandling);
@@ -84,7 +89,9 @@ class ModuleDescriptorValidator
 
         // Shown to the administrator who uploads the module: the module it is about, never
         // where the server unpacked it.
-        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), [] === $errors ? 'it is not well-formed XML ('.implode(', ', $notXml).')' : implode(', ', $errors)));
+        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), match (true) {
+            !$loaded => 'it is not well-formed XML ('.implode(', ', $notXml).')', [] === $errors => \sprintf('no descriptor schema matches version %s', (string) $version), default => implode(', ', $errors),
+        }));
     }
 
     /**
