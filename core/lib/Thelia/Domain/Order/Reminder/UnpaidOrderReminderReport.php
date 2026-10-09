@@ -19,6 +19,27 @@ final class UnpaidOrderReminderReport
     /** @var list<UnpaidOrderReminderOutcome> */
     private array $outcomes = [];
 
+    /** @var list<string> */
+    private array $missingMessages = [];
+
+    /**
+     * @param list<string> $messageCodes
+     */
+    public function setMissingMessages(array $messageCodes): void
+    {
+        $this->missingMessages = $messageCodes;
+    }
+
+    /**
+     * The messages the schedule names and the shop does not have: their steps wait.
+     *
+     * @return list<string>
+     */
+    public function missingMessages(): array
+    {
+        return $this->missingMessages;
+    }
+
     public function add(UnpaidOrderReminderOutcome $outcome): void
     {
         $this->outcomes[] = $outcome;

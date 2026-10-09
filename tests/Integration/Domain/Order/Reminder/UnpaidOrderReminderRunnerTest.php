@@ -17,18 +17,24 @@ namespace Thelia\Tests\Integration\Domain\Order\Reminder;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Reminder\UnpaidOrderPaymentLink;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderOutcome;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderRunner;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderSettings;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderHistoryQuery;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 /**
@@ -212,6 +218,120 @@ final class UnpaidOrderReminderRunnerTest extends ActionIntegrationTestCase
         self::assertCount(1, $this->mailsTo($fine));
         self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($broken->getId())->filterByEventType(OrderHistoryEventType::PAYMENT_REMINDER_SENT->value)->count());
         self::assertSame(1, OrderHistoryQuery::create()->filterByOrderId($broken->getId())->filterByEventType(OrderHistoryEventType::PAYMENT_REMINDER_FAILED->value)->count());
+    }
+
+    public function testAnOrderPaidWhileTheRunIsBusyIsLeftAlone(): void
+    {
+        // The run read both orders, then spends time on the first one's mail; the second
+        // is paid meanwhile, behind the back of the object the run holds.
+        $this->schedule('24:'.self::MESSAGE.',168:cancel');
+        $reminded = $this->unpaidOrderAged(25);
+        $paidMeanwhile = $this->unpaidOrderAged(24 * 8);
+        $paidStatusId = (int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID)->getId();
+        $payment = function (MessageEvent $event) use ($paidMeanwhile, $paidStatusId): void {
+            $this->getPropelConnection()->exec(\sprintf('UPDATE `order` SET status_id = %d WHERE id = %d', $paidStatusId, (int) $paidMeanwhile->getId()));
+        };
+        $this->dispatcher->addListener(MessageEvent::class, $payment);
+
+        try {
+            $report = $this->runner->run($this->now, 100, false);
+        } finally {
+            $this->dispatcher->removeListener(MessageEvent::class, $payment);
+        }
+
+        self::assertCount(1, $this->mailsTo($reminded));
+        OrderTableMap::clearInstancePool();
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($paidMeanwhile));
+        self::assertSame([], $this->only([$paidMeanwhile], $report->outcomes()));
+    }
+
+    public function testTheCancellationGivesTheStockBack(): void
+    {
+        $this->schedule('168:cancel');
+        $this->dispatcher->addListener(
+            TheliaEvents::getModuleEvent(TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK, 'Cheque'),
+            $manageStock = static fn (ManageStockOnCreationEvent $event) => $event->setManageStock(true),
+        );
+
+        try {
+            $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['baseQuantity' => 10]);
+            $productSaleElements = ProductSaleElementsQuery::create()->filterByProductId($product->getId())->findOne();
+            $order = $this->unpaidOrderAged(24 * 8);
+            (new OrderProduct())
+                ->setOrderId($order->getId())
+                ->setProductRef($product->getRef())
+                ->setProductSaleElementsRef($productSaleElements->getRef())
+                ->setProductSaleElementsId($productSaleElements->getId())
+                ->setTitle('Reserved line')
+                ->setQuantity(3)
+                ->setPrice('10.000000')
+                ->setPromoPrice('10.000000')
+                ->setWasNew(0)
+                ->setWasInPromo(0)
+                ->save();
+            $productSaleElements->setQuantity($productSaleElements->getQuantity() - 3)->save();
+
+            $this->runner->run($this->now, 1000, false);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::getModuleEvent(TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK, 'Cheque'), $manageStock);
+        }
+
+        self::assertSame(OrderStatus::CODE_CANCELED, $this->statusOf($order));
+        self::assertEqualsWithDelta(10.0, (float) ProductSaleElementsQuery::create()->findPk($productSaleElements->getId())->getQuantity(), 0.0001);
+    }
+
+    public function testAStepWhoseMessageDoesNotExistWaitsForItInsteadOfFailing(): void
+    {
+        $this->schedule('24:no_such_message_'.self::MESSAGE);
+        $order = $this->unpaidOrderAged(25);
+
+        $report = $this->runner->run($this->now, 100, false);
+
+        self::assertSame(['no_such_message_'.self::MESSAGE], $report->missingMessages());
+        self::assertSame([], $this->only([$order], $report->outcomes()));
+        self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::PAYMENT_REMINDER_FAILED->value)->count());
+    }
+
+    public function testAnAnonymizedCustomerIsNeverMailed(): void
+    {
+        $this->schedule('24:'.self::MESSAGE);
+        $order = $this->unpaidOrderAged(25);
+        $order->getCustomer()->setAnonymizedAt(new \DateTimeImmutable())->save();
+
+        $first = $this->runner->run($this->now, 100, false);
+        $second = $this->runner->run($this->now, 100, false);
+
+        self::assertSame([], $this->mailsTo($order));
+        self::assertSame(UnpaidOrderReminderOutcome::STATUS_FAILED, $this->only([$order], $first->outcomes())[0]->status);
+        self::assertSame([], $this->only([$order], $second->outcomes()));
+    }
+
+    public function testAnOrderPastTheWindowOfTheLastReminderIsNotReadAnyMore(): void
+    {
+        // Without a cancellation, an unpaid order stays unpaid for good: the run stops
+        // looking at it once its last reminder could no longer be paid from.
+        $this->schedule('24:'.self::MESSAGE);
+        $tooOld = $this->unpaidOrderAged(24 + UnpaidOrderReminderRunner::LAST_REMINDER_WINDOW_IN_HOURS + 2);
+        $inTime = $this->unpaidOrderAged(100);
+
+        $report = $this->runner->run($this->now, 1000, false);
+
+        self::assertSame([], $this->only([$tooOld], $report->outcomes()));
+        self::assertCount(1, $this->mailsTo($inTime));
+    }
+
+    public function testMoreThanAPageOfOrdersIsRemindedInOneRun(): void
+    {
+        $this->schedule('24:'.self::MESSAGE);
+        $orders = [];
+
+        for ($i = 0; $i < 105; ++$i) {
+            $orders[] = $this->unpaidOrderAged(25);
+        }
+
+        $report = $this->runner->run($this->now, 10000, false);
+
+        self::assertCount(105, $this->only($orders, $report->outcomes()));
     }
 
     public function testARunHandlesAtMostItsLimitAndTheNextOneGoesOn(): void
