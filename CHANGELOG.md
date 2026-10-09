@@ -35,7 +35,9 @@
 - A move between two statuses that both stand for `not_paid` (`not_paid` and `awaiting_capture`) no longer touches the stock, and the stock-on-creation flag of the payment module now holds until the order leaves those statuses, where any second status used to drop it.
 - The failed-payment cancellation of the checkout (`CheckoutPaymentService::cancel()`) refuses an order whose payment is secured, an order on hold for capture included.
 - A `PaymentException` thrown by a module's `capture()` or `voidAuthorization()` no longer settles the line as failed: only a `PaymentRefusedException` does. Any other exception leaves the line pending and reaches the caller wrapped in a `PaymentProviderUnreachableException`.
-- `recordCapture()` and `recordRefund()` refuse an outcome, succeeded or failed, reported without the provider reference.
+- `recordCapture()`, `recordRefund()` and `recordVoid()` refuse an outcome, succeeded or failed, reported without the provider reference, and `settle()` a succeeded one; a reference a line carries is never replaced, and one longer than 100 characters is refused.
+- `Thelia\Action\Order::updateStatus()` reads the status of the order under a row lock and decides the transition and the stock on it, not on the object the event carries. `OrderEvent::expectStatus()` makes a status change conditional: when the order no longer has the expected status, nothing is written and the event stops. The payment journal moves orders this way.
+- The order object given to `PaymentTransactionRecorder` is no longer reloaded: listeners of `ORDER_PAYMENT_TRANSACTION_RECORDED` receive a fresh copy.
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 
 ## Upgrade notes
