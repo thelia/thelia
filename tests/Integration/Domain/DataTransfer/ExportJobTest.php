@@ -807,14 +807,26 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * The name of a rows file comes from the export: one that would climb out of the
-     * export folder is refused before anything is written.
+     * A file name that would climb out of the export folder is refused before anything
+     * is written.
      */
-    public function testARowsFileNameClimbingOutOfTheExportFolderIsRefused(): void
+    public function testAFileNameClimbingOutOfTheExportFolderIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        ExportStorage::rowsFile('../../escaped');
+        ExportStorage::newPrivateFile('../escaped.json');
+    }
+
+    /**
+     * The name of a rows file comes from an export, a module's maybe: whatever it holds,
+     * the file stays in the export folder.
+     */
+    public function testARowsFileStaysInTheExportFolderWhateverItsName(): void
+    {
+        $path = ExportStorage::rowsFile('../../escaped');
+        (new Filesystem())->remove($path);
+
+        self::assertSame(realpath(ExportStorage::directory()), realpath(\dirname($path)));
     }
 
     /**
@@ -860,6 +872,53 @@ final class ExportJobTest extends IntegrationTestCase
         (new Filesystem())->remove([$other, $link]);
 
         self::assertTrue($kept);
+    }
+
+    /**
+     * The name a module gives its export is shown to nobody on disk: one with spaces or
+     * accents is written all the same, under a name of the folder's letters.
+     */
+    public function testAnExportNamedWithSpacesAndAccentsIsWritten(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'export clients été '.uniqid();
+
+        $event = $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+        $this->files[] = $event->getFilePath();
+
+        self::assertFileExists($event->getFilePath());
+        self::assertSame(1, preg_match('/^[A-Za-z0-9._-]+$/', basename($event->getFilePath())));
+    }
+
+    /**
+     * The archive is what is served: it holds the data of the customers as the export
+     * does, and is as private, in a folder no other account of the server can open.
+     */
+    public function testAnArchivedExportIsReadableByItsOwnerOnly(): void
+    {
+        (new Filesystem())->mkdir(ExportStorage::directory());
+        chmod(ExportStorage::directory(), 0o755);
+        $umask = umask(0);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), $this->getService(ArchiverManager::class)->get('thelia.zip'), Lang::getDefaultLanguage());
+        } finally {
+            umask($umask);
+        }
+
+        $this->files[] = $event->getFilePath();
+        clearstatcache();
+
+        self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
+        self::assertSame(0o700, fileperms(ExportStorage::directory()) & 0o777);
+    }
+
+    public function testAFileNameEndingWithANewLineIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        ExportStorage::newPrivateFile("export\n");
     }
 
     /**

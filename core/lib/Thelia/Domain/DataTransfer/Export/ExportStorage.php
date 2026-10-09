@@ -53,12 +53,11 @@ final class ExportStorage
      */
     public static function newPrivateFile(string $name): string
     {
-        if (1 !== preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]*$/', $name) || str_contains($name, '..')) {
+        if (1 !== preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]*\z/', $name) || str_contains($name, '..')) {
             throw new \InvalidArgumentException('The name of an export file is letters, digits, ".", "-" and "_", inside the export folder.');
         }
 
-        $filesystem = new Filesystem();
-        $filesystem->mkdir(self::directory(), 0o700);
+        self::closeFolder();
         $path = self::directory().\DIRECTORY_SEPARATOR.$name;
 
         // Created private, never made private afterwards: an account that opened it
@@ -81,12 +80,48 @@ final class ExportStorage
     }
 
     /**
+     * The export folder, made or closed to every other account of the server: a folder
+     * made before, or under another umask, is closed too, and with it every file inside,
+     * archives included, whatever mode they were created with.
+     */
+    public static function closeFolder(): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->mkdir(self::directory(), 0o700);
+        $filesystem->chmod(self::directory(), 0o700);
+    }
+
+    /**
+     * A file of the export folder that another tool wrote (an archiver), made readable
+     * by its owner only.
+     */
+    public static function makePrivate(string $path): void
+    {
+        $file = FolderFile::resolve(self::directory(), $path);
+
+        if (null !== $file) {
+            (new Filesystem())->chmod($file, 0o600);
+        }
+    }
+
+    /**
+     * A name of the folder's letters for what an export, or a module, calls itself:
+     * spaces, accents and anything else become "_".
+     */
+    public static function safeName(string $name): string
+    {
+        $safe = trim((string) preg_replace('/[^A-Za-z0-9_-]+/', '_', $name), '_-');
+
+        return '' === $safe ? 'export' : $safe;
+    }
+
+    /**
      * A new file for the rows an export reads: a name of its own, as two workers may
      * run the same export at once.
      */
     public static function rowsFile(string $exportName): string
     {
-        return self::newPrivateFile($exportName.'-'.bin2hex(random_bytes(8)).'.json');
+        return self::newPrivateFile(self::safeName($exportName).'-'.bin2hex(random_bytes(8)).'.json');
     }
 
     /**
