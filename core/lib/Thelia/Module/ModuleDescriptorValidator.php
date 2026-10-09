@@ -70,7 +70,9 @@ class ModuleDescriptorValidator
             }
         }
 
-        throw new InvalidXmlDocumentException(\sprintf('%s file is not a valid file : %s', $xml_file, implode(', ', $errors)));
+        // Shown to the administrator who uploads the module: the module it is about, never
+        // where the server unpacked it.
+        throw new InvalidXmlDocumentException(\sprintf('The module.xml of %s is not a valid file: %s', basename(\dirname((string) $xml_file, 2)), implode(', ', $errors)));
     }
 
     /**
@@ -93,11 +95,10 @@ class ModuleDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
+                        'XML error "%s" [%d] (Code %d) on line %d column %d'."\n",
                         $error->message,
                         $error->level,
                         $error->code,
-                        $error->file,
                         $error->line,
                         $error->column,
                     );

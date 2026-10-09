@@ -45,10 +45,7 @@ final readonly class ImportJobLauncher
         // Refused here, in the request, rather than by a worker minutes later.
         $this->importHandler->validateUpload($originalName, $file);
 
-        $stored = $file->move(
-            $this->storage->directory().\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd'),
-            uniqid('', true).'-'.self::shortName($originalName),
-        );
+        $stored = $this->storage->store($file, uniqid('', true).'-'.self::shortName($originalName));
         $relativePath = $this->storage->relativePathOf($stored->getPathname());
 
         try {

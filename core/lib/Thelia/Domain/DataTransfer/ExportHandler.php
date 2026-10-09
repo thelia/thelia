@@ -121,7 +121,6 @@ class ExportHandler
             $eventArchiver = $event->getArchiver();
 
             if ($eventArchiver instanceof ArchiverInterface) {
-                ExportStorage::closeFolder();
                 $eventArchiver->create($filePath);
                 $written[] = $eventArchiver->getArchivePath();
                 $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);

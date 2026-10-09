@@ -84,6 +84,21 @@ final class ModuleDescriptorValidatorTest extends TestCase
         $validator->validate($this->writeDescriptor('<enabled-by-default>maybe</enabled-by-default>'));
     }
 
+    /**
+     * The refusal is shown to the administrator who uploads the module: it names what
+     * is wrong, never where the server unpacked it.
+     */
+    public function testARefusedDescriptorNeverQuotesAPathOfTheServer(): void
+    {
+        try {
+            (new ModuleDescriptorValidator())->validate($this->writeDescriptor('<enabled-by-default>maybe</enabled-by-default>'));
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+            self::assertStringContainsString('XML error', $refusal->getMessage());
+        }
+    }
+
     private function writeDescriptor(string $trailingElements): string
     {
         $path = $this->workDir.'/module.xml';

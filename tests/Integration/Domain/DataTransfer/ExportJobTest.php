@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -507,8 +508,9 @@ final class ExportJobTest extends IntegrationTestCase
     {
         $export = $this->ordersExport();
         $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
-        // Too long for the row once the folder is in front of it.
-        ImageHeavyExport::$fileName = 'unrecorded-'.uniqid().'-'.str_repeat('x', 190);
+        // The name the export gives itself is too long for the row; the file on disk takes
+        // a name cut short, and is written.
+        ImageHeavyExport::$fileName = 'unrecorded-'.uniqid().'-'.str_repeat('x', 260);
         $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
 
         try {
@@ -767,13 +769,13 @@ final class ExportJobTest extends IntegrationTestCase
     /**
      * The rows file holds the data of the customers: no other account of the server reads it.
      */
-    public function testARowsFileIsReadableByItsOwnerOnly(): void
+    public function testARowsFileIsReadableByNoOtherAccount(): void
     {
         // Whatever the umask of the server: here, one that lets everybody read.
         $umask = umask(0);
 
         try {
-            $path = ExportStorage::rowsFile(uniqid('owner-'));
+            $path = ExportStorage::newRowsFile(uniqid('owner-'));
         } finally {
             umask($umask);
         }
@@ -784,14 +786,14 @@ final class ExportJobTest extends IntegrationTestCase
             (new Filesystem())->remove($path);
         }
 
-        self::assertSame(0o600, $mode);
+        self::assertSame(0o640, $mode);
     }
 
     /**
      * The export file holds the data of the customers as well, for a day: no other
      * account of the server reads it either.
      */
-    public function testAnExportFileIsReadableByItsOwnerOnly(): void
+    public function testAnExportFileIsReadableByNoOtherAccount(): void
     {
         $umask = umask(0);
 
@@ -803,7 +805,7 @@ final class ExportJobTest extends IntegrationTestCase
 
         $this->files[] = $event->getFilePath();
 
-        self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
+        self::assertSame(0o640, fileperms($event->getFilePath()) & 0o777);
     }
 
     /**
@@ -823,7 +825,7 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testARowsFileStaysInTheExportFolderWhateverItsName(): void
     {
-        $path = ExportStorage::rowsFile('../../escaped');
+        $path = ExportStorage::newRowsFile('../../escaped');
         (new Filesystem())->remove($path);
 
         self::assertSame(realpath(ExportStorage::directory()), realpath(\dirname($path)));
@@ -863,7 +865,7 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testDiscardingALinkOfTheExportFolderLeavesTheExportItPointsTo(): void
     {
-        $other = ExportStorage::rowsFile(uniqid('other-'));
+        $other = ExportStorage::newRowsFile(uniqid('other-'));
         $link = ExportStorage::directory().'/'.uniqid('link-').'.json';
         symlink($other, $link);
 
@@ -895,10 +897,10 @@ final class ExportJobTest extends IntegrationTestCase
      * The archive is what is served: it holds the data of the customers as the export
      * does, and is as private, in a folder no other account of the server can open.
      */
-    public function testAnArchivedExportIsReadableByItsOwnerOnly(): void
+    public function testAnArchivedExportIsReadableByNoOtherAccount(): void
     {
         (new Filesystem())->mkdir(ExportStorage::directory());
-        chmod(ExportStorage::directory(), 0o755);
+        chmod(ExportStorage::directory(), 0o775);
         $umask = umask(0);
 
         try {
@@ -910,8 +912,33 @@ final class ExportJobTest extends IntegrationTestCase
         $this->files[] = $event->getFilePath();
         clearstatcache();
 
-        self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
-        self::assertSame(0o700, fileperms(ExportStorage::directory()) & 0o777);
+        // Readable by the group the web server and the workers may share, by no one else,
+        // whatever the folder: one made before keeps the mode its owner gave it.
+        self::assertSame(0o640, fileperms($event->getFilePath()) & 0o777);
+        self::assertSame(0o775, fileperms(ExportStorage::directory()) & 0o777);
+    }
+
+    /**
+     * A file or a link already there under the name is never opened: an account that
+     * planted it would read what the export writes.
+     */
+    public function testAnExportFileIsNeverOpenedOverAFileOrALinkAlreadyThere(): void
+    {
+        $name = uniqid('planted-').'.csv';
+        $planted = sys_get_temp_dir().'/'.$name;
+        file_put_contents($planted, '');
+        ExportStorage::ensureFolder();
+        symlink($planted, ExportStorage::directory().'/'.$name);
+
+        try {
+            ExportStorage::newPrivateFile($name);
+            self::fail('A link already there is never opened.');
+        } catch (IOException) {
+        } finally {
+            (new Filesystem())->remove([ExportStorage::directory().'/'.$name, $planted]);
+        }
+
+        self::assertTrue(true);
     }
 
     public function testAFileNameEndingWithANewLineIsRefused(): void
