@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Service;
 
-use Propel\Runtime\Exception\PropelException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -264,9 +263,12 @@ final readonly class PaymentTransactionRecorder
             throw new \InvalidArgumentException('A pending line is settled to succeeded or failed, not left pending.');
         }
 
+        $pspReference = $this->cleanReference($pspReference);
+
         return $this->locked((int) $transaction->getOrderId(), function () use ($transaction, $state, $pspReference, $errorCode, $errorMessage, $moduleCode): OrderPaymentTransaction {
-            $transaction->reload();
-            $pspReference = $this->cleanReference($pspReference);
+            // Read afresh under the lock: the caller's object may be stale, or one whose save
+            // once failed, which Propel would then ignore.
+            $transaction = $this->freshCopyOf($transaction);
 
             if (!$transaction->isPending()) {
                 if ($transaction->getState() === $state->value && (null === $pspReference || $pspReference === $transaction->getPspReference())) {
@@ -316,15 +318,23 @@ final readonly class PaymentTransactionRecorder
     {
         $pspReference = $this->cleanReference($pspReference);
 
-        if (null === $pspReference || !$transaction->isPending()) {
+        if (null === $pspReference) {
             return $transaction;
         }
 
         return $this->locked((int) $transaction->getOrderId(), function () use ($transaction, $pspReference): OrderPaymentTransaction {
-            $transaction->setPspReference($pspReference);
-            $this->save($transaction);
+            // Read afresh under the lock: the notification may have settled the line since
+            // the caller read it.
+            $line = $this->freshCopyOf($transaction);
 
-            return $transaction;
+            if (!$line->isPending() || null !== $line->getPspReference()) {
+                return $line;
+            }
+
+            $line->setPspReference($pspReference);
+            $this->save($line);
+
+            return $line;
         });
     }
 
@@ -335,18 +345,14 @@ final readonly class PaymentTransactionRecorder
      */
     public function markOutcomeUnknown(OrderPaymentTransaction $transaction, string $errorCode, string $errorMessage): OrderPaymentTransaction
     {
-        $line = $this->freshCopyOf($transaction);
+        // One conditional update, without the lock: it is called when the journal may be
+        // busy, and must never annotate a line the notification settled in the meantime.
+        OrderPaymentTransactionQuery::create()
+            ->filterById($transaction->getId())
+            ->filterByState(PaymentTransactionState::PENDING->value)
+            ->update(['ErrorCode' => $errorCode, 'ErrorMessage' => $errorMessage]);
 
-        if (!$line->isPending()) {
-            return $line;
-        }
-
-        $line
-            ->setErrorCode($errorCode)
-            ->setErrorMessage($errorMessage);
-        $this->save($line);
-
-        return $line;
+        return $this->freshCopyOf($transaction);
     }
 
     /**
@@ -619,17 +625,17 @@ final readonly class PaymentTransactionRecorder
     {
         try {
             $transaction->save();
-        } catch (PropelException|\RuntimeException $exception) {
+        } catch (\Throwable $exception) {
+            // Propel keeps an object whose save failed flagged as being saved, and silently
+            // ignores any later save of it, whatever the failure: it leaves the pool, and
+            // whoever has to write the line again reads it afresh.
+            OrderPaymentTransactionTableMap::removeInstanceFromPool($transaction);
+
             // Propel raises an insert or an update the server refused as a
             // QueryExecutionException, which is not a PropelException.
             if (!$this->isDuplicateKey($exception)) {
                 throw $exception;
             }
-
-            // Propel keeps an object whose save failed flagged as being saved, and silently
-            // ignores any later save of it: it leaves the pool, and whoever has to write the
-            // line again reads it afresh.
-            OrderPaymentTransactionTableMap::removeInstanceFromPool($transaction);
 
             throw new ConflictingPaymentReferenceException(\sprintf('The reference %s is already carried by another %s of this order.', (string) $transaction->getPspReference(), (string) $transaction->getType()), 0, $exception);
         }

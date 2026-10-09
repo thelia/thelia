@@ -285,6 +285,37 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         $this->recorder->recordVoid($order, moduleCode: 'Cheque');
     }
 
+    public function testALineWhoseSaveFailedIsStillSettledTheNextTime(): void
+    {
+        // Propel ignores, without a word, every save of an object whose save once failed.
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+
+        try {
+            $this->recorder->settle($pending, PaymentTransactionState::FAILED, null, str_repeat('X', 51));
+            self::fail('An error code longer than its column is refused by the server.');
+        } catch (\Throwable) {
+        }
+
+        $this->recorder->settle($pending, PaymentTransactionState::FAILED, null, '05');
+
+        $stored = OrderPaymentTransactionQuery::create()->filterById($pending->getId())->select(['State'])->findOne();
+        self::assertSame(PaymentTransactionState::FAILED->value, $stored);
+    }
+
+    public function testAReferenceIsNotAttachedToALineSettledMeanwhile(): void
+    {
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+        $staleCopy = clone $pending;
+        $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'PSP-SETTLED');
+
+        $this->recorder->attachReference($staleCopy, 'PSP-LATE');
+
+        $stored = OrderPaymentTransactionQuery::create()->filterById($pending->getId())->select(['PspReference'])->findOne();
+        self::assertSame('PSP-SETTLED', $stored);
+    }
+
     public function testAnAuthorizationPutsAnUnpaidOrderOnHoldForCapture(): void
     {
         $order = $this->order(120);
