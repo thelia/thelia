@@ -92,9 +92,10 @@ final class UnpaidOrderReminderCommandTest extends ActionIntegrationTestCase
         ConfigQuery::write(UnpaidOrderReminderSettings::SCHEDULE_KEY, '24:no_such_reminder_message');
 
         $tester = $this->tester();
-        $tester->execute(['--dry-run' => true]);
+        $tester->execute([]);
 
         self::assertStringContainsString('no_such_reminder_message', $tester->getDisplay());
+        self::assertSame(Command::FAILURE, $tester->getStatusCode(), 'A schedule that cannot send is what the scheduler of the host has to report.');
     }
 
     public function testWithoutAScheduleItSaysSo(): void

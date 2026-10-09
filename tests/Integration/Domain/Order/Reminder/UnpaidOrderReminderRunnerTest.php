@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Order\Reminder;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
@@ -332,6 +333,51 @@ final class UnpaidOrderReminderRunnerTest extends ActionIntegrationTestCase
         $report = $this->runner->run($this->now, 10000, false);
 
         self::assertCount(105, $this->only($orders, $report->outcomes()));
+    }
+
+    public function testTheReminderIsRecordedBeforeTheMailLeaves(): void
+    {
+        // Sent at most once: had the database failed right after the mail, the entry is
+        // already there and the next run does not send it again.
+        $this->schedule('24:'.self::MESSAGE);
+        $order = $this->unpaidOrderAged(25);
+        $recordedWhenSent = [];
+        $probe = static function (MessageEvent $event) use ($order, &$recordedWhenSent): void {
+            $recordedWhenSent[] = OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::PAYMENT_REMINDER_SENT->value)->count();
+        };
+        $this->dispatcher->addListener(MessageEvent::class, $probe);
+
+        try {
+            $this->runner->run($this->now, 1000, false);
+        } finally {
+            $this->dispatcher->removeListener(MessageEvent::class, $probe);
+        }
+
+        self::assertContains(1, $recordedWhenSent);
+    }
+
+    public function testACancellationThatFailsIsRecordedAndTheRunGoesOn(): void
+    {
+        $this->schedule('168:cancel');
+        $refused = $this->unpaidOrderAged(24 * 9);
+        $next = $this->unpaidOrderAged(24 * 8);
+        $refusal = static function (OrderEvent $event) use ($refused): void {
+            if ((int) $event->getOrder()->getId() === (int) $refused->getId()) {
+                throw new \RuntimeException('Refused by a module');
+            }
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $refusal, 1024);
+
+        try {
+            $report = $this->runner->run($this->now, 1000, false);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $refusal);
+        }
+
+        self::assertSame(UnpaidOrderReminderOutcome::STATUS_FAILED, $this->only([$refused], $report->outcomes())[0]->status);
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->statusOf($refused));
+        self::assertSame(1, OrderHistoryQuery::create()->filterByOrderId($refused->getId())->filterByEventType(OrderHistoryEventType::PAYMENT_REMINDER_FAILED->value)->count());
+        self::assertSame(OrderStatus::CODE_CANCELED, $this->statusOf($next));
     }
 
     public function testARunHandlesAtMostItsLimitAndTheNextOneGoesOn(): void

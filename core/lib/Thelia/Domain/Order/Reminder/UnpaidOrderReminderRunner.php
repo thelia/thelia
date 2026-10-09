@@ -132,6 +132,7 @@ final readonly class UnpaidOrderReminderRunner
      * Read again under a lock of the order row, since the run read it: a payment may have
      * come in while the run was busy with the orders before it, and the object read then
      * still says unpaid. Nothing is done to an order that no longer waits, nor twice.
+     * A cancellation is made right after the lock, from the order read under it.
      *
      * A mail is claimed before it is sent: the history entry is written, then the mail
      * goes; a mail that cannot leave turns the entry into a failed one. Sent at most
@@ -156,7 +157,10 @@ final readonly class UnpaidOrderReminderRunner
             $order = OrderQuery::create()->findPk($orderId, $connection) ?? throw new \RuntimeException('the order is gone');
 
             if ($step->isCancellation()) {
-                $order->setCancelled($this->dispatcher);
+                // Cancelled once the lock is released: the change of status runs the actions
+                // the merchant hung on it, mails among them, and the order row, the stock
+                // rows and the transaction are not held while a mail server answers. The
+                // gap is the one any cancellation from the back office has.
                 $connection->commit();
             } else {
                 $customer = $order->getCustomer();
@@ -177,6 +181,12 @@ final readonly class UnpaidOrderReminderRunner
         }
 
         if ($step->isCancellation()) {
+            try {
+                $order->setCancelled($this->dispatcher);
+            } catch (\Throwable $failure) {
+                return $this->failed($order, $step, $failure->getMessage());
+            }
+
             OrderTableMap::removeInstanceFromPool($order);
 
             return true === OrderQuery::create()->findPk($orderId)?->getOrderStatus()?->isCancelled(true)

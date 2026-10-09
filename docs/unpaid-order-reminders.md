@@ -63,6 +63,12 @@ The mail itself also writes the usual `email_sent` entry.
 
 Each order is read again under a lock of its row before anything is done to it:
 an order paid while the run was busy with the ones before it is left alone. A
+cancellation is made right after the lock is released, so that the actions the
+merchant hangs on the cancelled status (mails among them) do not hold the order
+and its stock locked; a payment landing in those milliseconds meets the same gap
+as with a cancellation from the back office. A mail can likewise reach a customer
+who paid in the second before it left: its link then says the order no longer
+waits for a payment. A
 mail is claimed before it is sent: the `payment_reminder_sent` entry is written,
 the mail goes, and a mail that cannot leave turns the entry into a failed one. A
 reminder is therefore sent at most once, even when the database fails right
@@ -87,8 +93,8 @@ php bin/console order:remind-unpaid [--dry-run] [--limit=200]
 - Two runs at once: the second finds the lock (`thelia.unpaid_order_reminder`,
   from the shop's `LOCK_DSN`) and stops without doing anything. On several web
   servers, point `LOCK_DSN` at a store they share.
-- Exit code 0, or 1 when a step failed (the table says which), so the host's
-  scheduler can report it.
+- Exit code 0, or 1 when a step failed or waits for a missing message (the
+  output says which), so the host's scheduler can report it.
 - The links of the mails are built on the address of the shop (`url_site`): a
   scheduled task has no request to take the host from. Without it they carry the
   router's default host (`DEFAULT_URI`, `localhost` unless the host set it), and

@@ -103,10 +103,14 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
             $output->writeln(\sprintf('<error>No mail message is named "%s": the steps sending it wait until it exists.</error>', $messageCode));
         }
 
+        // A step waiting for its message is a schedule that cannot send: the scheduler of
+        // the host has to report it as much as a failed step.
+        $exitCode = $report->hasFailures() || [] !== $report->missingMessages() ? self::FAILURE : self::SUCCESS;
+
         if ([] === $report->outcomes()) {
             $output->writeln('<info>No unpaid order is due for a step.</info>');
 
-            return self::SUCCESS;
+            return $exitCode;
         }
 
         $table = new Table($output);
@@ -122,7 +126,7 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
             $output->writeln('<info>Dry run: nothing was sent nor changed.</info>');
         }
 
-        return $report->hasFailures() ? self::FAILURE : self::SUCCESS;
+        return $exitCode;
     }
 
     /**
