@@ -25,6 +25,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Service\PaymentAmount;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -527,6 +528,9 @@ class Order extends BaseOrder
 
         return $totals->hasSomethingLeftToCapture()
             || $totals->hasPendingCapture()
+            // Money taken, whatever the status says: the move to paid may have been refused
+            // by the transition graph.
+            || PaymentAmount::isPositive($totals->netCaptured())
             || OrderPaymentTransactionQuery::create()
                 ->filterByOrderId((int) $this->getId())
                 ->filterByTypeEnum(PaymentTransactionType::AUTHORIZATION)
