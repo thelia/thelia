@@ -2235,7 +2235,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
-(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW())
+(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
+(11, 'order_payment_reminder', NULL, NULL, 'order_payment_reminder.txt', NULL, 'order_payment_reminder.html', NOW(), NOW())
 ;
 
 /**
@@ -4040,7 +4041,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (7, '{{ locale }}', {{ intl('Newsletter subscription confirmation mail', locale) }}, {{ intl('Your subscription to %store newsletter', locale) }}, NULL, NULL),
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
-    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
+    (11, '{{ locale }}', {{ intl('Payment reminder of an unpaid order sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} is waiting for its payment', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

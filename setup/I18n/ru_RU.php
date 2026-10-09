@@ -1527,4 +1527,6 @@ return [
     'Catalog price rules' => 'Правила цен каталога',
     'Promotion' => 'Акция',
     'Newness' => 'Новинка',
+    'Payment reminder of an unpaid order sent to the customer' => 'Напоминание об оплате неоплаченного заказа отправлено клиенту',
+    'Your order {{ order_ref }} is waiting for its payment' => 'Ваш заказ {{ order_ref }} ожидает оплаты',
 ];

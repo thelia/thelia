@@ -433,4 +433,6 @@ return [
     'Catalog price rules' => 'Regole di prezzo del catalogo',
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
+    'Payment reminder of an unpaid order sent to the customer' => 'Promemoria di pagamento di un ordine non pagato inviato al cliente',
+    'Your order {{ order_ref }} is waiting for its payment' => 'Il tuo ordine {{ order_ref }} è in attesa di pagamento',
 ];
