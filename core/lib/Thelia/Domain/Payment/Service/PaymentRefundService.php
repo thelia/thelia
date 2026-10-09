@@ -64,6 +64,7 @@ final readonly class PaymentRefundService
         private PaymentTransactionTotalsReader $totalsReader,
         private ProviderCallRunner $runner,
         private EventDispatcherInterface $eventDispatcher,
+        private PaymentModuleLocator $moduleLocator,
     ) {
     }
 
@@ -191,7 +192,7 @@ final readonly class PaymentRefundService
     private function refundModuleOf(Order $order): PaymentModuleWithRefundInterface
     {
         try {
-            $module = $order->getPaymentModuleInstance();
+            $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (TheliaProcessException) {
             throw new RefundNotSupportedException((string) $order->getRef(), $order->getPaymentModuleTitle());
         }
