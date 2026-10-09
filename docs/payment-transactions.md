@@ -279,6 +279,18 @@ between two statuses that both stand for `not_paid` is stock-neutral, and the
 stock-on-creation flag of the payment module still applies until the order
 leaves those statuses.
 
+A payment module that maps movements to statuses in its own configuration
+implements `Thelia\Module\PaymentModuleManagingOrderStatusInterface` and answers
+`managesOrderStatus()` with true: its journal lines are written as usual, and the
+core leaves the status of its orders alone.
+
+An authorization that lapses at the provider before it was all captured is
+recorded with `recordExpiry()`: a void of what it still held, annotated with the
+error code `PaymentTransactionRecorder::REASON_EXPIRED`, carrying the
+authorization's reference when the provider gives the lapse none of its own. What
+was captured stays; the order follows as for any void. The back office reads it
+as "Authorization expired", not as a failure.
+
 `awaiting_capture` (`OrderStatus::CODE_AWAITING_CAPTURE`) is **not** a canonical
 status. It is seeded at install, and by `3.3.0.sql`, as a custom status
 equivalent to `not_paid`, so `isPaid(false)`, `isNotPaid(false)` and the
