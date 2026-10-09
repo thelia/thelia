@@ -20,7 +20,10 @@ use Thelia\Tools\TerminalText;
  * Reads an XML descriptor (module.xml, template.xml) and checks it against a schema,
  * closed: what libxml has to say is the reason given, never a warning of PHP, and a
  * descriptor that could not be read or checked is never passed. No network access for
- * an entity or a DTD a descriptor would point at.
+ * an entity or a DTD a descriptor would point at. The descriptor and the schema are
+ * read by PHP and handed to libxml as bytes, never as a path: a path is a URI to
+ * libxml, which decodes it, and a module in a folder named "Mod%41ule" was looked for
+ * as "ModAule" and refused.
  */
 final class XmlDescriptor
 {
@@ -39,10 +42,43 @@ final class XmlDescriptor
             return ['it is not a readable file'];
         }
 
+        if (0 === filesize($file)) {
+            return ['it is empty'];
+        }
+
         return self::askingLibxml(
-            static fn (): bool => $dom->load($file, \LIBXML_NONET),
+            static function () use ($dom, $file): bool {
+                $xml = file_get_contents($file);
+
+                return false !== $xml && $dom->loadXML($xml, \LIBXML_NONET);
+            },
             'it could not be loaded',
         );
+    }
+
+    /**
+     * The descriptor as SimpleXML, for a caller that has had it validated or takes false
+     * for an answer: false when it cannot be read or is not well-formed XML, without a
+     * warning of PHP, and nothing left in the error buffer of libxml.
+     */
+    public static function read(string $file): \SimpleXMLElement|false
+    {
+        if (!is_file($file) || !is_readable($file)) {
+            return false;
+        }
+
+        $previousErrorHandling = libxml_use_internal_errors(true);
+        set_error_handler(static fn (): bool => true);
+
+        try {
+            $xml = file_get_contents($file);
+
+            return false === $xml || '' === $xml ? false : simplexml_load_string($xml, \SimpleXMLElement::class, \LIBXML_NONET);
+        } finally {
+            restore_error_handler();
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrorHandling);
+        }
     }
 
     /**
@@ -59,7 +95,11 @@ final class XmlDescriptor
         }
 
         return self::askingLibxml(
-            static fn (): bool => $dom->schemaValidate($schemaFile),
+            static function () use ($dom, $schemaFile): bool {
+                $schema = file_get_contents($schemaFile);
+
+                return false !== $schema && $dom->schemaValidateSource($schema);
+            },
             'the descriptor could not be checked against '.self::printable(basename($schemaFile)),
         );
     }

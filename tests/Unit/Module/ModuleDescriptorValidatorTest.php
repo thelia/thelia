@@ -53,6 +53,24 @@ final class ModuleDescriptorValidatorTest extends TestCase
         self::assertSame('0', (string) $descriptor->{'enabled-by-default'});
     }
 
+    /**
+     * A module folder whose name reads as a URI ("Mod%41ule") is a folder: libxml, given
+     * the path, decoded it and refused the descriptor as not found.
+     */
+    public function testAModuleInAFolderThatReadsAsAUriIsValidated(): void
+    {
+        $folder = $this->workDir.'/Mod%41ule/Config';
+        (new Filesystem())->mkdir($folder);
+        copy($this->writeDescriptor(''), $folder.'/module.xml');
+        $validator = new ModuleDescriptorValidator();
+
+        $descriptor = $validator->getDescriptor($folder.'/module.xml');
+
+        self::assertSame(self::DESCRIPTOR_VERSION_2_2, $validator->getModuleVersion());
+        self::assertNotFalse($descriptor);
+        self::assertSame('Descriptor sample', (string) $descriptor->descriptive->title);
+    }
+
     public function testDescriptorWithoutEnabledByDefaultStillValidates(): void
     {
         $validator = new ModuleDescriptorValidator();

@@ -50,6 +50,65 @@ final class XmlDescriptorTest extends TestCase
         self::assertNotSame([], $notXml);
         self::assertStringContainsString('tag mismatch', $notXml[0]);
         self::assertMatchesRegularExpression('/ \(Code \d+\) on line 1$/', $notXml[0]);
+
+        file_put_contents($this->workDir.'/empty.xml', '');
+        self::assertSame(['it is empty'], XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/empty.xml'));
+    }
+
+    /**
+     * A path made only of the characters of a URI is one to libxml, which decodes it: the
+     * descriptor and the schema reach it as bytes, whatever their folder is named.
+     */
+    public function testAPathThatReadsAsAUriIsOpenedAsAPath(): void
+    {
+        $folder = $this->workDir.'/Mod%41ule';
+        (new Filesystem())->mkdir($folder);
+        file_put_contents($folder.'/good.xml', '<a><b/></a>');
+        file_put_contents($folder.'/a.xsd', '<?xml version="1.0"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:element name="a"><xs:complexType><xs:sequence><xs:element name="b"/></xs:sequence></xs:complexType></xs:element></xs:schema>');
+        $dom = new \DOMDocument();
+
+        self::assertSame([], XmlDescriptor::loadingErrors($dom, $folder.'/good.xml'));
+        self::assertSame([], XmlDescriptor::schemaErrors($dom, $folder.'/a.xsd'));
+
+        $read = XmlDescriptor::read($folder.'/good.xml');
+        self::assertInstanceOf(\SimpleXMLElement::class, $read);
+        self::assertSame('b', $read->b->getName());
+    }
+
+    /**
+     * Read for its values, a descriptor is given or false: no warning of PHP, nothing left
+     * in the error buffer of libxml, and the error mode of libxml given back.
+     */
+    public function testADescriptorIsReadOrFalseWithoutAWord(): void
+    {
+        file_put_contents($this->workDir.'/good.xml', '<a><b/></a>');
+        file_put_contents($this->workDir.'/bad.xml', '<a><b></a>');
+        file_put_contents($this->workDir.'/empty.xml', '');
+        $warnings = [];
+        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+        $previousMode = libxml_use_internal_errors(false);
+
+        try {
+            $read = XmlDescriptor::read($this->workDir.'/good.xml');
+            self::assertInstanceOf(\SimpleXMLElement::class, $read);
+            self::assertSame('b', $read->b->getName());
+
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/bad.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/empty.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/gone.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir));
+
+            self::assertSame([], $warnings);
+            self::assertSame([], libxml_get_errors());
+            self::assertFalse(libxml_use_internal_errors());
+        } finally {
+            libxml_use_internal_errors($previousMode);
+            restore_error_handler();
+        }
     }
 
     public function testADescriptorIsCheckedAgainstItsSchemaOrRefusedWithAReason(): void

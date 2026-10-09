@@ -36,6 +36,22 @@ final class TemplateDescriptorValidatorTest extends TestCase
     }
 
     /**
+     * A template folder whose name reads as a URI ("Th%41me") is a folder: libxml, given
+     * the path, decoded it and refused the descriptor as not found.
+     */
+    public function testATemplateInAFolderThatReadsAsAUriIsValidated(): void
+    {
+        $folder = $this->workDir.'/Th%41me';
+        (new Filesystem())->mkdir($folder);
+        copy($this->writeDescriptor(), $folder.'/template.xml');
+
+        $descriptor = (new TemplateDescriptorValidator($folder.'/template.xml'))->getDescriptor();
+
+        self::assertInstanceOf(\SimpleXMLElement::class, $descriptor);
+        self::assertSame('1.0.0', (string) $descriptor->version);
+    }
+
+    /**
      * A version is given as text, and the table of schemas is read back with integer keys:
      * the version a descriptor is checked against is the one asked for.
      */
