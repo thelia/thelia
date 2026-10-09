@@ -17,6 +17,7 @@ namespace Thelia\Domain\Payment\Service;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
+use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
@@ -46,6 +47,8 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
 final readonly class PaymentCaptureService
 {
     private const ERROR_CODE_EXCEPTION = 'exception';
+
+    private const ERROR_CODE_CONFLICTING_REFERENCE = 'conflicting_reference';
 
     private const UNKNOWN_OUTCOME_MESSAGE = 'The payment module could not get an answer from the provider: the outcome is known once the provider confirms it.';
 
@@ -262,13 +265,34 @@ final readonly class PaymentCaptureService
                 : $this->recorder->attachReference($transaction, $result->pspReference);
         }
 
-        return $this->recorder->settle(
-            $transaction,
-            $result->state,
-            $result->pspReference,
-            $result->errorCode,
-            $result->errorMessage,
-            $moduleCode,
-        );
+        try {
+            return $this->recorder->settle(
+                $transaction,
+                $result->state,
+                $result->pspReference,
+                $result->errorCode,
+                $result->errorMessage,
+                $moduleCode,
+            );
+        } catch (ConflictingPaymentReferenceException $conflict) {
+            // The module answered with a reference another line already carries: whether
+            // the provider took the money this time cannot be told. The line stays pending,
+            // reserving what it asked for, and says why; the provider's notification, with
+            // the reference it really gave, settles it.
+            Tlog::getInstance()->error(\sprintf(
+                'Payment module %s answered transaction #%d with the reference %s, already carried by another line.',
+                $moduleCode,
+                (int) $transaction->getId(),
+                (string) $result->pspReference,
+            ));
+
+            $this->keepTheOriginal($conflict, fn (): OrderPaymentTransaction => $this->recorder->markOutcomeUnknown(
+                $transaction,
+                self::ERROR_CODE_CONFLICTING_REFERENCE,
+                \sprintf('The payment module answered with the reference %s, which another movement of this order already carries: the outcome is known once the provider confirms it.', (string) $result->pspReference),
+            ));
+
+            throw $conflict;
+        }
     }
 }

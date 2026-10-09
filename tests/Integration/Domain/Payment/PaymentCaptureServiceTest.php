@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
+use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
@@ -317,6 +318,33 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame($authorization->getId(), $void->getParentId());
         self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_NOT_PAID, $this->statusCodeOf($order));
+    }
+
+    public function testAModuleAnsweringWithAReferenceAlreadyUsedLeavesTheLineWaitingForTheProvider(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        $first = $this->service->capture($order, 50.0);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::succeeded((string) $first->getPspReference());
+
+        try {
+            $this->service->capture($order, 70.0);
+            self::fail('A reference another capture carries cannot settle this one.');
+        } catch (ConflictingPaymentReferenceException) {
+        }
+
+        $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        self::assertTrue($line->isPending(), 'The module may have taken the money: the line waits for the provider.');
+        self::assertNull($line->getPspReference());
+        self::assertSame('conflicting_reference', $line->getErrorCode());
+        self::assertStringContainsString((string) $first->getPspReference(), (string) $line->getErrorMessage());
+
+        // The provider's notification, with the reference it really gave, settles it.
+        $this->recorder->recordCapture($order, 70, 'PSP-REAL-70', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $line->reload();
+        self::assertTrue($line->isSucceeded());
+        self::assertSame('PSP-REAL-70', $line->getPspReference());
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusCodeOf($order));
     }
 
     /**
