@@ -161,14 +161,9 @@ class ModuleDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $schemaFile = (string) $xsdFile->getRealPath();
-        // What a message of libxml may quote of the server: the schema, and the
-        // descriptor, each by its name.
-        $names = [...self::namesOf($schemaFile), ...self::namesOf((string) $dom->documentURI)];
-
         return array_map(
-            static fn (string $error): string => 'XML error "'.strtr($error, $names).'"',
-            XmlDescriptor::schemaErrors($dom, $schemaFile),
+            static fn (string $error): string => 'XML error "'.$error.'"',
+            XmlDescriptor::schemaErrors($dom, (string) $xsdFile->getRealPath()),
         );
     }
 
@@ -176,6 +171,6 @@ class ModuleDescriptorValidator
     {
         $this->validate($xml_file);
 
-        return @simplexml_load_file($xml_file, \SimpleXMLElement::class, \LIBXML_NONET);
+        return XmlDescriptor::read((string) $xml_file);
     }
 }

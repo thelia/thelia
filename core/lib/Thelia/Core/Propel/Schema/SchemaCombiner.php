@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Propel\Schema;
 
+use Thelia\Core\File\XmlDescriptor;
+
 /**
  * Combine Propel schemas describing databases into a single schema per database.
  */
@@ -220,7 +222,7 @@ class SchemaCombiner
         foreach ($externalSchemaElementsToDelete as $externalSchemaElement) {
             // add a removal notice
             $externalSchemaRemovalNoticeComment = $databaseElement->ownerDocument->createComment(
-                \sprintf("external-schema reference to '%s' removed", $externalSchemaElement->getAttribute('filename')),
+                \sprintf("external-schema reference to '%s' removed", self::commentText($externalSchemaElement->getAttribute('filename'))),
             );
             $databaseElement->appendChild($externalSchemaRemovalNoticeComment);
 
@@ -369,7 +371,7 @@ class SchemaCombiner
 
         // add a source schema start marker
         $fileStartMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("Start of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
+            \sprintf("Start of schema from '%s'", self::origin($sourceDatabaseElement)),
         );
         $globalDatabaseElement->appendChild($fileStartMarkerComment);
 
@@ -381,7 +383,7 @@ class SchemaCombiner
 
         // and a source schema end marker
         $fileEndMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("End of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
+            \sprintf("End of schema from '%s'", self::origin($sourceDatabaseElement)),
         );
         $globalDatabaseElement->appendChild($fileEndMarkerComment);
 
@@ -407,13 +409,29 @@ class SchemaCombiner
         );
         $globalDatabaseElement->appendChild($externalSchemaIncludeComment);
 
-        // include the external schema
-        $externalSchemaInclude = $globalDatabaseElement->ownerDocument->createElement(
-            'external-schema',
-            $externalDatabaseElement->ownerDocument->baseURI,
-        );
+        // include the external schema (as a text node: createElement() escapes nothing)
+        $externalSchemaInclude = $globalDatabaseElement->ownerDocument->createElement('external-schema');
+        $externalSchemaInclude->appendChild($globalDatabaseElement->ownerDocument->createTextNode(self::origin($externalDatabaseElement)));
         $globalDatabaseElement->appendChild($externalSchemaInclude);
 
         $this->externalSchemaDatabaseElements[$database][] = $externalDatabaseElement;
+    }
+
+    /**
+     * Where a database element comes from: the path of its document, fit for a comment.
+     */
+    private static function origin(\DOMElement $databaseElement): string
+    {
+        return self::commentText((string) $databaseElement->ownerDocument?->baseURI);
+    }
+
+    /**
+     * A text a module ships (a folder name, a filename attribute), fit for a comment of
+     * the combined schema: printed through TerminalText, and with no two dashes in a row,
+     * which would end the comment and let the rest of the text in as markup.
+     */
+    private static function commentText(string $text): string
+    {
+        return (string) preg_replace('/-(?=-)/', '- ', XmlDescriptor::printable($text));
     }
 }

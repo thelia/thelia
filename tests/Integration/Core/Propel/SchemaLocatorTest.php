@@ -14,18 +14,78 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\Propel;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Test\IntegrationTestCase;
 
 final class SchemaLocatorTest extends IntegrationTestCase
 {
+    private ?string $localModuleDir = null;
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->localModuleDir) {
+            (new Filesystem())->remove($this->localModuleDir);
+        }
+
+        parent::tearDown();
+    }
+
     private function createSchemaLocator(): SchemaLocator
     {
         return new SchemaLocator(
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR,
-            THELIA_LOCAL_MODULE_DIR,
+            $this->localModuleDir ?? THELIA_LOCAL_MODULE_DIR,
         );
+    }
+
+    /**
+     * A module folder whose name reads as a URI ("Mod%41ule") is a folder: libxml, given
+     * the path, decoded it and the schemas of the module were silently left out. Each
+     * schema is told apart by its path, as the documents are merged by it.
+     */
+    public function testTheSchemasOfAModuleInAFolderThatReadsAsAUriAreFound(): void
+    {
+        // The keys are real paths: the temporary directory is a link on some hosts.
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $configDir = $this->localModuleDir.'/Mod%41ule/Config';
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($configDir.'/schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
+        $filesystem->dumpFile($configDir.'/other-schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_two"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
+
+        $schemas = $this->createSchemaLocator()->findForModules(['Mod%41ule'], false);
+
+        ksort($schemas);
+        self::assertSame([$configDir.'/other-schema.xml', $configDir.'/schema.xml'], array_keys($schemas));
+        self::assertSame('sample_two', $schemas[$configDir.'/other-schema.xml']->getElementsByTagName('table')->item(0)?->getAttribute('name'));
+    }
+
+    /**
+     * A schema that cannot be read is left out, as before, but said so in the error log:
+     * its tables went missing from the generated models without a word.
+     */
+    public function testASchemaThatCannotBeReadIsSkippedAndSaidSo(): void
+    {
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $configDir = $this->localModuleDir.'/Broken/Config';
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($configDir.'/schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
+        $filesystem->dumpFile($configDir.'/broken-schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="never"></database>');
+        $errorLog = $this->localModuleDir.'/error.log';
+        $previousErrorLog = ini_set('error_log', $errorLog);
+
+        try {
+            $schemas = $this->createSchemaLocator()->findForModules(['Broken'], false);
+        } finally {
+            ini_set('error_log', (string) $previousErrorLog);
+        }
+
+        self::assertSame([$configDir.'/schema.xml'], array_keys($schemas));
+        $said = (string) file_get_contents($errorLog);
+        self::assertStringContainsString('[thelia] The Propel schema '.$configDir.'/broken-schema.xml of module "Broken" could not be read (', $said);
+        self::assertStringContainsString('tag mismatch', $said);
+        self::assertStringContainsString('it is skipped, and its tables with it.', $said);
     }
 
     public function testFindForModulesReturnsCoreSchemas(): void

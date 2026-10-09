@@ -50,6 +50,67 @@ final class XmlDescriptorTest extends TestCase
         self::assertNotSame([], $notXml);
         self::assertStringContainsString('tag mismatch', $notXml[0]);
         self::assertMatchesRegularExpression('/ \(Code \d+\) on line 1$/', $notXml[0]);
+
+        file_put_contents($this->workDir.'/empty.xml', '');
+        self::assertSame(['it is empty'], XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/empty.xml'));
+    }
+
+    /**
+     * A path made only of the characters of a URI is one to libxml, which decodes it: the
+     * descriptor and the schema reach it as bytes, whatever their folder is named.
+     */
+    public function testAPathThatReadsAsAUriIsOpenedAsAPath(): void
+    {
+        $folder = $this->workDir.'/Mod%41ule';
+        (new Filesystem())->mkdir($folder);
+        file_put_contents($folder.'/good.xml', '<a><b/></a>');
+        file_put_contents($folder.'/a.xsd', '<?xml version="1.0"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:element name="a"><xs:complexType><xs:sequence><xs:element name="b"/></xs:sequence></xs:complexType></xs:element></xs:schema>');
+        $dom = new \DOMDocument();
+
+        self::assertSame([], XmlDescriptor::loadingErrors($dom, $folder.'/good.xml'));
+        self::assertSame($folder.'/good.xml', $dom->documentURI);
+        self::assertSame($folder.'/good.xml', $dom->baseURI);
+        self::assertSame([], XmlDescriptor::schemaErrors($dom, $folder.'/a.xsd'));
+
+        $read = XmlDescriptor::read($folder.'/good.xml');
+        self::assertInstanceOf(\SimpleXMLElement::class, $read);
+        self::assertSame('b', $read->b->getName());
+    }
+
+    /**
+     * Read for its values, a descriptor is given or false: no warning of PHP, nothing left
+     * in the error buffer of libxml, and the error mode of libxml given back.
+     */
+    public function testADescriptorIsReadOrFalseWithoutAWord(): void
+    {
+        file_put_contents($this->workDir.'/good.xml', '<a><b/></a>');
+        file_put_contents($this->workDir.'/bad.xml', '<a><b></a>');
+        file_put_contents($this->workDir.'/empty.xml', '');
+        $warnings = [];
+        set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+        $previousMode = libxml_use_internal_errors(false);
+
+        try {
+            $read = XmlDescriptor::read($this->workDir.'/good.xml');
+            self::assertInstanceOf(\SimpleXMLElement::class, $read);
+            self::assertSame('b', $read->b->getName());
+
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/bad.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/empty.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir.'/gone.xml'));
+            self::assertFalse(XmlDescriptor::read($this->workDir));
+
+            self::assertSame([], $warnings);
+            self::assertSame([], libxml_get_errors());
+            self::assertFalse(libxml_use_internal_errors());
+        } finally {
+            libxml_use_internal_errors($previousMode);
+            restore_error_handler();
+        }
     }
 
     public function testADescriptorIsCheckedAgainstItsSchemaOrRefusedWithAReason(): void
@@ -77,6 +138,33 @@ final class XmlDescriptorTest extends TestCase
         $refused = XmlDescriptor::schemaErrors($conforming, $this->workDir."/a\0.xsd");
         self::assertSame('the descriptor could not be checked against a?.xsd', $refused[0]);
         self::assertStringContainsString('null bytes', $refused[1]);
+
+        // A schema that is gone: PHP says so, naming the file and never its folder.
+        $gone = XmlDescriptor::schemaErrors($conforming, $this->workDir.'/gone.xsd');
+        self::assertSame('the descriptor could not be checked against gone.xsd', $gone[0]);
+        self::assertStringContainsString('gone.xsd', $gone[1]);
+        self::assertStringNotContainsString($this->workDir, implode(' ', $gone));
+    }
+
+    /**
+     * A descriptor that declares a document type is refused: an entity it declares is
+     * never resolved (a file of the server would be read into the descriptor), and would
+     * be copied as it is into whatever is written from the document.
+     */
+    public function testADocumentTypeIsRefusedAndItsEntitiesAreNeverResolved(): void
+    {
+        file_put_contents($this->workDir.'/secret.txt', 'the secret');
+        file_put_contents($this->workDir.'/external.xml', '<!DOCTYPE a [<!ENTITY secret SYSTEM "file://'.$this->workDir.'/secret.txt">]><a><b>&secret;</b></a>');
+        file_put_contents($this->workDir.'/internal.xml', '<!DOCTYPE a [<!ENTITY word "spelled out">]><a><b>&word;</b></a>');
+
+        $dom = new \DOMDocument();
+        self::assertSame(['it declares a document type, which none may'], XmlDescriptor::loadingErrors($dom, $this->workDir.'/external.xml'));
+        self::assertStringNotContainsString('the secret', (string) $dom->saveXML());
+        self::assertSame(['it declares a document type, which none may'], XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/internal.xml'));
+
+        $read = XmlDescriptor::read($this->workDir.'/external.xml');
+        self::assertInstanceOf(\SimpleXMLElement::class, $read);
+        self::assertSame('', (string) $read->b);
     }
 
     /**
