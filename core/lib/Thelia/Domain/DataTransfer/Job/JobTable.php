@@ -28,6 +28,6 @@ enum JobTable: string
      */
     public function describe(int $jobId): string
     {
-        return \sprintf('%s #%d', self::Export === $this ? 'Export' : 'Import', $jobId);
+        return \sprintf('%s #%d', $this->name, $jobId);
     }
 }
