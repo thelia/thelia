@@ -18,9 +18,13 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
+use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -97,9 +101,16 @@ final readonly class RunExportJobHandler
             },
         );
 
-        $extension = $archiver instanceof ArchiverInterface ? $archiver->getExtension() : $serializer->getExtension();
+        $this->record($job, $event, $archiver instanceof ArchiverInterface ? $archiver->getExtension() : $serializer->getExtension());
+    }
 
-        // A file its row cannot record holds customer data nobody will download.
+    /**
+     * A file its row cannot record holds customer data nobody will download: it goes,
+     * when it is a file of the export folder. A listener may have pointed the export at
+     * something that is not the export's to delete.
+     */
+    private function record(ExportJob $job, ExportEvent $event, string $extension): void
+    {
         try {
             $job->setStatus(JobStatus::DONE->value)
                 ->setFilePath($event->getFilePath())
@@ -107,7 +118,16 @@ final readonly class RunExportJobHandler
                 ->setFinishedAt(new \DateTime())
                 ->save();
         } catch (\Throwable $notRecorded) {
-            (new Filesystem())->remove($event->getFilePath());
+            $file = ExportCachePurger::resolve($event->getFilePath());
+
+            // The reason the row was not recorded is what the job failed on, not this.
+            try {
+                if (null !== $file) {
+                    (new Filesystem())->remove($file);
+                }
+            } catch (\Throwable $notRemoved) {
+                Tlog::getInstance()->addError(\sprintf('The file of an export its row could not record was not removed: %s', JobFailureMessage::forLog($notRemoved)));
+            }
 
             throw $notRecorded;
         }

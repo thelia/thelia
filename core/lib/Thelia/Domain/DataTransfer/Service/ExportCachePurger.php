@@ -29,6 +29,22 @@ class ExportCachePurger
         return THELIA_CACHE_DIR.'export';
     }
 
+    /**
+     * The path, its links resolved, when it is a file of the export folder: the only kind
+     * of path an export is ever served from or deleted by. Null otherwise.
+     */
+    public static function resolve(string $path): ?string
+    {
+        $directory = realpath(self::directory());
+        $file = realpath($path);
+
+        if (false === $directory || false === $file || !is_file($file) || !str_starts_with($file, $directory.\DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $file;
+    }
+
     public function purgeOldExportFiles(string $directory): int
     {
         $deletedCount = 0;

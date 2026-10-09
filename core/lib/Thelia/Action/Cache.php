@@ -43,6 +43,9 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /** @var CacheEvent[] */
     protected array $onTerminateCacheClearEvents = [];
 
+    /** The commands running in this process: one a worker runs ends inside the worker's. */
+    private int $commandDepth = 0;
+
     /**
      * CacheListener constructor.
      */
@@ -79,6 +82,27 @@ class Cache extends BaseAction implements EventSubscriberInterface
         if (!$findDir) {
             $this->onTerminateCacheClearEvents[] = $event;
         }
+    }
+
+    public function onConsoleCommand(): void
+    {
+        ++$this->commandDepth;
+    }
+
+    /**
+     * Only the outermost command clears. A recurring task runs its command inside the
+     * worker, and that command ends with a console terminate of its own; the worker's
+     * command ends whatever stopped it, an exception included.
+     */
+    public function onConsoleTerminate(): void
+    {
+        $this->commandDepth = max(0, $this->commandDepth - 1);
+
+        if (0 !== $this->commandDepth) {
+            return;
+        }
+
+        $this->onTerminate();
     }
 
     public function onTerminate(): void
@@ -132,7 +156,8 @@ class Cache extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
-            ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            ConsoleEvents::COMMAND => ['onConsoleCommand', \PHP_INT_MAX],
+            ConsoleEvents::TERMINATE => ['onConsoleTerminate', self::TERMINATE_PRIORITY],
             WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
         ];
     }
