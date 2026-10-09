@@ -376,15 +376,21 @@ WHERE NOT EXISTS (SELECT 1 FROM `order_status` WHERE `code` = 'awaiting_capture'
 
 SET @awaiting_capture_status_id := (SELECT `id` FROM `order_status` WHERE `code` = 'awaiting_capture');
 
-INSERT IGNORE INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-    (@awaiting_capture_status_id, 'cs_CZ', 'Čeká na stržení platby', '', '', ''),
-    (@awaiting_capture_status_id, 'de_DE', 'Warten auf Einzug', '', '', ''),
-    (@awaiting_capture_status_id, 'en_US', 'Awaiting capture', '', '', ''),
-    (@awaiting_capture_status_id, 'es_ES', 'Pendiente de captura', '', '', ''),
-    (@awaiting_capture_status_id, 'fr_FR', 'En attente de capture', '', '', ''),
-    (@awaiting_capture_status_id, 'it_IT', 'In attesa di cattura', '', '', ''),
-    (@awaiting_capture_status_id, 'nl_NL', 'Wacht op incasso', '', '', ''),
-    (@awaiting_capture_status_id, 'ru_RU', 'Ожидает списания', '', '', '');
+-- Only for the languages the shop has, the way the hook titles above are added: a
+-- language added later gets its row from setup/I18n.
+INSERT IGNORE INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`)
+SELECT @awaiting_capture_status_id, `wording`.`locale`, `wording`.`title`, '', '', ''
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Čeká na stržení platby' AS `title`
+    UNION ALL SELECT 'de_DE', 'Warten auf Einzug'
+    UNION ALL SELECT 'en_US', 'Awaiting capture'
+    UNION ALL SELECT 'es_ES', 'Pendiente de captura'
+    UNION ALL SELECT 'fr_FR', 'En attente de capture'
+    UNION ALL SELECT 'it_IT', 'In attesa di cattura'
+    UNION ALL SELECT 'nl_NL', 'Wacht op incasso'
+    UNION ALL SELECT 'ru_RU', 'Ожидает списания'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
 
 -- Taking money an authorization holds is a right of its own, granted profile by
 -- profile, distinct from editing orders.
@@ -393,14 +399,20 @@ INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
 
 SET @payment_capture_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.payment-capture');
 
-INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@payment_capture_resource_id, 'cs_CZ', 'Stržení platby objednávky', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'de_DE', 'Einzug der Bestellzahlung', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'en_US', 'Order payment capture', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'es_ES', 'Captura del pago del pedido', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'fr_FR', 'Capture du paiement d\'une commande', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'it_IT', 'Cattura del pagamento dell\'ordine', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'nl_NL', 'Incasso van de orderbetaling', NULL, NULL, NULL),
-    (@payment_capture_resource_id, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL);
+-- Only for the languages the shop has, the way the hook titles above are added: a
+-- language added later gets its row from setup/I18n.
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT @payment_capture_resource_id, `wording`.`locale`, `wording`.`title`, NULL, NULL, NULL
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Stržení platby objednávky' AS `title`
+    UNION ALL SELECT 'de_DE', 'Einzug der Bestellzahlung'
+    UNION ALL SELECT 'en_US', 'Order payment capture'
+    UNION ALL SELECT 'es_ES', 'Captura del pago del pedido'
+    UNION ALL SELECT 'fr_FR', 'Capture du paiement d\'une commande'
+    UNION ALL SELECT 'it_IT', 'Cattura del pagamento dell\'ordine'
+    UNION ALL SELECT 'nl_NL', 'Incasso van de orderbetaling'
+    UNION ALL SELECT 'ru_RU', 'Списание оплаты заказа'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
 
 SET FOREIGN_KEY_CHECKS = 1;
