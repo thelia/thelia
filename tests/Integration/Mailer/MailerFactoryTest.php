@@ -20,13 +20,16 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\Parser\ParserFallback;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Mailer\Exception\EmailNotSentException;
+use Thelia\Mailer\Exception\StoreEmailMissingException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -614,21 +617,61 @@ final class MailerFactoryTest extends IntegrationTestCase
         $transport = $this->spyTransport($sent);
 
         (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
-            ->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+            ->sendTestMail('someone@example.com', 'A test', '<p>Email test from : Tom &amp; Jerry</p>');
 
         self::assertCount(1, $sent);
+        self::assertInstanceOf(Email::class, $sent[0]);
+        // The text part reads as the HTML one shows: no tag, no entity.
+        self::assertSame('Email test from : Tom & Jerry', $sent[0]->getTextBody());
+        self::assertSame('<p>Email test from : Tom &amp; Jerry</p>', $sent[0]->getHtmlBody());
     }
 
     public function testATestOfTheMailSettingsOfAShopWithoutAnAddressSaysSo(): void
     {
         $this->givenTheStoreEmail('');
 
-        try {
-            $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
-            self::fail('The shop has no address to send from.');
-        } catch (EmailNotSentException $notSent) {
-            self::assertTrue($notSent->isStoreEmailMissing());
-        }
+        $this->expectException(StoreEmailMissingException::class);
+
+        $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+    }
+
+    /**
+     * The back office previews a message with the parser the shop sends it with: the one
+     * that claims its template file, the default parser for a body stored in the database.
+     */
+    public function testTheParserOfAMessageIsTheOneThatClaimsItsTemplateFile(): void
+    {
+        $templateHelper = $this->getService(TemplateHelperInterface::class);
+        $mailTemplatePath = $templateHelper->getActiveMailTemplate()->getAbsolutePath();
+        $claimant = new class($mailTemplatePath) extends ParserFallback {
+            public function __construct(private readonly string $claimedPath)
+            {
+            }
+
+            public function supportTemplateRender(string $templatePath, ?string $templateName): bool
+            {
+                return $templatePath === $this->claimedPath && 'password' === $templateName;
+            }
+
+            public static function getDefaultPriority(): int
+            {
+                return -5;
+            }
+        };
+        $default = new class extends ParserFallback {
+            public static function getDefaultPriority(): int
+            {
+                return 100;
+            }
+        };
+        $resolver = new ParserResolver([$claimant, $default], [], new RequestStack(), $templateHelper);
+        $factory = new MailerFactory($templateHelper, $resolver, $this->getService(MailerInterface::class), new NullTransport());
+
+        $withFile = (new Message())->setName('with_file')->setHtmlTemplateFileName('password.html')->setTextTemplateFileName('');
+        $withoutFile = (new Message())->setName('stored_body')->setHtmlTemplateFileName('')->setTextTemplateFileName('');
+
+        self::assertSame($claimant, $factory->parserFor($withFile));
+        self::assertSame($default, $factory->parserFor($withoutFile));
     }
 
     protected function tearDown(): void
