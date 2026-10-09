@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
@@ -28,6 +29,8 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
+use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
+use Thelia\Domain\Payment\Service\AuthorizedOrderCancellationGuard;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -44,6 +47,7 @@ final readonly class OrderProcessor implements ProcessorInterface
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
         private OrderStatusTransitionGuard $transitionGuard,
+        private AuthorizedOrderCancellationGuard $cancellationGuard,
     ) {
     }
 
@@ -73,6 +77,7 @@ final readonly class OrderProcessor implements ProcessorInterface
             if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
                 $order->setStatusId($lockedStatusId);
                 $this->transitionGuard->assertAllowed($order, $requestedStatusId);
+                $this->cancellationGuard->assertMayMoveTo($order, $requestedStatusId);
             }
 
             // The status written back is always the one read under the lock: the column itself is
@@ -86,6 +91,10 @@ final readonly class OrderProcessor implements ProcessorInterface
             $connection->rollBack();
 
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (CancellationNeedsCaptureRightException $exception) {
+            $connection->rollBack();
+
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
         } catch (\Throwable $throwable) {
             $connection->rollBack();
 
@@ -107,6 +116,8 @@ final readonly class OrderProcessor implements ProcessorInterface
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
         } catch (OrderStatusTransitionRefusedException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (CancellationNeedsCaptureRightException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
         }
 
         return $this->transformer->modelToResource(

@@ -75,12 +75,7 @@ final readonly class OrderHistoryActorResolver
         // whoever else the browser is signed in as.
         $sessionCounts = !$tokenUser instanceof Admin && !$tokenUser instanceof Customer;
         $hasModuleCode = null !== $moduleCode && '' !== $moduleCode;
-
-        // Outside the back office, a module that names itself is trusted over an
-        // administrator in session: a provider's return may land in a browser where an
-        // administrator is signed in too, and the module reported the movement, not them.
-        $sessionAdminCounts = $sessionCounts && (!$hasModuleCode || $this->isBackOfficeOrUnknownRequest());
-        $adminUser = $tokenUser instanceof Admin ? $tokenUser : ($sessionAdminCounts ? $this->securityContext->getAdminUser() : null);
+        $adminUser = $this->actingAdministrator($moduleCode);
 
         if ($adminUser instanceof UserInterface) {
             return new OrderHistoryActor(
@@ -104,6 +99,36 @@ final readonly class OrderHistoryActorResolver
         }
 
         return OrderHistoryActor::system();
+    }
+
+    /**
+     * The administrator the change is made by, under the precedence above, or null when
+     * it is made by a module, a customer or the shop itself.
+     */
+    public function actingAdministrator(?string $moduleCode = null): ?UserInterface
+    {
+        $tokenUser = $this->tokenUser();
+
+        if ($tokenUser instanceof Admin) {
+            return $tokenUser;
+        }
+
+        // A customer token closes the session: the request is the customer's, whoever
+        // else the browser is signed in as.
+        if ($tokenUser instanceof Customer) {
+            return null;
+        }
+
+        // Outside the back office, a module that names itself is trusted over an
+        // administrator in session: a provider's return may land in a browser where an
+        // administrator is signed in too, and the module reported the movement, not them.
+        if (null !== $moduleCode && '' !== $moduleCode && !$this->isBackOfficeOrUnknownRequest()) {
+            return null;
+        }
+
+        $sessionAdmin = $this->securityContext->getAdminUser();
+
+        return $sessionAdmin instanceof UserInterface ? $sessionAdmin : null;
     }
 
     /**
