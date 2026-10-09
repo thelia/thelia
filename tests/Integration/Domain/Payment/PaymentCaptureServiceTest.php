@@ -497,6 +497,28 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         $this->service->capture($order);
     }
 
+    public function testADeactivatedModuleIsNotAskedToCapture(): void
+    {
+        // Its services are no longer compiled in the container: calling it would fail
+        // half-way, after the pending line is written.
+        [$order] = $this->authorizedOrder(120);
+        ModuleQuery::create()
+            ->findOneByCode(DeferredCapturePaymentModule::getModuleCode())
+            ->setActivate(BaseModule::IS_NOT_ACTIVATED)
+            ->save($this->getPropelConnection());
+
+        self::assertFalse($this->service->supportsCapture($order));
+
+        try {
+            $this->service->capture($order);
+            self::fail('A deactivated module was asked to capture.');
+        } catch (DeferredCaptureNotSupportedException $exception) {
+            self::assertStringContainsString(DeferredCapturePaymentModule::getModuleCode(), $exception->getMessage());
+        }
+
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+    }
+
     public function testNothingToCaptureIsRefused(): void
     {
         $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
