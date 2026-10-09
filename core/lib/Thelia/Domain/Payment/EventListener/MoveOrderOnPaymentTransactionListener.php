@@ -29,6 +29,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
 
 /**
  * Moves an order along with the money that was reserved, taken or released on it.
@@ -48,6 +49,9 @@ use Thelia\Model\OrderStatusQuery;
  *
  * The hold status is the custom status seeded as `awaiting_capture`: a shop that deleted
  * it keeps its authorized orders unpaid.
+ *
+ * A payment module that moves the status itself, from its own configuration, says so
+ * through PaymentModuleManagingOrderStatusInterface: its orders are left alone.
  */
 final readonly class MoveOrderOnPaymentTransactionListener
 {
@@ -63,7 +67,7 @@ final readonly class MoveOrderOnPaymentTransactionListener
     {
         $transaction = $event->getTransaction();
 
-        if (!$transaction->isSucceeded()) {
+        if (!$transaction->isSucceeded() || $this->moduleMovesTheStatus($event->getOrder())) {
             return;
         }
 
@@ -72,6 +76,20 @@ final readonly class MoveOrderOnPaymentTransactionListener
             PaymentTransactionType::CAPTURE, PaymentTransactionType::VOID => $this->settleOnceNothingIsHeld($event),
             default => null,
         };
+    }
+
+    /**
+     * A module that cannot be loaded is not asked: the journal decides, as for any other.
+     */
+    private function moduleMovesTheStatus(Order $order): bool
+    {
+        try {
+            $module = $order->getPaymentModuleInstance();
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $module instanceof PaymentModuleManagingOrderStatusInterface && $module->managesOrderStatus();
     }
 
     private function holdForCapture(OrderPaymentTransactionEvent $event): void

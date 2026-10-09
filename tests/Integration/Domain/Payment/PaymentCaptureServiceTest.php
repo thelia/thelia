@@ -95,6 +95,22 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_PAID, $this->statusCodeOf($order));
     }
 
+    public function testAModuleThatMovesTheStatusItselfIsLeftToDoSo(): void
+    {
+        // The module maps the movements to statuses in its own configuration: the journal
+        // is written, the order is not moved by the core.
+        DeferredCapturePaymentModule::$managesOrderStatus = true;
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->statusCodeOf($order), 'No hold for capture.');
+
+        $this->service->capture($order);
+
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->statusCodeOf($order), 'Not paid by the core either.');
+    }
+
     public function testAPartialCaptureLeavesTheRestAndTheOrderOnHold(): void
     {
         [$order] = $this->authorizedOrder(120);

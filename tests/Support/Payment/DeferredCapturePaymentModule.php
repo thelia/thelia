@@ -19,6 +19,7 @@ use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Module\AbstractPaymentModule;
+use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
 use Thelia\Module\PaymentModuleWithCaptureInterface;
 
 /**
@@ -29,9 +30,12 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  * Registered under a `module` row by the tests that need it; the core instantiates it
  * from that row's namespace, so it needs no container.
  */
-final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleWithCaptureInterface
+final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleWithCaptureInterface, PaymentModuleManagingOrderStatusInterface
 {
     public static bool $deferredCapture = true;
+
+    /** Whether the module moves the order status itself, from its own configuration. */
+    public static bool $managesOrderStatus = false;
 
     /** @var PaymentOperationResult|\Throwable|null what the next capture answers, or throws */
     public static PaymentOperationResult|\Throwable|null $nextCaptureAnswer = null;
@@ -52,6 +56,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$captureCalls = [];
         self::$voidCalls = [];
         self::$whileCapturing = null;
+        self::$managesOrderStatus = false;
     }
 
     public function pay(Order $order): ?Response
@@ -62,6 +67,11 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     public function isValidPayment(): bool
     {
         return true;
+    }
+
+    public function managesOrderStatus(): bool
+    {
+        return self::$managesOrderStatus;
     }
 
     public function supportsDeferredCapture(): bool
