@@ -16,19 +16,25 @@ namespace Thelia\Domain\Payment\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Log\Tlog;
+use Thelia\Model\Order;
 use Thelia\Model\OrderStatusQuery;
 
 /**
  * Releases what the authorization of an order still holds when the order is cancelled,
- * so the amount does not stay reserved on the buyer's card until it expires.
+ * so the amount does not stay reserved on the buyer's card until it expires — and when
+ * the provider confirms an authorization on an order already cancelled, which nothing
+ * would ever capture.
  *
- * Priority 3, after every core listener of the status: the cancellation is committed
- * whatever the provider answers, and a release that fails is logged for the merchant
- * to do at the provider.
+ * Priority 3 on the status change, after every core listener of the status: the
+ * cancellation is committed whatever the provider answers, and a release that fails is
+ * logged for the merchant to do at the provider. The journal announces its lines once
+ * it is released, so the late authorization is released from outside its lock.
  */
 final readonly class VoidAuthorizationOnCancelListener
 {
@@ -47,6 +53,25 @@ final readonly class VoidAuthorizationOnCancelListener
             return;
         }
 
+        $this->releaseWhatIsHeld($order);
+    }
+
+    #[AsEventListener(event: TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED)]
+    public function onTransactionRecorded(OrderPaymentTransactionEvent $event): void
+    {
+        $transaction = $event->getTransaction();
+
+        if (PaymentTransactionType::AUTHORIZATION !== $transaction->getTypeEnum()
+            || !$transaction->isSucceeded()
+            || !$event->getOrder()->getOrderStatus()->isCancelled(false)) {
+            return;
+        }
+
+        $this->releaseWhatIsHeld($event->getOrder());
+    }
+
+    private function releaseWhatIsHeld(Order $order): void
+    {
         if (!$this->totalsReader->forOrder((int) $order->getId())->hasSomethingLeftToCapture()) {
             return;
         }
