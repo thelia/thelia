@@ -107,7 +107,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
 (97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW()),
 (98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
-(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW())
+(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
+(100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
+(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW())
 
 ;
 
