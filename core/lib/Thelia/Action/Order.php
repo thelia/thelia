@@ -405,9 +405,15 @@ class Order extends BaseAction implements EventSubscriberInterface
         // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
         // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
 
-        // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
-        // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-        if (OrderVersionQuery::create()->groupByStatusId()->filterById($order->getId())->count() > 1) {
+        // A move between two statuses that both stand for "not paid" (an authorization
+        // putting the order on hold for capture) leaves the stock as it is.
+        if ($order->isNotPaid(true) && $newStatus->isNotPaid(true)) {
+            return;
+        }
+
+        // We consider the ManageStockOnCreation flag only if the order has not yet left the
+        // "not paid" statuses: a stay on hold for capture is not a status change here.
+        if ($this->hasLeftNotPaid($order)) {
             // A status change occured. Ignore $manageStockOnCreation
             $manageStockOnCreation = false;
         } else {
@@ -437,6 +443,27 @@ class Order extends BaseAction implements EventSubscriberInterface
             .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
             .' = operation: '.$event->getOperation(),
         );
+    }
+
+    /**
+     * Whether the order ever held a status that does not stand for "not paid".
+     */
+    private function hasLeftNotPaid(ModelOrder $order): bool
+    {
+        $statusIds = OrderVersionQuery::create()
+            ->filterById($order->getId())
+            ->select(['StatusId'])
+            ->distinct()
+            ->find()
+            ->getData();
+
+        foreach (OrderStatusQuery::create()->findPks($statusIds) as $status) {
+            if (!$status->isNotPaid(true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
