@@ -53,10 +53,12 @@ interface PaymentModuleWithCaptureInterface extends PaymentModuleInterface
      *
      * The core has already checked the amount against the authorization and the
      * smallest coin of the currency, and written $transaction as pending; the module
-     * calls the provider and reports the outcome. A PaymentException thrown here is a
-     * refusal: the line is settled as failed with its message. Any other exception
-     * leaves the line pending — the call may have reached the provider — until the
-     * provider's notification settles it; both are rethrown.
+     * calls the provider and reports the outcome, a refusal included, through the
+     * returned PaymentOperationResult. A PaymentRefusedException thrown here is a refusal
+     * too: the line is settled as failed with its message, and the exception rethrown.
+     * Any other exception leaves the line pending — the call may have reached the
+     * provider — until the provider's notification settles it, and reaches the caller as
+     * a PaymentProviderUnreachableException wrapping it.
      */
     public function capture(Order $order, float $amount, OrderPaymentTransaction $transaction): PaymentOperationResult;
 
