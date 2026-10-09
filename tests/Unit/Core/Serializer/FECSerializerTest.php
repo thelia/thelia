@@ -23,35 +23,27 @@ use Thelia\Core\Serializer\Serializer\FECSerializer;
  */
 final class FECSerializerTest extends TestCase
 {
-    public function testTheFirstRowIsPrecededByTheFieldNamesAndValuesAreWrittenTheFecWay(): void
+    public function testValuesAreWrittenTheFecWay(): void
     {
         $serializer = new FECSerializer();
         $file = new \SplFileObject('php://memory', 'w+b');
         $serializer->prepareFile($file);
 
+        $fields = static fn (array $values): array => array_values(array_merge(array_fill_keys(FECSerializer::FIELDS, ''), $values));
         $written = $serializer->serialize([
             'JournalCode' => 'VE',
             'EcritureDate' => '2026-02-10',
             'EcritureLib' => "Facture 2026-000012\tACME\r\nSARL",
             'Debit' => '132.00',
             'Credit' => '0.00',
-            'Montantdevise' => '',
-            'DateLet' => '',
         ]);
 
-        self::assertSame(
-            "JournalCode\tEcritureDate\tEcritureLib\tDebit\tCredit\tMontantdevise\tDateLet\r\n"
-            ."VE\t20260210\tFacture 2026-000012 ACME  SARL\t132,00\t0,00\t\t\r\n",
-            $written,
-        );
-        self::assertSame("VE\t20260211\t-=label\t-5,00\t0,00\t\t\r\n", $serializer->serialize([
+        self::assertSame(implode("\t", $fields(['JournalCode' => 'VE', 'EcritureDate' => '20260210', 'EcritureLib' => 'Facture 2026-000012 ACME  SARL', 'Debit' => '132,00', 'Credit' => '0,00']))."\r\n", $written);
+        self::assertSame(implode("\t", $fields(['JournalCode' => 'VE', 'EcritureLib' => '-=label', 'Debit' => '-5,00', 'Credit' => '0,00']))."\r\n", $serializer->serialize([
             'JournalCode' => 'VE',
-            'EcritureDate' => '2026-02-11',
             'EcritureLib' => '-=label',
             'Debit' => '-5.00',
             'Credit' => '0.00',
-            'Montantdevise' => '',
-            'DateLet' => '',
         ]), 'No formula guard: an accounting program reads the label as it is.');
     }
 
@@ -63,8 +55,32 @@ final class FECSerializerTest extends TestCase
         $file->fwrite($serializer->serialize(['JournalCode' => 'VE', 'Debit' => '1.50']));
         $file->fwrite($serializer->serialize(['JournalCode' => 'VE', 'Debit' => '2.00']));
         $file->rewind();
+        $rows = $serializer->unserialize($file);
 
-        self::assertSame([['JournalCode' => 'VE', 'Debit' => '1,50'], ['JournalCode' => 'VE', 'Debit' => '2,00']], $serializer->unserialize($file));
+        self::assertCount(2, $rows);
+        self::assertSame(['VE', '1,50'], [$rows[0]['JournalCode'], $rows[0]['Debit']]);
+        self::assertSame(['VE', '2,00'], [$rows[1]['JournalCode'], $rows[1]['Debit']]);
+    }
+
+    public function testTheFieldNamesAreWrittenEvenWithoutAnyEntry(): void
+    {
+        $serializer = new FECSerializer();
+        $file = new \SplFileObject('php://memory', 'w+b');
+
+        $serializer->prepareFile($file);
+        $file->rewind();
+
+        self::assertSame(implode("\t", FECSerializer::FIELDS)."\r\n", (string) $file->fgets());
+    }
+
+    public function testTheFieldsAreWrittenInTheOrderOfTheFormatWhateverTheRow(): void
+    {
+        $serializer = new FECSerializer();
+        $serializer->prepareFile(new \SplFileObject('php://memory', 'w+b'));
+
+        $line = $serializer->serialize(['Credit' => '1.00', 'JournalCode' => 'VE']);
+
+        self::assertSame("VE\t\t\t\t\t\t\t\t\t\t\t\t1,00\t\t\t\t\t\r\n", $line);
     }
 
     public function testItIsAPlainTextFile(): void
