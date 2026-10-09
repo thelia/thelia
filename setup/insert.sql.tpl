@@ -2241,7 +2241,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
 (59, 'admin.configuration.delivery-date', NOW(), NOW()),
 (60, 'admin.sale-unit', NOW(), NOW()),
-(61, 'admin.order.payment-capture', NOW(), NOW())
+(61, 'admin.order.payment-capture', NOW(), NOW()),
+(62, 'admin.order.payment-refund', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -4054,7 +4055,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL),
     (59, '{{ locale }}', {{ intl('Configuration delivery dates', locale) }}, NULL, NULL, NULL),
     (60, '{{ locale }}', {{ intl('Sale units', locale) }}, NULL, NULL, NULL),
-    (61, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (61, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL),
+    (62, '{{ locale }}', {{ intl('Order payment refund', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
