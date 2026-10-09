@@ -21,7 +21,9 @@ use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
+use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
@@ -43,12 +45,18 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  * A module that refuses with a PaymentException leaves a failed line. Any other
  * exception — a timeout, a broken connection — leaves the line pending: the call may have
  * reached the provider, and only its notification can say whether the money was taken.
+ *
+ * Once the provider has answered, nothing that follows reports the movement as failed:
+ * a listener of the journal that breaks is logged, and a journal another worker holds
+ * past the wait leaves the line pending, noting the answer, for the notification.
  */
 final readonly class PaymentCaptureService
 {
     private const ERROR_CODE_EXCEPTION = 'exception';
 
     private const ERROR_CODE_CONFLICTING_REFERENCE = 'conflicting_reference';
+
+    private const ERROR_CODE_JOURNAL_BUSY = 'journal_busy';
 
     private const UNKNOWN_OUTCOME_MESSAGE = 'The payment module could not get an answer from the provider: the outcome is known once the provider confirms it.';
 
@@ -79,7 +87,7 @@ final readonly class PaymentCaptureService
             $this->assertCapturable($order, $amount, $currencyCode);
         }
 
-        $transaction = $this->recorder->withOrderLock($order, function () use ($order, $amount, $currencyCode, $moduleCode): OrderPaymentTransaction {
+        $transaction = $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock($order, function () use ($order, $amount, $currencyCode, $moduleCode): OrderPaymentTransaction {
             $totals = $this->totalsReader->forOrder((int) $order->getId());
 
             if (!$totals->hasSomethingLeftToCapture()) {
@@ -112,7 +120,7 @@ final readonly class PaymentCaptureService
                 OrderPaymentTransactionQuery::create()->findLatestSucceededAuthorization((int) $order->getId()),
                 $moduleCode,
             );
-        });
+        }));
 
         $result = $this->callModule(
             static fn (): PaymentOperationResult => $module->capture($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction),
@@ -128,13 +136,13 @@ final readonly class PaymentCaptureService
         $module = $this->captureModuleOf($order);
         $moduleCode = $module->getCode();
 
-        $transaction = $this->recorder->recordVoid(
+        $transaction = $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->recordVoid(
             $order,
             null,
             PaymentTransactionState::PENDING,
             OrderPaymentTransactionQuery::create()->findLatestSucceededAuthorization((int) $order->getId()),
             $moduleCode,
-        );
+        ));
 
         $result = $this->callModule(static fn (): PaymentOperationResult => $module->voidAuthorization($order, $transaction), $transaction, $moduleCode);
 
@@ -255,25 +263,40 @@ final readonly class PaymentCaptureService
         }
     }
 
+    /**
+     * The line the journal wrote, even when a listener of its announcement failed: that
+     * failure is logged by the recorder, and the line is what the rest of the call needs.
+     *
+     * @param callable(): OrderPaymentTransaction $write
+     */
+    private function keepingTheLine(callable $write): OrderPaymentTransaction
+    {
+        try {
+            return $write();
+        } catch (PaymentAnnouncementFailedException $announcementFailure) {
+            return $announcementFailure->getTransaction();
+        }
+    }
+
     private function conclude(OrderPaymentTransaction $transaction, PaymentOperationResult $result, string $moduleCode): OrderPaymentTransaction
     {
-        // The module hands the call to the provider and will learn the outcome from a
-        // notification: the line stays pending, with the reference to find it by.
-        if (!$result->state->isSettled()) {
-            return null === $result->pspReference
-                ? $transaction
-                : $this->recorder->attachReference($transaction, $result->pspReference);
-        }
-
         try {
-            return $this->recorder->settle(
+            // The module hands the call to the provider and will learn the outcome from a
+            // notification: the line stays pending, with the reference to find it by.
+            if (!$result->state->isSettled()) {
+                return null === $result->pspReference
+                    ? $transaction
+                    : $this->recorder->attachReference($transaction, $result->pspReference);
+            }
+
+            return $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->settle(
                 $transaction,
                 $result->state,
                 $result->pspReference,
                 $result->errorCode,
                 $result->errorMessage,
                 $moduleCode,
-            );
+            ));
         } catch (ConflictingPaymentReferenceException $conflict) {
             // The module answered with a reference another line already carries: whether
             // the provider took the money this time cannot be told. The line stays pending,
@@ -293,6 +316,25 @@ final readonly class PaymentCaptureService
             ));
 
             throw $conflict;
+        } catch (PaymentJournalBusyException $busy) {
+            // The provider answered, but another worker held the journal past the wait.
+            // Reporting a failure would invite a second capture of money already taken:
+            // the line stays pending, says what the provider answered, and the provider's
+            // notification settles it.
+            Tlog::getInstance()->error(\sprintf(
+                'Payment module %s answered transaction #%d (%s, reference %s), but the journal was busy: %s',
+                $moduleCode,
+                (int) $transaction->getId(),
+                $result->state->value,
+                (string) $result->pspReference,
+                $busy->getMessage(),
+            ));
+
+            return $this->recorder->markOutcomeUnknown(
+                $transaction,
+                self::ERROR_CODE_JOURNAL_BUSY,
+                \sprintf('The provider answered %s under the reference %s while the journal was busy: the outcome is recorded once the provider confirms it.', $result->state->value, (string) ($result->pspReference ?? '-')),
+            );
         }
     }
 }

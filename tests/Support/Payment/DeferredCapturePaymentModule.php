@@ -42,12 +42,16 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     /** @var list<int> ids of the orders whose authorization was released */
     public static array $voidCalls = [];
 
+    /** What happens elsewhere while the provider is being called — another worker taking the journal. */
+    public static ?\Closure $whileCapturing = null;
+
     public static function reset(): void
     {
         self::$deferredCapture = true;
         self::$nextCaptureAnswer = null;
         self::$captureCalls = [];
         self::$voidCalls = [];
+        self::$whileCapturing = null;
     }
 
     public function pay(Order $order): ?Response
@@ -68,6 +72,10 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     public function capture(Order $order, float $amount, OrderPaymentTransaction $transaction): PaymentOperationResult
     {
         self::$captureCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId()];
+
+        if (null !== self::$whileCapturing) {
+            (self::$whileCapturing)();
+        }
 
         $answer = self::$nextCaptureAnswer;
         self::$nextCaptureAnswer = null;

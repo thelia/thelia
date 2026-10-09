@@ -27,7 +27,9 @@ use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
+use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
@@ -53,6 +55,12 @@ use Thelia\Model\OrderPaymentTransactionQuery;
  * holds with another outcome or another amount is refused: a new attempt carries a new
  * reference.
  *
+ * The event is raised once the journal is released, with the order read afresh: its
+ * listeners call payment modules and move the order, and must neither run with the
+ * journal locked nor decide on a status an earlier listener already changed. A listener
+ * that fails surfaces as a PaymentAnnouncementFailedException carrying the line, which
+ * stays written.
+ *
  * A failure here is not swallowed, unlike an order history entry: a payment whose trace
  * cannot be written is a payment the merchant cannot account for.
  *
@@ -69,12 +77,15 @@ final readonly class PaymentTransactionRecorder
 
     private const DUPLICATE_KEY_SQLSTATE = '23000';
 
+    private PaymentAnnouncementQueue $announcements;
+
     public function __construct(
         private OrderHistoryActorResolver $actorResolver,
         private PaymentTransactionTotalsReader $totalsReader,
         private EventDispatcherInterface $eventDispatcher,
         private PaymentJournalLock $journalLock,
     ) {
+        $this->announcements = new PaymentAnnouncementQueue();
     }
 
     /**
@@ -170,7 +181,7 @@ final readonly class PaymentTransactionRecorder
         ?string $errorCode = null,
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
-        return $this->journalLock->withOrder((int) $order->getId(), function () use ($order, $pspReference, $state, $authorization, $moduleCode, $errorCode, $errorMessage): OrderPaymentTransaction {
+        return $this->locked((int) $order->getId(), function () use ($order, $pspReference, $state, $authorization, $moduleCode, $errorCode, $errorMessage): OrderPaymentTransaction {
             $orderId = (int) $order->getId();
             $reference = $this->cleanReference($pspReference);
 
@@ -210,7 +221,7 @@ final readonly class PaymentTransactionRecorder
     ): ?OrderPaymentTransaction {
         $orderId = (int) $order->getId();
 
-        return $this->journalLock->withOrder($orderId, function () use ($order, $orderId, $amount, $pspReference, $moduleCode): ?OrderPaymentTransaction {
+        return $this->locked($orderId, function () use ($order, $orderId, $amount, $pspReference, $moduleCode): ?OrderPaymentTransaction {
             if (OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::AUTHORIZATION, PaymentTransactionType::CAPTURE])) {
                 return null;
             }
@@ -235,7 +246,7 @@ final readonly class PaymentTransactionRecorder
             throw new \InvalidArgumentException('A pending line is settled to succeeded or failed, not left pending.');
         }
 
-        return $this->journalLock->withOrder((int) $transaction->getOrderId(), function () use ($transaction, $state, $pspReference, $errorCode, $errorMessage, $moduleCode): OrderPaymentTransaction {
+        return $this->locked((int) $transaction->getOrderId(), function () use ($transaction, $state, $pspReference, $errorCode, $errorMessage, $moduleCode): OrderPaymentTransaction {
             $transaction->reload();
 
             if (!$transaction->isPending()) {
@@ -276,7 +287,7 @@ final readonly class PaymentTransactionRecorder
             return $transaction;
         }
 
-        return $this->journalLock->withOrder((int) $transaction->getOrderId(), function () use ($transaction, $pspReference): OrderPaymentTransaction {
+        return $this->locked((int) $transaction->getOrderId(), function () use ($transaction, $pspReference): OrderPaymentTransaction {
             $transaction->setPspReference($pspReference);
             $this->save($transaction);
 
@@ -317,7 +328,7 @@ final readonly class PaymentTransactionRecorder
      */
     public function withOrderLock(Order $order, callable $work): mixed
     {
-        return $this->journalLock->withOrder((int) $order->getId(), $work);
+        return $this->locked((int) $order->getId(), $work);
     }
 
     /**
@@ -343,7 +354,7 @@ final readonly class PaymentTransactionRecorder
             throw new \InvalidArgumentException(\sprintf('Payment transaction #%d belongs to another order than %s.', (int) $parent->getId(), (string) $order->getRef()));
         }
 
-        return $this->journalLock->withOrder($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard): OrderPaymentTransaction {
+        return $this->locked($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard): OrderPaymentTransaction {
             $existing = null !== $pspReference
                 ? OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference)
                 : $this->replayedReferenceLessLine($orderId, $type, $state, $amount);
@@ -417,7 +428,7 @@ final readonly class PaymentTransactionRecorder
             return $existing;
         }
 
-        throw new ConflictingPaymentReferenceException(\sprintf('Order %s: the %s %s is already recorded as %s of %s; a new attempt is reported with a new reference.', (string) $order->getRef(), (string) $existing->getType(), (string) ($existing->getPspReference() ?? '#'.$existing->getId()), (string) $existing->getState(), PaymentAmount::forMessage(PaymentAmount::forMessage((string) $existing->getAmount()))));
+        throw new ConflictingPaymentReferenceException(\sprintf('Order %s: the %s %s is already recorded as %s of %s; a new attempt is reported with a new reference.', (string) $order->getRef(), (string) $existing->getType(), (string) ($existing->getPspReference() ?? '#'.$existing->getId()), (string) $existing->getState(), PaymentAmount::forMessage((string) $existing->getAmount())));
     }
 
     /**
@@ -474,12 +485,72 @@ final readonly class PaymentTransactionRecorder
         return null;
     }
 
+    /**
+     * Runs $work under the lock of the order's journal, then announces the lines it wrote
+     * once the outermost lock of this recorder is released.
+     *
+     * @template T
+     *
+     * @param callable(): T $work
+     *
+     * @return T
+     */
+    private function locked(int $orderId, callable $work): mixed
+    {
+        $this->announcements->enter();
+
+        try {
+            $result = $this->journalLock->withOrder($orderId, $work);
+        } catch (\Throwable $failure) {
+            // Lines written before the failure stay written, and are announced all the same;
+            // the failure is what the caller has to see.
+            $this->announceAll($this->announcements->leave(), $failure);
+
+            throw $failure;
+        }
+
+        $this->announceAll($this->announcements->leave());
+
+        return $result;
+    }
+
     private function announce(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode): void
     {
-        $this->eventDispatcher->dispatch(
-            new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
-            TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
-        );
+        $this->announcements->push($order, $transaction, $moduleCode);
+    }
+
+    /**
+     * @param list<array{Order, OrderPaymentTransaction, ?string}> $lines
+     */
+    private function announceAll(array $lines, ?\Throwable $pendingFailure = null): void
+    {
+        $firstFailure = null;
+
+        foreach ($lines as [$order, $transaction, $moduleCode]) {
+            try {
+                // Read afresh: a listener of an earlier line, or another worker once the
+                // lock was released, may have moved it.
+                $order->reload();
+
+                $this->eventDispatcher->dispatch(
+                    new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
+                    TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
+                );
+            } catch (\Throwable $failure) {
+                Tlog::getInstance()->error(\sprintf(
+                    'Payment transaction #%d of order %s is recorded, but a listener of its announcement failed: %s',
+                    (int) $transaction->getId(),
+                    (string) $order->getRef(),
+                    $failure->getMessage(),
+                ));
+
+                $firstFailure ??= new PaymentAnnouncementFailedException($transaction, $failure);
+            }
+        }
+
+        if (null !== $firstFailure && null === $pendingFailure) {
+            throw $firstFailure;
+        }
     }
 
     /**
