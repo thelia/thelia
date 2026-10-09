@@ -19,6 +19,7 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ClosableArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\FolderFile;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
@@ -121,7 +122,9 @@ class ExportHandler
             $eventArchiver = $event->getArchiver();
 
             if ($eventArchiver instanceof ArchiverInterface) {
-                $eventArchiver->create($filePath);
+                // An archiver creates its file under the umask of the process, when it is
+                // created (a tar) or saved (a zip): private from its first byte, as the export.
+                FolderFile::writingPrivately(static fn () => $eventArchiver->create($filePath));
                 $written[] = $eventArchiver->getArchivePath();
                 $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
             }
@@ -294,7 +297,7 @@ class ExportHandler
         }
 
         // A zip is written when it is saved, and says it failed only by what save() returns.
-        if (!$archiver->add($filePath)->save()) {
+        if (!FolderFile::writingPrivately(static fn (): bool => $archiver->add($filePath)->save())) {
             throw new \RuntimeException(\sprintf('The archive %s of the export was not written.', basename($archiver->getArchivePath())));
         }
 
@@ -303,7 +306,7 @@ class ExportHandler
             $archiver->close();
         }
 
-        // Written by the archiver under the umask of the process: as private as the export.
+        // The belt, as the umask is the process's: as private as the export.
         ExportStorage::makePrivate($archiver->getArchivePath());
         $event->setFilePath($archiver->getArchivePath());
 

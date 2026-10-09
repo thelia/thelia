@@ -171,6 +171,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '10 minutes',
             ],
+            // A lost password request mails the administrator it names a link that sets
+            // a new password: whoever knows a login must not be able to flood that
+            // administrator's mailbox from as many addresses as they like. Five an hour
+            // leaves room for a mail that took time to arrive.
+            'admin_lost_password' => [
+                'policy' => 'sliding_window',
+                'limit' => 5,
+                'interval' => '1 hour',
+            ],
             // An export reads, an import rewrites, the whole catalog in one job, and a
             // queue runs them one after the other: a form sent over and over would
             // hold the heavy queue for hours. Per administrator, ten in ten minutes is
