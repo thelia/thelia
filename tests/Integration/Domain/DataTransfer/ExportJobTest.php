@@ -566,6 +566,43 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
     }
 
+    /**
+     * A zip is written when it is closed, and says so only by what save() returns: an
+     * archive that was not written is a failed export, not a done one without its file.
+     */
+    public function testAnArchiveTheArchiverDidNotWriteFailsTheExport(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $archiver = $this->archiverKeepingNothing();
+        $archiver->saysItDidNotSave = true;
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
+            self::fail('An archive that was not written fails the export.');
+        } catch (\RuntimeException) {
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * Once archived, the export holds customer data twice: only the archive is kept.
+     */
+    public function testAnArchivedExportKeepsOnlyItsArchive(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+
+        $event = $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $this->archiverKeepingNothing(), Lang::getDefaultLanguage());
+        $left = glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [];
+        (new Filesystem())->remove($left);
+
+        self::assertSame([$event->getFilePath()], $left);
+    }
+
     public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
     {
         $export = $this->ordersExport();
@@ -610,6 +647,33 @@ final class ExportJobTest extends IntegrationTestCase
         $archiver->create(THELIA_CACHE_DIR.'export-test-other-'.uniqid());
         $archiver->close();
         array_map('unlink', [$image, ...(glob(THELIA_CACHE_DIR.'export-test-other-*') ?: [])]);
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * The last count of the rows is told once the file is written: a caller that fails
+     * then (its row cannot be saved) leaves no file behind either.
+     */
+    public function testAnExportWhoseLastProgressFailsLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+
+        try {
+            $this->getService(ExportHandler::class)->export(
+                $export,
+                $this->getService(SerializerManager::class)->get(self::SERIALIZER),
+                null,
+                Lang::getDefaultLanguage(),
+                onProgress: static function (): void {
+                    throw new \RuntimeException('The row of the job cannot be saved.');
+                },
+            );
+            self::fail('The progress cannot be recorded.');
+        } catch (\RuntimeException) {
+        }
 
         self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
     }
@@ -795,12 +859,14 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * @return ArchiverInterface&object{refusesToSave: bool, onAdd: ?\Closure}
+     * @return ArchiverInterface&object{refusesToSave: bool, saysItDidNotSave: bool, onAdd: ?\Closure}
      */
     private function archiverKeepingNothing(): ArchiverInterface
     {
         return new class implements ArchiverInterface {
             public bool $refusesToSave = false;
+
+            public bool $saysItDidNotSave = false;
 
             /** @var (\Closure(): void)|null told of every file added */
             public ?\Closure $onAdd = null;
@@ -871,7 +937,7 @@ final class ExportJobTest extends IntegrationTestCase
                     throw new \RuntimeException('The archive cannot be written.');
                 }
 
-                return true;
+                return !$this->saysItDidNotSave;
             }
 
             public function extract(string $toPath): void

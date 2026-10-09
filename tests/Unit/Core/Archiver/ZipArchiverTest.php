@@ -40,12 +40,33 @@ final class ZipArchiverTest extends TestCase
         try {
             $archiver = (new ZipArchiver())->create($base);
             $archiver->add($added);
+            $archivePath = $archiver->getArchivePath();
             $archiver->discard();
+            // A zip still open is written when it is let go: gone, it must write nothing.
+            unset($archiver);
 
-            self::assertFileDoesNotExist($archiver->getArchivePath());
+            self::assertFileDoesNotExist($archivePath);
         } finally {
             @unlink($added);
             @unlink($base.'.zip');
+        }
+    }
+
+    /**
+     * A file that is not a zip is refused when it is opened, not later, by an extraction
+     * that finds nothing to extract.
+     */
+    public function testAFileThatIsNotAZipIsRefusedWhenOpened(): void
+    {
+        $path = sys_get_temp_dir().'/thelia_zip_archiver_'.uniqid().'.zip';
+        file_put_contents($path, 'not a zip');
+
+        try {
+            $this->expectException(\RuntimeException::class);
+
+            (new ZipArchiver())->open($path);
+        } finally {
+            @unlink($path);
         }
     }
 }
