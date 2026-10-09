@@ -346,6 +346,25 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
     }
 
+    public function testAnAuthorizationThatExpiredReleasesWhatItStillHeld(): void
+    {
+        // The provider let the authorization lapse before the rest was captured.
+        $order = $this->order(120);
+        $authorization = $this->recorder->recordAuthorization($order, 120, 'AUTH-EXP', moduleCode: 'Cheque');
+        $this->recorder->recordCapture($order, 50, 'CAP-EXP', authorization: $authorization, moduleCode: 'Cheque');
+
+        $expiry = $this->recorder->recordExpiry($order, moduleCode: 'Cheque');
+        $replayed = $this->recorder->recordExpiry($order, moduleCode: 'Cheque');
+
+        self::assertSame(PaymentTransactionType::VOID->value, $expiry->getType());
+        self::assertSame('70.000000', $expiry->getAmount());
+        self::assertSame(PaymentTransactionRecorder::REASON_EXPIRED, $expiry->getErrorCode());
+        self::assertSame('AUTH-EXP', $expiry->getPspReference(), 'Without a reference of its own, the expiry carries the authorization\'s.');
+        self::assertSame($expiry->getId(), $replayed->getId());
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode(), 'What was captured is kept.');
+    }
+
     public function testAnAuthorizationPutsAnUnpaidOrderOnHoldForCapture(): void
     {
         $order = $this->order(120);
