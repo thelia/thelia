@@ -151,14 +151,8 @@ final class ExportStorage
     public static function discard(string $path): void
     {
         // The path itself: a link of the folder to another export goes alone.
-        $file = FolderFile::removable(self::directory(), $path);
-
-        if (null === $file) {
-            return;
-        }
-
         try {
-            (new Filesystem())->remove($file);
+            FolderFile::remove(self::directory(), $path);
         } catch (IOExceptionInterface $notRemoved) {
             Tlog::getInstance()->addWarning(\sprintf('An export file was not removed: %s', JobFailureMessage::forLog($notRemoved)));
         }
