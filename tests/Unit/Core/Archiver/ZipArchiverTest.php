@@ -48,4 +48,22 @@ final class ZipArchiverTest extends TestCase
             @unlink($base.'.zip');
         }
     }
+
+    /**
+     * A file that is not a zip is refused when it is opened, not later, by an extraction
+     * that finds nothing to extract.
+     */
+    public function testAFileThatIsNotAZipIsRefusedWhenOpened(): void
+    {
+        $path = sys_get_temp_dir().'/thelia_zip_archiver_'.uniqid().'.zip';
+        file_put_contents($path, 'not a zip');
+
+        try {
+            $this->expectException(\RuntimeException::class);
+
+            (new ZipArchiver())->open($path);
+        } finally {
+            @unlink($path);
+        }
+    }
 }
