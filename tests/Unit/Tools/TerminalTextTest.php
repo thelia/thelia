@@ -66,14 +66,15 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * A run of thousands of blanks (a value libxml cites from a descriptor) is read once:
-     * the regular expression never backtracks over it, with or without the PCRE JIT.
+     * A run of thousands of blanks (a value libxml cites from a descriptor) is read once,
+     * with or without the PCRE JIT: a pattern that looked for a line break after the blanks
+     * was tried again from each blank of the run, and took 17 seconds on fifty thousand.
      */
     #[RunInSeparateProcess]
     public function testALongRunOfBlanksIsReadOnce(): void
     {
         // In a process of its own: PCRE keeps a pattern compiled once, with the JIT it had.
-        // A run read again from each of its positions takes tens of seconds on this one.
+        // A pattern tried again from each blank of the run takes minutes on this one.
         $text = 'a'.str_repeat(' ', 200000).'b'.str_repeat("\t", 100000).'c'.str_repeat("\n ", 50000).'d';
         $jit = \ini_get('pcre.jit');
         ini_set('pcre.jit', '0');
@@ -91,8 +92,9 @@ final class TerminalTextTest extends TestCase
 
     /**
      * The bounds of every range replaced are replaced, and their neighbours kept, unless the
-     * neighbour is itself a control, format or private use character: a range narrowed by
-     * one code point is seen.
+     * neighbour is itself in a range, or a control, format or private use character: a range
+     * narrowed by one code point is seen, but for the ranges of the second step that the
+     * third step covers too (the format characters among them), which stand as a backstop.
      */
     #[DataProvider('ranges')]
     public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
@@ -108,6 +110,20 @@ final class TerminalTextTest extends TestCase
 
             self::assertSame('a'.mb_chr($neighbour).'b', TerminalText::withoutControlCharacters('a'.mb_chr($neighbour).'b'), \sprintf('U+%04X', $neighbour));
         }
+    }
+
+    /**
+     * The blanks are those of Unicode, not of ASCII alone: an ideographic space or a
+     * no-break space next to a line break goes with it, and stays on its own.
+     */
+    public function testABlankOfUnicodeAroundALineBreakGoesWithIt(): void
+    {
+        self::assertSame('a b', TerminalText::onOneLine("a\u{3000}\n\u{A0}b"));
+        self::assertSame("a\u{3000}b", TerminalText::onOneLine("a\u{3000}b"));
+        self::assertSame("a\u{A0}\u{A0}b", TerminalText::onOneLine("a\u{A0}\u{A0}b"));
+        // At either end, only the ASCII blanks go; a blank of Unicode next to a line break goes with it.
+        self::assertSame("\u{A0}a\u{3000}", TerminalText::onOneLine(" \u{A0}a\u{3000} "));
+        self::assertSame('a', TerminalText::onOneLine(" \n\u{A0}a\u{3000} \n"));
     }
 
     /** @return iterable<string, array{int, int}> */
@@ -152,17 +168,6 @@ final class TerminalTextTest extends TestCase
         return 1 === preg_match('/[\p{Cc}\p{Cf}\p{Co}]/u', mb_chr($codePoint));
     }
 
-    /**
-     * The blanks are those of Unicode, not of ASCII alone: an ideographic space or a
-     * no-break space next to a line break goes with it, and stays on its own.
-     */
-    public function testABlankOfUnicodeAroundALineBreakGoesWithIt(): void
-    {
-        self::assertSame('a b', TerminalText::onOneLine("a\u{3000}\n\u{A0}b"));
-        self::assertSame("a\u{3000}b", TerminalText::onOneLine("a\u{3000}b"));
-        self::assertSame("a\u{A0}\u{A0}b", TerminalText::onOneLine("a\u{A0}\u{A0}b"));
-    }
-
     /** @return iterable<string, array{string, string}> */
     public static function texts(): iterable
     {
@@ -179,6 +184,13 @@ final class TerminalTextTest extends TestCase
         yield 'a noncharacter of the last plane' => ["Acme\u{10FFFF}", 'Acme?'];
         yield 'a noncharacter of the Arabic presentation block' => ["Acme\u{FDD0}", 'Acme?'];
         yield 'an unassigned code point of the tags plane' => ["Acme\u{E0200}", 'Acme?'];
+        yield 'a format character of the Syriac block' => ["Acme\u{70F}", 'Acme?'];
+        yield 'a format character of a supplementary plane' => ["Acme\u{110BD}", 'Acme?'];
+        yield 'a private use character of plane 15' => ["Acme\u{F0000}", 'Acme?'];
+        yield 'a private use character of plane 16' => ["Acme\u{10FFFD}", 'Acme?'];
+        yield 'a sequence beyond U+10FFFF' => ["Acme\xF4\x90\x80\x80", 'Acme????'];
+        yield 'an overlong sequence' => ["Acme\xC0\x80", 'Acme??'];
+        yield 'an overlong three-byte sequence' => ["Acme\xE0\x80\x80", 'Acme???'];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
         yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
         yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];

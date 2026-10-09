@@ -42,7 +42,9 @@ final class TerminalText
      *    U+FE0F, U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the
      *    blank fillers (U+115F, U+1160, U+2800, U+3164, U+FFA0), the tag block (U+E0000 to
      *    U+E00FF), the Khmer inherent vowels (U+17B4, U+17B5) and the shorthand format
-     *    controls (U+1BCA0 to U+1BCA3).
+     *    controls (U+1BCA0 to U+1BCA3). Many of them are format characters (Cf) that the
+     *    third step would replace too: this step stands on its own, without the Unicode
+     *    tables of PCRE.
      * 3. On what is then valid UTF-8, in Unicode mode: every other format character
      *    (category Cf, the Arabic number signs among them), every private use character
      *    (Co), the object replacement character (U+FFFC), the noncharacters of every plane
@@ -78,18 +80,21 @@ final class TerminalText
      * A message on one line: each line break (a carriage return is one), and the blanks
      * around it (any blank of Unicode), becomes a space, so that a text spread over lines
      * (the errors of a schema, one per line) cannot start a line of its own that reads like
-     * the output of the command. The blanks without a line break are kept as they are, a tab
-     * becomes "?", what withoutControlCharacters() replaces is replaced the same way, and
-     * the blanks at either end are dropped. "a  \n b\tc" gives "a b?c".
+     * the output of the command. The blanks without a line break are kept as they are (a
+     * no-break space at either end among them), a tab becomes "?", what
+     * withoutControlCharacters() replaces is replaced the same way, and the ASCII blanks at
+     * either end are dropped. "a  \n b\tc" gives "a b?c".
      */
     public static function onOneLine(string $text): string
     {
         // Cleaned first: what follows runs on valid UTF-8, in Unicode mode, so that the
         // tables of the locale never take the second byte of "à" (0xA0) for a blank. Every
-        // run of blanks is then read once, as a whole (possessive, from its first blank on:
-        // no run is read again from each of its positions, which took seconds on a run of
-        // thousands without the PCRE JIT): one that holds a line break becomes a space, the
-        // others stay. A carriage return is a line break too.
+        // run of blanks is then matched as a whole, from its first blank, and told apart in
+        // the callback: one that holds a line break becomes a space, the others stay. That
+        // is what keeps the time linear: a pattern that had to find a line break after the
+        // blanks (such as "\s*[\r\n]+") was tried again from each blank of a run, and a
+        // run of fifty thousand blanks took seconds without the PCRE JIT. A carriage return
+        // is a line break too.
         $cleaned = self::withoutControlCharacters(str_replace("\r", "\n", $text));
         $onOneLine = preg_replace_callback(
             '/\s++/u',
