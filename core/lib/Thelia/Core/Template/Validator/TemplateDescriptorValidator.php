@@ -57,7 +57,7 @@ class TemplateDescriptorValidator
         $errors = XmlDescriptor::loadingErrors($dom, $this->xmlDescriptorPath);
 
         if ([] === $errors) {
-            ['version' => $found, 'errors' => $errors] = XmlDescriptor::versionOf($dom, $this->xsdFinder, self::$versions, $version, $this->schemaValidate(...));
+            ['version' => $found, 'errors' => $errors] = XmlDescriptor::matchingSchemaVersion($dom, $this->xsdFinder, self::$versions, $version, $this->schemaValidate(...));
 
             if (null !== $found) {
                 return $this;
@@ -65,7 +65,7 @@ class TemplateDescriptorValidator
         }
 
         // A file of the theme, read by its developer: named by its path.
-        throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
+        throw new InvalidDescriptorException(XmlDescriptor::printable(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors))));
     }
 
     /**
@@ -84,9 +84,6 @@ class TemplateDescriptorValidator
         );
     }
 
-    /**
-     * @return object|null
-     */
     public function getDescriptor(): \SimpleXMLElement|false|null
     {
         if (file_exists($this->xmlDescriptorPath)) {

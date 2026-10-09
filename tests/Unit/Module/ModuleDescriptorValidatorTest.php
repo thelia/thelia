@@ -153,14 +153,14 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', '', "a\0b"] as $notReadable) {
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', '', "a\0b", "dir\0x/Config/module.xml"] as $notReadable) {
             try {
                 (new ModuleDescriptorValidator())->validate($notReadable);
                 self::fail('The descriptor is refused.');
             } catch (InvalidXmlDocumentException $refusal) {
                 self::assertStringEndsWith(' is not a valid file: it is not a readable file', $refusal->getMessage());
                 self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
-                self::assertSame(0, preg_match('/[\x00-\x1F\x7F]|The  is/', $refusal->getMessage()));
+                self::assertSame(0, preg_match('/[\x00-\x1F\x7F]|The {2,}is/', $refusal->getMessage()));
             }
         }
     }
@@ -195,9 +195,13 @@ final class ModuleDescriptorValidatorTest extends TestCase
         $resolved = $this->workDir.'/Sample/Config/module.xml';
 
         self::assertSame('failed to load external entity "module.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given));
-        self::assertSame('I/O warning : failed to load "y.dtd"', $this->withoutPath('I/O warning : failed to load "http://h/x/y.dtd"', $given));
+        self::assertSame('I/O warning : failed to load "y.dtd"', $this->withoutPath('I/O warning : failed to load "/h/x/y.dtd"', $given));
         self::assertSame('AttValue: " or \' expected', $this->withoutPath('AttValue: " or \' expected', $given));
         self::assertSame('failed to load external entity "a$1b.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s/a$1b.xml"', $this->workDir), $this->workDir.'/a$1b.xml'));
+        // A value quoted is not a path of the server; another file named is not the descriptor.
+        self::assertSame("Entity 'a/b' not defined", $this->withoutPath("Entity 'a/b' not defined", $given));
+        self::assertSame("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $this->withoutPath("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $given));
+        self::assertSame('failed to load external entity "evil.dtd"', $this->withoutPath('failed to load external entity "/srv/x/evil.dtd"', $given));
     }
 
     /**
@@ -284,6 +288,21 @@ final class ModuleDescriptorValidatorTest extends TestCase
             self::fail('The descriptor is refused.');
         } catch (InvalidXmlDocumentException $refusal) {
             self::assertStringContainsString("not an element of the set {'0', '1'}", $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A value of the descriptor quoted by the schema is shown without what would make a
+     * log or a page obey it.
+     */
+    public function testARefusalQuotesAValueOfTheDescriptorPrintably(): void
+    {
+        try {
+            (new ModuleDescriptorValidator())->validate($this->writeDescriptor("<enabled-by-default>a\nb\u{202E}c</enabled-by-default>"));
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString("'a b c'", $refusal->getMessage());
+            self::assertSame(0, preg_match('/[\x00-\x1F\x7F\x{202E}]/u', $refusal->getMessage()));
         }
     }
 

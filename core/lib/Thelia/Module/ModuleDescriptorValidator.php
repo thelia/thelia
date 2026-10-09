@@ -55,7 +55,7 @@ class ModuleDescriptorValidator
         if ([] !== $notLoaded) {
             $reason = implode(', ', array_map(static fn (string $said): string => self::withoutPath($said, (string) $xml_file), $notLoaded));
         } else {
-            ['version' => $this->moduleVersion, 'errors' => $errors] = XmlDescriptor::versionOf($dom, $this->xsdFinder, self::$versions, null === $version ? null : (string) $version, $this->schemaValidate(...));
+            ['version' => $this->moduleVersion, 'errors' => $errors] = XmlDescriptor::matchingSchemaVersion($dom, $this->xsdFinder, self::$versions, null === $version ? null : (string) $version, $this->schemaValidate(...));
 
             if (null !== $this->moduleVersion) {
                 return true;
@@ -65,8 +65,9 @@ class ModuleDescriptorValidator
         }
 
         // Shown to the administrator who uploads the module: the module it is about, never
-        // where the server unpacked it.
-        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), $reason));
+        // where the server unpacked it, and nothing a value of the descriptor would make a
+        // log or a page obey.
+        throw new InvalidXmlDocumentException(XmlDescriptor::printable(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), $reason)));
     }
 
     /**
@@ -75,9 +76,7 @@ class ModuleDescriptorValidator
      */
     private static function describe(string $xmlFile): string
     {
-        // A name is printed: never a control character a path may carry.
-        $xmlFile = (string) preg_replace('/[\x00-\x1F\x7F]/', '', $xmlFile);
-        $file = basename($xmlFile);
+        $file = trim(basename($xmlFile));
 
         if ('' === $file) {
             return 'descriptor';
@@ -94,10 +93,11 @@ class ModuleDescriptorValidator
 
     /**
      * A message of libxml about the file, without a path of the server. libxml quotes the
-     * path of a file it could not open, in full, resolved and normalised: whatever it
-     * quoted there becomes the name of the file (the whole of it, as the path may hold a
-     * quote). Then the path as given and as resolved, wherever they stand, and last any
-     * other path quoted.
+     * path of a file it could not open, in full, resolved and normalised: when it is the
+     * descriptor, whatever was quoted becomes the name of the file (the whole of it, as
+     * the path may hold a quote). Then the path as given and as resolved, wherever they
+     * stand, and last any other absolute path quoted; a value quoted (an entity, a
+     * namespace) is left as it is.
      */
     private static function withoutPath(string $message, string $xmlFile): string
     {
@@ -108,10 +108,14 @@ class ModuleDescriptorValidator
         }
 
         // The name is given back as it is: never read for the references of a replacement.
-        $message = (string) preg_replace_callback('#(failed to load external entity )".*"#s', static fn (array $found): string => $found[1].'"'.$file.'"', $message);
+        $message = (string) preg_replace_callback(
+            '#(failed to load external entity )"(.*)"#s',
+            static fn (array $found): string => basename(rawurldecode($found[2])) === $file ? $found[1].'"'.$file.'"' : $found[0],
+            $message,
+        );
         $message = strtr($message, self::namesOf($xmlFile));
 
-        return (string) preg_replace('#(["\'])[^"\']*/([^"\'/]+)\1#', '$1$2$1', $message);
+        return (string) preg_replace('#(["\'])/[^"\']*/([^"\'/]+)\1#', '$1$2$1', $message);
     }
 
     /**
@@ -123,7 +127,8 @@ class ModuleDescriptorValidator
      */
     private static function namesOf(string $path): array
     {
-        if ('' === $path) {
+        // A path with a NUL byte is no path: the file system refuses to resolve it.
+        if ('' === $path || str_contains($path, "\0")) {
             return [];
         }
 
