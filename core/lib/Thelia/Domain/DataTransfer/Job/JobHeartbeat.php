@@ -33,13 +33,8 @@ final readonly class JobHeartbeat
     ) {
     }
 
-    /**
-     * @param 'export_job'|'import_job' $table
-     */
-    public function beat(string $table, int $jobId): void
+    public function beat(JobTable $table, int $jobId): void
     {
-        JobTables::assert($table);
-
         $connection = $this->connection->get();
 
         // Best effort: a beat waits a second at most for a row someone else holds (a
@@ -48,11 +43,11 @@ final readonly class JobHeartbeat
         try {
             $connection->executeStatement('SET SESSION innodb_lock_wait_timeout = 1');
             $connection->executeStatement(
-                'UPDATE `'.$table.'` SET `updated_at` = ? WHERE `id` = ?',
+                'UPDATE `'.$table->value.'` SET `updated_at` = ? WHERE `id` = ?',
                 [(new \DateTimeImmutable())->format('Y-m-d H:i:s'), $jobId],
             );
         } catch (\Throwable $exception) {
-            Tlog::getInstance()->addDebug(\sprintf('No sign of life written for %s %d: %s', $table, $jobId, JobFailureMessage::forLog($exception)));
+            Tlog::getInstance()->addDebug(\sprintf('No sign of life written for %s: %s', $table->describe($jobId), JobFailureMessage::forLog($exception)));
         } finally {
             try {
                 $connection->executeStatement('SET SESSION innodb_lock_wait_timeout = DEFAULT');

@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Job\JobHeartbeat;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
+use Thelia\Domain\DataTransfer\Job\JobTable;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\ImportJob;
 use Thelia\Model\ImportQuery;
@@ -60,7 +61,7 @@ final class JobHeartbeatTest extends IntegrationTestCase
         $connection->beginTransaction();
 
         try {
-            $this->getService(JobHeartbeat::class)->beat(ImportJobTableMap::TABLE_NAME, (int) $this->job->getId());
+            $this->getService(JobHeartbeat::class)->beat(JobTable::Import, (int) $this->job->getId());
 
             $seenByAnotherWorker = $this->getService(ShopDatabaseConnection::class)->get()
                 ->fetchOne('SELECT updated_at FROM import_job WHERE id = ?', [$this->job->getId()]);
@@ -69,15 +70,5 @@ final class JobHeartbeatTest extends IntegrationTestCase
         }
 
         self::assertGreaterThan(new \DateTimeImmutable('-1 minute'), new \DateTimeImmutable((string) $seenByAnotherWorker));
-    }
-
-    /**
-     * The table is written into the SQL: only the tables of the jobs are ever named.
-     */
-    public function testABeatNamesOnlyAJobTable(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->getService(JobHeartbeat::class)->beat('customer', 1);
     }
 }

@@ -122,6 +122,11 @@ abstract class JsonFileAbstractExport extends AbstractExport
             throw new DataTransferNoDataFoundException(Translator::getInstance()->trans('No data found for your export.'));
         }
 
+        // Written again: the rows file before is never read, and goes.
+        if (null !== $this->rowsFile) {
+            ExportStorage::discard($this->rowsFile);
+        }
+
         $filename = ExportStorage::rowsFile($exportName);
         $this->rowsFile = $filename;
 

@@ -22,9 +22,9 @@ interface DataTransferJobMessage
     public function jobId(): int;
 
     /**
-     * @return 'export_job'|'import_job' the table of the job's row
+     * The table of the job's row.
      */
-    public function jobTable(): string;
+    public function jobTable(): JobTable;
 
     /**
      * The job as the failed jobs screen names it: "Export #4", "Import #12".

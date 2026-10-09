@@ -54,6 +54,12 @@ use Thelia\Tools\URL;
  */
 final class WorkerStateResetListenerTest extends IntegrationTestCase
 {
+    /** Core listeners of the start of a command that hold no state a job starts afresh from. */
+    private const NOT_A_RESET = [
+        // Counts the commands running, so that one a worker runs never clears the cache under it.
+        Cache::class,
+    ];
+
     /**
      * What the core forgets when a command starts is what a worker forgets before
      * each job. A core listener added to ConsoleEvents::COMMAND without its
@@ -67,9 +73,7 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
         foreach ($dispatcher->getListeners(ConsoleEvents::COMMAND) as $listener) {
             $class = \is_array($listener) && \is_object($listener[0]) ? $listener[0]::class : null;
 
-            // The cache action counts the commands running, so that one a worker runs
-            // never clears the cache under it: no state a job starts afresh from.
-            if (null !== $class && str_starts_with($class, 'Thelia\\') && Cache::class !== $class) {
+            if (null !== $class && str_starts_with($class, 'Thelia\\') && !\in_array($class, self::NOT_A_RESET, true)) {
                 $coreListeners[] = $class;
             }
         }
