@@ -67,7 +67,7 @@ knows what it has to check:
 - `recordAuthorization()` needs a positive amount **and the provider
   reference** (`MissingProviderReferenceException`): without it a replayed
   notification cannot be told from a second authorization.
-- `recordCapture()` and `recordRefund()` need the provider reference for an
+- `recordCapture()`, `recordRefund()` and `recordVoid()` need the provider reference for an
   outcome, succeeded or failed (`MissingProviderReferenceException`): without
   it a replayed notification cannot be told from a second movement of the same
   amount. Only a pending line, written by the core before the provider is
@@ -89,6 +89,12 @@ knows what it has to check:
   not known. These are the only changes a line ever receives. A line already
   settled the same way, under the same reference, is answered as it is: the
   module's answer and the provider's notification may both bring the outcome.
+  A succeeded outcome needs the provider reference, given or already carried
+  (`MissingProviderReferenceException`); a reference the line carries is never
+  replaced. Each of these reads the line afresh under the lock, and
+  `markOutcomeUnknown()` only ever annotates a line still pending: a stale object,
+  or one whose save failed — which Propel would then silently ignore — is never
+  written through. A reference holds at most 100 characters.
 
 **Pending lines reserve.** `PaymentTransactionTotalsReader` adds up the
 succeeded lines and, apart, the pending ones. A pending capture is not reported
@@ -121,7 +127,9 @@ reference.
 Every write, settlement and replay raises `ORDER_PAYMENT_TRANSACTION_RECORDED`
 with an `OrderPaymentTransactionEvent` carrying the order and the line. Its
 listeners must stand being called twice for the same line. The event is raised
-once the outermost lock of the journal is released, with the order read afresh:
+once the outermost lock of the journal is released, with the order read afresh
+in an object of its own — the caller's object, and what it has not saved yet, are
+left alone:
 its listeners call payment modules and move the order. A listener that fails
 surfaces as `PaymentAnnouncementFailedException`, which carries the line — still
 written — and is not a `PaymentException`: a notification ending on it is
@@ -150,7 +158,9 @@ authorization or a capture, succeeded or pending, whatever wrote them: an open
 authorization is not taken by marking the order paid, and a module that writes
 its own captures keeps a single line. A failure here is logged and the status
 change goes on: the status is committed, and a notification answered with an
-error would be retried on an order already paid.
+error would be retried on an order already paid. Such an order keeps no capture
+line — a replayed notification finds it already paid — and the log is where
+the merchant learns it.
 
 ## Deferred capture
 
@@ -185,7 +195,9 @@ published module implements would break them all.
 - Once the provider has answered, nothing that follows reports the movement as
   failed: a listener of the journal that breaks is logged, and a journal another
   worker holds past the wait leaves the line pending, annotated `journal_busy`
-  with the provider's answer, for the notification to settle.
+  with the provider's answer, for the notification to settle. A module that
+  answers succeeded without the provider reference leaves it pending as well,
+  annotated `missing_reference`.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
 is what the back office and the admin API call, through the
@@ -231,7 +243,13 @@ history see each move like any other:
 - a capture on an order with no authorization moves nothing: that module says
   "paid" itself.
 
-The journal is the truth and the status follows it. A move the transition graph
+The journal is the truth and the status follows it. Each move is dispatched with
+the status it was decided on (`OrderEvent::expectStatus()`): `Action\Order`
+reads the status under a row lock before writing, and drops — stopping the
+event — a move whose status another worker has changed since, so two
+notifications never pay the order twice nor put a cancelled order back on hold.
+Every status change is now decided on the status read under that lock, not on
+the object the caller loaded. A move the transition graph
 refuses is logged and not made, and a status listener that fails is logged: the
 line stays written and the provider's notification is answered.
 
@@ -260,7 +278,8 @@ and leaves an authorized order unpaid when it is gone.
 The checkout does not read `isPaid()` for this: `Order::isPaymentSecured()`
 answers true for an order paid, refunded, on hold for capture, or whose journal
 still holds an authorized or pending amount, an authorization awaiting its
-answer included; never for a cancelled order. The failed-payment cancellation of
+answer included, or money taken and not given back whatever the status says;
+never for a cancelled order. The failed-payment cancellation of
 the checkout refuses a secured order. `OrderFacade::findUnpaidOrderOf()`
 and the session's paid-cart check read it, so an authorized order is neither
 presented to its module again nor cancelled for a new one — which would reserve
@@ -339,8 +358,10 @@ the capture right, a form to record the outcome read in the provider's back
 office, with its reference: `OrderController::settlePaymentTransaction()`
 answers `POST /admin/order/update/{order_id}/payment-transaction/{id}/settle`
 through the `ORDER_PAYMENT_TRANSACTION_SETTLE` event
-(`OrderPaymentSettlementEvent`); the line is annotated `settled_by_hand` and the
-administration log names who did it. Amounts are read and typed in the decimals
+(`OrderPaymentSettlementEvent`); the line is annotated `settled_by_hand`, its note
+names the administrator, and the administration log keeps the same. A bulk
+cancellation that meets an order still holding an authorization, without the
+capture right, leaves it and says why. Amounts are read and typed in the decimals
 of the order currency.
 
 `OrderController::capturePayment()` answers `POST
@@ -352,7 +373,8 @@ the order, the amount and the outcome. A double submit is refused by the
 capture service as a repetition; a refusal from the core comes back as the
 usual error flash. Only the payment rules word what the administrator reads: any
 other failure — a module listening to the capture, say — is shown as an internal
-error, its message going to the log.
+error, its message going to the log. A trusted failure is shown as worded even
+when it wraps a technical one.
 
 ## Installation and update
 
