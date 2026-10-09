@@ -16,6 +16,7 @@ namespace Thelia\Tests\Support\Payment;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Enum\RefundReason;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
@@ -23,6 +24,7 @@ use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\PaymentModuleCancellingOnReleaseInterface;
 use Thelia\Module\PaymentModuleCapturingOnceInterface;
 use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
+use Thelia\Module\PaymentModuleWithRefundInterface;
 
 /**
  * A payment module that reserves the amount first and takes it later, the way a
@@ -32,7 +34,7 @@ use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
  * Registered under a `module` row by the tests that need it; the core instantiates it
  * from that row's namespace, so it needs no container.
  */
-final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleCapturingOnceInterface, PaymentModuleManagingOrderStatusInterface, PaymentModuleCancellingOnReleaseInterface
+final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleCapturingOnceInterface, PaymentModuleManagingOrderStatusInterface, PaymentModuleCancellingOnReleaseInterface, PaymentModuleWithRefundInterface
 {
     public static bool $deferredCapture = true;
 
@@ -54,6 +56,14 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     /** @var list<int> ids of the orders whose authorization was released */
     public static array $voidCalls = [];
 
+    public static bool $refunds = true;
+
+    /** @var PaymentOperationResult|\Throwable|null what the next refund answers, or throws */
+    public static PaymentOperationResult|\Throwable|null $nextRefundAnswer = null;
+
+    /** @var list<array{order: int, amount: float, transaction: int, reason: string, comment: ?string}> */
+    public static array $refundCalls = [];
+
     /** What happens elsewhere while the provider is being called — another worker taking the journal. */
     public static ?\Closure $whileCapturing = null;
 
@@ -71,6 +81,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$managesOrderStatus = false;
         self::$capturesOnce = false;
         self::$cancelsOrderOnRelease = false;
+        self::$refunds = true;
+        self::$nextRefundAnswer = null;
+        self::$refundCalls = [];
     }
 
     public function pay(Order $order): ?Response
@@ -150,5 +163,24 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$scopes[] = ['call' => 'voidAuthorization', 'saleUnit' => SaleUnitConfigScope::current()];
 
         return PaymentOperationResult::succeeded('VOID-'.$transaction->getId());
+    }
+
+    public function supportsRefund(): bool
+    {
+        return self::$refunds;
+    }
+
+    public function refund(Order $order, float $amount, OrderPaymentTransaction $transaction, RefundReason $reason, ?string $comment): PaymentOperationResult
+    {
+        self::$refundCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId(), 'reason' => $reason->value, 'comment' => $comment];
+
+        $answer = self::$nextRefundAnswer;
+        self::$nextRefundAnswer = null;
+
+        if ($answer instanceof \Throwable) {
+            throw $answer;
+        }
+
+        return $answer ?? PaymentOperationResult::succeeded('REF-'.$transaction->getId());
     }
 }
