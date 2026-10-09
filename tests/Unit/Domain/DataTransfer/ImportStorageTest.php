@@ -49,9 +49,9 @@ final class ImportStorageTest extends TestCase
     }
 
     /**
-     * A link of the storage goes, never the file it points to.
+     * A link of the storage to a file elsewhere never gets that file removed.
      */
-    public function testALinkOfTheStorageGoesAndItsTargetStays(): void
+    public function testALinkOfTheStorageToAFileElsewhereLeavesThatFileAlone(): void
     {
         $target = $this->project.'/elsewhere.csv';
         file_put_contents($target, 'ref;stock');
