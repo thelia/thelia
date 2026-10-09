@@ -67,6 +67,8 @@ final class UnpaidOrderPaymentLinkTest extends GuestCheckoutTestCase
         $location = (string) $this->client->getResponse()->headers->get('Location');
         parse_str((string) parse_url($location, \PHP_URL_QUERY), $query);
         self::assertSame($link, $query['redirect'] ?? null, 'Signing in comes back to the link.');
+        $this->client->followRedirect();
+        self::assertStringContainsString((string) $order->getRef(), (string) $this->client->getResponse()->getContent(), 'The login page says which order waits.');
     }
 
     public function testTheOwnerSignedInLandsOnThePaymentStep(): void
@@ -91,6 +93,20 @@ final class UnpaidOrderPaymentLinkTest extends GuestCheckoutTestCase
         $this->forgetHydratedModels();
         $this->client->request('GET', '/checkout/cart');
         self::assertStringNotContainsString(self::PRODUCT_TITLE, (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testASignedInAccountIsNotSwappedForTheGuestOfTheOrder(): void
+    {
+        $this->signInAsARealAccount();
+        $fixtures = $this->fixtures();
+        $order = $this->unpaidOrderOf($fixtures->guestCustomer($fixtures->customerTitle()));
+
+        $this->client->request('GET', $this->linkOf($order));
+
+        $this->assertResponseRedirectsTo('/checkout/cart');
+        $this->forgetHydratedModels();
+        $this->client->request('GET', '/account');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode(), 'The account is still signed in.');
     }
 
     public function testALinkToAnOrderPaidSinceOpensNothing(): void
