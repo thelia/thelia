@@ -111,7 +111,7 @@ final class XmlDescriptor
      * The text fit to print in a reason, on one line: a value of the descriptor or a name
      * of a file may carry a control character, a mark that reorders or hides what follows,
      * a line break, or a byte that is not UTF-8, that a log, a terminal or a page would
-     * obey. TerminalText knows them all.
+     * obey: the characters TerminalText replaces.
      */
     public static function printable(string $text): string
     {

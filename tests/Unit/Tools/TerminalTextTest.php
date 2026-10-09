@@ -22,7 +22,7 @@ use Thelia\Tools\TerminalText;
 final class TerminalTextTest extends TestCase
 {
     #[DataProvider('texts')]
-    public function testControlCharactersAreReplaced(string $text, string $expected): void
+    public function testTheTextIsCleanedAsExpected(string $text, string $expected): void
     {
         self::assertSame($expected, TerminalText::withoutControlCharacters($text));
     }
@@ -40,8 +40,11 @@ final class TerminalTextTest extends TestCase
         self::assertSame('| ??', TerminalText::onOneLine("|\n\f\x88"));
         // The result is the same the second time.
         self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
-        // A tab at either end is shown, never dropped.
+        // A tab in a run of blanks without a line break is shown, at either end too; one in a
+        // run that holds a line break goes with it.
         self::assertSame('?a?', TerminalText::onOneLine("\ta\t"));
+        self::assertSame('a', TerminalText::onOneLine("\t\na\n\t"));
+        self::assertSame('a', TerminalText::onOneLine("\t \na"));
         // A lone carriage return is a line break, never a return to the start of the line.
         self::assertSame('Acme OK', TerminalText::onOneLine("Acme\rOK"));
     }
@@ -71,7 +74,7 @@ final class TerminalTextTest extends TestCase
         $tried = 0;
 
         try {
-            foreach (['C.UTF-8', 'C'] as $candidate) {
+            foreach (['C.UTF-8', 'en_US.UTF-8'] as $candidate) {
                 if (false === setlocale(\LC_CTYPE, $candidate)) {
                     continue;
                 }
@@ -91,9 +94,9 @@ final class TerminalTextTest extends TestCase
     /**
      * A run of thousands of blanks (a value libxml cites from a descriptor) is read once,
      * even without the PCRE JIT, the slower path: a pattern that looked for a line break
-     * after the blanks was tried again from each blank of the run, and took five seconds on
-     * thirty thousand, minutes on this one. In a process of its own, as PCRE keeps a pattern
-     * compiled once, with the JIT it had.
+     * after the blanks was tried again from each blank of the run: five seconds on thirty
+     * thousand (measured), and the time grows with the square of the run. In a process of
+     * its own, as PCRE keeps a pattern compiled once, with the JIT it had.
      */
     #[RunInSeparateProcess]
     public function testALongRunOfBlanksIsReadOnce(): void
@@ -114,11 +117,64 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
+     * Under a backtrack limit, the text comes out cleaned or not at all, never as it was.
+     * Which step a given limit stops depends on the build of PCRE: the lowest refuses even
+     * the check that the text is UTF-8, so the first step runs and fails on a valid text
+     * too; the next ones let the check pass and stop the second step (limits 2 to 9,
+     * measured on PCRE 10.46 and 10.47); none stops the third step or the run of blanks
+     * without stopping an earlier step first. So the limits are swept, each result is held
+     * to the two outcomes allowed, and the
+     * test is only worth something once a limit has let the check pass and given nothing:
+     * it says so, or skips. What it proves is the fallback of the second step, through the
+     * text that carries a character the second step alone replaces (U+034F): a fallback
+     * giving the text back would show it. The other two texts, one invalid and one that
+     * only the third step cleans (U+0600), hold the shape of the outcome, nothing more.
+     */
+    #[RunInSeparateProcess]
+    public function testABacktrackLimitLeavesNothingOrTheCleanedText(): void
+    {
+        $jit = \ini_get('pcre.jit');
+        $limit = \ini_get('pcre.backtrack_limit');
+        ini_set('pcre.jit', '0');
+        $secondStepOnly = str_repeat("a\u{34F}", 2000);
+        $texts = [
+            [str_repeat("\xFFa\u{200B}", 2000), str_repeat('?a?', 2000)],
+            [$secondStepOnly, str_repeat('a?', 2000)],
+            [str_repeat("a\u{600}", 2000), str_repeat('a?', 2000)],
+        ];
+        $lines = str_repeat("a\n b", 2000);
+        $secondStepStopped = 0;
+
+        try {
+            foreach (range(1, 32) as $backtrackLimit) {
+                ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
+                $checkPasses = 1 === preg_match('//u', $secondStepOnly);
+
+                foreach ($texts as [$text, $cleaned]) {
+                    $result = TerminalText::withoutControlCharacters($text);
+                    self::assertContains($result, ['', $cleaned], \sprintf('limit %d', $backtrackLimit));
+                    $secondStepStopped += $checkPasses && $text === $secondStepOnly && '' === $result ? 1 : 0;
+                }
+
+                self::assertContains(TerminalText::onOneLine($lines), ['', str_repeat('a b', 2000)], \sprintf('limit %d', $backtrackLimit));
+            }
+        } finally {
+            ini_set('pcre.jit', (string) $jit);
+            ini_set('pcre.backtrack_limit', (string) $limit);
+        }
+
+        if (0 === $secondStepStopped) {
+            self::markTestSkipped('No limit from 1 to 32 lets the UTF-8 check pass and stops the second step on this build of PCRE: the fallback of the second step is not proven here.');
+        }
+    }
+
+    /**
      * The bounds of every range replaced are replaced, and their neighbours kept, unless the
      * neighbour is itself in a range, or a control, format or private use character. What it
      * proves: a range narrowed by one code point is seen. What it cannot prove: a narrowed
-     * range of the second step that the third step covers too (the format characters), as
-     * the third step stands behind it.
+     * range of the second step that the third step covers too (the format characters, the
+     * Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15, and the tags
+     * and variation selectors of plane 14 among them), as the third step stands behind it.
      */
     #[DataProvider('ranges')]
     public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
@@ -128,19 +184,11 @@ final class TerminalTextTest extends TestCase
         }
 
         foreach ([$first - 1, $last + 1] as $neighbour) {
-            if ($neighbour < 0 || $neighbour > 0x10FFFF || ($neighbour >= 0xD800 && $neighbour <= 0xDFFF) || self::isReplacedByItself($neighbour)) {
+            if (!self::isACodePoint($neighbour) || self::isReplacedByItself($neighbour)) {
                 continue;
             }
 
             self::assertSame('a'.mb_chr($neighbour).'b', TerminalText::withoutControlCharacters('a'.mb_chr($neighbour).'b'), \sprintf('U+%04X', $neighbour));
-        }
-    }
-
-    /** @return iterable<string, array{int, int}> */
-    public static function ranges(): iterable
-    {
-        foreach (self::replacedRanges() as [$first, $last]) {
-            yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
         }
     }
 
@@ -178,13 +226,25 @@ final class TerminalTextTest extends TestCase
         yield 'U+3FFFD, an unassigned four-byte character, next to an invalid byte' => ["\xFF\u{3FFFD}", "?\u{3FFFD}"];
         yield 'U+10FFFD, the last private use character, next to an invalid byte' => ["\xFF\u{10FFFD}", '??'];
         yield 'U+FFFD, the replacement character, next to an invalid byte' => ["\xFF\u{FFFD}", "?\u{FFFD}"];
+        yield 'U+07FF, the last two-byte character, next to an invalid byte' => ["\xFF\u{7FF}", "?\u{7FF}"];
+        yield 'U+1000, the first character of the E1 lead byte, next to an invalid byte' => ["\xFF\u{1000}", "?\u{1000}"];
+        yield 'U+CFFF, the last character of the EC lead byte, next to an invalid byte' => ["\xFF\u{CFFF}", "?\u{CFFF}"];
+        yield 'U+E000, private use behind the EE lead byte, next to an invalid byte' => ["\xFF\u{E000}", '??'];
+        yield 'U+40000, the first character of the F1 lead byte, next to an invalid byte' => ["\xFF\u{40000}", "?\u{40000}"];
+        yield 'U+FFFFF, a noncharacter behind the F3 lead byte, next to an invalid byte' => ["\xFF\u{FFFFF}", '??'];
+        yield 'U+00A1, a character of the C2 lead byte that is kept, next to an invalid byte' => ["\xFF\u{A1}", "?\u{A1}"];
+        yield 'U+0FFF, the last second byte of E0, next to an invalid byte' => ["\xFF\u{FFF}", "?\u{FFF}"];
+        yield 'U+D000, the first second byte of ED, next to an invalid byte' => ["\xFF\u{D000}", "?\u{D000}"];
+        yield 'U+80000, behind the F2 lead byte, next to an invalid byte' => ["\xFF\u{80000}", "?\u{80000}"];
+        yield 'U+100000, the first second byte of F4 (private use), next to an invalid byte' => ["\xFF\u{100000}", '??'];
+        yield 'an Egyptian hieroglyph format control' => ["Acme\u{13437}", 'Acme?'];
+        yield 'the hieroglyph after that range is kept' => ["Acme\u{13440}", "Acme\u{13440}"];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
-        yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
-        yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
-        yield 'the paragraph separator (bound of a range)' => ["Ac\u{2029}me", 'Ac?me'];
-        yield 'the hair space next to the zero-width range is kept' => ["Ac\u{200A}me", "Ac\u{200A}me"];
-        yield 'the first Hangul filler (bound of a range)' => ["Ac\u{115F}me", 'Ac?me'];
-        yield 'the Hangul letter before it is kept' => ["Ac\u{115E}me", "Ac\u{115E}me"];
+        // The bounds of every range, and their neighbours, are the bounds test's: here, a
+        // character in its context (a word, a sequence, an identifier), and the inner points
+        // of the ranges the docblock splits.
+        yield 'the last bidirectional isolate (U+2069, inside U+2066 to U+206F)' => ["Ac\u{2069}me", 'Ac?me'];
+        yield 'the paragraph separator (U+2029, inside U+2028 to U+202E)' => ["Ac\u{2029}me", 'Ac?me'];
         yield 'a right-to-left override' => ["Acme\u{202E}eludoM", 'Acme?eludoM'];
         yield 'an isolate' => ["Acme\u{2066}Module\u{2069}", 'Acme?Module?'];
         yield 'a zero-width space' => ["Ac\u{200B}me", 'Ac?me'];
@@ -224,6 +284,14 @@ final class TerminalTextTest extends TestCase
         yield 'a khmer vowel sign is kept' => ["Ac\u{17B6}me", "Ac\u{17B6}me"];
     }
 
+    /** @return iterable<string, array{int, int}> */
+    public static function ranges(): iterable
+    {
+        foreach (self::replacedRanges() as [$first, $last]) {
+            yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
+        }
+    }
+
     /**
      * The ranges the docblock of withoutControlCharacters() lists, and the two noncharacters
      * of each of the 17 planes.
@@ -237,7 +305,8 @@ final class TerminalTextTest extends TestCase
             [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
             [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
             [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
-            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
+            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A],
+            [0xE0000, 0xE0FFF],
         ];
 
         for ($plane = 0; $plane <= 16; ++$plane) {
@@ -245,6 +314,11 @@ final class TerminalTextTest extends TestCase
         }
 
         return $ranges;
+    }
+
+    private static function isACodePoint(int $value): bool
+    {
+        return $value >= 0 && $value <= 0x10FFFF && ($value < 0xD800 || $value > 0xDFFF);
     }
 
     private static function isReplacedByItself(int $codePoint): bool
