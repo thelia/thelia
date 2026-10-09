@@ -22,28 +22,34 @@ namespace Thelia\Tools;
 final class TerminalText
 {
     /**
-     * The text with every C0 and C1 control character but the tab and the line feed replaced,
-     * and the formatting characters that reorder or hide text on screen: the bidirectional
-     * embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the zero-width
-     * and directional marks (U+200B to U+200F, U+061C), the invisible operators and word
-     * joiner (U+2060 to U+2064), the deprecated format controls (U+206A to U+206F), the
-     * interlinear annotation marks (U+FFF9 to U+FFFB), the tag block (U+E0000 to U+E00FF), the
-     * Khmer inherent vowels (U+17B4, U+17B5), the shorthand format controls (U+1BCA0 to
-     * U+1BCA3), the Mongolian free variation selectors and vowel separator (U+180B to U+180F),
-     * the combining grapheme joiner (U+034F), the variation selectors (U+FE00 to U+FE0F,
-     * U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the blank fillers
-     * (U+115F, U+1160, U+2800, U+3164, U+FFA0), the soft hyphen (U+00AD), the line and
-     * paragraph separators (U+2028, U+2029) and the byte order mark (U+FEFF). The line feed is
-     * kept: messages span lines, so a module directory named with one can still start a line
-     * of its own. A text that is not valid UTF-8 has each byte outside a well-formed sequence
-     * replaced first: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that
-     * is not in UTF-8. Each range is then matched as its UTF-8 encoding, byte by byte. Last,
-     * on what is then valid UTF-8, every other format character (Unicode category Cf, the
-     * Arabic number signs among them), private use character (Co), the object replacement
-     * character (U+FFFC), the noncharacters (U+FDD0 to U+FDEF, U+FFFE, U+FFFF) and the
-     * unassigned ignorable code points of the specials block (U+2065, U+FFF0 to U+FFF8),
-     * which print as nothing or as a glyph that is not the text. A step that fails leaves
-     * nothing rather than the text it was to clean.
+     * The text with every character a terminal, a log or a page would obey or hide replaced
+     * by "?", in three steps, each of which leaves nothing rather than the text it was to
+     * clean when it fails:
+     *
+     * 1. A text that is not valid UTF-8 has each byte outside a well-formed sequence
+     *    replaced: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that is
+     *    not in UTF-8.
+     * 2. Matched as their UTF-8 encoding, byte by byte: the C0 and C1 control characters but
+     *    the tab and the line feed (kept: messages span lines, so a module directory named
+     *    with one can still start a line of its own), the soft hyphen (U+00AD), the Arabic
+     *    letter mark (U+061C), the zero-width and directional marks (U+200B to U+200F), the
+     *    line and paragraph separators (U+2028, U+2029), the bidirectional embeddings,
+     *    overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the invisible operators
+     *    and word joiner (U+2060 to U+2064), the deprecated format controls (U+206A to
+     *    U+206F), the byte order mark (U+FEFF), the interlinear annotation marks (U+FFF9 to
+     *    U+FFFB), the Mongolian free variation selectors and vowel separator (U+180B to
+     *    U+180F), the combining grapheme joiner (U+034F), the variation selectors (U+FE00 to
+     *    U+FE0F, U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the
+     *    blank fillers (U+115F, U+1160, U+2800, U+3164, U+FFA0), the tag block (U+E0000 to
+     *    U+E00FF), the Khmer inherent vowels (U+17B4, U+17B5) and the shorthand format
+     *    controls (U+1BCA0 to U+1BCA3).
+     * 3. On what is then valid UTF-8, in Unicode mode: every other format character
+     *    (category Cf, the Arabic number signs among them), every private use character
+     *    (Co), the object replacement character (U+FFFC), the noncharacters of every plane
+     *    (U+FDD0 to U+FDEF, and U+FFFE and U+FFFF of each of the 17 planes), the unassigned
+     *    ignorable code points (U+2065 of the general punctuation block, U+FFF0 to U+FFF8 of
+     *    the specials block, and the rest of the tags and variation selectors planes,
+     *    U+E0000 to U+E0FFF), which print as nothing or as a glyph that is not the text.
      */
     public static function withoutControlCharacters(string $text): string
     {
@@ -55,7 +61,7 @@ final class TerminalText
 
         $text = preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80-\x83][\x80-\xBF]|\xE1\x9E[\xB4\xB5]|\xF0\x9B\xB2[\xA0-\xA3]/', '?', $text) ?? '';
 
-        return preg_replace('/[\p{Cf}\p{Co}\x{FFFC}\x{2065}\x{FFF0}-\x{FFF8}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}]/u', '?', $text) ?? '';
+        return preg_replace('/[\p{Cf}\p{Co}\x{FFFC}\x{2065}\x{FFF0}-\x{FFF8}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}\x{10FFFE}\x{10FFFF}\x{E0000}-\x{E0FFF}]/u', '?', $text) ?? '';
     }
 
     /**
@@ -69,9 +75,12 @@ final class TerminalText
     }
 
     /**
-     * A message on one line: each line break, and the blanks around it, becomes a space, so
-     * that a text spread over lines (the errors of a schema, one per line) cannot start a
-     * line of its own that reads like the output of the command.
+     * A message on one line: each line break (a carriage return is one), and the blanks
+     * around it (any blank of Unicode), becomes a space, so that a text spread over lines
+     * (the errors of a schema, one per line) cannot start a line of its own that reads like
+     * the output of the command. The blanks without a line break are kept as they are, a tab
+     * becomes "?", what withoutControlCharacters() replaces is replaced the same way, and
+     * the blanks at either end are dropped. "a  \n b\tc" gives "a b?c".
      */
     public static function onOneLine(string $text): string
     {

@@ -89,6 +89,80 @@ final class TerminalTextTest extends TestCase
         self::assertLessThan(2_000_000_000, hrtime(true) - $started);
     }
 
+    /**
+     * The bounds of every range replaced are replaced, and their neighbours kept, unless the
+     * neighbour is itself a control, format or private use character: a range narrowed by
+     * one code point is seen.
+     */
+    #[DataProvider('ranges')]
+    public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
+    {
+        foreach ([$first, $last] as $bound) {
+            self::assertSame('a?b', TerminalText::withoutControlCharacters('a'.mb_chr($bound).'b'), \sprintf('U+%04X', $bound));
+        }
+
+        foreach ([$first - 1, $last + 1] as $neighbour) {
+            if ($neighbour < 0 || $neighbour > 0x10FFFF || ($neighbour >= 0xD800 && $neighbour <= 0xDFFF) || self::isReplacedByItself($neighbour)) {
+                continue;
+            }
+
+            self::assertSame('a'.mb_chr($neighbour).'b', TerminalText::withoutControlCharacters('a'.mb_chr($neighbour).'b'), \sprintf('U+%04X', $neighbour));
+        }
+    }
+
+    /** @return iterable<string, array{int, int}> */
+    public static function ranges(): iterable
+    {
+        foreach (self::replacedRanges() as [$first, $last]) {
+            yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
+        }
+    }
+
+    /**
+     * The ranges the docblock of withoutControlCharacters() lists, and the two noncharacters
+     * of each of the 17 planes.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function replacedRanges(): array
+    {
+        $ranges = [
+            [0x00, 0x08], [0x0B, 0x1F], [0x7F, 0x7F], [0x80, 0x9F], [0xAD, 0xAD], [0x34F, 0x34F], [0x61C, 0x61C],
+            [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
+            [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
+            [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
+            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
+        ];
+
+        for ($plane = 0; $plane <= 16; ++$plane) {
+            $ranges[] = [$plane * 0x10000 + 0xFFFE, $plane * 0x10000 + 0xFFFF];
+        }
+
+        return $ranges;
+    }
+
+    private static function isReplacedByItself(int $codePoint): bool
+    {
+        foreach (self::replacedRanges() as [$first, $last]) {
+            if ($codePoint >= $first && $codePoint <= $last) {
+                return true;
+            }
+        }
+
+        return 1 === preg_match('/[\p{Cc}\p{Cf}\p{Co}]/u', mb_chr($codePoint));
+    }
+
+    /**
+     * The blanks are those of Unicode, not of ASCII alone: an ideographic space or a
+     * no-break space next to a line break goes with it, and stays on its own.
+     */
+    public function testABlankOfUnicodeAroundALineBreakGoesWithIt(): void
+    {
+        self::assertSame('a b', TerminalText::onOneLine("a\u{3000}\n\u{A0}b"));
+        self::assertSame("a\u{3000}b", TerminalText::onOneLine("a\u{3000}b"));
+        self::assertSame("a\u{A0}\u{A0}b", TerminalText::onOneLine("a\u{A0}\u{A0}b"));
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function texts(): iterable
     {
@@ -101,6 +175,10 @@ final class TerminalTextTest extends TestCase
         yield 'a private use character' => ["Acme\u{E000}", 'Acme?'];
         yield 'a letter with an accent is kept' => ['Acmé', 'Acmé'];
         yield 'a noncharacter' => ["Acme\u{FFFE}", 'Acme?'];
+        yield 'a noncharacter of the first supplementary plane' => ["Acme\u{1FFFE}", 'Acme?'];
+        yield 'a noncharacter of the last plane' => ["Acme\u{10FFFF}", 'Acme?'];
+        yield 'a noncharacter of the Arabic presentation block' => ["Acme\u{FDD0}", 'Acme?'];
+        yield 'an unassigned code point of the tags plane' => ["Acme\u{E0200}", 'Acme?'];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
         yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
         yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
