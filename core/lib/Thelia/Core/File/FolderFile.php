@@ -14,10 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Core\File;
 
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * The one check of a path that must name a file of a folder, for the folders the shop
  * owns (the export folder, the import storage): what is served is the resolved file,
  * what is removed is the path itself, and only when both lie in the folder.
+ *
+ * It assumes the folder is written by the account of the shop alone: a path changed
+ * between the check and its use could only be changed by that account.
  */
 final class FolderFile
 {
@@ -41,21 +47,32 @@ final class FolderFile
     }
 
     /**
-     * The path to remove when it names a file of the folder from within the folder: a
-     * link of the folder goes alone, never the file it points to, and nothing outside
-     * the folder ever goes, a link included. Null otherwise.
+     * Whether the path may be removed: it names a file of the folder from within the
+     * folder. A link of the folder goes alone, never the file it points to, and nothing
+     * outside the folder ever goes, a link included.
      */
-    public static function removable(string $directory, string $path): ?string
+    public static function isRemovable(string $directory, string $path): bool
     {
         $folder = realpath($directory);
         $parent = realpath(\dirname($path));
 
-        if (null === self::resolve($directory, $path) || false === $folder || false === $parent
-            || ($parent !== $folder && !str_starts_with($parent, $folder.\DIRECTORY_SEPARATOR))
-        ) {
-            return null;
+        return null !== self::resolve($directory, $path) && false !== $folder && false !== $parent
+            && ($parent === $folder || str_starts_with($parent, $folder.\DIRECTORY_SEPARATOR));
+    }
+
+    /**
+     * Removes the path when it may be: true once it is gone.
+     *
+     * @throws IOExceptionInterface when the file system refuses
+     */
+    public static function remove(string $directory, string $path): bool
+    {
+        if (!self::isRemovable($directory, $path)) {
+            return false;
         }
 
-        return $path;
+        (new Filesystem())->remove($path);
+
+        return true;
     }
 }

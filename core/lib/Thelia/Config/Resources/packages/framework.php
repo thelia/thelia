@@ -164,6 +164,13 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // A test mail goes to whatever address the administrator types, at once and
+            // whatever the queue: ten in ten minutes is more than a configuration needs.
+            'admin_test_mail' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
             // An export reads, an import rewrites, the whole catalog in one job, and a
             // queue runs them one after the other: a form sent over and over would
             // hold the heavy queue for hours. Per administrator, ten in ten minutes is

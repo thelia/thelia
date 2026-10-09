@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\DataTransfer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Model\ImportJob;
 
@@ -71,5 +72,26 @@ final class ImportStorageTest extends TestCase
         (new ImportStorage($this->project))->discardFileOf((new ImportJob())->setFilePath(ImportStorage::DIRECTORY.'/stock.csv'));
 
         self::assertFileDoesNotExist($file);
+    }
+
+    /**
+     * An uploaded file holds personal data: once stored it is readable by the owner and
+     * the group of the shop only, whatever the umask of the server.
+     */
+    public function testAStoredUploadIsReadableByNoOtherAccount(): void
+    {
+        $upload = $this->project.'/upload.csv';
+        file_put_contents($upload, 'ref;stock');
+        chmod($upload, 0o644);
+        $umask = umask(0);
+
+        try {
+            $stored = (new ImportStorage($this->project))->store(new File($upload), 'stock.csv');
+        } finally {
+            umask($umask);
+        }
+
+        self::assertSame(0o640, fileperms($stored->getPathname()) & 0o777);
+        self::assertSame(0o750, fileperms(\dirname($stored->getPathname())) & 0o777);
     }
 }

@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\File\FolderFile;
 use Thelia\Model\ImportJob;
 
@@ -43,6 +44,29 @@ final readonly class ImportStorage
     }
 
     /**
+     * Moves an uploaded file into the storage, in the folder of the day, readable by the
+     * owner and the group of the shop only: it holds what was uploaded, personal data
+     * included.
+     */
+    public function store(File $upload, string $name): File
+    {
+        $folder = $this->directory().\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd');
+        $filesystem = new Filesystem();
+        $previousUmask = umask(0o027);
+
+        try {
+            $filesystem->mkdir($folder, 0o750);
+            $stored = $upload->move($folder, $name);
+        } finally {
+            umask($previousUmask);
+        }
+
+        $filesystem->chmod($stored->getPathname(), 0o640);
+
+        return $stored;
+    }
+
+    /**
      * Where the uploaded file of a job is on this server.
      */
     public function pathOf(ImportJob $job): string
@@ -61,14 +85,6 @@ final readonly class ImportStorage
     }
 
     /**
-     * Whether $path, links resolved, is a file of this directory.
-     */
-    public function holds(string $path): bool
-    {
-        return null !== $this->resolve($path);
-    }
-
-    /**
      * The path, its links resolved, when it is a file of this directory. Null otherwise.
      */
     public function resolve(string $path): ?string
@@ -83,10 +99,6 @@ final readonly class ImportStorage
     public function discardFileOf(ImportJob $job): void
     {
         // Gone meanwhile (another run, the purge) is as good as deleted.
-        $file = FolderFile::removable($this->directory(), $this->pathOf($job));
-
-        if (null !== $file) {
-            (new Filesystem())->remove($file);
-        }
+        FolderFile::remove($this->directory(), $this->pathOf($job));
     }
 }

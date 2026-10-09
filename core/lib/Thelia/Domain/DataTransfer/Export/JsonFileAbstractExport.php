@@ -127,7 +127,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
             ExportStorage::discard($this->rowsFile);
         }
 
-        $filename = ExportStorage::rowsFile($exportName);
+        $filename = ExportStorage::newRowsFile($exportName);
         $this->rowsFile = $filename;
 
         // Rows read half way hold customer data all the same: they go with the failure.
