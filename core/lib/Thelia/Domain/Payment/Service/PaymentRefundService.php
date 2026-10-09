@@ -25,6 +25,7 @@ use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\RefundNotSupportedException;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
@@ -134,13 +135,18 @@ final readonly class PaymentRefundService
 
     /**
      * Whether the payment module of the order refunds through its provider. A module that
-     * cannot even be instantiated answers no, so the order sheet still renders.
+     * cannot even be instantiated answers no, so the order sheet still renders, and the
+     * fault is logged.
      */
     public function supportsRefund(Order $order): bool
     {
         try {
             $this->refundModuleOf($order);
-        } catch (\Throwable) {
+        } catch (RefundNotSupportedException) {
+            return false;
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->warning(\sprintf('The payment module of order %s cannot be asked whether it refunds: %s', (string) $order->getRef(), $throwable->getMessage()));
+
             return false;
         }
 
@@ -194,7 +200,7 @@ final readonly class PaymentRefundService
         try {
             $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (TheliaProcessException) {
-            throw new RefundNotSupportedException((string) $order->getRef(), $order->getPaymentModuleTitle());
+            throw new RefundNotSupportedException((string) $order->getRef(), $this->moduleLocator->nameOf($order));
         }
 
         if (!$module instanceof PaymentModuleWithRefundInterface || !$module->supportsRefund()) {
