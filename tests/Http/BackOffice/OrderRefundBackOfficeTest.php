@@ -149,6 +149,21 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertCount(0, $crawler->filter('[data-payment-type="refund"] [data-testid="order-payment-line-error"]'));
     }
 
+    public function testARefundShownThroughTheProviderIsNotRecordedByHandWhenTheModuleStoppedRefunding(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        // The page offered to refund through the provider; by the time the form is sent the
+        // module no longer can. Recording it as made outside would claim money nobody sent.
+        $crawler = $this->postRefund($order, ['amount' => '40', 'reason' => 'other'], static function (): void {
+            DeferredCapturePaymentModule::$refunds = false;
+        });
+
+        self::assertStringContainsString('changed', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+        self::assertCount(0, OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->filterByType('refund')->find());
+    }
+
     public function testWithoutTheRefundRightThereIsNoButtonAndTheRequestIsRefused(): void
     {
         $this->loginAs($this->factory->restrictedAdmin([
@@ -169,10 +184,16 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
     /**
      * @param array<string, string> $fields
      */
-    private function postRefund(Order $order, array $fields): Crawler
+    private function postRefund(Order $order, array $fields, ?\Closure $beforeSending = null): Crawler
     {
         $crawler = $this->sheet($order);
-        $this->client->request('POST', $this->refundUrl($order), ['_token' => $this->tokenOf($crawler)] + $fields);
+        $shownMode = (string) $crawler->filter('[data-testid="order-payment-refund-form"] input[name="mode"]')->attr('value');
+
+        if (null !== $beforeSending) {
+            $beforeSending();
+        }
+
+        $this->client->request('POST', $this->refundUrl($order), ['_token' => $this->tokenOf($crawler), 'mode' => $shownMode] + $fields);
 
         return $this->client->followRedirect();
     }
