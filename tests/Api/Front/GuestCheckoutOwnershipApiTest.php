@@ -17,6 +17,7 @@ namespace Thelia\Tests\Api\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerTitle;
@@ -128,6 +129,50 @@ final class GuestCheckoutOwnershipApiTest extends ApiTestCase
             $response->getStatusCode(),
             'A cart line belongs to the cart the token names, and to no other guest.',
         );
+    }
+
+    public function testAGuestAddsALineToItsOwnCart(): void
+    {
+        $this->enableGuestCheckout();
+
+        [, $guest] = $this->registerGuest();
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => 10]);
+
+        $response = $this->jsonRequest('POST', '/api/front/cart_items', [
+            'cart' => '/api/front/carts/'.$guest['cartId'],
+            'productSaleElements' => '/api/front/product_sale_elements/'.$product->getProductSaleElementss()->getFirst()->getId(),
+            'quantity' => 1,
+        ], $guest['token']);
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * The token names one cart: the earlier visit the guest account carries is not
+     * one the guest adds to.
+     */
+    public function testAGuestCannotAddALineToTheCartOfAnEarlierVisitorSharingItsAccount(): void
+    {
+        $this->enableGuestCheckout();
+
+        $sharedEmail = 'shared-addition-'.bin2hex(random_bytes(6)).'@test.com';
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => 10]);
+
+        [, $first] = $this->registerGuestInAFreshSession(['email' => $sharedEmail]);
+        [, $second] = $this->registerGuestInAFreshSession(['email' => $sharedEmail]);
+
+        self::assertSame($first['id'], $second['id'], 'The shop reuses the guest row behind an address.');
+
+        $response = $this->jsonRequest('POST', '/api/front/cart_items', [
+            'cart' => '/api/front/carts/'.$first['cartId'],
+            'productSaleElements' => '/api/front/product_sale_elements/'.$product->getProductSaleElementss()->getFirst()->getId(),
+            'quantity' => 1,
+        ], $second['token']);
+
+        self::assertSame(404, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(0, CartItemQuery::create()->filterByCartId($first['cartId'])->count($this->getPropelConnection()));
     }
 
     /**
