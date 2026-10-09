@@ -323,6 +323,19 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_CANCELED, $this->statusCodeOf($order));
     }
 
+    public function testAnAuthorizationConfirmedAfterTheOrderWasCancelledIsReleased(): void
+    {
+        // The buyer gave up, the order was cancelled, then the provider confirmed the
+        // reservation: nothing will ever capture it, so it is released at once.
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode(), 'statusCode' => OrderStatus::CODE_CANCELED]);
+
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-LATE-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        self::assertSame([(int) $order->getId()], DeferredCapturePaymentModule::$voidCalls);
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_CANCELED, $this->statusCodeOf($order));
+    }
+
     public function testAModuleThatCannotBeInstantiatedIsReportedNotDisguisedAsUnsupported(): void
     {
         $broken = (new Module())
