@@ -21,7 +21,7 @@ use Thelia\Model\ConfigQuery;
 
 final readonly class SharedCachePolicy
 {
-    public const SHAREABLE_VIEWS = ['index', 'category', 'product', 'content', 'folder', 'brand', 'sale'];
+    public const SHAREABLE_VIEWS = ['index', 'category', 'product', 'content', 'folder', 'brand'];
 
     public const SENSITIVE_PREFIXES = [
         'admin',
@@ -49,11 +49,13 @@ final readonly class SharedCachePolicy
 
     public const MAX_TTL = 86400;
 
-    public function __construct(private PricingActivityChecker $pricingActivityChecker)
-    {
+    public function __construct(
+        private PricingActivityChecker $pricingActivityChecker,
+        private SharedCacheKeyCollector $keyCollector,
+    ) {
     }
 
-    public function isShareable(Request $request, Response $response): bool
+    public function isTaggable(Request $request, Response $response): bool
     {
         if (!$request->isMethod('GET') && !$request->isMethod('HEAD')) {
             return false;
@@ -63,19 +65,24 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        if ($request->cookies->count() > 0 || $request->headers->has('Authorization') || $request->isXmlHttpRequest()) {
-            return false;
-        }
-
-        if ($response->headers->hasCacheControlDirective('no-store')) {
-            return false;
-        }
-
         if (!\in_array((string) $request->attributes->get('_view', ''), self::SHAREABLE_VIEWS, true)) {
             return false;
         }
 
-        if ($this->isSensitivePath($request->getPathInfo())) {
+        return !$this->isSensitivePath($request->getPathInfo());
+    }
+
+    public function isShareable(Request $request, Response $response): bool
+    {
+        if (!$this->isTaggable($request, $response)) {
+            return false;
+        }
+
+        if ($request->cookies->count() > 0 || $request->headers->has('Authorization') || $request->isXmlHttpRequest()) {
+            return false;
+        }
+
+        if ($response->headers->hasCacheControlDirective('no-store') || !$this->keyCollector->isComplete()) {
             return false;
         }
 

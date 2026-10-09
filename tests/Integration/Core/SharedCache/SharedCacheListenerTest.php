@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheListener;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePolicy;
@@ -274,6 +275,99 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertSame($before, $this->snapshot($response));
     }
 
+    #[DataProvider('everyMode')]
+    public function testAPageAnnouncesWhatItRead(SharedCacheMode $mode): void
+    {
+        $this->mode($mode);
+        $collector = $this->collector('/api/front/products/42', '/api/front/categories', '/api/front/brands/3');
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $collector);
+
+        self::assertSame('product-42 categories brand-3', $response->headers->get('Surrogate-Key'));
+        self::assertSame('product-42 categories brand-3', $response->headers->get('xkey'));
+    }
+
+    /**
+     * @return iterable<string, array{SharedCacheMode}>
+     */
+    public static function everyMode(): iterable
+    {
+        foreach (SharedCacheMode::cases() as $mode) {
+            yield $mode->value => [$mode];
+        }
+    }
+
+    public function testAPageThatReadNothingAnnouncesNothing(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/', 'index'), $response);
+
+        self::assertFalse($response->headers->has('Surrogate-Key'));
+        self::assertFalse($response->headers->has('xkey'));
+    }
+
+    #[DataProvider('pagesThatStayPersonal')]
+    public function testAPersonalPageAnnouncesNothing(string $path, string $view): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request($path, $view), $response, null, HttpKernelInterface::MAIN_REQUEST, $this->collector('/api/front/products/42'));
+
+        self::assertFalse($response->headers->has('Surrogate-Key'));
+    }
+
+    public function testAPageThatReadSomethingPersonalIsNotShared(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $before = $this->snapshot($response);
+
+        $this->handle(
+            $this->request('/horatio.html', 'product'),
+            $response,
+            null,
+            HttpKernelInterface::MAIN_REQUEST,
+            $this->collector('/api/front/products/42', '/api/front/account/customers/7'),
+        );
+
+        self::assertSame($before, $this->snapshot($response));
+    }
+
+    public function testAPageThatReadTooManyThingsIsNotShared(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $before = $this->snapshot($response);
+        $paths = [];
+        for ($id = 1; $id <= SharedCacheKeyCollector::MAX_KEYS + 1; ++$id) {
+            $paths[] = '/api/front/products/'.$id;
+        }
+
+        $this->handle(
+            $this->request('/salon.html', 'category'),
+            $response,
+            null,
+            HttpKernelInterface::MAIN_REQUEST,
+            $this->collector(...$paths),
+        );
+
+        self::assertSame($before, $this->snapshot($response));
+    }
+
+    private function collector(string ...$paths): SharedCacheKeyCollector
+    {
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
+        foreach ($paths as $path) {
+            $collector->record($path);
+        }
+
+        return $collector;
+    }
+
     #[DataProvider('everyCase')]
     public function testNoPublicResponseEverSetsACookie(string $mode, string $path, string $view, string $method, bool $withIncomingCookie): void
     {
@@ -335,14 +429,21 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         return $response;
     }
 
-    private function handle(Request $request, Response $response, ?PricingActivityChecker $checker = null, int $requestType = HttpKernelInterface::MAIN_REQUEST): void
-    {
+    private function handle(
+        Request $request,
+        Response $response,
+        ?PricingActivityChecker $checker = null,
+        int $requestType = HttpKernelInterface::MAIN_REQUEST,
+        ?SharedCacheKeyCollector $collector = null,
+    ): void {
         if (null === $checker) {
             $checker = $this->createStub(PricingActivityChecker::class);
             $checker->method('hasVisitorDependentPricing')->willReturn(false);
         }
 
-        (new SharedCacheListener(new SharedCachePolicy($checker)))
+        $collector ??= new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
+
+        (new SharedCacheListener(new SharedCachePolicy($checker, $collector), $collector))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, $requestType, $response));
     }
 
