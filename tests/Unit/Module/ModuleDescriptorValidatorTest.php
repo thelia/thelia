@@ -173,6 +173,31 @@ final class ModuleDescriptorValidatorTest extends TestCase
 
         self::assertTrue($validator->validate($this->writeDescriptor(''), (string) self::DESCRIPTOR_VERSION_2_2));
         self::assertSame(self::DESCRIPTOR_VERSION_2_2, (int) $validator->getModuleVersion());
+
+        // What only the 2.2 schema accepts is refused against the first one.
+        try {
+            $validator->validate($this->writeDescriptor('<enabled-by-default>1</enabled-by-default>'), '1');
+            self::fail('The first schema does not know enabled-by-default.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString('XML error', $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A quote in a folder of the path is no way out for the rest of the path.
+     */
+    public function testAQuoteInThePathHidesNothingOfIt(): void
+    {
+        $quoted = $this->workDir.'/quo"te/Sample/Config/module.xml';
+
+        try {
+            (new ModuleDescriptorValidator())->validate($quoted);
+            self::fail('The descriptor is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringStartsWith('The module.xml of Sample is not a valid file', $refusal->getMessage());
+            self::assertStringNotContainsString('/', $refusal->getMessage());
+            self::assertStringNotContainsString('quo', $refusal->getMessage());
+        }
     }
 
     /**
