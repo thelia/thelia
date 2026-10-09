@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,6 +29,7 @@ use Thelia\Domain\Order\Reminder\UnpaidOrderReminderSettings;
  * number of orders, a step is never done twice, and a run that finds another one going
  * leaves it alone.
  */
+#[AsCommand(name: 'order:remind-unpaid', description: 'Send the payment reminders of the unpaid orders and cancel them, as the reminder schedule of the shop says.')]
 class UnpaidOrderReminderCommand extends ContainerAwareCommand
 {
     public const LOCK_NAME = 'thelia.unpaid_order_reminder';
@@ -47,11 +49,9 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
         parent::__construct();
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         $this
-            ->setName('order:remind-unpaid')
-            ->setDescription('Send the payment reminders of the unpaid orders and cancel them, as the reminder schedule of the shop says.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'List what the run would do, without sending or changing anything')
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'The most orders a run acts on; the next run goes on', (string) self::DEFAULT_LIMIT);
     }
