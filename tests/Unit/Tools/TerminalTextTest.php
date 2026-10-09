@@ -117,18 +117,19 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * Under a backtrack limit, the text comes out cleaned or not at all, never as it was.
-     * Which step a given limit stops depends on the build of PCRE: the lowest refuses even
-     * the check that the text is UTF-8, so the first step runs and fails on a valid text
-     * too; the next ones let the check pass and stop the second step (limits 2 to 9,
-     * measured on PCRE 10.46 and 10.47); none stops the third step or the run of blanks
-     * without stopping an earlier step first. So the limits are swept, each result is held
-     * to the two outcomes allowed, and the test is only worth something once a limit has
-     * let the check pass and given nothing: it says so, or skips. What it proves is the
-     * fallback of the second step, through the
-     * text that carries a character the second step alone replaces (U+034F): a fallback
-     * giving the text back would show it. The other two texts, one invalid and one that
-     * only the third step cleans (U+0600), hold the shape of the outcome, nothing more.
+     * Under a backtrack limit, with the JIT of PCRE off (on, no limit but the lowest stops
+     * anything), the text comes out cleaned or not at all, never as it was. Which step a
+     * given limit stops depends on the build of PCRE: the lowest refuses even the check
+     * that the text is UTF-8, so the first step runs and fails on a valid text too; the
+     * next ones let the check pass and stop the second step (limits 2 to 9, measured on
+     * PCRE 10.46 and 10.47); none stops the third step or the run of blanks without
+     * stopping an earlier step first. So the limits are swept, each result is held to the
+     * two outcomes allowed, and the test is only worth something once a limit has let the
+     * check pass and given nothing: it says so, or skips. What it proves is the fallback of
+     * the second step, through the text that carries a character the second step alone
+     * replaces (U+034F): a fallback giving the text back would show it. The other two
+     * texts, one invalid and one that only the third step cleans (U+0600), hold the shape
+     * of the outcome, nothing more.
      */
     #[RunInSeparateProcess]
     public function testABacktrackLimitLeavesNothingOrTheCleanedText(): void
@@ -169,29 +170,31 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * The bounds of every range replaced are replaced, and their neighbours kept, unless the
-     * neighbour is itself in a range, or a control, format or private use character. What it
-     * proves: a range narrowed by one code point is seen. What it cannot prove: a narrowed
-     * range of the second step that the third step covers too (the format characters, the
-     * Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15, and the tags
+     * Every point of each range replaced is replaced, and the neighbours of the range kept,
+     * unless the neighbour is itself in a range, or a control, format or private use
+     * character. What it proves: a range narrowed by one code point, or holed, is seen
+     * (U+180C among the Mongolian selectors, say). What it cannot prove: a narrowed or
+     * holed range of the second step that the third step covers too (the format characters,
+     * the Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15, and the tags
      * and variation selectors of plane 14 among them), as the third step stands behind it.
+     * The one range of plane 14, U+E0000 to U+E0FFF, is for that reason only sampled, one
+     * point in sixty-four and its last.
      */
     #[DataProvider('ranges')]
-    public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
+    public function testEveryPointOfARangeIsReplacedAndItsNeighboursKept(int $first, int $last): void
     {
-        // Every point of the range, not the bounds alone: a hole inside a range of the
-        // second step that the third step does not cover (U+180C among the Mongolian
-        // selectors, say) would be seen. The largest range, U+E0000 to U+E0FFF, is sampled.
         $step = $last - $first > 1024 ? 64 : 1;
 
         for ($codePoint = $first; $codePoint <= $last; $codePoint += $step) {
             self::assertSame('a?b', TerminalText::withoutControlCharacters('a'.mb_chr($codePoint).'b'), \sprintf('U+%04X', $codePoint));
         }
 
-        self::assertSame('a?b', TerminalText::withoutControlCharacters('a'.mb_chr($last).'b'), \sprintf('U+%04X', $last));
+        if (0 !== ($last - $first) % $step) {
+            self::assertSame('a?b', TerminalText::withoutControlCharacters('a'.mb_chr($last).'b'), \sprintf('U+%04X', $last));
+        }
 
         foreach ([$first - 1, $last + 1] as $neighbour) {
-            if (!self::isACodePoint($neighbour) || self::isReplacedByItself($neighbour)) {
+            if (!self::isACodePoint($neighbour) || self::isInAReplacedRangeOrCategory($neighbour)) {
                 continue;
             }
 
@@ -328,7 +331,7 @@ final class TerminalTextTest extends TestCase
         return $value >= 0 && $value <= 0x10FFFF && ($value < 0xD800 || $value > 0xDFFF);
     }
 
-    private static function isReplacedByItself(int $codePoint): bool
+    private static function isInAReplacedRangeOrCategory(int $codePoint): bool
     {
         foreach (self::replacedRanges() as [$first, $last]) {
             if ($codePoint >= $first && $codePoint <= $last) {
