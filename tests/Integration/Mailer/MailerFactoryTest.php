@@ -385,24 +385,7 @@ final class MailerFactoryTest extends IntegrationTestCase
     {
         $this->givenTheStoreEmail('shop@example.com');
         $sent = [];
-        $transport = new class($sent) implements TransportInterface {
-            /** @param list<RawMessage> $sent */
-            public function __construct(private array &$sent)
-            {
-            }
-
-            public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
-            {
-                $this->sent[] = $message;
-
-                return new SentMessage($message, $envelope ?? Envelope::create($message));
-            }
-
-            public function __toString(): string
-            {
-                return 'spy://';
-            }
-        };
+        $transport = $this->spyTransport($sent);
         $message = new Message();
         $message->setName('test_message_sent_at_once');
         $message->setLocale('en_US');
@@ -432,11 +415,60 @@ final class MailerFactoryTest extends IntegrationTestCase
         $this->mailerFactory->sendTestMessage((string) $message->getName(), 'someone@example.com', [], null);
     }
 
+    public function testATestOfTheMailSettingsGoesToTheMailServerAtOnce(): void
+    {
+        $this->givenTheStoreEmail('shop@example.com');
+        $sent = [];
+        $transport = $this->spyTransport($sent);
+
+        (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
+            ->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+
+        self::assertCount(1, $sent);
+    }
+
+    public function testATestOfTheMailSettingsOfAShopWithoutAnAddressSaysSo(): void
+    {
+        $this->givenTheStoreEmail('');
+
+        try {
+            $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+            self::fail('The shop has no address to send from.');
+        } catch (EmailNotSentException $notSent) {
+            self::assertTrue($notSent->isStoreEmailMissing());
+        }
+    }
+
     protected function tearDown(): void
     {
         ConfigQuery::resetCache();
 
         parent::tearDown();
+    }
+
+    /**
+     * @param list<RawMessage> $sent the messages the transport is handed, as it is
+     */
+    private function spyTransport(array &$sent): TransportInterface
+    {
+        return new class($sent) implements TransportInterface {
+            /** @param list<RawMessage> $sent */
+            public function __construct(private array &$sent)
+            {
+            }
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
+            {
+                $this->sent[] = $message;
+
+                return new SentMessage($message, $envelope ?? Envelope::create($message));
+            }
+
+            public function __toString(): string
+            {
+                return 'spy://';
+            }
+        };
     }
 
     private function givenTheStoreEmail(string $address): void

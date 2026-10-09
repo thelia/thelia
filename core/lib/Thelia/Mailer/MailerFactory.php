@@ -92,19 +92,34 @@ class MailerFactory
      */
     public function sendTestMessage(string $messageCode, string $recipient, array $messageParameters = [], ?string $locale = null): void
     {
+        $this->sendNow($this->createEmailMessage($messageCode, $this->testSender($messageCode), [$recipient => $recipient], $messageParameters, $locale));
+    }
+
+    /**
+     * Sends a mail of the given subject and body to test the mail settings, handed to the
+     * mail server now, queue or not.
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    public function sendTestMail(string $recipient, string $subject, string $htmlBody): void
+    {
+        $this->sendNow($this->createSimpleEmailMessage($this->testSender('mail_settings_test'), [$recipient => $recipient], $subject, $htmlBody, strip_tags($htmlBody)));
+    }
+
+    /**
+     * @return array<string, string> the address and the name of the shop
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    private function testSender(string $messageCode): array
+    {
         $storeEmail = (string) ConfigQuery::getStoreEmail();
 
         if ('' === $storeEmail) {
             throw EmailNotSentException::storeEmailMissing($messageCode);
         }
 
-        $this->sendNow($this->createEmailMessage(
-            $messageCode,
-            [$storeEmail => (string) ConfigQuery::getStoreName()],
-            [$recipient => $recipient],
-            $messageParameters,
-            $locale,
-        ));
+        return [$storeEmail => (string) ConfigQuery::getStoreName()];
     }
 
     /**
@@ -449,7 +464,6 @@ class MailerFactory
 
         $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
 
-        $email->subject($subject);
         $email->subject($subject);
         $email->text($textBody);
         $email->html($htmlBody);
