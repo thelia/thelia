@@ -101,12 +101,14 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
     {
         // Unlike a refusal, a failure of the database — a deadlock, a lost connection —
         // may have cost the caller what it wrote already: its transaction must not commit
-        // as if nothing happened. The statement timeout stands for that failure here.
+        // as if nothing happened. A temporary table shadowing `order` for this connection
+        // stands for that failure here: the locked read of the status fails on MySQL and
+        // MariaDB alike, without the implicit commit LOCK TABLES would cause.
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
         $connection = $this->getPropelConnection();
         self::assertInstanceOf(ConnectionWrapper::class, $connection);
         $interrupt = static function () use ($connection): void {
-            $connection->exec('SET SESSION max_statement_time = 0.000001');
+            $connection->exec('CREATE TEMPORARY TABLE `order` (id INT)');
         };
         $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt, 129);
 
@@ -117,7 +119,7 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
             self::assertNotInstanceOf(OrderStatusTransitionRefusedException::class, $failure);
         } finally {
             $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt);
-            $connection->exec('SET SESSION max_statement_time = 0');
+            $connection->exec('DROP TEMPORARY TABLE IF EXISTS `order`');
         }
 
         self::assertTrue((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
