@@ -122,13 +122,11 @@ class ExportHandler
             $eventArchiver = $event->getArchiver();
 
             if ($eventArchiver instanceof ArchiverInterface) {
-                // An archiver writes under the umask of the process, as it goes or when it
-                // saves: the archive is private from its first byte, as the export is.
-                FolderFile::writingPrivately(function () use ($event, $eventArchiver, $filePath, $includeImages, $includeDocuments, &$written): void {
-                    $eventArchiver->create($filePath);
-                    $written[] = $eventArchiver->getArchivePath();
-                    $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
-                });
+                // An archiver creates its file under the umask of the process, when it is
+                // created (a tar) or saved (a zip): private from its first byte, as the export.
+                FolderFile::writingPrivately(static fn () => $eventArchiver->create($filePath));
+                $written[] = $eventArchiver->getArchivePath();
+                $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
             }
 
             $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
@@ -299,7 +297,7 @@ class ExportHandler
         }
 
         // A zip is written when it is saved, and says it failed only by what save() returns.
-        if (!$archiver->add($filePath)->save()) {
+        if (!FolderFile::writingPrivately(static fn (): bool => $archiver->add($filePath)->save())) {
             throw new \RuntimeException(\sprintf('The archive %s of the export was not written.', basename($archiver->getArchivePath())));
         }
 

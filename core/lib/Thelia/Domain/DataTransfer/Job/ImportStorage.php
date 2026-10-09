@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\File\FolderFile;
 use Thelia\Model\ImportJob;
@@ -53,14 +52,7 @@ final readonly class ImportStorage
         $folder = $this->directory().\DIRECTORY_SEPARATOR.(new \DateTime())->format('Ymd');
         FolderFile::ensureFolder($folder);
         $stored = FolderFile::writingPrivately(static fn (): File => $upload->move($folder, $name));
-
-        try {
-            FolderFile::makePrivate($stored->getPathname());
-        } catch (IOExceptionInterface $notPrivate) {
-            @unlink($stored->getPathname());
-
-            throw $notPrivate;
-        }
+        FolderFile::makePrivateOrRemove($stored->getPathname());
 
         return $stored;
     }

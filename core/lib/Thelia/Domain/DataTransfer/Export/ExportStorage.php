@@ -68,14 +68,8 @@ final class ExportStorage
 
         fclose($handle);
 
-        // The belt, as the umask is the process's: a file it cannot buckle on is not left.
-        try {
-            FolderFile::makePrivate($path);
-        } catch (IOExceptionInterface $notPrivate) {
-            @unlink($path);
-
-            throw $notPrivate;
-        }
+        // The belt, as the umask is the process's.
+        FolderFile::makePrivateOrRemove($path);
 
         return $path;
     }

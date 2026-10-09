@@ -101,13 +101,14 @@ final class FolderFile
      */
     public static function ensureFolder(string $directory): void
     {
-        self::writingPrivately(static fn () => (new Filesystem())->mkdir($directory, self::FOLDER_MODE), ~self::FOLDER_MODE & 0o777);
+        self::withUmask(~self::FOLDER_MODE & 0o777, static fn () => (new Filesystem())->mkdir($directory, self::FOLDER_MODE));
     }
 
     /**
-     * Runs $write with the umask that makes what it creates private from its very
-     * creation (FILE_MODE at most): an account that opened a file in between would keep
-     * reading it. The umask is the process's and is given back whatever happens.
+     * Runs $write with the umask that makes the files it creates private from their very
+     * creation (FILE_MODE at most): an account that opened one in between would keep
+     * reading it. A folder created in there would be FILE_MODE too, without the x bit:
+     * $write creates files only.
      *
      * @template T
      *
@@ -115,12 +116,43 @@ final class FolderFile
      *
      * @return T
      */
-    public static function writingPrivately(\Closure $write, int $umask = ~self::FILE_MODE &0o777): mixed
+    public static function writingPrivately(\Closure $write): mixed
+    {
+        return self::withUmask(~self::FILE_MODE & 0o777, $write);
+    }
+
+    /**
+     * Makes the file FILE_MODE, or removes it: a file that cannot be made private is not
+     * left behind.
+     *
+     * @throws IOExceptionInterface when the file system refuses
+     */
+    public static function makePrivateOrRemove(string $file): void
+    {
+        try {
+            self::makePrivate($file);
+        } catch (IOExceptionInterface $notPrivate) {
+            @unlink($file);
+
+            throw $notPrivate;
+        }
+    }
+
+    /**
+     * The umask is the process's: given back whatever happens.
+     *
+     * @template T
+     *
+     * @param \Closure(): T $run
+     *
+     * @return T
+     */
+    private static function withUmask(int $umask, \Closure $run): mixed
     {
         $previousUmask = umask($umask);
 
         try {
-            return $write();
+            return $run();
         } finally {
             umask($previousUmask);
         }
