@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Bridge\Propel\Filter\CustomFilters\ProductFilter;
 
 use ApiPlatform\Metadata\Operation;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
@@ -43,7 +44,7 @@ class DepthProductFilter extends AbstractFilter
         }
 
         $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: (int) $value);
-        $idCategories = [];
+        $idCategories = [(int) $categoryId];
 
         foreach ($categoriesWithDepth as $categories) {
             foreach ($categories as $category) {
@@ -51,11 +52,15 @@ class DepthProductFilter extends AbstractFilter
             }
         }
 
+        // Must stay declared after SearchFilter on the resource: this replaces whatever condition the request put on
+        // productCategories.category.id (the search filter's equality) with the whole branch, on the same join. An OR
+        // added here would hang on whichever criterion came last (visible, ref...) and widen it instead.
         $query
-            ->_or()
-            ->useProductCategoryQuery()
-            ->filterByCategoryId($idCategories)
-            ->endUse()
+            ->add(
+                $this->getPropertyQueryPath($query, 'productCategories.category.id', $context),
+                array_values(array_unique($idCategories)),
+                Criteria::IN,
+            )
             ->groupById();
     }
 
