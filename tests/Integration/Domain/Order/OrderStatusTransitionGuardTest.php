@@ -97,6 +97,18 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
         self::assertFalse((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
     }
 
+    public function testAnOrderDeletedMeanwhileIsSaidToBeGone(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $staleView = clone $order;
+        $order->delete();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('no longer exists');
+
+        $this->moveOrderTo($staleView, OrderStatus::CODE_REFUNDED);
+    }
+
     public function testAForcedTransitionBypassesTheGraph(): void
     {
         $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
