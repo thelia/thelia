@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Service;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\Order\OrderRefundedEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\RefundReason;
@@ -43,7 +40,7 @@ use Thelia\Module\PaymentModuleWithRefundInterface;
  * capture, see ProviderCallRunner.
  *
  * The service never moves the order: once nothing collected is left, the journal does,
- * through the transition graph. ORDER_REFUNDED is sent when money was given back.
+ * through the transition graph. ORDER_REFUNDED is sent from the journal, once the money was given back (AnnounceRefundListener).
  */
 final readonly class PaymentRefundService
 {
@@ -64,7 +61,7 @@ final readonly class PaymentRefundService
         private PaymentTransactionRecorder $recorder,
         private PaymentTransactionTotalsReader $totalsReader,
         private ProviderCallRunner $runner,
-        private EventDispatcherInterface $eventDispatcher,
+        private RefundRequestContext $requests,
         private PaymentModuleLocator $moduleLocator,
     ) {
     }
@@ -80,29 +77,25 @@ final readonly class PaymentRefundService
         $moduleCode = $module->getCode();
         $comment = self::cleanComment($comment);
 
-        $transaction = $this->runner->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock(
-            $order,
-            fn (): OrderPaymentTransaction => $this->recorder->recordRefund(
+        return $this->requests->during((int) $order->getId(), $reason, $comment, false, function () use ($order, $amount, $reason, $comment, $module, $moduleCode): OrderPaymentTransaction {
+            $transaction = $this->runner->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock(
                 $order,
-                $this->checkedAmount($order, $amount),
-                null,
-                PaymentTransactionState::PENDING,
-                OrderPaymentTransactionQuery::create()->findLatestSucceededCapture((int) $order->getId()),
+                fn (): OrderPaymentTransaction => $this->recorder->recordRefund(
+                    $order,
+                    $this->checkedAmount($order, $amount),
+                    null,
+                    PaymentTransactionState::PENDING,
+                    OrderPaymentTransactionQuery::create()->findLatestSucceededCapture((int) $order->getId()),
+                    $moduleCode,
+                ),
+            ));
+
+            return $this->runner->run(
+                static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment),
+                $transaction,
                 $moduleCode,
-            ),
-        ));
-
-        $transaction = $this->runner->run(
-            static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment),
-            $transaction,
-            $moduleCode,
-        );
-
-        if ($transaction->isSucceeded()) {
-            $this->announce($order, $transaction, $reason, $comment, false);
-        }
-
-        return $transaction;
+            );
+        });
     }
 
     /**
@@ -113,7 +106,7 @@ final readonly class PaymentRefundService
     {
         $comment = self::cleanComment($comment);
 
-        $transaction = $this->runner->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock(
+        return $this->requests->during((int) $order->getId(), $reason, $comment, true, fn (): OrderPaymentTransaction => $this->runner->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock(
             $order,
             fn (): OrderPaymentTransaction => $this->recorder->recordRefund(
                 $order,
@@ -126,11 +119,7 @@ final readonly class PaymentRefundService
                 self::ERROR_CODE_OFFLINE,
                 $comment ?? self::OFFLINE_DEFAULT_NOTE,
             ),
-        ));
-
-        $this->announce($order, $transaction, $reason, $comment, true);
-
-        return $transaction;
+        )));
     }
 
     /**
@@ -208,11 +197,6 @@ final readonly class PaymentRefundService
         }
 
         return $module;
-    }
-
-    private function announce(Order $order, OrderPaymentTransaction $transaction, RefundReason $reason, ?string $comment, bool $offline): void
-    {
-        $this->eventDispatcher->dispatch(new OrderRefundedEvent($order, $transaction, $reason, $comment, $offline), TheliaEvents::ORDER_REFUNDED);
     }
 
     /**
