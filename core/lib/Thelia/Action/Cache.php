@@ -20,8 +20,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
-use Symfony\Component\Messenger\Event\WorkerStartedEvent;
-use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Messenger\WorkerRestartSignal;
@@ -45,8 +43,8 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /** @var CacheEvent[] */
     protected array $onTerminateCacheClearEvents = [];
 
-    /** A worker runs in this process: a command it runs ends inside it. */
-    private bool $workerRunning = false;
+    /** The commands running in this process: one a worker runs ends inside the worker's. */
+    private int $commandDepth = 0;
 
     /**
      * CacheListener constructor.
@@ -86,27 +84,25 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function onConsoleCommand(): void
+    {
+        ++$this->commandDepth;
+    }
+
     /**
-     * A recurring task runs its command inside the worker, and that command ends with a
-     * console terminate of its own: the clear waits for the worker to stop.
+     * Only the outermost command clears. A recurring task runs its command inside the
+     * worker, and that command ends with a console terminate of its own; the worker's
+     * command ends whatever stopped it, an exception included.
      */
     public function onConsoleTerminate(): void
     {
-        if ($this->workerRunning) {
+        $this->commandDepth = max(0, $this->commandDepth - 1);
+
+        if (0 !== $this->commandDepth) {
             return;
         }
 
         $this->onTerminate();
-    }
-
-    public function onWorkerStarted(): void
-    {
-        $this->workerRunning = true;
-    }
-
-    public function onWorkerStopped(): void
-    {
-        $this->workerRunning = false;
     }
 
     public function onTerminate(): void
@@ -160,10 +156,9 @@ class Cache extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            ConsoleEvents::COMMAND => ['onConsoleCommand', \PHP_INT_MAX],
             ConsoleEvents::TERMINATE => ['onConsoleTerminate', self::TERMINATE_PRIORITY],
-            WorkerStartedEvent::class => 'onWorkerStarted',
             WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
-            WorkerStoppedEvent::class => 'onWorkerStopped',
         ];
     }
 }

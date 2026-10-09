@@ -246,8 +246,8 @@ final class CacheTest extends TestCase
 
     /**
      * A recurring task runs its command inside the worker, and that command ends with a
-     * console terminate of its own: the clear it asked for still waits for the worker
-     * to stop, not for the command to end.
+     * console terminate of its own: the clear it asked for still waits for the command
+     * of the worker to end, not for the nested one.
      */
     public function testAClearAScheduledCommandAskedForWaitsForTheWorkerToStop(): void
     {
@@ -257,13 +257,46 @@ final class CacheTest extends TestCase
         $transport = new InMemoryTransport();
         $transport->send(new Envelope(new \stdClass()));
 
+        $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
         $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+            $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
             $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
             $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
         })->run();
 
         self::assertCount(1, $transport->getAcknowledged());
         self::assertDirectoryExists($this->clearedDir);
+
+        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+
+        self::assertDirectoryDoesNotExist($this->clearedDir);
+    }
+
+    /**
+     * A worker may die on an exception (its queue gone as it acknowledges a job), and then
+     * never says it stopped: the command that ran it still ends, and the clear runs then.
+     */
+    public function testAClearAJobAskedForRunsEvenWhenTheWorkerDies(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event): void {
+            if (!$event->isWorkerIdle()) {
+                throw new \RuntimeException('The queue is gone.');
+            }
+        }, 1024);
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+
+        $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
+
+        try {
+            $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
+                $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+            })->run();
+            self::fail('The worker dies.');
+        } catch (\RuntimeException) {
+        }
 
         $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
 
