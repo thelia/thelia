@@ -85,7 +85,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function onConsoleCommand(object $event): void
+    public function onConsoleCommand(ConsoleEvent $event): void
     {
         $this->runningCommands[self::commandOf($event)] = true;
     }
@@ -97,7 +97,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
      * own start and end: one whose start was never counted (a listener before this one
      * failed) never stands for the worker's.
      */
-    public function onConsoleTerminate(object $event): void
+    public function onConsoleTerminate(ConsoleEvent $event): void
     {
         unset($this->runningCommands[self::commandOf($event)]);
 
@@ -165,9 +165,9 @@ class Cache extends BaseAction implements EventSubscriberInterface
         ];
     }
 
-    private static function commandOf(object $event): int
+    private static function commandOf(ConsoleEvent $event): int
     {
-        $command = $event instanceof ConsoleEvent ? $event->getCommand() : null;
+        $command = $event->getCommand();
 
         return null === $command ? 0 : spl_object_id($command);
     }

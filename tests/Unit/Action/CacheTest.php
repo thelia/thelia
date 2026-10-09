@@ -134,7 +134,7 @@ final class CacheTest extends TestCase
 
         self::assertDirectoryExists($this->clearedDir);
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+        $dispatcher->dispatch(self::ended(new Command('thelia:cache:clear')), ConsoleEvents::TERMINATE);
 
         self::assertTrue($clearedDirWasStillThere, 'The cache directory must outlive every other terminate listener.');
         self::assertDirectoryDoesNotExist($this->clearedDir);
@@ -244,7 +244,7 @@ final class CacheTest extends TestCase
         self::assertCount(1, iterator_to_array($transport->get()), 'The worker stops before the next job.');
         self::assertDirectoryExists($this->clearedDir);
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+        $dispatcher->dispatch(self::ended(new Command('thelia:cache:clear')), ConsoleEvents::TERMINATE);
 
         self::assertDirectoryDoesNotExist($this->clearedDir);
     }
