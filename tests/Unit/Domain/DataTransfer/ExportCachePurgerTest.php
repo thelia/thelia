@@ -53,4 +53,23 @@ final class ExportCachePurgerTest extends TestCase
 
         self::assertFileExists($this->directory.'/old.csv');
     }
+
+    /**
+     * A link in the export folder goes; the file it points to, wherever it is, never does.
+     */
+    public function testAnOldLinkGoesAndItsTargetStays(): void
+    {
+        $target = sys_get_temp_dir().'/export-cache-purger-target-'.uniqid('', true);
+        touch($target, strtotime('-3 days'));
+        symlink($target, $this->directory.'/link.csv');
+
+        try {
+            (new ExportCachePurger())->purgeOldExportFiles($this->directory);
+
+            self::assertFileExists($target);
+            self::assertFalse(is_link($this->directory.'/link.csv'));
+        } finally {
+            (new Filesystem())->remove($target);
+        }
+    }
 }
