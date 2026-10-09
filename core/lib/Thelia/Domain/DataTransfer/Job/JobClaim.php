@@ -39,9 +39,6 @@ final readonly class JobClaim
     /** The default redeliver timeout of the Doctrine transport. */
     public const STALE_AFTER_SECONDS = 3600;
 
-    /** The tables a job lives in: the only names ever written into the SQL. */
-    private const TABLES = ['export_job', 'import_job'];
-
     /**
      * @param 'export_job'|'import_job' $table
      * @param bool                      $allowFailed false for a message looking again at a job that was
@@ -52,7 +49,7 @@ final readonly class JobClaim
      */
     public function claim(string $table, int $jobId, bool $allowFailed = true): bool
     {
-        self::assertJobTable($table);
+        JobTables::assert($table);
 
         $now = new \DateTimeImmutable();
 
@@ -84,7 +81,7 @@ final readonly class JobClaim
      */
     public function abandonIfQueued(string $table, int $jobId, string $reason): bool
     {
-        self::assertJobTable($table);
+        JobTables::assert($table);
 
         $statement = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->prepare(
             'UPDATE `'.$table.'` SET `status` = :failed, `error` = :reason, `finished_at` = :now WHERE `id` = :id AND `status` = :queued',
@@ -98,12 +95,5 @@ final readonly class JobClaim
         ]);
 
         return 1 === $statement->rowCount();
-    }
-
-    private static function assertJobTable(string $table): void
-    {
-        if (!\in_array($table, self::TABLES, true)) {
-            throw new \InvalidArgumentException(\sprintf('"%s" is not a table of export or import jobs.', $table));
-        }
     }
 }

@@ -38,6 +38,8 @@ final readonly class JobHeartbeat
      */
     public function beat(string $table, int $jobId): void
     {
+        JobTables::assert($table);
+
         $connection = $this->connection->get();
 
         // Best effort: a beat waits a second at most for a row someone else holds (a

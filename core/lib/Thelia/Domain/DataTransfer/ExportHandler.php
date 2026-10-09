@@ -137,6 +137,10 @@ class ExportHandler
             $this->rowsWritten = 0;
         }
 
+        // A listener may have handed the export over elsewhere: what it was made of in the
+        // export folder would never be downloaded.
+        $this->discardWhatTheExportLeft($event, $written);
+
         return $event;
     }
 
@@ -171,6 +175,29 @@ class ExportHandler
         }
 
         return $instance;
+    }
+
+    /**
+     * @param list<string> $written the files the export wrote
+     */
+    private function discardWhatTheExportLeft(ExportEvent $event, array $written): void
+    {
+        $kept = ExportCachePurger::resolve($event->getFilePath());
+
+        foreach ($written as $file) {
+            $resolved = ExportCachePurger::resolve($file);
+
+            if (null === $resolved || $resolved === $kept) {
+                continue;
+            }
+
+            // The export is done: a file the purge will sweep never fails it.
+            try {
+                (new Filesystem())->remove($resolved);
+            } catch (\Throwable $notRemoved) {
+                Tlog::getInstance()->addWarning(\sprintf('A file an export left was not removed: %s', JobFailureMessage::forLog($notRemoved)));
+            }
+        }
     }
 
     /**
@@ -272,33 +299,10 @@ class ExportHandler
         $this->exportCachePurger->purgeOldExportFiles(\dirname($filePath));
 
         $file = new \SplFileObject($filePath, 'w+b');
-        $written = 0;
 
         // A file left half written holds customer data: it goes with the failure.
         try {
-            $serializer->prepareFile($file);
-
-            foreach ($export as $idx => $data) {
-                if (!\is_array($data) || empty($data)) {
-                    continue;
-                }
-                $data = $export->beforeSerialize($data);
-                $data = $export->applyOrderAndAliases($data);
-                $data = $serializer->serialize($data);
-                $data = $export->afterSerialize($data);
-
-                if ($idx > 0) {
-                    $data = $serializer->separator().$data;
-                }
-
-                $file->fwrite($data);
-
-                if (null !== $onProgress && 0 === ++$written % DataTransferProgress::STEP) {
-                    $onProgress($written);
-                }
-            }
-
-            $serializer->finalizeFile($file);
+            $written = $this->writeRows($export, $serializer, $file, $onProgress);
             $this->rowsWritten = $written;
 
             // The caller records the count, and may fail to: the file goes with it too.
@@ -315,6 +319,39 @@ class ExportHandler
         unset($file);
 
         return $filePath;
+    }
+
+    /**
+     * @return int the rows written
+     */
+    private function writeRows(AbstractExport $export, SerializerInterface $serializer, \SplFileObject $file, ?\Closure $onProgress): int
+    {
+        $written = 0;
+        $serializer->prepareFile($file);
+
+        foreach ($export as $idx => $data) {
+            if (!\is_array($data) || empty($data)) {
+                continue;
+            }
+            $data = $export->beforeSerialize($data);
+            $data = $export->applyOrderAndAliases($data);
+            $data = $serializer->serialize($data);
+            $data = $export->afterSerialize($data);
+
+            if ($idx > 0) {
+                $data = $serializer->separator().$data;
+            }
+
+            $file->fwrite($data);
+
+            if (0 === ++$written % DataTransferProgress::STEP && null !== $onProgress) {
+                $onProgress($written);
+            }
+        }
+
+        $serializer->finalizeFile($file);
+
+        return $written;
     }
 
     private function archive(ExportEvent $event, ArchiverInterface $archiver, string $filePath, bool $includeImages, bool $includeDocuments): void

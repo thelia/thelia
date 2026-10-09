@@ -70,4 +70,14 @@ final class JobHeartbeatTest extends IntegrationTestCase
 
         self::assertGreaterThan(new \DateTimeImmutable('-1 minute'), new \DateTimeImmutable((string) $seenByAnotherWorker));
     }
+
+    /**
+     * The table is written into the SQL: only the tables of the jobs are ever named.
+     */
+    public function testABeatNamesOnlyAJobTable(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->getService(JobHeartbeat::class)->beat('customer', 1);
+    }
 }
