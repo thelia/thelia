@@ -8,6 +8,10 @@
 
 - An order lines export, `thelia.export.order_lines`, writes one row per order line with the references of the product and of the combination, the GTIN and the manufacturer part number frozen on the line, the quantity and the unit price, bounded by the same optional dates as the full order export. The two product price exports gain an `mpn` column, and the stock import an optional `mpn` column; a row of the stock import whose `ean` is not a GTIN is refused with the reason and the import goes on. A GTIN or a part number a spreadsheet would run as a formula is exported behind a leading quote.
 
+## Fixed
+
+- `maintenance:purge --dry-run` no longer deletes the export cache files; it counts them.
+
 ## Behaviour changes
 
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
