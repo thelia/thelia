@@ -182,6 +182,28 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         $this->service->refund($order, 40.0, RefundReason::Other);
     }
 
+    public function testADeactivatedModuleIsNotAskedToRefund(): void
+    {
+        // Its services are no longer compiled in the container: calling it would fail
+        // half-way, after the pending line is written.
+        $order = $this->paidOrder(100);
+        ModuleQuery::create()
+            ->findOneByCode(DeferredCapturePaymentModule::getModuleCode())
+            ->setActivate(BaseModule::IS_NOT_ACTIVATED)
+            ->save($this->getPropelConnection());
+
+        self::assertFalse($this->service->supportsRefund($order));
+
+        try {
+            $this->service->refund($order, 40.0, RefundReason::Other);
+            self::fail('A deactivated module was asked to refund.');
+        } catch (RefundNotSupportedException $exception) {
+            self::assertStringContainsString(DeferredCapturePaymentModule::getModuleCode(), $exception->getMessage());
+        }
+
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
+    }
+
     public function testARefundMadeOutsideTheProviderIsWrittenByHand(): void
     {
         // A cheque order: refunded by bank transfer, recorded for the books.
