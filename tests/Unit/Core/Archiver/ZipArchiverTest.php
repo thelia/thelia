@@ -40,9 +40,12 @@ final class ZipArchiverTest extends TestCase
         try {
             $archiver = (new ZipArchiver())->create($base);
             $archiver->add($added);
+            $archivePath = $archiver->getArchivePath();
             $archiver->discard();
+            // A zip still open is written when it is let go: gone, it must write nothing.
+            unset($archiver);
 
-            self::assertFileDoesNotExist($archiver->getArchivePath());
+            self::assertFileDoesNotExist($archivePath);
         } finally {
             @unlink($added);
             @unlink($base.'.zip');
