@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Currency;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPostageTaxQuery;
@@ -52,7 +53,7 @@ final class SalesPieceBuilder
         $taxCents = self::cents((float) $tax);
 
         if ($totalCents <= 0) {
-            throw new OrderNotExportableException(\sprintf('Order %s: its invoice amounts to nothing.', $orderRef));
+            throw new OrderNotExportableException(self::trans('Order %ref: its invoice amounts to nothing.', ['%ref' => $orderRef]));
         }
 
         $postage = (float) $order->getPostage();
@@ -65,7 +66,7 @@ final class SalesPieceBuilder
         $productTaxCents = $taxCents - $postageTaxCents;
 
         if ($productCents < 0 || $productTaxCents < 0) {
-            throw new OrderNotExportableException(\sprintf('Order %s: its discount is larger than its products, the invoice cannot be split by rate.', $orderRef));
+            throw new OrderNotExportableException(self::trans('Order %ref: its discount is larger than its products, the invoice cannot be split by rate.', ['%ref' => $orderRef]));
         }
 
         $products = self::allocate($productCents, $productAmounts);
@@ -88,7 +89,7 @@ final class SalesPieceBuilder
         }
 
         foreach (self::byRate($taxes) as $rate => $cents) {
-            $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException(\sprintf('Order %s: tax was collected at %s%%, a rate the chart of accounts gives no tax account.', $orderRef, $rate));
+            $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException(self::trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_TAX, $taxAccount, $rate, 0, $cents);
         }
 
@@ -106,7 +107,7 @@ final class SalesPieceBuilder
         return new AccountingPiece(
             (int) $order->getId(),
             (string) $order->getInvoiceRef(),
-            $order->getInvoiceDate() ?? throw new OrderNotExportableException(\sprintf('Order %s has no invoice date.', $orderRef)),
+            $order->getInvoiceDate() ?? throw new OrderNotExportableException(self::trans('Order %ref has no invoice date.', ['%ref' => $orderRef])),
             (string) $customer?->getRef(),
             $customerName,
             $foreignCurrencyCode,
@@ -172,7 +173,7 @@ final class SalesPieceBuilder
      */
     private function accountsOf(AccountingChart $chart, string $rate, string $orderRef): array
     {
-        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException(\sprintf('Order %s: it was taxed at %s%%, a rate the chart of accounts has no account for.', $orderRef, $rate));
+        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException(self::trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
     }
 
     /**
@@ -277,5 +278,13 @@ final class SalesPieceBuilder
     private static function cents(float $amount): int
     {
         return (int) round($amount * 100);
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private static function trans(string $message, array $parameters): string
+    {
+        return Translator::getInstance()->trans($message, $parameters);
     }
 }
