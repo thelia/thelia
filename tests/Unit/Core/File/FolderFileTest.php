@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Core\File;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\File\FolderFile;
 
@@ -137,6 +138,22 @@ final class FolderFileTest extends TestCase
         self::assertSame(0o770, fileperms($this->root.'/made/deep') & 0o777);
         self::assertSame(0o770, fileperms($this->root.'/made') & 0o777);
         self::assertSame(0o700, fileperms($this->folder) & 0o777);
+    }
+
+    /**
+     * A file made private is FILE_MODE; one that cannot be is not left behind, and the
+     * refusal is told.
+     */
+    public function testAFileIsMadePrivateOrTheRefusalIsTold(): void
+    {
+        file_put_contents($this->folder.'/a.csv', 'a');
+        chmod($this->folder.'/a.csv', 0o666);
+
+        FolderFile::makePrivateOrRemove($this->folder.'/a.csv');
+        self::assertSame(0o640, fileperms($this->folder.'/a.csv') & 0o777);
+
+        $this->expectException(IOExceptionInterface::class);
+        FolderFile::makePrivateOrRemove($this->folder.'/gone.csv');
     }
 
     /**

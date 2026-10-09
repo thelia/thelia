@@ -139,6 +139,18 @@ final class FolderFile
     }
 
     /**
+     * The file made FILE_MODE: for one written under the umask of the process (an
+     * archiver, an upload moved), or as a belt for one created privately, since the umask
+     * is the process's and a thread of a threaded server may have changed it.
+     *
+     * @throws IOExceptionInterface when the file system refuses
+     */
+    public static function makePrivate(string $file): void
+    {
+        (new Filesystem())->chmod($file, self::FILE_MODE);
+    }
+
+    /**
      * The umask is the process's: given back whatever happens.
      *
      * @template T
@@ -156,17 +168,5 @@ final class FolderFile
         } finally {
             umask($previousUmask);
         }
-    }
-
-    /**
-     * The file made FILE_MODE: for one written under the umask of the process (an
-     * archiver, an upload moved), or as a belt for one created privately, since the umask
-     * is the process's and a thread of a threaded server may have changed it.
-     *
-     * @throws IOExceptionInterface when the file system refuses
-     */
-    public static function makePrivate(string $file): void
-    {
-        (new Filesystem())->chmod($file, self::FILE_MODE);
     }
 }
