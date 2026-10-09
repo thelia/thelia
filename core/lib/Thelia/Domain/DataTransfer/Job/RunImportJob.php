@@ -40,6 +40,6 @@ final readonly class RunImportJob implements DataTransferJobMessage, DescribedJo
 
     public function jobTable(): string
     {
-        return 'import_job';
+        return JobTables::IMPORT;
     }
 }

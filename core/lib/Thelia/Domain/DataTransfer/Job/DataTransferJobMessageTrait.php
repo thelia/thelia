@@ -34,7 +34,7 @@ trait DataTransferJobMessageTrait
      */
     public function describe(): string
     {
-        return \sprintf('%s #%d', 'export_job' === $this->jobTable() ? 'Export' : 'Import', $this->jobId());
+        return \sprintf('%s #%d', JobTables::EXPORT === $this->jobTable() ? 'Export' : 'Import', $this->jobId());
     }
 
     public function postponements(): int
