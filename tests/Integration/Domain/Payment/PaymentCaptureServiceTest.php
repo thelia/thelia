@@ -238,6 +238,19 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('invalid_reference', $capture->getErrorCode());
     }
 
+    public function testARefusalWithAReferenceTooLongIsStillARefusal(): void
+    {
+        // Nothing was taken: the reference is dropped, the refusal stands.
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::failed('05', 'Do not honor', str_repeat('R', 120));
+
+        $capture = $this->service->capture($order, 40.0);
+
+        self::assertTrue($capture->isFailed());
+        self::assertSame('05', $capture->getErrorCode());
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+    }
+
     public function testALineRecordedByHandStaysRecordedWhenAListenerFails(): void
     {
         [$order] = $this->authorizedOrder(120);

@@ -327,7 +327,20 @@ final readonly class PaymentCaptureService
 
             throw $conflict;
         } catch (InvalidProviderReferenceException $invalid) {
-            // The answer cannot be written as it came: the line stays pending, reserving
+            // A refusal took nothing: it stands without the reference the journal cannot
+            // hold, which nothing will ever need to find this line by.
+            if (PaymentTransactionState::FAILED === $result->state) {
+                return $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->settle(
+                    $transaction,
+                    PaymentTransactionState::FAILED,
+                    null,
+                    $result->errorCode,
+                    $result->errorMessage,
+                    $moduleCode,
+                ));
+            }
+
+            // Anything else cannot be written as it came: the line stays pending, reserving
             // what it asked for, and says why, for the merchant to settle it by hand.
             Tlog::getInstance()->error(\sprintf(
                 'Payment module %s answered transaction #%d with a reference the journal cannot hold: %s',
