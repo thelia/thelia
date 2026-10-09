@@ -303,6 +303,12 @@ final class TheliaEvents
      * the journal line.
      */
     public const ORDER_PAYMENT_CAPTURE = 'action.order.paymentCapture';
+
+    /**
+     * Sent to record by hand the outcome of a pending line of the payment journal the
+     * provider never confirmed (OrderPaymentSettlementEvent).
+     */
+    public const ORDER_PAYMENT_TRANSACTION_SETTLE = 'action.order.paymentTransactionSettle';
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';
     public const ORDER_PRODUCT_AFTER_CREATE = 'action.orderProduct.afterCreate';
 
