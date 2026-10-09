@@ -15,8 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tools;
 
 /**
- * Text written to an operator's terminal from something a module ships (its descriptor, its
- * directory name): a control character could rewrite or hide what the console prints.
+ * Text written to an operator's terminal, to a log or to a page of the back office from
+ * something a module or a theme ships (its descriptor, its directory name): a control
+ * character could rewrite or hide what is printed.
  */
 final class TerminalText
 {
@@ -36,7 +37,11 @@ final class TerminalText
      * kept: messages span lines, so a module directory named with one can still start a line
      * of its own. A text that is not valid UTF-8 has each byte outside a well-formed sequence
      * replaced first: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that
-     * is not in UTF-8. Each range is then matched as its UTF-8 encoding, byte by byte.
+     * is not in UTF-8. Each range is then matched as its UTF-8 encoding, byte by byte. Last,
+     * on what is then valid UTF-8, every other format character (Unicode category Cf, the
+     * Arabic number signs among them), private use character (Co), and the object
+     * replacement character (U+FFFC) and the unassigned U+2065, which print as nothing or
+     * as a glyph that is not the text.
      */
     public static function withoutControlCharacters(string $text): string
     {
@@ -46,7 +51,9 @@ final class TerminalText
             $text = preg_replace('/(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]/', '?', $text) ?? '';
         }
 
-        return preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80-\x83][\x80-\xBF]|\xE1\x9E[\xB4\xB5]|\xF0\x9B\xB2[\xA0-\xA3]/', '?', $text) ?? '';
+        $text = preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80-\x83][\x80-\xBF]|\xE1\x9E[\xB4\xB5]|\xF0\x9B\xB2[\xA0-\xA3]/', '?', $text) ?? '';
+
+        return preg_replace('/[\p{Cf}\p{Co}\x{FFFC}\x{2065}]/u', '?', $text) ?? $text;
     }
 
     /**
@@ -66,6 +73,9 @@ final class TerminalText
      */
     public static function onOneLine(string $text): string
     {
-        return self::singleLine(preg_replace('/\s*[\r\n]+\s*/', ' ', trim($text)) ?? '');
+        // Possessive quantifiers: a long run of blanks is read once, never backtracked over
+        // (a run of thousands, cited by libxml from a descriptor, took seconds without the
+        // PCRE JIT).
+        return self::singleLine(preg_replace('/[^\S\r\n]*+[\r\n]++\s*+/', ' ', trim($text, " \t\n\r\0\x0B\f")) ?? '');
     }
 }

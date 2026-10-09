@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Tools;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Thelia\Tools\TerminalText;
 
@@ -35,6 +36,34 @@ final class TerminalTextTest extends TestCase
     public function testAMessageSpreadOverLinesIsPrintedOnOne(): void
     {
         self::assertSame('first error. second error.?OK', TerminalText::onOneLine("first error.\n  \r\nsecond error.\tOK\n"));
+        // A form feed is a blank of the line too: the result is the same the second time.
+        self::assertSame('| ?', TerminalText::onOneLine("|\n\f\x88"));
+        self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
+    }
+
+    /**
+     * A run of thousands of blanks (a value libxml cites from a descriptor) is read once:
+     * the regular expression never backtracks over it, with or without the PCRE JIT.
+     */
+    #[RunInSeparateProcess]
+    public function testALongRunOfBlanksIsReadOnce(): void
+    {
+        // In a process of its own: PCRE keeps a pattern compiled once, with the JIT it had.
+
+        $text = 'a'.str_repeat(' ', 30000).'b'.str_repeat("\n ", 5000).'c';
+        $jit = \ini_get('pcre.jit');
+        ini_set('pcre.jit', '0');
+        $started = hrtime(true);
+
+        try {
+            $printed = TerminalText::onOneLine($text);
+        } finally {
+            ini_set('pcre.jit', (string) $jit);
+        }
+
+        self::assertSame('a'.str_repeat(' ', 30000).'b c', $printed);
+        self::assertSame(\PREG_NO_ERROR, preg_last_error());
+        self::assertLessThan(2_000_000_000, hrtime(true) - $started);
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -43,6 +72,11 @@ final class TerminalTextTest extends TestCase
         yield 'an escape sequence' => ["Acme\e[31m", 'Acme?[31m'];
         yield 'a carriage return' => ["Acme\rFake", 'Acme?Fake'];
         yield 'a C1 control sequence introducer' => ["Acme\u{9B}31m", 'Acme?31m'];
+        yield 'a format character off the list (Arabic number sign)' => ["Acme\u{600}1", 'Acme?1'];
+        yield 'the object replacement character' => ["Acme\u{FFFC}", 'Acme?'];
+        yield 'the unassigned ignorable U+2065' => ["Ac\u{2065}me", 'Ac?me'];
+        yield 'a private use character' => ["Acme\u{E000}", 'Acme?'];
+        yield 'a letter with an accent is kept' => ['Acmé', 'Acmé'];
         yield 'a right-to-left override' => ["Acme\u{202E}eludoM", 'Acme?eludoM'];
         yield 'an isolate' => ["Acme\u{2066}Module\u{2069}", 'Acme?Module?'];
         yield 'a zero-width space' => ["Ac\u{200B}me", 'Ac?me'];
