@@ -18,7 +18,12 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
@@ -257,17 +262,19 @@ final class CacheTest extends TestCase
         $transport = new InMemoryTransport();
         $transport->send(new Envelope(new \stdClass()));
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
-        $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
-            $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
+        $worker = new Command('messenger:consume');
+        $task = new Command('sale:check-activation');
+        $dispatcher->dispatch(self::started($worker), ConsoleEvents::COMMAND);
+        $this->worker($transport, $dispatcher, function () use ($dispatcher, $task): void {
+            $dispatcher->dispatch(self::started($task), ConsoleEvents::COMMAND);
             $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
-            $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+            $dispatcher->dispatch(self::ended($task), ConsoleEvents::TERMINATE);
         })->run();
 
         self::assertCount(1, $transport->getAcknowledged());
         self::assertDirectoryExists($this->clearedDir);
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+        $dispatcher->dispatch(self::ended($worker), ConsoleEvents::TERMINATE);
 
         self::assertDirectoryDoesNotExist($this->clearedDir);
     }
@@ -288,7 +295,8 @@ final class CacheTest extends TestCase
         $transport = new InMemoryTransport();
         $transport->send(new Envelope(new \stdClass()));
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::COMMAND);
+        $worker = new Command('messenger:consume');
+        $dispatcher->dispatch(self::started($worker), ConsoleEvents::COMMAND);
 
         try {
             $this->worker($transport, $dispatcher, function () use ($dispatcher): void {
@@ -298,7 +306,35 @@ final class CacheTest extends TestCase
         } catch (\RuntimeException) {
         }
 
-        $dispatcher->dispatch(new Event(), ConsoleEvents::TERMINATE);
+        $dispatcher->dispatch(self::ended($worker), ConsoleEvents::TERMINATE);
+
+        self::assertDirectoryDoesNotExist($this->clearedDir);
+    }
+
+    /**
+     * A listener of the start of a command that fails before the cache action counted it
+     * still ends with that command: the end of a command never counted leaves the
+     * worker's clear waiting for the worker.
+     */
+    public function testACommandNeverCountedNeverClearsUnderTheWorker(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->action());
+        $this->addALazyWorkerListenerStoredIn($dispatcher, $this->clearedDir);
+        $transport = new InMemoryTransport();
+        $transport->send(new Envelope(new \stdClass()));
+        $worker = new Command('messenger:consume');
+        $task = new Command('sale:check-activation');
+
+        $dispatcher->dispatch(self::started($worker), ConsoleEvents::COMMAND);
+        $this->worker($transport, $dispatcher, function () use ($dispatcher, $task): void {
+            $dispatcher->dispatch(new CacheEvent($this->clearedDir, true, false), TheliaEvents::CACHE_CLEAR);
+            $dispatcher->dispatch(self::ended($task), ConsoleEvents::TERMINATE);
+        })->run();
+
+        self::assertDirectoryExists($this->clearedDir);
+
+        $dispatcher->dispatch(self::ended($worker), ConsoleEvents::TERMINATE);
 
         self::assertDirectoryDoesNotExist($this->clearedDir);
     }
@@ -335,6 +371,16 @@ final class CacheTest extends TestCase
         self::assertCount(1, $transport->getRejected());
         self::assertCount(1, iterator_to_array($transport->get()));
         self::assertDirectoryExists($this->clearedDir);
+    }
+
+    private static function started(Command $command): ConsoleCommandEvent
+    {
+        return new ConsoleCommandEvent($command, new ArrayInput([]), new NullOutput());
+    }
+
+    private static function ended(Command $command): ConsoleTerminateEvent
+    {
+        return new ConsoleTerminateEvent($command, new ArrayInput([]), new NullOutput(), Command::SUCCESS);
     }
 
     private function worker(InMemoryTransport $transport, EventDispatcher $dispatcher, \Closure $handler): Worker

@@ -16,6 +16,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -43,8 +44,8 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /** @var CacheEvent[] */
     protected array $onTerminateCacheClearEvents = [];
 
-    /** The commands running in this process: one a worker runs ends inside the worker's. */
-    private int $commandDepth = 0;
+    /** @var array<int, true> the commands running in this process, by their object id */
+    private array $runningCommands = [];
 
     /**
      * CacheListener constructor.
@@ -84,21 +85,23 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function onConsoleCommand(): void
+    public function onConsoleCommand(object $event): void
     {
-        ++$this->commandDepth;
+        $this->runningCommands[self::commandOf($event)] = true;
     }
 
     /**
-     * Only the outermost command clears. A recurring task runs its command inside the
+     * Only the last command running clears. A recurring task runs its command inside the
      * worker, and that command ends with a console terminate of its own; the worker's
-     * command ends whatever stopped it, an exception included.
+     * command ends whatever stopped it, an exception included. A command is told by its
+     * own start and end: one whose start was never counted (a listener before this one
+     * failed) never stands for the worker's.
      */
-    public function onConsoleTerminate(): void
+    public function onConsoleTerminate(object $event): void
     {
-        $this->commandDepth = max(0, $this->commandDepth - 1);
+        unset($this->runningCommands[self::commandOf($event)]);
 
-        if (0 !== $this->commandDepth) {
+        if ([] !== $this->runningCommands) {
             return;
         }
 
@@ -160,5 +163,12 @@ class Cache extends BaseAction implements EventSubscriberInterface
             ConsoleEvents::TERMINATE => ['onConsoleTerminate', self::TERMINATE_PRIORITY],
             WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
         ];
+    }
+
+    private static function commandOf(object $event): int
+    {
+        $command = $event instanceof ConsoleEvent ? $event->getCommand() : null;
+
+        return null === $command ? 0 : spl_object_id($command);
     }
 }
