@@ -60,7 +60,8 @@ class TemplateDescriptorValidator
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
+                // The keys of the table are read back as integers: a version is compared as text.
+                if (false === $xsdVersion || (null !== $version && $version !== (string) $xsdVersion)) {
                     continue;
                 }
 
@@ -86,10 +87,14 @@ class TemplateDescriptorValidator
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
+        $previousErrorHandling = libxml_use_internal_errors(true);
+        // A schema that cannot be read is a warning of PHP: an exception here, whatever the
+        // environment does with a warning.
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
 
         try {
-            libxml_use_internal_errors(true);
-
             if (!$dom->schemaValidate($xsdFile->getRealPath())) {
                 $errors = libxml_get_errors();
 
@@ -104,13 +109,15 @@ class TemplateDescriptorValidator
                         $error->column,
                     );
                 }
-
-                libxml_clear_errors();
             }
-
-            libxml_use_internal_errors(false);
-        } catch (\Exception) {
-            libxml_use_internal_errors(false);
+        } catch (\Exception $notChecked) {
+            // A schema that could not be read checks nothing: a descriptor it could not check
+            // is not a valid one.
+            $errorMessages[] = \sprintf('the descriptor could not be checked against %s (%s)', $xsdFile->getBasename(), $notChecked->getMessage());
+        } finally {
+            restore_error_handler();
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousErrorHandling);
         }
 
         return $errorMessages;
