@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
 /**
@@ -47,27 +48,12 @@ class ModuleDescriptorValidator
 
     public function validate($xml_file, $version = null): bool
     {
+        $this->moduleVersion = null;
         $dom = new \DOMDocument();
         $errors = [];
+        $notLoaded = XmlDescriptor::loadingErrors($dom, (string) $xml_file);
 
-        // No network access for an entity or a DTD a descriptor would point at. What
-        // libxml has to say about a file that is not XML is the reason given, never a
-        // warning of PHP.
-        $previousErrorHandling = libxml_use_internal_errors(true);
-
-        try {
-            libxml_clear_errors();
-            $loaded = $dom->load($xml_file, \LIBXML_NONET);
-            $notXml = array_map(
-                static fn (\LibXMLError $error): string => self::withoutPath(trim($error->message), (string) $xml_file),
-                libxml_get_errors(),
-            );
-            libxml_clear_errors();
-        } finally {
-            libxml_use_internal_errors($previousErrorHandling);
-        }
-
-        if ($loaded) {
+        if ([] === $notLoaded) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
@@ -88,7 +74,7 @@ class ModuleDescriptorValidator
         }
 
         $reason = match (true) {
-            !$loaded => 'it is not well-formed XML ('.implode(', ', $notXml).')',
+            [] !== $notLoaded => implode(', ', array_map(static fn (string $said): string => self::withoutPath($said, (string) $xml_file), $notLoaded)),
             [] === $errors => \sprintf('no descriptor schema matches version %s', null === $version ? 'any' : (string) $version),
             default => implode(', ', $errors),
         };
@@ -115,18 +101,48 @@ class ModuleDescriptorValidator
     }
 
     /**
-     * A message of libxml without a path of the server: libxml quotes, in full and
-     * resolved, the path of a file it could not open. The path of the descriptor, as given
-     * and as resolved, becomes the name of the file; then so does any other path quoted.
+     * A message of libxml about the file, without a path of the server. libxml quotes the
+     * path of a file it could not open, in full, resolved and normalised: whatever it
+     * quoted there becomes the name of the file (the whole of it, as the path may hold a
+     * quote). Then the path as given and as resolved, wherever they stand, and last any
+     * other path quoted.
      */
     private static function withoutPath(string $message, string $xmlFile): string
     {
         $file = basename($xmlFile);
-        $resolvedFolder = realpath(\dirname($xmlFile));
-        $forms = array_filter([$xmlFile, false === $resolvedFolder ? null : $resolvedFolder.\DIRECTORY_SEPARATOR.$file]);
-        $message = str_replace($forms, $file, $message);
+
+        if ('' === $file) {
+            return $message;
+        }
+
+        // The name is given back as it is: never read for the references of a replacement.
+        $message = (string) preg_replace_callback('#(failed to load external entity )".*"#s', static fn (array $found): string => $found[1].'"'.$file.'"', $message);
+        $message = strtr($message, self::namesOf($xmlFile));
 
         return (string) preg_replace('#"[^"]*/([^"/]+)"#', '"$1"', $message);
+    }
+
+    /**
+     * The path as given and as the file system resolves it, each standing for the name of
+     * the file (strtr() takes the longest first, so that the shorter one never eats a part
+     * of the longer).
+     *
+     * @return array<string, string>
+     */
+    private static function namesOf(string $path): array
+    {
+        if ('' === $path) {
+            return [];
+        }
+
+        $resolvedFolder = realpath(\dirname($path));
+        $names = [$path => basename($path)];
+
+        if (false !== $resolvedFolder) {
+            $names[$resolvedFolder.\DIRECTORY_SEPARATOR.basename($path)] = basename($path);
+        }
+
+        return $names;
     }
 
     /**
@@ -139,35 +155,15 @@ class ModuleDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $errorMessages = [];
-        $previousErrorHandling = libxml_use_internal_errors(true);
+        $schemaFile = (string) $xsdFile->getRealPath();
+        // What a message of libxml may quote of the server: the schema, and the
+        // descriptor, each by its name.
+        $names = [...self::namesOf($schemaFile), ...self::namesOf((string) $dom->documentURI)];
 
-        try {
-            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-                $errors = libxml_get_errors();
-
-                foreach ($errors as $error) {
-                    $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) on line %d column %d'."\n",
-                        self::withoutPath($error->message, $dom->documentURI ?? ''),
-                        $error->level,
-                        $error->code,
-                        $error->line,
-                        $error->column,
-                    );
-                }
-
-                libxml_clear_errors();
-            }
-        } catch (\ErrorException $notChecked) {
-            // A schema that could not be read checks nothing: a descriptor it could not check
-            // is not a valid one.
-            $errorMessages[] = \sprintf('the descriptor could not be checked against %s (%s)', $xsdFile->getBasename(), $notChecked->getMessage());
-        } finally {
-            libxml_use_internal_errors($previousErrorHandling);
-        }
-
-        return $errorMessages;
+        return array_map(
+            static fn (string $error): string => 'XML error "'.strtr($error, $names).'"',
+            XmlDescriptor::schemaErrors($dom, $schemaFile),
+        );
     }
 
     public function getDescriptor($xml_file): \SimpleXMLElement|false

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Validator;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
 
@@ -53,14 +54,15 @@ class TemplateDescriptorValidator
     public function validate(?string $version = null): self
     {
         $dom = new \DOMDocument();
-        $errors = [];
+        $errors = XmlDescriptor::loadingErrors($dom, $this->xmlDescriptorPath);
 
-        if ($dom->load($this->xmlDescriptorPath)) {
+        if ([] === $errors) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
+                // The keys of the table are read back as integers: a version is compared as text.
+                if (false === $xsdVersion || (null !== $version && $version !== (string) $xsdVersion)) {
                     continue;
                 }
 
@@ -72,6 +74,7 @@ class TemplateDescriptorValidator
             }
         }
 
+        // A file of the theme, read by its developer: named by its path.
         throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
     }
 
@@ -85,35 +88,10 @@ class TemplateDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $errorMessages = [];
-
-        try {
-            libxml_use_internal_errors(true);
-
-            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-                $errors = libxml_get_errors();
-
-                foreach ($errors as $error) {
-                    $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
-                        $error->message,
-                        $error->level,
-                        $error->code,
-                        $error->file,
-                        $error->line,
-                        $error->column,
-                    );
-                }
-
-                libxml_clear_errors();
-            }
-
-            libxml_use_internal_errors(false);
-        } catch (\Exception) {
-            libxml_use_internal_errors(false);
-        }
-
-        return $errorMessages;
+        return array_map(
+            static fn (string $error): string => 'XML error "'.$error.'"',
+            XmlDescriptor::schemaErrors($dom, (string) $xsdFile->getRealPath()),
+        );
     }
 
     /**

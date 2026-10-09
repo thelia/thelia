@@ -141,8 +141,8 @@ final class FolderFileTest extends TestCase
     }
 
     /**
-     * A file made private is FILE_MODE; one that cannot be is not left behind, and the
-     * refusal is told.
+     * A file made private is FILE_MODE; one that cannot be (a link to nothing, whose mode
+     * the file system refuses to change) is not left behind, and the refusal is told.
      */
     public function testAFileIsMadePrivateOrTheRefusalIsTold(): void
     {
