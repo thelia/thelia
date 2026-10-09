@@ -17,12 +17,14 @@ namespace Thelia\Domain\Payment\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderPaymentSettlementEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 
 /**
  * The core answer to ORDER_PAYMENT_TRANSACTION_SETTLE: a pending line the provider never
  * confirmed gets the outcome the merchant read at the provider. The line says it was
- * settled by hand, with the merchant's note; who did it is in the administration log.
+ * settled by hand, by whom, with the merchant's note; the administration log keeps the
+ * same.
  */
 final readonly class SettleOrderPaymentTransactionListener
 {
@@ -32,6 +34,7 @@ final readonly class SettleOrderPaymentTransactionListener
 
     public function __construct(
         private PaymentTransactionRecorder $recorder,
+        private OrderHistoryActorResolver $actorResolver,
     ) {
     }
 
@@ -39,13 +42,19 @@ final readonly class SettleOrderPaymentTransactionListener
     public function onSettle(OrderPaymentSettlementEvent $event): void
     {
         $note = trim((string) $event->getNote());
+        $note = '' === $note ? self::DEFAULT_NOTE : $note;
+        $administrator = $this->actorResolver->actingAdministrator();
+
+        if (null !== $administrator) {
+            $note .= \sprintf(' (recorded by %s)', $administrator->getUsername());
+        }
 
         $event->setTransaction($this->recorder->settle(
             $event->getTransaction(),
             $event->getState(),
             $event->getPspReference(),
             self::ERROR_CODE_SETTLED_BY_HAND,
-            '' === $note ? self::DEFAULT_NOTE : $note,
+            $note,
         ));
     }
 }

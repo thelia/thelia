@@ -270,7 +270,8 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
 
     public function testTheOutcomeOfALineTheProviderNeverConfirmedIsRecordedFromTheSheet(): void
     {
-        $this->loginAs($this->factory->admin());
+        $admin = $this->factory->admin();
+        $this->loginAs($admin);
         $order = $this->authorizedOrder(120);
         DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-SILENT');
         $this->getService(PaymentCaptureService::class)->capture($order);
@@ -282,14 +283,16 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         $this->client->request('POST', '/admin/order/update/'.$order->getId().'/payment-transaction/'.$lineId.'/settle', [
             '_token' => $this->tokenOf($crawler),
             'outcome' => 'succeeded',
-            'psp_reference' => 'PSP-READ-AT-PROVIDER',
+            // The line already carries the reference the module answered with.
+            'psp_reference' => '',
         ]);
         $this->client->followRedirect();
 
         $line = OrderPaymentTransactionQuery::create()->findPk($lineId);
         $line->reload();
         self::assertTrue($line->isSucceeded());
-        self::assertSame('PSP-READ-AT-PROVIDER', $line->getPspReference());
+        self::assertSame('CAP-SILENT', $line->getPspReference());
+        self::assertStringContainsString((string) $admin->getLogin(), (string) $line->getErrorMessage(), 'The line says who recorded it.');
         self::assertSame(OrderStatus::CODE_PAID, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame(1, AdminLogQuery::create()->filterByMessage('%recorded by hand as succeeded%', Criteria::LIKE)->count());
     }
