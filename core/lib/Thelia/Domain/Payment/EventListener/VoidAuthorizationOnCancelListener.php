@@ -19,6 +19,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Service\AuthorizedOrderCancellationGuard;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Log\Tlog;
@@ -41,7 +42,25 @@ final readonly class VoidAuthorizationOnCancelListener
     public function __construct(
         private PaymentCaptureService $captureService,
         private PaymentTransactionTotalsReader $totalsReader,
+        private AuthorizedOrderCancellationGuard $cancellationGuard,
     ) {
+    }
+
+    /**
+     * Priority 160, before Thelia\Action\Order::updateStatus (128) writes the status: an
+     * administrator without the right to capture payments cannot cancel an order whose
+     * authorization still holds an amount.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 160)]
+    public function refuseAReleaseWithoutTheRight(OrderEvent $event): void
+    {
+        $toStatusId = $event->getStatus();
+
+        if (null === $toStatusId) {
+            return;
+        }
+
+        $this->cancellationGuard->assertMayMoveTo($event->getOrder(), (int) $toStatusId, $event->getSourceModuleCode());
     }
 
     #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 3)]

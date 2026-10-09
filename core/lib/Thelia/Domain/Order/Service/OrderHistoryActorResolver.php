@@ -60,16 +60,7 @@ final readonly class OrderHistoryActorResolver
     public function resolve(?string $moduleCode = null): OrderHistoryActor
     {
         $hasModuleCode = null !== $moduleCode && '' !== $moduleCode;
-
-        // Only an administrator: a customer holding a front API token is the customer,
-        // and is looked at below, after a module that names itself.
-        $tokenUser = $this->security?->getUser();
-        $adminUser = $tokenUser instanceof Admin ? $tokenUser : null;
-
-        if (null === $adminUser && (!$hasModuleCode || $this->isBackOfficeOrUnknownRequest())) {
-            $sessionAdmin = $this->securityContext->getAdminUser();
-            $adminUser = $sessionAdmin instanceof UserInterface ? $sessionAdmin : null;
-        }
+        $adminUser = $this->actingAdministrator($moduleCode);
 
         if (null !== $adminUser) {
             return new OrderHistoryActor(
@@ -93,6 +84,28 @@ final readonly class OrderHistoryActorResolver
         }
 
         return OrderHistoryActor::system();
+    }
+
+    /**
+     * The administrator the change is made by, under the precedence above, or null when
+     * it is made by a module, a customer or the shop itself.
+     */
+    public function actingAdministrator(?string $moduleCode = null): ?UserInterface
+    {
+        // Only an administrator: a customer holding a front API token is the customer.
+        $tokenUser = $this->security?->getUser();
+
+        if ($tokenUser instanceof Admin) {
+            return $tokenUser;
+        }
+
+        if (null !== $moduleCode && '' !== $moduleCode && !$this->isBackOfficeOrUnknownRequest()) {
+            return null;
+        }
+
+        $sessionAdmin = $this->securityContext->getAdminUser();
+
+        return $sessionAdmin instanceof UserInterface ? $sessionAdmin : null;
     }
 
     /**

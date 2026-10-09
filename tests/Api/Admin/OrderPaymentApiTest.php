@@ -28,8 +28,11 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransactionQuery;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Support\Payment\DeferredCapturePaymentModule;
@@ -324,6 +327,71 @@ final class OrderPaymentApiTest extends ApiTestCase
         $response = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => null], token: $this->authenticateAsAdmin($cashier));
 
         self::assertSame(Response::HTTP_CREATED, $response->getStatusCode());
+    }
+
+    public function testCancellingAnOrderThatHoldsAnAuthorizationNeedsTheCaptureRight(): void
+    {
+        // Cancelling releases the amount at the provider: a decision on the money, which
+        // the order rights alone do not grant.
+        [$order] = $this->authorizedOrder(120);
+        $clerk = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]],
+            ['password' => 'password'],
+        );
+        $token = $this->authenticateAsAdmin($clerk);
+
+        $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $this->bodyCancelling($order, $token), $token);
+
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+        self::assertSame([], DeferredCapturePaymentModule::$voidCalls);
+    }
+
+    public function testWithTheCaptureRightCancellingReleasesTheAuthorization(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        $manager = $this->createFixtureFactory()->restrictedAdmin(
+            [AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE], AdminResources::ORDER_PAYMENT_CAPTURE => [AccessManager::CREATE]],
+            ['password' => 'password'],
+        );
+        $token = $this->authenticateAsAdmin($manager);
+
+        $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $this->bodyCancelling($order, $token), $token);
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame([(int) $order->getId()], DeferredCapturePaymentModule::$voidCalls);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function bodyCancelling(Order $order, string $token): array
+    {
+        // The API validates the whole order it is sent back, lines included.
+        $line = (new OrderProduct())
+            ->setOrderId($order->getId())
+            ->setProductRef('ref')
+            ->setProductSaleElementsRef('pse-ref')
+            ->setTitle('Product')
+            ->setQuantity(1.0)
+            ->setPrice('100.000000')
+            ->setWasNew(0)
+            ->setWasInPromo(0);
+        $line->save();
+        (new OrderProductTax())
+            ->setOrderProductId($line->getId())
+            ->setTitle('VAT')
+            ->setAmount('20.000000')
+            ->setPromoAmount('20.000000')
+            ->save();
+
+        $response = $this->jsonRequest('GET', '/api/admin/orders/'.$order->getId(), [], $token);
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
+
+        $body = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $body['orderStatus'] = '/api/admin/order_statutes/'.OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId();
+
+        return $body;
     }
 
     /**
