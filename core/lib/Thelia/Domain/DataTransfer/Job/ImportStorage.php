@@ -60,27 +60,37 @@ final readonly class ImportStorage
     }
 
     /**
-     * Whether $path, links resolved, lies inside this directory.
+     * Whether $path, links resolved, is a file of this directory.
      */
     public function holds(string $path): bool
+    {
+        return null !== $this->resolve($path);
+    }
+
+    /**
+     * The path, its links resolved, when it is a file of this directory. Null otherwise.
+     */
+    public function resolve(string $path): ?string
     {
         $directory = realpath($this->directory());
         $file = realpath($path);
 
-        return false !== $directory && false !== $file && str_starts_with($file, $directory.\DIRECTORY_SEPARATOR);
+        if (false === $directory || false === $file || !is_file($file) || !str_starts_with($file, $directory.\DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $file;
     }
 
     /**
-     * Deletes the uploaded file of a job, when it is still there and lies inside this
-     * directory.
+     * Deletes the uploaded file of a job, when it is still there and is a file of this
+     * directory: never a folder, never what a link points to.
      */
     public function discardFileOf(ImportJob $job): void
     {
-        $path = $this->pathOf($job);
-
         // Gone meanwhile (another run, the purge) is as good as deleted.
-        if ($this->holds($path)) {
-            (new Filesystem())->remove($path);
+        if ($this->holds($this->pathOf($job))) {
+            (new Filesystem())->remove($this->pathOf($job));
         }
     }
 }
