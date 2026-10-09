@@ -79,6 +79,12 @@ final readonly class PaymentTransactionRecorder
      */
     private const REPLAY_WINDOW_SECONDS = 60;
 
+    /**
+     * The error code of a void the provider made itself when the authorization lapsed
+     * before it was captured.
+     */
+    public const REASON_EXPIRED = 'expired';
+
     private const DUPLICATE_KEY_SQLSTATE = '23000';
 
     /** The size of the psp_reference column. */
@@ -215,6 +221,32 @@ final readonly class PaymentTransactionRecorder
 
             return $this->record($order, PaymentTransactionType::VOID, $remaining, $state, $reference, $authorization, $moduleCode, $errorCode, $errorMessage);
         });
+    }
+
+    /**
+     * The authorization lapsed at the provider before it was all captured: what it still
+     * held is released, as a void annotated with REASON_EXPIRED. What was captured stays.
+     *
+     * A provider rarely gives the lapse a reference of its own; the line then carries the
+     * reference of the authorization, which makes a replayed notice the same line.
+     */
+    public function recordExpiry(
+        Order $order,
+        ?string $pspReference = null,
+        ?OrderPaymentTransaction $authorization = null,
+        ?string $moduleCode = null,
+    ): OrderPaymentTransaction {
+        $authorization ??= OrderPaymentTransactionQuery::create()->findLatestSucceededAuthorization((int) $order->getId());
+
+        return $this->recordVoid(
+            $order,
+            $pspReference ?? $authorization?->getPspReference(),
+            PaymentTransactionState::SUCCEEDED,
+            $authorization,
+            $moduleCode,
+            self::REASON_EXPIRED,
+            'The authorization expired at the provider before it was captured.',
+        );
     }
 
     /**
