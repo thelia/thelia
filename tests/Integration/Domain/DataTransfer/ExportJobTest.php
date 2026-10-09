@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -912,6 +913,29 @@ final class ExportJobTest extends IntegrationTestCase
 
         self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
         self::assertSame(0o700, fileperms(ExportStorage::directory()) & 0o777);
+    }
+
+    /**
+     * A file or a link already there under the name is never opened: an account that
+     * planted it would read what the export writes.
+     */
+    public function testAnExportFileIsNeverOpenedOverAFileOrALinkAlreadyThere(): void
+    {
+        $name = uniqid('planted-').'.csv';
+        $planted = sys_get_temp_dir().'/'.$name;
+        file_put_contents($planted, '');
+        ExportStorage::closeFolder();
+        symlink($planted, ExportStorage::directory().'/'.$name);
+
+        try {
+            ExportStorage::newPrivateFile($name);
+            self::fail('A link already there is never opened.');
+        } catch (IOException) {
+        } finally {
+            (new Filesystem())->remove([ExportStorage::directory().'/'.$name, $planted]);
+        }
+
+        self::assertTrue(true);
     }
 
     public function testAFileNameEndingWithANewLineIsRefused(): void
