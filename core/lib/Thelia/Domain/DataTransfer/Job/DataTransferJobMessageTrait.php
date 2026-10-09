@@ -24,17 +24,14 @@ trait DataTransferJobMessageTrait
 {
     abstract public function jobId(): int;
 
-    /**
-     * @return 'export_job'|'import_job'
-     */
-    abstract public function jobTable(): string;
+    abstract public function jobTable(): JobTable;
 
     /**
      * The job as the failed jobs screen names it: "Export #4", "Import #12".
      */
     public function describe(): string
     {
-        return \sprintf('%s #%d', JobTables::EXPORT === $this->jobTable() ? 'Export' : 'Import', $this->jobId());
+        return $this->jobTable()->describe($this->jobId());
     }
 
     public function postponements(): int

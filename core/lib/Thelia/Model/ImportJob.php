@@ -17,17 +17,11 @@ namespace Thelia\Model;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Job\DataTransferJob;
 use Thelia\Model\Base\ImportJob as BaseImportJob;
-use Thelia\Model\Map\ImportJobTableMap;
 use Thelia\Model\Tools\DataTransferJobTrait;
 
 class ImportJob extends BaseImportJob implements DataTransferJob
 {
     use DataTransferJobTrait;
-
-    public function tableName(): string
-    {
-        return ImportJobTableMap::TABLE_NAME;
-    }
 
     /** What the TEXT column of the refused rows holds, with room to spare. */
     public const ROW_ERRORS_MAX_BYTES = 60000;

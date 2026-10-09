@@ -41,6 +41,7 @@ use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
 use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
+use Thelia\Domain\DataTransfer\Job\JobTable;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
@@ -307,10 +308,10 @@ final class ExportJobTest extends IntegrationTestCase
         $claim = new JobClaim();
 
         $job->setStatus(JobStatus::RUNNING->value)->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS - 60)))->save($this->getPropelConnection());
-        self::assertFalse($claim->claim('export_job', $job->getId()));
+        self::assertFalse($claim->claim(JobTable::Export, $job->getId()));
 
         $job->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS + 60)))->save($this->getPropelConnection());
-        self::assertTrue($claim->claim('export_job', $job->getId()));
+        self::assertTrue($claim->claim(JobTable::Export, $job->getId()));
     }
 
     /**

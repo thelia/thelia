@@ -40,21 +40,18 @@ final readonly class JobClaim
     public const STALE_AFTER_SECONDS = 3600;
 
     /**
-     * @param 'export_job'|'import_job' $table
-     * @param bool                      $allowFailed false for a message looking again at a job that was
-     *                                               running: a job that failed meanwhile waits for the
-     *                                               administrator to replay it, it never restarts on its own
+     * @param bool $allowFailed false for a message looking again at a job that was
+     *                          running: a job that failed meanwhile waits for the
+     *                          administrator to replay it, it never restarts on its own
      *
      * @return bool true when this run owns the job now
      */
-    public function claim(string $table, int $jobId, bool $allowFailed = true): bool
+    public function claim(JobTable $table, int $jobId, bool $allowFailed = true): bool
     {
-        JobTables::assert($table);
-
         $now = new \DateTimeImmutable();
 
         $statement = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->prepare(
-            'UPDATE `'.$table.'` SET `status` = :running, `started_at` = :now, `finished_at` = NULL, `error` = NULL, `updated_at` = :updated'
+            'UPDATE `'.$table->value.'` SET `status` = :running, `started_at` = :now, `finished_at` = NULL, `error` = NULL, `updated_at` = :updated'
             .' WHERE `id` = :id AND (`status` IN (:queued, :failed) OR (`status` = :stillRunning AND `updated_at` < :stale))',
         );
         $statement->execute([
@@ -75,16 +72,12 @@ final readonly class JobClaim
      * Marks a job failed only while it still waits for a worker: a worker that took it
      * meanwhile keeps it running.
      *
-     * @param 'export_job'|'import_job' $table
-     *
      * @return bool true when the job was still waiting
      */
-    public function abandonIfQueued(string $table, int $jobId, string $reason): bool
+    public function abandonIfQueued(JobTable $table, int $jobId, string $reason): bool
     {
-        JobTables::assert($table);
-
         $statement = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)->prepare(
-            'UPDATE `'.$table.'` SET `status` = :failed, `error` = :reason, `finished_at` = :now WHERE `id` = :id AND `status` = :queued',
+            'UPDATE `'.$table->value.'` SET `status` = :failed, `error` = :reason, `finished_at` = :now WHERE `id` = :id AND `status` = :queued',
         );
         $statement->execute([
             'failed' => JobStatus::FAILED->value,
