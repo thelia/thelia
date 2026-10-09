@@ -34,8 +34,8 @@ final class TerminalText
      *    the tab and the line feed (kept: messages span lines and are indented; an
      *    identifier goes through singleLine(), which replaces them too), the soft hyphen
      *    (U+00AD), the Arabic letter mark (U+061C), the zero-width and directional marks
-     *    (U+200B to U+200F), the
-     *    line and paragraph separators (U+2028, U+2029), the bidirectional embeddings,
+     *    (U+200B to U+200F), the line and paragraph separators (U+2028, U+2029), the
+     *    bidirectional embeddings,
      *    overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the invisible operators
      *    and word joiner (U+2060 to U+2064), the deprecated format controls (U+206A to
      *    U+206F), the byte order mark (U+FEFF), the interlinear annotation marks (U+FFF9 to
@@ -87,9 +87,10 @@ final class TerminalText
      * (the errors of a schema, one per line) cannot start a line of its own that reads like
      * the output of the command. The blanks without a line break are kept as they are (a
      * no-break space at either end among them), a tab in a run of blanks that holds no
-     * line break becomes "?" (at either end too), what withoutControlCharacters() replaces is replaced the same
-     * way, and the spaces and line breaks at either end are dropped. "a  \n b\tc" gives
-     * "a b?c".
+     * line break becomes "?" (at either end too), what withoutControlCharacters() replaces
+     * is replaced the same way, and the spaces and line breaks at either end are dropped.
+     * "a  \n b\tc" gives "a b?c". When PCRE fails, nothing is given, as in
+     * withoutControlCharacters().
      */
     public static function onOneLine(string $text): string
     {

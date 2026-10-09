@@ -117,25 +117,40 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * A step that fails leaves nothing rather than the text it was to clean. Under this
-     * limit PCRE refuses even the check that the text is UTF-8, so the first step runs and
-     * fails on a valid text too: what is proven here is the first step, and that nothing
-     * downstream (the other steps, onOneLine()) brings the text back. The fallbacks of the
-     * second and third steps cannot be reached with a limit: one match per character, no
-     * backtracking.
+     * Whichever step a backtrack limit stops, the text comes out cleaned or not at all,
+     * never as it was. Which step a given limit stops depends on the build of PCRE: at 1 it
+     * refuses even the check that the text is UTF-8, so the first step runs and fails on a
+     * valid text too; at 2 to 4 (PCRE 10.46, measured) the check passes and the second
+     * step fails. So the limits are swept, and each result is held to the two outcomes
+     * allowed; the valid text carries a character the second step alone replaces (the
+     * combining grapheme joiner, U+034F), so that the third step cannot stand in for it.
      */
     #[RunInSeparateProcess]
-    public function testAStepThatFailsLeavesNothing(): void
+    public function testAStepALimitStopsLeavesNothing(): void
     {
         $jit = \ini_get('pcre.jit');
         $limit = \ini_get('pcre.backtrack_limit');
         ini_set('pcre.jit', '0');
-        ini_set('pcre.backtrack_limit', '1');
+        $invalid = str_repeat("\xFFa\u{200B}", 2000);
+        $valid = str_repeat("a\u{34F}", 2000);
+        $lines = str_repeat("a\n b", 2000);
+        $stopped = 0;
 
         try {
-            self::assertSame('', TerminalText::withoutControlCharacters(str_repeat("\xFFa\u{200B}", 2000)));
-            self::assertSame('', TerminalText::withoutControlCharacters(str_repeat("a\u{200B}", 2000)));
-            self::assertSame('', TerminalText::onOneLine(str_repeat("a\n b", 2000)));
+            foreach (range(1, 8) as $backtrackLimit) {
+                ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
+
+                foreach ([$invalid => str_repeat('?a?', 2000), $valid => str_repeat('a?', 2000)] as $text => $cleaned) {
+                    $result = TerminalText::withoutControlCharacters($text);
+                    self::assertContains($result, ['', $cleaned], \sprintf('limit %d', $backtrackLimit));
+                    $stopped += '' === $result ? 1 : 0;
+                }
+
+                self::assertContains(TerminalText::onOneLine($lines), ['', str_repeat('a b', 2000)], \sprintf('limit %d', $backtrackLimit));
+            }
+
+            self::assertSame('', TerminalText::withoutControlCharacters($invalid), 'at the last limit, the first step still stops');
+            self::assertGreaterThan(0, $stopped);
         } finally {
             ini_set('pcre.jit', (string) $jit);
             ini_set('pcre.backtrack_limit', (string) $limit);
@@ -206,7 +221,7 @@ final class TerminalTextTest extends TestCase
         yield 'U+E000, private use behind the EE lead byte, next to an invalid byte' => ["\xFF\u{E000}", '??'];
         yield 'U+40000, the first character of the F1 lead byte, next to an invalid byte' => ["\xFF\u{40000}", "?\u{40000}"];
         yield 'U+FFFFF, a noncharacter behind the F3 lead byte, next to an invalid byte' => ["\xFF\u{FFFFF}", '??'];
-        yield 'U+00A1, the first character of the C2 lead byte, next to an invalid byte' => ["\xFF\u{A1}", "?\u{A1}"];
+        yield 'U+00A1, a character of the C2 lead byte that is kept, next to an invalid byte' => ["\xFF\u{A1}", "?\u{A1}"];
         yield 'U+0FFF, the last second byte of E0, next to an invalid byte' => ["\xFF\u{FFF}", "?\u{FFF}"];
         yield 'U+D000, the first second byte of ED, next to an invalid byte' => ["\xFF\u{D000}", "?\u{D000}"];
         yield 'U+80000, behind the F2 lead byte, next to an invalid byte' => ["\xFF\u{80000}", "?\u{80000}"];
