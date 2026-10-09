@@ -203,6 +203,9 @@ final class ModuleDescriptorValidatorTest extends TestCase
         self::assertSame("Entity 'a/b' not defined", $this->withoutPath("Entity 'a/b' not defined", $given));
         self::assertSame("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $this->withoutPath("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $given));
         self::assertSame('failed to load external entity "evil.dtd"', $this->withoutPath('failed to load external entity "/srv/x/evil.dtd"', $given));
+        // A short relative path given is not looked for inside unrelated text.
+        self::assertSame("Entity 'a/b' not defined, Config/b too", $this->withoutPath("Entity 'a/b' not defined, Config/b too", 'a/b'));
+        self::assertSame('value a/b/c kept', $this->withoutPath('value a/b/c kept', 'a/b'));
     }
 
     /**
