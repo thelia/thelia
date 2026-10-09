@@ -24,10 +24,11 @@ final class TerminalText
 {
     /**
      * The text with every character a terminal, a log or a page would obey or hide replaced
-     * by "?", in three steps, each of which leaves nothing rather than the text it was to
-     * clean when it fails. A backtrack limit proves it for the second step. It cannot for
-     * the first: the lowest limit stops it, but had it given the text back, the same limit
-     * would stop the second step on that text; and a text left invalid would fail the
+     * by "?" (but the tab and the line feed, which singleLine() and onOneLine() handle), in
+     * three steps, each of which leaves nothing rather than the text it was to clean when
+     * it fails. A backtrack limit proves it for the second step. It cannot for the first:
+     * the lowest limits stop it, but had it given the text back, the same limits would
+     * stop the second step on that text; and a text left invalid would fail the
      * third step, in Unicode mode, anyway. It cannot for the third step nor for the run of
      * blanks of onOneLine() either: no limit stops them without stopping an earlier step
      * first. These three stand by construction.
@@ -47,8 +48,8 @@ final class TerminalText
      *    vowel separator (U+180B to U+180F), the combining grapheme joiner (U+034F), the
      *    variation selectors (U+FE00 to U+FE0F, U+E0100 to U+E01FF), the musical format
      *    controls (U+1D173 to U+1D17A), the blank fillers (U+115F, U+1160, U+2800, U+3164,
-     *    U+FFA0), the tags block and the
-     *    unassigned code points that follow it (U+E0000 to U+E00FF), the Khmer inherent
+     *    U+FFA0), the tags block and the unassigned code points that follow it (U+E0000 to
+     *    U+E00FF), the Khmer inherent
      *    vowels (U+17B4, U+17B5), the shorthand format controls (U+1BCA0 to U+1BCA3) and
      *    the Egyptian hieroglyph format controls (U+13430 to U+1343F, format characters
      *    added in Unicode 12 and 15, that an older PCRE may not know). Many of them are
