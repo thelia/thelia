@@ -68,13 +68,12 @@ degrades to best-effort and the worst case is one cosmetic duplicated line.
 sequenceDiagram
     participant BO as Back-office / module / console
     participant Core as Action\Order (prio 128)
-    participant L as RecordOrderHistoryListener (prio 192 / 64)
+    participant L as RecordOrderHistoryListener (prio 64)
     participant R as OrderHistoryRecorder
 
     BO->>Core: ORDER_UPDATE_STATUS
-    Note over L: prio 192 — memorizes the old status (WeakMap on the event)
-    Core->>Core: setStatusId + save (own transaction)
-    L->>R: prio 64 — recordStatusChanged(from, to)
+    Core->>Core: read the status under a row lock, setPreviousStatusId, setStatusId + save (own transaction)
+    L->>R: prio 64 — recordStatusChanged(previous status of the event, to)
     R->>R: resolve actor, dedupe, try/catch
     R-->>L: never throws
 ```
