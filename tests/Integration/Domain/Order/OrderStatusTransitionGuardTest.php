@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
@@ -75,6 +76,25 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
 
         self::assertSame(OrderStatus::CODE_REFUNDED, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testARefusedTransitionLeavesTheTransactionOfTheCallerCommittable(): void
+    {
+        // Nothing is written before the graph refuses: a caller inside its own
+        // transaction catches the refusal and goes on, and its commit still goes through.
+        // The test runs inside a transaction of its own, which stands for that caller.
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+            self::fail('The transition sent -> not_paid should have been refused.');
+        } catch (OrderStatusTransitionRefusedException) {
+        }
+
+        $connection = $this->getPropelConnection();
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        self::assertFalse((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
     }
 
     public function testAForcedTransitionBypassesTheGraph(): void

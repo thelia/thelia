@@ -391,9 +391,18 @@ class Order extends BaseAction implements EventSubscriberInterface
             // Every entry point (back office, API, payment modules, commands) lands here,
             // so this is where the transition graph is enforced.
             $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+        } catch (\Throwable $refusal) {
+            // Nothing is written yet: the transaction is closed as it is, never rolled
+            // back, so that a caller inside a transaction of its own that catches the
+            // refusal can still commit what it wrote.
+            $con->commit();
 
-            $event->setPreviousStatusId($currentStatusId);
+            throw $refusal;
+        }
 
+        $event->setPreviousStatusId($currentStatusId);
+
+        try {
             $this->updateQuantity($order, $newStatus, $dispatcher);
 
             $order->setStatusId($newStatus)->save();
