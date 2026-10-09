@@ -87,6 +87,16 @@ final class UnpaidOrderReminderCommandTest extends ActionIntegrationTestCase
         self::assertStringContainsString('https://shop.example.com/boutique/order/pay/', $texts[(string) $order->getCustomer()->getEmail()] ?? '');
     }
 
+    public function testAStepNamingAMessageTheShopDoesNotHaveIsReported(): void
+    {
+        ConfigQuery::write(UnpaidOrderReminderSettings::SCHEDULE_KEY, '24:no_such_reminder_message');
+
+        $tester = $this->tester();
+        $tester->execute(['--dry-run' => true]);
+
+        self::assertStringContainsString('no_such_reminder_message', $tester->getDisplay());
+    }
+
     public function testWithoutAScheduleItSaysSo(): void
     {
         ConfigQuery::write(UnpaidOrderReminderSettings::SCHEDULE_KEY, '');

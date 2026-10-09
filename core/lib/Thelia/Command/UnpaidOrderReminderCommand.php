@@ -99,6 +99,10 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
             $lock->release();
         }
 
+        foreach ($report->missingMessages() as $messageCode) {
+            $output->writeln(\sprintf('<error>No mail message is named "%s": the steps sending it wait until it exists.</error>', $messageCode));
+        }
+
         if ([] === $report->outcomes()) {
             $output->writeln('<info>No unpaid order is due for a step.</info>');
 

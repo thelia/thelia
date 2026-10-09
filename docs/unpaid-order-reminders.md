@@ -38,6 +38,14 @@ orders from mailing them reminders that no longer make sense: with
 `24:...,72:...,168:cancel`, a four-day-old order gets the 72 hour reminder and
 never the 24 hour one, and a two-month-old order is cancelled without a mail.
 
+Without a cancellation step an unpaid order stays unpaid for good, so the run
+stops reading it 30 days after the last step
+(`UnpaidOrderReminderRunner::LAST_REMINDER_WINDOW_IN_HOURS`), as long as the link
+of its last mail is accepted.
+
+A step is known by its delay: changing `24` into `25` makes it a new step, which
+the orders already reminded at 24 hours will be sent again.
+
 ## Once and only once
 
 Each step done is written to the order history (see [order-history.md](order-history.md)):
@@ -49,9 +57,19 @@ Each step done is written to the order history (see [order-history.md](order-his
 
 A step of an order that has either entry is never done again, so a run replayed
 sends nothing twice, and a step that keeps failing (an address the mailer
-refuses, a transition the status graph forbids) does not take a place in every
-run: the next step is its next chance. The mail itself also writes the usual
-`email_sent` entry.
+refuses, a transition the status graph forbids, a customer whose identity was
+erased) does not take a place in every run: the next step is its next chance.
+The mail itself also writes the usual `email_sent` entry.
+
+Each order is read again under a lock of its row before anything is done to it:
+an order paid while the run was busy with the ones before it is left alone. A
+mail is claimed before it is sent: the `payment_reminder_sent` entry is written,
+the mail goes, and a mail that cannot leave turns the entry into a failed one. A
+reminder is therefore sent at most once, even when the database fails right
+after the mail.
+
+A step naming a message the shop does not have is not done and not marked: its
+orders wait until the message exists, and the command says which one is missing.
 
 The cancellation is `Order::setCancelled()`, the status change any cancellation
 goes through: the transition graph is asked, the stock is given back by the
