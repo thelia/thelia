@@ -21,6 +21,13 @@ use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
  */
 final class ExportPeriod
 {
+    /** The text of the refusal, translated where it is shown. */
+    public const INVALID_DATES = 'The dates of the export are not valid.';
+
+    private function __construct()
+    {
+    }
+
     /**
      * The period of an export, as the export reads it: a start and an end given as a
      * year and a month (the form of the back office) become the first second of that
@@ -73,7 +80,7 @@ final class ExportPeriod
 
         if (false === $date) {
             // Translated where it is shown, as the reason of any job refused.
-            throw new JobRefusedException('The dates of the export are not valid.');
+            throw new JobRefusedException(self::INVALID_DATES);
         }
 
         if ($endOfMonth) {
