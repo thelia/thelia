@@ -977,4 +977,5 @@ return [
     'Order %ref: its discount is larger than its products, the invoice cannot be split by rate.' => 'Commande %ref : sa remise dépasse ses produits, la facture ne peut pas être ventilée par taux.',
     'Order %ref: its invoice amounts to nothing.' => 'Commande %ref : sa facture est nulle.',
     'Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.' => 'Commande %ref : de la taxe a été collectée à %rate, un taux sans compte de taxe dans le plan de comptes.',
+    'Order %ref: it was placed in another currency without exchange rate, it cannot be booked in the shop currency.' => 'Commande %ref : passée dans une autre devise sans taux de change, elle ne peut pas être comptabilisée dans la devise de la boutique.',
 ];

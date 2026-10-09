@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Currency;
 use Thelia\Model\Order;
@@ -40,33 +41,36 @@ use Thelia\Model\OrderProductTaxQuery;
  */
 final class SalesPieceBuilder
 {
+    private ?string $locale = null;
+
     /**
      * @throws OrderNotExportableException
      */
-    public function build(Order $order, AccountingChart $chart, Currency $shopCurrency): AccountingPiece
+    public function build(Order $order, AccountingChart $chart, Currency $shopCurrency, ?string $locale = null): AccountingPiece
     {
+        $this->locale = $locale;
         $orderRef = (string) $order->getRef();
-        [$productAmounts, $productTaxes] = $this->productAmountsByRate($order);
+        [$productAmounts, $productTaxes] = $this->productAmountsByRate($order, $chart);
 
         $tax = 0.0;
         $totalCents = self::cents($order->getTotalAmount($tax));
         $taxCents = self::cents((float) $tax);
 
         if ($totalCents <= 0) {
-            throw new OrderNotExportableException(self::trans('Order %ref: its invoice amounts to nothing.', ['%ref' => $orderRef]));
+            throw new OrderNotExportableException($this->trans('Order %ref: its invoice amounts to nothing.', ['%ref' => $orderRef]));
         }
 
         $postage = (float) $order->getPostage();
         $postageTax = (float) $order->getPostageTax();
         $postageCents = self::cents($postage - $postageTax);
         $postageTaxCents = self::cents($postageTax);
-        [$postageWeights, $postageTaxWeights] = $this->postageWeightsByRate($order, $postage - $postageTax, $postageTax);
+        [$postageWeights, $postageTaxWeights] = $this->postageWeightsByRate($order, $postage - $postageTax, $postageTax, $chart);
 
         $productCents = $totalCents - $taxCents - $postageCents;
         $productTaxCents = $taxCents - $postageTaxCents;
 
         if ($productCents < 0 || $productTaxCents < 0) {
-            throw new OrderNotExportableException(self::trans('Order %ref: its discount is larger than its products, the invoice cannot be split by rate.', ['%ref' => $orderRef]));
+            throw new OrderNotExportableException($this->trans('Order %ref: its discount is larger than its products, the invoice cannot be split by rate.', ['%ref' => $orderRef]));
         }
 
         $products = self::allocate($productCents, $productAmounts);
@@ -83,21 +87,27 @@ final class SalesPieceBuilder
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_PRODUCT, $this->accountsOf($chart, $rate, $orderRef)['product'], $rate, 0, $cents);
         }
 
+        // The shipping has an account of its own: only its tax needs the accounts of its rate.
         foreach (self::byRate($shipping) as $rate => $cents) {
-            $this->accountsOf($chart, $rate, $orderRef);
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_SHIPPING, $chart->shippingAccount, $rate, 0, $cents);
         }
 
         foreach (self::byRate($taxes) as $rate => $cents) {
-            $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException(self::trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
+            $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException($this->trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_TAX, $taxAccount, $rate, 0, $cents);
         }
 
         $foreignCurrencyCode = null;
 
         if ((int) $order->getCurrencyId() !== (int) $shopCurrency->getId()) {
+            $rate = (float) $order->getCurrencyRate();
+
+            if ($rate <= 0) {
+                throw new OrderNotExportableException($this->trans('Order %ref: it was placed in another currency without exchange rate, it cannot be booked in the shop currency.', ['%ref' => $orderRef]));
+            }
+
             $foreignCurrencyCode = (string) $order->getCurrency()?->getCode();
-            $entries = self::inShopCurrency($entries, (float) $order->getCurrencyRate());
+            $entries = self::inShopCurrency($entries, $rate);
         }
 
         $invoiceAddress = $order->getOrderAddressRelatedByInvoiceOrderAddressId();
@@ -107,7 +117,7 @@ final class SalesPieceBuilder
         return new AccountingPiece(
             (int) $order->getId(),
             (string) $order->getInvoiceRef(),
-            $order->getInvoiceDate() ?? throw new OrderNotExportableException(self::trans('Order %ref has no invoice date.', ['%ref' => $orderRef])),
+            $order->getInvoiceDate() ?? throw new OrderNotExportableException($this->trans('Order %ref has no invoice date.', ['%ref' => $orderRef])),
             (string) $customer?->getRef(),
             $customerName,
             $foreignCurrencyCode,
@@ -122,21 +132,31 @@ final class SalesPieceBuilder
      *
      * @return array{array<string, float>, array<string, float>}
      */
-    private function productAmountsByRate(Order $order): array
+    private function productAmountsByRate(Order $order, AccountingChart $chart): array
     {
         $amounts = [];
         $taxes = [];
+        $lines = OrderProductQuery::create()->filterByOrderId($order->getId())->find();
+        $unitTaxes = [];
 
-        foreach (OrderProductQuery::create()->filterByOrderId($order->getId())->find() as $line) {
+        foreach (OrderProductTaxQuery::create()->filterByOrderProductId(array_map(static fn ($line): int => (int) $line->getId(), iterator_to_array($lines, false)), Criteria::IN)->find() as $tax) {
+            $unitTaxes[(int) $tax->getOrderProductId()][] = $tax;
+        }
+
+        foreach ($lines as $line) {
             $promo = 1 === (int) $line->getWasInPromo();
             $unitPrice = (float) ($promo ? $line->getPromoPrice() : $line->getPrice());
             $unitTax = 0.0;
 
-            foreach (OrderProductTaxQuery::create()->filterByOrderProductId($line->getId())->find() as $tax) {
+            foreach ($unitTaxes[(int) $line->getId()] ?? [] as $tax) {
                 $unitTax += (float) ($promo ? $tax->getPromoAmount() : $tax->getAmount());
             }
 
-            $rate = AccountingChart::rateKey($unitPrice > 0 ? $unitTax / $unitPrice * 100 : 0.0);
+            if ($unitPrice <= 0.0 && $unitTax <= 0.0) {
+                continue;
+            }
+
+            $rate = $this->rateOf($chart, $unitPrice > 0 ? $unitTax / $unitPrice * 100 : 0.0);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitPrice;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitTax;
         }
@@ -145,22 +165,34 @@ final class SalesPieceBuilder
     }
 
     /**
+     * The rate the chart files an amount under: the closest of its rates, so that amounts
+     * rounded to the cent do not miss it; the computed rate itself when the chart has none
+     * that close, for the refusal to name it.
+     */
+    private function rateOf(AccountingChart $chart, float $percent): string
+    {
+        $rate = AccountingChart::rateKey($percent);
+
+        return $chart->closestRate($rate) ?? $rate;
+    }
+
+    /**
      * @return array{array<string, float>, array<string, float>}
      */
-    private function postageWeightsByRate(Order $order, float $untaxedPostage, float $postageTax): array
+    private function postageWeightsByRate(Order $order, float $untaxedPostage, float $postageTax, AccountingChart $chart): array
     {
         $amounts = [];
         $taxes = [];
 
         foreach (OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->find() as $share) {
             $untaxed = (float) $share->getUntaxedAmount();
-            $rate = AccountingChart::rateKey($untaxed > 0 ? (float) $share->getAmount() / $untaxed * 100 : 0.0);
+            $rate = $this->rateOf($chart, $untaxed > 0 ? (float) $share->getAmount() / $untaxed * 100 : 0.0);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $untaxed;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $share->getAmount();
         }
 
         if ([] === $amounts) {
-            $rate = AccountingChart::rateKey($untaxedPostage > 0 ? $postageTax / $untaxedPostage * 100 : 0.0);
+            $rate = $this->rateOf($chart, $untaxedPostage > 0 ? $postageTax / $untaxedPostage * 100 : 0.0);
             $amounts[$rate] = $untaxedPostage;
             $taxes[$rate] = $postageTax;
         }
@@ -173,7 +205,7 @@ final class SalesPieceBuilder
      */
     private function accountsOf(AccountingChart $chart, string $rate, string $orderRef): array
     {
-        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException(self::trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
+        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException($this->trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
     }
 
     /**
@@ -258,11 +290,18 @@ final class SalesPieceBuilder
         $difference = array_sum(array_map(static fn (AccountingEntry $entry): int => $entry->debitCents - $entry->creditCents, $converted));
 
         if (0 !== $difference) {
+            // On the largest sale rather than on a tax: the tax stays the converted tax.
             $largest = null;
 
-            foreach ($converted as $index => $entry) {
-                if ($entry->creditCents > 0 && (null === $largest || $entry->creditCents > $converted[$largest]->creditCents)) {
-                    $largest = $index;
+            foreach ([AccountingEntry::ROLE_PRODUCT, AccountingEntry::ROLE_SHIPPING, AccountingEntry::ROLE_TAX] as $role) {
+                foreach ($converted as $index => $entry) {
+                    if ($role === $entry->role && $entry->creditCents > 0 && (null === $largest || $entry->creditCents > $converted[$largest]->creditCents)) {
+                        $largest = $index;
+                    }
+                }
+
+                if (null !== $largest) {
+                    break;
                 }
             }
 
@@ -272,7 +311,7 @@ final class SalesPieceBuilder
             }
         }
 
-        return $converted;
+        return array_values(array_filter($converted, static fn (AccountingEntry $entry): bool => 0 !== $entry->debitCents || 0 !== $entry->creditCents));
     }
 
     private static function cents(float $amount): int
@@ -283,8 +322,8 @@ final class SalesPieceBuilder
     /**
      * @param array<string, string> $parameters
      */
-    private static function trans(string $message, array $parameters): string
+    private function trans(string $message, array $parameters): string
     {
-        return Translator::getInstance()->trans($message, $parameters);
+        return Translator::getInstance()->trans($message, $parameters, null, $this->locale);
     }
 }

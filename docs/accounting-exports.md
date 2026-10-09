@@ -36,17 +36,28 @@ twice.
   the customer said, under the rounding rule the order was priced with, older
   orders included;
 - the products are credited by tax rate, the rate being the one their frozen
-  taxes make on their frozen price (to the hundredth of a percent);
+  taxes make on their frozen price, filed under the closest rate of the chart
+  within a tenth of a point (0.83 of tax on 4.17 makes 19.90%, filed at 20%); a
+  line taxed twice is filed under the sum of its rates, which the chart needs a
+  row for;
 - an order discount is spread over the rates in proportion of their amount
   excluding tax;
-- the shipping is credited excluding tax, at the rates `order_postage_tax` froze
-  when it was split between rules, or at the one rate its tax makes;
+- the shipping is credited excluding tax on the shipping account, at the rates
+  `order_postage_tax` froze when it was split between rules, or at the one rate
+  its tax makes; untaxed shipping needs no row of its own in the chart;
 - the tax collected is credited by rate, the shipping's included.
 
 Every split is made in whole cents, the cents left over going to the largest
 remainders, so the lines add up to the totals and the piece balances to the cent.
 An order in another currency is booked in the shop currency at the rate frozen on
-the order, each line keeping its own amount and currency.
+the order, each line keeping its own amount and currency; the cent the conversion
+leaves goes to the largest sale, never to a tax. An order without exchange rate
+is left out.
+
+An order priced before the rounding rules (`last_legacy_rounding_order_id`) is
+booked as its invoice says, and that invoice did not take the discount off the
+tax: the tax of such an order with a discount is the tax before discount, and the
+amount excluding tax carries the whole discount.
 
 An order the chart cannot book (a rate without account, a discount larger than
 the products, an invoice of zero) is left out and named in the report.
@@ -55,7 +66,8 @@ the products, an invoice of zero) is left out and named in the report.
 
 `SalesJournal` selects the orders whose invoice date falls in the period and that
 have an invoice reference, by invoice date, by batches of 200, and gives their
-pieces one by one: a year of invoices is never held at once. The order is booked
+pieces one by one, letting go of the models of each batch: a year of invoices is
+never held at once. The order is booked
 when it is invoiced, so an order placed in January and invoiced in February is in
 February. The index `idx_order_invoice_date` (3.3.0) serves the selection.
 
@@ -70,13 +82,16 @@ February. The index `idx_order_invoice_date` (3.3.0) serves the selection.
   `Montantdevise` and `Idevise` only for an order in another currency. Labels
   follow the language of the export (`--locale=fr_FR` on the command line).
 - `thelia.export.tax_summary` (`TaxSummaryExport`): per month of invoice and
-  per rate, the amount taxed, the tax and the number of invoices, read from the
-  same pieces, so it adds up to the tax lines of the journal.
+  per rate (the highest first), the amount taxed (products and shipping), the
+  tax and the number of invoices, read from the same pieces, so it adds up to
+  the tax lines of the journal.
 
 Written with the FEC serializer (`thelia.fec`, `FECSerializer`), the journal is
-the accounting entries file: tab separated, CR LF, the field names first, dates
-as YYYYMMDD, amounts with a decimal comma, UTF-8, no spreadsheet guard. With the
-CSV serializer it is a sheet to read.
+the accounting entries file: tab separated, CR LF, the field names first (even
+for a period without entry), every row in the order of the format, dates as
+YYYYMMDD, amounts with a decimal comma, UTF-8, no spreadsheet guard. The file is
+named like any export; rename it `<SIREN>FEC<YYYYMMDD>.txt` before handing it to
+the tax administration. With the CSV serializer it is a sheet to read.
 
 ```bash
 php Thelia export thelia.export.sales_journal thelia.fec --start=2026-02-01 --end=2026-02-28 --locale=fr_FR

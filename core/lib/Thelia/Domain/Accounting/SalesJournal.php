@@ -18,6 +18,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Map\OrderAddressTableMap;
+use Thelia\Model\Map\OrderPostageTaxTableMap;
+use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderQuery;
@@ -65,7 +70,7 @@ final class SalesJournal
 
             foreach ($orders as $order) {
                 try {
-                    $piece = $builder->build($order, $chart, $shopCurrency);
+                    $piece = $builder->build($order, $chart, $shopCurrency, $locale);
                 } catch (OrderNotExportableException $exception) {
                     $report->addWarning($exception->getMessage());
 
@@ -83,7 +88,7 @@ final class SalesJournal
             }
 
             $offset += self::BATCH_SIZE;
-            OrderTableMap::clearInstancePool();
+            self::forgetTheBatch();
         } while (self::BATCH_SIZE === \count($orders));
 
         $report->addLine($translator->trans('%count pieces, debit %debit, credit %credit.', ['%count' => $count, '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
@@ -99,6 +104,20 @@ final class SalesJournal
         $report->addWarning(null !== ModuleQuery::create()->filterByCode('CreditNote')->filterByActivate(1)->findOne()
             ? $translator->trans('The credit notes of the CreditNote module are not in this journal: book them separately.', [], null, $locale)
             : $translator->trans('No credit note module is installed: refunds made without credit note are not in this journal.', [], null, $locale));
+    }
+
+    /**
+     * The models a batch read are let go: held by Propel's pools, a year of invoices would
+     * be kept in memory to the end of the run.
+     */
+    private static function forgetTheBatch(): void
+    {
+        OrderTableMap::clearInstancePool();
+        OrderProductTableMap::clearInstancePool();
+        OrderProductTaxTableMap::clearInstancePool();
+        OrderPostageTaxTableMap::clearInstancePool();
+        OrderAddressTableMap::clearInstancePool();
+        CustomerTableMap::clearInstancePool();
     }
 
     private function invoiced(?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery

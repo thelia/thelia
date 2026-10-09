@@ -84,7 +84,8 @@ class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInt
             }
         }
 
-        ksort($totals);
+        // By month, then the highest rate first, compared as numbers.
+        uasort($totals, static fn (array $left, array $right): int => [$left['period'], (float) $right['rate']] <=> [$right['period'], (float) $left['rate']]);
 
         return array_values(array_map(static fn (array $total): array => [
             'period' => $total['period'],

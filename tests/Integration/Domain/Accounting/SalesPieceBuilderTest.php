@@ -151,6 +151,76 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
         self::assertSame(55 + 22, $this->creditsOn($piece, '445705'));
     }
 
+    public function testARateRoundedOffTheChartIsFiledUnderTheChartRate(): void
+    {
+        // 0.83 of tax on 4.17 makes 19.90%: the frozen amounts were rounded, the rate is 20.
+        $order = $this->invoicedOrder();
+        $this->line($order, 4.17, 1, [0.83]);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        self::assertSame(417, $this->creditsOn($piece, '706200'));
+        self::assertSame(83, $this->creditsOn($piece, '445720'));
+    }
+
+    public function testALineTaxedTwiceIsFiledUnderTheSumOfItsRates(): void
+    {
+        $order = $this->invoicedOrder();
+        $this->line($order, 100.0, 1, [20.0, 2.0]);
+        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '22:706220:445722');
+
+        $piece = $this->builder->build($order, $chart, $this->defaultCurrency());
+
+        self::assertSame(10000, $this->creditsOn($piece, '706220'));
+        self::assertSame(2200, $this->creditsOn($piece, '445722'));
+    }
+
+    public function testUntaxedShippingNeedsNoRateOfItsOwn(): void
+    {
+        $order = $this->invoicedOrder(postage: 10.0, postageTax: 0.0);
+        $this->line($order, 100.0, 1, [20.0]);
+        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720');
+
+        $piece = $this->builder->build($order, $chart, $this->defaultCurrency());
+
+        $this->assertBalanced($piece);
+        self::assertSame(1000, $this->creditsOn($piece, '708500'));
+    }
+
+    public function testAPromotedLineIsBookedAtItsPromotedPrice(): void
+    {
+        $order = $this->invoicedOrder();
+        $this->line($order, 100.0, 1, [20.0], promoPrice: 80.0, promoTax: 16.0);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        self::assertSame(8000, $this->creditsOn($piece, '706200'));
+        self::assertSame(1600, $this->creditsOn($piece, '445720'));
+    }
+
+    public function testAFreeLineChangesNothing(): void
+    {
+        $order = $this->invoicedOrder();
+        $this->line($order, 100.0, 1, [20.0]);
+        $this->line($order, 0.0, 1, [0.0]);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        self::assertSame([['411000', 12000, 0], ['706200', 0, 10000], ['445720', 0, 2000]], $this->summary($piece));
+    }
+
+    public function testAnOrderWithoutExchangeRateIsLeftOut(): void
+    {
+        $order = $this->invoicedOrder();
+        $dollar = $this->factory->currency(['code' => 'USD', 'symbol' => '$', 'rate' => 1.25]);
+        $order->setCurrencyId((int) $dollar->getId())->setCurrencyRate(0.0)->save();
+        $this->line($order, 100.0, 1, [20.0]);
+
+        $this->expectException(OrderNotExportableException::class);
+
+        $this->builder->build($order, $this->chart, $this->defaultCurrency());
+    }
+
     public function testARateWithoutAccountKeepsTheOrderOutWithTheReason(): void
     {
         $order = $this->invoicedOrder();
@@ -194,7 +264,7 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
     /**
      * @param list<float> $unitTaxes
      */
-    private function line(Order $order, float $unitPrice, int $quantity, array $unitTaxes): void
+    private function line(Order $order, float $unitPrice, int $quantity, array $unitTaxes, ?float $promoPrice = null, ?float $promoTax = null): void
     {
         $line = (new OrderProduct())
             ->setOrderId($order->getId())
@@ -204,9 +274,9 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
             ->setTitle('Line')
             ->setQuantity($quantity)
             ->setPrice((string) $unitPrice)
-            ->setPromoPrice((string) $unitPrice)
+            ->setPromoPrice((string) ($promoPrice ?? $unitPrice))
             ->setWasNew(0)
-            ->setWasInPromo(0);
+            ->setWasInPromo(null !== $promoPrice ? 1 : 0);
         $line->save();
 
         foreach ($unitTaxes as $unitTax) {
@@ -214,7 +284,7 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
                 ->setOrderProductId($line->getId())
                 ->setTitle('VAT')
                 ->setAmount((string) $unitTax)
-                ->setPromoAmount((string) $unitTax)
+                ->setPromoAmount((string) ($promoTax ?? $unitTax))
                 ->save();
         }
     }
