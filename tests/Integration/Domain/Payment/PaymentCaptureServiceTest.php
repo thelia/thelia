@@ -238,6 +238,28 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('invalid_reference', $capture->getErrorCode());
     }
 
+    public function testALineRecordedByHandStaysRecordedWhenAListenerFails(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-QUIET');
+        $pending = $this->service->capture($order);
+        $listener = static function (OrderPaymentTransactionEvent $event): void {
+            if ($event->getTransaction()->isSucceeded()) {
+                throw new \RuntimeException('ERP down');
+            }
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener, 255);
+
+        try {
+            $event = new OrderPaymentSettlementEvent($pending, PaymentTransactionState::SUCCEEDED);
+            $this->dispatch($event, TheliaEvents::ORDER_PAYMENT_TRANSACTION_SETTLE);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        }
+
+        self::assertTrue($event->getTransaction()->isSucceeded(), 'The settlement is reported as done: it is.');
+    }
+
     public function testAPaymentExceptionThatIsNotARefusalLeavesTheLinePending(): void
     {
         // Only a refusal says the provider took nothing. Any other failure of the module,
