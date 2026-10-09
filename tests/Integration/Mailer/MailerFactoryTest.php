@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Mailer;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
@@ -27,6 +28,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Mailer\Exception\EmailNotSentException;
+use Thelia\Mailer\Exception\StoreEmailMissingException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -431,12 +433,27 @@ final class MailerFactoryTest extends IntegrationTestCase
     {
         $this->givenTheStoreEmail('');
 
-        try {
-            $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
-            self::fail('The shop has no address to send from.');
-        } catch (EmailNotSentException $notSent) {
-            self::assertTrue($notSent->isStoreEmailMissing());
-        }
+        $this->expectException(StoreEmailMissingException::class);
+
+        $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+    }
+
+    /**
+     * The back office previews a message with the parser the shop sends it with: the one
+     * that claims its template file, the default parser for a body stored in the database.
+     */
+    public function testTheParserOfAMessageIsTheOneThatClaimsItsTemplateFile(): void
+    {
+        $resolver = $this->getService(ParserResolver::class);
+        $withFile = MessageQuery::create()->filterByHtmlTemplateFileName('', Criteria::NOT_EQUAL)->findOne();
+        self::assertNotNull($withFile);
+        $withoutFile = (new Message())->setName('stored_body_'.uniqid())->setHtmlTemplateFileName('')->setTextTemplateFileName('');
+
+        self::assertSame($resolver->getDefaultParser(), $this->mailerFactory->parserFor($withoutFile));
+        self::assertSame(
+            $resolver->getParser($this->getService(TemplateHelperInterface::class)->getActiveMailTemplate()->getAbsolutePath(), pathinfo((string) $withFile->getHtmlTemplateFileName(), \PATHINFO_FILENAME)),
+            $this->mailerFactory->parserFor($withFile),
+        );
     }
 
     protected function tearDown(): void

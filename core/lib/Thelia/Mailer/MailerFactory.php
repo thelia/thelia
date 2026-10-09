@@ -31,6 +31,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderQuery;
 
@@ -377,13 +378,9 @@ class MailerFactory
         }
 
         $message->setLocale($locale);
-        // Select the parser from the actual template file base name (e.g. "password"), not the
-        // message code (e.g. "lost_password"): the two frequently differ, and the parser is
-        // chosen by testing whether a matching template file exists. Using the code would make
-        // that existence test miss the real file and fall back to the wrong engine.
-        $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
-        $parser = $this->getParser(
-            '' !== $templateFileName ? pathinfo($templateFileName, \PATHINFO_FILENAME) : null
+        $parser = $this->parserFor($message);
+        $parser->setTemplateDefinition(
+            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
         );
         // Assign parameters
         foreach ($messageParameters as $name => $value) {
@@ -524,23 +521,29 @@ class MailerFactory
     }
 
     /**
-     * @throws \Exception
+     * The parser that renders the message: the one that claims its template file, or the
+     * default parser for a message with no template file at all, which renders from its
+     * body stored in the database. The back office previews a message with it, so that
+     * what it shows is what would be sent. Its template definition is the caller's to set.
+     *
+     * @throws \Exception when no parser claims the template file
      */
-    protected function getParser(?string $template): ParserInterface
+    public function parserFor(Message $message): ParserInterface
     {
-        // A message with no template file at all renders from its database-stored body,
-        // so there is no file for a parser to claim: asking the resolver for one would
-        // report a missing resource, and sendEmailMessage() would swallow it — the mail
-        // silently lost. The default parser renders the stored body instead.
-        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
-        $parser = null === $template
-            ? $this->parserResolver->getDefaultParser()
-            : $this->parserResolver->getParser($path, $template);
+        // The parser is chosen by testing whether a matching template file exists: by the
+        // base name of that file (e.g. "password"), never by the message code (e.g.
+        // "lost_password"), the two frequently differ. A message with no template file has
+        // no file for a parser to claim: asking the resolver for one would report a missing
+        // resource, and sendEmailMessage() would swallow it, the mail silently lost.
+        $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
 
-        $parser->setTemplateDefinition(
-            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
+        if ('' === $templateFileName) {
+            return $this->parserResolver->getDefaultParser();
+        }
+
+        return $this->parserResolver->getParser(
+            $this->templateHelper->getActiveMailTemplate()->getAbsolutePath(),
+            pathinfo($templateFileName, \PATHINFO_FILENAME),
         );
-
-        return $parser;
     }
 }
