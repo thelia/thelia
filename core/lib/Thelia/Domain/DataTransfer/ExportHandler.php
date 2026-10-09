@@ -299,17 +299,17 @@ class ExportHandler
             }
 
             $serializer->finalizeFile($file);
+            $this->rowsWritten = $written;
+
+            // The caller records the count, and may fail to: the file goes with it too.
+            if (null !== $onProgress) {
+                $onProgress($written);
+            }
         } catch (\Throwable $exception) {
             unset($file);
             (new Filesystem())->remove($filePath);
 
             throw $exception;
-        }
-
-        $this->rowsWritten = $written;
-
-        if (null !== $onProgress) {
-            $onProgress($written);
         }
 
         unset($file);

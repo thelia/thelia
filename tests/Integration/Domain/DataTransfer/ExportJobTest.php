@@ -652,6 +652,33 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * The last count of the rows is told once the file is written: a caller that fails
+     * then (its row cannot be saved) leaves no file behind either.
+     */
+    public function testAnExportWhoseLastProgressFailsLeavesNoFileBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+
+        try {
+            $this->getService(ExportHandler::class)->export(
+                $export,
+                $this->getService(SerializerManager::class)->get(self::SERIALIZER),
+                null,
+                Lang::getDefaultLanguage(),
+                onProgress: static function (): void {
+                    throw new \RuntimeException('The row of the job cannot be saved.');
+                },
+            );
+            self::fail('The progress cannot be recorded.');
+        } catch (\RuntimeException) {
+        }
+
+        self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
      * A listener of the export that fails still leaves no file behind.
      */
     public function testAnExportWhoseListenerFailsLeavesNoFileBehind(): void
