@@ -101,7 +101,18 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('100.000000', $line->getAmount());
         self::assertSame(OrderStatus::CODE_REFUNDED, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame('Parcel came back', DeferredCapturePaymentModule::$refundCalls[0]['comment']);
-        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%Payment refund of 100%', Criteria::LIKE)->count());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%Payment refund of 100%Parcel came back%', Criteria::LIKE)->count());
+    }
+
+    public function testAnAmountThatIsNotAPlainNumberIsRefused(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        $crawler = $this->postRefund($order, ['amount' => '1e1', 'reason' => 'other']);
+
+        self::assertStringContainsString('positive number', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
     }
 
     public function testAPartialRefundShowsWhatIsLeftAndASecondOneBeyondItIsRefused(): void
