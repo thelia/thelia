@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Messenger;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Cache\Messenger\EarlyExpirationMessage;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Envelope;
@@ -200,6 +201,8 @@ final class AllowedClassesSerializerTest extends IntegrationTestCase
         yield 'a console command' => [RunCommandMessage::class];
         // Calls any public method of a recurring task service, with any arguments.
         yield 'a call to a scheduled service' => [ServiceCallMessage::class];
+        // Computes a cache value through a service the message names.
+        yield 'an early expiration of a cache item' => [EarlyExpirationMessage::class];
         // PHP finds a class whatever the case of its name.
         yield 'a console command named in lower case' => [strtolower(RunCommandMessage::class)];
     }
