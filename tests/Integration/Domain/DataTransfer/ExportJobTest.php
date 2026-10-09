@@ -723,8 +723,9 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testAJsonFileAModuleReadsItsRowsFromIsLeftAlone(): void
     {
-        ModuleJsonFileExport::$rowsFile = sys_get_temp_dir().'/'.uniqid('module-rows-').'.json';
-        file_put_contents(ModuleJsonFileExport::$rowsFile, json_encode(['id' => 1], \JSON_THROW_ON_ERROR)."\r\n");
+        // In the export folder: only the export's own rows file may go from there.
+        ModuleJsonFileExport::$rowsFile = ExportStorage::directory().'/'.uniqid('module-rows-').'.json';
+        (new Filesystem())->dumpFile(ModuleJsonFileExport::$rowsFile, json_encode(['id' => 1], \JSON_THROW_ON_ERROR)."\r\n");
 
         try {
             $rows = iterator_to_array(new ModuleJsonFileExport());
@@ -784,6 +785,64 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         self::assertSame(0o600, $mode);
+    }
+
+    /**
+     * The export file holds the data of the customers as well, for a day: no other
+     * account of the server reads it either.
+     */
+    public function testAnExportFileIsReadableByItsOwnerOnly(): void
+    {
+        $umask = umask(0);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+        } finally {
+            umask($umask);
+        }
+
+        $this->files[] = $event->getFilePath();
+
+        self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
+    }
+
+    /**
+     * The name of a rows file comes from the export: one that would climb out of the
+     * export folder is refused before anything is written.
+     */
+    public function testARowsFileNameClimbingOutOfTheExportFolderIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        ExportStorage::rowsFile('../../escaped');
+    }
+
+    /**
+     * An export of a module that writes its rows twice keeps only the second file: the
+     * first goes at once.
+     */
+    public function testARowsFileWrittenAgainReplacesThePreviousOne(): void
+    {
+        $export = new class extends OrderExport {
+            public function rowsFile(StatementInterface $statement, string $name): string
+            {
+                return $this->getDataJsonCache($statement, $name);
+            }
+        };
+        $name = uniqid('twice-');
+        $statement = static function (): StatementInterface {
+            $statement = Propel::getConnection()->prepare('SELECT 1 AS id');
+            $statement->execute();
+
+            return $statement;
+        };
+
+        $export->rowsFile($statement(), $name);
+        $second = $export->rowsFile($statement(), $name);
+        $left = glob(ExportStorage::directory().'/'.$name.'-*.json') ?: [];
+        (new Filesystem())->remove($left);
+
+        self::assertSame([$second], $left);
     }
 
     /**

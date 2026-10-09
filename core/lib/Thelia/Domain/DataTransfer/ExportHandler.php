@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ClosableArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
@@ -183,13 +182,7 @@ class ExportHandler
      */
     private function discardWhatTheExportLeft(ExportEvent $event, array $written): void
     {
-        $kept = ExportStorage::resolve($event->getFilePath());
-
-        foreach ($written as $file) {
-            if (ExportStorage::resolve($file) !== $kept) {
-                ExportStorage::discard($file);
-            }
-        }
+        ExportStorage::discardAllBut($written, $event->getFilePath());
     }
 
     /**
@@ -230,12 +223,9 @@ class ExportHandler
             $serializer->getExtension(),
         );
 
-        $filePath = ExportStorage::directory().DS.$filename;
+        $this->exportCachePurger->purgeOldExportFiles(ExportStorage::directory());
 
-        $fileSystem = new Filesystem();
-        $fileSystem->mkdir(\dirname($filePath));
-
-        $this->exportCachePurger->purgeOldExportFiles(\dirname($filePath));
+        $filePath = ExportStorage::newPrivateFile($filename);
 
         $file = new \SplFileObject($filePath, 'w+b');
 
@@ -250,7 +240,7 @@ class ExportHandler
             }
         } catch (\Throwable $exception) {
             unset($file);
-            (new Filesystem())->remove($filePath);
+            ExportStorage::discard($filePath);
 
             throw $exception;
         }
@@ -316,7 +306,7 @@ class ExportHandler
         $event->setFilePath($archiver->getArchivePath());
 
         // The archive holds the export: the file it was made of would keep customer data twice.
-        (new Filesystem())->remove($filePath);
+        ExportStorage::discard($filePath);
     }
 
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void

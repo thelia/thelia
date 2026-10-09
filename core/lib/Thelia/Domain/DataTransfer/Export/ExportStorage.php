@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Export;
 
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Log\Tlog;
@@ -27,6 +28,10 @@ use Thelia\Messenger\JobFailureMessage;
  */
 final class ExportStorage
 {
+    private function __construct()
+    {
+    }
+
     public static function directory(): string
     {
         return THELIA_CACHE_DIR.'export';
@@ -49,18 +54,61 @@ final class ExportStorage
     }
 
     /**
-     * A new file, readable by its owner only, for the rows an export reads: a name of
-     * its own, as two workers may run the same export at once.
+     * A new file of the export folder, readable by its owner only from its very
+     * creation: it holds the data of the customers.
+     */
+    public static function newPrivateFile(string $name): string
+    {
+        if (1 !== preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]*$/', $name) || str_contains($name, '..')) {
+            throw new \InvalidArgumentException('The name of an export file is letters, digits, ".", "-" and "_", inside the export folder.');
+        }
+
+        $filesystem = new Filesystem();
+        $filesystem->mkdir(self::directory(), 0o700);
+        $path = self::directory().\DIRECTORY_SEPARATOR.$name;
+
+        // Created private, never made private afterwards: an account that opened it
+        // in between would keep reading. "x" never opens a file or a link already there.
+        $previousUmask = umask(0o077);
+
+        try {
+            $handle = @fopen($path, 'x');
+        } finally {
+            umask($previousUmask);
+        }
+
+        if (false === $handle) {
+            throw new IOException(\sprintf('The export file %s could not be created.', $name));
+        }
+
+        fclose($handle);
+
+        return $path;
+    }
+
+    /**
+     * A new file for the rows an export reads: a name of its own, as two workers may
+     * run the same export at once.
      */
     public static function rowsFile(string $exportName): string
     {
-        $filesystem = new Filesystem();
-        $filesystem->mkdir(self::directory());
-        $path = self::directory().\DIRECTORY_SEPARATOR.$exportName.'-'.bin2hex(random_bytes(8)).'.json';
-        $filesystem->touch($path);
-        $filesystem->chmod($path, 0o600);
+        return self::newPrivateFile($exportName.'-'.bin2hex(random_bytes(8)).'.json');
+    }
 
-        return $path;
+    /**
+     * Removes every file of the export folder among $paths but the one kept.
+     *
+     * @param list<string> $paths
+     */
+    public static function discardAllBut(array $paths, ?string $kept): void
+    {
+        $keptFile = null === $kept ? null : self::resolve($kept);
+
+        foreach ($paths as $path) {
+            if (self::resolve($path) !== $keptFile) {
+                self::discard($path);
+            }
+        }
     }
 
     /**
