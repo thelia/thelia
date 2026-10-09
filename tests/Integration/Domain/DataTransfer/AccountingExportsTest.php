@@ -24,6 +24,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
@@ -109,6 +110,70 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertSame('2026-02', $summary[0]['period']);
     }
 
+    public function testTheLastSecondOfThePeriodIsInItAndTheNextOneIsNot(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $last = $this->invoicedOrder('2026-02-28', [[100.0, 1, 20.0]]);
+        $last->setInvoiceDate(new \DateTime('2026-02-28 23:59:59'))->save();
+        $next = $this->invoicedOrder('2026-03-01', [[100.0, 1, 20.0]]);
+        $next->setInvoiceDate(new \DateTime('2026-03-01 00:00:00'))->save();
+        $empty = $this->invoicedOrder('2026-02-15', [[100.0, 1, 20.0]]);
+        $empty->setInvoiceRef('')->save();
+
+        $export = new SalesJournalExport();
+        $rows = $this->rows($export, '2026-02');
+
+        self::assertNotSame([], $this->mine($rows, [$last]));
+        self::assertSame([], $this->mine($rows, [$next]));
+        self::assertSame([], array_filter($rows, static fn (array $row): bool => '' === $row['PieceRef']));
+    }
+
+    public function testMoreThanABatchOfInvoicesIsBooked(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $orders = [];
+
+        for ($i = 0; $i < 205; ++$i) {
+            $orders[] = $this->invoicedOrder('2026-02-1'.($i % 9), [[10.0, 1, 2.0]]);
+        }
+
+        $rows = $this->mine($this->rows(new SalesJournalExport(), '2026-02'), $orders);
+
+        self::assertCount(205, array_unique(array_column($rows, 'PieceRef')));
+    }
+
+    public function testTheReportSpeaksTheLanguageOfTheExport(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $this->invoicedOrder('2026-02-11', [[100.0, 1, 10.0]]);
+
+        $export = new SalesJournalExport();
+        $this->rows($export, '2026-02', 'fr_FR');
+
+        self::assertStringContainsString('Commande', implode("\n", $export->report()->warnings()));
+    }
+
+    public function testTheTaxSummaryListsTheRatesOfAMonthHighestFirst(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720,2.1:706021:445721');
+        $this->invoicedOrder('2026-02-10', [[100.0, 1, 20.0], [10.0, 3, 0.21]]);
+
+        $summary = array_values(array_filter($this->rows(new TaxSummaryExport(), '2026-02'), static fn (array $row): bool => '2026-02' === $row['period']));
+
+        self::assertSame(['20.00', '2.10'], array_column($summary, 'rate'), 'By number, not by text: 2.1 sorts after 20 as text.');
+    }
+
+    public function testAnEmptyPeriodStillGivesTheFieldNames(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+
+        $tester = new CommandTester((new Application(self::$kernel))->find('export'));
+        $tester->execute(['ref' => 'thelia.export.sales_journal', 'serializer' => 'thelia.fec', '--start' => '1990-01-01', '--end' => '1990-01-31']);
+
+        self::assertSame(1, preg_match('/(\S+\.txt)/', $tester->getDisplay(), $file));
+        self::assertSame(implode("\t", self::FEC_FIELDS)."\r\n", (string) file_get_contents($file[1]));
+    }
+
     public function testBothExportsAreInTheCatalogue(): void
     {
         self::assertSame(SalesJournalExport::class, ExportQuery::create()->findOneByRef('thelia.export.sales_journal')?->getHandleClass());
@@ -171,9 +236,9 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
     /**
      * @return list<array<string, mixed>>
      */
-    private function rows(SalesJournalExport|TaxSummaryExport $export, string $month): array
+    private function rows(SalesJournalExport|TaxSummaryExport $export, string $month, ?string $locale = null): array
     {
-        $export->setLang(Lang::getDefaultLanguage());
+        $export->setLang(null !== $locale ? LangQuery::create()->findOneByLocale($locale) : Lang::getDefaultLanguage());
         $start = new \DateTime($month.'-01 00:00:00');
         $export->setRangeDate(['start' => $start, 'end' => (clone $start)->modify('last day of this month 23:59:59')]);
 
