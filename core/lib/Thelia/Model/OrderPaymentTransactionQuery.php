@@ -54,6 +54,16 @@ class OrderPaymentTransactionQuery extends BaseOrderPaymentTransactionQuery
             ->findOne($con);
     }
 
+    public function findLatestSucceededCapture(int $orderId, ?ConnectionInterface $con = null): ?OrderPaymentTransaction
+    {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->filterByTypeEnum(PaymentTransactionType::CAPTURE)
+            ->filterSucceeded()
+            ->orderById(Criteria::DESC)
+            ->findOne($con);
+    }
+
     /**
      * Whether the journal holds, for one of these movements, a line that happened or may
      * have happened — succeeded or still pending.
@@ -122,6 +132,22 @@ class OrderPaymentTransactionQuery extends BaseOrderPaymentTransactionQuery
         return self::create()
             ->filterByOrderId($orderId)
             ->filterByTypeEnum(PaymentTransactionType::CAPTURE)
+            ->filterByState([PaymentTransactionState::SUCCEEDED->value, PaymentTransactionState::PENDING->value], Criteria::IN)
+            ->filterByAmount($amount)
+            ->filterByCreatedAt($since, Criteria::GREATER_EQUAL)
+            ->orderById(Criteria::DESC)
+            ->findOne($con);
+    }
+
+    /**
+     * The refund of this amount asked since $since that did not fail: a repeated click or a
+     * retried call is refused rather than sent to the provider again.
+     */
+    public function findRecentRefundOf(int $orderId, string $amount, \DateTimeInterface $since, ?ConnectionInterface $con = null): ?OrderPaymentTransaction
+    {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->filterByTypeEnum(PaymentTransactionType::REFUND)
             ->filterByState([PaymentTransactionState::SUCCEEDED->value, PaymentTransactionState::PENDING->value], Criteria::IN)
             ->filterByAmount($amount)
             ->filterByCreatedAt($since, Criteria::GREATER_EQUAL)
