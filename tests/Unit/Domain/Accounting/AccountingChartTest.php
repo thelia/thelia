@@ -37,7 +37,7 @@ final class AccountingChartTest extends TestCase
     {
         $chart = AccountingChart::fromValues('', '', '', '', '');
 
-        self::assertSame(['customer account', 'shipping account', 'accounts of the tax rates'], $chart->missing());
+        self::assertSame([AccountingChart::MISSING_CUSTOMER_ACCOUNT, AccountingChart::MISSING_SHIPPING_ACCOUNT, AccountingChart::MISSING_RATE_ACCOUNTS], $chart->missing());
         self::assertSame('VE', $chart->journalCode, 'The sales journal has a default code.');
     }
 
