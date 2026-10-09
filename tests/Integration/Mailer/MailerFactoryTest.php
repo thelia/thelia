@@ -14,16 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Mailer;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\Parser\ParserFallback;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -424,9 +425,13 @@ final class MailerFactoryTest extends IntegrationTestCase
         $transport = $this->spyTransport($sent);
 
         (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
-            ->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+            ->sendTestMail('someone@example.com', 'A test', '<p>Email test from : Tom &amp; Jerry</p>');
 
         self::assertCount(1, $sent);
+        self::assertInstanceOf(Email::class, $sent[0]);
+        // The text part reads as the HTML one shows: no tag, no entity.
+        self::assertSame('Email test from : Tom & Jerry', $sent[0]->getTextBody());
+        self::assertSame('<p>Email test from : Tom &amp; Jerry</p>', $sent[0]->getHtmlBody());
     }
 
     public function testATestOfTheMailSettingsOfAShopWithoutAnAddressSaysSo(): void
@@ -444,16 +449,37 @@ final class MailerFactoryTest extends IntegrationTestCase
      */
     public function testTheParserOfAMessageIsTheOneThatClaimsItsTemplateFile(): void
     {
-        $resolver = $this->getService(ParserResolver::class);
-        $withFile = MessageQuery::create()->filterByHtmlTemplateFileName('', Criteria::NOT_EQUAL)->findOne();
-        self::assertNotNull($withFile);
-        $withoutFile = (new Message())->setName('stored_body_'.uniqid())->setHtmlTemplateFileName('')->setTextTemplateFileName('');
+        $templateHelper = $this->getService(TemplateHelperInterface::class);
+        $mailTemplatePath = $templateHelper->getActiveMailTemplate()->getAbsolutePath();
+        $claimant = new class($mailTemplatePath) extends ParserFallback {
+            public function __construct(private readonly string $claimedPath)
+            {
+            }
 
-        self::assertSame($resolver->getDefaultParser(), $this->mailerFactory->parserFor($withoutFile));
-        self::assertSame(
-            $resolver->getParser($this->getService(TemplateHelperInterface::class)->getActiveMailTemplate()->getAbsolutePath(), pathinfo((string) $withFile->getHtmlTemplateFileName(), \PATHINFO_FILENAME)),
-            $this->mailerFactory->parserFor($withFile),
-        );
+            public function supportTemplateRender(string $templatePath, ?string $templateName): bool
+            {
+                return $templatePath === $this->claimedPath && 'password' === $templateName;
+            }
+
+            public static function getDefaultPriority(): int
+            {
+                return -5;
+            }
+        };
+        $default = new class extends ParserFallback {
+            public static function getDefaultPriority(): int
+            {
+                return 100;
+            }
+        };
+        $resolver = new ParserResolver([$claimant, $default], [], new RequestStack(), $templateHelper);
+        $factory = new MailerFactory($templateHelper, $resolver, $this->getService(MailerInterface::class), new NullTransport());
+
+        $withFile = (new Message())->setName('with_file')->setHtmlTemplateFileName('password.html')->setTextTemplateFileName('');
+        $withoutFile = (new Message())->setName('stored_body')->setHtmlTemplateFileName('')->setTextTemplateFileName('');
+
+        self::assertSame($claimant, $factory->parserFor($withFile));
+        self::assertSame($default, $factory->parserFor($withoutFile));
     }
 
     protected function tearDown(): void

@@ -104,7 +104,8 @@ class MailerFactory
      */
     public function sendTestMail(string $recipient, string $subject, string $htmlBody): void
     {
-        $this->sendNow($this->createSimpleEmailMessage($this->testSender('mail_settings_test'), [$recipient => $recipient], $subject, $htmlBody, strip_tags($htmlBody)));
+        // The text part is the HTML one without its tags and entities.
+        $this->sendNow($this->createSimpleEmailMessage($this->testSender('mail_settings_test'), [$recipient => $recipient], $subject, $htmlBody, html_entity_decode(strip_tags($htmlBody), \ENT_QUOTES | \ENT_HTML5)));
     }
 
     /**
