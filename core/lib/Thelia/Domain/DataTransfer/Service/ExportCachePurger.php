@@ -30,6 +30,22 @@ class ExportCachePurger
     }
 
     /**
+     * The path, its links resolved, when it is a file of the export folder: the only kind
+     * of path an export is ever served from or deleted by. Null otherwise.
+     */
+    public static function resolve(string $path): ?string
+    {
+        $directory = realpath(self::directory());
+        $file = realpath($path);
+
+        if (false === $directory || false === $file || !is_file($file) || !str_starts_with($file, $directory.\DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $file;
+    }
+
+    /**
      * @param bool $dryRun count the files that would be deleted, and delete nothing
      */
     public function purgeOldExportFiles(string $directory, bool $dryRun = false): int

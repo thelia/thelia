@@ -549,6 +549,38 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * Only a file goes: a listener that pointed the export at a folder of the export
+     * folder never gets that folder removed with all it holds.
+     */
+    public function testARowThatCannotRecordAFolderOfTheExportFolderLeavesItAlone(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        // Longer than the row can hold.
+        $folder = ExportCachePurger::directory().'/'.uniqid('kept-').'/'.str_repeat('d', 120).'/'.str_repeat('e', 120);
+        (new Filesystem())->dumpFile($folder.'/kept.csv', 'kept');
+        $pointsAtTheFolder = static function (ExportEvent $event) use ($folder): void {
+            $event->setFilePath($folder);
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::EXPORT_SUCCESS, $pointsAtTheFolder);
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        try {
+            ($this->handler())(new RunExportJob((int) $job->getId()));
+            self::fail('The row cannot hold the path of the folder.');
+        } catch (JobSetAsideException) {
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::EXPORT_SUCCESS, $pointsAtTheFolder);
+            $kept = is_file($folder.'/kept.csv');
+            (new Filesystem())->remove([\dirname($folder, 2), ...(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [])]);
+        }
+
+        self::assertTrue($kept);
+    }
+
+    /**
      * A worker runs export after export on the same handler: the rows of the previous
      * one are never told for the next, written by a module that tells none.
      */
