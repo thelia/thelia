@@ -21,17 +21,22 @@ use Thelia\Core\Serializer\AbstractSerializer;
  * by a tab, records by CR LF, the field names on the first line, dates as YYYYMMDD and
  * amounts with a decimal comma.
  *
- * An export gives its dates as Y-m-d and its amounts with a decimal point, as every other
- * serializer reads them; only the fields the format names are rewritten. Nothing is
+ * The field names are written first, so that a period without entry still gives a file the
+ * accounting program accepts, and every row is written in the order of the format, a field
+ * the row does not give being empty. An export gives its dates as Y-m-d and its amounts
+ * with a decimal point, as every other serializer reads them. Nothing is
  * guarded against spreadsheets: the file is read by an accounting program, which must get
  * the labels as they are.
  */
 class FECSerializer extends AbstractSerializer
 {
+    /**
+     * The fields of the format, in their order.
+     */
+    public const FIELDS = ['JournalCode', 'JournalLib', 'EcritureNum', 'EcritureDate', 'CompteNum', 'CompteLib', 'CompAuxNum', 'CompAuxLib', 'PieceRef', 'PieceDate', 'EcritureLib', 'Debit', 'Credit', 'EcritureLet', 'DateLet', 'ValidDate', 'Montantdevise', 'Idevise'];
+
     private const DATE_FIELDS = ['EcritureDate', 'PieceDate', 'DateLet', 'ValidDate'];
     private const AMOUNT_FIELDS = ['Debit', 'Credit', 'Montantdevise'];
-
-    private bool $headerWritten = false;
 
     public function getId(): string
     {
@@ -55,21 +60,15 @@ class FECSerializer extends AbstractSerializer
 
     public function prepareFile(\SplFileObject $fileObject): void
     {
-        $this->headerWritten = false;
+        $fileObject->fwrite($this->record(self::FIELDS));
     }
 
     public function serialize(mixed $data): string
     {
-        $header = '';
-
-        if (!$this->headerWritten) {
-            $header = $this->record(array_keys($data));
-            $this->headerWritten = true;
-        }
-
         $fields = [];
 
-        foreach ($data as $name => $value) {
+        foreach (self::FIELDS as $name) {
+            $value = $data[$name] ?? '';
             $value = \is_scalar($value) ? (string) $value : '';
 
             if (\in_array($name, self::DATE_FIELDS, true) && 1 === preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $date)) {
@@ -81,7 +80,7 @@ class FECSerializer extends AbstractSerializer
             $fields[] = $value;
         }
 
-        return $header.$this->record($fields);
+        return $this->record($fields);
     }
 
     /**
