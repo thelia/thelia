@@ -23,6 +23,7 @@ use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentException;
+use Thelia\Domain\Payment\Service\PaymentJournalLock;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Model\Order;
@@ -200,6 +201,28 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         $this->expectException(PaymentException::class);
 
         $this->recorder->settle($settled, PaymentTransactionState::FAILED);
+    }
+
+    public function testTheListenersRunOnceTheJournalIsReleased(): void
+    {
+        // A listener may call a payment module or write another order's journal: it must
+        // not keep this order's journal locked while it does.
+        $order = $this->order(120);
+        $lockHeld = null;
+        $listener = static function () use ($order, &$lockHeld): void {
+            $statement = \Propel\Runtime\Propel::getConnection()->prepare('SELECT IS_USED_LOCK(?) = CONNECTION_ID()');
+            $statement->execute([PaymentJournalLock::nameFor((int) $order->getId())]);
+            $lockHeld = '1' === (string) $statement->fetchColumn();
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener, 255);
+
+        try {
+            $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        }
+
+        self::assertFalse($lockHeld);
     }
 
     public function testAnAuthorizationPutsAnUnpaidOrderOnHoldForCapture(): void

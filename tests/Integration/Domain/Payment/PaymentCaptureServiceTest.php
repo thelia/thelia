@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Payment;
 
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
+use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
@@ -26,8 +27,11 @@ use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
+use Thelia\Domain\Payment\Service\PaymentJournalLock;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Propel\Runtime\Propel;
+use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -165,6 +169,56 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertStringNotContainsString('SECRET', (string) $line->getErrorMessage(), 'The raw technical message is logged, not stored.');
         self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
+    public function testAListenerFailingAfterTheProviderTookTheMoneyDoesNotFailTheCapture(): void
+    {
+        // The money is taken and the line says so: a listener that breaks afterwards is
+        // logged, it does not tell the merchant the capture failed and invite a second one.
+        [$order] = $this->authorizedOrder(120);
+        $listener = static function (OrderPaymentTransactionEvent $event): void {
+            if ($event->getTransaction()->isSucceeded()) {
+                throw new \RuntimeException('Listener down');
+            }
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener, 255);
+
+        try {
+            $capture = $this->service->capture($order);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        }
+
+        self::assertTrue($capture->isSucceeded());
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->captured);
+    }
+
+    public function testAJournalBusyWhenTheProviderAnswersLeavesTheLineForTheNotification(): void
+    {
+        // The provider took the money; another worker holds the journal past the wait.
+        // The capture is not reported as failed: the line waits, with its reference, for
+        // the notification to settle it.
+        [$order] = $this->authorizedOrder(120);
+        $configuration = Propel::getServiceContainer()->getConnectionManager(OrderPaymentTransactionTableMap::DATABASE_NAME)->getConfiguration();
+        $otherWorker = new \PDO($configuration['dsn'], $configuration['user'] ?? null, $configuration['password'] ?? null);
+        DeferredCapturePaymentModule::$whileCapturing = static function () use ($otherWorker, $order): void {
+            $otherWorker->query("SELECT GET_LOCK('".PaymentJournalLock::nameFor((int) $order->getId())."', 0)");
+        };
+
+        try {
+            $capture = $this->service->capture($order);
+        } finally {
+            $otherWorker->query("SELECT RELEASE_LOCK('".PaymentJournalLock::nameFor((int) $order->getId())."')");
+        }
+
+        self::assertTrue($capture->isPending());
+        self::assertSame('journal_busy', $capture->getErrorCode());
+        self::assertStringContainsString('CAP-'.$capture->getId(), (string) $capture->getErrorMessage());
+
+        $this->recorder->recordCapture($order, 120, 'CAP-'.$capture->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $capture->reload();
+        self::assertTrue($capture->isSucceeded());
     }
 
     public function testAModuleThatRefusesWithAPaymentExceptionLeavesAFailedLineWithItsMessage(): void
