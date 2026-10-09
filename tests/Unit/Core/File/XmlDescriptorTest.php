@@ -160,7 +160,7 @@ final class XmlDescriptorTest extends TestCase
         self::assertSame('a b?c?d?e', XmlDescriptor::printable("a\nb\tc\x7Fd\u{202E}e"));
         self::assertSame('a?b?c?d?e?f', XmlDescriptor::printable("a\u{85}b\u{9B}c\u{200F}d\u{2028}e\u{2066}f"));
         self::assertSame('Mod?', XmlDescriptor::printable("Mod\xE9"));
-        self::assertNotSame('', XmlDescriptor::printable("\xE9"));
+        self::assertSame('?', XmlDescriptor::printable("\xE9"));
 
         file_put_contents($this->workDir."/ga\xE9rbage.xsd", 'garbage');
         $dom = new \DOMDocument();
