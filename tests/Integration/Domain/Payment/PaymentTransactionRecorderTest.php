@@ -244,6 +244,48 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_NOT_PAID, $this->reload($order)->getOrderStatus()->getCode());
     }
 
+    public function testAReplayedVoidIsAnsweredWithItsLine(): void
+    {
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $void = $this->recorder->recordVoid($order, 'VOID-1', moduleCode: 'Cheque');
+
+        $replayed = $this->recorder->recordVoid($order, 'VOID-1', moduleCode: 'Cheque');
+
+        self::assertSame($void->getId(), $replayed->getId());
+        self::assertSame(2, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->count());
+    }
+
+    public function testANotificationSettlesTheVoidWaitingForItsReference(): void
+    {
+        // The call releasing the authorization timed out: the void was left pending, with
+        // nothing left to release in the totals, and without the provider's reference.
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $pending = $this->recorder->recordVoid($order, null, PaymentTransactionState::PENDING);
+
+        $notified = $this->recorder->recordVoid($order, 'PSP-VOID-7', moduleCode: 'Cheque');
+
+        self::assertSame($pending->getId(), $notified->getId());
+        self::assertTrue($notified->isSucceeded());
+        self::assertSame('120.000000', $notified->getAmount());
+        self::assertSame(OrderStatus::CODE_NOT_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testANotificationSettlesThePendingVoidItsReferenceNames(): void
+    {
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $pending = $this->recorder->recordVoid($order, null, PaymentTransactionState::PENDING);
+        $this->recorder->attachReference($pending, 'PSP-VOID-8');
+
+        $notified = $this->recorder->recordVoid($order, 'PSP-VOID-8', PaymentTransactionState::FAILED, moduleCode: 'Cheque');
+
+        self::assertSame($pending->getId(), $notified->getId());
+        self::assertTrue($notified->isFailed());
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture, 'A void that failed released nothing.');
+    }
+
     public function testAPendingCaptureReservesWhatItAskedFor(): void
     {
         $order = $this->order(100);

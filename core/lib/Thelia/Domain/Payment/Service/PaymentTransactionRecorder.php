@@ -155,6 +155,11 @@ final readonly class PaymentTransactionRecorder
      * Releases what the authorization still holds once the captures awaiting their
      * answer are set aside. The amount is read under the lock, so the totals read zero
      * left to capture afterwards.
+     *
+     * A void the journal already knows is answered with its own amount, not with what is
+     * left once it is counted: by its reference, or, for a reference it does not know yet,
+     * as the one pending void still waiting for it — a release the shop asked for whose
+     * answer never came back.
      */
     public function recordVoid(
         Order $order,
@@ -166,19 +171,25 @@ final readonly class PaymentTransactionRecorder
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
         return $this->journalLock->withOrder((int) $order->getId(), function () use ($order, $pspReference, $state, $authorization, $moduleCode, $errorCode, $errorMessage): OrderPaymentTransaction {
-            $remaining = $this->totalsReader->forOrder((int) $order->getId())->remainingToCapture;
+            $orderId = (int) $order->getId();
+            $reference = $this->cleanReference($pspReference);
 
-            if (PaymentTransactionState::FAILED !== $state && !PaymentAmount::isPositive($remaining)) {
-                $replayed = null === $this->cleanReference($pspReference)
-                    ? null
-                    : OrderPaymentTransactionQuery::create()->findByReference((int) $order->getId(), PaymentTransactionType::VOID, (string) $this->cleanReference($pspReference));
+            $known = null === $reference
+                ? null
+                : OrderPaymentTransactionQuery::create()->findByReference($orderId, PaymentTransactionType::VOID, $reference)
+                    ?? ($state->isSettled() ? $this->lineWaitingForItsReference($orderId, PaymentTransactionType::VOID) : null);
 
-                if (null === $replayed) {
-                    throw new InvalidPaymentAmountException(\sprintf('Order %s: no authorization holds anything to release.', (string) $order->getRef()));
-                }
+            if (null !== $known) {
+                return $this->record($order, PaymentTransactionType::VOID, (string) $known->getAmount(), $state, $reference, $authorization, $moduleCode, $errorCode, $errorMessage);
             }
 
-            return $this->record($order, PaymentTransactionType::VOID, $remaining, $state, $pspReference, $authorization, $moduleCode, $errorCode, $errorMessage);
+            $remaining = $this->totalsReader->forOrder($orderId)->remainingToCapture;
+
+            if (PaymentTransactionState::FAILED !== $state && !PaymentAmount::isPositive($remaining)) {
+                throw new InvalidPaymentAmountException(\sprintf('Order %s: no authorization holds anything to release.', (string) $order->getRef()));
+            }
+
+            return $this->record($order, PaymentTransactionType::VOID, $remaining, $state, $reference, $authorization, $moduleCode, $errorCode, $errorMessage);
         });
     }
 
@@ -434,9 +445,10 @@ final readonly class PaymentTransactionRecorder
      * reference: a call that timed out, or whose answer could not be recorded, left the
      * line without the reference the provider gave the movement. It is adopted when it is
      * the only pending line of that movement and amount without a reference; two of them
-     * cannot be told apart, and neither is guessed at.
+     * cannot be told apart, and neither is guessed at. A void has no amount of its own to
+     * match on — it releases whatever is left — and is matched on the movement alone.
      */
-    private function lineWaitingForItsReference(int $orderId, PaymentTransactionType $type, string $amount): ?OrderPaymentTransaction
+    private function lineWaitingForItsReference(int $orderId, PaymentTransactionType $type, ?string $amount = null): ?OrderPaymentTransaction
     {
         $waiting = OrderPaymentTransactionQuery::create()->findPendingWithoutReference($orderId, $type, $amount);
 
