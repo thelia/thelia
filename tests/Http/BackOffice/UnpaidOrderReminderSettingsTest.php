@@ -110,6 +110,20 @@ final class UnpaidOrderReminderSettingsTest extends WebIntegrationTestCase
         self::assertSame('24:order_payment_reminder', ConfigQuery::read(UnpaidOrderReminderSettings::SCHEDULE_KEY));
     }
 
+    public function testAStepNamingNoMessageOfTheShopIsRefused(): void
+    {
+        $crawler = $this->client->request('GET', self::PAGE);
+        $form = $crawler->filter('[data-testid="reminder-save"]')->form();
+        $values = $form->getPhpValues();
+        $values['steps'][0] = ['delay' => '24', 'action' => 'no_such_reminder_message'];
+
+        $crawler = $this->client->request('POST', $form->getUri(), $values);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertStringContainsString('no_such_reminder_message', $crawler->filter('[data-testid="reminder-error"]')->text(''));
+        self::assertSame('', (string) ConfigQuery::read(UnpaidOrderReminderSettings::SCHEDULE_KEY, ''));
+    }
+
     public function testTheDashboardAndTheOrderListFollowTheFirstStep(): void
     {
         ConfigQuery::write(UnpaidOrderReminderSettings::SCHEDULE_KEY, '6:order_payment_reminder');
