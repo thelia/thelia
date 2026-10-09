@@ -137,6 +137,10 @@ class ExportHandler
             $this->rowsWritten = 0;
         }
 
+        // A listener may have handed the export over elsewhere: what it was made of in the
+        // export folder would never be downloaded.
+        $this->discardWhatTheExportLeft($event, $written);
+
         return $event;
     }
 
@@ -171,6 +175,29 @@ class ExportHandler
         }
 
         return $instance;
+    }
+
+    /**
+     * @param list<string> $written the files the export wrote
+     */
+    private function discardWhatTheExportLeft(ExportEvent $event, array $written): void
+    {
+        $kept = ExportCachePurger::resolve($event->getFilePath());
+
+        foreach ($written as $file) {
+            $resolved = ExportCachePurger::resolve($file);
+
+            if (null === $resolved || $resolved === $kept) {
+                continue;
+            }
+
+            // The export is done: a file the purge will sweep never fails it.
+            try {
+                (new Filesystem())->remove($resolved);
+            } catch (\Throwable $notRemoved) {
+                Tlog::getInstance()->addWarning(\sprintf('A file an export left was not removed: %s', JobFailureMessage::forLog($notRemoved)));
+            }
+        }
     }
 
     /**

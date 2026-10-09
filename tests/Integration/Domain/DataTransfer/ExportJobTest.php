@@ -541,11 +541,11 @@ final class ExportJobTest extends IntegrationTestCase
         } catch (JobSetAsideException) {
         } finally {
             $dispatcher->removeListener(TheliaEvents::EXPORT_SUCCESS, $pointsElsewhere);
-            (new Filesystem())->remove(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: []);
+            $kept = is_file($elsewhere);
+            (new Filesystem())->remove([\dirname($elsewhere, 3), ...(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [])]);
         }
 
-        self::assertFileExists($elsewhere);
-        (new Filesystem())->remove(\dirname($elsewhere, 3));
+        self::assertTrue($kept);
     }
 
     /**
@@ -666,6 +666,35 @@ final class ExportJobTest extends IntegrationTestCase
         (new Filesystem())->remove($left);
 
         self::assertSame([$event->getFilePath()], $left);
+    }
+
+    /**
+     * A listener that hands the export over elsewhere leaves nothing of it in the export
+     * folder, where nobody would ever download it.
+     */
+    public function testAnExportAListenerMovedElsewhereLeavesNothingBehind(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $elsewhere = sys_get_temp_dir().'/'.uniqid('handed-over-').'.csv';
+        $handsItOver = static function (ExportEvent $event) use ($elsewhere): void {
+            copy($event->getFilePath(), $elsewhere);
+            $event->setFilePath($elsewhere);
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::EXPORT_SUCCESS, $handsItOver);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+            $left = glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [];
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::EXPORT_SUCCESS, $handsItOver);
+            (new Filesystem())->remove([$elsewhere, ...(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [])]);
+        }
+
+        self::assertSame($elsewhere, $event->getFilePath());
+        self::assertSame([], $left);
     }
 
     public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
