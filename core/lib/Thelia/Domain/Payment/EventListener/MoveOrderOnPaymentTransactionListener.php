@@ -144,8 +144,11 @@ final readonly class MoveOrderOnPaymentTransactionListener
             return;
         }
 
+        // Decided on the status the order had when the line was announced: another worker
+        // that moved it since wins, and this move is dropped.
         $statusEvent = (new OrderEvent($order))
             ->setStatus($statusId)
+            ->expectStatus((int) $order->getStatusId())
             ->setSourceModuleCode($event->getSourceModuleCode());
 
         try {
