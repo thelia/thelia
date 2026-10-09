@@ -39,6 +39,15 @@ final readonly class AccountingChart
 
     private const ACCOUNT_PATTERN = '/^[0-9A-Za-z]{1,20}$/';
 
+    private const JOURNAL_LABEL_MAX_LENGTH = 100;
+
+    /**
+     * How far, in points, a rate the frozen amounts of an order make may be from the rate of
+     * the chart it is filed under: a unit price and its tax are each rounded to the cent, and
+     * 0.83 of tax on 4.17 makes 19.90%.
+     */
+    public const RATE_TOLERANCE = 0.1;
+
     /**
      * @param array<string, array{product: string, tax: ?string}> $rates by rate key
      */
@@ -72,6 +81,16 @@ final readonly class AccountingChart
     {
         $customerAccount = trim($customerAccount);
         $shippingAccount = trim($shippingAccount);
+        $journalCode = trim($journalCode);
+        $journalLabel = trim($journalLabel);
+
+        if ('' !== $journalCode && 1 !== preg_match(self::ACCOUNT_PATTERN, $journalCode)) {
+            throw new InvalidAccountingChartException(\sprintf('The journal code "%s" is not a code: letters and digits only, 20 at most.', $journalCode));
+        }
+
+        if (mb_strlen($journalLabel) > self::JOURNAL_LABEL_MAX_LENGTH || 1 === preg_match('/[\x00-\x1F]/', $journalLabel)) {
+            throw new InvalidAccountingChartException(\sprintf('The journal label holds %d characters at most, on one line.', self::JOURNAL_LABEL_MAX_LENGTH));
+        }
 
         foreach (['customer' => $customerAccount, 'shipping' => $shippingAccount] as $role => $account) {
             if ('' !== $account && 1 !== preg_match(self::ACCOUNT_PATTERN, $account)) {
@@ -113,8 +132,8 @@ final readonly class AccountingChart
         }
 
         return new self(
-            '' !== trim($journalCode) ? trim($journalCode) : self::DEFAULT_JOURNAL_CODE,
-            '' !== trim($journalLabel) ? trim($journalLabel) : self::DEFAULT_JOURNAL_LABEL,
+            '' !== $journalCode ? $journalCode : self::DEFAULT_JOURNAL_CODE,
+            '' !== $journalLabel ? $journalLabel : self::DEFAULT_JOURNAL_LABEL,
             $customerAccount,
             $shippingAccount,
             $rates,
@@ -163,6 +182,27 @@ final readonly class AccountingChart
     public function accountsOf(string $rateKey): ?array
     {
         return $this->rates[$rateKey] ?? null;
+    }
+
+    /**
+     * The rate of the chart a rate of an order is filed under: the closest one within
+     * RATE_TOLERANCE, or null when the chart has none that close.
+     */
+    public function closestRate(string $rateKey): ?string
+    {
+        $closest = null;
+        $distance = self::RATE_TOLERANCE + 0.0001;
+
+        foreach (array_keys($this->rates) as $chartRate) {
+            $gap = abs((float) $chartRate - (float) $rateKey);
+
+            if ($gap < $distance) {
+                $closest = (string) $chartRate;
+                $distance = $gap;
+            }
+        }
+
+        return $closest;
     }
 
     public function rateAccountsSetting(): string
