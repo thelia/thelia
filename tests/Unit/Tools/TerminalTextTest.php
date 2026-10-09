@@ -40,9 +40,11 @@ final class TerminalTextTest extends TestCase
         self::assertSame('| ??', TerminalText::onOneLine("|\n\f\x88"));
         // The result is the same the second time.
         self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
-        // A tab at either end that no line break touches is shown; one a line break touches goes with it.
+        // A tab in a run of blanks without a line break is shown, at either end too; one in a
+        // run that holds a line break goes with it.
         self::assertSame('?a?', TerminalText::onOneLine("\ta\t"));
         self::assertSame('a', TerminalText::onOneLine("\t\na\n\t"));
+        self::assertSame('a', TerminalText::onOneLine("\t \na"));
         // A lone carriage return is a line break, never a return to the start of the line.
         self::assertSame('Acme OK', TerminalText::onOneLine("Acme\rOK"));
     }
@@ -115,7 +117,12 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * A step that fails leaves nothing rather than the text it was to clean.
+     * A step that fails leaves nothing rather than the text it was to clean. Under this
+     * limit PCRE refuses even the check that the text is UTF-8, so the first step runs and
+     * fails on a valid text too: what is proven here is the first step, and that nothing
+     * downstream (the other steps, onOneLine()) brings the text back. The fallbacks of the
+     * second and third steps cannot be reached with a limit: one match per character, no
+     * backtracking.
      */
     #[RunInSeparateProcess]
     public function testAStepThatFailsLeavesNothing(): void
@@ -127,6 +134,8 @@ final class TerminalTextTest extends TestCase
 
         try {
             self::assertSame('', TerminalText::withoutControlCharacters(str_repeat("\xFFa\u{200B}", 2000)));
+            self::assertSame('', TerminalText::withoutControlCharacters(str_repeat("a\u{200B}", 2000)));
+            self::assertSame('', TerminalText::onOneLine(str_repeat("a\n b", 2000)));
         } finally {
             ini_set('pcre.jit', (string) $jit);
             ini_set('pcre.backtrack_limit', (string) $limit);
@@ -137,7 +146,8 @@ final class TerminalTextTest extends TestCase
      * The bounds of every range replaced are replaced, and their neighbours kept, unless the
      * neighbour is itself in a range, or a control, format or private use character. What it
      * proves: a range narrowed by one code point is seen. What it cannot prove: a narrowed
-     * range of the second step that the third step covers too (the format characters), as
+     * range of the second step that the third step covers too (the format characters, the
+     * Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15 among them), as
      * the third step stands behind it.
      */
     #[DataProvider('ranges')]
@@ -196,18 +206,18 @@ final class TerminalTextTest extends TestCase
         yield 'U+E000, private use behind the EE lead byte, next to an invalid byte' => ["\xFF\u{E000}", '??'];
         yield 'U+40000, the first character of the F1 lead byte, next to an invalid byte' => ["\xFF\u{40000}", "?\u{40000}"];
         yield 'U+FFFFF, a noncharacter behind the F3 lead byte, next to an invalid byte' => ["\xFF\u{FFFFF}", '??'];
+        yield 'U+00A1, the first character of the C2 lead byte, next to an invalid byte' => ["\xFF\u{A1}", "?\u{A1}"];
+        yield 'U+0FFF, the last second byte of E0, next to an invalid byte' => ["\xFF\u{FFF}", "?\u{FFF}"];
+        yield 'U+D000, the first second byte of ED, next to an invalid byte' => ["\xFF\u{D000}", "?\u{D000}"];
+        yield 'U+80000, behind the F2 lead byte, next to an invalid byte' => ["\xFF\u{80000}", "?\u{80000}"];
+        yield 'U+100000, the first second byte of F4 (private use), next to an invalid byte' => ["\xFF\u{100000}", '??'];
         yield 'an Egyptian hieroglyph format control' => ["Acme\u{13437}", 'Acme?'];
         yield 'the hieroglyph after that range is kept' => ["Acme\u{13440}", "Acme\u{13440}"];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
-        yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
-        // U+2069, U+2029, U+115F and their neighbours are covered by the bounds test too: they
-        // stay here as the inner bounds of two ranges the pattern writes apart (U+2066 to
-        // U+2069 and U+206A to U+206F, U+2028 to U+2029 and U+202A to U+202E).
-        yield 'the narrow no-break space next to the embeddings range (U+2028 to U+202E) is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
-        yield 'the paragraph separator (bound of a range)' => ["Ac\u{2029}me", 'Ac?me'];
-        yield 'the hair space next to the zero-width range is kept' => ["Ac\u{200A}me", "Ac\u{200A}me"];
-        yield 'the first Hangul filler (bound of a range)' => ["Ac\u{115F}me", 'Ac?me'];
-        yield 'the Hangul letter before it is kept' => ["Ac\u{115E}me", "Ac\u{115E}me"];
+        // The bounds of every range, and their neighbours, are the bounds test's: here, the
+        // inner points of the ranges the docblock splits.
+        yield 'the last bidirectional isolate (U+2069, inside U+2066 to U+206F)' => ["Ac\u{2069}me", 'Ac?me'];
+        yield 'the paragraph separator (U+2029, inside U+2028 to U+202E)' => ["Ac\u{2029}me", 'Ac?me'];
         yield 'a right-to-left override' => ["Acme\u{202E}eludoM", 'Acme?eludoM'];
         yield 'an isolate' => ["Acme\u{2066}Module\u{2069}", 'Acme?Module?'];
         yield 'a zero-width space' => ["Ac\u{200B}me", 'Ac?me'];
