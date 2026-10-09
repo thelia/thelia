@@ -207,7 +207,11 @@ class ExportHandler
             }
         }
 
-        (new Filesystem())->remove($written);
+        // Only what the export wrote in its folder, and a file that cannot go never takes
+        // the place of the failure being told.
+        foreach ($written as $file) {
+            ExportStorage::discard($file);
+        }
     }
 
     /**

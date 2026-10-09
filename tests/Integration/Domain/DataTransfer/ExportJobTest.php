@@ -812,6 +812,31 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertNotSame($paths[0], $paths[1]);
     }
 
+    /**
+     * A failed export removes what it wrote in the export folder, never a file an archiver
+     * of a module wrote elsewhere.
+     */
+    public function testAFailedExportLeavesAFileOutsideTheExportFolderAlone(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $archiver = $this->archiverKeepingNothing();
+        $archiver->archiveAt = sys_get_temp_dir().'/'.uniqid('archive-elsewhere-').'.nothing';
+        $archiver->refusesToSave = true;
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
+            self::fail('The archive cannot be written.');
+        } catch (\RuntimeException) {
+        }
+
+        $kept = is_file($archiver->archiveAt);
+        (new Filesystem())->remove([$archiver->archiveAt, ...(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [])]);
+
+        self::assertTrue($kept);
+    }
+
     public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
     {
         $export = $this->ordersExport();
@@ -1068,7 +1093,7 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * @return ArchiverInterface&object{refusesToSave: bool, saysItDidNotSave: bool, onAdd: ?\Closure}
+     * @return ArchiverInterface&object{refusesToSave: bool, saysItDidNotSave: bool, archiveAt: ?string, onAdd: ?\Closure}
      */
     private function archiverKeepingNothing(): ArchiverInterface
     {
@@ -1076,6 +1101,9 @@ final class ExportJobTest extends IntegrationTestCase
             public bool $refusesToSave = false;
 
             public bool $saysItDidNotSave = false;
+
+            /** Where the archive is written, when not next to the export. */
+            public ?string $archiveAt = null;
 
             /** @var (\Closure(): void)|null told of every file added */
             public ?\Closure $onAdd = null;
@@ -1120,7 +1148,7 @@ final class ExportJobTest extends IntegrationTestCase
 
             public function create(string $baseName): self
             {
-                $this->archivePath = $baseName.'.nothing';
+                $this->archivePath = $this->archiveAt ?? $baseName.'.nothing';
                 touch($this->archivePath);
 
                 return $this;
