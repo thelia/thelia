@@ -38,7 +38,8 @@ class ExportCachePurger
 
         foreach ($finder as $oldExportFile) {
             if (!$dryRun) {
-                $fileSystem->remove($oldExportFile->getRealPath());
+                // The link itself, never the file it points to.
+                $fileSystem->remove($oldExportFile->getPathname());
             }
             ++$deletedCount;
         }
