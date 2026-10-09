@@ -36,11 +36,28 @@ final class TerminalTextTest extends TestCase
     public function testAMessageSpreadOverLinesIsPrintedOnOne(): void
     {
         self::assertSame('first error. second error.?OK', TerminalText::onOneLine("first error.\n  \r\nsecond error.\tOK\n"));
-        // A control character is shown as such, and the result is the same the second time.
+        // A control character is shown as such.
         self::assertSame('| ??', TerminalText::onOneLine("|\n\f\x88"));
+        // The result is the same the second time.
         self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
+        // A tab at either end is shown, never dropped.
+        self::assertSame('?a?', TerminalText::onOneLine("\ta\t"));
         // A lone carriage return is a line break, never a return to the start of the line.
         self::assertSame('Acme OK', TerminalText::onOneLine("Acme\rOK"));
+    }
+
+    /**
+     * The blanks are those of Unicode, not of ASCII alone: an ideographic space or a
+     * no-break space next to a line break goes with it, and stays on its own.
+     */
+    public function testABlankOfUnicodeAroundALineBreakGoesWithIt(): void
+    {
+        self::assertSame('a b', TerminalText::onOneLine("a\u{3000}\n\u{A0}b"));
+        self::assertSame("a\u{3000}b", TerminalText::onOneLine("a\u{3000}b"));
+        self::assertSame("a\u{A0}\u{A0}b", TerminalText::onOneLine("a\u{A0}\u{A0}b"));
+        // At either end, only the ASCII blanks go; a blank of Unicode next to a line break goes with it.
+        self::assertSame("\u{A0}a\u{3000}", TerminalText::onOneLine(" \u{A0}a\u{3000} "));
+        self::assertSame('a', TerminalText::onOneLine(" \n\u{A0}a\u{3000} \n"));
     }
 
     /**
@@ -51,6 +68,7 @@ final class TerminalTextTest extends TestCase
     public function testAnAccentBeforeALineBreakIsKeptWhateverTheLocale(): void
     {
         $locale = setlocale(\LC_CTYPE, '0');
+        $tried = 0;
 
         try {
             foreach (['C.UTF-8', 'C'] as $candidate) {
@@ -58,23 +76,28 @@ final class TerminalTextTest extends TestCase
                     continue;
                 }
 
+                ++$tried;
                 self::assertSame("caf\u{E0} x \u{420}", TerminalText::onOneLine("caf\u{E0}\nx\n\u{420}"), $candidate);
             }
         } finally {
             setlocale(\LC_CTYPE, (string) $locale);
         }
+
+        if (0 === $tried) {
+            self::markTestSkipped('No locale to try.');
+        }
     }
 
     /**
      * A run of thousands of blanks (a value libxml cites from a descriptor) is read once,
-     * with or without the PCRE JIT: a pattern that looked for a line break after the blanks
-     * was tried again from each blank of the run, and took 17 seconds on fifty thousand.
+     * even without the PCRE JIT, the slower path: a pattern that looked for a line break
+     * after the blanks was tried again from each blank of the run, and took five seconds on
+     * thirty thousand, minutes on this one. In a process of its own, as PCRE keeps a pattern
+     * compiled once, with the JIT it had.
      */
     #[RunInSeparateProcess]
     public function testALongRunOfBlanksIsReadOnce(): void
     {
-        // In a process of its own: PCRE keeps a pattern compiled once, with the JIT it had.
-        // A pattern tried again from each blank of the run takes minutes on this one.
         $text = 'a'.str_repeat(' ', 200000).'b'.str_repeat("\t", 100000).'c'.str_repeat("\n ", 50000).'d';
         $jit = \ini_get('pcre.jit');
         ini_set('pcre.jit', '0');
@@ -92,9 +115,10 @@ final class TerminalTextTest extends TestCase
 
     /**
      * The bounds of every range replaced are replaced, and their neighbours kept, unless the
-     * neighbour is itself in a range, or a control, format or private use character: a range
-     * narrowed by one code point is seen, but for the ranges of the second step that the
-     * third step covers too (the format characters among them), which stand as a backstop.
+     * neighbour is itself in a range, or a control, format or private use character. What it
+     * proves: a range narrowed by one code point is seen. What it cannot prove: a narrowed
+     * range of the second step that the third step covers too (the format characters), as
+     * the third step stands behind it.
      */
     #[DataProvider('ranges')]
     public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
@@ -112,60 +136,12 @@ final class TerminalTextTest extends TestCase
         }
     }
 
-    /**
-     * The blanks are those of Unicode, not of ASCII alone: an ideographic space or a
-     * no-break space next to a line break goes with it, and stays on its own.
-     */
-    public function testABlankOfUnicodeAroundALineBreakGoesWithIt(): void
-    {
-        self::assertSame('a b', TerminalText::onOneLine("a\u{3000}\n\u{A0}b"));
-        self::assertSame("a\u{3000}b", TerminalText::onOneLine("a\u{3000}b"));
-        self::assertSame("a\u{A0}\u{A0}b", TerminalText::onOneLine("a\u{A0}\u{A0}b"));
-        // At either end, only the ASCII blanks go; a blank of Unicode next to a line break goes with it.
-        self::assertSame("\u{A0}a\u{3000}", TerminalText::onOneLine(" \u{A0}a\u{3000} "));
-        self::assertSame('a', TerminalText::onOneLine(" \n\u{A0}a\u{3000} \n"));
-    }
-
     /** @return iterable<string, array{int, int}> */
     public static function ranges(): iterable
     {
         foreach (self::replacedRanges() as [$first, $last]) {
             yield \sprintf('U+%04X to U+%04X', $first, $last) => [$first, $last];
         }
-    }
-
-    /**
-     * The ranges the docblock of withoutControlCharacters() lists, and the two noncharacters
-     * of each of the 17 planes.
-     *
-     * @return list<array{int, int}>
-     */
-    private static function replacedRanges(): array
-    {
-        $ranges = [
-            [0x00, 0x08], [0x0B, 0x1F], [0x7F, 0x7F], [0x80, 0x9F], [0xAD, 0xAD], [0x34F, 0x34F], [0x61C, 0x61C],
-            [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
-            [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
-            [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
-            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
-        ];
-
-        for ($plane = 0; $plane <= 16; ++$plane) {
-            $ranges[] = [$plane * 0x10000 + 0xFFFE, $plane * 0x10000 + 0xFFFF];
-        }
-
-        return $ranges;
-    }
-
-    private static function isReplacedByItself(int $codePoint): bool
-    {
-        foreach (self::replacedRanges() as [$first, $last]) {
-            if ($codePoint >= $first && $codePoint <= $last) {
-                return true;
-            }
-        }
-
-        return 1 === preg_match('/[\p{Cc}\p{Cf}\p{Co}]/u', mb_chr($codePoint));
     }
 
     /** @return iterable<string, array{string, string}> */
@@ -191,6 +167,17 @@ final class TerminalTextTest extends TestCase
         yield 'a sequence beyond U+10FFFF' => ["Acme\xF4\x90\x80\x80", 'Acme????'];
         yield 'an overlong sequence' => ["Acme\xC0\x80", 'Acme??'];
         yield 'an overlong three-byte sequence' => ["Acme\xE0\x80\x80", 'Acme???'];
+        yield 'an overlong four-byte sequence' => ["Acme\xF0\x8F\xBF\xBF", 'Acme????'];
+        yield 'a lead byte of an overlong two-byte sequence' => ["Acme\xC1\xBF", 'Acme??'];
+        yield 'a lead byte beyond UTF-8' => ["Acme\xF5\x80\x80\x80", 'Acme????'];
+        // A text with an invalid byte goes through the first step: the valid characters at
+        // the bounds of each sequence length stay whole there.
+        yield 'U+0800, the first three-byte character, next to an invalid byte' => ["\xFF\u{800}", "?\u{800}"];
+        yield 'U+D7FF, the last before the surrogates, next to an invalid byte' => ["\xFF\u{D7FF}", "?\u{D7FF}"];
+        yield 'U+10000, the first four-byte character, next to an invalid byte' => ["\xFF\u{10000}", "?\u{10000}"];
+        yield 'U+3FFFD, an unassigned four-byte character, next to an invalid byte' => ["\xFF\u{3FFFD}", "?\u{3FFFD}"];
+        yield 'U+10FFFD, the last private use character, next to an invalid byte' => ["\xFF\u{10FFFD}", '??'];
+        yield 'U+FFFD, the replacement character, next to an invalid byte' => ["\xFF\u{FFFD}", "?\u{FFFD}"];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
         yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
         yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
@@ -235,5 +222,39 @@ final class TerminalTextTest extends TestCase
         yield 'a shorthand format control' => ["Ac\u{1BCA0}me", 'Ac?me'];
         yield 'an unassigned tag-block character' => ["Acme\u{E00FF}", 'Acme?'];
         yield 'a khmer vowel sign is kept' => ["Ac\u{17B6}me", "Ac\u{17B6}me"];
+    }
+
+    /**
+     * The ranges the docblock of withoutControlCharacters() lists, and the two noncharacters
+     * of each of the 17 planes.
+     *
+     * @return list<array{int, int}>
+     */
+    private static function replacedRanges(): array
+    {
+        $ranges = [
+            [0x00, 0x08], [0x0B, 0x1F], [0x7F, 0x7F], [0x80, 0x9F], [0xAD, 0xAD], [0x34F, 0x34F], [0x61C, 0x61C],
+            [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
+            [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
+            [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
+            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
+        ];
+
+        for ($plane = 0; $plane <= 16; ++$plane) {
+            $ranges[] = [$plane * 0x10000 + 0xFFFE, $plane * 0x10000 + 0xFFFF];
+        }
+
+        return $ranges;
+    }
+
+    private static function isReplacedByItself(int $codePoint): bool
+    {
+        foreach (self::replacedRanges() as [$first, $last]) {
+            if ($codePoint >= $first && $codePoint <= $last) {
+                return true;
+            }
+        }
+
+        return 1 === preg_match('/[\p{Cc}\p{Cf}\p{Co}]/u', mb_chr($codePoint));
     }
 }

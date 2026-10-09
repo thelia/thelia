@@ -17,7 +17,8 @@ namespace Thelia\Tools;
 /**
  * Text written to an operator's terminal, to a log or to a page of the back office from
  * something a module or a theme ships (its descriptor, its directory name): a control
- * character could rewrite or hide what is printed.
+ * character could rewrite or hide what is printed. The escaping for the output format
+ * (HTML, the console formatter) stays with the caller.
  */
 final class TerminalText
 {
@@ -50,8 +51,9 @@ final class TerminalText
      *    (Co), the object replacement character (U+FFFC), the noncharacters of every plane
      *    (U+FDD0 to U+FDEF, and U+FFFE and U+FFFF of each of the 17 planes), the unassigned
      *    ignorable code points (U+2065 of the general punctuation block, U+FFF0 to U+FFF8 of
-     *    the specials block, and the rest of the tags and variation selectors planes,
-     *    U+E0000 to U+E0FFF), which print as nothing or as a glyph that is not the text.
+     *    the specials block, and the rest of the tags and variation selectors blocks of
+     *    plane 14, U+E0000 to U+E0FFF), which print as nothing or as a glyph that is not
+     *    the text.
      */
     public static function withoutControlCharacters(string $text): string
     {
@@ -81,21 +83,22 @@ final class TerminalText
      * around it (any blank of Unicode), becomes a space, so that a text spread over lines
      * (the errors of a schema, one per line) cannot start a line of its own that reads like
      * the output of the command. The blanks without a line break are kept as they are (a
-     * no-break space at either end among them), a tab becomes "?", what
-     * withoutControlCharacters() replaces is replaced the same way, and the ASCII blanks at
-     * either end are dropped. "a  \n b\tc" gives "a b?c".
+     * no-break space at either end among them), a tab becomes "?" (at either end too: it
+     * stays, shown), what withoutControlCharacters() replaces is replaced the same way, and
+     * the spaces and line breaks at either end are dropped. "a  \n b\tc" gives "a b?c".
      */
     public static function onOneLine(string $text): string
     {
-        // Cleaned first: what follows runs on valid UTF-8, in Unicode mode, so that the
-        // tables of the locale never take the second byte of "à" (0xA0) for a blank. Every
-        // run of blanks is then matched as a whole, from its first blank, and told apart in
+        // A carriage return is a line break too. Cleaned first: what follows runs on valid
+        // UTF-8, in Unicode mode, so that the tables of the locale never take the second
+        // byte of "à" (0xA0) for a blank.
+        $cleaned = self::withoutControlCharacters(str_replace("\r", "\n", $text));
+
+        // Every run of blanks is matched as a whole, from its first blank, and told apart in
         // the callback: one that holds a line break becomes a space, the others stay. That
         // is what keeps the time linear: a pattern that had to find a line break after the
         // blanks (such as "\s*[\r\n]+") was tried again from each blank of a run, and a
-        // run of fifty thousand blanks took seconds without the PCRE JIT. A carriage return
-        // is a line break too.
-        $cleaned = self::withoutControlCharacters(str_replace("\r", "\n", $text));
+        // run of thirty thousand blanks took five seconds without the PCRE JIT.
         $onOneLine = preg_replace_callback(
             '/\s++/u',
             static fn (array $run): string => str_contains($run[0], "\n") ? ' ' : $run[0],
