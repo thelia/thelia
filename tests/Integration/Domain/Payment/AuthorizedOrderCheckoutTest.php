@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Payment;
 
 use Thelia\Domain\Order\OrderFacade;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Model\CartQuery;
 use Thelia\Model\OrderQuery;
@@ -55,6 +56,23 @@ final class AuthorizedOrderCheckoutTest extends ActionIntegrationTestCase
         self::assertFalse($order->isPaymentSecured());
 
         $this->getService(PaymentTransactionRecorder::class)->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+
+        self::assertTrue(OrderQuery::create()->findPk($order->getId())->isPaymentSecured());
+    }
+
+    public function testACancelledOrderIsNeverSecuredWhateverItsJournalHolds(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'statusCode' => OrderStatus::CODE_CANCELED]);
+        $this->getService(PaymentTransactionRecorder::class)->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+
+        self::assertFalse(OrderQuery::create()->findPk($order->getId())->isPaymentSecured());
+    }
+
+    public function testAnAuthorizationAwaitingItsAnswerSecuresThePayment(): void
+    {
+        // The provider has not confirmed yet: the amount may be reserved already.
+        $order = $this->factory->order(null, ['postage' => 120]);
+        $this->getService(PaymentTransactionRecorder::class)->recordAuthorization($order, 120, 'AUTH-1', PaymentTransactionState::PENDING, 'Cheque');
 
         self::assertTrue(OrderQuery::create()->findPk($order->getId())->isPaymentSecured());
     }
