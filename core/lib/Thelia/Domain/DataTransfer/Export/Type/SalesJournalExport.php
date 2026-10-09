@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\DataTransfer\Export\Type;
+
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Accounting\AccountingChart;
+use Thelia\Domain\Accounting\AccountingEntry;
+use Thelia\Domain\Accounting\SalesJournal;
+use Thelia\Domain\DataTransfer\Export\ArrayAbstractExport;
+use Thelia\Domain\DataTransfer\Export\ExportReport;
+use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
+use Thelia\Model\Lang;
+
+/**
+ * The sales journal of a period, one row per entry, its columns those of the French
+ * accounting entries file in their order: written with the FEC serializer it is that file,
+ * with the CSV one a sheet to read.
+ *
+ * The piece is the invoice: its reference numbers the entries and its date dates them.
+ */
+class SalesJournalExport extends ArrayAbstractExport implements ReportingExportInterface
+{
+    public const FILE_NAME = 'sales_journal';
+    public const USE_RANGE_DATE = true;
+
+    private ExportReport $report;
+
+    public function __construct()
+    {
+        $this->report = new ExportReport();
+    }
+
+    public function report(): ExportReport
+    {
+        return $this->report;
+    }
+
+    /**
+     * @return list<array<string, string>>
+     */
+    protected function getData(): array|string|ModelCriteria
+    {
+        $locale = $this->locale();
+        $chart = AccountingChart::fromSettings();
+        $pieces = (new SalesJournal())->pieces($chart, $this->rangeDate['start'] ?? null, $this->rangeDate['end'] ?? null, $this->report, $locale);
+        SalesJournal::summarize($pieces, $this->report, $locale);
+        $translator = Translator::getInstance();
+        $rows = [];
+
+        foreach ($pieces as $piece) {
+            $date = $piece->invoiceDate->format('Y-m-d');
+            $label = $translator->trans('Invoice %ref %customer', ['%ref' => $piece->invoiceRef, '%customer' => $piece->customerName], null, $locale);
+
+            foreach ($piece->entries as $entry) {
+                $isCustomer = AccountingEntry::ROLE_CUSTOMER === $entry->role;
+                $rows[] = [
+                    'JournalCode' => $chart->journalCode,
+                    'JournalLib' => $chart->journalLabel,
+                    'EcritureNum' => $piece->invoiceRef,
+                    'EcritureDate' => $date,
+                    'CompteNum' => $entry->account,
+                    'CompteLib' => $this->accountLabel($entry, $locale),
+                    'CompAuxNum' => $isCustomer ? $piece->customerRef : '',
+                    'CompAuxLib' => $isCustomer ? $piece->customerName : '',
+                    'PieceRef' => $piece->invoiceRef,
+                    'PieceDate' => $date,
+                    'EcritureLib' => trim($label),
+                    'Debit' => SalesJournal::amount($entry->debitCents),
+                    'Credit' => SalesJournal::amount($entry->creditCents),
+                    'EcritureLet' => '',
+                    'DateLet' => '',
+                    'ValidDate' => $date,
+                    'Montantdevise' => null !== $piece->foreignCurrencyCode && null !== $entry->foreignCents ? SalesJournal::amount($entry->foreignCents) : '',
+                    'Idevise' => $piece->foreignCurrencyCode ?? '',
+                ];
+            }
+        }
+
+        return $rows;
+    }
+
+    private function accountLabel(AccountingEntry $entry, string $locale): string
+    {
+        $translator = Translator::getInstance();
+        $rate = rtrim(rtrim((string) $entry->rateKey, '0'), '.');
+
+        return match ($entry->role) {
+            AccountingEntry::ROLE_CUSTOMER => $translator->trans('Customers', [], null, $locale),
+            AccountingEntry::ROLE_PRODUCT => $translator->trans('Sales at %rate', ['%rate' => $rate.'%'], null, $locale),
+            AccountingEntry::ROLE_SHIPPING => $translator->trans('Shipping', [], null, $locale),
+            default => $translator->trans('VAT collected at %rate', ['%rate' => $rate.'%'], null, $locale),
+        };
+    }
+
+    private function locale(): string
+    {
+        return isset($this->language) ? (string) $this->language->getLocale() : (string) Lang::getDefaultLanguage()->getLocale();
+    }
+}

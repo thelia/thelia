@@ -129,25 +129,29 @@ final readonly class AccountingChart
         return number_format(round($percent, 2), 2, '.', '');
     }
 
+    public const MISSING_CUSTOMER_ACCOUNT = 'customer_account';
+    public const MISSING_SHIPPING_ACCOUNT = 'shipping_account';
+    public const MISSING_RATE_ACCOUNTS = 'rate_accounts';
+
     /**
      * What an export needs and the chart does not give, empty when it can run.
      *
-     * @return list<string>
+     * @return list<self::MISSING_*>
      */
     public function missing(): array
     {
         $missing = [];
 
         if ('' === $this->customerAccount) {
-            $missing[] = 'customer account';
+            $missing[] = self::MISSING_CUSTOMER_ACCOUNT;
         }
 
         if ('' === $this->shippingAccount) {
-            $missing[] = 'shipping account';
+            $missing[] = self::MISSING_SHIPPING_ACCOUNT;
         }
 
         if ([] === $this->rates) {
-            $missing[] = 'accounts of the tax rates';
+            $missing[] = self::MISSING_RATE_ACCOUNTS;
         }
 
         return $missing;
