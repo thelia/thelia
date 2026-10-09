@@ -708,12 +708,14 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testAnExportLeavesNoneOfTheRowsItReadBehind(): void
     {
-        (new Filesystem())->remove(glob(ExportStorage::directory().'/order*.json') ?: []);
+        // A worker of this machine may be running another export meanwhile: only what this
+        // one leaves counts.
+        $before = glob(ExportStorage::directory().'/order-*.json') ?: [];
 
         $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
         $this->files[] = $event->getFilePath();
 
-        self::assertSame([], glob(ExportStorage::directory().'/order*.json'));
+        self::assertSame([], array_values(array_diff(glob(ExportStorage::directory().'/order-*.json') ?: [], $before)));
     }
 
     /**
@@ -760,6 +762,29 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         self::assertSame([], glob(ExportStorage::directory().'/'.$name.'-*.json'));
+    }
+
+    /**
+     * The rows file holds the data of the customers: no other account of the server reads it.
+     */
+    public function testARowsFileIsReadableByItsOwnerOnly(): void
+    {
+        // Whatever the umask of the server: here, one that lets everybody read.
+        $umask = umask(0);
+
+        try {
+            $path = ExportStorage::rowsFile(uniqid('owner-'));
+        } finally {
+            umask($umask);
+        }
+
+        try {
+            $mode = fileperms($path) & 0o777;
+        } finally {
+            (new Filesystem())->remove($path);
+        }
+
+        self::assertSame(0o600, $mode);
     }
 
     /**
