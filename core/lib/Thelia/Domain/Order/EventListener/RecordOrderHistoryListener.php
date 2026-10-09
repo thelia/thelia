@@ -80,7 +80,13 @@ readonly class RecordOrderHistoryListener
             return;
         }
 
-        $fromStatusCode = $this->statusCodeBeforeChange[$event] ?? null;
+        // The status Thelia\Action\Order::updateStatus read under the row lock, which may
+        // differ from the one the caller's object held when the event was dispatched; what
+        // was remembered at 192 is only the fallback for an event that never went there.
+        $previousStatusId = $event->getPreviousStatusId();
+        $fromStatusCode = null !== $previousStatusId
+            ? $this->statusCodeOf($previousStatusId)
+            : ($this->statusCodeBeforeChange[$event] ?? null);
         unset($this->statusCodeBeforeChange[$event]);
 
         $this->orderHistoryRecorder->recordStatusChanged(
