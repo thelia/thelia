@@ -76,4 +76,18 @@ final class AuthorizedOrderCheckoutTest extends ActionIntegrationTestCase
 
         self::assertTrue(OrderQuery::create()->findPk($order->getId())->isPaymentSecured());
     }
+
+    public function testMoneyTakenSecuresThePaymentEvenWhenTheStatusDidNotFollow(): void
+    {
+        // The transition graph refused the move to paid, or its listener failed: the
+        // journal says the money was taken, which is what the checkout must read.
+        $order = $this->factory->order(null, ['postage' => 120]);
+        $recorder = $this->getService(PaymentTransactionRecorder::class);
+        $recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $recorder->recordCapture($order, 120, 'CAP-1', moduleCode: 'Cheque');
+        $order = OrderQuery::create()->findPk($order->getId());
+        $order->setStatusId((int) \Thelia\Model\OrderStatusQuery::getNotPaidStatus()->getId())->save();
+
+        self::assertTrue($order->isPaymentSecured());
+    }
 }
