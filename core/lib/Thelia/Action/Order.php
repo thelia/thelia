@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -357,18 +358,42 @@ class Order extends BaseAction implements EventSubscriberInterface
             throw new \LogicException('ORDER_UPDATE_STATUS was dispatched without a target status.');
         }
 
-        // Every entry point (back office, API, payment modules, commands) lands here,
-        // so this is where the transition graph is enforced.
-        $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
-
-        $event->setPreviousStatusId($order->getStatusId());
-
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
         // Prevent partial stock update on status change.
         $con->beginTransaction();
 
         try {
+            // The status the order has now, the row held until the commit: two workers
+            // moving the same order decide one after the other, each on what the other
+            // wrote, not on the object it happened to load.
+            $currentStatusId = $this->lockStatusOf($order, $con);
+            $expectedStatusId = $event->getExpectedStatusId();
+
+            if (null !== $expectedStatusId && $expectedStatusId !== $currentStatusId) {
+                $con->commit();
+                $event->stopPropagation();
+
+                Tlog::getInstance()->info(\sprintf(
+                    'Order %s left status #%d before the move to status #%d was written: the move is dropped.',
+                    (string) $order->getRef(),
+                    $expectedStatusId,
+                    $newStatus,
+                ));
+
+                return;
+            }
+
+            if ($currentStatusId !== (int) $order->getStatusId()) {
+                $order->setStatusId($currentStatusId);
+            }
+
+            // Every entry point (back office, API, payment modules, commands) lands here,
+            // so this is where the transition graph is enforced.
+            $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+
+            $event->setPreviousStatusId($currentStatusId);
+
             $this->updateQuantity($order, $newStatus, $dispatcher);
 
             $order->setStatusId($newStatus)->save();
@@ -381,6 +406,15 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             throw $exception;
         }
+    }
+
+    private function lockStatusOf(ModelOrder $order, ConnectionInterface $con): int
+    {
+        $statement = $con->prepare('SELECT status_id FROM `order` WHERE id = ? FOR UPDATE');
+        $statement->bindValue(1, (int) $order->getId(), \PDO::PARAM_INT);
+        $statement->execute();
+
+        return (int) $statement->fetchColumn();
     }
 
     /**
