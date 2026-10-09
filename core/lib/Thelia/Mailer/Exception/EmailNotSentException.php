@@ -25,9 +25,20 @@ namespace Thelia\Mailer\Exception;
  */
 final class EmailNotSentException extends \RuntimeException
 {
+    private const STORE_EMAIL_MISSING = 1;
+
     public static function storeEmailMissing(string $messageCode): self
     {
-        return new self(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
+        return new self(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode), self::STORE_EMAIL_MISSING);
+    }
+
+    /**
+     * The shop has no address to send from: what an administrator fixes in the store
+     * information.
+     */
+    public function isStoreEmailMissing(): bool
+    {
+        return self::STORE_EMAIL_MISSING === $this->getCode();
     }
 
     public static function emptyRecipientList(string $messageCode): self
