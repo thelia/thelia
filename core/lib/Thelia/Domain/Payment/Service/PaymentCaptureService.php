@@ -168,11 +168,11 @@ final readonly class PaymentCaptureService
     private function assertCapturable(Order $order, float $amount, ?string $currencyCode): void
     {
         if (!PaymentAmount::isPositive($amount)) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::normalize($amount)));
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
 
         if (!CurrencyMinorUnit::fits($amount, $currencyCode)) {
-            throw new InvalidPaymentAmountException(\sprintf('Order %s: %s is not an amount the provider can take in %s.', (string) $order->getRef(), PaymentAmount::normalize($amount), (string) $currencyCode));
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: %s is not an amount the provider can take in %s.', (string) $order->getRef(), PaymentAmount::forMessage($amount), (string) $currencyCode));
         }
     }
 
