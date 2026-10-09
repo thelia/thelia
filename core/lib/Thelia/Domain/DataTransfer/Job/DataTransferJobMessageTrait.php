@@ -26,9 +26,6 @@ trait DataTransferJobMessageTrait
 
     abstract public function jobTable(): JobTable;
 
-    /**
-     * The job as the failed jobs screen names it: "Export #4", "Import #12".
-     */
     public function describe(): string
     {
         return $this->jobTable()->describe($this->jobId());

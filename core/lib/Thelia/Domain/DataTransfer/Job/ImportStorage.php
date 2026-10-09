@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Job;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\File\FolderFile;
 use Thelia\Model\ImportJob;
 
 /**
@@ -72,14 +73,7 @@ final readonly class ImportStorage
      */
     public function resolve(string $path): ?string
     {
-        $directory = realpath($this->directory());
-        $file = realpath($path);
-
-        if (false === $directory || false === $file || !is_file($file) || !str_starts_with($file, $directory.\DIRECTORY_SEPARATOR)) {
-            return null;
-        }
-
-        return $file;
+        return FolderFile::resolve($this->directory(), $path);
     }
 
     /**
@@ -89,8 +83,10 @@ final readonly class ImportStorage
     public function discardFileOf(ImportJob $job): void
     {
         // Gone meanwhile (another run, the purge) is as good as deleted.
-        if ($this->holds($this->pathOf($job))) {
-            (new Filesystem())->remove($this->pathOf($job));
+        $file = FolderFile::removable($this->directory(), $this->pathOf($job));
+
+        if (null !== $file) {
+            (new Filesystem())->remove($file);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Export;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\File\FolderFile;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
 
@@ -43,14 +44,7 @@ final class ExportStorage
      */
     public static function resolve(string $path): ?string
     {
-        $directory = realpath(self::directory());
-        $file = realpath($path);
-
-        if (false === $directory || false === $file || !is_file($file) || !str_starts_with($file, $directory.\DIRECTORY_SEPARATOR)) {
-            return null;
-        }
-
-        return $file;
+        return FolderFile::resolve(self::directory(), $path);
     }
 
     /**
@@ -118,7 +112,8 @@ final class ExportStorage
      */
     public static function discard(string $path): void
     {
-        $file = self::resolve($path);
+        // The path itself: a link of the folder to another export goes alone.
+        $file = FolderFile::removable(self::directory(), $path);
 
         if (null === $file) {
             return;

@@ -100,8 +100,8 @@ final class AdminFormActionTest extends TestCase
 
         $errorRenderer = $this->createMock(AdminFormErrorRenderer::class);
         $errorRenderer->expects(self::once())
-            ->method('setup')
-            ->with('Language creation', 'field required', $form, self::isInstanceOf(FormValidationException::class));
+            ->method('fail')
+            ->with('Language creation', self::isInstanceOf(FormValidationException::class), $form);
 
         $events = $this->createMock(EventDispatcherInterface::class);
         $events->expects(self::never())->method('dispatch');
@@ -189,7 +189,7 @@ final class AdminFormActionTest extends TestCase
             ->willThrowException(new \RuntimeException('invalid token'));
 
         $errorRenderer = $this->createMock(AdminFormErrorRenderer::class);
-        $errorRenderer->expects(self::once())->method('setup');
+        $errorRenderer->expects(self::once())->method('fail');
 
         $events = $this->createMock(EventDispatcherInterface::class);
         $events->expects(self::never())->method('dispatch');

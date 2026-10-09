@@ -846,6 +846,23 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * A link of the export folder is removed as the link: the export it points to is
+     * another export, and stays.
+     */
+    public function testDiscardingALinkOfTheExportFolderLeavesTheExportItPointsTo(): void
+    {
+        $other = ExportStorage::rowsFile(uniqid('other-'));
+        $link = ExportStorage::directory().'/'.uniqid('link-').'.json';
+        symlink($other, $link);
+
+        ExportStorage::discard($link);
+        $kept = is_file($other);
+        (new Filesystem())->remove([$other, $link]);
+
+        self::assertTrue($kept);
+    }
+
+    /**
      * Two workers may run the same export at once: each reads the rows it selected,
      * through a file of its own.
      */

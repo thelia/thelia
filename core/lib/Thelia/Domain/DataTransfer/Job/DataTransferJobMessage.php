@@ -27,7 +27,7 @@ interface DataTransferJobMessage
     public function jobTable(): JobTable;
 
     /**
-     * The job as the failed jobs screen names it: "Export #4", "Import #12".
+     * The job as the failed jobs screen names it ({@see JobTable::describe()}).
      */
     public function describe(): string;
 

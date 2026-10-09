@@ -117,10 +117,10 @@ final readonly class RunImportJobHandler
             throw new JobRefusedException('The uploaded file of this import is no longer on the server.');
         }
 
-        // The path comes from the row: only a file of the import storage is read.
-        if (!$this->storage->holds($path)) {
-            throw new JobRefusedException('The file of this import is not in the import storage.');
-        }
+        // The path comes from the row: only a file of the import storage is read, the
+        // one checked.
+        $path = $this->storage->resolve($path)
+            ?? throw new JobRefusedException('The file of this import is not in the import storage.');
 
         $jobId = (int) $job->getId();
         $heartbeat = $this->heartbeat;

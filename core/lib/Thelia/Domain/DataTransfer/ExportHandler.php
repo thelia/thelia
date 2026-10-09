@@ -223,7 +223,7 @@ class ExportHandler
             $serializer->getExtension(),
         );
 
-        $this->exportCachePurger->purgeOldExportFiles(ExportStorage::directory());
+        $this->exportCachePurger->purgeOldExportFiles();
 
         $filePath = ExportStorage::newPrivateFile($filename);
 
