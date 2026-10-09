@@ -93,20 +93,24 @@ class OrderPaymentTransactionQuery extends BaseOrderPaymentTransactionQuery
     }
 
     /**
-     * The pending lines of this movement and amount that do not carry a provider reference
+     * The pending lines of this movement, and of this amount when one is given, that do not carry a provider reference
      * yet: written before a call whose answer never came back with one.
      *
      * @return \Propel\Runtime\Collection\ObjectCollection<OrderPaymentTransaction>
      */
-    public function findPendingWithoutReference(int $orderId, PaymentTransactionType $type, string $amount, ?ConnectionInterface $con = null): \Propel\Runtime\Collection\ObjectCollection
+    public function findPendingWithoutReference(int $orderId, PaymentTransactionType $type, ?string $amount = null, ?ConnectionInterface $con = null): \Propel\Runtime\Collection\ObjectCollection
     {
-        return self::create()
+        $query = self::create()
             ->filterByOrderId($orderId)
             ->filterByTypeEnum($type)
             ->filterByState(PaymentTransactionState::PENDING->value)
-            ->filterByPspReference(null, Criteria::ISNULL)
-            ->filterByAmount($amount)
-            ->find($con);
+            ->filterByPspReference(null, Criteria::ISNULL);
+
+        if (null !== $amount) {
+            $query->filterByAmount($amount);
+        }
+
+        return $query->find($con);
     }
 
     /**
