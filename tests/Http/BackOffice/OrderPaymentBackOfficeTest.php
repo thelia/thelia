@@ -333,6 +333,24 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('1200', $input->attr('value'));
     }
 
+    public function testABulkCancellationSaysWhyAnAuthorizedOrderWasLeftAlone(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
+        $order = $this->authorizedOrder(120);
+
+        $token = $this->tokenOf($this->sheet($order));
+        $this->client->request('POST', '/admin/order/update/status', [
+            '_token' => $token,
+            'order_ids' => [$order->getId()],
+            'status_id' => OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId(),
+        ]);
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('right to capture payments', $crawler->text());
+        self::assertStringContainsString((string) $order->getRef(), $crawler->text());
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
     {
         $this->loginAs($this->factory->admin());
