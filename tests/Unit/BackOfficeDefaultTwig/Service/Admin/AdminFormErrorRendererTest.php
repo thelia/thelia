@@ -35,8 +35,10 @@ final class AdminFormErrorRendererTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!class_exists(AdminFormErrorRenderer::class)) {
-            self::markTestSkipped('The back-office theme is not installed.');
+        // The CI installs the theme from its main branch, which may predate the renderer
+        // that keeps technical failures out of the flash messages.
+        if (!class_exists(AdminFormErrorRenderer::class) || !method_exists(AdminFormErrorRenderer::class, 'isTechnical')) {
+            self::markTestSkipped('The installed back-office theme predates the technical failure filter.');
         }
 
         $this->session = new Session(new MockArraySessionStorage());
