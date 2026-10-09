@@ -25,6 +25,7 @@ use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\InvalidProviderReferenceException;
 use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
@@ -666,7 +667,7 @@ final readonly class PaymentTransactionRecorder
         $pspReference = trim($pspReference);
 
         if (mb_strlen($pspReference) > self::PSP_REFERENCE_MAX_LENGTH) {
-            throw new PaymentException(\sprintf('A provider reference holds at most %d characters, %d given.', self::PSP_REFERENCE_MAX_LENGTH, mb_strlen($pspReference)));
+            throw new InvalidProviderReferenceException(\sprintf('A provider reference holds at most %d characters, %d given.', self::PSP_REFERENCE_MAX_LENGTH, mb_strlen($pspReference)));
         }
 
         return '' === $pspReference ? null : $pspReference;

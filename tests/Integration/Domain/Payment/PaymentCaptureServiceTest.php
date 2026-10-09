@@ -227,6 +227,17 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('40.000000', $this->totals->forOrder($order->getId())->captured, 'The notification settles the line rather than writing a second capture.');
     }
 
+    public function testAModuleAnsweringWithAReferenceTooLongLeavesTheLineForTheNotification(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::succeeded(str_repeat('R', 120));
+
+        $capture = $this->service->capture($order, 40.0);
+
+        self::assertTrue($capture->isPending());
+        self::assertSame('invalid_reference', $capture->getErrorCode());
+    }
+
     public function testAPaymentExceptionThatIsNotARefusalLeavesTheLinePending(): void
     {
         // Only a refusal says the provider took nothing. Any other failure of the module,
