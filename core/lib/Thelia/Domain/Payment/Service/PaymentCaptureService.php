@@ -205,7 +205,7 @@ final readonly class PaymentCaptureService
         try {
             $module = $this->moduleLocator->paymentModuleOf($order);
         } catch (TheliaProcessException) {
-            throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $order->getPaymentModuleTitle());
+            throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $this->moduleLocator->nameOf($order));
         }
 
         if (!$module instanceof PaymentModuleWithCaptureInterface || !$module->supportsDeferredCapture()) {

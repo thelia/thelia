@@ -172,6 +172,9 @@ published module implements would break them all.
 
 - `supportsDeferredCapture()` says whether, as currently configured, the module
   authorizes first. A module can expose that choice to the merchant.
+- The module is called through `PaymentModuleLocator`: the instance the
+  container built, so `getContainer()` works in it. A deactivated module is not
+  called: its services are no longer compiled, and the refusal names it.
 - The module writes the **authorization** itself, through the recorder, when
   the provider confirms it — typically from its notification controller — with
   the provider reference.
