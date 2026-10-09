@@ -200,7 +200,9 @@ published module implements would break them all.
   answers succeeded without the provider reference leaves it pending as well,
   annotated `missing_reference`, and one whose reference is longer than the
   100 characters the journal holds, annotated `invalid_reference`, for the
-  merchant to settle by hand.
+  merchant to settle by hand; a refusal with such a reference is settled as
+  failed without it. A failure of the database while the status is read under
+  the row lock rolls the transaction back, a refusal closes it as it is.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
 is what the back office and the admin API call, through the
