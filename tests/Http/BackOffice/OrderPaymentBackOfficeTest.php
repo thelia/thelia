@@ -351,6 +351,18 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
     }
 
+    public function testAMistypedAmountIsShownAsAnError(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $this->tokenOf($crawler), 'amount' => 'abc']);
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('positive number', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+    }
+
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
     {
         $this->loginAs($this->factory->admin());
