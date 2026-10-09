@@ -125,8 +125,15 @@ abstract class JsonFileAbstractExport extends AbstractExport
         $filename = ExportStorage::rowsFile($exportName);
         $this->rowsFile = $filename;
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
+        // Rows read half way hold customer data all the same: they go with the failure.
+        try {
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
+            }
+        } catch (\Throwable $exception) {
+            ExportStorage::discard($filename);
+
+            throw $exception;
         }
 
         return $filename;

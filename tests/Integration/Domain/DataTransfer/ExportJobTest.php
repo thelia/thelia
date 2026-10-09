@@ -736,6 +736,32 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * Rows read half way hold customer data all the same: a row that cannot be written
+     * takes the rows file with it.
+     */
+    public function testARowsFileWrittenHalfWayGoesWithTheFailure(): void
+    {
+        $export = new class extends OrderExport {
+            public function rowsFile(StatementInterface $statement, string $name): string
+            {
+                return $this->getDataJsonCache($statement, $name);
+            }
+        };
+        $name = uniqid('broken-');
+        // The second row is not UTF-8: it cannot be written as JSON.
+        $statement = Propel::getConnection()->prepare("SELECT 'first' AS name UNION ALL SELECT X'B1'");
+        $statement->execute();
+
+        try {
+            $export->rowsFile($statement, $name);
+            self::fail('The second row cannot be written.');
+        } catch (\JsonException) {
+        }
+
+        self::assertSame([], glob(ExportStorage::directory().'/'.$name.'-*.json'));
+    }
+
+    /**
      * Two workers may run the same export at once: each reads the rows it selected,
      * through a file of its own.
      */
