@@ -23,6 +23,8 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
+use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -501,10 +503,18 @@ class Order extends BaseOrder
      * "not paid" so that nothing ships and nothing is invoiced — yet the amount is
      * reserved on the buyer's card. The checkout reads this, not isPaid(): an authorized
      * order presented again to its module, or cancelled to place a new one, would reserve
-     * the amount a second time.
+     * the amount a second time. An authorization still waiting for the provider's answer
+     * counts: the amount may be reserved already.
+     *
+     * A cancelled order is never secured: whatever its journal still holds is released
+     * on the cancellation, and its cart is free to be ordered again.
      */
     public function isPaymentSecured(): bool
     {
+        if ($this->isCancelled(false)) {
+            return false;
+        }
+
         if ($this->isPaid(false) || $this->isRefunded(false)) {
             return true;
         }
@@ -515,7 +525,13 @@ class Order extends BaseOrder
 
         $totals = (new PaymentTransactionTotalsReader())->forOrder((int) $this->getId());
 
-        return $totals->hasSomethingLeftToCapture() || $totals->hasPendingCapture();
+        return $totals->hasSomethingLeftToCapture()
+            || $totals->hasPendingCapture()
+            || OrderPaymentTransactionQuery::create()
+                ->filterByOrderId((int) $this->getId())
+                ->filterByTypeEnum(PaymentTransactionType::AUTHORIZATION)
+                ->filterByState(PaymentTransactionState::PENDING->value)
+                ->exists();
     }
 
     /**
