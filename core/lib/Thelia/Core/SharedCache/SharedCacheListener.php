@@ -60,14 +60,14 @@ final readonly class SharedCacheListener
 
     private function tag(Request $request, Response $response): void
     {
-        $keys = $this->keyCollector->keys();
-
-        if ([] === $keys || !$this->keyCollector->isComplete() || !$this->policy->isTaggable($request, $response)) {
+        if (!$this->keyCollector->isComplete() || !$this->policy->isTaggable($request, $response)) {
             return;
         }
 
-        $response->headers->set('Surrogate-Key', implode(' ', $keys));
-        $response->headers->set('xkey', implode(' ', $keys));
+        $keys = implode(' ', [SharedCacheKey::ALL, ...$this->keyCollector->keys()]);
+
+        $response->headers->set('Surrogate-Key', $keys);
+        $response->headers->set('xkey', $keys);
     }
 
     private function makePublic(Response $response, int $ttl): void

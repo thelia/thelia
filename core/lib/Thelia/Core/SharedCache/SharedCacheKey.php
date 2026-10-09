@@ -27,8 +27,25 @@ final class SharedCacheKey
         'folders' => 'folder',
     ];
 
+    public const ALL = 'thelia';
+
     private function __construct()
     {
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function forChange(string $family, int $id): array
+    {
+        return match ($family) {
+            'product' => ['product-'.$id, 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image'],
+            'category' => ['category-'.$id, 'categories', 'products'],
+            'content' => ['content-'.$id, 'contents'],
+            'folder' => ['folder-'.$id, 'folders', 'contents'],
+            'brand' => ['brand-'.$id, 'brands', 'products'],
+            default => [self::ALL],
+        };
     }
 
     public static function item(string $resource, int|string $id): string

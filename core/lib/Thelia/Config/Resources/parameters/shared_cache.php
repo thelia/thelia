@@ -17,5 +17,8 @@ use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
+        ->set('env(SHARED_CACHE_PURGER)', '')
+        ->set('env(SHARED_CACHE_PURGE_URLS)', '')
+        ->set('env(SHARED_CACHE_PURGE_SECRET)', '')
         ->set('thelia.shared_cache.readable_prefixes', SharedCacheKeyCollector::READABLE_PREFIXES);
 };

@@ -284,8 +284,8 @@ final class SharedCacheListenerTest extends IntegrationTestCase
 
         $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $collector);
 
-        self::assertSame('product-42 categories brand-3', $response->headers->get('Surrogate-Key'));
-        self::assertSame('product-42 categories brand-3', $response->headers->get('xkey'));
+        self::assertSame('thelia product-42 categories brand-3', $response->headers->get('Surrogate-Key'));
+        self::assertSame('thelia product-42 categories brand-3', $response->headers->get('xkey'));
     }
 
     /**
@@ -298,15 +298,15 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         }
     }
 
-    public function testAPageThatReadNothingAnnouncesNothing(): void
+    public function testAPageThatReadNothingStillCarriesTheKeyOfTheWholeShop(): void
     {
         $this->mode(SharedCacheMode::ENABLED);
         $response = $this->sessionResponse();
 
         $this->handle($this->request('/', 'index'), $response);
 
-        self::assertFalse($response->headers->has('Surrogate-Key'));
-        self::assertFalse($response->headers->has('xkey'));
+        self::assertSame('thelia', $response->headers->get('Surrogate-Key'));
+        self::assertSame('thelia', $response->headers->get('xkey'));
     }
 
     #[DataProvider('pagesThatStayPersonal')]
@@ -453,6 +453,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
     private function snapshot(Response $response): array
     {
         $headers = $response->headers->all();
+        unset($headers['surrogate-key'], $headers['xkey']);
         ksort($headers);
 
         return [(string) $response->getStatusCode(), $headers];
