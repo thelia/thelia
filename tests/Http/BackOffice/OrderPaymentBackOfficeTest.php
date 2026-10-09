@@ -294,6 +294,26 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertStringContainsString('Do not honor', $crawler->filter('[data-testid="order-payment-line"][data-payment-state="failed"] [data-testid="order-payment-line-error"]')->text());
     }
 
+    public function testWhatWasReleasedIsReadInTheTotals(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $this->recorder->recordCapture($order, 20, 'CAP-20', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+        $this->recorder->recordVoid($order, 'VOID-100', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $crawler = $this->sheet($order);
+
+        self::assertStringContainsString('100.00', $crawler->filter('[data-testid="order-payment-voided"]')->text(), 'Authorized 120, captured 20: the 100 released explains why nothing is left.');
+    }
+
+    public function testNothingReleasedShowsNoReleasedLine(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        self::assertCount(0, $this->sheet($order)->filter('[data-testid="order-payment-voided"]'));
+    }
+
     private function authorizedOrder(float $total): Order
     {
         $order = $this->factory->order(null, ['postage' => $total, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
