@@ -64,6 +64,7 @@ final class ExportPeriodTest extends TestCase
     public function testABoundTheFormCannotHaveSentIsRefused(array $bound): void
     {
         $this->expectException(JobRefusedException::class);
+        $this->expectExceptionMessage(ExportPeriod::INVALID_DATES);
 
         ExportPeriod::resolve(['start' => $bound, 'end' => null]);
     }

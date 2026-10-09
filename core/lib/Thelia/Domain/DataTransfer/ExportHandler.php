@@ -121,6 +121,7 @@ class ExportHandler
             $eventArchiver = $event->getArchiver();
 
             if ($eventArchiver instanceof ArchiverInterface) {
+                ExportStorage::closeFolder();
                 $eventArchiver->create($filePath);
                 $written[] = $eventArchiver->getArchivePath();
                 $this->archive($event, $eventArchiver, $filePath, $includeImages, $includeDocuments);
@@ -219,7 +220,7 @@ class ExportHandler
             '%s-%s-%s.%s',
             (new \DateTime())->format('Ymd'),
             uniqid('', true),
-            $export->getFileName(),
+            ExportStorage::safeName($export->getFileName()),
             $serializer->getExtension(),
         );
 
@@ -303,6 +304,8 @@ class ExportHandler
             $archiver->close();
         }
 
+        // Written by the archiver under the umask of the process: as private as the export.
+        ExportStorage::makePrivate($archiver->getArchivePath());
         $event->setFilePath($archiver->getArchivePath());
 
         // The archive holds the export: the file it was made of would keep customer data twice.
