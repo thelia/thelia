@@ -418,6 +418,50 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertSame($customCancelled->getId(), $this->reload($order)->getStatusId());
     }
 
+    public function testANotificationSettlesTheCaptureWaitingForItsReference(): void
+    {
+        // The call to the provider timed out: the line was left pending, without the
+        // reference the provider gave the capture. The notification brings both.
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+
+        $notified = $this->recorder->recordCapture($order, 120, 'PSP-CAP-77', moduleCode: 'Cheque');
+
+        self::assertSame($pending->getId(), $notified->getId(), 'The notification settles the waiting line rather than writing a second capture.');
+        self::assertTrue($notified->isSucceeded());
+        self::assertSame('PSP-CAP-77', $notified->getPspReference());
+        self::assertSame(2, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->count());
+        self::assertSame(OrderStatus::CODE_PAID, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testANotificationOfAnotherAmountDoesNotSettleTheWaitingCapture(): void
+    {
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $pending = $this->recorder->recordCapture($order, 70, null, PaymentTransactionState::PENDING);
+
+        $notified = $this->recorder->recordCapture($order, 50, 'PSP-CAP-78', moduleCode: 'Cheque');
+
+        self::assertNotSame($pending->getId(), $notified->getId());
+        $pending->reload();
+        self::assertTrue($pending->isPending());
+    }
+
+    public function testTwoCapturesWaitingForTheSameAmountAreNotGuessedBetween(): void
+    {
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+        $this->recorder->recordCapture($order, 60, null, PaymentTransactionState::PENDING);
+        $this->recorder->recordCapture($order, 60, null, PaymentTransactionState::PENDING);
+
+        // Which of the two the notification is about cannot be told: nothing is settled,
+        // and the capture, which the two pending lines already reserve, is refused.
+        $this->expectException(CaptureExceedsAuthorizationException::class);
+
+        $this->recorder->recordCapture($order, 60, 'PSP-CAP-79', moduleCode: 'Cheque');
+    }
+
     private function paid(Order $order): Order
     {
         $this->recorder->recordCapture($order, 100, 'CAP-PAID');
