@@ -28,6 +28,7 @@ class OrderPaymentTransactionEvent extends ActionEvent
         protected Order $order,
         protected OrderPaymentTransaction $transaction,
         protected ?string $sourceModuleCode = null,
+        protected bool $replay = false,
     ) {
     }
 
@@ -44,5 +45,14 @@ class OrderPaymentTransactionEvent extends ActionEvent
     public function getSourceModuleCode(): ?string
     {
         return $this->sourceModuleCode;
+    }
+
+    /**
+     * Whether the line was announced before: a movement reported again, or a line settled
+     * again with the outcome it has. Listeners that act once per movement skip it.
+     */
+    public function isReplay(): bool
+    {
+        return $this->replay;
     }
 }
