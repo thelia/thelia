@@ -1174,6 +1174,7 @@ return [
     'Order status - top' => 'Order status - top',
     'Order status transition override' => 'Order status transition override',
     'Order payment capture' => 'Order payment capture',
+    'Order payment refund' => 'Order payment refund',
     'Awaiting capture' => 'Awaiting capture',
     'Orders - JavaScript' => 'Orders - JavaScript',
     'Orders - at the top' => 'Orders - at the top',

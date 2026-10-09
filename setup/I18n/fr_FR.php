@@ -1048,6 +1048,7 @@ return [
     'Order failed - at the top' => 'Échec de la commande - en haut',
     'Order status transition override' => 'Forçage des transitions de statut de commande',
     'Order payment capture' => 'Capture du paiement d\'une commande',
+    'Order payment refund' => 'Remboursement du paiement d\'une commande',
     'Awaiting capture' => 'En attente de capture',
     'Orders - JavaScript' => 'Commandes - JavaScript',
     'Orders - at the top' => 'Commandes - en haut',

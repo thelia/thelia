@@ -284,6 +284,7 @@ return [
     'Ontario' => 'Ontario',
     'Order status transition override' => 'Forzatura delle transizioni di stato dell\'ordine',
     'Order payment capture' => 'Cattura del pagamento dell\'ordine',
+    'Order payment refund' => 'Rimborso del pagamento dell\'ordine',
     'Awaiting capture' => 'In attesa di cattura',
     'Oregon' => 'Oregon',
     'Oristano' => 'Oristano',

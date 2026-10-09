@@ -91,6 +91,8 @@ class AdminResources
     public const ORDER_STATUS_FORCE = 'admin.order.status-force';
     /** Taking money an authorization holds: a right of its own, distinct from editing orders. */
     public const ORDER_PAYMENT_CAPTURE = 'admin.order.payment-capture';
+    /** Giving money back through the provider, or recording a refund made outside it: a right of its own. */
+    public const ORDER_PAYMENT_REFUND = 'admin.order.payment-refund';
     public const PRODUCT = 'admin.product';
     public const PROFILE = 'admin.configuration.profile';
     public const SHIPPING_ZONE = 'admin.configuration.shipping-zone';

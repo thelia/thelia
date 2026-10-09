@@ -415,4 +415,26 @@ FROM (
 ) AS `wording`
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
 
+
+-- Giving money back is a right of its own too, distinct from editing orders and from
+-- taking money.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.payment-refund', NOW(), NOW());
+
+SET @payment_refund_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.payment-refund');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT @payment_refund_resource_id, `wording`.`locale`, `wording`.`title`, NULL, NULL, NULL
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Vrácení platby objednávky' AS `title`
+    UNION ALL SELECT 'de_DE', 'Erstattung der Bestellzahlung'
+    UNION ALL SELECT 'en_US', 'Order payment refund'
+    UNION ALL SELECT 'es_ES', 'Reembolso del pago del pedido'
+    UNION ALL SELECT 'fr_FR', 'Remboursement du paiement d\'une commande'
+    UNION ALL SELECT 'it_IT', 'Rimborso del pagamento dell\'ordine'
+    UNION ALL SELECT 'nl_NL', 'Terugbetaling van de orderbetaling'
+    UNION ALL SELECT 'ru_RU', 'Возврат оплаты заказа'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
+
 SET FOREIGN_KEY_CHECKS = 1;

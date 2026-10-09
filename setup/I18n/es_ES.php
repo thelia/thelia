@@ -800,6 +800,7 @@ return [
     'Order failed - at the top' => 'Pedido erróneo - al tope',
     'Order status transition override' => 'Forzar transiciones de estado de pedido',
     'Order payment capture' => 'Captura del pago del pedido',
+    'Order payment refund' => 'Reembolso del pago del pedido',
     'Awaiting capture' => 'Pendiente de captura',
     'Orders - JavaScript' => 'Pedidos - JavaScript',
     'Orders - at the top' => 'Pedidos - encabezado',
