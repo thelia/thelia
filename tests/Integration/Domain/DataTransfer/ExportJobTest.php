@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Archiver\Archiver\TarArchiver;
+use Thelia\Core\Archiver\Archiver\ZipArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\ExportEvent;
@@ -960,6 +961,37 @@ final class ExportJobTest extends IntegrationTestCase
 
         self::assertStringEndsWith('.tar', $event->getFilePath());
         self::assertSame([0o640, 0o640, 0o640], $archiver->modes);
+    }
+
+    /**
+     * A zip creates its file when it saves, before the archive is made private at the end:
+     * it is private from that save, whatever the umask of the process.
+     */
+    public function testAZipIsPrivateFromItsSave(): void
+    {
+        $archiver = new class extends ZipArchiver {
+            public ?int $modeWhenSaved = null;
+
+            public function save(): bool
+            {
+                $saved = parent::save();
+                clearstatcache();
+                $this->modeWhenSaved = fileperms($this->archivePath) & 0o777;
+
+                return $saved;
+            }
+        };
+        $umask = umask(0);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
+        } finally {
+            umask($umask);
+        }
+
+        $this->files[] = $event->getFilePath();
+        self::assertStringEndsWith('.zip', $event->getFilePath());
+        self::assertSame(0o640, $archiver->modeWhenSaved);
     }
 
     /**

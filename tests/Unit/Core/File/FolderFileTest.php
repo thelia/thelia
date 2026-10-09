@@ -152,8 +152,15 @@ final class FolderFileTest extends TestCase
         FolderFile::makePrivateOrRemove($this->folder.'/a.csv');
         self::assertSame(0o640, fileperms($this->folder.'/a.csv') & 0o777);
 
-        $this->expectException(IOExceptionInterface::class);
-        FolderFile::makePrivateOrRemove($this->folder.'/gone.csv');
+        // A link to nothing: the file system refuses to change its mode.
+        symlink($this->root.'/nowhere.csv', $this->folder.'/dangling.csv');
+
+        try {
+            FolderFile::makePrivateOrRemove($this->folder.'/dangling.csv');
+            self::fail('The mode of a link to nothing cannot be changed.');
+        } catch (IOExceptionInterface) {
+            self::assertFalse(is_link($this->folder.'/dangling.csv'));
+        }
     }
 
     /**

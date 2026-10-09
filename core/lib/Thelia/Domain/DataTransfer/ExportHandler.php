@@ -125,7 +125,8 @@ class ExportHandler
                 // An archiver creates its file under the umask of the process, and when it
                 // pleases: a tar at its first add, an image maybe, a zip when it saves. The
                 // whole archive is written under a private umask, so that the file is private
-                // from its first byte, as the export is. An archiver creates files only.
+                // from its first byte, as the export is. An archiver creates files only, and so
+                // does $onProgress, told the files added meanwhile.
                 FolderFile::writingPrivately(function () use ($event, $eventArchiver, $filePath, $includeImages, $includeDocuments, &$written): void {
                     $eventArchiver->create($filePath);
                     $written[] = $eventArchiver->getArchivePath();
