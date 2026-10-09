@@ -14,17 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Job;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\ExportHandler;
-use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
-use Thelia\Log\Tlog;
-use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -118,16 +115,8 @@ final readonly class RunExportJobHandler
                 ->setFinishedAt(new \DateTime())
                 ->save();
         } catch (\Throwable $notRecorded) {
-            $file = ExportCachePurger::resolve($event->getFilePath());
-
-            // The reason the row was not recorded is what the job failed on, not this.
-            try {
-                if (null !== $file) {
-                    (new Filesystem())->remove($file);
-                }
-            } catch (\Throwable $notRemoved) {
-                Tlog::getInstance()->addError(\sprintf('The file of an export its row could not record was not removed: %s', JobFailureMessage::forLog($notRemoved)));
-            }
+            // The reason the row was not recorded is what the job failed on.
+            ExportStorage::discard($event->getFilePath());
 
             throw $notRecorded;
         }
