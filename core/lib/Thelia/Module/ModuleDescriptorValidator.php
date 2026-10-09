@@ -58,9 +58,8 @@ class ModuleDescriptorValidator
         try {
             libxml_clear_errors();
             $loaded = $dom->load($xml_file, \LIBXML_NONET);
-            // libxml quotes the path of a file it could not open: the name of the file stands for it.
             $notXml = array_map(
-                static fn (\LibXMLError $error): string => str_replace((string) $xml_file, basename((string) $xml_file), trim($error->message)),
+                static fn (\LibXMLError $error): string => self::withoutPath(trim($error->message), (string) $xml_file),
                 libxml_get_errors(),
             );
             libxml_clear_errors();
@@ -73,7 +72,8 @@ class ModuleDescriptorValidator
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
 
-                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
+                // The keys of the table are read back as integers: a version is compared as text.
+                if (false === $xsdVersion || (null !== $version && (string) $version !== (string) $xsdVersion)) {
                     continue;
                 }
 
@@ -87,11 +87,15 @@ class ModuleDescriptorValidator
             }
         }
 
+        $reason = match (true) {
+            !$loaded => 'it is not well-formed XML ('.implode(', ', $notXml).')',
+            [] === $errors => \sprintf('no descriptor schema matches version %s', null === $version ? 'any' : (string) $version),
+            default => implode(', ', $errors),
+        };
+
         // Shown to the administrator who uploads the module: the module it is about, never
         // where the server unpacked it.
-        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), match (true) {
-            !$loaded => 'it is not well-formed XML ('.implode(', ', $notXml).')', [] === $errors => \sprintf('no descriptor schema matches version %s', (string) $version), default => implode(', ', $errors),
-        }));
+        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), $reason));
     }
 
     /**
@@ -103,11 +107,26 @@ class ModuleDescriptorValidator
         $file = basename($xmlFile);
         $configFolder = \dirname($xmlFile);
 
-        if ('Config' !== basename($configFolder) || '' === basename(\dirname($configFolder))) {
+        if ('Config' !== basename($configFolder) || \in_array(basename(\dirname($configFolder)), ['', '.', '..'], true)) {
             return $file;
         }
 
         return \sprintf('%s of %s', $file, basename(\dirname($configFolder)));
+    }
+
+    /**
+     * A message of libxml without a path of the server: libxml quotes, in full and
+     * resolved, the path of a file it could not open. The path of the descriptor, as given
+     * and as resolved, becomes the name of the file; then so does any other path quoted.
+     */
+    private static function withoutPath(string $message, string $xmlFile): string
+    {
+        $file = basename($xmlFile);
+        $resolvedFolder = realpath(\dirname($xmlFile));
+        $forms = array_filter([$xmlFile, false === $resolvedFolder ? null : $resolvedFolder.\DIRECTORY_SEPARATOR.$file]);
+        $message = str_replace($forms, $file, $message);
+
+        return (string) preg_replace('#"[^"]*/([^"/]+)"#', '"$1"', $message);
     }
 
     /**
@@ -121,17 +140,16 @@ class ModuleDescriptorValidator
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
         $errorMessages = [];
+        $previousErrorHandling = libxml_use_internal_errors(true);
 
         try {
-            libxml_use_internal_errors(true);
-
             if (!$dom->schemaValidate($xsdFile->getRealPath())) {
                 $errors = libxml_get_errors();
 
                 foreach ($errors as $error) {
                     $errorMessages[] = \sprintf(
                         'XML error "%s" [%d] (Code %d) on line %d column %d'."\n",
-                        $error->message,
+                        self::withoutPath($error->message, $dom->documentURI ?? ''),
                         $error->level,
                         $error->code,
                         $error->line,
@@ -141,10 +159,12 @@ class ModuleDescriptorValidator
 
                 libxml_clear_errors();
             }
-
-            libxml_use_internal_errors(false);
-        } catch (\ErrorException) {
-            libxml_use_internal_errors(false);
+        } catch (\ErrorException $notChecked) {
+            // A schema that could not be read checks nothing: a descriptor it could not check
+            // is not a valid one.
+            $errorMessages[] = \sprintf('the descriptor could not be checked against %s (%s)', $xsdFile->getBasename(), $notChecked->getMessage());
+        } finally {
+            libxml_use_internal_errors($previousErrorHandling);
         }
 
         return $errorMessages;

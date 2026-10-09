@@ -150,15 +150,53 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        $missing = $this->workDir.'/Sample/Config/module.xml';
+        // As given, and as a path libxml resolves before quoting it.
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', $this->workDir.'/Other/../Sample/Config/module.xml'] as $missing) {
+            try {
+                (new ModuleDescriptorValidator())->validate($missing);
+                self::fail('The descriptor is refused.');
+            } catch (InvalidXmlDocumentException $refusal) {
+                self::assertMatchesRegularExpression('#^The module\.xml of Sample is not a valid file: it is not well-formed XML \(.*"module\.xml".*\)$#', $refusal->getMessage());
+                self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+                self::assertStringNotContainsString('/', $refusal->getMessage());
+            }
+        }
+    }
+
+    /**
+     * A version is given as text, and the table of schemas is read back with integer keys:
+     * the version a descriptor is checked against is the one asked for.
+     */
+    public function testADescriptorIsCheckedAgainstTheVersionAskedFor(): void
+    {
+        $validator = new ModuleDescriptorValidator();
+
+        self::assertTrue($validator->validate($this->writeDescriptor(''), (string) self::DESCRIPTOR_VERSION_2_2));
+        self::assertSame(self::DESCRIPTOR_VERSION_2_2, (int) $validator->getModuleVersion());
+
+        // What only the 2.2 schema accepts is refused against the first one.
+        try {
+            $validator->validate($this->writeDescriptor('<enabled-by-default>1</enabled-by-default>'), '1');
+            self::fail('The first schema does not know enabled-by-default.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString('XML error', $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A quote in a folder of the path is no way out for the rest of the path.
+     */
+    public function testAQuoteInThePathHidesNothingOfIt(): void
+    {
+        $quoted = $this->workDir.'/quo"te/Sample/Config/module.xml';
 
         try {
-            (new ModuleDescriptorValidator())->validate($missing);
+            (new ModuleDescriptorValidator())->validate($quoted);
             self::fail('The descriptor is refused.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringStartsWith('The module.xml of Sample is not a valid file: it is not well-formed XML (', $refusal->getMessage());
-            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
-            self::assertStringContainsString('module.xml', substr($refusal->getMessage(), 60));
+            self::assertStringStartsWith('The module.xml of Sample is not a valid file', $refusal->getMessage());
+            self::assertStringNotContainsString('/', $refusal->getMessage());
+            self::assertStringNotContainsString('quo', $refusal->getMessage());
         }
     }
 
