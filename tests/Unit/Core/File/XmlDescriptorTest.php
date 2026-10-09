@@ -75,7 +75,7 @@ final class XmlDescriptorTest extends TestCase
 
         // A path PHP refuses before libxml sees it.
         $refused = XmlDescriptor::schemaErrors($conforming, $this->workDir."/a\0.xsd");
-        self::assertSame('the descriptor could not be checked against a.xsd', $refused[0]);
+        self::assertSame('the descriptor could not be checked against a .xsd', $refused[0]);
         self::assertStringContainsString('null bytes', $refused[1]);
     }
 
@@ -129,13 +129,23 @@ final class XmlDescriptorTest extends TestCase
         $neither = new \DOMDocument();
         $neither->loadXML('<a><other/></a>');
 
-        self::assertSame(1, XmlDescriptor::versionOf($old, $schemas, $versions, null, $check)['version']);
-        self::assertSame(1, XmlDescriptor::versionOf($old, array_reverse($schemas), $versions, null, $check)['version']);
+        self::assertSame(1, XmlDescriptor::matchingSchemaVersion($old, $schemas, $versions, null, $check)['version']);
+        self::assertSame(1, XmlDescriptor::matchingSchemaVersion($old, array_reverse($schemas), $versions, null, $check)['version']);
 
-        $refused = XmlDescriptor::versionOf($neither, $schemas, $versions, null, $check);
+        $refused = XmlDescriptor::matchingSchemaVersion($neither, $schemas, $versions, null, $check);
         self::assertNull($refused['version']);
         self::assertStringContainsString('( new )', $refused['errors'][0]);
-        self::assertSame($refused, XmlDescriptor::versionOf($neither, array_reverse($schemas), $versions, null, $check));
-        self::assertSame(['version' => null, 'errors' => ['no descriptor schema matches version 9']], XmlDescriptor::versionOf($old, $schemas, $versions, '9', $check));
+        self::assertSame($refused, XmlDescriptor::matchingSchemaVersion($neither, array_reverse($schemas), $versions, null, $check));
+        self::assertSame(['version' => null, 'errors' => ['no descriptor schema matches version 9']], XmlDescriptor::matchingSchemaVersion($old, $schemas, $versions, '9', $check));
+
+        // Versions are numbers: 10 comes after 9, whatever the alphabet says.
+        $tenth = ['9' => 'v1.xsd', '10' => 'v2.xsd'];
+        self::assertStringContainsString('( new )', XmlDescriptor::matchingSchemaVersion($neither, $schemas, $tenth, null, $check)['errors'][0]);
+    }
+
+    public function testAReasonIsPrintable(): void
+    {
+        self::assertSame('a b c d e', XmlDescriptor::printable("a\nb\tc\x7Fd\u{202E}e"));
+        self::assertSame('plain', XmlDescriptor::printable('plain'));
     }
 }

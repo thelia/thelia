@@ -56,10 +56,9 @@ final class XmlDescriptor
             return ['the schema is missing'];
         }
 
-        // The schema is named: never with a control character its path may carry.
         return self::askingLibxml(
             static fn (): bool => $dom->schemaValidate($schemaFile),
-            'the descriptor could not be checked against '.preg_replace('/[\x00-\x1F\x7F]/', '', basename($schemaFile)),
+            'the descriptor could not be checked against '.self::printable(basename($schemaFile)),
         );
     }
 
@@ -75,7 +74,7 @@ final class XmlDescriptor
      *
      * @return array{version: int|string|null, errors: list<string>}
      */
-    public static function versionOf(\DOMDocument $dom, iterable $schemas, array $versions, ?string $version, \Closure $check): array
+    public static function matchingSchemaVersion(\DOMDocument $dom, iterable $schemas, array $versions, ?string $version, \Closure $check): array
     {
         $known = [];
 
@@ -90,7 +89,7 @@ final class XmlDescriptor
 
         // The file system lists the schemas in no order: the latest version is tried first,
         // and its errors are the ones told.
-        uksort($known, static fn (string $a, string $b): int => strnatcmp($b, $a));
+        uksort($known, static fn (string $left, string $right): int => strnatcmp($right, $left));
         $errors = [];
 
         foreach ($known as [$schemaVersion, $schemaFile]) {
@@ -107,10 +106,21 @@ final class XmlDescriptor
     }
 
     /**
+     * The text fit to print in a reason: a value of the descriptor or a name of a file
+     * may carry a control character, or a mark that reverses the direction of what
+     * follows, that a log or a page would obey.
+     */
+    public static function printable(string $text): string
+    {
+        return (string) preg_replace('/[\x00-\x1F\x7F\x{202A}-\x{202E}\x{2066}-\x{2069}]/u', ' ', $text);
+    }
+
+    /**
      * Runs $ask with the errors of libxml kept for us, and any warning of PHP turned into
      * an exception (whatever the environment does with a warning, and whether the call
-     * was silenced with @): what either has to say is the reason. The error mode and the
-     * buffer of libxml, and the error handler, are given back as they were.
+     * was silenced with @): what either has to say is the reason. The error mode of
+     * libxml and the error handler are given back as they were; the error buffer of
+     * libxml is emptied, before and after (libxml lets no error be put back).
      *
      * @param \Closure(): bool $ask
      *
