@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Module;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptorValidator;
 
@@ -150,17 +151,25 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        // As given, and as a path libxml resolves before quoting it.
-        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', $this->workDir.'/Other/../Sample/Config/module.xml'] as $missing) {
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml'] as $missing) {
             try {
                 (new ModuleDescriptorValidator())->validate($missing);
                 self::fail('The descriptor is refused.');
             } catch (InvalidXmlDocumentException $refusal) {
-                self::assertMatchesRegularExpression('#^The module\.xml of Sample is not a valid file: it is not well-formed XML \(.*"module\.xml".*\)$#', $refusal->getMessage());
-                self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
-                self::assertStringNotContainsString('/', $refusal->getMessage());
+                self::assertSame('The module.xml of Sample is not a valid file: it is not well-formed XML (it is not a file)', $refusal->getMessage());
             }
         }
+
+        // What libxml says of a file it could not read, as it says it: the path in full,
+        // resolved and normalised, whatever was given.
+        $given = $this->workDir.'/Other/../Sample/Config//module.xml';
+        $resolved = $this->workDir.'/Sample/Config/module.xml';
+        self::assertSame(
+            'failed to load external entity "module.xml"',
+            $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given),
+        );
+        self::assertSame('I/O warning : failed to load "y.dtd"', $this->withoutPath('I/O warning : failed to load "http://h/x/y.dtd"', $given));
+        self::assertSame('AttValue: " or \' expected', $this->withoutPath('AttValue: " or \' expected', $given));
     }
 
     /**
@@ -184,20 +193,100 @@ final class ModuleDescriptorValidatorTest extends TestCase
     }
 
     /**
-     * A quote in a folder of the path is no way out for the rest of the path.
+     * A quote in a folder of the path is no way out for the rest of the path, nor is a
+     * path libxml normalises before quoting it.
      */
     public function testAQuoteInThePathHidesNothingOfIt(): void
     {
-        $quoted = $this->workDir.'/quo"te/Sample/Config/module.xml';
+        $given = $this->workDir.'/quo"te//Sample/Config/module.xml';
+        $resolved = $this->workDir.'/quo"te/Sample/Config/module.xml';
+
+        $masked = $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given);
+
+        self::assertSame('failed to load external entity "module.xml"', $masked);
+    }
+
+    private function withoutPath(string $message, string $xmlFile): string
+    {
+        return (string) (new \ReflectionMethod(ModuleDescriptorValidator::class, 'withoutPath'))->invoke(null, $message, $xmlFile);
+    }
+
+    /**
+     * A folder given as a descriptor is refused as not a file, with no warning of PHP.
+     */
+    public function testAFolderIsNotADescriptor(): void
+    {
+        try {
+            (new ModuleDescriptorValidator())->validate($this->workDir);
+            self::fail('A folder is refused.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringEndsWith('is not a valid file: it is not well-formed XML (it is not a file)', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A schema the server cannot read checks nothing: the descriptor is refused, never
+     * passed, and the refusal names the schema, never where it is. Whether PHP turns the
+     * warning into an exception, as the development environment does, or not.
+     */
+    public function testADescriptorIsRefusedWhenItsSchemaCannotBeRead(): void
+    {
+        $schemas = $this->workDir.'/schemas';
+        (new Filesystem())->mkdir($schemas);
+        file_put_contents($schemas.'/module-2_2.xsd', 'garbage');
+        $descriptor = $this->writeDescriptor('');
 
         try {
-            (new ModuleDescriptorValidator())->validate($quoted);
-            self::fail('The descriptor is refused.');
+            $this->validatorWithSchemasIn($schemas)->validate($descriptor);
+            self::fail('A schema that cannot be read validates nothing.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringStartsWith('The module.xml of Sample is not a valid file', $refusal->getMessage());
-            self::assertStringNotContainsString('/', $refusal->getMessage());
-            self::assertStringNotContainsString('quo', $refusal->getMessage());
+            self::assertStringContainsString('could not be checked against module-2_2.xsd (', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
+
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
+
+        try {
+            $this->validatorWithSchemasIn($schemas)->validate($descriptor);
+            self::fail('A schema that cannot be read validates nothing.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString('could not be checked against module-2_2.xsd (', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame([], libxml_get_errors());
+    }
+
+    /**
+     * A server with no schema at all says so, rather than that the descriptor is not XML.
+     */
+    public function testAServerWithoutASchemaSaysSo(): void
+    {
+        $schemas = $this->workDir.'/no-schemas';
+        (new Filesystem())->mkdir($schemas);
+
+        try {
+            $this->validatorWithSchemasIn($schemas)->validate($this->writeDescriptor(''));
+            self::fail('No schema matches.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringEndsWith('no descriptor schema matches version any', $refusal->getMessage());
+        }
+    }
+
+    private function validatorWithSchemasIn(string $folder): ModuleDescriptorValidator
+    {
+        return new class($folder) extends ModuleDescriptorValidator {
+            public function __construct(string $folder)
+            {
+                parent::__construct();
+                $this->xsdFinder = (new Finder())->name('*.xsd')->in($folder);
+            }
+        };
     }
 
     /**
