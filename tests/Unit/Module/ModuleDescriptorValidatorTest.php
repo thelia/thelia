@@ -153,7 +153,7 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', '', "a\0b", "dir\0x/Config/module.xml"] as $notReadable) {
+        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', '', "a\0b", "dir\0x/Config/module.xml", $this->workDir."/Mod\xE9/Config/module.xml"] as $notReadable) {
             try {
                 (new ModuleDescriptorValidator())->validate($notReadable);
                 self::fail('The descriptor is refused.');
@@ -161,6 +161,7 @@ final class ModuleDescriptorValidatorTest extends TestCase
                 self::assertStringEndsWith(' is not a valid file: it is not a readable file', $refusal->getMessage());
                 self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
                 self::assertSame(0, preg_match('/[\x00-\x1F\x7F]|The {2,}is/', $refusal->getMessage()));
+                self::assertSame(1, preg_match('//u', $refusal->getMessage()));
             }
         }
     }
@@ -301,14 +302,14 @@ final class ModuleDescriptorValidatorTest extends TestCase
             (new ModuleDescriptorValidator())->validate($this->writeDescriptor("<enabled-by-default>a\nb\u{202E}c</enabled-by-default>"));
             self::fail('The descriptor is refused.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringContainsString("'a b c'", $refusal->getMessage());
+            self::assertStringContainsString("'a b?c'", $refusal->getMessage());
             self::assertSame(0, preg_match('/[\x00-\x1F\x7F\x{202E}]/u', $refusal->getMessage()));
         }
     }
 
     /**
-     * The error handler, the error mode and the error buffer of libxml are the caller's:
-     * given back as they were, a refusal or not.
+     * The error handler and the error mode of libxml are the caller's, given back as they
+     * were, a refusal or not; the error buffer of libxml is left empty.
      */
     public function testTheErrorHandlingOfTheCallerIsGivenBack(): void
     {

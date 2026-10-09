@@ -132,8 +132,10 @@ class ModuleDescriptorValidator
             return [];
         }
 
+        // The path as given stands only when absolute: a short relative one ("a/b") would
+        // be found inside unrelated text.
         $resolvedFolder = realpath(\dirname($path));
-        $forms = [$path, rawurldecode($path)];
+        $forms = str_starts_with($path, '/') ? [$path, rawurldecode($path)] : [];
 
         if (false !== $resolvedFolder) {
             $forms[] = $resolvedFolder.\DIRECTORY_SEPARATOR.basename($path);
