@@ -32,6 +32,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
+use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -362,42 +363,52 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         // Prevent partial stock update on status change.
         $con->beginTransaction();
+        $expectedStatusId = $event->getExpectedStatusId();
 
         try {
             // The status the order has now, the row held until the commit: two workers
             // moving the same order decide one after the other, each on what the other
             // wrote, not on the object it happened to load.
             $currentStatusId = $this->lockStatusOf($order, $con);
-            $expectedStatusId = $event->getExpectedStatusId();
 
-            if (null !== $expectedStatusId && $expectedStatusId !== $currentStatusId) {
-                $con->commit();
-                $event->stopPropagation();
+            if (null === $expectedStatusId || $expectedStatusId === $currentStatusId) {
+                if ($currentStatusId !== (int) $order->getStatusId()) {
+                    $order->setStatusId($currentStatusId);
+                    // The status the database already holds: never written back from here.
+                    $order->resetModified(OrderTableMap::COL_STATUS_ID);
+                }
 
-                Tlog::getInstance()->info(\sprintf(
-                    'Order %s left status #%d before the move to status #%d was written: the move is dropped.',
-                    (string) $order->getRef(),
-                    $expectedStatusId,
-                    $newStatus,
-                ));
-
-                return;
+                // Every entry point (back office, API, payment modules, commands) lands here,
+                // so this is where the transition graph is enforced.
+                $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
             }
-
-            if ($currentStatusId !== (int) $order->getStatusId()) {
-                $order->setStatusId($currentStatusId);
-            }
-
-            // Every entry point (back office, API, payment modules, commands) lands here,
-            // so this is where the transition graph is enforced.
-            $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
-        } catch (\Throwable $refusal) {
-            // Nothing is written yet: the transaction is closed as it is, never rolled
+        } catch (OrderStatusTransitionRefusedException|\InvalidArgumentException $refusal) {
+            // A refusal writes nothing: the transaction is closed as it is, never rolled
             // back, so that a caller inside a transaction of its own that catches the
             // refusal can still commit what it wrote.
             $con->commit();
 
             throw $refusal;
+        } catch (\Throwable $failure) {
+            // A failure of the database may have undone the caller's work already: its
+            // transaction must not commit as if nothing happened.
+            $con->rollBack();
+
+            throw $failure;
+        }
+
+        if (null !== $expectedStatusId && $expectedStatusId !== $currentStatusId) {
+            $con->commit();
+            $event->stopPropagation();
+
+            Tlog::getInstance()->info(\sprintf(
+                'Order %s left status #%d before the move to status #%d was written: the move is dropped.',
+                (string) $order->getRef(),
+                $expectedStatusId,
+                $newStatus,
+            ));
+
+            return;
         }
 
         $event->setPreviousStatusId($currentStatusId);
