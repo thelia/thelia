@@ -39,9 +39,11 @@ final class TerminalText
      * replaced first: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that
      * is not in UTF-8. Each range is then matched as its UTF-8 encoding, byte by byte. Last,
      * on what is then valid UTF-8, every other format character (Unicode category Cf, the
-     * Arabic number signs among them), private use character (Co), and the object
-     * replacement character (U+FFFC) and the unassigned U+2065, which print as nothing or
-     * as a glyph that is not the text.
+     * Arabic number signs among them), private use character (Co), the object replacement
+     * character (U+FFFC), the noncharacters (U+FDD0 to U+FDEF, U+FFFE, U+FFFF) and the
+     * unassigned ignorable code points of the specials block (U+2065, U+FFF0 to U+FFF8),
+     * which print as nothing or as a glyph that is not the text. A step that fails leaves
+     * nothing rather than the text it was to clean.
      */
     public static function withoutControlCharacters(string $text): string
     {
@@ -53,7 +55,7 @@ final class TerminalText
 
         $text = preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F\xAD]|\xD8\x9C|\xE2\x80[\x8B-\x8F\xA8-\xAE]|\xE2\x81[\xA0-\xA4\xA6-\xA9\xAA-\xAF]|\xEF\xBB\xBF|\xEF\xBF[\xB9-\xBB]|\xE1\xA0[\x8B-\x8F]|\xCD\x8F|\xEF\xB8[\x80-\x8F]|\xF3\xA0[\x84-\x87][\x80-\xBF]|\xF0\x9D\x85[\xB3-\xBA]|\xE1\x85[\x9F\xA0]|\xE2\xA0\x80|\xE3\x85\xA4|\xEF\xBE\xA0|\xF3\xA0[\x80-\x83][\x80-\xBF]|\xE1\x9E[\xB4\xB5]|\xF0\x9B\xB2[\xA0-\xA3]/', '?', $text) ?? '';
 
-        return preg_replace('/[\p{Cf}\p{Co}\x{FFFC}\x{2065}]/u', '?', $text) ?? $text;
+        return preg_replace('/[\p{Cf}\p{Co}\x{FFFC}\x{2065}\x{FFF0}-\x{FFF8}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}]/u', '?', $text) ?? '';
     }
 
     /**
@@ -73,9 +75,19 @@ final class TerminalText
      */
     public static function onOneLine(string $text): string
     {
-        // Possessive quantifiers: a long run of blanks is read once, never backtracked over
-        // (a run of thousands, cited by libxml from a descriptor, took seconds without the
-        // PCRE JIT).
-        return self::singleLine(preg_replace('/[^\S\r\n]*+[\r\n]++\s*+/', ' ', trim($text, " \t\n\r\0\x0B\f")) ?? '');
+        // Cleaned first: what follows runs on valid UTF-8, in Unicode mode, so that the
+        // tables of the locale never take the second byte of "à" (0xA0) for a blank. Every
+        // run of blanks is then read once, as a whole (possessive, from its first blank on:
+        // no run is read again from each of its positions, which took seconds on a run of
+        // thousands without the PCRE JIT): one that holds a line break becomes a space, the
+        // others stay. A carriage return is a line break too.
+        $cleaned = self::withoutControlCharacters(str_replace("\r", "\n", $text));
+        $onOneLine = preg_replace_callback(
+            '/\s++/u',
+            static fn (array $run): string => str_contains($run[0], "\n") ? ' ' : $run[0],
+            $cleaned,
+        ) ?? '';
+
+        return trim(str_replace("\t", '?', $onOneLine));
     }
 }

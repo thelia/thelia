@@ -36,9 +36,33 @@ final class TerminalTextTest extends TestCase
     public function testAMessageSpreadOverLinesIsPrintedOnOne(): void
     {
         self::assertSame('first error. second error.?OK', TerminalText::onOneLine("first error.\n  \r\nsecond error.\tOK\n"));
-        // A form feed is a blank of the line too: the result is the same the second time.
-        self::assertSame('| ?', TerminalText::onOneLine("|\n\f\x88"));
+        // A control character is shown as such, and the result is the same the second time.
+        self::assertSame('| ??', TerminalText::onOneLine("|\n\f\x88"));
         self::assertSame(TerminalText::onOneLine("p\x88M\n\f"), TerminalText::onOneLine(TerminalText::onOneLine("p\x88M\n\f")));
+        // A lone carriage return is a line break, never a return to the start of the line.
+        self::assertSame('Acme OK', TerminalText::onOneLine("Acme\rOK"));
+    }
+
+    /**
+     * The blanks are read in Unicode mode, whatever the locale of the process: the second
+     * byte of "à" (0xA0) is a blank to the tables of a C.UTF-8 locale on a libc whose
+     * isspace() says so (macOS; glibc says no, so this test tells nothing on Linux).
+     */
+    public function testAnAccentBeforeALineBreakIsKeptWhateverTheLocale(): void
+    {
+        $locale = setlocale(\LC_CTYPE, '0');
+
+        try {
+            foreach (['C.UTF-8', 'C'] as $candidate) {
+                if (false === setlocale(\LC_CTYPE, $candidate)) {
+                    continue;
+                }
+
+                self::assertSame("caf\u{E0} x \u{420}", TerminalText::onOneLine("caf\u{E0}\nx\n\u{420}"), $candidate);
+            }
+        } finally {
+            setlocale(\LC_CTYPE, (string) $locale);
+        }
     }
 
     /**
@@ -49,8 +73,8 @@ final class TerminalTextTest extends TestCase
     public function testALongRunOfBlanksIsReadOnce(): void
     {
         // In a process of its own: PCRE keeps a pattern compiled once, with the JIT it had.
-
-        $text = 'a'.str_repeat(' ', 30000).'b'.str_repeat("\n ", 5000).'c';
+        // A run read again from each of its positions takes tens of seconds on this one.
+        $text = 'a'.str_repeat(' ', 200000).'b'.str_repeat("\t", 100000).'c'.str_repeat("\n ", 50000).'d';
         $jit = \ini_get('pcre.jit');
         ini_set('pcre.jit', '0');
         $started = hrtime(true);
@@ -61,8 +85,7 @@ final class TerminalTextTest extends TestCase
             ini_set('pcre.jit', (string) $jit);
         }
 
-        self::assertSame('a'.str_repeat(' ', 30000).'b c', $printed);
-        self::assertSame(\PREG_NO_ERROR, preg_last_error());
+        self::assertSame('a'.str_repeat(' ', 200000).'b'.str_repeat('?', 100000).'c d', $printed);
         self::assertLessThan(2_000_000_000, hrtime(true) - $started);
     }
 
@@ -77,6 +100,14 @@ final class TerminalTextTest extends TestCase
         yield 'the unassigned ignorable U+2065' => ["Ac\u{2065}me", 'Ac?me'];
         yield 'a private use character' => ["Acme\u{E000}", 'Acme?'];
         yield 'a letter with an accent is kept' => ['Acmé', 'Acmé'];
+        yield 'a noncharacter' => ["Acme\u{FFFE}", 'Acme?'];
+        yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
+        yield 'the last bidirectional isolate (bound of a range)' => ["Ac\u{2069}me", 'Ac?me'];
+        yield 'the narrow no-break space next to that range is kept' => ["Ac\u{202F}me", "Ac\u{202F}me"];
+        yield 'the paragraph separator (bound of a range)' => ["Ac\u{2029}me", 'Ac?me'];
+        yield 'the hair space next to the zero-width range is kept' => ["Ac\u{200A}me", "Ac\u{200A}me"];
+        yield 'the first Hangul filler (bound of a range)' => ["Ac\u{115F}me", 'Ac?me'];
+        yield 'the Hangul letter before it is kept' => ["Ac\u{115E}me", "Ac\u{115E}me"];
         yield 'a right-to-left override' => ["Acme\u{202E}eludoM", 'Acme?eludoM'];
         yield 'an isolate' => ["Acme\u{2066}Module\u{2069}", 'Acme?Module?'];
         yield 'a zero-width space' => ["Ac\u{200B}me", 'Ac?me'];
