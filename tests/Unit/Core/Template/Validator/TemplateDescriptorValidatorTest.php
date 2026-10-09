@@ -66,27 +66,51 @@ final class TemplateDescriptorValidatorTest extends TestCase
             }
         };
 
-        try {
-            $validator->validate();
-            self::fail('A schema that cannot be read validates nothing.');
-        } catch (InvalidDescriptorException $refusal) {
-            self::assertStringContainsString('could not be checked against template-1_0.xsd (', $refusal->getMessage());
-        }
-
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
-        });
+        $handler = static fn (): bool => false;
+        set_error_handler($handler);
+        $previousMode = libxml_use_internal_errors(true);
 
         try {
             $validator->validate();
             self::fail('A schema that cannot be read validates nothing.');
         } catch (InvalidDescriptorException $refusal) {
             self::assertStringContainsString('could not be checked against template-1_0.xsd (', $refusal->getMessage());
+            // The error handler, the error mode and the error buffer of libxml are the
+            // caller's: given back as they were.
+            self::assertTrue(libxml_use_internal_errors());
+            self::assertSame([], libxml_get_errors());
+            self::assertSame($handler, set_error_handler(null));
+            restore_error_handler();
         } finally {
+            libxml_use_internal_errors($previousMode);
             restore_error_handler();
         }
+    }
 
-        self::assertSame([], libxml_get_errors());
+    /**
+     * A descriptor that is not XML, or is missing, is refused with the reason, and with
+     * no warning of PHP; the path stays, as the file is the theme's and the reader its
+     * developer.
+     */
+    public function testADescriptorThatIsNotXmlIsRefusedWithAReason(): void
+    {
+        $path = $this->workDir.'/template.xml';
+        file_put_contents($path, '<template><unclosed></template>');
+
+        try {
+            (new TemplateDescriptorValidator($path))->validate();
+            self::fail('The descriptor is refused.');
+        } catch (InvalidDescriptorException $refusal) {
+            self::assertStringStartsWith($path.' file is not a valid template descriptor : ', $refusal->getMessage());
+            self::assertStringContainsString('tag mismatch', $refusal->getMessage());
+        }
+
+        try {
+            (new TemplateDescriptorValidator($this->workDir.'/gone.xml'))->validate();
+            self::fail('The descriptor is refused.');
+        } catch (InvalidDescriptorException $refusal) {
+            self::assertStringEndsWith(' : it is not a readable file', $refusal->getMessage());
+        }
     }
 
     private function writeDescriptor(): string

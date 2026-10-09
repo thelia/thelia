@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Validator;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
 
@@ -53,9 +54,9 @@ class TemplateDescriptorValidator
     public function validate(?string $version = null): self
     {
         $dom = new \DOMDocument();
-        $errors = [];
+        $errors = XmlDescriptor::loadingErrors($dom, $this->xmlDescriptorPath);
 
-        if ($dom->load($this->xmlDescriptorPath)) {
+        if ([] === $errors) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
@@ -73,6 +74,7 @@ class TemplateDescriptorValidator
             }
         }
 
+        // A file of the theme, read by its developer: named by its path.
         throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
     }
 
@@ -86,41 +88,10 @@ class TemplateDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $errorMessages = [];
-        $previousErrorHandling = libxml_use_internal_errors(true);
-        // A schema that cannot be read is a warning of PHP: an exception here, whatever the
-        // environment does with a warning.
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
-        });
-
-        try {
-            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-                $errors = libxml_get_errors();
-
-                foreach ($errors as $error) {
-                    $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
-                        $error->message,
-                        $error->level,
-                        $error->code,
-                        $error->file,
-                        $error->line,
-                        $error->column,
-                    );
-                }
-            }
-        } catch (\Exception $notChecked) {
-            // A schema that could not be read checks nothing: a descriptor it could not check
-            // is not a valid one.
-            $errorMessages[] = \sprintf('the descriptor could not be checked against %s (%s)', $xsdFile->getBasename(), $notChecked->getMessage());
-        } finally {
-            restore_error_handler();
-            libxml_clear_errors();
-            libxml_use_internal_errors($previousErrorHandling);
-        }
-
-        return $errorMessages;
+        return array_map(
+            static fn (string $error): string => 'XML error "'.$error.'"',
+            XmlDescriptor::schemaErrors($dom, (string) $xsdFile->getRealPath()),
+        );
     }
 
     /**

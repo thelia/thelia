@@ -140,7 +140,9 @@ final class ModuleDescriptorValidatorTest extends TestCase
             (new ModuleDescriptorValidator())->validate($path);
             self::fail('The descriptor is refused.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringStartsWith('The module.xml is not a valid file: it is not well-formed XML (', $refusal->getMessage());
+            self::assertStringStartsWith('The module.xml is not a valid file: ', $refusal->getMessage());
+            self::assertStringContainsString('tag mismatch', $refusal->getMessage());
+            self::assertStringContainsString('(line 1)', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
     }
@@ -151,25 +153,38 @@ final class ModuleDescriptorValidatorTest extends TestCase
      */
     public function testADescriptorThatCannotBeOpenedIsRefusedWithoutItsPath(): void
     {
-        foreach ([$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml'] as $missing) {
+        $unreadable = $this->workDir.'/Unreadable/Config/module.xml';
+        (new Filesystem())->mkdir(\dirname($unreadable));
+        file_put_contents($unreadable, '<module/>');
+        chmod($unreadable, 0);
+        // The account running the tests may read anything: then only the missing ones count.
+        $cases = [$this->workDir.'/Sample/Config/module.xml', $this->workDir.'/./Sample/Config/module.xml', ...(is_readable($unreadable) ? [] : [$unreadable])];
+
+        foreach ($cases as $notReadable) {
             try {
-                (new ModuleDescriptorValidator())->validate($missing);
+                (new ModuleDescriptorValidator())->validate($notReadable);
                 self::fail('The descriptor is refused.');
             } catch (InvalidXmlDocumentException $refusal) {
-                self::assertSame('The module.xml of Sample is not a valid file: it is not well-formed XML (it is not a file)', $refusal->getMessage());
+                self::assertStringEndsWith(' is not a valid file: it is not a readable file', $refusal->getMessage());
+                self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
             }
         }
+    }
 
-        // What libxml says of a file it could not read, as it says it: the path in full,
-        // resolved and normalised, whatever was given.
+    /**
+     * What libxml says of a file it could not read, as it says it: the path in full,
+     * resolved and normalised, whatever was given; the name of the file stands for it, and
+     * a name is never read for the references of a replacement.
+     */
+    public function testAMessageOfLibxmlLosesThePathOfTheServer(): void
+    {
         $given = $this->workDir.'/Other/../Sample/Config//module.xml';
         $resolved = $this->workDir.'/Sample/Config/module.xml';
-        self::assertSame(
-            'failed to load external entity "module.xml"',
-            $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given),
-        );
+
+        self::assertSame('failed to load external entity "module.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given));
         self::assertSame('I/O warning : failed to load "y.dtd"', $this->withoutPath('I/O warning : failed to load "http://h/x/y.dtd"', $given));
         self::assertSame('AttValue: " or \' expected', $this->withoutPath('AttValue: " or \' expected', $given));
+        self::assertSame('failed to load external entity "a$1b.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s/a$1b.xml"', $this->workDir), $this->workDir.'/a$1b.xml'));
     }
 
     /**
@@ -220,7 +235,7 @@ final class ModuleDescriptorValidatorTest extends TestCase
             (new ModuleDescriptorValidator())->validate($this->workDir);
             self::fail('A folder is refused.');
         } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringEndsWith('is not a valid file: it is not well-formed XML (it is not a file)', $refusal->getMessage());
+            self::assertStringEndsWith('is not a valid file: it is not a readable file', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
     }
@@ -244,22 +259,47 @@ final class ModuleDescriptorValidatorTest extends TestCase
             self::assertStringContainsString('could not be checked against module-2_2.xsd (', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
+    }
 
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
-        });
+    /**
+     * The error handler, the error mode and the error buffer of libxml are the caller's:
+     * given back as they were, a refusal or not.
+     */
+    public function testTheErrorHandlingOfTheCallerIsGivenBack(): void
+    {
+        $schemas = $this->workDir.'/schemas';
+        (new Filesystem())->mkdir($schemas);
+        file_put_contents($schemas.'/module-2_2.xsd', 'garbage');
+        $handler = static fn (): bool => false;
+        set_error_handler($handler);
+        $previousMode = libxml_use_internal_errors(true);
 
         try {
-            $this->validatorWithSchemasIn($schemas)->validate($descriptor);
-            self::fail('A schema that cannot be read validates nothing.');
-        } catch (InvalidXmlDocumentException $refusal) {
-            self::assertStringContainsString('could not be checked against module-2_2.xsd (', $refusal->getMessage());
-            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+            self::assertTrue((new ModuleDescriptorValidator())->validate($this->writeDescriptor('')));
+            self::assertTrue(libxml_use_internal_errors());
+            self::assertSame($handler, set_error_handler(null));
+            restore_error_handler();
+
+            foreach ([$this->writeDescriptor('<enabled-by-default>maybe</enabled-by-default>'), $this->workDir.'/gone.xml'] as $refused) {
+                try {
+                    (new ModuleDescriptorValidator())->validate($refused);
+                } catch (InvalidXmlDocumentException) {
+                }
+            }
+
+            try {
+                $this->validatorWithSchemasIn($schemas)->validate($this->writeDescriptor(''));
+            } catch (InvalidXmlDocumentException) {
+            }
+
+            self::assertTrue(libxml_use_internal_errors());
+            self::assertSame([], libxml_get_errors());
+            self::assertSame($handler, set_error_handler(null));
+            restore_error_handler();
         } finally {
+            libxml_use_internal_errors($previousMode);
             restore_error_handler();
         }
-
-        self::assertSame([], libxml_get_errors());
     }
 
     /**
