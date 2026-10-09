@@ -720,4 +720,24 @@ FROM `order_shipment` AS `sh`
 INNER JOIN `order_product` AS `op` ON `op`.`order_id` = `sh`.`order_id`
 WHERE NOT EXISTS (SELECT 1 FROM `order_shipment_item` AS `existing` WHERE `existing`.`order_shipment_id` = `sh`.`id`);
 
+-- Shared cache for the public pages
+--
+-- A shop that upgrades keeps answering the way it did: the mode arrives
+-- disabled, and INSERT IGNORE leaves alone a shop that already chose a value.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
+    ('shared_cache_ttl', '300', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'shared_cache_mode' AS `name`, 'en_US' AS `locale`, 'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)' AS `title`
+    UNION ALL SELECT 'shared_cache_mode', 'fr_FR', 'Cache partagé des pages publiques anonymes : disabled (désactivé), announce (la page annonce combien de temps un cache partagé peut la garder, cookies inchangés) ou enabled (retire aussi les cookies d''une page anonyme pour qu''un proxy puisse la garder)'
+    UNION ALL SELECT 'shared_cache_ttl', 'en_US', 'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)'
+    UNION ALL SELECT 'shared_cache_ttl', 'fr_FR', 'Secondes pendant lesquelles un cache partagé peut garder une page publique (entre 1 et 86400, 300 si invalide)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
 SET FOREIGN_KEY_CHECKS = 1;
