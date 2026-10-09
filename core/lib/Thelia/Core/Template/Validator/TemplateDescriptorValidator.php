@@ -89,7 +89,7 @@ class TemplateDescriptorValidator
         if (file_exists($this->xmlDescriptorPath)) {
             $this->validate();
 
-            return @simplexml_load_file($this->xmlDescriptorPath, \SimpleXMLElement::class, \LIBXML_NONET);
+            return XmlDescriptor::read($this->xmlDescriptorPath);
         }
 
         Tlog::getInstance()->addWarning(\sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));
