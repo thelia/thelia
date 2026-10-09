@@ -32,11 +32,14 @@ final class SalesJournal
     private const BATCH_SIZE = 200;
 
     /**
-     * @return list<AccountingPiece>
+     * The pieces one by one, read by batches: a year of invoices is never held at once.
+     * What was left out is added to the report once the last piece is given.
+     *
+     * @return \Generator<int, AccountingPiece>
      *
      * @throws InvalidAccountingChartException when the chart of accounts is missing an account
      */
-    public function pieces(AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, ExportReport $report, string $locale): array
+    public function pieces(AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, ExportReport $report, string $locale): \Generator
     {
         $translator = Translator::getInstance();
 
@@ -52,23 +55,38 @@ final class SalesJournal
 
         $shopCurrency = CurrencyQuery::create()->findOneByByDefault(1) ?? throw new \RuntimeException('The shop has no default currency.');
         $builder = new SalesPieceBuilder();
-        $pieces = [];
         $offset = 0;
+        $count = 0;
+        $debit = 0;
+        $credit = 0;
 
         do {
             $orders = $this->invoiced($from, $to)->offset($offset)->limit(self::BATCH_SIZE)->find();
 
             foreach ($orders as $order) {
                 try {
-                    $pieces[] = $builder->build($order, $chart, $shopCurrency);
+                    $piece = $builder->build($order, $chart, $shopCurrency);
                 } catch (OrderNotExportableException $exception) {
                     $report->addWarning($exception->getMessage());
+
+                    continue;
                 }
+
+                ++$count;
+
+                foreach ($piece->entries as $entry) {
+                    $debit += $entry->debitCents;
+                    $credit += $entry->creditCents;
+                }
+
+                yield $piece;
             }
 
             $offset += self::BATCH_SIZE;
             OrderTableMap::clearInstancePool();
         } while (self::BATCH_SIZE === \count($orders));
+
+        $report->addLine($translator->trans('%count pieces, debit %debit, credit %credit.', ['%count' => $count, '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
 
         $withoutReference = $this->period(OrderQuery::create(), $from, $to)
             ->where('(Order.InvoiceRef IS NULL OR Order.InvoiceRef = \'\')')
@@ -81,8 +99,6 @@ final class SalesJournal
         $report->addWarning(null !== ModuleQuery::create()->filterByCode('CreditNote')->filterByActivate(1)->findOne()
             ? $translator->trans('The credit notes of the CreditNote module are not in this journal: book them separately.', [], null, $locale)
             : $translator->trans('No credit note module is installed: refunds made without credit note are not in this journal.', [], null, $locale));
-
-        return $pieces;
     }
 
     private function invoiced(?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery
@@ -101,24 +117,6 @@ final class SalesJournal
         $range = array_filter(['min' => $from, 'max' => $to]);
 
         return [] === $range ? $query : $query->filterByInvoiceDate($range);
-    }
-
-    /**
-     * @param list<AccountingPiece> $pieces
-     */
-    public static function summarize(array $pieces, ExportReport $report, string $locale): void
-    {
-        $debit = 0;
-        $credit = 0;
-
-        foreach ($pieces as $piece) {
-            foreach ($piece->entries as $entry) {
-                $debit += $entry->debitCents;
-                $credit += $entry->creditCents;
-            }
-        }
-
-        $report->addLine(Translator::getInstance()->trans('%count pieces, debit %debit, credit %credit.', ['%count' => \count($pieces), '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
     }
 
     public static function amount(int $cents): string
