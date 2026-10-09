@@ -49,6 +49,48 @@ final class AccountingChartTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function rates(): iterable
+    {
+        yield 'ten' => ['10:706100:445710', '10.00'];
+        yield 'a hundred' => ['100:706999:445999', '100.00'];
+        yield 'a half' => ['0.5:706005:445705', '0.50'];
+        yield 'five and a half' => ['5.5:706055:445705', '5.50'];
+    }
+
+    #[DataProvider('rates')]
+    public function testARateIsWrittenBackAsTheMerchantTypedIt(string $setting, string $key): void
+    {
+        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', $setting);
+
+        self::assertSame($setting, $chart->rateAccountsSetting());
+        self::assertNotNull($chart->accountsOf($key));
+    }
+
+    public function testARateIsFoundWithinATenthOfAPoint(): void
+    {
+        $chart = AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720,5.5:706055:445705');
+
+        self::assertSame('20.00', $chart->closestRate('19.90'));
+        self::assertSame('5.50', $chart->closestRate('5.46'));
+        self::assertNull($chart->closestRate('19.80'));
+    }
+
+    public function testAJournalCodeOrLabelTheFileCannotCarryIsRefused(): void
+    {
+        foreach ([['V E', 'Ventes'], [str_repeat('V', 21), 'Ventes'], ['VE', str_repeat('x', 101)]] as [$code, $label]) {
+            try {
+                AccountingChart::fromValues($code, $label, '411000', '708500', '20:706200:445720');
+                self::fail(\sprintf('"%s" / "%s" was accepted.', $code, $label));
+            } catch (InvalidAccountingChartException) {
+            }
+        }
+
+        self::assertSame('VE', AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720')->journalCode);
+    }
+
+    /**
      * @return iterable<string, array{string}>
      */
     public static function invalidRateAccounts(): iterable
