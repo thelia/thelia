@@ -15,10 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Export;
 
 use Propel\Runtime\Connection\StatementInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
-use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 
 /**
  * Class JsonFileAbstractExport.
@@ -29,6 +27,9 @@ abstract class JsonFileAbstractExport extends AbstractExport
 {
     /** @var \SplFileObject Data to export */
     private ?\SplFileObject $data = null;
+
+    /** The rows file getDataJsonCache() wrote: the only file this export ever removes. */
+    private ?string $rowsFile = null;
 
     public function current(): mixed
     {
@@ -61,7 +62,15 @@ abstract class JsonFileAbstractExport extends AbstractExport
                 && str_ends_with($data, '.json')
                 && file_exists($data)
             ) {
-                $this->data = self::openAndForget($data);
+                $this->data = new \SplFileObject($data, 'r');
+                $this->data->setFlags(\SplFileObject::READ_AHEAD);
+                $this->data->rewind();
+
+                // Gone once open: the open file is read to its end all the same, and the
+                // customer data it holds outlives no export, even one whose worker dies.
+                if ($data === $this->rowsFile) {
+                    ExportStorage::discard($data);
+                }
 
                 return;
             }
@@ -113,34 +122,13 @@ abstract class JsonFileAbstractExport extends AbstractExport
             throw new DataTransferNoDataFoundException(Translator::getInstance()->trans('No data found for your export.'));
         }
 
-        // A name of its own: two workers may run the same export at once.
-        $filename = ExportCachePurger::directory().DS.$exportName.'-'.bin2hex(random_bytes(8)).'.json';
-        (new Filesystem())->mkdir(\dirname($filename));
+        $filename = ExportStorage::rowsFile($exportName);
+        $this->rowsFile = $filename;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
         }
 
         return $filename;
-    }
-
-    /**
-     * Opens the rows an export read, then removes the file: the open file is read to its
-     * end all the same, and the customer data it holds outlives no export, even one whose
-     * worker dies half way.
-     */
-    public static function openAndForget(string $path): \SplFileObject
-    {
-        $file = new \SplFileObject($path, 'r');
-        $file->setFlags(\SplFileObject::READ_AHEAD);
-        $file->rewind();
-
-        try {
-            (new Filesystem())->remove($path);
-        } catch (\Throwable) {
-            // A file that cannot go yet (an open file on Windows) is the purge's to sweep.
-        }
-
-        return $file;
     }
 }

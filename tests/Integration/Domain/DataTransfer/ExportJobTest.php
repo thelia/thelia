@@ -34,6 +34,7 @@ use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\DataTransferProgress;
 use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
@@ -54,6 +55,7 @@ use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\DataTransfer\ImageHeavyExport;
+use Thelia\Tests\Support\DataTransfer\ModuleJsonFileExport;
 use Thelia\Tests\Support\DataTransfer\ModuleWrittenExportHandler;
 
 /**
@@ -560,7 +562,7 @@ final class ExportJobTest extends IntegrationTestCase
         $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
         ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
         // Longer than the row can hold.
-        $folder = ExportCachePurger::directory().'/'.uniqid('kept-').'/'.str_repeat('d', 120).'/'.str_repeat('e', 120);
+        $folder = ExportStorage::directory().'/'.uniqid('kept-').'/'.str_repeat('d', 120).'/'.str_repeat('e', 120);
         (new Filesystem())->dumpFile($folder.'/kept.csv', 'kept');
         $pointsAtTheFolder = static function (ExportEvent $event) use ($folder): void {
             $event->setFilePath($folder);
@@ -705,12 +707,32 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testAnExportLeavesNoneOfTheRowsItReadBehind(): void
     {
-        (new Filesystem())->remove(glob(ExportCachePurger::directory().'/order*.json') ?: []);
+        (new Filesystem())->remove(glob(ExportStorage::directory().'/order*.json') ?: []);
 
         $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
         $this->files[] = $event->getFilePath();
 
-        self::assertSame([], glob(ExportCachePurger::directory().'/order*.json'));
+        self::assertSame([], glob(ExportStorage::directory().'/order*.json'));
+    }
+
+    /**
+     * Only the rows file the export wrote goes once open: a JSON file a module reads its
+     * rows from is the module's, wherever it is.
+     */
+    public function testAJsonFileAModuleReadsItsRowsFromIsLeftAlone(): void
+    {
+        ModuleJsonFileExport::$rowsFile = sys_get_temp_dir().'/'.uniqid('module-rows-').'.json';
+        file_put_contents(ModuleJsonFileExport::$rowsFile, json_encode(['id' => 1], \JSON_THROW_ON_ERROR)."\r\n");
+
+        try {
+            $rows = iterator_to_array(new ModuleJsonFileExport());
+            $kept = is_file(ModuleJsonFileExport::$rowsFile);
+        } finally {
+            (new Filesystem())->remove(ModuleJsonFileExport::$rowsFile);
+        }
+
+        self::assertSame([['id' => 1]], array_values(array_filter($rows)));
+        self::assertTrue($kept);
     }
 
     /**

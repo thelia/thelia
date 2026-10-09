@@ -25,6 +25,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
@@ -182,20 +183,11 @@ class ExportHandler
      */
     private function discardWhatTheExportLeft(ExportEvent $event, array $written): void
     {
-        $kept = ExportCachePurger::resolve($event->getFilePath());
+        $kept = ExportStorage::resolve($event->getFilePath());
 
         foreach ($written as $file) {
-            $resolved = ExportCachePurger::resolve($file);
-
-            if (null === $resolved || $resolved === $kept) {
-                continue;
-            }
-
-            // The export is done: a file the purge will sweep never fails it.
-            try {
-                (new Filesystem())->remove($resolved);
-            } catch (\Throwable $notRemoved) {
-                Tlog::getInstance()->addWarning(\sprintf('A file an export left was not removed: %s', JobFailureMessage::forLog($notRemoved)));
+            if (ExportStorage::resolve($file) !== $kept) {
+                ExportStorage::discard($file);
             }
         }
     }
@@ -291,7 +283,7 @@ class ExportHandler
             $serializer->getExtension(),
         );
 
-        $filePath = ExportCachePurger::directory().DS.$filename;
+        $filePath = ExportStorage::directory().DS.$filename;
 
         $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
