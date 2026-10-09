@@ -17,9 +17,11 @@ namespace Thelia\Tests\Integration\Domain\Payment;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
+use Thelia\Core\Event\Order\OrderPaymentSettlementEvent;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
@@ -171,6 +173,42 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('exception', $line->getErrorCode());
         self::assertStringNotContainsString('SECRET', (string) $line->getErrorMessage(), 'The raw technical message is logged, not stored.');
         self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
+    public function testTheOutcomeOfALineTheProviderNeverConfirmedCanBeRecordedByHand(): void
+    {
+        // The provider never sent its notification; the merchant reads the outcome in the
+        // provider's own back office and records it.
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = new \RuntimeException('timeout');
+
+        try {
+            $this->service->capture($order);
+        } catch (PaymentProviderUnreachableException) {
+        }
+
+        $pending = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        $event = new OrderPaymentSettlementEvent($pending, PaymentTransactionState::SUCCEEDED, 'PSP-SEEN-1', 'Seen as captured in the provider back office.');
+        $this->dispatch($event, TheliaEvents::ORDER_PAYMENT_TRANSACTION_SETTLE);
+
+        $settled = $event->getTransaction();
+        self::assertTrue($settled->isSucceeded());
+        self::assertSame('PSP-SEEN-1', $settled->getPspReference());
+        self::assertSame('settled_by_hand', $settled->getErrorCode());
+        self::assertSame('Seen as captured in the provider back office.', $settled->getErrorMessage());
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusCodeOf($order));
+    }
+
+    public function testALineRecordedByHandAsFailedGivesItsAmountBack(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-NEVER');
+        $pending = $this->service->capture($order);
+
+        $this->dispatch(new OrderPaymentSettlementEvent($pending, PaymentTransactionState::FAILED), TheliaEvents::ORDER_PAYMENT_TRANSACTION_SETTLE);
+
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
     }
 

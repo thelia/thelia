@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminLogQuery;
@@ -265,6 +266,52 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertStringContainsString('needs the right to capture payments', $crawler->text());
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame([], DeferredCapturePaymentModule::$voidCalls);
+    }
+
+    public function testTheOutcomeOfALineTheProviderNeverConfirmedIsRecordedFromTheSheet(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-SILENT');
+        $this->getService(PaymentCaptureService::class)->capture($order);
+        $lineId = $this->latestLineId($order);
+
+        $crawler = $this->sheet($order);
+        self::assertCount(1, $crawler->filter('[data-testid="order-payment-settle-form"]'));
+
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/payment-transaction/'.$lineId.'/settle', [
+            '_token' => $this->tokenOf($crawler),
+            'outcome' => 'succeeded',
+            'psp_reference' => 'PSP-READ-AT-PROVIDER',
+        ]);
+        $this->client->followRedirect();
+
+        $line = OrderPaymentTransactionQuery::create()->findPk($lineId);
+        $line->reload();
+        self::assertTrue($line->isSucceeded());
+        self::assertSame('PSP-READ-AT-PROVIDER', $line->getPspReference());
+        self::assertSame(OrderStatus::CODE_PAID, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%recorded by hand as succeeded%', Criteria::LIKE)->count());
+    }
+
+    public function testRecordingAnOutcomeByHandNeedsTheCaptureRight(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-SILENT');
+        $this->getService(PaymentCaptureService::class)->capture($order);
+        $lineId = $this->latestLineId($order);
+
+        $crawler = $this->sheet($order);
+        self::assertCount(0, $crawler->filter('[data-testid="order-payment-settle-form"]'));
+
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/payment-transaction/'.$lineId.'/settle', [
+            '_token' => $this->tokenOf($crawler),
+            'outcome' => 'succeeded',
+        ]);
+
+        self::assertSame(403, $this->client->getResponse()->getStatusCode());
+        self::assertTrue(OrderPaymentTransactionQuery::create()->findPk($lineId)->isPending());
     }
 
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
