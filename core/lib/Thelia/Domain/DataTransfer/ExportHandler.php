@@ -327,7 +327,10 @@ class ExportHandler
             $this->processExportDocuments($event->getExport(), $archiver);
         }
 
-        $archiver->add($filePath)->save();
+        // A zip is written when it is saved, and says it failed only by what save() returns.
+        if (!$archiver->add($filePath)->save()) {
+            throw new \RuntimeException(\sprintf('The archive %s of the export was not written.', basename($archiver->getArchivePath())));
+        }
 
         // A tar writes as it goes and keeps its handle: let go once the archive is whole.
         if ($archiver instanceof ClosableArchiverInterface) {
@@ -335,6 +338,9 @@ class ExportHandler
         }
 
         $event->setFilePath($archiver->getArchivePath());
+
+        // The archive holds the export: the file it was made of would keep customer data twice.
+        (new Filesystem())->remove($filePath);
     }
 
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void
