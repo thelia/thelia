@@ -135,6 +135,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function refund(Order $order, float $amount, OrderPaymentTransaction $transaction, RefundReason $reason, ?string $comment): PaymentOperationResult
     {
+        // A real module reaches its services through the container.
+        $this->getContainer();
+
         self::$refundCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId(), 'reason' => $reason->value, 'comment' => $comment];
 
         $answer = self::$nextRefundAnswer;
