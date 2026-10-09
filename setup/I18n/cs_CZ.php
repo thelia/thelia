@@ -24,6 +24,7 @@ return [
     'New York' => 'New York',
     'Order status transition override' => 'Vynucení přechodu stavu objednávky',
     'Order payment capture' => 'Stržení platby objednávky',
+    'Order payment refund' => 'Vrácení platby objednávky',
     'Awaiting capture' => 'Čeká na stržení platby',
     'Reset your password on {{ config("store_name") }}' => 'Obnovte své heslo v obchodě {{ config("store_name") }}',
     'Search' => 'Vyhledávání',

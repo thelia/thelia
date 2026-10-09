@@ -287,6 +287,7 @@ return [
     'Order confirmation sent to the customer' => 'Bevestiging van de bestelling verzonden naar de klant',
     'Order status transition override' => 'Overschrijven van orderstatusovergangen',
     'Order payment capture' => 'Incasso van de orderbetaling',
+    'Order payment refund' => 'Terugbetaling van de orderbetaling',
     'Awaiting capture' => 'Wacht op incasso',
     'Paid' => 'Betaald',
     'Pakistan' => 'Pakistan',

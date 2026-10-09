@@ -2270,7 +2270,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (66, 'admin.configuration.ai-mcp', NOW(), NOW()),
 (67, 'admin.customer.group', NOW(), NOW()),
 (68, 'admin.order.edit', NOW(), NOW()),
-(69, 'admin.order.payment-capture', NOW(), NOW())
+(69, 'admin.order.payment-capture', NOW(), NOW()),
+(70, 'admin.order.payment-refund', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -4130,7 +4131,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, '{{ locale }}', {{ intl('Configuration AI MCP tokens', locale) }}, NULL, NULL, NULL),
     (67, '{{ locale }}', {{ intl('Customer groups', locale) }}, NULL, NULL, NULL),
     (68, '{{ locale }}', {{ intl('Editing the lines of an order', locale) }}, NULL, NULL, NULL),
-    (69, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (69, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL),
+    (70, '{{ locale }}', {{ intl('Order payment refund', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
