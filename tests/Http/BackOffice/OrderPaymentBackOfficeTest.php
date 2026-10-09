@@ -199,6 +199,30 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
     }
 
+    public function testAFailureOutsideThePaymentRulesIsNotShownToTheAdministrator(): void
+    {
+        // A listener of the capture — a module of the shop — fails with a message carrying
+        // what it sent elsewhere. Only the payment rules word what the administrator reads.
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $failure = static function (): void {
+            throw new \RuntimeException('Partner hook refused https://hook.example/notify?key=SECRET');
+        };
+        $dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_CAPTURE, $failure, 1024);
+
+        try {
+            $crawler = $this->sheet($order);
+            $this->client->request('POST', $this->captureUrl($order), ['_token' => $this->tokenOf($crawler), 'amount' => '120']);
+            $crawler = $this->client->followRedirect();
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_CAPTURE, $failure);
+        }
+
+        self::assertStringNotContainsString('SECRET', $crawler->text());
+        self::assertStringContainsString('The details are in the log', $crawler->text());
+    }
+
     public function testAnAdministratorWithoutOrderAccessSeesNoSheetAndNoJournal(): void
     {
         $this->loginAs($this->factory->restrictedAdmin([AdminResources::CUSTOMER => [AccessManager::VIEW]]));
