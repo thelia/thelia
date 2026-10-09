@@ -21,6 +21,7 @@ use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
 use Thelia\Domain\Payment\Exception\DeferredCaptureNotSupportedException;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
@@ -61,6 +62,8 @@ final readonly class PaymentCaptureService
     private const ERROR_CODE_CONFLICTING_REFERENCE = 'conflicting_reference';
 
     private const ERROR_CODE_JOURNAL_BUSY = 'journal_busy';
+
+    private const ERROR_CODE_MISSING_REFERENCE = 'missing_reference';
 
     private const UNKNOWN_OUTCOME_MESSAGE = 'The payment module could not get an answer from the provider: the outcome is known once the provider confirms it.';
 
@@ -320,6 +323,21 @@ final readonly class PaymentCaptureService
             ));
 
             throw $conflict;
+        } catch (MissingProviderReferenceException $missing) {
+            // The module says the money was taken but not under which reference: a line
+            // counted as taken that no notification can find would be written twice. It
+            // stays pending, reserving what it asked for, until the notification settles it.
+            Tlog::getInstance()->error(\sprintf(
+                'Payment module %s answered transaction #%d as succeeded without the provider reference.',
+                $moduleCode,
+                (int) $transaction->getId(),
+            ));
+
+            return $this->recorder->markOutcomeUnknown(
+                $transaction,
+                self::ERROR_CODE_MISSING_REFERENCE,
+                'The payment module reported the movement as done without the provider reference: the outcome is recorded once the provider confirms it.',
+            );
         } catch (PaymentJournalBusyException $busy) {
             // The provider answered, but another worker held the journal past the wait.
             // Reporting a failure would invite a second capture of money already taken:

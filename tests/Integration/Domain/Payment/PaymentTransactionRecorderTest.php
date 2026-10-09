@@ -239,6 +239,52 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertFalse($lockHeld);
     }
 
+    public function testASucceededOutcomeIsNotSettledWithoutTheProviderReference(): void
+    {
+        // A capture the journal counts as taken, without a reference, is one the
+        // provider's notification can never find again: it would be written twice.
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+
+        try {
+            $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED);
+            self::fail('A succeeded capture needs its reference.');
+        } catch (MissingProviderReferenceException) {
+        }
+
+        self::assertTrue(OrderPaymentTransactionQuery::create()->findPk($pending->getId())->isPending());
+        self::assertTrue($this->recorder->settle($pending, PaymentTransactionState::FAILED)->isFailed(), 'A failure needs none.');
+    }
+
+    public function testSettlingNeverReplacesTheReferenceTheLineCarries(): void
+    {
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+        $this->recorder->attachReference($pending, 'PSP-KNOWN');
+
+        $this->expectException(PaymentException::class);
+
+        $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'PSP-TYPO');
+    }
+
+    public function testAReferenceLongerThanTheColumnIsRefusedAsSuch(): void
+    {
+        $this->expectException(PaymentException::class);
+        $this->expectExceptionMessage('100');
+
+        $this->recorder->recordCapture($this->order(120), 120, str_repeat('R', 101), moduleCode: 'Cheque');
+    }
+
+    public function testAVoidReportedWithoutItsReferenceIsRefused(): void
+    {
+        $order = $this->order(120);
+        $this->recorder->recordAuthorization($order, 120, 'AUTH-1', moduleCode: 'Cheque');
+
+        $this->expectException(MissingProviderReferenceException::class);
+
+        $this->recorder->recordVoid($order, moduleCode: 'Cheque');
+    }
+
     public function testAnAuthorizationPutsAnUnpaidOrderOnHoldForCapture(): void
     {
         $order = $this->order(120);
