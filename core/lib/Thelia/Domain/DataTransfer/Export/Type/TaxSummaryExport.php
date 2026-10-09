@@ -61,7 +61,6 @@ class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInt
     {
         $locale = isset($this->language) ? (string) $this->language->getLocale() : (string) Lang::getDefaultLanguage()->getLocale();
         $pieces = (new SalesJournal())->pieces(AccountingChart::fromSettings(), $this->rangeDate['start'] ?? null, $this->rangeDate['end'] ?? null, $this->report, $locale);
-        SalesJournal::summarize($pieces, $this->report, $locale);
         $totals = [];
 
         foreach ($pieces as $piece) {
