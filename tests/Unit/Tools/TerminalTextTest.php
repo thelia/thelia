@@ -117,22 +117,27 @@ final class TerminalTextTest extends TestCase
     }
 
     /**
-     * Whichever step a backtrack limit stops, the text comes out cleaned or not at all,
-     * never as it was. Which step a given limit stops depends on the build of PCRE: at 1 it
-     * refuses even the check that the text is UTF-8, so the first step runs and fails on a
-     * valid text too; at 2 to 4 (PCRE 10.46, measured) the check passes and the second
-     * step fails. So the limits are swept, and each result is held to the two outcomes
-     * allowed; the valid text carries a character the second step alone replaces (the
-     * combining grapheme joiner, U+034F), so that the third step cannot stand in for it.
+     * Under a backtrack limit, the text comes out cleaned or not at all, never as it was.
+     * Which step a given limit stops depends on the build of PCRE: the lowest refuses even
+     * the check that the text is UTF-8, so the first step runs and fails on a valid text
+     * too; the next ones let the check pass and stop the second step (measured on PCRE
+     * 10.46 and 10.47); none stops the third step or the run of blanks on their own, whose
+     * fallbacks stand by construction. So the limits are swept, each result is held to the
+     * two outcomes allowed, and the valid texts carry a character that one step alone
+     * replaces (U+034F for the second, U+0600 for the third), so that no later step can
+     * stand in for a fallback that would give the text back.
      */
     #[RunInSeparateProcess]
-    public function testAStepALimitStopsLeavesNothing(): void
+    public function testABacktrackLimitLeavesNothingOrTheCleanedText(): void
     {
         $jit = \ini_get('pcre.jit');
         $limit = \ini_get('pcre.backtrack_limit');
         ini_set('pcre.jit', '0');
-        $invalid = str_repeat("\xFFa\u{200B}", 2000);
-        $valid = str_repeat("a\u{34F}", 2000);
+        $texts = [
+            str_repeat("\xFFa\u{200B}", 2000) => str_repeat('?a?', 2000),
+            str_repeat("a\u{34F}", 2000) => str_repeat('a?', 2000),
+            str_repeat("a\u{600}", 2000) => str_repeat('a?', 2000),
+        ];
         $lines = str_repeat("a\n b", 2000);
         $stopped = 0;
 
@@ -140,7 +145,7 @@ final class TerminalTextTest extends TestCase
             foreach (range(1, 8) as $backtrackLimit) {
                 ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
 
-                foreach ([$invalid => str_repeat('?a?', 2000), $valid => str_repeat('a?', 2000)] as $text => $cleaned) {
+                foreach ($texts as $text => $cleaned) {
                     $result = TerminalText::withoutControlCharacters($text);
                     self::assertContains($result, ['', $cleaned], \sprintf('limit %d', $backtrackLimit));
                     $stopped += '' === $result ? 1 : 0;
@@ -149,8 +154,7 @@ final class TerminalTextTest extends TestCase
                 self::assertContains(TerminalText::onOneLine($lines), ['', str_repeat('a b', 2000)], \sprintf('limit %d', $backtrackLimit));
             }
 
-            self::assertSame('', TerminalText::withoutControlCharacters($invalid), 'at the last limit, the first step still stops');
-            self::assertGreaterThan(0, $stopped);
+            self::assertGreaterThan(0, $stopped, 'the lowest limit stops a step');
         } finally {
             ini_set('pcre.jit', (string) $jit);
             ini_set('pcre.backtrack_limit', (string) $limit);
@@ -229,8 +233,9 @@ final class TerminalTextTest extends TestCase
         yield 'an Egyptian hieroglyph format control' => ["Acme\u{13437}", 'Acme?'];
         yield 'the hieroglyph after that range is kept' => ["Acme\u{13440}", "Acme\u{13440}"];
         yield 'an unassigned ignorable of the specials block' => ["Acme\u{FFF0}", 'Acme?'];
-        // The bounds of every range, and their neighbours, are the bounds test's: here, the
-        // inner points of the ranges the docblock splits.
+        // The bounds of every range, and their neighbours, are the bounds test's: here, a
+        // character in its context (a word, a sequence, an identifier), and the inner points
+        // of the ranges the docblock splits.
         yield 'the last bidirectional isolate (U+2069, inside U+2066 to U+206F)' => ["Ac\u{2069}me", 'Ac?me'];
         yield 'the paragraph separator (U+2029, inside U+2028 to U+202E)' => ["Ac\u{2029}me", 'Ac?me'];
         yield 'a right-to-left override' => ["Acme\u{202E}eludoM", 'Acme?eludoM'];
@@ -293,7 +298,8 @@ final class TerminalTextTest extends TestCase
             [0x115F, 0x1160], [0x17B4, 0x17B5], [0x180B, 0x180F], [0x200B, 0x200F], [0x2028, 0x202E],
             [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
             [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
-            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A], [0xE0000, 0xE0FFF],
+            [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A],
+            [0xE0000, 0xE00FF], [0xE0100, 0xE01FF], [0xE0000, 0xE0FFF],
         ];
 
         for ($plane = 0; $plane <= 16; ++$plane) {

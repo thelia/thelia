@@ -25,7 +25,8 @@ final class TerminalText
     /**
      * The text with every character a terminal, a log or a page would obey or hide replaced
      * by "?", in three steps, each of which leaves nothing rather than the text it was to
-     * clean when it fails:
+     * clean when it fails (by construction: a backtrack limit proves it for the second step,
+     * the others it never reaches on their own):
      *
      * 1. A text that is not valid UTF-8 has each byte outside a well-formed sequence
      *    replaced: a raw C1 byte (0x80 to 0x9F) is a control character to a terminal that is
@@ -35,10 +36,10 @@ final class TerminalText
      *    identifier goes through singleLine(), which replaces them too), the soft hyphen
      *    (U+00AD), the Arabic letter mark (U+061C), the zero-width and directional marks
      *    (U+200B to U+200F), the line and paragraph separators (U+2028, U+2029), the
-     *    bidirectional embeddings,
-     *    overrides and isolates (U+202A to U+202E, U+2066 to U+2069), the invisible operators
-     *    and word joiner (U+2060 to U+2064), the deprecated format controls (U+206A to
-     *    U+206F), the byte order mark (U+FEFF), the interlinear annotation marks (U+FFF9 to
+     *    bidirectional embeddings, overrides and isolates (U+202A to U+202E, U+2066 to
+     *    U+2069), the invisible operators and word joiner (U+2060 to U+2064), the deprecated
+     *    format controls (U+206A to U+206F), the byte order mark (U+FEFF), the interlinear
+     *    annotation marks (U+FFF9 to
      *    U+FFFB), the Mongolian free variation selectors and vowel separator (U+180B to
      *    U+180F), the combining grapheme joiner (U+034F), the variation selectors (U+FE00 to
      *    U+FE0F, U+E0100 to U+E01FF), the musical format controls (U+1D173 to U+1D17A), the
