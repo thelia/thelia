@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderPaymentSettlementEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
+use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 
 /**
@@ -49,12 +50,18 @@ final readonly class SettleOrderPaymentTransactionListener
             $note .= \sprintf(' (recorded by %s)', $administrator->getUsername());
         }
 
-        $event->setTransaction($this->recorder->settle(
-            $event->getTransaction(),
-            $event->getState(),
-            $event->getPspReference(),
-            self::ERROR_CODE_SETTLED_BY_HAND,
-            $note,
-        ));
+        try {
+            $event->setTransaction($this->recorder->settle(
+                $event->getTransaction(),
+                $event->getState(),
+                $event->getPspReference(),
+                self::ERROR_CODE_SETTLED_BY_HAND,
+                $note,
+            ));
+        } catch (PaymentAnnouncementFailedException $announcementFailure) {
+            // The line is settled; a listener that broke afterwards is logged by the
+            // recorder, and the merchant's gesture is reported, and logged, as done.
+            $event->setTransaction($announcementFailure->getTransaction());
+        }
     }
 }
