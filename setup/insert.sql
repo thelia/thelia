@@ -2295,7 +2295,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (69, 'admin.order.payment-capture', NOW(), NOW()),
 (70, 'admin.pricing', NOW(), NOW()),
 (71, 'admin.subscription', NOW(), NOW()),
-(72, 'admin.company', NOW(), NOW())
+(72, 'admin.company', NOW(), NOW()),
+(73, 'admin.order.payment-refund', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15983,6 +15984,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'cs_CZ', NULL, NULL, NULL, NULL),
     (71, 'cs_CZ', NULL, NULL, NULL, NULL),
     (72, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (73, 'cs_CZ', 'Vrácení platby objednávky', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -16054,6 +16056,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'de_DE', 'Preisgestaltung', NULL, NULL, NULL),
     (71, 'de_DE', 'Abonnements', NULL, NULL, NULL),
     (72, 'de_DE', 'Unternehmen', NULL, NULL, NULL),
+    (73, 'de_DE', 'Erstattung der Bestellzahlung', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -16125,6 +16128,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'en_US', 'Pricing', NULL, NULL, NULL),
     (71, 'en_US', 'Subscriptions', NULL, NULL, NULL),
     (72, 'en_US', 'Companies', NULL, NULL, NULL),
+    (73, 'en_US', 'Order payment refund', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -16196,6 +16200,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'es_ES', 'Tarifas', NULL, NULL, NULL),
     (71, 'es_ES', 'Suscripciones', NULL, NULL, NULL),
     (72, 'es_ES', 'Empresas', NULL, NULL, NULL),
+    (73, 'es_ES', 'Reembolso del pago del pedido', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -16267,6 +16272,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'fr_FR', 'Tarification', NULL, NULL, NULL),
     (71, 'fr_FR', 'Abonnements', NULL, NULL, NULL),
     (72, 'fr_FR', 'Sociétés', NULL, NULL, NULL),
+    (73, 'fr_FR', 'Remboursement du paiement d\'une commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -16338,6 +16344,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'it_IT', 'Listini', NULL, NULL, NULL),
     (71, 'it_IT', NULL, NULL, NULL, NULL),
     (72, 'it_IT', 'Aziende', NULL, NULL, NULL),
+    (73, 'it_IT', 'Rimborso del pagamento dell\'ordine', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -16409,6 +16416,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, 'nl_NL', 'Prijsstelling', NULL, NULL, NULL),
     (71, 'nl_NL', 'Abonnementen', NULL, NULL, NULL),
     (72, 'nl_NL', 'Bedrijven', NULL, NULL, NULL),
+    (73, 'nl_NL', 'Terugbetaling van de orderbetaling', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -16479,7 +16487,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL),
     (70, 'ru_RU', 'Ценообразование', NULL, NULL, NULL),
     (71, 'ru_RU', 'Подписки', NULL, NULL, NULL),
-    (72, 'ru_RU', 'Компании', NULL, NULL, NULL)
+    (72, 'ru_RU', 'Компании', NULL, NULL, NULL),
+    (73, 'ru_RU', 'Возврат оплаты заказа', NULL, NULL, NULL)
 ;
 
 
