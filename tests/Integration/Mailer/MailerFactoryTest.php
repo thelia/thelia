@@ -15,16 +15,23 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
+use Thelia\Model\MessageQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class MailerFactoryTest extends IntegrationTestCase
@@ -368,6 +375,73 @@ final class MailerFactoryTest extends IntegrationTestCase
         // should complete without error.
         $this->mailerFactory->send($email);
         self::assertTrue(true);
+    }
+
+    /**
+     * A test message is handed to the mail server at once, queue or not: its point is
+     * the server's answer.
+     */
+    public function testATestMessageGoesToTheMailServerAtOnce(): void
+    {
+        $this->givenTheStoreEmail('shop@example.com');
+        $sent = [];
+        $transport = new class($sent) implements TransportInterface {
+            /** @param list<RawMessage> $sent */
+            public function __construct(private array &$sent)
+            {
+            }
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
+            {
+                $this->sent[] = $message;
+
+                return new SentMessage($message, $envelope ?? Envelope::create($message));
+            }
+
+            public function __toString(): string
+            {
+                return 'spy://';
+            }
+        };
+        $message = new Message();
+        $message->setName('test_message_sent_at_once');
+        $message->setLocale('en_US');
+        $message->setSubject('A test');
+        $message->setHtmlMessage('<p>A test.</p>');
+        $message->setTextMessage('A test.');
+        $message->save();
+
+        (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
+            ->sendTestMessage('test_message_sent_at_once', 'someone@example.com', [], 'en_US');
+
+        self::assertCount(1, $sent);
+    }
+
+    /**
+     * A shop without an address to send from is told so, not what the address parser
+     * makes of an empty one.
+     */
+    public function testATestMessageOfAShopWithoutAnAddressSaysSo(): void
+    {
+        $this->givenTheStoreEmail('');
+        $message = MessageQuery::create()->findOne();
+        self::assertNotNull($message);
+
+        $this->expectException(EmailNotSentException::class);
+
+        $this->mailerFactory->sendTestMessage((string) $message->getName(), 'someone@example.com', [], null);
+    }
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
+    }
+
+    private function givenTheStoreEmail(string $address): void
+    {
+        ConfigQuery::write('store_email', $address);
     }
 
     /**

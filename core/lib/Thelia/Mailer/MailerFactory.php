@@ -82,6 +82,32 @@ class MailerFactory
     }
 
     /**
+     * Builds a message of the shop and hands it to the mail server now, queue or not:
+     * for a test of the message, whose only point is the server's answer. Nothing is
+     * written in the history of an order the test variables may name.
+     *
+     * @param array<string, mixed> $messageParameters
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    public function sendTestMessage(string $messageCode, string $recipient, array $messageParameters = [], ?string $locale = null): void
+    {
+        $storeEmail = (string) ConfigQuery::getStoreEmail();
+
+        if ('' === $storeEmail) {
+            throw EmailNotSentException::storeEmailMissing($messageCode);
+        }
+
+        $this->sendNow($this->createEmailMessage(
+            $messageCode,
+            [$storeEmail => (string) ConfigQuery::getStoreName()],
+            [$recipient => $recipient],
+            $messageParameters,
+            $locale,
+        ));
+    }
+
+    /**
      * Send a message to the customer.
      *
      * A message that cannot be sent is logged and swallowed: a mail is never worth
