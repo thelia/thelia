@@ -33,7 +33,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\DataTransferProgress;
 use Thelia\Domain\DataTransfer\EventListener\RemovedJobRowListener;
-use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
 use Thelia\Domain\DataTransfer\ExportHandler;
@@ -41,6 +40,7 @@ use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobClaim;
 use Thelia\Domain\DataTransfer\Job\JobLifecycle;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
+use Thelia\Domain\DataTransfer\Job\JobTable;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
@@ -307,10 +307,10 @@ final class ExportJobTest extends IntegrationTestCase
         $claim = new JobClaim();
 
         $job->setStatus(JobStatus::RUNNING->value)->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS - 60)))->save($this->getPropelConnection());
-        self::assertFalse($claim->claim('export_job', $job->getId()));
+        self::assertFalse($claim->claim(JobTable::Export, $job->getId()));
 
         $job->setUpdatedAt(new \DateTime(\sprintf('-%d seconds', JobClaim::STALE_AFTER_SECONDS + 60)))->save($this->getPropelConnection());
-        self::assertTrue($claim->claim('export_job', $job->getId()));
+        self::assertTrue($claim->claim(JobTable::Export, $job->getId()));
     }
 
     /**
@@ -707,12 +707,14 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testAnExportLeavesNoneOfTheRowsItReadBehind(): void
     {
-        (new Filesystem())->remove(glob(ExportStorage::directory().'/order*.json') ?: []);
+        // A worker of this machine may be running another export meanwhile: only what this
+        // one leaves counts.
+        $before = glob(ExportStorage::directory().'/order-*.json') ?: [];
 
         $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
         $this->files[] = $event->getFilePath();
 
-        self::assertSame([], glob(ExportStorage::directory().'/order*.json'));
+        self::assertSame([], array_values(array_diff(glob(ExportStorage::directory().'/order-*.json') ?: [], $before)));
     }
 
     /**
@@ -721,8 +723,9 @@ final class ExportJobTest extends IntegrationTestCase
      */
     public function testAJsonFileAModuleReadsItsRowsFromIsLeftAlone(): void
     {
-        ModuleJsonFileExport::$rowsFile = sys_get_temp_dir().'/'.uniqid('module-rows-').'.json';
-        file_put_contents(ModuleJsonFileExport::$rowsFile, json_encode(['id' => 1], \JSON_THROW_ON_ERROR)."\r\n");
+        // In the export folder: only the export's own rows file may go from there.
+        ModuleJsonFileExport::$rowsFile = ExportStorage::directory().'/'.uniqid('module-rows-').'.json';
+        (new Filesystem())->dumpFile(ModuleJsonFileExport::$rowsFile, json_encode(['id' => 1], \JSON_THROW_ON_ERROR)."\r\n");
 
         try {
             $rows = iterator_to_array(new ModuleJsonFileExport());
@@ -762,6 +765,87 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
+     * The rows file holds the data of the customers: no other account of the server reads it.
+     */
+    public function testARowsFileIsReadableByItsOwnerOnly(): void
+    {
+        // Whatever the umask of the server: here, one that lets everybody read.
+        $umask = umask(0);
+
+        try {
+            $path = ExportStorage::rowsFile(uniqid('owner-'));
+        } finally {
+            umask($umask);
+        }
+
+        try {
+            $mode = fileperms($path) & 0o777;
+        } finally {
+            (new Filesystem())->remove($path);
+        }
+
+        self::assertSame(0o600, $mode);
+    }
+
+    /**
+     * The export file holds the data of the customers as well, for a day: no other
+     * account of the server reads it either.
+     */
+    public function testAnExportFileIsReadableByItsOwnerOnly(): void
+    {
+        $umask = umask(0);
+
+        try {
+            $event = $this->getService(ExportHandler::class)->export($this->ordersExport(), $this->getService(SerializerManager::class)->get(self::SERIALIZER), null, Lang::getDefaultLanguage());
+        } finally {
+            umask($umask);
+        }
+
+        $this->files[] = $event->getFilePath();
+
+        self::assertSame(0o600, fileperms($event->getFilePath()) & 0o777);
+    }
+
+    /**
+     * The name of a rows file comes from the export: one that would climb out of the
+     * export folder is refused before anything is written.
+     */
+    public function testARowsFileNameClimbingOutOfTheExportFolderIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        ExportStorage::rowsFile('../../escaped');
+    }
+
+    /**
+     * An export of a module that writes its rows twice keeps only the second file: the
+     * first goes at once.
+     */
+    public function testARowsFileWrittenAgainReplacesThePreviousOne(): void
+    {
+        $export = new class extends OrderExport {
+            public function rowsFile(StatementInterface $statement, string $name): string
+            {
+                return $this->getDataJsonCache($statement, $name);
+            }
+        };
+        $name = uniqid('twice-');
+        $statement = static function (): StatementInterface {
+            $statement = Propel::getConnection()->prepare('SELECT 1 AS id');
+            $statement->execute();
+
+            return $statement;
+        };
+
+        $export->rowsFile($statement(), $name);
+        $second = $export->rowsFile($statement(), $name);
+        $left = glob(ExportStorage::directory().'/'.$name.'-*.json') ?: [];
+        (new Filesystem())->remove($left);
+
+        self::assertSame([$second], $left);
+    }
+
+    /**
      * Two workers may run the same export at once: each reads the rows it selected,
      * through a file of its own.
      */
@@ -784,6 +868,31 @@ final class ExportJobTest extends IntegrationTestCase
         (new Filesystem())->remove($paths);
 
         self::assertNotSame($paths[0], $paths[1]);
+    }
+
+    /**
+     * A failed export removes what it wrote in the export folder, never a file an archiver
+     * of a module wrote elsewhere.
+     */
+    public function testAFailedExportLeavesAFileOutsideTheExportFolderAlone(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'image-heavy-'.uniqid();
+        $archiver = $this->archiverKeepingNothing();
+        $archiver->archiveAt = sys_get_temp_dir().'/'.uniqid('archive-elsewhere-').'.nothing';
+        $archiver->refusesToSave = true;
+
+        try {
+            $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get(self::SERIALIZER), $archiver, Lang::getDefaultLanguage());
+            self::fail('The archive cannot be written.');
+        } catch (\RuntimeException) {
+        }
+
+        $kept = is_file($archiver->archiveAt);
+        (new Filesystem())->remove([$archiver->archiveAt, ...(glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*') ?: [])]);
+
+        self::assertTrue($kept);
     }
 
     public function testAnArchiveThatCannotBeWrittenLeavesNoFileBehind(): void
@@ -1012,22 +1121,6 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertSame(JobStatus::DONE, $job->getJobStatus());
     }
 
-    /**
-     * Anything but a year of four digits and a month of the year is refused, rather
-     * than read as another date or as no bound at all.
-     */
-    public function testDatesTheExportFormCannotHaveSentAreRefused(): void
-    {
-        foreach ([['year' => '2026; DROP', 'month' => '1'], ['year' => '99999', 'month' => '1'], ['year' => '26', 'month' => '1'], ['year' => '2026', 'month' => '13'], ['year' => '2026', 'month' => '0']] as $bound) {
-            try {
-                $this->getService(ExportHandler::class)->resolveRangeDate(['start' => $bound, 'end' => null]);
-                self::fail('Refused: '.json_encode($bound, \JSON_THROW_ON_ERROR));
-            } catch (JobRefusedException) {
-                $this->addToAssertionCount(1);
-            }
-        }
-    }
-
     public function testAnUnknownSerializerIsRefusedBeforeAnyJobIsRecorded(): void
     {
         $before = ExportJobQuery::create()->count();
@@ -1042,7 +1135,7 @@ final class ExportJobTest extends IntegrationTestCase
     }
 
     /**
-     * @return ArchiverInterface&object{refusesToSave: bool, saysItDidNotSave: bool, onAdd: ?\Closure}
+     * @return ArchiverInterface&object{refusesToSave: bool, saysItDidNotSave: bool, archiveAt: ?string, onAdd: ?\Closure}
      */
     private function archiverKeepingNothing(): ArchiverInterface
     {
@@ -1050,6 +1143,9 @@ final class ExportJobTest extends IntegrationTestCase
             public bool $refusesToSave = false;
 
             public bool $saysItDidNotSave = false;
+
+            /** Where the archive is written, when not next to the export. */
+            public ?string $archiveAt = null;
 
             /** @var (\Closure(): void)|null told of every file added */
             public ?\Closure $onAdd = null;
@@ -1094,7 +1190,7 @@ final class ExportJobTest extends IntegrationTestCase
 
             public function create(string $baseName): self
             {
-                $this->archivePath = $baseName.'.nothing';
+                $this->archivePath = $this->archiveAt ?? $baseName.'.nothing';
                 touch($this->archivePath);
 
                 return $this;
@@ -1143,7 +1239,6 @@ final class ExportJobTest extends IntegrationTestCase
     private function launcherWith(MessageBusInterface $bus): ExportJobLauncher
     {
         return new ExportJobLauncher(
-            $this->getService(ExportHandler::class),
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
             $this->lifecycle($bus),

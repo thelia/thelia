@@ -18,7 +18,7 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
-use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\DataTransfer\Export\ExportPeriod;
 use Thelia\Model\Export;
 use Thelia\Model\ExportJob;
 use Thelia\Model\Lang;
@@ -34,7 +34,6 @@ use Thelia\Model\Lang;
 final readonly class ExportJobLauncher
 {
     public function __construct(
-        private ExportHandler $exportHandler,
         private SerializerManager $serializerManager,
         private ArchiverManager $archiverManager,
         private JobLifecycle $lifecycle,
@@ -61,7 +60,7 @@ final readonly class ExportJobLauncher
             throw new JobRefusedException(\sprintf('The archiver "%s" is not available on this server.', $archiverId));
         }
 
-        $rangeDate = $this->exportHandler->resolveRangeDate($rangeDate);
+        $rangeDate = ExportPeriod::resolve($rangeDate);
 
         $job = (new ExportJob())
             ->setExportId($export->getId())
@@ -72,17 +71,12 @@ final readonly class ExportJobLauncher
             ->setLangId($language?->getId())
             ->setIncludeImages($includeImages ? 1 : 0)
             ->setIncludeDocuments($includeDocuments ? 1 : 0)
-            ->setRangeStart(self::date($rangeDate['start'] ?? null))
-            ->setRangeEnd(self::date($rangeDate['end'] ?? null));
+            ->setRangeStart($rangeDate['start'] ?? null)
+            ->setRangeEnd($rangeDate['end'] ?? null);
         $job->save();
 
         $this->lifecycle->dispatch($job, new RunExportJob($job->getId()));
 
         return $job;
-    }
-
-    private static function date(mixed $value): ?\DateTimeInterface
-    {
-        return $value instanceof \DateTimeInterface ? $value : null;
     }
 }

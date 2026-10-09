@@ -27,13 +27,6 @@ interface DataTransferJob
     public function getJobStatus(): JobStatus;
 
     /**
-     * The table of the row: what the claim and the signs of life update.
-     *
-     * @return 'export_job'|'import_job'
-     */
-    public function tableName(): string;
-
-    /**
      * Records that the job failed, with what the administrator reads of it.
      */
     public function markFailed(string $error): void;

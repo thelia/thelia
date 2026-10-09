@@ -132,7 +132,7 @@ final readonly class RunImportJobHandler
             // A sign of life, outside the transaction, so a long import is never taken
             // from the worker running it.
             static function () use ($heartbeat, $jobId): void {
-                $heartbeat->beat(ImportJobTableMap::TABLE_NAME, $jobId);
+                $heartbeat->beat(JobTable::Import, $jobId);
             },
         );
     }
