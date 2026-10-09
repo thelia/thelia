@@ -50,8 +50,25 @@ class ModuleDescriptorValidator
         $dom = new \DOMDocument();
         $errors = [];
 
-        // No network access for an entity or a DTD a descriptor would point at.
-        if ($dom->load($xml_file, \LIBXML_NONET)) {
+        // No network access for an entity or a DTD a descriptor would point at. What
+        // libxml has to say about a file that is not XML is the reason given, never a
+        // warning of PHP.
+        $previousErrorHandling = libxml_use_internal_errors(true);
+
+        try {
+            libxml_clear_errors();
+            $loaded = $dom->load($xml_file, \LIBXML_NONET);
+            // libxml quotes the path of a file it could not open: the name of the file stands for it.
+            $notXml = array_map(
+                static fn (\LibXMLError $error): string => str_replace((string) $xml_file, basename((string) $xml_file), trim($error->message)),
+                libxml_get_errors(),
+            );
+            libxml_clear_errors();
+        } finally {
+            libxml_use_internal_errors($previousErrorHandling);
+        }
+
+        if ($loaded) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
@@ -72,7 +89,25 @@ class ModuleDescriptorValidator
 
         // Shown to the administrator who uploads the module: the module it is about, never
         // where the server unpacked it.
-        throw new InvalidXmlDocumentException(\sprintf('The module.xml of %s is not a valid file: %s', basename(\dirname((string) $xml_file, 2)), implode(', ', $errors)));
+        throw new InvalidXmlDocumentException(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), match (true) {
+            !$loaded => 'it is not well-formed XML ('.implode(', ', $notXml).')', [] === $errors => \sprintf('no descriptor schema matches version %s', (string) $version), default => implode(', ', $errors),
+        }));
+    }
+
+    /**
+     * The descriptor as the administrator knows it: "module.xml of <module>" for one at its
+     * place in a module (<module>/Config/module.xml), the file name alone anywhere else.
+     */
+    private static function describe(string $xmlFile): string
+    {
+        $file = basename($xmlFile);
+        $configFolder = \dirname($xmlFile);
+
+        if ('Config' !== basename($configFolder) || '' === basename(\dirname($configFolder))) {
+            return $file;
+        }
+
+        return \sprintf('%s of %s', $file, basename(\dirname($configFolder)));
     }
 
     /**
