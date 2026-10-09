@@ -875,4 +875,106 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@order_edit_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
     (@order_edit_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
+-- Report of an export job
+--
+-- What an export reported (the counts of the sales journal, the orders it
+-- left out) is kept on its job, for the screen of the job to show once the
+-- worker is done. Added only when missing, so a replay changes nothing.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'export_job' AND `COLUMN_NAME` = 'report');
+SET @statement := IF(@add_column, 'ALTER TABLE `export_job` ADD `report` TEXT COMMENT \'what the export reported: its lines and warnings, as JSON, NULL for an export that reports nothing\' AFTER `error`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- ---------------------------------------------------------------------
+-- Accounting exports
+--
+-- The sales journal and the tax summary select the invoices of a period by
+-- their date. Their chart of accounts is five settings, seeded empty: the
+-- exports refuse to run until the merchant fills the accounts, and the
+-- journal code and label fall back to VE and Ventes. INSERT IGNORE leaves a
+-- value the merchant already set, and replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'idx_order_invoice_date');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `idx_order_invoice_date` (`invoice_date`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('accounting_journal_code', '', 0, 0, NOW(), NOW()),
+    ('accounting_journal_label', '', 0, 0, NOW(), NOW()),
+    ('accounting_customer_account', '', 0, 0, NOW(), NOW()),
+    ('accounting_shipping_account', '', 0, 0, NOW(), NOW()),
+    ('accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
+    ('accounting_commercial_credit_account', '', 0, 0, NOW(), NOW());
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('accounting_journal_code', 'en_US', 'Code of the sales journal in the accounting exports (VE when empty)'),
+    ('accounting_journal_code', 'fr_FR', 'Code du journal des ventes dans les exports comptables (VE si vide)'),
+    ('accounting_journal_code', 'de_DE', 'Code des Verkaufsjournals in den Buchhaltungsexporten (VE wenn leer)'),
+    ('accounting_journal_code', 'es_ES', 'Código del diario de ventas en las exportaciones contables (VE si está vacío)'),
+    ('accounting_journal_code', 'nl_NL', 'Code van het verkoopdagboek in de boekhoudexports (VE indien leeg)'),
+    ('accounting_journal_code', 'ru_RU', 'Код журнала продаж в бухгалтерских выгрузках (VE, если пусто)'),
+    ('accounting_journal_code', 'it_IT', 'Codice del giornale delle vendite nelle esportazioni contabili (VE se vuoto)'),
+    ('accounting_journal_label', 'en_US', 'Label of the sales journal in the accounting exports (Ventes when empty)'),
+    ('accounting_journal_label', 'fr_FR', 'Libellé du journal des ventes dans les exports comptables (Ventes si vide)'),
+    ('accounting_journal_label', 'de_DE', 'Bezeichnung des Verkaufsjournals in den Buchhaltungsexporten (Ventes wenn leer)'),
+    ('accounting_journal_label', 'es_ES', 'Nombre del diario de ventas en las exportaciones contables (Ventes si está vacío)'),
+    ('accounting_journal_label', 'nl_NL', 'Naam van het verkoopdagboek in de boekhoudexports (Ventes indien leeg)'),
+    ('accounting_journal_label', 'ru_RU', 'Название журнала продаж в бухгалтерских выгрузках (Ventes, если пусто)'),
+    ('accounting_journal_label', 'it_IT', 'Descrizione del giornale delle vendite nelle esportazioni contabili (Ventes se vuoto)'),
+    ('accounting_customer_account', 'en_US', 'Customer account the sales journal debits, e.g. 411000 (required by the accounting exports)'),
+    ('accounting_customer_account', 'fr_FR', 'Compte client débité par le journal des ventes, par exemple 411000 (obligatoire pour les exports comptables)'),
+    ('accounting_customer_account', 'de_DE', 'Kundenkonto, das das Verkaufsjournal belastet, z. B. 411000 (für die Buchhaltungsexporte erforderlich)'),
+    ('accounting_customer_account', 'es_ES', 'Cuenta de cliente que carga el diario de ventas, p. ej. 411000 (obligatoria para las exportaciones contables)'),
+    ('accounting_customer_account', 'nl_NL', 'Klantrekening die het verkoopdagboek debiteert, bijv. 411000 (verplicht voor de boekhoudexports)'),
+    ('accounting_customer_account', 'ru_RU', 'Счёт клиента, который дебетует журнал продаж, например 411000 (обязателен для бухгалтерских выгрузок)'),
+    ('accounting_customer_account', 'it_IT', 'Conto cliente addebitato dal giornale delle vendite, ad es. 411000 (obbligatorio per le esportazioni contabili)'),
+    ('accounting_shipping_account', 'en_US', 'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)'),
+    ('accounting_shipping_account', 'fr_FR', 'Compte crédité du port par le journal des ventes, par exemple 708500 (obligatoire pour les exports comptables)'),
+    ('accounting_shipping_account', 'de_DE', 'Konto, dem das Verkaufsjournal die Versandkosten gutschreibt, z. B. 708500 (für die Buchhaltungsexporte erforderlich)'),
+    ('accounting_shipping_account', 'es_ES', 'Cuenta que abona el diario de ventas con el envío, p. ej. 708500 (obligatoria para las exportaciones contables)'),
+    ('accounting_shipping_account', 'nl_NL', 'Rekening die het verkoopdagboek crediteert met de verzendkosten, bijv. 708500 (verplicht voor de boekhoudexports)'),
+    ('accounting_shipping_account', 'ru_RU', 'Счёт, который журнал продаж кредитует на сумму доставки, например 708500 (обязателен для бухгалтерских выгрузок)'),
+    ('accounting_shipping_account', 'it_IT', 'Conto accreditato delle spese di spedizione dal giornale delle vendite, ad es. 708500 (obbligatorio per le esportazioni contabili)'),
+    ('accounting_rate_accounts', 'en_US', 'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)'),
+    ('accounting_rate_accounts', 'fr_FR', 'Compte de ventes et compte de TVA collectée par taux, par exemple 20:706200:445720,5.5:706055:445705,0:706000 (obligatoire pour les exports comptables)'),
+    ('accounting_rate_accounts', 'de_DE', 'Erlöskonto und Konto der vereinnahmten Steuer je Steuersatz, z. B. 20:706200:445720,5.5:706055:445705,0:706000 (für die Buchhaltungsexporte erforderlich)'),
+    ('accounting_rate_accounts', 'es_ES', 'Cuenta de ventas y cuenta del impuesto repercutido por tipo, p. ej. 20:706200:445720,5.5:706055:445705,0:706000 (obligatoria para las exportaciones contables)'),
+    ('accounting_rate_accounts', 'nl_NL', 'Omzetrekening en rekening van de geïnde belasting per tarief, bijv. 20:706200:445720,5.5:706055:445705,0:706000 (verplicht voor de boekhoudexports)'),
+    ('accounting_rate_accounts', 'ru_RU', 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)'),
+    ('accounting_rate_accounts', 'it_IT', 'Conto vendite e conto IVA a debito per aliquota, ad es. 20:706200:445720,5.5:706055:445705,0:706000 (obbligatorio per le esportazioni contabili)'),
+    ('accounting_commercial_credit_account', 'en_US', 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)'),
+    ('accounting_commercial_credit_account', 'fr_FR', 'Compte débité des avoirs commerciaux (rabais, remise, remboursement de différence), par exemple 709000 (compte de ventes de leur taux si vide)'),
+    ('accounting_commercial_credit_account', 'de_DE', 'Konto, das mit kaufmännischen Gutschriften (Rabatt, Nachlass, Erstattung einer Differenz) belastet wird, z. B. 709000 (Erlöskonto ihres Steuersatzes wenn leer)'),
+    ('accounting_commercial_credit_account', 'es_ES', 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)'),
+    ('accounting_commercial_credit_account', 'nl_NL', 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)'),
+    ('accounting_commercial_credit_account', 'ru_RU', 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)'),
+    ('accounting_commercial_credit_account', 'it_IT', 'Conto addebitato delle note di credito commerciali (ribasso, sconto, rimborso di una differenza), ad es. 709000 (conto vendite della loro aliquota se vuoto)');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
 SET FOREIGN_KEY_CHECKS = 1;
