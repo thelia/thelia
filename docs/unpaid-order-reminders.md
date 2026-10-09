@@ -71,6 +71,10 @@ php bin/console order:remind-unpaid [--dry-run] [--limit=200]
   servers, point `LOCK_DSN` at a store they share.
 - Exit code 0, or 1 when a step failed (the table says which), so the host's
   scheduler can report it.
+- The links of the mails are built on the address of the shop (`url_site`): a
+  scheduled task has no request to take the host from. Without it they carry the
+  router's default host (`DEFAULT_URI`, `localhost` unless the host set it), and
+  the command says so.
 
 Schedule it every fifteen minutes or every hour; the delays of the schedule are
 in hours, so a run more frequent than that buys nothing.

@@ -18,7 +18,11 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Command\UnpaidOrderReminderCommand;
+use Thelia\Domain\Order\Reminder\UnpaidOrderReminderRunner;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderSettings;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderQuery;
@@ -39,12 +43,48 @@ final class UnpaidOrderReminderCommandTest extends ActionIntegrationTestCase
         $order = $this->factory->order(null, ['postage' => 20, 'statusCode' => OrderStatus::CODE_NOT_PAID]);
         $order->setCreatedAt(new \DateTimeImmutable('-8 days'))->save();
 
+        ConfigQuery::write('url_site', '');
         $tester = $this->tester();
         $tester->execute(['--dry-run' => true, '--limit' => '1000']);
 
         $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('url_site', $tester->getDisplay(), 'Without the address of the shop, the links of the mails would carry whatever host the router has.');
         self::assertMatchesRegularExpression('/'.preg_quote((string) $order->getRef(), '/').'\s*\|\s*168 h\s*\|\s*cancel\s*\|\s*planned/', $tester->getDisplay());
         self::assertSame(OrderStatus::CODE_NOT_PAID, (string) OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
+    public function testTheLinkOfTheMailPointsToTheShopFromTheCommandLine(): void
+    {
+        // No request behind a scheduled task: the address the merchant gave the shop is
+        // the only one the link can carry.
+        $routes = $this->getService(RouterInterface::class)->getRouteCollection();
+
+        if (null === $routes->get(UnpaidOrderReminderRunner::PAYMENT_ROUTE)) {
+            self::markTestSkipped('The front theme does not carry the route the reminder links to yet.');
+        }
+
+        ConfigQuery::write('store_email', 'shop@example.com');
+        ConfigQuery::write('url_site', 'https://shop.example.com/boutique');
+        ConfigQuery::write(UnpaidOrderReminderSettings::SCHEDULE_KEY, '24:order_payment_reminder');
+        $order = $this->factory->order(null, ['postage' => 20, 'statusCode' => OrderStatus::CODE_NOT_PAID]);
+        $order->setCreatedAt(new \DateTimeImmutable('-25 hours'))->save();
+        $texts = [];
+        $listener = static function (MessageEvent $event) use (&$texts): void {
+            $message = $event->getMessage();
+
+            if ($message instanceof Email && !$event->isQueued()) {
+                $texts[$message->getTo()[0]->getAddress()] = (string) $message->getTextBody();
+            }
+        };
+        $this->dispatcher->addListener(MessageEvent::class, $listener);
+
+        try {
+            $this->tester()->execute(['--limit' => '1000']);
+        } finally {
+            $this->dispatcher->removeListener(MessageEvent::class, $listener);
+        }
+
+        self::assertStringContainsString('https://shop.example.com/boutique/order/pay/', $texts[(string) $order->getCustomer()->getEmail()] ?? '');
     }
 
     public function testWithoutAScheduleItSaysSo(): void

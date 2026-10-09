@@ -20,8 +20,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderRunner;
 use Thelia\Domain\Order\Reminder\UnpaidOrderReminderSettings;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  * Reminds the unpaid orders, and cancels them, as the merchant's schedule says. Meant to
@@ -45,6 +49,10 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
         private readonly UnpaidOrderReminderRunner $runner,
         private readonly UnpaidOrderReminderSettings $settings,
         private readonly LockFactory $lockFactory,
+        private readonly RouterInterface $router,
+        // Built here so that the mail templates find it: outside a request, nothing else
+        // instantiates it.
+        private readonly URL $url,
     ) {
         parent::__construct();
     }
@@ -81,6 +89,10 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
         }
 
         try {
+            if (!$this->pointUrlsAtTheShop()) {
+                $output->writeln(\sprintf('<comment>The address of the shop (url_site) is not set: the links of the mails point to %s.</comment>', $this->url->getBaseUrl()));
+            }
+
             $dryRun = (bool) $input->getOption('dry-run');
             $report = $this->runner->run(new \DateTimeImmutable(), (int) $limit, $dryRun);
         } finally {
@@ -107,5 +119,30 @@ class UnpaidOrderReminderCommand extends ContainerAwareCommand
         }
 
         return $report->hasFailures() ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * A scheduled task has no request to take the host from, and the router would build
+     * the links of the mails on DEFAULT_URI, "localhost" unless the host set it. The
+     * address the merchant gave the shop is the one its customers know.
+     */
+    private function pointUrlsAtTheShop(): bool
+    {
+        $shopUrl = trim((string) ConfigQuery::getConfiguredShopUrl());
+
+        if ('' === $shopUrl || false === parse_url($shopUrl) || null === parse_url($shopUrl, \PHP_URL_HOST)) {
+            return false;
+        }
+
+        $shop = RequestContext::fromUri($shopUrl);
+        $this->router->getContext()
+            ->setScheme($shop->getScheme())
+            ->setHost($shop->getHost())
+            ->setHttpPort($shop->getHttpPort())
+            ->setHttpsPort($shop->getHttpsPort())
+            ->setBaseUrl(rtrim($shop->getBaseUrl(), '/'));
+        $this->url->setRequestContext($this->router->getContext());
+
+        return true;
     }
 }
