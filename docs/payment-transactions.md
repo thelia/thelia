@@ -274,6 +274,10 @@ journal moves a paid order to `refunded`, through the transition graph, as it
 moves it to `paid` after a capture. A partial refund leaves the order as it is.
 Giving money back is a right of its own, `admin.order.payment-refund`.
 
+Orders paid before 3.3.0 get their capture from the update (`setup/update/php/3.3.0.php`):
+the order total, its `transaction_ref`, the shop as author. Without it they would
+hold nothing refundable.
+
 ## Statuses
 
 `MoveOrderOnPaymentTransactionListener` moves the order along with the money,

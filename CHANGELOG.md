@@ -46,6 +46,7 @@
 
 ## Upgrade notes
 
+- Orders paid, processing or sent before the update have no payment journal: `setup/update/php/3.3.0.php` writes for each of them the capture it was paid with (its total, its `transaction_ref` as reference, the shop as author, dated from its invoice), so what they collected can be refunded from Thelia. Refunded and cancelled orders, and orders that already have a line, are left alone; replaying the script writes nothing more.
 - The payment refund right `admin.order.payment-refund` is created by `3.3.0.sql` and granted to no profile: grant it, with create access, to the profiles that refund.
 - The payment capture right `admin.order.payment-capture` is created by `3.3.0.sql` and granted to no profile: after the update only the superadministrator captures payments. Grant it, with create access, to the profiles that should.
 
