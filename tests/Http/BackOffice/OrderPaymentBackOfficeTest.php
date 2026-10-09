@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\BackOffice;
 
 use BackOfficeDefaultTwigBundle\Service\Order\OrderPaymentContextBuilder;
+use BackOfficeDefaultTwigBundle\Service\Order\OrderPaymentLinePresenter;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -361,6 +362,23 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         $crawler = $this->client->followRedirect();
 
         self::assertStringContainsString('positive number', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+    }
+
+    public function testAnExpiredAuthorizationReadsAsSuchNotAsAnError(): void
+    {
+        if (!\defined(OrderPaymentLinePresenter::class.'::EXPIRED_LABEL')) {
+            self::markTestSkipped('The installed back-office theme predates the expiry label.');
+        }
+
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $this->recorder->recordExpiry($order, moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        $crawler = $this->sheet($order);
+
+        $line = $crawler->filter('[data-testid="order-payment-line"][data-payment-type="void"]');
+        self::assertStringContainsString('Authorization expired', $line->text());
+        self::assertCount(0, $line->filter('[data-testid="order-payment-line-error"]'));
     }
 
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
