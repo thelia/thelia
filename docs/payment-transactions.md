@@ -254,8 +254,9 @@ is what the back office calls, through the `ORDER_PAYMENT_REFUND` event
 - the module is called outside the lock and its answer recorded as for a capture
   (`ProviderCallRunner`): a `PaymentRefusedException` leaves a failed line, any
   other exception leaves it pending;
-- a module that cannot refund is refused with `RefundNotSupportedException`,
-  which names it.
+- a module that cannot refund, is deactivated or is no longer installed is
+  refused with `RefundNotSupportedException`, which names it. Modules are always
+  called through `PaymentModuleLocator`, which hands them their container.
 
 A refund made outside the provider — a bank transfer, a cheque — is recorded with
 `recordOfflineRefund()` (the event with `$offline` true), whatever the module: a
