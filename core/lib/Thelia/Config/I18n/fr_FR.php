@@ -978,4 +978,12 @@ return [
     'Order %ref: its invoice amounts to nothing.' => 'Commande %ref : sa facture est nulle.',
     'Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.' => 'Commande %ref : de la taxe a été collectée à %rate, un taux sans compte de taxe dans le plan de comptes.',
     'Order %ref: it was placed in another currency without exchange rate, it cannot be booked in the shop currency.' => 'Commande %ref : passée dans une autre devise sans taux de change, elle ne peut pas être comptabilisée dans la devise de la boutique.',
+    'The customer account "%account" is not an account number: letters and digits only, 20 at most.' => 'Le compte client « %account » n\'est pas un numéro de compte : lettres et chiffres seulement, 20 au plus.',
+    'The shipping account "%account" is not an account number: letters and digits only, 20 at most.' => 'Le compte de port « %account » n\'est pas un numéro de compte : lettres et chiffres seulement, 20 au plus.',
+    'The journal code "%code" is not a code: letters and digits only, 20 at most.' => 'Le code journal « %code » n\'est pas un code : lettres et chiffres seulement, 20 au plus.',
+    'The journal label holds %max characters at most, on one line.' => 'Le libellé du journal tient en %max caractères au plus, sur une ligne.',
+    '"%rate" is not the accounts of a tax rate: write the rate in percent, the product account, then the tax account, as in "20:706200:445720".' => '« %rate » n\'est pas les comptes d\'un taux de taxe : écrivez le taux en pourcentage, le compte de produit puis le compte de taxe, comme « 20:706200:445720 ».',
+    'The tax account "%account" of the %rate rate is not an account number.' => 'Le compte de taxe « %account » du taux de %rate n\'est pas un numéro de compte.',
+    'The %rate rate needs the account of the tax it collects.' => 'Le taux de %rate demande le compte de la taxe qu\'il collecte.',
+    'The %rate rate is given twice.' => 'Le taux de %rate est donné deux fois.',
 ];

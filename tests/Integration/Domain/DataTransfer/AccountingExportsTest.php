@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Thelia\Domain\Accounting\AccountingChart;
@@ -25,6 +26,8 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
@@ -137,9 +140,24 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
             $orders[] = $this->invoicedOrder('2026-02-1'.($i % 9), [[10.0, 1, 2.0]]);
         }
 
-        $rows = $this->mine($this->rows(new SalesJournalExport(), '2026-02'), $orders);
+        // The shop runs with the instance pool on, which the tests turn off.
+        OrderTableMap::clearInstancePool();
+        OrderProductTableMap::clearInstancePool();
+        Propel::enableInstancePooling();
+
+        try {
+            $rows = $this->mine($this->rows(new SalesJournalExport(), '2026-02'), $orders);
+            $pooledLines = \count(OrderProductTableMap::$instances);
+            $pooledOrders = \count(OrderTableMap::$instances);
+        } finally {
+            Propel::disableInstancePooling();
+            OrderTableMap::clearInstancePool();
+            OrderProductTableMap::clearInstancePool();
+        }
 
         self::assertCount(205, array_unique(array_column($rows, 'PieceRef')));
+        self::assertSame(0, $pooledLines, 'The models of each batch are let go.');
+        self::assertSame(0, $pooledOrders);
     }
 
     public function testTheReportSpeaksTheLanguageOfTheExport(): void
