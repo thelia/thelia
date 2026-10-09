@@ -309,6 +309,19 @@ final class TheliaEvents
      * provider never confirmed (OrderPaymentSettlementEvent).
      */
     public const ORDER_PAYMENT_TRANSACTION_SETTLE = 'action.order.paymentTransactionSettle';
+
+    /**
+     * Sent to give back all or part of what an order's payment collected
+     * (OrderPaymentRefundEvent); the core listener asks the payment module, or records a
+     * refund made outside it, and writes the journal line.
+     */
+    public const ORDER_PAYMENT_REFUND = 'action.order.paymentRefund';
+
+    /**
+     * Sent once money was given back on an order (OrderRefundedEvent), through the provider
+     * or recorded by hand.
+     */
+    public const ORDER_REFUNDED = 'action.order.refunded';
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';
     public const ORDER_PRODUCT_AFTER_CREATE = 'action.orderProduct.afterCreate';
 

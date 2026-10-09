@@ -35,7 +35,8 @@ use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
 /**
  * Moves an order along with the money that was reserved, taken or released on it.
  *
- * An authorization puts an unpaid order on hold for capture. The order is paid once the
+ * An authorization puts an unpaid order on hold for capture; a paid order whose collected
+ * money was all given back is refunded. The order is paid once the
  * authorization is settled — everything captured, or what was not captured released —
  * with no capture still waiting for its answer and something actually taken; released
  * without anything taken, it goes back to unpaid. A remainder smaller than the smallest
@@ -76,6 +77,7 @@ final readonly class MoveOrderOnPaymentTransactionListener
         match ($transaction->getTypeEnum()) {
             PaymentTransactionType::AUTHORIZATION => $this->holdForCapture($event),
             PaymentTransactionType::CAPTURE, PaymentTransactionType::VOID => $this->settleOnceNothingIsHeld($event),
+            PaymentTransactionType::REFUND => $this->refundOnceNothingIsKept($event),
             default => null,
         };
     }
@@ -143,6 +145,29 @@ final readonly class MoveOrderOnPaymentTransactionListener
         if (OrderStatus::CODE_AWAITING_CAPTURE === $status->getCode()) {
             $this->move($order, (int) OrderStatusQuery::getNotPaidStatus()->getId(), $event);
         }
+    }
+
+    /**
+     * After a refund: once everything collected was given back, and no refund waits for its
+     * answer, a paid order is refunded. A partial refund leaves it as it is.
+     */
+    private function refundOnceNothingIsKept(OrderPaymentTransactionEvent $event): void
+    {
+        $order = $event->getOrder();
+
+        if (!$order->getOrderStatus()->isPaid(false)) {
+            return;
+        }
+
+        $totals = $this->totalsReader->forOrder((int) $order->getId());
+
+        if (!PaymentAmount::isPositive($totals->captured)
+            || PaymentAmount::isPositive($totals->pendingRefund)
+            || !CurrencyMinorUnit::isBelowSmallestCoin($totals->netCaptured(), $order->getCurrency()->getCode())) {
+            return;
+        }
+
+        $this->move($order, (int) OrderStatusQuery::getRefundedStatus()->getId(), $event);
     }
 
     private function nothingIsHeld(PaymentTransactionTotals $totals, Order $order): bool
