@@ -23,6 +23,7 @@
 - A payment module that moves the order status itself, from its own configuration, implements the optional `Thelia\Module\PaymentModuleManagingOrderStatusInterface`: the core then leaves the status of its orders alone. An authorization that lapsed at the provider is recorded with `PaymentTransactionRecorder::recordExpiry()`, a void of what it still held annotated `expired`; the back office reads it as an expired authorization.
 - Two more optional capabilities of a payment module. `Thelia\Module\PaymentModuleCapturingOnceInterface` (`capturesOnce()`): its provider takes a single capture per authorization, so once one is asked the back office, the admin API (`remainingToCapture`) and `PaymentCaptureService` (`leftToCapture()`) offer no other; while it waits for its answer no administrator cancels the order (`CancellationWaitsForCaptureException`, 422 on the admin API), and once it is taken cancelling no longer needs the capture right. `Thelia\Module\PaymentModuleCancellingOnReleaseInterface` (`cancelsOrderOnRelease()`): the module cancels the order itself once its provider ended the authorization, and the core does not move it back to not paid first. A module that stops authorizing first still has the authorizations its journal holds open captured and released from Thelia.
 - The outcome of a pending line the provider never confirmed can be recorded by hand through `ORDER_PAYMENT_TRANSACTION_SETTLE` (`OrderPaymentSettlementEvent`), the line annotated `settled_by_hand`.
+- An order is refunded, in full or in part, through its payment module when the module implements the optional `Thelia\Module\PaymentModuleWithRefundInterface`, or recorded as refunded outside the provider (a bank transfer, a cheque) whatever its module. `Thelia\Domain\Payment\Service\PaymentRefundService`, reached through `ORDER_PAYMENT_REFUND`, bounds the amount by what the journal says was collected and not given back, refuses the same amount asked again within a minute (`DuplicateRefundException`), writes the refund pending before the provider is called and records its answer as for a capture. The reason is one of a fixed list (`RefundReason`), with an optional comment. `ORDER_REFUNDED` is sent once money was given back. Once everything collected was given back, a paid order moves to `refunded`. Refunding is a right of its own, `admin.order.payment-refund`, created by `3.3.0.sql` and granted to no profile.
 - The capture is a right of its own, `admin.order.payment-capture` (`AdminResources::ORDER_PAYMENT_CAPTURE`), distinct from editing orders. It is also asked to cancel an order whose authorization still holds an amount and to record by hand the outcome of a pending line.
 
 ## Themes
@@ -209,6 +210,7 @@
 
 ## Upgrade notes
 
+- The payment refund right `admin.order.payment-refund` is created by `3.3.0.sql` and granted to no profile: grant it, with create access, to the profiles that refund.
 - The payment capture right `admin.order.payment-capture` is created by `3.3.0.sql` and granted to no profile: after the update only the superadministrator captures payments. Grant it, with create access, to the profiles that should.
 
 # 3.2.1
