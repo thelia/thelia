@@ -49,7 +49,7 @@ final class XmlDescriptorTest extends TestCase
         $notXml = XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/bad.xml');
         self::assertNotSame([], $notXml);
         self::assertStringContainsString('tag mismatch', $notXml[0]);
-        self::assertStringContainsString('(line 1)', $notXml[0]);
+        self::assertMatchesRegularExpression('/ \(Code \d+\) on line 1$/', $notXml[0]);
     }
 
     public function testADescriptorIsCheckedAgainstItsSchemaOrRefusedWithAReason(): void

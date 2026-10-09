@@ -99,12 +99,14 @@ final class XmlDescriptor
     }
 
     /**
+     * What libxml said, each error by its message, its code and its line.
+     *
      * @return list<string>
      */
     private static function saidByLibxml(): array
     {
         return array_values(array_filter(array_map(
-            static fn (\LibXMLError $error): string => trim($error->message).($error->line > 0 ? \sprintf(' (line %d)', $error->line) : ''),
+            static fn (\LibXMLError $error): string => '' === trim($error->message) ? '' : \sprintf('%s (Code %d) on line %d', trim($error->message), $error->code, $error->line),
             libxml_get_errors(),
         )));
     }

@@ -142,7 +142,7 @@ final class ModuleDescriptorValidatorTest extends TestCase
         } catch (InvalidXmlDocumentException $refusal) {
             self::assertStringStartsWith('The module.xml is not a valid file: ', $refusal->getMessage());
             self::assertStringContainsString('tag mismatch', $refusal->getMessage());
-            self::assertStringContainsString('(line 1)', $refusal->getMessage());
+            self::assertMatchesRegularExpression('/ \(Code \d+\) on line 1/', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
     }
