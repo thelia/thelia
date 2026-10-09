@@ -430,4 +430,26 @@ PREPARE create_table_statement FROM @statement;
 EXECUTE create_table_statement;
 DEALLOCATE PREPARE create_table_statement;
 
+-- ---------------------------------------------------------------------
+-- Payment refund right
+-- ---------------------------------------------------------------------
+-- Giving money back is a right of its own, distinct from editing orders and from
+-- taking money. It is granted to no profile. Replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.payment-refund', NOW(), NOW());
+
+SET @payment_refund_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.payment-refund');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@payment_refund_resource_id, 'cs_CZ', 'Vrácení platby objednávky', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'de_DE', 'Erstattung der Bestellzahlung', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'en_US', 'Order payment refund', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'es_ES', 'Reembolso del pago del pedido', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'fr_FR', 'Remboursement du paiement d\'une commande', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'it_IT', 'Rimborso del pagamento dell\'ordine', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'nl_NL', 'Terugbetaling van de orderbetaling', NULL, NULL, NULL),
+    (@payment_refund_resource_id, 'ru_RU', 'Возврат оплаты заказа', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

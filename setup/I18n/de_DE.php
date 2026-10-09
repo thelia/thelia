@@ -790,6 +790,7 @@ return [
     'Order failed - at the top' => 'Fehlschlag der Bestellung - oben',
     'Order status transition override' => 'Erzwingen von Bestellstatus-Übergängen',
     'Order payment capture' => 'Einzug der Bestellzahlung',
+    'Order payment refund' => 'Erstattung der Bestellzahlung',
     'Awaiting capture' => 'Warten auf Einzug',
     'Orders - JavaScript' => 'Bestellungen - JavaScript',
     'Orders - at the top' => 'Bestellungen - oben',
