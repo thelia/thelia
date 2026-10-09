@@ -92,6 +92,6 @@ final class ImportStorageTest extends TestCase
         }
 
         self::assertSame(0o640, fileperms($stored->getPathname()) & 0o777);
-        self::assertSame(0o750, fileperms(\dirname($stored->getPathname())) & 0o777);
+        self::assertSame(0o770, fileperms(\dirname($stored->getPathname())) & 0o777);
     }
 }
