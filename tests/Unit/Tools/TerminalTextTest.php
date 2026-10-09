@@ -120,12 +120,14 @@ final class TerminalTextTest extends TestCase
      * Under a backtrack limit, the text comes out cleaned or not at all, never as it was.
      * Which step a given limit stops depends on the build of PCRE: the lowest refuses even
      * the check that the text is UTF-8, so the first step runs and fails on a valid text
-     * too; the next ones let the check pass and stop the second step (measured on PCRE
-     * 10.46 and 10.47); none stops the third step or the run of blanks on their own, whose
-     * fallbacks stand by construction. So the limits are swept, each result is held to the
-     * two outcomes allowed, and the valid texts carry a character that one step alone
-     * replaces (U+034F for the second, U+0600 for the third), so that no later step can
-     * stand in for a fallback that would give the text back.
+     * too; the next ones let the check pass and stop the second step (limits 2 to 9 on
+     * PCRE 10.46 and 10.47); none stops the third step or the run of blanks on their own.
+     * So the limits are swept, each result is held to the two outcomes allowed, and the
+     * test is only worth something once a limit has let the check pass and given nothing:
+     * it says so, or skips. What it proves is the fallback of the second step, through the
+     * text that carries a character the second step alone replaces (U+034F): a fallback
+     * giving the text back would show it. The other two texts, one invalid and one that
+     * only the third step cleans (U+0600), hold the shape of the outcome, nothing more.
      */
     #[RunInSeparateProcess]
     public function testABacktrackLimitLeavesNothingOrTheCleanedText(): void
@@ -133,31 +135,35 @@ final class TerminalTextTest extends TestCase
         $jit = \ini_get('pcre.jit');
         $limit = \ini_get('pcre.backtrack_limit');
         ini_set('pcre.jit', '0');
+        $secondStepOnly = str_repeat("a\u{34F}", 2000);
         $texts = [
-            str_repeat("\xFFa\u{200B}", 2000) => str_repeat('?a?', 2000),
-            str_repeat("a\u{34F}", 2000) => str_repeat('a?', 2000),
-            str_repeat("a\u{600}", 2000) => str_repeat('a?', 2000),
+            [str_repeat("\xFFa\u{200B}", 2000), str_repeat('?a?', 2000)],
+            [$secondStepOnly, str_repeat('a?', 2000)],
+            [str_repeat("a\u{600}", 2000), str_repeat('a?', 2000)],
         ];
         $lines = str_repeat("a\n b", 2000);
-        $stopped = 0;
+        $secondStepStopped = 0;
 
         try {
-            foreach (range(1, 8) as $backtrackLimit) {
+            foreach (range(1, 12) as $backtrackLimit) {
                 ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
+                $checkPasses = 1 === preg_match('//u', $secondStepOnly);
 
-                foreach ($texts as $text => $cleaned) {
+                foreach ($texts as [$text, $cleaned]) {
                     $result = TerminalText::withoutControlCharacters($text);
                     self::assertContains($result, ['', $cleaned], \sprintf('limit %d', $backtrackLimit));
-                    $stopped += '' === $result ? 1 : 0;
+                    $secondStepStopped += $checkPasses && $text === $secondStepOnly && '' === $result ? 1 : 0;
                 }
 
                 self::assertContains(TerminalText::onOneLine($lines), ['', str_repeat('a b', 2000)], \sprintf('limit %d', $backtrackLimit));
             }
-
-            self::assertGreaterThan(0, $stopped, 'the lowest limit stops a step');
         } finally {
             ini_set('pcre.jit', (string) $jit);
             ini_set('pcre.backtrack_limit', (string) $limit);
+        }
+
+        if (0 === $secondStepStopped) {
+            self::markTestSkipped('No limit from 1 to 12 lets the UTF-8 check pass and stops the second step on this build of PCRE: the fallback of the second step is not proven here.');
         }
     }
 
@@ -166,8 +172,8 @@ final class TerminalTextTest extends TestCase
      * neighbour is itself in a range, or a control, format or private use character. What it
      * proves: a range narrowed by one code point is seen. What it cannot prove: a narrowed
      * range of the second step that the third step covers too (the format characters, the
-     * Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15 among them), as
-     * the third step stands behind it.
+     * Egyptian hieroglyph controls on a PCRE with the tables of Unicode 15, and the tags
+     * and variation selectors of plane 14 among them), as the third step stands behind it.
      */
     #[DataProvider('ranges')]
     public function testTheBoundsOfARangeAreReplacedAndItsNeighboursKept(int $first, int $last): void
@@ -299,7 +305,7 @@ final class TerminalTextTest extends TestCase
             [0x2060, 0x2064], [0x2065, 0x2065], [0x2066, 0x206F], [0x2800, 0x2800], [0x3164, 0x3164],
             [0xFDD0, 0xFDEF], [0xFE00, 0xFE0F], [0xFEFF, 0xFEFF], [0xFFA0, 0xFFA0], [0xFFF0, 0xFFF8],
             [0xFFF9, 0xFFFB], [0xFFFC, 0xFFFC], [0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A],
-            [0xE0000, 0xE00FF], [0xE0100, 0xE01FF], [0xE0000, 0xE0FFF],
+            [0xE0000, 0xE0FFF],
         ];
 
         for ($plane = 0; $plane <= 16; ++$plane) {
