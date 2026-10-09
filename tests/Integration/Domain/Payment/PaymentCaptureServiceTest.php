@@ -212,6 +212,21 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
     }
 
+    public function testAModuleAnsweringSucceededWithoutAReferenceLeavesTheLineForTheNotification(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::succeeded();
+
+        $capture = $this->service->capture($order, 40.0);
+
+        self::assertTrue($capture->isPending());
+        self::assertSame('missing_reference', $capture->getErrorCode());
+
+        $this->recorder->recordCapture($order, 40, 'PSP-LATE-40', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        self::assertSame('40.000000', $this->totals->forOrder($order->getId())->captured, 'The notification settles the line rather than writing a second capture.');
+    }
+
     public function testAPaymentExceptionThatIsNotARefusalLeavesTheLinePending(): void
     {
         // Only a refusal says the provider took nothing. Any other failure of the module,

@@ -79,6 +79,9 @@ final readonly class PaymentTransactionRecorder
 
     private const DUPLICATE_KEY_SQLSTATE = '23000';
 
+    /** The size of the psp_reference column. */
+    private const PSP_REFERENCE_MAX_LENGTH = 100;
+
     private PaymentAnnouncementQueue $announcements;
 
     public function __construct(
@@ -187,6 +190,8 @@ final readonly class PaymentTransactionRecorder
         ?string $errorCode = null,
         ?string $errorMessage = null,
     ): OrderPaymentTransaction {
+        $this->assertReferenceOfAnOutcome($order, PaymentTransactionType::VOID, $state, $pspReference);
+
         return $this->locked((int) $order->getId(), function () use ($order, $pspReference, $state, $authorization, $moduleCode, $errorCode, $errorMessage): OrderPaymentTransaction {
             $orderId = (int) $order->getId();
             $reference = $this->cleanReference($pspReference);
@@ -242,6 +247,10 @@ final readonly class PaymentTransactionRecorder
      *
      * A line already settled the same way, under the same reference, is answered as it is:
      * the module's answer and the provider's notification may both bring the outcome.
+     *
+     * A succeeded outcome needs the provider reference, given here or already carried:
+     * without it, the provider's notification could never find the line and would write
+     * the movement a second time. A reference the line already carries is never replaced.
      */
     public function settle(
         OrderPaymentTransaction $transaction,
@@ -267,6 +276,16 @@ final readonly class PaymentTransactionRecorder
                 }
 
                 throw new PaymentException(\sprintf('Payment transaction #%d is already %s and cannot be settled again.', (int) $transaction->getId(), (string) $transaction->getState()));
+            }
+
+            $carried = $transaction->getPspReference();
+
+            if (null !== $pspReference && null !== $carried && $pspReference !== $carried) {
+                throw new PaymentException(\sprintf('Payment transaction #%d carries the reference %s; it is not settled under %s.', (int) $transaction->getId(), $carried, $pspReference));
+            }
+
+            if (PaymentTransactionState::SUCCEEDED === $state && null === ($pspReference ?? $carried)) {
+                throw new MissingProviderReferenceException(\sprintf('Payment transaction #%d is settled as succeeded with the reference the provider gave it.', (int) $transaction->getId()));
             }
 
             $transaction->setState($state->value);
@@ -635,6 +654,10 @@ final readonly class PaymentTransactionRecorder
         }
 
         $pspReference = trim($pspReference);
+
+        if (mb_strlen($pspReference) > self::PSP_REFERENCE_MAX_LENGTH) {
+            throw new PaymentException(\sprintf('A provider reference holds at most %d characters, %d given.', self::PSP_REFERENCE_MAX_LENGTH, mb_strlen($pspReference)));
+        }
 
         return '' === $pspReference ? null : $pspReference;
     }
