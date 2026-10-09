@@ -36,10 +36,11 @@ twice.
   the customer said, under the rounding rule the order was priced with, older
   orders included;
 - the products are credited by tax rate, the rate being the one their frozen
-  taxes make on their frozen price, filed under the closest rate of the chart
-  within a tenth of a point (0.83 of tax on 4.17 makes 19.90%, filed at 20%); a
-  line taxed twice is filed under the sum of its rates, which the chart needs a
-  row for;
+  taxes make on their frozen price, filed under the rate of the chart whose tax on
+  that price, rounded to the cent, is within a cent of the frozen tax, or which is
+  within a tenth of a point (0.20 of tax on 0.99 makes 20.20%, 0.83 on 4.17 makes
+  19.90%: both are filed at 20%); a line taxed twice is filed under the sum of its
+  rates, which the chart needs a row for;
 - an order discount is spread over the rates in proportion of their amount
   excluding tax;
 - the shipping is credited excluding tax on the shipping account, at the rates
