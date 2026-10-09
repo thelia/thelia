@@ -307,7 +307,7 @@ final readonly class PaymentTransactionRecorder
 
             if (!$transaction->isPending()) {
                 if ($transaction->getState() === $state->value && (null === $pspReference || $pspReference === $transaction->getPspReference())) {
-                    $this->announce($transaction->getOrder(), $transaction, $moduleCode);
+                    $this->announce($transaction->getOrder(), $transaction, $moduleCode, replay: true);
 
                     return $transaction;
                 }
@@ -497,7 +497,7 @@ final readonly class PaymentTransactionRecorder
         }
 
         if ($sameAmount && ($existing->getState() === $state->value || PaymentTransactionState::PENDING === $state)) {
-            $this->announce($order, $existing, $moduleCode);
+            $this->announce($order, $existing, $moduleCode, replay: true);
 
             return $existing;
         }
@@ -601,19 +601,19 @@ final readonly class PaymentTransactionRecorder
         return $result;
     }
 
-    private function announce(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode): void
+    private function announce(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode, bool $replay = false): void
     {
-        $this->announcements->push($order, $transaction, $moduleCode);
+        $this->announcements->push($order, $transaction, $moduleCode, $replay);
     }
 
     /**
-     * @param list<array{Order, OrderPaymentTransaction, ?string}> $lines
+     * @param list<array{Order, OrderPaymentTransaction, ?string, bool}> $lines
      */
     private function announceAll(array $lines, ?\Throwable $pendingFailure = null): void
     {
         $firstFailure = null;
 
-        foreach ($lines as [$order, $transaction, $moduleCode]) {
+        foreach ($lines as [$order, $transaction, $moduleCode, $replay]) {
             try {
                 // Read afresh, in an object of its own: a listener of an earlier line, or
                 // another worker once the lock was released, may have moved it, and the
@@ -622,7 +622,7 @@ final readonly class PaymentTransactionRecorder
                 $order = OrderQuery::create()->findPk($order->getId()) ?? $order;
 
                 $this->eventDispatcher->dispatch(
-                    new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
+                    new OrderPaymentTransactionEvent($order, $transaction, $moduleCode, $replay),
                     TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED,
                 );
             } catch (\Throwable $failure) {

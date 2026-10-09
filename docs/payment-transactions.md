@@ -267,8 +267,14 @@ commercial gesture, cancellation, other); the comment is cleaned and cut to 255
 characters before it reaches the provider.
 
 `ORDER_REFUNDED` (`OrderRefundedEvent`: the order, the line, the reason, the
-comment, whether it was made outside the provider) is sent once money was given
-back, for credit note and accounting modules. The service never moves the order:
+comment, whether it was made outside the provider) is sent for credit note and
+accounting modules, once per refund line, by `AnnounceRefundListener`: when the
+line is written succeeded or its pending answer arrives, whether the refund was
+asked from Thelia, recorded by hand or made from the provider's back office. The
+reason and the comment are there when the refund was asked from Thelia and
+answered in the same request; a refund the provider confirms later, or made at
+the provider, carries null. A line announced again (`isReplay()`) is not sent
+twice, so a listener of `ORDER_REFUNDED` that fails is not called again for it. The service never moves the order:
 once everything collected was given back and no refund waits for its answer, the
 journal moves a paid order to `refunded`, through the transition graph, as it
 moves it to `paid` after a capture. A partial refund leaves the order as it is.
