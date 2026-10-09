@@ -422,8 +422,14 @@ class Order extends BaseAction implements EventSubscriberInterface
         $statement = $con->prepare('SELECT status_id FROM `order` WHERE id = ? FOR UPDATE');
         $statement->bindValue(1, (int) $order->getId(), \PDO::PARAM_INT);
         $statement->execute();
+        $statusId = $statement->fetchColumn();
 
-        return (int) $statement->fetchColumn();
+        // No row: PDO answers false, Propel's statement an empty string.
+        if (!is_numeric($statusId)) {
+            throw new \InvalidArgumentException(\sprintf('Order #%d no longer exists: its status cannot change.', (int) $order->getId()));
+        }
+
+        return (int) $statusId;
     }
 
     /**
