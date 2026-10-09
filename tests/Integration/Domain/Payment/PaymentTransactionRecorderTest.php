@@ -343,15 +343,23 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         $this->recorder->recordAuthorization($this->order(100), 100);
     }
 
-    public function testAReplayedReferenceLessCaptureIsTheSameLine(): void
+    public function testACaptureReportedWithoutItsReferenceIsRefused(): void
     {
-        $order = $this->order(120);
+        // Without a reference, a replayed notification cannot be told from a second
+        // capture of the same amount: the journal would count the money twice or once,
+        // depending on a clock. Only the core's own lines go without one.
+        $this->expectException(MissingProviderReferenceException::class);
 
-        $first = $this->recorder->recordCapture($order, 120, moduleCode: 'Cheque');
-        $replayed = $this->recorder->recordCapture($order, 120, moduleCode: 'Cheque');
+        $this->recorder->recordCapture($this->order(120), 120, moduleCode: 'Cheque');
+    }
 
-        self::assertSame($first->getId(), $replayed->getId());
-        self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+    public function testARefundReportedWithoutItsReferenceIsRefused(): void
+    {
+        $order = $this->paid($this->order(100));
+
+        $this->expectException(MissingProviderReferenceException::class);
+
+        $this->recorder->recordRefund($order, 10, null, PaymentTransactionState::FAILED, moduleCode: 'Cheque');
     }
 
     public function testAReplayAfterAListenerFailureMovesTheOrderAtLast(): void

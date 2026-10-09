@@ -48,8 +48,10 @@ use Thelia\Model\OrderPaymentTransactionQuery;
  * ORDER_PAYMENT_TRANSACTION_RECORDED event is raised again for it, so a notification that
  * failed half way — the line written, the order not moved — heals when the provider
  * replays it. The listeners of that event must therefore stand being called twice for
- * the same line. A line with a provider reference is found by it; a settled line without
- * one by its type, outcome and amount within the last minute. A reference the journal
+ * the same line. A line with a provider reference is found by it: a module reports every
+ * settled capture and refund with the reference the provider gave it. Only the capture
+ * the shop writes for a module that keeps no journal goes without one, and is found by
+ * its type, outcome and amount within the last minute. A reference the journal
  * does not know settles the one pending line of that movement and amount still waiting
  * for its reference, when there is exactly one. A reference the journal
  * holds with another outcome or another amount is refused: a new attempt carries a new
@@ -70,8 +72,8 @@ use Thelia\Model\OrderPaymentTransactionQuery;
 final readonly class PaymentTransactionRecorder
 {
     /**
-     * How long, in seconds, a settled line without a provider reference stands for the
-     * same movement reported again.
+     * How long, in seconds, the capture written for a module that keeps no journal stands
+     * for the same capture written again.
      */
     private const REPLAY_WINDOW_SECONDS = 60;
 
@@ -126,6 +128,8 @@ final readonly class PaymentTransactionRecorder
             throw new InvalidPaymentAmountException(\sprintf('Order %s: a capture cannot be negative, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
 
+        $this->assertReferenceOfAnOutcome($order, PaymentTransactionType::CAPTURE, $state, $pspReference);
+
         $guard = PaymentTransactionState::FAILED === $state
             ? null
             : fn (): null => $this->assertCaptureFitsAuthorization($order, $amount);
@@ -146,6 +150,8 @@ final readonly class PaymentTransactionRecorder
         if (!PaymentAmount::isPositive($amount)) {
             throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));
         }
+
+        $this->assertReferenceOfAnOutcome($order, PaymentTransactionType::REFUND, $state, $pspReference);
 
         $guard = PaymentTransactionState::FAILED === $state
             ? null
@@ -440,8 +446,9 @@ final readonly class PaymentTransactionRecorder
     }
 
     /**
-     * A settled line without a provider reference stands for the same movement reported
-     * within the last minute with the same outcome and amount. A pending line is never
+     * A settled line without a provider reference — the capture written for a module
+     * that keeps no journal — stands for the same movement written again within the last
+     * minute with the same outcome and amount. A pending line is never
      * matched this way: it is written by the core before a call, and two calls are two.
      */
     private function replayedReferenceLessLine(int $orderId, PaymentTransactionType $type, PaymentTransactionState $state, string $amount): ?OrderPaymentTransaction
@@ -472,6 +479,18 @@ final readonly class PaymentTransactionRecorder
         $waiting = OrderPaymentTransactionQuery::create()->findPendingWithoutReference($orderId, $type, $amount);
 
         return 1 === \count($waiting) ? $waiting->getFirst() : null;
+    }
+
+    /**
+     * An outcome is reported with the reference the provider gave the movement: without
+     * it, the same notification replayed cannot be told from a second movement of the
+     * same amount. A pending line, written before the provider is called, has none yet.
+     */
+    private function assertReferenceOfAnOutcome(Order $order, PaymentTransactionType $type, PaymentTransactionState $state, ?string $pspReference): void
+    {
+        if ($state->isSettled() && null === $this->cleanReference($pspReference)) {
+            throw new MissingProviderReferenceException(\sprintf('Order %s: a %s is reported with the reference the provider gave it.', (string) $order->getRef(), $type->value));
+        }
     }
 
     private function assertCaptureFitsAuthorization(Order $order, float|string $amount): null
