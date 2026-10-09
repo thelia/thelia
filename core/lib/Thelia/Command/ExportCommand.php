@@ -24,6 +24,7 @@ use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\LangQuery;
@@ -161,6 +162,16 @@ class ExportCommand extends ContainerAwareCommand
         $output->writeln($formattedLine);
         $output->writeln('<info>Export available at path:</info>');
         $output->writeln('<comment>'.$exportEvent->getFilePath().'</comment>');
+
+        if ($exportEvent->getExport() instanceof ReportingExportInterface) {
+            foreach ($exportEvent->getExport()->report()->lines() as $line) {
+                $output->writeln($line);
+            }
+
+            foreach ($exportEvent->getExport()->report()->warnings() as $warning) {
+                $output->writeln('<comment>'.$warning.'</comment>');
+            }
+        }
 
         return 0;
     }
