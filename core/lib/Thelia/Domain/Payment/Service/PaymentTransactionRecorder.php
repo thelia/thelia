@@ -30,9 +30,11 @@ use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\OrderPaymentTransactionTableMap;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
+use Thelia\Model\OrderQuery;
 
 /**
  * Writes the payment journal of an order.
@@ -580,9 +582,11 @@ final readonly class PaymentTransactionRecorder
 
         foreach ($lines as [$order, $transaction, $moduleCode]) {
             try {
-                // Read afresh: a listener of an earlier line, or another worker once the
-                // lock was released, may have moved it.
-                $order->reload();
+                // Read afresh, in an object of its own: a listener of an earlier line, or
+                // another worker once the lock was released, may have moved it, and the
+                // caller's object may hold changes it has not saved yet.
+                OrderTableMap::removeInstanceFromPool($order);
+                $order = OrderQuery::create()->findPk($order->getId()) ?? $order;
 
                 $this->eventDispatcher->dispatch(
                     new OrderPaymentTransactionEvent($order, $transaction, $moduleCode),
