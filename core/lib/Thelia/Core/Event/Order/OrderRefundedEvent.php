@@ -20,15 +20,19 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 
 /**
- * Dispatched as ORDER_REFUNDED once money was given back — through the provider, or recorded
- * by hand — for credit note and accounting modules to follow.
+ * Dispatched as ORDER_REFUNDED once per refund line, when money was given back: through the
+ * provider, at once or on its later answer, from the provider's back office, or recorded by
+ * hand. For credit note and accounting modules to follow, keyed on the line.
+ *
+ * The reason and the comment are those the administrator gave when the refund was asked
+ * from Thelia and answered in the same request; null otherwise.
  */
 class OrderRefundedEvent extends ActionEvent
 {
     public function __construct(
         protected Order $order,
         protected OrderPaymentTransaction $transaction,
-        protected RefundReason $reason,
+        protected ?RefundReason $reason,
         protected ?string $comment,
         protected bool $offline,
     ) {
@@ -44,7 +48,7 @@ class OrderRefundedEvent extends ActionEvent
         return $this->transaction;
     }
 
-    public function getReason(): RefundReason
+    public function getReason(): ?RefundReason
     {
         return $this->reason;
     }

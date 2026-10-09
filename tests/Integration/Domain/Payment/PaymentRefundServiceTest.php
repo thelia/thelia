@@ -17,6 +17,8 @@ namespace Thelia\Tests\Integration\Domain\Payment;
 use Thelia\Core\Event\Order\OrderPaymentRefundEvent;
 use Thelia\Core\Event\Order\OrderRefundedEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Enum\RefundReason;
 use Thelia\Domain\Payment\Exception\DuplicateRefundException;
@@ -171,6 +173,56 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertSame('60.000000', $this->totals->forOrder((int) $order->getId())->refundable(), 'A refund waiting for its answer counts as given.');
     }
 
+    public function testARefundTheProviderConfirmsLaterIsAnnouncedOnceWithoutAReason(): void
+    {
+        $order = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentOperationResult::pending('REF-LATE');
+
+        $announced = $this->announcedRefunds(function () use ($order): void {
+            $pending = $this->service->refund($order, 40.0, RefundReason::Goodwill, 'Late parcel');
+            self::assertTrue($pending->isPending());
+
+            // The provider's notification, in a request of its own, then replayed.
+            $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'REF-LATE', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+            $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'REF-LATE', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+        });
+
+        self::assertSame([['40.000000', null, null, false]], $announced);
+    }
+
+    public function testARefundMadeFromTheProvidersBackOfficeIsAnnouncedOnce(): void
+    {
+        $order = $this->paidOrder(100);
+
+        $announced = $this->announcedRefunds(function () use ($order): void {
+            $this->recorder->recordRefund($order, 25, 'PSP-BO-1', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+            $this->recorder->recordRefund($order, 25, 'PSP-BO-1', moduleCode: DeferredCapturePaymentModule::getModuleCode());
+        });
+
+        self::assertSame([['25.000000', null, null, false]], $announced);
+    }
+
+    public function testARefundRecordedByHandIsAnnouncedWithItsReason(): void
+    {
+        $order = $this->paidOrder(100);
+
+        $announced = $this->announcedRefunds(function () use ($order): void {
+            $this->service->recordOfflineRefund($order, 100.0, RefundReason::Cancellation, 'Bank transfer');
+        });
+
+        self::assertSame([['100.000000', RefundReason::Cancellation, 'Bank transfer', true]], $announced);
+    }
+
+    public function testARefusedRefundIsNotAnnounced(): void
+    {
+        $order = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentOperationResult::failed('05', 'Refused');
+
+        self::assertSame([], $this->announcedRefunds(function () use ($order): void {
+            $this->service->refund($order, 40.0, RefundReason::Other);
+        }));
+    }
+
     public function testAModuleThatCannotRefundIsNamedInTheRefusal(): void
     {
         $order = $this->paidOrder(100);
@@ -230,6 +282,26 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertSame('REF-'.$online->getTransaction()->getId(), $online->getTransaction()->getPspReference());
         self::assertSame(PaymentRefundService::ERROR_CODE_OFFLINE, $offline->getTransaction()->getErrorCode());
         self::assertCount(1, DeferredCapturePaymentModule::$refundCalls, 'The refund recorded by hand calls no provider.');
+    }
+
+    /**
+     * @return list<array{string, ?RefundReason, ?string, bool}>
+     */
+    private function announcedRefunds(callable $work): array
+    {
+        $announced = [];
+        $listener = static function (OrderRefundedEvent $event) use (&$announced): void {
+            $announced[] = [(string) $event->getTransaction()->getAmount(), $event->getReason(), $event->getComment(), $event->isOffline()];
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_REFUNDED, $listener);
+
+        try {
+            $work();
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_REFUNDED, $listener);
+        }
+
+        return $announced;
     }
 
     private function paidOrder(float $total): Order

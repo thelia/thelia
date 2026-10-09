@@ -28,7 +28,7 @@ final class PaymentAnnouncementQueue
 {
     private int $depth = 0;
 
-    /** @var list<array{Order, OrderPaymentTransaction, ?string}> */
+    /** @var list<array{Order, OrderPaymentTransaction, ?string, bool}> */
     private array $lines = [];
 
     public function enter(): void
@@ -36,13 +36,13 @@ final class PaymentAnnouncementQueue
         ++$this->depth;
     }
 
-    public function push(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode): void
+    public function push(Order $order, OrderPaymentTransaction $transaction, ?string $moduleCode, bool $replay = false): void
     {
-        $this->lines[] = [$order, $transaction, $moduleCode];
+        $this->lines[] = [$order, $transaction, $moduleCode, $replay];
     }
 
     /**
-     * @return list<array{Order, OrderPaymentTransaction, ?string}> the lines to announce now, once the outermost lock is left
+     * @return list<array{Order, OrderPaymentTransaction, ?string, bool}> the lines to announce now, once the outermost lock is left
      */
     public function leave(): array
     {
