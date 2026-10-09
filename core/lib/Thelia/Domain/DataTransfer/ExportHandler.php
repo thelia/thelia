@@ -169,7 +169,7 @@ class ExportHandler
             }
         }
 
-        $rangeDate = $this->resolveRangeDate($rangeDate);
+        $rangeDate = ExportPeriod::resolve($rangeDate);
 
         if (null !== $rangeDate) {
             $instance->setRangeDate($rangeDate);
@@ -212,16 +212,6 @@ class ExportHandler
         foreach ($written as $file) {
             ExportStorage::discard($file);
         }
-    }
-
-    /**
-     * @param array{start?: mixed, end?: mixed}|null $rangeDate
-     *
-     * @return array{start?: mixed, end?: mixed}|null
-     */
-    public function resolveRangeDate(?array $rangeDate): ?array
-    {
-        return ExportPeriod::resolve($rangeDate);
     }
 
     /**

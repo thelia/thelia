@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Export;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 
 /**
@@ -29,7 +28,7 @@ final class ExportPeriod
      *
      * @param array{start?: mixed, end?: mixed}|null $rangeDate
      *
-     * @return array{start?: mixed, end?: mixed}|null
+     * @return array{start: ?\DateTimeInterface, end: ?\DateTimeInterface}|null
      */
     public static function resolve(?array $rangeDate): ?array
     {
@@ -47,9 +46,13 @@ final class ExportPeriod
      * A bound given as a date stays as it is; one given as the year and month of the
      * back-office form becomes the first, or the last, moment of that month.
      */
-    private static function boundOf(mixed $bound, bool $endOfMonth): mixed
+    private static function boundOf(mixed $bound, bool $endOfMonth): ?\DateTimeInterface
     {
-        if (!$bound || $bound instanceof \DateTimeInterface) {
+        if (!$bound) {
+            return null;
+        }
+
+        if ($bound instanceof \DateTimeInterface) {
             return $bound;
         }
 
@@ -69,10 +72,11 @@ final class ExportPeriod
         ) : false;
 
         if (false === $date) {
-            throw new JobRefusedException(Translator::getInstance()->trans('The dates of the export are not valid.'));
+            // Translated where it is shown, as the reason of any job refused.
+            throw new JobRefusedException('The dates of the export are not valid.');
         }
 
-        if ($endOfMonth && $date instanceof \DateTime) {
+        if ($endOfMonth) {
             $date->add(new \DateInterval('P1M'))->sub(new \DateInterval('P1D'));
         }
 
