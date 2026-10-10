@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Propel\Schema;
 
-use Thelia\Core\File\XmlDescriptor;
+use Thelia\Tools\TerminalText;
 
 /**
  * Combine Propel schemas describing databases into a single schema per database.
@@ -427,11 +427,12 @@ class SchemaCombiner
 
     /**
      * A text a module ships (a folder name, a filename attribute), fit for a comment of
-     * the combined schema: printed through TerminalText, and with no two dashes in a row,
-     * which would end the comment and let the rest of the text in as markup.
+     * the combined schema: on one line, through TerminalText, and with no two dashes in
+     * a row, which no comment may hold ("-->" would end it and let the rest of the text
+     * in as markup).
      */
     private static function commentText(string $text): string
     {
-        return (string) preg_replace('/-(?=-)/', '- ', XmlDescriptor::printable($text));
+        return (string) preg_replace('/-(?=-)/', '- ', TerminalText::singleLine($text));
     }
 }

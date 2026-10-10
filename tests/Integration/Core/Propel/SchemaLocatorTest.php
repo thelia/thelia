@@ -22,10 +22,14 @@ final class SchemaLocatorTest extends IntegrationTestCase
 {
     private ?string $localModuleDir = null;
 
+    private ?string $projectDir = null;
+
     protected function tearDown(): void
     {
-        if (null !== $this->localModuleDir) {
-            (new Filesystem())->remove($this->localModuleDir);
+        foreach ([$this->localModuleDir, $this->projectDir] as $directory) {
+            if (null !== $directory) {
+                (new Filesystem())->remove($directory);
+            }
         }
 
         parent::tearDown();
@@ -86,6 +90,63 @@ final class SchemaLocatorTest extends IntegrationTestCase
         self::assertStringContainsString('[thelia] The Propel schema '.$configDir.'/broken-schema.xml of module "Broken" could not be read (', $said);
         self::assertStringContainsString('tag mismatch', $said);
         self::assertStringContainsString('it is skipped, and its tables with it.', $said);
+    }
+
+    /**
+     * An external schema a module names (a file of the project, by its path from the
+     * root) is read as the schemas of the module are: one that cannot be read is left
+     * out and said so, by the schema that named it, the others are kept.
+     */
+    public function testAnExternalSchemaThatCannotBeReadIsSkippedAndSaidSo(): void
+    {
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $projectFolder = 'var/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $this->projectDir = THELIA_ROOT.$projectFolder;
+        $configDir = $this->localModuleDir.'/Outer/Config';
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($configDir.'/schema.xml', \sprintf('<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table><external-schema filename="%1$s/good.xml"/><external-schema filename="%1$s/broken.xml"/></database>', $projectFolder));
+        $filesystem->dumpFile($this->projectDir.'/good.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_two"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
+        $filesystem->dumpFile($this->projectDir.'/broken.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="never"></database>');
+        $errorLog = $this->localModuleDir.'/error.log';
+        $previousErrorLog = ini_set('error_log', $errorLog);
+
+        try {
+            $schemas = $this->createSchemaLocator()->findForModules(['Outer'], false);
+        } finally {
+            ini_set('error_log', (string) $previousErrorLog);
+        }
+
+        ksort($schemas);
+        self::assertSame([$configDir.'/schema.xml', $this->projectDir.'/good.xml'], array_keys($schemas));
+        $said = (string) file_get_contents($errorLog);
+        self::assertStringContainsString('[thelia] The Propel schema '.$this->projectDir.'/broken.xml of the schema '.$configDir.'/schema.xml could not be read (', $said);
+        self::assertStringContainsString('tag mismatch', $said);
+        self::assertStringNotContainsString('good.xml', $said);
+    }
+
+    /**
+     * The filename of an external schema is relative to the project: a file it names
+     * outside of it is no schema of the project, and is left out with that reason.
+     */
+    public function testAnExternalSchemaOutsideTheProjectIsSkippedAndSaidSo(): void
+    {
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $configDir = $this->localModuleDir.'/Outer/Config';
+        $outside = str_repeat('../', substr_count(trim(THELIA_ROOT, '/'), '/') + 1).ltrim($this->localModuleDir, '/').'/outside.xml';
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($configDir.'/schema.xml', \sprintf('<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table><external-schema filename="%s"/></database>', $outside));
+        $filesystem->dumpFile($this->localModuleDir.'/outside.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_two"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
+        $errorLog = $this->localModuleDir.'/error.log';
+        $previousErrorLog = ini_set('error_log', $errorLog);
+
+        try {
+            $schemas = $this->createSchemaLocator()->findForModules(['Outer'], false);
+        } finally {
+            ini_set('error_log', (string) $previousErrorLog);
+        }
+
+        self::assertSame([$configDir.'/schema.xml'], array_keys($schemas));
+        self::assertStringContainsString('of the schema '.$configDir.'/schema.xml could not be read (it is not a file of the project)', (string) file_get_contents($errorLog));
     }
 
     public function testFindForModulesReturnsCoreSchemas(): void

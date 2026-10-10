@@ -18,8 +18,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Thelia\Core\File\FolderFile;
 use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Validator\ModuleValidator;
+use Thelia\Tools\TerminalText;
 
 /**
  * Find Propel schemas of Thelia and Thelia modules.
@@ -98,8 +100,8 @@ class SchemaLocator
                     // generated at this point.
                     error_log(\sprintf(
                         '[thelia] Module "%s" is active in the database but its directory was not found on disk. Its Propel schema will be skipped; run "module:deactivate %s" to clean up.',
-                        XmlDescriptor::printable($moduleCode),
-                        XmlDescriptor::printable($moduleCode),
+                        TerminalText::singleLine($moduleCode),
+                        TerminalText::singleLine($moduleCode),
                     ));
 
                     continue;
@@ -118,7 +120,7 @@ class SchemaLocator
                 if ([] === $notLoaded) {
                     $schemaDocuments[] = $schemaDocument;
                 } else {
-                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', XmlDescriptor::printable($moduleCode)), $notLoaded);
+                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', $moduleCode), $notLoaded);
                 }
             }
 
@@ -171,8 +173,8 @@ class SchemaLocator
                 // yet: Propel models are not generated at this point.
                 error_log(\sprintf(
                     '[thelia] Module "%s" could not be validated (%s). Its dependencies will be skipped.',
-                    XmlDescriptor::printable($module),
-                    XmlDescriptor::printable($exception->getMessage()),
+                    TerminalText::singleLine($module),
+                    TerminalText::onOneLine($exception->getMessage()),
                 ));
 
                 continue;
@@ -246,11 +248,22 @@ class SchemaLocator
                     continue;
                 }
 
+                $owner = \sprintf('the schema %s', (string) $schemaDocument->documentURI);
+                // The filename is relative to the project: a schema it names outside of it
+                // (through "..", or a link) is no schema of the project.
+                $externalSchemaFile = FolderFile::resolve(THELIA_ROOT, $externalSchemaPath);
+
+                if (null === $externalSchemaFile) {
+                    $this->skip($externalSchemaPath, $owner, ['it is not a file of the project']);
+
+                    continue;
+                }
+
                 $externalSchemaDocument = new \DOMDocument();
-                $notLoaded = XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaPath);
+                $notLoaded = XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaFile);
 
                 if ([] !== $notLoaded) {
-                    $this->skip($externalSchemaPath, \sprintf('external schema of %s', XmlDescriptor::printable((string) $schemaDocument->documentURI)), $notLoaded);
+                    $this->skip($externalSchemaFile, $owner, $notLoaded);
 
                     continue;
                 }
@@ -266,7 +279,9 @@ class SchemaLocator
      * A schema that cannot be read is left out, and said so: its tables would be missing
      * from the generated models without a word otherwise. Not an exception, as the kernel
      * could not boot, CLI included, and nothing could be repaired; not Tlog either, which
-     * needs the models this is building.
+     * needs the models this is building. The path and the owner come from the module
+     * (its folder, its filename attribute), and are printed on one line here; the
+     * reasons are those of XmlDescriptor, printed already.
      *
      * @param list<string> $reasons
      */
@@ -274,8 +289,8 @@ class SchemaLocator
     {
         error_log(\sprintf(
             '[thelia] The Propel schema %s of %s could not be read (%s): it is skipped, and its tables with it.',
-            XmlDescriptor::printable($schemaPath),
-            $owner,
+            TerminalText::singleLine($schemaPath),
+            TerminalText::singleLine($owner),
             implode(', ', $reasons),
         ));
     }
