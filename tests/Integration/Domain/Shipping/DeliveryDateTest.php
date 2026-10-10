@@ -225,6 +225,33 @@ final class DeliveryDateTest extends IntegrationTestCase
     }
 
     /**
+     * A delay of zero days offers today, but a slot of today whose hours are over can no
+     * longer be honoured: a buyer at 15:00 is not offered the morning round.
+     */
+    public function testASlotOfTodayWhoseHoursAreOverIsNotOffered(): void
+    {
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Slot, 0, 3, []);
+        $morning = $this->settings()->addSlot($this->carrier, '09:00', '11:00', null);
+        $evening = $this->settings()->addSlot($this->carrier, '18:00', '20:00', null);
+
+        $offer = $this->calendar()->offerFor($this->carrier, new \DateTimeImmutable('today 15:00'))
+            ?? throw new \LogicException('The carrier offers no date.');
+        $today = $offer->days[0];
+
+        self::assertSame($this->day(0), $today->date->format('Y-m-d'));
+        self::assertFalse($today->slot((int) $morning->getId())?->available, 'The morning of today is over.');
+        self::assertTrue($today->slot((int) $evening->getId())?->available, 'The evening of today is still ahead.');
+        self::assertTrue($today->available);
+        self::assertTrue($offer->days[1]->slot((int) $morning->getId())?->available, 'Tomorrow morning is still ahead.');
+
+        $late = $this->calendar()->offerFor($this->carrier, new \DateTimeImmutable('today 20:00'))
+            ?? throw new \LogicException('The carrier offers no date.');
+
+        self::assertFalse($late->days[0]->available, 'Today has no slot left that can still be honoured.');
+        self::assertTrue($late->days[0]->open, 'It is still a day the carrier delivers on.');
+    }
+
+    /**
      * Dev check: a date forged in a request, outside the window or on a closed day, is refused.
      */
     public function testAForgedDayIsRefusedWhateverThePageShowed(): void

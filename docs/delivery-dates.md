@@ -42,7 +42,7 @@ Written through `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSetting
 
 ## How a day is judged
 
-`DeliveryDateCalendar::offerFor($module, $today, $locale)` lists every day from today + delay to today + horizon, each with `open` (the carrier delivers that day) and `available` (open and, for slots, one slot left), and for slots their hours and whether each can still be taken. It reads neither the session nor the cart, and costs the same few queries whatever the length of the window. Days are calendar days in the time zone PHP runs in, which is the shop's; hours are local.
+`DeliveryDateCalendar::offerFor($module, $now, $locale)` lists every day from today + delay to today + horizon, each with `open` (the carrier delivers that day) and `available` (open and, for slots, one slot left), and for slots their hours and whether each can still be taken (a slot of today whose hours are over cannot). It reads neither the session nor the cart, and costs the same few queries whatever the length of the window. Days are calendar days in the time zone PHP runs in, which is the shop's; hours are local.
 
 `DeliveryDateGuard` judges a choice against that list, recomputed at the time of asking. It is called by `CartGuard::checkValidDelivery()`, so the Flexy tunnel, `GET .../validation` and `POST .../place` all refuse the same way:
 
