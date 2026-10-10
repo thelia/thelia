@@ -155,6 +155,25 @@ final class OrderEditionBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(5.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity());
     }
 
+    public function testAFormThatLostALineOnTheWayRemovesNothing(): void
+    {
+        $this->loginAs($this->factory()->admin());
+        $order = $this->order(OrderStatus::CODE_NOT_PAID, [[$this->product(50.0), 1], [$this->product(20.0), 1]]);
+        $lines = $this->lines($order);
+        $crawler = $this->client->request('GET', '/admin/order/'.$order->getId().'/edit-lines');
+        $form = $crawler->filter('[data-testid="order-edit-save"]')->form();
+        $values = $form->getPhpValues();
+        // What a request cut short by an input limit sends: the second line never arrives.
+        unset($values['lines'][$lines[1]->getId()], $values['preview']);
+        $values['save'] = '1';
+
+        $crawler = $this->client->request('POST', $form->getUri(), $values);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertNotSame('', $crawler->filter('[data-testid="order-edit-error"]')->text(''));
+        self::assertCount(2, $this->lines($order));
+    }
+
     public function testWithoutTheEditionRightThereIsNoButtonAndNoPage(): void
     {
         $this->loginAs($this->factory()->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
