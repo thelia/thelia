@@ -32,7 +32,11 @@ final readonly class DeliveryModuleEligibilityChecker
     ) {
     }
 
-    public function isEligible(Module $module, Cart $cart, Country $country, ?State $state): bool
+    /**
+     * @param string|null $zipCode the postal code of the delivery address, checked against the
+     *                             postal code rules of the zones; null when it is not known
+     */
+    public function isEligible(Module $module, Cart $cart, Country $country, ?State $state, ?string $zipCode = null): bool
     {
         // A product of the cart the carrier cannot take rules it out, whatever it serves.
         if ($this->cartShippingRules->for($cart)->excludes((int) $module->getId())) {
@@ -77,7 +81,7 @@ final readonly class DeliveryModuleEligibilityChecker
         $isCartVirtual = $cart->isVirtual();
 
         $areaDeliveryModule = AreaDeliveryModuleQuery::create()
-            ->findByCountryAndModule($country, $module, $state);
+            ->findByCountryAndModule($country, $module, $state, $zipCode);
 
         if (false === $isCartVirtual && null === $areaDeliveryModule) {
             return false;

@@ -86,10 +86,13 @@ class Delivery extends BaseSpecificModule
 
         $virtual = $cart->isVirtual();
 
+        // The postal code counts only for the country of the address it belongs to.
+        $zipCode = null !== $address && $address->getCountryId() === $country?->getId() ? $address->getZipcode() : null;
+
         /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
             $areaDeliveryModule = AreaDeliveryModuleQuery::create()
-                ->findByCountryAndModule($country, $deliveryModule, $state);
+                ->findByCountryAndModule($country, $deliveryModule, $state, $zipCode);
 
             if (null === $areaDeliveryModule && false === $virtual) {
                 continue;

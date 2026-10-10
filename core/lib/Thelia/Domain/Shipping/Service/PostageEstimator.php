@@ -52,13 +52,26 @@ class PostageEstimator
     /**
      * Return the minimum expected postage, tax included, for a cart in a given country.
      *
+     * Without a postal code, the one of the cart's delivery address is used when that
+     * address is in the country estimated for: an estimate never offers a carrier the
+     * checkout will refuse for that address.
+     *
      * @throws PropelException
      */
     public function estimatePostageForCountry(
         Cart $cart,
         Country $country,
         ?State $state = null,
+        ?string $zipCode = null,
     ): EstimatedPostageDTO {
+        if (null === $zipCode) {
+            $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+            if (null !== $deliveryAddress && $deliveryAddress->getCountryId() === $country->getId()) {
+                $zipCode = $deliveryAddress->getZipcode();
+            }
+        }
+
         $orderSession = $this->session->getOrder();
 
         $deliveryModules = $this->resolveCandidateDeliveryModules(
@@ -75,7 +88,7 @@ class PostageEstimator
 
         /** @var Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
-            if (!$this->isModuleEligibleForCountryAndCart($deliveryModule, $country, $state, $virtual)) {
+            if (!$this->isModuleEligibleForCountryAndCart($deliveryModule, $country, $state, $virtual, $zipCode)) {
                 continue;
             }
 
@@ -148,9 +161,10 @@ class PostageEstimator
         Country $country,
         ?State $state,
         bool $virtual,
+        ?string $zipCode,
     ): bool {
         $areaDeliveryModule = AreaDeliveryModuleQuery::create()
-            ->findByCountryAndModule($country, $deliveryModule, $state);
+            ->findByCountryAndModule($country, $deliveryModule, $state, $zipCode);
 
         if (null === $areaDeliveryModule && false === $virtual) {
             return false;
