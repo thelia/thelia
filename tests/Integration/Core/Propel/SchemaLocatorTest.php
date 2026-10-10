@@ -58,7 +58,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
         $filesystem->dumpFile($configDir.'/schema.xml', self::schema('sample_one'));
         $filesystem->dumpFile($configDir.'/other-schema.xml', self::schema('sample_two'));
 
-        [$schemas] = $this->locating(['Mod%41ule']);
+        [$schemas] = $this->schemasAndErrorLog(['Mod%41ule']);
 
         self::assertEqualsCanonicalizing([$configDir.'/other-schema.xml', $configDir.'/schema.xml'], array_keys($schemas));
         self::assertSame('sample_two', $schemas[$configDir.'/other-schema.xml']->getElementsByTagName('table')->item(0)?->getAttribute('name'));
@@ -75,7 +75,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
         $filesystem->dumpFile($configDir.'/schema.xml', self::schema('sample_one'));
         $filesystem->dumpFile($configDir.'/broken-schema.xml', self::BROKEN_SCHEMA);
 
-        [$schemas, $said] = $this->locating(['Broken']);
+        [$schemas, $said] = $this->schemasAndErrorLog(['Broken']);
 
         self::assertSame([$configDir.'/schema.xml'], array_keys($schemas));
         self::assertStringContainsString('[thelia] The Propel schema '.$configDir.'/broken-schema.xml of module "Broken" could not be read (', $said);
@@ -97,7 +97,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
         $filesystem->dumpFile($this->projectDir.'/good.xml', self::schema('sample_two'));
         $filesystem->dumpFile($this->projectDir.'/broken.xml', self::BROKEN_SCHEMA);
 
-        [$schemas, $said] = $this->locating(['Outer']);
+        [$schemas, $said] = $this->schemasAndErrorLog(['Outer']);
 
         self::assertEqualsCanonicalizing([$configDir.'/schema.xml', $this->projectDir.'/good.xml'], array_keys($schemas));
         self::assertStringContainsString('[thelia] The Propel schema '.$this->projectDir.'/broken.xml of the schema '.$configDir.'/schema.xml could not be read (', $said);
@@ -118,7 +118,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
         $filesystem->dumpFile($configDir.'/schema.xml', self::schema('sample_one', \sprintf('<external-schema filename="%s&#10;side.xml"/>', $outside)));
         $filesystem->dumpFile($this->localModuleDir."/out\nside.xml", self::schema('sample_two'));
 
-        [$schemas, $said] = $this->locating(['Outer']);
+        [$schemas, $said] = $this->schemasAndErrorLog(['Outer']);
 
         self::assertSame([$configDir.'/schema.xml'], array_keys($schemas));
         self::assertStringContainsString('[thelia] The Propel schema '.$outside.'?side.xml of the schema '.$configDir.'/schema.xml could not be read (it is not a file of the project)', $said);
@@ -139,7 +139,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
         $filesystem->dumpFile($configDir.'/schema.xml', self::schema('sample_one', \sprintf('<external-schema filename="%s/bad&#10;[thelia] forged.xml"/>', $projectFolder)));
         $filesystem->dumpFile($this->projectDir."/bad\n[thelia] forged.xml", self::BROKEN_SCHEMA);
 
-        [$schemas, $said] = $this->locating([$moduleCode]);
+        [$schemas, $said] = $this->schemasAndErrorLog([$moduleCode]);
 
         self::assertSame([$configDir.'/schema.xml'], array_keys($schemas));
         self::assertStringContainsString('[thelia] The Propel schema '.$this->projectDir.'/bad?[thelia] forged.xml of the schema '.$this->localModuleDir.'/Forged?/Config/schema.xml could not be read (', $said);
@@ -185,7 +185,8 @@ final class SchemaLocatorTest extends IntegrationTestCase
 
     /**
      * A folder of the project, where an external schema has to be, by its path from the
-     * root, as a filename attribute names it; kept in $projectDir, removed after the test.
+     * root, as a filename attribute names it: the first file written there makes it.
+     * Kept in $projectDir, removed after the test.
      */
     private function temporaryProjectFolder(): string
     {
@@ -203,7 +204,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
      *
      * @return array{0: array<string, \DOMDocument>, 1: string}
      */
-    private function locating(array $modules): array
+    private function schemasAndErrorLog(array $modules): array
     {
         $errorLog = $this->localModuleDir.'/error.log';
         $previousErrorLog = ini_set('error_log', $errorLog);

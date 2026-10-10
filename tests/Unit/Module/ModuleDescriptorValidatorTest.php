@@ -259,8 +259,8 @@ final class ModuleDescriptorValidatorTest extends TestCase
     }
 
     /**
-     * A schema PHP cannot read for the account: the refusal names the schema, never its
-     * folder, out of what PHP said.
+     * A schema the account cannot read: the reason carries the read error PHP gave,
+     * naming the schema file and not its folder.
      */
     public function testADescriptorIsRefusedWhenItsSchemaCannotBeReadByTheAccount(): void
     {
