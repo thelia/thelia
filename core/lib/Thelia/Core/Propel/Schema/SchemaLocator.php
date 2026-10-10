@@ -113,9 +113,12 @@ class SchemaLocator
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
                 $schemaDocument = new \DOMDocument();
+                $notLoaded = XmlDescriptor::loadingErrors($schemaDocument, (string) $schemaFile->getRealPath());
 
-                if ([] === XmlDescriptor::loadingErrors($schemaDocument, (string) $schemaFile->getRealPath())) {
+                if ([] === $notLoaded) {
                     $schemaDocuments[] = $schemaDocument;
+                } else {
+                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', $moduleCode), $notLoaded);
                 }
             }
 
@@ -244,8 +247,11 @@ class SchemaLocator
                 }
 
                 $externalSchemaDocument = new \DOMDocument();
+                $notLoaded = XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaPath);
 
-                if ([] !== XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaPath)) {
+                if ([] !== $notLoaded) {
+                    $this->skip($externalSchemaPath, \sprintf('external schema of %s', XmlDescriptor::printable((string) $schemaDocument->documentURI)), $notLoaded);
+
                     continue;
                 }
 
@@ -254,6 +260,24 @@ class SchemaLocator
         }
 
         return $this->mergeDOMDocumentsArrays([$schemaDocuments, $externalSchemaDocuments]);
+    }
+
+    /**
+     * A schema that cannot be read is left out, and said so: its tables would be missing
+     * from the generated models without a word otherwise. Not an exception, as the kernel
+     * could not boot, CLI included, and nothing could be repaired; not Tlog either, which
+     * needs the models this is building.
+     *
+     * @param list<string> $reasons
+     */
+    private function skip(string $schemaPath, string $owner, array $reasons): void
+    {
+        error_log(\sprintf(
+            '[thelia] The Propel schema %s of %s could not be read (%s): it is skipped, and its tables with it.',
+            XmlDescriptor::printable($schemaPath),
+            $owner,
+            implode(', ', $reasons),
+        ));
     }
 
     /**
