@@ -24,7 +24,6 @@ use Thelia\Model\Country;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
-use Thelia\Model\TaxRule;
 
 /**
  * The VAT a cart would have carried had it not been exempted.
@@ -90,17 +89,13 @@ readonly class ExemptedVatCalculator
         $giftWrapping = $this->giftWrappingProvider->findActive(
             null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId()
         );
-        $taxRule = $giftWrapping?->getTaxRule();
 
-        if (!$taxRule instanceof TaxRule) {
+        if (null === $giftWrapping) {
             return 0.0;
         }
 
-        $untaxedPrice = (float) $giftWrapping->getPrice();
-
-        return $this->taxCalculatorFactory->createTaxCalculator()
-            ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
-            ->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+        return $this->giftWrappingProvider->taxedPrice($giftWrapping, $country, $state)
+            - round((float) $giftWrapping->getPrice(), 2);
     }
 
     private function lineTotal(float $unitPrice, float $quantity): float
