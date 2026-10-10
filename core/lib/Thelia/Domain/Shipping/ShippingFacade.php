@@ -326,10 +326,12 @@ final readonly class ShippingFacade
         ?int $addressId,
     ): array {
         if (null !== $country) {
-            // Explicit (country/state) context over address
-            $address = null;
+            // Explicit (country/state) context over address; the address still gives its
+            // postal code when it is in that country, as the API passes both.
+            $address = null === $addressId ? null : AddressQuery::create()->findPk($addressId);
+            $zipCode = null !== $address && $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
 
-            return [$address, $country, $state, null];
+            return [null, $country, $state, $zipCode];
         }
 
         if (null !== $addressId) {
