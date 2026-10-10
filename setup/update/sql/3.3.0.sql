@@ -302,4 +302,64 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Availability, customer rating and price facets of a product listing
+--
+-- The same reach as the promo and newness rows of 3.2.0: a row of
+-- `choice_filter_other` is what lets the category and the template screens
+-- of the back office show, place and draw these facets. A fresh install
+-- seeds them (setup/insert.sql); an upgraded shop gets them here.
+--
+-- Matched by `type`, never by id: a row is inserted only when none of that
+-- type exists and takes the next free id. INSERT IGNORE keeps a title the
+-- merchant already typed, one statement per facet so that each one is seen
+-- seeding every locale. The rating facet only shows when a review module
+-- provides the ratings, whatever this row says.
+-- ---------------------------------------------------------------------
+INSERT INTO `choice_filter_other` (`type`, `visible`)
+    SELECT 'availability', 1 FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `choice_filter_other` WHERE `type` = 'availability');
+
+INSERT INTO `choice_filter_other` (`type`, `visible`)
+    SELECT 'rating', 1 FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `choice_filter_other` WHERE `type` = 'rating');
+
+INSERT INTO `choice_filter_other` (`type`, `visible`)
+    SELECT 'price', 1 FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `choice_filter_other` WHERE `type` = 'price');
+
+SET @availability_filter_id := (SELECT MIN(`id`) FROM `choice_filter_other` WHERE `type` = 'availability');
+SET @rating_filter_id := (SELECT MIN(`id`) FROM `choice_filter_other` WHERE `type` = 'rating');
+SET @price_filter_id := (SELECT MIN(`id`) FROM `choice_filter_other` WHERE `type` = 'price');
+
+INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (@availability_filter_id, 'cs_CZ', 'Dostupnost', NULL),
+    (@availability_filter_id, 'de_DE', 'Verfügbarkeit', NULL),
+    (@availability_filter_id, 'en_US', 'Availability', NULL),
+    (@availability_filter_id, 'es_ES', 'Disponibilidad', NULL),
+    (@availability_filter_id, 'fr_FR', 'Disponibilité', NULL),
+    (@availability_filter_id, 'it_IT', 'Disponibilità', NULL),
+    (@availability_filter_id, 'nl_NL', 'Beschikbaarheid', NULL),
+    (@availability_filter_id, 'ru_RU', 'Наличие', NULL);
+
+INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (@rating_filter_id, 'cs_CZ', 'Hodnocení zákazníků', NULL),
+    (@rating_filter_id, 'de_DE', 'Kundenbewertung', NULL),
+    (@rating_filter_id, 'en_US', 'Customer rating', NULL),
+    (@rating_filter_id, 'es_ES', 'Valoración de clientes', NULL),
+    (@rating_filter_id, 'fr_FR', 'Note client', NULL),
+    (@rating_filter_id, 'it_IT', 'Valutazione dei clienti', NULL),
+    (@rating_filter_id, 'nl_NL', 'Klantbeoordeling', NULL),
+    (@rating_filter_id, 'ru_RU', 'Оценка покупателей', NULL);
+
+INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (@price_filter_id, 'cs_CZ', 'Cena', NULL),
+    (@price_filter_id, 'de_DE', 'Preis', NULL),
+    (@price_filter_id, 'en_US', 'Price', NULL),
+    (@price_filter_id, 'es_ES', 'Precio', NULL),
+    (@price_filter_id, 'fr_FR', 'Prix', NULL),
+    (@price_filter_id, 'it_IT', 'Prezzo', NULL),
+    (@price_filter_id, 'nl_NL', 'Prijs', NULL),
+    (@price_filter_id, 'ru_RU', 'Цена', NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

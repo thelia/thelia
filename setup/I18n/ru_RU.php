@@ -1527,4 +1527,7 @@ return [
     'Catalog price rules' => 'Правила цен каталога',
     'Promotion' => 'Акция',
     'Newness' => 'Новинка',
+    'Availability' => 'Наличие',
+    'Customer rating' => 'Оценка покупателей',
+    'Price' => 'Цена',
 ];

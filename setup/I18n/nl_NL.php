@@ -415,4 +415,7 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Availability' => 'Beschikbaarheid',
+    'Customer rating' => 'Klantbeoordeling',
+    'Price' => 'Prijs',
 ];

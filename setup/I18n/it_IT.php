@@ -433,4 +433,7 @@ return [
     'Catalog price rules' => 'Regole di prezzo del catalogo',
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
+    'Availability' => 'Disponibilità',
+    'Customer rating' => 'Valutazione dei clienti',
+    'Price' => 'Prezzo',
 ];
