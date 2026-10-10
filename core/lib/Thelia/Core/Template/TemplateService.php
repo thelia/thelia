@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Template;
 
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Model\ConfigQuery;
 
 class TemplateService
@@ -114,10 +115,7 @@ class TemplateService
             return '';
         }
 
-        $previousInternalErrors = libxml_use_internal_errors(true);
-        $descriptor = simplexml_load_file($descriptorPath);
-        libxml_clear_errors();
-        libxml_use_internal_errors($previousInternalErrors);
+        $descriptor = XmlDescriptor::read($descriptorPath);
 
         if (!$descriptor instanceof \SimpleXMLElement) {
             return '';

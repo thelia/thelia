@@ -106,7 +106,11 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
         return array_filter(
             $properties,
-            fn (\ReflectionProperty $property): bool => $property->getType() instanceof \ReflectionType
+            // Only a property typed with a single class can hold a resource or a
+            // collection of them; a union or an intersection type has no name to
+            // check, and the serializer asks this of every class it reads, far
+            // beyond API resources.
+            fn (\ReflectionProperty $property): bool => $property->getType() instanceof \ReflectionNamedType
                 && isset($data[$property->getName()])
                 && (
                     (

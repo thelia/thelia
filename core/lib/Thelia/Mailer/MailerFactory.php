@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Mailer;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
@@ -22,13 +24,14 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\EventListener\OrderEmailHistoryListener;
 use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderQuery;
 
@@ -59,13 +62,66 @@ class MailerFactory
         private readonly TemplateHelperInterface $templateHelper,
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
-        private readonly OrderHistoryRecorder $orderHistoryRecorder,
+        #[Autowire(service: 'mailer.transports')]
+        private readonly TransportInterface $transport,
     ) {
     }
 
     public function send(Email $message): void
     {
         $this->mailer->send($message);
+    }
+
+    /**
+     * Hands the message to the mail server now, whether the shop has a queue or not:
+     * for a test of the mail configuration, whose only point is the server's answer.
+     * Any refusal is thrown to the caller.
+     */
+    public function sendNow(Email $message): void
+    {
+        $this->transport->send($message);
+    }
+
+    /**
+     * Builds a message of the shop and hands it to the mail server now, queue or not:
+     * for a test of the message, whose only point is the server's answer. Nothing is
+     * written in the history of an order the test variables may name.
+     *
+     * @param array<string, mixed> $messageParameters
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    public function sendTestMessage(string $messageCode, string $recipient, array $messageParameters = [], ?string $locale = null): void
+    {
+        $this->sendNow($this->createEmailMessage($messageCode, $this->testSender($messageCode), [$recipient => $recipient], $messageParameters, $locale));
+    }
+
+    /**
+     * Sends a mail of the given subject and body to test the mail settings, handed to the
+     * mail server now, queue or not.
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    public function sendTestMail(string $recipient, string $subject, string $htmlBody): void
+    {
+        // The text part is the HTML one without its tags and entities.
+        $this->sendNow($this->createSimpleEmailMessage($this->testSender('mail_settings_test'), [$recipient => $recipient], $subject, $htmlBody, html_entity_decode(strip_tags($htmlBody), \ENT_QUOTES | \ENT_HTML5)));
+    }
+
+    /**
+     * @return array<string, string> the address and the name of the shop
+     *
+     * @throws EmailNotSentException when the shop has no address to send from
+     */
+    private function testSender(string $messageCode): array
+    {
+        $storeEmail = (string) ConfigQuery::getStoreEmail();
+
+        if ('' === $storeEmail) {
+            throw EmailNotSentException::storeEmailMissing($messageCode);
+        }
+
+        return [$storeEmail => (string) ConfigQuery::getStoreName()];
     }
 
     /**
@@ -197,6 +253,9 @@ class MailerFactory
      * is logged here, with everything the server may need; what the exception carries
      * is what a caller may show, and names neither a recipient nor a transport.
      *
+     * With a queue, "sent" means queued: only a mail that could not be built or queued
+     * throws here. One the mail server refuses later is set aside with the failed jobs.
+     *
      * @param array       $from              From addresses. An array of (email-address => name)
      * @param array       $to                To addresses. An array of (email-address => name)
      * @param array       $messageParameters an array of (name => value) parameters that will be available in the message
@@ -234,50 +293,34 @@ class MailerFactory
 
         try {
             $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
+            $this->tagWithTheOrderItIsAbout($instance, $messageCode, $messageParameters);
 
             $this->send($instance);
         } catch (\Exception $ex) {
             // The raw reason names the recipient: the server log is the only place
             // for it. The credentials of the transport are not even wanted there.
             Tlog::getInstance()->addError(
-                \sprintf('Error while sending email message %s: ', $messageCode).self::withoutTransportCredentials($ex->getMessage()),
+                \sprintf('Error while sending email message %s: ', $messageCode).TransportCredentials::hide($ex->getMessage()),
             );
 
             throw EmailNotSentException::sendingFailed($messageCode, $ex);
         }
-
-        // Only once the message is out. A send that failed has thrown above and
-        // leaves no line: an order history saying a customer was written to when
-        // nothing left the shop is worse than one that says nothing. Outside the
-        // try on purpose, so that a failure to record is never reported as a mail
-        // that did not leave.
-        $this->recordEmailSentOnOrder($messageCode, $messageParameters);
     }
 
     /**
-     * Hides the credentials a transport puts in the reason it refuses a message.
+     * Names, on the mail itself, the order it is about, when it is about one.
      *
-     * A mailer names the DSN it was configured with when it fails, password
-     * included: `smtp://user:s3cr3t@mail.example.com`. The log of a shop is read,
-     * shipped and archived far more widely than its configuration, so the
-     * userinfo part of any URL is replaced before the reason is written.
-     */
-    private static function withoutTransportCredentials(string $message): string
-    {
-        return preg_replace('#://[^@/\s]+@#', '://***@', $message) ?? $message;
-    }
-
-    /**
-     * Adds the mail to the history of the order it is about, when it is about one.
-     *
-     * Only the message code travels: never the body, never the subject, never the
-     * address it went to. What the entry answers is "the shop wrote to this order on
-     * that date, with that message" — the rest is the message template and the order
-     * itself, both of which are already on file.
+     * The line in the order history is written once the mail server has accepted the
+     * mail ({@see OrderEmailHistoryListener}), which is in this request when the shop
+     * has no queue and in a worker, minutes later, when it has one: an order history
+     * saying a customer was written to when nothing left the shop is worse than one
+     * that says nothing. Only the order id and the message code travel, never the
+     * body or the address, in headers of the mail that the history listener takes
+     * off before the mail leaves the shop: the customer never receives them.
      *
      * @param array<string, mixed> $messageParameters
      */
-    private function recordEmailSentOnOrder(string $messageCode, array $messageParameters): void
+    private function tagWithTheOrderItIsAbout(Email $email, string $messageCode, array $messageParameters): void
     {
         $orderId = $this->orderIdFromMessageParameters($messageParameters);
 
@@ -285,7 +328,9 @@ class MailerFactory
             return;
         }
 
-        $this->orderHistoryRecorder->recordEmailSent($orderId, $messageCode);
+        $email->getHeaders()
+            ->addTextHeader(OrderEmailHistoryListener::ORDER_ID_HEADER, (string) $orderId)
+            ->addTextHeader(OrderEmailHistoryListener::MESSAGE_CODE_HEADER, $messageCode);
     }
 
     /**
@@ -334,13 +379,9 @@ class MailerFactory
         }
 
         $message->setLocale($locale);
-        // Select the parser from the actual template file base name (e.g. "password"), not the
-        // message code (e.g. "lost_password"): the two frequently differ, and the parser is
-        // chosen by testing whether a matching template file exists. Using the code would make
-        // that existence test miss the real file and fall back to the wrong engine.
-        $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
-        $parser = $this->getParser(
-            '' !== $templateFileName ? pathinfo($templateFileName, \PATHINFO_FILENAME) : null
+        $parser = $this->parserFor($message);
+        $parser->setTemplateDefinition(
+            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
         );
         // Assign parameters
         foreach ($messageParameters as $name => $value) {
@@ -422,7 +463,6 @@ class MailerFactory
         $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
 
         $email->subject($subject);
-        $email->subject($subject);
         $email->text($textBody);
         $email->html($htmlBody);
 
@@ -482,23 +522,29 @@ class MailerFactory
     }
 
     /**
-     * @throws \Exception
+     * The parser that renders the message: the one that claims its template file, or the
+     * default parser for a message with no template file at all, which renders from its
+     * body stored in the database. The back office previews a message with it, so that
+     * what it shows is what would be sent. Its template definition is the caller's to set.
+     *
+     * @throws \Exception when no parser claims the template file
      */
-    protected function getParser(?string $template): ParserInterface
+    public function parserFor(Message $message): ParserInterface
     {
-        // A message with no template file at all renders from its database-stored body,
-        // so there is no file for a parser to claim: asking the resolver for one would
-        // report a missing resource, and sendEmailMessage() would swallow it — the mail
-        // silently lost. The default parser renders the stored body instead.
-        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
-        $parser = null === $template
-            ? $this->parserResolver->getDefaultParser()
-            : $this->parserResolver->getParser($path, $template);
+        // The parser is chosen by testing whether a matching template file exists: by the
+        // base name of that file (e.g. "password"), never by the message code (e.g.
+        // "lost_password"), the two frequently differ. A message with no template file has
+        // no file for a parser to claim: asking the resolver for one would report a missing
+        // resource, and sendEmailMessage() would swallow it, the mail silently lost.
+        $templateFileName = (string) ($message->getHtmlTemplateFileName() ?: $message->getTextTemplateFileName());
 
-        $parser->setTemplateDefinition(
-            $parser->getTemplateDefinition() ?: $this->templateHelper->getActiveMailTemplate()
+        if ('' === $templateFileName) {
+            return $this->parserResolver->getDefaultParser();
+        }
+
+        return $this->parserResolver->getParser(
+            $this->templateHelper->getActiveMailTemplate()->getAbsolutePath(),
+            pathinfo($templateFileName, \PATHINFO_FILENAME),
         );
-
-        return $parser;
     }
 }

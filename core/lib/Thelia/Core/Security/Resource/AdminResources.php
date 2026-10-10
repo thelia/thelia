@@ -76,6 +76,7 @@ class AdminResources
     public const FEATURE = 'admin.configuration.feature';
     public const FOLDER = 'admin.folder';
     public const GIFT_WRAPPING = 'admin.configuration.gift-wrapping';
+    public const BACKGROUND_JOBS = 'admin.configuration.background-jobs';
     public const HOME = 'admin.home';
     public const LANGUAGE = 'admin.configuration.language';
     public const MAILING_SYSTEM = 'admin.configuration.mailing-system';

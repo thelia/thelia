@@ -141,7 +141,6 @@ parameters:
 		# Absorbs analysis noise that drifted in from default-twig `main` ahead of this
 		# baseline. reportUnmatchedIgnoredErrors is false, so these only ever soak up the
 		# listed known items; the gate still fails on any new error class.
-		- '#^Property .*ExportImportController.*events is never read, only written\.$#'
 		- '#^Parameter .*unsubscribed of method .*NewsletterQuery.*filterByUnsubscribed.* expects .*int given\.$#'
 		- '#^Cannot cast Thelia.*Product to int\.$#'
 		- '#^Parameter .*active of method .*LangQuery.*filterByActive.* expects .*int given\.$#'

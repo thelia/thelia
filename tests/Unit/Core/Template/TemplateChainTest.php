@@ -126,6 +126,26 @@ final class TemplateChainTest extends TestCase
         );
     }
 
+    /**
+     * A template folder whose name reads as a URI ("%41") is a folder: libxml, given the
+     * path, decoded it and found no descriptor, so the parent was lost.
+     */
+    public function testATemplateInAFolderThatReadsAsAUriStillNamesItsParent(): void
+    {
+        $parent = $this->uniqueTemplateName().'%41';
+        $child = $this->uniqueTemplateName().'%42';
+        $this->writeTemplate($parent, null);
+        $this->writeTemplate($child, $parent);
+
+        self::assertSame(
+            [
+                THELIA_TEMPLATE_DIR.self::TYPE.DS.$child,
+                THELIA_TEMPLATE_DIR.self::TYPE.DS.$parent,
+            ],
+            TemplateService::getTemplateChainAbsolutePath(self::TYPE, $child),
+        );
+    }
+
     public function testATemplateWithoutDescriptorHasNoParent(): void
     {
         $template = $this->uniqueTemplateName();

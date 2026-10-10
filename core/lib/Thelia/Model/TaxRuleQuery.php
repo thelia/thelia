@@ -33,6 +33,15 @@ class TaxRuleQuery extends BaseTaxRuleQuery
     protected static array $caches = [];
 
     /**
+     * Forget the taxes read per rule and country: a worker would otherwise keep
+     * applying a rate changed in the back office since it read it.
+     */
+    public static function resetCache(): void
+    {
+        self::$caches = [];
+    }
+
+    /**
      * @throws PropelException
      */
     public function getTaxCalculatorCollection(TaxRule $taxRule, ?Country $country = null, ?State $state = null): mixed

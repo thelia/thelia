@@ -118,4 +118,5 @@ return [
     'This order requires an account.' => 'Tato objednávka vyžaduje účet.',
     'This shop is not asking for the consent "%consent".' => 'Tento obchod nevyžaduje souhlas "%consent".',
     'You must accept "%consent" to place this order.' => 'Pro odeslání této objednávky musíte souhlasit s "%consent".',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'Hodnota „%value“ ve sloupci %column není číslo (id varianty produktu %id)',
 ];

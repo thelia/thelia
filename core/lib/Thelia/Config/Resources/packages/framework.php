@@ -14,6 +14,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use Thelia\Domain\DataTransfer\Job\RunExportJob;
+use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Messenger\Middleware\ReplayedJobMiddleware;
+use Thelia\Messenger\Serializer\AllowedClassesSerializer;
+
 return static function (ContainerConfigurator $container): void {
     $container->extension('framework', [
         'session' => [
@@ -158,6 +164,31 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // A test mail goes to whatever address the administrator types, at once and
+            // whatever the queue: ten in ten minutes is more than a configuration needs.
+            'admin_test_mail' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
+            // A lost password request mails the administrator it names a link that sets
+            // a new password: whoever knows a login must not be able to flood that
+            // administrator's mailbox from as many addresses as they like. Five an hour
+            // leaves room for a mail that took time to arrive.
+            'admin_lost_password' => [
+                'policy' => 'sliding_window',
+                'limit' => 5,
+                'interval' => '1 hour',
+            ],
+            // An export reads, an import rewrites, the whole catalog in one job, and a
+            // queue runs them one after the other: a form sent over and over would
+            // hold the heavy queue for hours. Per administrator, ten in ten minutes is
+            // more than anyone runs by hand.
+            'admin_data_transfer_launch' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '10 minutes',
+            ],
             // Resolving references answers with titles, prices and stock levels for up
             // to five hundred lines at a time: without a cap, a signed-in account walks
             // the catalog and measures its stock. Thirty a minute leaves a buyer room to
@@ -166,6 +197,66 @@ return static function (ContainerConfigurator $container): void {
                 'policy' => 'sliding_window',
                 'limit' => 30,
                 'interval' => '1 minute',
+            ],
+        ],
+        'messenger' => [
+            // Read and written as JSON through an allow list, never PHP
+            // serialization: whoever can write to a queue picks the classes.
+            'serializer' => [
+                'default_serializer' => AllowedClassesSerializer::class,
+            ],
+            'failure_transport' => 'failed',
+            'default_bus' => 'messenger.bus.default',
+            'buses' => [
+                'messenger.bus.default' => [
+                    // A job replayed by messenger:failed:retry starts afresh, as one
+                    // replayed from the back office does.
+                    'middleware' => [ReplayedJobMiddleware::class],
+                ],
+            ],
+            'transports' => [
+                // The jobs of the shop. Empty, MESSENGER_TRANSPORT_DSN leaves this
+                // transport synchronous and every job runs in the request that
+                // dispatched it. A worker consumes it once it names a queue:
+                // doctrine://default for the shop database, or a Redis or AMQP DSN
+                // once symfony/redis-messenger or symfony/amqp-messenger is installed.
+                'async' => [
+                    'dsn' => '%env(default:thelia.messenger.inline_transport_dsn:MESSENGER_TRANSPORT_DSN)%',
+                    // Three more attempts, 30 seconds, 2 minutes then 8 minutes
+                    // apart, which outlasts a mail server restarting. Then the job
+                    // is set aside in the failure transport: never lost, never
+                    // replayed in a loop.
+                    'retry_strategy' => [
+                        'max_retries' => 3,
+                        'delay' => 30000,
+                        'multiplier' => 4,
+                        'max_delay' => 0,
+                    ],
+                ],
+                // The heavy jobs, exports and imports, on a queue of their own so a
+                // long import never holds up the mails. Derived from
+                // MESSENGER_TRANSPORT_DSN (see HeavyTransportDsnProcessor), or set
+                // with MESSENGER_HEAVY_TRANSPORT_DSN. A job that fails is recorded
+                // on its row and set aside at once, whatever failed: running a whole
+                // import again on its own is the administrator's call, from the
+                // failed jobs.
+                'async_heavy' => [
+                    'dsn' => '%env(thelia_heavy_queue:MESSENGER_TRANSPORT_DSN)%',
+                    'retry_strategy' => [
+                        'max_retries' => 0,
+                    ],
+                ],
+                'failed' => '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%',
+            ],
+            'routing' => [
+                // The mail is rendered in the request, where the language and the
+                // address of the shop are known; only the delivery to the mail
+                // server waits for the worker.
+                SendEmailMessage::class => 'async',
+                // An export or an import asked for in the back office: its row
+                // tells how it went while the page is free.
+                RunExportJob::class => 'async_heavy',
+                RunImportJob::class => 'async_heavy',
             ],
         ],
     ], prepend: true);

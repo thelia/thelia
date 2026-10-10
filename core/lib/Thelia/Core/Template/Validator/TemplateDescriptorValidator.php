@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Template\Validator;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
 
@@ -53,26 +54,18 @@ class TemplateDescriptorValidator
     public function validate(?string $version = null): self
     {
         $dom = new \DOMDocument();
-        $errors = [];
+        $errors = XmlDescriptor::loadingErrors($dom, $this->xmlDescriptorPath);
 
-        if ($dom->load($this->xmlDescriptorPath)) {
-            /** @var \SplFileInfo $xsdFile */
-            foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
+        if ([] === $errors) {
+            ['version' => $found, 'errors' => $errors] = XmlDescriptor::matchingSchemaVersion($dom, $this->xsdFinder, self::$versions, $version, $this->schemaValidate(...));
 
-                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
-                    continue;
-                }
-
-                $errors = $this->schemaValidate($dom, $xsdFile);
-
-                if ([] === $errors) {
-                    return $this;
-                }
+            if (null !== $found) {
+                return $this;
             }
         }
 
-        throw new InvalidDescriptorException(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors)));
+        // A file of the theme, read by its developer: named by its path.
+        throw new InvalidDescriptorException(XmlDescriptor::printable(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors))));
     }
 
     /**
@@ -85,46 +78,18 @@ class TemplateDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $errorMessages = [];
-
-        try {
-            libxml_use_internal_errors(true);
-
-            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-                $errors = libxml_get_errors();
-
-                foreach ($errors as $error) {
-                    $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
-                        $error->message,
-                        $error->level,
-                        $error->code,
-                        $error->file,
-                        $error->line,
-                        $error->column,
-                    );
-                }
-
-                libxml_clear_errors();
-            }
-
-            libxml_use_internal_errors(false);
-        } catch (\Exception) {
-            libxml_use_internal_errors(false);
-        }
-
-        return $errorMessages;
+        return array_map(
+            static fn (string $error): string => 'XML error "'.$error.'"',
+            XmlDescriptor::schemaErrors($dom, (string) $xsdFile->getRealPath()),
+        );
     }
 
-    /**
-     * @return object|null
-     */
     public function getDescriptor(): \SimpleXMLElement|false|null
     {
         if (file_exists($this->xmlDescriptorPath)) {
             $this->validate();
 
-            return @simplexml_load_file($this->xmlDescriptorPath);
+            return XmlDescriptor::read($this->xmlDescriptorPath);
         }
 
         Tlog::getInstance()->addWarning(\sprintf('Template descriptor %s does not exists.', $this->xmlDescriptorPath));

@@ -4733,5 +4733,123 @@ CREATE TABLE `customer_list_item`
             ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- export_job
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_job`;
+
+CREATE TABLE `export_job`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `export_id` INTEGER NOT NULL,
+    `admin_id` INTEGER COMMENT 'the admin who asked for the export, NULL once that admin is gone',
+    `status` VARCHAR(20) DEFAULT 'queued' NOT NULL COMMENT 'queued, running, done or failed',
+    `serializer` VARCHAR(100) NOT NULL COMMENT 'the id of the serializer the file is written with',
+    `archiver` VARCHAR(100) COMMENT 'the id of the archiver the file is packed with, NULL for none',
+    `lang_id` INTEGER,
+    `include_images` TINYINT DEFAULT 0 NOT NULL,
+    `include_documents` TINYINT DEFAULT 0 NOT NULL,
+    `range_start` DATETIME,
+    `range_end` DATETIME,
+    `processed_rows` INTEGER DEFAULT 0 NOT NULL COMMENT 'the rows written so far',
+    `file_path` VARCHAR(255) COMMENT 'where the finished file is, on the server',
+    `file_name` VARCHAR(255) COMMENT 'the name the file is downloaded under',
+    `error` TEXT COMMENT 'why the export failed, as shown to the administrator',
+    `started_at` DATETIME,
+    `finished_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_export_job_export_id` (`export_id`),
+    INDEX `idx_export_job_created_at` (`created_at`),
+    INDEX `fi_export_job_admin_id` (`admin_id`),
+    INDEX `fi_export_job_lang_id` (`lang_id`),
+    CONSTRAINT `fk_export_job_export_id`
+        FOREIGN KEY (`export_id`)
+        REFERENCES `export` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_export_job_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_export_job_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- import_job
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_job`;
+
+CREATE TABLE `import_job`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `import_id` INTEGER NOT NULL,
+    `admin_id` INTEGER COMMENT 'the admin who asked for the import, NULL once that admin is gone',
+    `status` VARCHAR(20) DEFAULT 'queued' NOT NULL COMMENT 'queued, running, done or failed',
+    `lang_id` INTEGER,
+    `file_path` VARCHAR(255) NOT NULL COMMENT 'where the uploaded file waits for the import, on the server',
+    `file_name` VARCHAR(255) NOT NULL COMMENT 'the name the file was uploaded under',
+    `imported_rows` INTEGER DEFAULT 0 NOT NULL COMMENT 'the rows the import changed',
+    `row_errors` TEXT COMMENT 'the rows the import refused and why, as a JSON list',
+    `error` TEXT COMMENT 'why the import failed, as shown to the administrator',
+    `started_at` DATETIME,
+    `finished_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_import_job_import_id` (`import_id`),
+    INDEX `idx_import_job_created_at` (`created_at`),
+    INDEX `fi_import_job_admin_id` (`admin_id`),
+    INDEX `fi_import_job_lang_id` (`lang_id`),
+    CONSTRAINT `fk_import_job_import_id`
+        FOREIGN KEY (`import_id`)
+        REFERENCES `import` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_import_job_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_import_job_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- messenger_messages
+--
+-- The queue of the background jobs when the shop keeps them in its own
+-- database (MESSENGER_TRANSPORT_DSN=doctrine://default), and the jobs that
+-- failed for good whatever the transport. Read and written by the Doctrine
+-- transport of Symfony Messenger, never by Propel: the table is not in
+-- schema.xml and has no model.
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `messenger_messages`;
+
+CREATE TABLE `messenger_messages`
+(
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `body` LONGTEXT NOT NULL,
+    `headers` LONGTEXT NOT NULL,
+    `queue_name` VARCHAR(190) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `available_at` DATETIME NOT NULL,
+    `delivered_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_messenger_messages_queue_name_available_at` (`queue_name`, `available_at`, `delivered_at`, `id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

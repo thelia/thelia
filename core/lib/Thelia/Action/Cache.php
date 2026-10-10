@@ -16,11 +16,14 @@ namespace Thelia\Action;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Messenger\WorkerRestartSignal;
 
 /**
  * Class Cache.
@@ -41,12 +44,16 @@ class Cache extends BaseAction implements EventSubscriberInterface
     /** @var CacheEvent[] */
     protected array $onTerminateCacheClearEvents = [];
 
+    /** @var array<int, true> the commands running in this process, by their object id */
+    private array $runningCommands = [];
+
     /**
      * CacheListener constructor.
      */
     public function __construct(
         protected AdapterInterface $adapter,
         protected string $environment,
+        protected ?WorkerRestartSignal $workerRestartSignal = null,
     ) {
     }
 
@@ -78,10 +85,51 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function onConsoleCommand(ConsoleEvent $event): void
+    {
+        $this->runningCommands[self::commandOf($event)] = true;
+    }
+
+    /**
+     * Only the last command running clears. A recurring task runs its command inside the
+     * worker, and that command ends with a console terminate of its own; the worker's
+     * command ends whatever stopped it, an exception included. A command is told by its
+     * own start and end: one whose start was never counted (a listener before this one
+     * failed) never stands for the worker's.
+     */
+    public function onConsoleTerminate(ConsoleEvent $event): void
+    {
+        unset($this->runningCommands[self::commandOf($event)]);
+
+        if ([] !== $this->runningCommands) {
+            return;
+        }
+
+        $this->onTerminate();
+    }
+
     public function onTerminate(): void
     {
-        foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
+        // A worker runs one command after another in the same process: a clear is done
+        // once, not again at the end of every command that follows.
+        $cacheEvents = $this->onTerminateCacheClearEvents;
+        $this->onTerminateCacheClearEvents = [];
+
+        foreach ($cacheEvents as $cacheEvent) {
             $this->execCacheClear($cacheEvent);
+        }
+    }
+
+    /**
+     * A worker ends no command between two jobs: a clear a job asked for stops the
+     * worker, and runs when its command ends. It cannot run as the job ends: the job is
+     * not acknowledged yet, and the worker still loads its own listeners from the
+     * container files the clear deletes.
+     */
+    public function stopTheWorkerOnAPendingClear(WorkerRunningEvent $event): void
+    {
+        if ([] !== $this->onTerminateCacheClearEvents) {
+            $event->getWorker()->stop();
         }
     }
 
@@ -91,6 +139,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
         $fs->remove($event->getDir());
+
+        // Only once the directory is gone: a worker started again before would boot
+        // on the container being deleted.
+        $this->workerRestartSignal?->sendIfItHeldTheContainer($event->getDir());
 
         if (!$event->invalidatesPropelSchema()) {
             return;
@@ -107,7 +159,16 @@ class Cache extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
-            ConsoleEvents::TERMINATE => ['onTerminate', self::TERMINATE_PRIORITY],
+            ConsoleEvents::COMMAND => ['onConsoleCommand', \PHP_INT_MAX],
+            ConsoleEvents::TERMINATE => ['onConsoleTerminate', self::TERMINATE_PRIORITY],
+            WorkerRunningEvent::class => ['stopTheWorkerOnAPendingClear', self::TERMINATE_PRIORITY],
         ];
+    }
+
+    private static function commandOf(ConsoleEvent $event): int
+    {
+        $command = $event->getCommand();
+
+        return null === $command ? 0 : spl_object_id($command);
     }
 }

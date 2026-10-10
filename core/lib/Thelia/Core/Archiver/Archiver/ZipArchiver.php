@@ -54,7 +54,7 @@ class ZipArchiver extends AbstractArchiver
 
         $this->archivePath = $baseName.'.'.$this->getExtension();
 
-        $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $this->assertOpened($this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE));
 
         return $this;
     }
@@ -65,7 +65,7 @@ class ZipArchiver extends AbstractArchiver
 
         $this->archivePath = $path;
 
-        $this->archive->open($this->archivePath);
+        $this->assertOpened($this->archive->open($this->archivePath));
 
         return $this;
     }
@@ -77,6 +77,41 @@ class ZipArchiver extends AbstractArchiver
 
     public function close(): bool
     {
-        return $this->archive->close();
+        if (null === $this->archive) {
+            return true;
+        }
+
+        $closed = $this->archive->close();
+        $this->archive = null;
+
+        return $closed;
+    }
+
+    /**
+     * A zip is written when it is closed: what it was given is dropped first, so a
+     * failed export never writes a whole archive only to remove it.
+     */
+    public function discard(): void
+    {
+        if (null === $this->archive) {
+            return;
+        }
+
+        $this->archive->unchangeAll();
+        $this->archive->close();
+        $this->archive = null;
+    }
+
+    /**
+     * ZipArchive::open() tells a failure by its return value: refused at once, rather than
+     * by an extraction that finds nothing or an archive that is never written.
+     */
+    private function assertOpened(int|bool $opened): void
+    {
+        if (true !== $opened) {
+            $this->archive = null;
+
+            throw new \RuntimeException(\sprintf('The zip archive %s cannot be opened (ZipArchive error %s).', basename($this->archivePath), var_export($opened, true)));
+        }
     }
 }

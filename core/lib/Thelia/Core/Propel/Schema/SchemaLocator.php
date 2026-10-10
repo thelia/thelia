@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
@@ -97,8 +98,8 @@ class SchemaLocator
                     // generated at this point.
                     error_log(\sprintf(
                         '[thelia] Module "%s" is active in the database but its directory was not found on disk. Its Propel schema will be skipped; run "module:deactivate %s" to clean up.',
-                        $moduleCode,
-                        $moduleCode,
+                        XmlDescriptor::printable($moduleCode),
+                        XmlDescriptor::printable($moduleCode),
                     ));
 
                     continue;
@@ -112,10 +113,12 @@ class SchemaLocator
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
                 $schemaDocument = new \DOMDocument();
-                $isValid = $schemaDocument->load($schemaFile->getRealPath());
+                $notLoaded = XmlDescriptor::loadingErrors($schemaDocument, (string) $schemaFile->getRealPath());
 
-                if ($isValid) {
+                if ([] === $notLoaded) {
                     $schemaDocuments[] = $schemaDocument;
+                } else {
+                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', XmlDescriptor::printable($moduleCode)), $notLoaded);
                 }
             }
 
@@ -168,8 +171,8 @@ class SchemaLocator
                 // yet: Propel models are not generated at this point.
                 error_log(\sprintf(
                     '[thelia] Module "%s" could not be validated (%s). Its dependencies will be skipped.',
-                    $module,
-                    $exception->getMessage(),
+                    XmlDescriptor::printable($module),
+                    XmlDescriptor::printable($exception->getMessage()),
                 ));
 
                 continue;
@@ -244,8 +247,11 @@ class SchemaLocator
                 }
 
                 $externalSchemaDocument = new \DOMDocument();
+                $notLoaded = XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaPath);
 
-                if (!$externalSchemaDocument->load($externalSchemaPath)) {
+                if ([] !== $notLoaded) {
+                    $this->skip($externalSchemaPath, \sprintf('external schema of %s', XmlDescriptor::printable((string) $schemaDocument->documentURI)), $notLoaded);
+
                     continue;
                 }
 
@@ -254,6 +260,24 @@ class SchemaLocator
         }
 
         return $this->mergeDOMDocumentsArrays([$schemaDocuments, $externalSchemaDocuments]);
+    }
+
+    /**
+     * A schema that cannot be read is left out, and said so: its tables would be missing
+     * from the generated models without a word otherwise. Not an exception, as the kernel
+     * could not boot, CLI included, and nothing could be repaired; not Tlog either, which
+     * needs the models this is building.
+     *
+     * @param list<string> $reasons
+     */
+    private function skip(string $schemaPath, string $owner, array $reasons): void
+    {
+        error_log(\sprintf(
+            '[thelia] The Propel schema %s of %s could not be read (%s): it is skipped, and its tables with it.',
+            XmlDescriptor::printable($schemaPath),
+            $owner,
+            implode(', ', $reasons),
+        ));
     }
 
     /**

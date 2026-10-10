@@ -15,16 +15,26 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\Parser\ParserFallback;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
+use Thelia\Mailer\Exception\EmailNotSentException;
+use Thelia\Mailer\Exception\StoreEmailMissingException;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
+use Thelia\Model\MessageQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class MailerFactoryTest extends IntegrationTestCase
@@ -39,7 +49,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
     }
 
@@ -230,7 +240,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverReturning($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
 
         $wasAdminEnvironment = Request::$isAdminEnv;
@@ -283,7 +293,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
 
         $email = $mailerFactory->createEmailMessage(
@@ -371,6 +381,145 @@ final class MailerFactoryTest extends IntegrationTestCase
     }
 
     /**
+     * A test message is handed to the mail server at once, queue or not: its point is
+     * the server's answer.
+     */
+    public function testATestMessageGoesToTheMailServerAtOnce(): void
+    {
+        $this->givenTheStoreEmail('shop@example.com');
+        $sent = [];
+        $transport = $this->spyTransport($sent);
+        $message = new Message();
+        $message->setName('test_message_sent_at_once');
+        $message->setLocale('en_US');
+        $message->setSubject('A test');
+        $message->setHtmlMessage('<p>A test.</p>');
+        $message->setTextMessage('A test.');
+        $message->save();
+
+        (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
+            ->sendTestMessage('test_message_sent_at_once', 'someone@example.com', [], 'en_US');
+
+        self::assertCount(1, $sent);
+    }
+
+    /**
+     * A shop without an address to send from is told so, not what the address parser
+     * makes of an empty one.
+     */
+    public function testATestMessageOfAShopWithoutAnAddressSaysSo(): void
+    {
+        $this->givenTheStoreEmail('');
+        $message = MessageQuery::create()->findOne();
+        self::assertNotNull($message);
+
+        $this->expectException(EmailNotSentException::class);
+
+        $this->mailerFactory->sendTestMessage((string) $message->getName(), 'someone@example.com', [], null);
+    }
+
+    public function testATestOfTheMailSettingsGoesToTheMailServerAtOnce(): void
+    {
+        $this->givenTheStoreEmail('shop@example.com');
+        $sent = [];
+        $transport = $this->spyTransport($sent);
+
+        (new MailerFactory($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), $transport))
+            ->sendTestMail('someone@example.com', 'A test', '<p>Email test from : Tom &amp; Jerry</p>');
+
+        self::assertCount(1, $sent);
+        self::assertInstanceOf(Email::class, $sent[0]);
+        // The text part reads as the HTML one shows: no tag, no entity.
+        self::assertSame('Email test from : Tom & Jerry', $sent[0]->getTextBody());
+        self::assertSame('<p>Email test from : Tom &amp; Jerry</p>', $sent[0]->getHtmlBody());
+    }
+
+    public function testATestOfTheMailSettingsOfAShopWithoutAnAddressSaysSo(): void
+    {
+        $this->givenTheStoreEmail('');
+
+        $this->expectException(StoreEmailMissingException::class);
+
+        $this->mailerFactory->sendTestMail('someone@example.com', 'A test', '<p>A test</p>');
+    }
+
+    /**
+     * The back office previews a message with the parser the shop sends it with: the one
+     * that claims its template file, the default parser for a body stored in the database.
+     */
+    public function testTheParserOfAMessageIsTheOneThatClaimsItsTemplateFile(): void
+    {
+        $templateHelper = $this->getService(TemplateHelperInterface::class);
+        $mailTemplatePath = $templateHelper->getActiveMailTemplate()->getAbsolutePath();
+        $claimant = new class($mailTemplatePath) extends ParserFallback {
+            public function __construct(private readonly string $claimedPath)
+            {
+            }
+
+            public function supportTemplateRender(string $templatePath, ?string $templateName): bool
+            {
+                return $templatePath === $this->claimedPath && 'password' === $templateName;
+            }
+
+            public static function getDefaultPriority(): int
+            {
+                return -5;
+            }
+        };
+        $default = new class extends ParserFallback {
+            public static function getDefaultPriority(): int
+            {
+                return 100;
+            }
+        };
+        $resolver = new ParserResolver([$claimant, $default], [], new RequestStack(), $templateHelper);
+        $factory = new MailerFactory($templateHelper, $resolver, $this->getService(MailerInterface::class), new NullTransport());
+
+        $withFile = (new Message())->setName('with_file')->setHtmlTemplateFileName('password.html')->setTextTemplateFileName('');
+        $withoutFile = (new Message())->setName('stored_body')->setHtmlTemplateFileName('')->setTextTemplateFileName('');
+
+        self::assertSame($claimant, $factory->parserFor($withFile));
+        self::assertSame($default, $factory->parserFor($withoutFile));
+    }
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
+    }
+
+    /**
+     * @param list<RawMessage> $sent the messages the transport is handed, as it is
+     */
+    private function spyTransport(array &$sent): TransportInterface
+    {
+        return new class($sent) implements TransportInterface {
+            /** @param list<RawMessage> $sent */
+            public function __construct(private array &$sent)
+            {
+            }
+
+            public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
+            {
+                $this->sent[] = $message;
+
+                return new SentMessage($message, $envelope ?? Envelope::create($message));
+            }
+
+            public function __toString(): string
+            {
+                return 'spy://';
+            }
+        };
+    }
+
+    private function givenTheStoreEmail(string $address): void
+    {
+        ConfigQuery::write('store_email', $address);
+    }
+
+    /**
      * A factory whose parser renders what it is given, for messages that carry their body
      * in the database rather than in a template file of the mail theme.
      */
@@ -385,7 +534,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverWhereNoParserClaimsAView($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
     }
 

@@ -1,0 +1,95 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\DataTransfer\Job;
+
+use Symfony\Component\HttpFoundation\File\File;
+use Thelia\Domain\DataTransfer\ImportHandler;
+use Thelia\Model\Import;
+use Thelia\Model\ImportJob;
+use Thelia\Model\Lang;
+
+/**
+ * Records an import and hands it to the job queue.
+ *
+ * The uploaded file is moved out of the request into the import storage
+ * ({@see ImportStorage}), not into the cache: a deployment empties the cache, and the
+ * import would lose its file before a worker reached it. Without a queue the import runs in this call and comes
+ * back finished, with the rows it changed and the ones it refused, as it did in the
+ * page. With one it comes back queued.
+ */
+final readonly class ImportJobLauncher
+{
+    private const MAX_NAME_LENGTH = 100;
+
+    public function __construct(
+        private ImportHandler $importHandler,
+        private JobLifecycle $lifecycle,
+        private ImportStorage $storage,
+    ) {
+    }
+
+    public function launch(Import $import, File $file, string $originalName, ?Lang $language = null, ?int $adminId = null): ImportJob
+    {
+        // Refused here, in the request, rather than by a worker minutes later.
+        $this->importHandler->validateUpload($originalName, $file);
+
+        $stored = $this->storage->store($file, uniqid('', true).'-'.self::shortName($originalName));
+        $relativePath = $this->storage->relativePathOf($stored->getPathname());
+
+        try {
+            $job = (new ImportJob())
+                ->setImportId($import->getId())
+                ->setAdminId($adminId)
+                ->setStatus(JobStatus::QUEUED->value)
+                ->setLangId($language?->getId())
+                ->setFilePath($relativePath)
+                ->setFileName(self::shortName($originalName));
+            $job->save();
+        } catch (\Throwable $exception) {
+            // The file holds what was uploaded, personal data included: it never stays
+            // behind without a row that the purge would find it by.
+            unlink($stored->getPathname());
+
+            throw $exception;
+        }
+
+        try {
+            $this->lifecycle->dispatch($job, new RunImportJob($job->getId()));
+        } catch (\Throwable $exception) {
+            // The queue refused the job: the row is failed, and the file goes with it.
+            if (is_file($stored->getPathname())) {
+                unlink($stored->getPathname());
+            }
+
+            throw $exception;
+        }
+
+        return $job;
+    }
+
+    /**
+     * The uploaded name, cut to keep its extension and the stored path short.
+     */
+    private static function shortName(string $originalName): string
+    {
+        $name = basename($originalName);
+        $extension = pathinfo($name, \PATHINFO_EXTENSION);
+        $stem = '' === $extension ? $name : substr($name, 0, -\strlen($extension) - 1);
+
+        // Cut in bytes, on a whole character: a name of a hundred Chinese characters
+        // would otherwise go past what the file system takes.
+        return mb_strcut($stem, 0, self::MAX_NAME_LENGTH, 'UTF-8').('' === $extension ? '' : '.'.mb_strcut($extension, 0, 10, 'UTF-8'));
+    }
+}

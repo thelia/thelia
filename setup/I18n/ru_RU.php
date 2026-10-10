@@ -1527,4 +1527,5 @@ return [
     'Catalog price rules' => 'Правила цен каталога',
     'Promotion' => 'Акция',
     'Newness' => 'Новинка',
+    'Configuration background jobs' => 'Настройка фоновых задач',
 ];

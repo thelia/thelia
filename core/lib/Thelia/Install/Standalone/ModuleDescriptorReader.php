@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Install\Standalone;
 
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Exception\InvalidModuleDescriptorException;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptor;
@@ -63,8 +64,7 @@ final readonly class ModuleDescriptorReader
                     continue;
                 }
 
-                // No network access for an entity or a DTD a descriptor would point at.
-                $descriptor = @simplexml_load_file($moduleXml, \SimpleXMLElement::class, \LIBXML_NONET);
+                $descriptor = XmlDescriptor::read($moduleXml);
                 if (false === $descriptor) {
                     continue;
                 }

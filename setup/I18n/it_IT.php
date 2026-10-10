@@ -433,4 +433,5 @@ return [
     'Catalog price rules' => 'Regole di prezzo del catalogo',
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
+    'Configuration background jobs' => 'Configurazione delle attività in background',
 ];

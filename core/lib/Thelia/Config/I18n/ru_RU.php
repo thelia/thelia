@@ -867,4 +867,5 @@ return [
     'This order requires an account.' => 'Для этого заказа требуется аккаунт.',
     'This shop is not asking for the consent "%consent".' => 'Этот магазин не запрашивает согласие "%consent".',
     'You must accept "%consent" to place this order.' => 'Чтобы оформить этот заказ, необходимо принять "%consent".',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'Значение «%value» столбца %column не является числом (id варианта товара %id)',
 ];
