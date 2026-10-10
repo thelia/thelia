@@ -18,13 +18,15 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * The one check of a path that must name a file of a folder, for the folders the shop
- * owns (the export folder, the import storage): what is served is the resolved file,
- * what is removed is the path itself, and only when both lie in the folder. And the one
- * mode of what is written there: the files hold the data of the customers.
+ * The one check of a path that must name a file of a folder: what is read or served is
+ * the resolved file (an export of the shop, a schema a module names by its path from
+ * the root of the project). For the folders the shop owns (the export folder, the
+ * import storage), what is removed is the path itself, and only when both lie in the
+ * folder; and the one mode of what is written there: the files hold the data of the
+ * customers.
  *
- * It assumes the folder is written by the accounts of the shop alone: a path changed
- * between the check and its use could only be changed by one of them.
+ * For those folders, it assumes they are written by the accounts of the shop alone: a
+ * path changed between the check and its use could only be changed by one of them.
  */
 final class FolderFile
 {

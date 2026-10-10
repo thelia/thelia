@@ -25,7 +25,8 @@ final class SchemaCombinerTest extends TestCase
 {
     public function testThePathOfASchemaCannotCloseItsMarkerNorAddMarkup(): void
     {
-        $folder = '/srv/modules/x--><table name="evil"><column name="id" type="INTEGER"/></table><!--'."\u{202E}";
+        // A line break or a tab in the path would be kept by a text made for a message.
+        $folder = '/srv/modules/x--><table name="evil"><column name="id" type="INTEGER"/></table><!--'."\u{202E}\n\tz";
         $source = self::schema('sample_one');
         $source->documentURI = $folder.'/schema.xml';
         $external = self::schema('sample_two');
@@ -39,16 +40,17 @@ final class SchemaCombinerTest extends TestCase
         self::assertTrue($reread->loadXML($written), $written);
         self::assertSame(['sample_one'], array_map(static fn (\DOMElement $table): string => $table->getAttribute('name'), iterator_to_array($reread->getElementsByTagName('table'))));
         self::assertStringContainsString("Start of schema from '/srv/modules/x- -><table name=\"evil\">", $written);
-        self::assertSame('/srv/modules/x- -><table name="evil"><column name="id" type="INTEGER"/></table><!- -?/external.xml', $reread->getElementsByTagName('external-schema')->item(0)?->textContent);
+        self::assertSame('/srv/modules/x- -><table name="evil"><column name="id" type="INTEGER"/></table><!- -???z/external.xml', $reread->getElementsByTagName('external-schema')->item(0)?->textContent);
     }
 
     /**
      * The external-schema references of a source schema are removed and said so, by the
-     * filename they carried: a text the module wrote, held to the same rule.
+     * filename they carried: a text the module wrote, held to the same rule, and given as
+     * it is otherwise (a blank at its end included).
      */
     public function testTheFilenameOfARemovedReferenceCannotCloseItsNotice(): void
     {
-        $source = self::schema('sample_one', '<external-schema filename="x--&gt;&lt;table name=&quot;evil&quot;/&gt;&lt;!--"/>');
+        $source = self::schema('sample_one', '<external-schema filename="x--&gt;&lt;table name=&quot;evil&quot;/&gt;&lt;!-- "/>');
         $source->documentURI = '/srv/modules/Sample/Config/schema.xml';
 
         $combined = (new SchemaCombiner([$source]))->getCombinedDocument('TheliaMain');
@@ -58,7 +60,7 @@ final class SchemaCombinerTest extends TestCase
         $reread = new \DOMDocument();
         self::assertTrue($reread->loadXML($written), $written);
         self::assertSame(['sample_one'], array_map(static fn (\DOMElement $table): string => $table->getAttribute('name'), iterator_to_array($reread->getElementsByTagName('table'))));
-        self::assertStringContainsString("external-schema reference to 'x- -><table name=\"evil\"/><!- -' removed", $written);
+        self::assertStringContainsString("external-schema reference to 'x- -><table name=\"evil\"/><!- - ' removed", $written);
     }
 
     private static function schema(string $table, string $trailingElements = ''): \DOMDocument
