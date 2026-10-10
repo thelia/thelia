@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Taxation\Service;
 
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Legal\CompanyIdentifier;
 use Thelia\Domain\Localization\Service\EuropeanUnionCountries;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Domain\Taxation\Enum\VatExemptionState;
@@ -105,7 +106,7 @@ final class VatExemptionResolver implements ResetInterface
      */
     private function numberBelongsTo(string $vatNumber, string $countryCode): bool
     {
-        $normalized = strtoupper(preg_replace('/\s+/', '', $vatNumber) ?? '');
+        $normalized = CompanyIdentifier::normalizeVatNumber($vatNumber) ?? '';
 
         foreach ($this->europeanUnionCountries->vatPrefixesFor($countryCode) as $prefix) {
             if (str_starts_with($normalized, $prefix)) {
