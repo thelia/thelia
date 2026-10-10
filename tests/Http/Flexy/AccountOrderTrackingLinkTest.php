@@ -105,6 +105,32 @@ final class AccountOrderTrackingLinkTest extends WebIntegrationTestCase
         self::assertStringNotContainsString('carrier.example', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testAnOrderInACustomStatusEquivalentToCanceledShowsNoTracking(): void
+    {
+        $this->factory()->orderStatus(['code' => 'cancelled_by_shop', 'equivalentCode' => OrderStatus::CODE_CANCELED]);
+        [$customer, $order] = $this->orderOfANewCustomer('cancelled_by_shop', 'CANCEL1');
+
+        $crawler = $this->openOrderAs($customer, $order);
+
+        self::assertCount(0, $crawler->filter('[data-testid="delivery-tracking-link"]'));
+        self::assertStringNotContainsString('carrier.example', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testTheGuestOrderPageOfACustomStatusEquivalentToCanceledShowsNoTracking(): void
+    {
+        $factory = $this->factory();
+        $factory->orderStatus(['code' => 'guest_cancelled_by_shop', 'equivalentCode' => OrderStatus::CODE_CANCELED]);
+        $guest = $factory->guestCustomer($factory->customerTitle());
+        $order = $this->order($guest, $this->carrier(), 'guest_cancelled_by_shop', 'GUESTCANCEL1');
+
+        $token = $this->getService(GuestOrderAccessService::class)->createToken($order);
+        $crawler = $this->client->request('GET', '/order/track/'.$token);
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        self::assertCount(0, $crawler->filter('[data-testid="delivery-tracking-link"]'));
+        self::assertStringNotContainsString('carrier.example', (string) $this->client->getResponse()->getContent());
+    }
+
     public function testTheOrderListOffersTheLinkOnShippedOrdersOnly(): void
     {
         $carrier = $this->carrier();
