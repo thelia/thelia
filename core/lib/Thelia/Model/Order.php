@@ -226,6 +226,22 @@ class Order extends BaseOrder
      *
      * @throws PropelException
      */
+    /**
+     * The totals of the lines read by getTotalAmount(), by order and rounding mode.
+     *
+     * @var array<string, object|false|null>
+     */
+    private static array $totalAmountQueryResults = [];
+
+    /**
+     * Lets go of the totals already read: the lines of an order changed in this process,
+     * and the next read must see them.
+     */
+    public static function forgetTotalAmounts(): void
+    {
+        self::$totalAmountQueryResults = [];
+    }
+
     public function getTotalAmount(float|int &$tax = 0, bool $includePostage = true, bool $includeDiscount = true): float
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
@@ -236,7 +252,7 @@ class Order extends BaseOrder
         // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
         // and may cache results for several orders, for example in the order list in the back-office.
         // The rounding mode is part of the key: it decides what the query computes.
-        static $queryResult = [];
+        $queryResult = &self::$totalAmountQueryResults;
 
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $id = $this->getId().'-'.$roundingMode;
