@@ -254,7 +254,7 @@ class SchemaLocator
                 $externalSchemaFile = FolderFile::resolve(THELIA_ROOT, $externalSchemaPath);
 
                 if (null === $externalSchemaFile) {
-                    $this->skip($externalSchemaPath, $owner, ['it is not a file of the project']);
+                    $this->skip($externalSchemaElement->getAttribute('filename'), $owner, ['it is not a file of the project']);
 
                     continue;
                 }
@@ -276,12 +276,14 @@ class SchemaLocator
     }
 
     /**
-     * A schema that cannot be read is left out, and said so: its tables would be missing
-     * from the generated models without a word otherwise. Not an exception, as the kernel
-     * could not boot, CLI included, and nothing could be repaired; not Tlog either, which
-     * needs the models this is building. The path and the owner come from the module
-     * (its folder, its filename attribute), and are printed on one line here; the
-     * reasons are those of XmlDescriptor, printed already.
+     * A schema that cannot be read, or is no file of the project, is left out, and said
+     * so: its tables would be missing from the generated models without a word
+     * otherwise. Not an exception, as the kernel could not boot, CLI included, and
+     * nothing could be repaired; not Tlog either, which needs the models this is
+     * building. The path is the file's, or the filename as the module wrote it when it
+     * names no file of the project; the owner is the module, or the schema that named
+     * the file. Both come from the module (its folder, its filename attribute) and are
+     * printed on one line here; the reasons are those of XmlDescriptor, printed already.
      *
      * @param list<string> $reasons
      */
