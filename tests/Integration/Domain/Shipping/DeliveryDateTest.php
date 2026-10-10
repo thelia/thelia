@@ -503,6 +503,29 @@ final class DeliveryDateTest extends IntegrationTestCase
     }
 
     /**
+     * The day belongs to the carrier it was picked for: another carrier quoted for the same
+     * cart, by its model or by its instance, is quoted without it.
+     */
+    public function testAnotherCarrierQuotedForTheCartIsNotHandedTheDayPicked(): void
+    {
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Date, 0, 14, []);
+        [$cart] = $this->cartReadyToPay();
+        $this->cartFacade()->chooseDeliveryDate($cart, $this->firstOpenDay());
+        $otherCarrier = $this->otherModule();
+
+        self::assertSame(
+            $this->firstOpenDay(),
+            (new DeliveryPostageEvent($this->carrier->getModuleInstance(static::getContainer()), $cart))->getDeliveryDate()?->format('Y-m-d'),
+            'The carrier of the cart, quoted by its instance, reads the day picked for it.',
+        );
+        self::assertNull((new DeliveryPostageEvent($otherCarrier, $cart))->getDeliveryDate());
+        self::assertNull(
+            (new DeliveryPostageEvent($otherCarrier->getModuleInstance(static::getContainer()), $cart))->getDeliveryDate(),
+            'The carriers of the delivery loop are quoted by their instance.',
+        );
+    }
+
+    /**
      * The calendar is asked by the API, the tunnel and the guard alike: it needs no request.
      */
     public function testTheCalendarNeedsNoSessionNorRequest(): void
