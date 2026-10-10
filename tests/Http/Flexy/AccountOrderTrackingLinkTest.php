@@ -125,6 +125,22 @@ final class AccountOrderTrackingLinkTest extends WebIntegrationTestCase
         self::assertNotNull($shipped->getId());
     }
 
+    public function testTheOrderListOffersTheLinkOnACustomStatusEquivalentToSent(): void
+    {
+        $factory = $this->factory();
+        $factory->orderStatus(['code' => 'handed_to_carrier', 'equivalentCode' => OrderStatus::CODE_SENT]);
+        $customer = $factory->customer($factory->customerTitle());
+        $this->order($customer, $this->carrier(), 'handed_to_carrier', 'HANDED1');
+
+        $this->injector?->setCustomer($customer);
+        $crawler = $this->client->request('GET', $this->url('account_orders', []));
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        $links = $crawler->filter('[data-testid="order-card-tracking-link"]');
+        self::assertCount(1, $links, 'A custom status equivalent to "sent" is a shipped order.');
+        self::assertSame('https://carrier.example/track?parcel=HANDED1', $links->attr('href'));
+    }
+
     /**
      * A buyer without an account follows the order from the link of the confirmation
      * e-mail: the tracking link of the parcel is there too.
