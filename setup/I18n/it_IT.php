@@ -434,4 +434,6 @@ return [
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
     'Order lines edition' => 'Modifica delle righe dell\'ordine',
+    'Notice to the customer that their order was changed' => 'Avviso al cliente che il suo ordine è stato modificato',
+    'Your order {{ order_ref }} has been changed' => 'Il tuo ordine {{ order_ref }} è stato modificato',
 ];
