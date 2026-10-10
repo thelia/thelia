@@ -149,6 +149,24 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertContains($this->module->getId(), $ids($facade->listValidMethodsAsResourceApi($this->guestCartShippedTo('69001'))));
     }
 
+    public function testThePostalCodeIsNamedWhenItIsWhyNoCarrierIsOffered(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $facade = $this->getService(ShippingFacade::class);
+
+        self::assertSame('20 090', $facade->postalCodeWithoutCarrier($this->guestCartShippedTo('20 090')));
+        self::assertNull($facade->postalCodeWithoutCarrier($this->guestCartShippedTo('69001')), 'A carrier is offered.');
+    }
+
+    public function testThePostalCodeIsNotBlamedWhenNoCarrierServesTheCountry(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+
+        self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -177,6 +195,18 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             static fn ($offer): int => (int) $offer->getDeliveryModule()->getId(),
             $this->getService(ShippingFacade::class)->listValidMethods($cart),
         );
+    }
+
+    /**
+     * The seeded carriers serve no zone of the test country, but deactivating them keeps
+     * the test about the one carrier it configures.
+     */
+    private function onlyTheModuleOfTheTestIsActive(): void
+    {
+        ModuleQuery::create()
+            ->filterByType(2)
+            ->filterById($this->module->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
+            ->update(['Activate' => 0], $this->getPropelConnection());
     }
 
     private function zoneServedByTheModule(): Area
