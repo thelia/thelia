@@ -302,4 +302,26 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Order lines edition
+--
+-- Changing the lines, the discount or the postage of a placed order is a right
+-- of its own, granted profile by profile, distinct from updating orders.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.edit', NOW(), NOW());
+
+SET @order_edit_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.edit');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@order_edit_resource_id, 'cs_CZ', 'Úprava položek objednávky', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'de_DE', 'Bearbeitung der Bestellpositionen', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'en_US', 'Order lines edition', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'es_ES', 'Edición de las líneas de pedido', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'fr_FR', 'Modification des lignes de commande', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'it_IT', 'Modifica delle righe dell''ordine', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'nl_NL', 'Bewerken van orderregels', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'ru_RU', 'Изменение строк заказа', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

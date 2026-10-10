@@ -89,6 +89,8 @@ class AdminResources
     public const ORDER_STATUS = 'admin.configuration.order-status';
     /** Moving an order to a status its transition graph does not allow: a right of its own, distinct from editing orders. */
     public const ORDER_STATUS_FORCE = 'admin.order.status-force';
+    /** Changing the lines, the discount or the postage of an order after it was placed: a right of its own, distinct from updating orders. */
+    public const ORDER_EDIT = 'admin.order.edit';
     public const PRODUCT = 'admin.product';
     public const PROFILE = 'admin.configuration.profile';
     public const SHIPPING_ZONE = 'admin.configuration.shipping-zone';

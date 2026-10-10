@@ -415,4 +415,5 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Order lines edition' => 'Bewerken van orderregels',
 ];
