@@ -104,7 +104,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (93, 'videos_library_path', 'local/media/videos', 0, 0, NOW(), NOW()),
 (94, 'video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW()),
 (95, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
-(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW())
+(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
+(97, 'express_payment_zones', '', 0, 0, NOW(), NOW())
 
 ;
 
