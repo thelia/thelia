@@ -729,6 +729,10 @@
     <index name="idx_order_customer_id">
       <index-column name="customer_id" />
     </index>
+    <!-- The sales journal selects the invoices of a period by their date. -->
+    <index name="idx_order_invoice_date">
+      <index-column name="invoice_date" />
+    </index>
     <index name="idx_order_invoice_order_address_id">
       <index-column name="invoice_order_address_id" />
     </index>

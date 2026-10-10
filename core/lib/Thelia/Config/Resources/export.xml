@@ -137,6 +137,36 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.sales_journal" class="Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport" category_id="thelia.export.orders">
+            <export_descriptive locale="en_US">
+                <title>Sales journal</title>
+                <description>
+                    The accounting entries of the invoices of the period, by invoice date: the customer debited, the products, the shipping and the tax collected credited by tax rate, each invoice balanced. Choose FEC for the French accounting entries file, CSV to read it. Needs the chart of accounts of the accounting settings.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Journal des ventes</title>
+                <description>
+                    Les écritures comptables des factures de la période, par date de facture : le client au débit, les produits, le port et la TVA collectée au crédit par taux, chaque facture équilibrée. Choisissez FEC pour le fichier des écritures comptables, CSV pour le lire. Demande le plan de comptes des réglages comptables.
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.tax_summary" class="Thelia\Domain\DataTransfer\Export\Type\TaxSummaryExport" category_id="thelia.export.orders">
+            <export_descriptive locale="en_US">
+                <title>Tax summary</title>
+                <description>
+                    The taxes of the invoices of the period, one row per month and per tax rate: the amount taxed, the tax and the number of invoices. The same figures as the sales journal, to check the tax return against.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Récapitulatif des taxes</title>
+                <description>
+                    Les taxes des factures de la période, une ligne par mois et par taux : la base taxée, la taxe et le nombre de factures. Les mêmes montants que le journal des ventes, pour recouper la déclaration.
+                </description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.product_i18n" class="Thelia\Domain\DataTransfer\Export\Type\ProductI18nExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product I18n information</title>

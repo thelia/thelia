@@ -302,4 +302,16 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Sales journal
+--
+-- The accounting exports select the invoices of a period by their date.
+-- ---------------------------------------------------------------------
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'idx_order_invoice_date');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `idx_order_invoice_date` (`invoice_date`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;
