@@ -66,7 +66,7 @@ class Address extends BaseAddress
 
     public function preUpdate(?ConnectionInterface $con = null): bool
     {
-        $this->dropVatVerificationWhenItsSubjectChanges();
+        $this->dropVatVerificationWhenItsSubjectChanges($con);
         $this->cartCopiesAreStale = [] !== array_intersect($this->getModifiedColumns(), self::COLUMNS_COPIED_TO_CARTS);
 
         return parent::preUpdate($con);
@@ -108,7 +108,7 @@ class Address extends BaseAddress
         return $expiresAt >= new \DateTimeImmutable();
     }
 
-    private function dropVatVerificationWhenItsSubjectChanges(): void
+    private function dropVatVerificationWhenItsSubjectChanges(?ConnectionInterface $con): void
     {
         $subjectChanged = $this->isColumnModified(AddressTableMap::COL_VAT_NUMBER)
             || $this->isColumnModified(AddressTableMap::COL_COUNTRY_ID);
@@ -117,8 +117,37 @@ class Address extends BaseAddress
             return;
         }
 
+        if (null === $this->getVatVerifiedAt() && !$this->storedVerificationCoversAnotherSubject($con)) {
+            return;
+        }
+
         $this
             ->setVatVerifiedAt(null)
             ->setVatVerifiedName(null);
+
+        // An address rebuilt from an API payload (PUT) never read its verification: both
+        // columns are already null in memory, so the setters above change nothing. Marking
+        // them modified is what makes the update blank the verification stored in the row.
+        $this->modifiedColumns[AddressTableMap::COL_VAT_VERIFIED_AT] = true;
+        $this->modifiedColumns[AddressTableMap::COL_VAT_VERIFIED_NAME] = true;
+    }
+
+    /**
+     * Whether the row holds a verification that was made for another number or country
+     * than the ones about to be written. Only asked when the verification is not in memory.
+     */
+    private function storedVerificationCoversAnotherSubject(?ConnectionInterface $con): bool
+    {
+        $stored = AddressQuery::create()
+            ->filterById($this->getId())
+            ->select(['VatNumber', 'CountryId', 'VatVerifiedAt'])
+            ->findOne($con);
+
+        if (null === $stored || null === $stored['VatVerifiedAt']) {
+            return false;
+        }
+
+        return $stored['VatNumber'] !== $this->getVatNumber()
+            || (int) $stored['CountryId'] !== (int) $this->getCountryId();
     }
 }
