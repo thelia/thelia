@@ -40,6 +40,12 @@ final class ZipCodePatternTest extends TestCase
         yield 'prefix with letters' => ['sw1*', 'SW1A 1AA', true];
         yield 'empty code' => ['75*', '  ', false];
         yield 'a dot is not a wildcard' => ['7.001', '75001', false];
+        yield 'range with a leading zero' => ['01000...01999', '01500', true];
+        yield 'range against a shorter code' => ['01000...01999', '1500', false];
+        yield 'range against a longer code' => ['01000...01999', '001500', false];
+        yield 'range above its upper bound' => ['01000...01999', '02000', false];
+        yield 'range of long codes' => ['12345678901234567890...12345678901234567899', '12345678901234567895', true];
+        yield 'range of long codes, outside' => ['12345678901234567890...12345678901234567899', '12345678901234567900', false];
     }
 
     #[DataProvider('codes')]
@@ -59,6 +65,8 @@ final class ZipCodePatternTest extends TestCase
         yield 'range with letters' => ['A1...B2'];
         yield 'range upside down' => ['75020...75001'];
         yield 'range with a star' => ['75*...76000'];
+        yield 'range with bounds of two lengths' => ['1000...20000'];
+        yield 'longer than the column' => [str_repeat('7', 51)];
     }
 
     #[DataProvider('patternsThatMatchNothing')]
