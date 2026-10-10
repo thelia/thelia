@@ -2222,7 +2222,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (55, 'admin.order.status-force', NOW(), NOW()),
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
-(58, 'admin.configuration.gift-wrapping', NOW(), NOW())
+(58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
+(61, 'admin.order.edit', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2235,7 +2236,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
-(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW())
+(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
+(12, 'order_edited', NULL, NULL, 'order_edited.txt', NULL, 'order_edited.html', NOW(), NOW())
 ;
 
 /**
@@ -4023,7 +4025,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (55, '{{ locale }}', {{ intl('Order status transition override', locale) }}, NULL, NULL, NULL),
     (56, '{{ locale }}', {{ intl('Configuration / Tag', locale) }}, NULL, NULL, NULL),
     (57, '{{ locale }}', {{ intl('Catalog price rules', locale) }}, NULL, NULL, NULL),
-    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (58, '{{ locale }}', {{ intl('Configuration gift wrappings', locale) }}, NULL, NULL, NULL),
+    (61, '{{ locale }}', {{ intl('Order lines edition', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4040,7 +4043,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (7, '{{ locale }}', {{ intl('Newsletter subscription confirmation mail', locale) }}, {{ intl('Your subscription to %store newsletter', locale) }}, NULL, NULL),
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
-    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
+    (12, '{{ locale }}', {{ intl('Notice to the customer that their order was changed', locale) }}, {{ intl('Your order {{ order_ref }} has been changed', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

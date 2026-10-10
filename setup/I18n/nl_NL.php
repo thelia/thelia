@@ -415,4 +415,7 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Order lines edition' => 'Bewerken van orderregels',
+    'Notice to the customer that their order was changed' => 'Bericht aan de klant dat de bestelling is gewijzigd',
+    'Your order {{ order_ref }} has been changed' => 'Je bestelling {{ order_ref }} is gewijzigd',
 ];

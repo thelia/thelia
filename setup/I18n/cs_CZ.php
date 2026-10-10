@@ -31,4 +31,7 @@ return [
     'Your subscription to %store newsletter' => 'Váš odběr novinek z obchodu {{ config("store_name") }}',
     'Promotion' => 'Akce',
     'Newness' => 'Novinka',
+    'Order lines edition' => 'Úprava položek objednávky',
+    'Notice to the customer that their order was changed' => 'Oznámení zákazníkovi o změně objednávky',
+    'Your order {{ order_ref }} has been changed' => 'Vaše objednávka {{ order_ref }} byla změněna',
 ];

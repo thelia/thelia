@@ -1117,4 +1117,7 @@ return [
     'Catalog price rules' => 'Katalogpreisregeln',
     'Promotion' => 'Aktion',
     'Newness' => 'Neuheit',
+    'Order lines edition' => 'Bearbeitung der Bestellpositionen',
+    'Notice to the customer that their order was changed' => 'Hinweis an den Kunden, dass seine Bestellung geändert wurde',
+    'Your order {{ order_ref }} has been changed' => 'Ihre Bestellung {{ order_ref }} wurde geändert',
 ];

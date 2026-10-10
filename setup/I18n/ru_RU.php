@@ -1527,4 +1527,7 @@ return [
     'Catalog price rules' => 'Правила цен каталога',
     'Promotion' => 'Акция',
     'Newness' => 'Новинка',
+    'Order lines edition' => 'Изменение строк заказа',
+    'Notice to the customer that their order was changed' => 'Уведомление клиента об изменении заказа',
+    'Your order {{ order_ref }} has been changed' => 'Ваш заказ {{ order_ref }} изменён',
 ];

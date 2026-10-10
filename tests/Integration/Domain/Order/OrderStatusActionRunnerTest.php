@@ -16,10 +16,13 @@ namespace Thelia\Tests\Integration\Domain\Order;
 
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
+use Thelia\Core\Event\Order\OrderEditEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
+use Thelia\Domain\Order\Edition\OrderEdit;
+use Thelia\Domain\Order\Edition\OrderEditOutcome;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
@@ -386,6 +389,54 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 
         $this->expectExceptionMessage('names no message');
         $action->normalizePayload([SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'no_such_message']);
+    }
+
+    public function testAnEmailActionOnEditingAnOrderSendsWhatChanged(): void
+    {
+        $mailer = $this->recordingMailer();
+        $this->action(OrderStatusActionTrigger::EDIT, null, OrderStatus::CODE_PAID, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'order_confirmation']);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $changes = [['change' => 'quantity', 'product_ref' => 'REF-1', 'from' => '1', 'to' => '2']];
+
+        $this->runnerWith(new SendCustomerEmailAction($mailer))->onOrderEdited($this->edited($order, $changes));
+
+        $sent = $mailer->parametersOfMessagesSent('order_confirmation');
+        self::assertCount(1, $sent);
+        self::assertSame($changes, $sent[0]['order_changes']);
+        self::assertSame(OrderStatus::CODE_PAID, $sent[0]['order_status_code']);
+    }
+
+    public function testOnlyEmailsRunWhenAnOrderIsEdited(): void
+    {
+        // An edit moves the stock itself: a stock action replayed at each edit would move it twice.
+        $action = $this->action(OrderStatusActionTrigger::EDIT, null, OrderStatus::CODE_PAID, ExplodingAction::getType());
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+
+        $this->runnerWith(new ExplodingAction())->onOrderEdited($this->edited($order, [['change' => 'discount', 'from' => '0.00', 'to' => '5.00']]));
+
+        $failures = OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->find();
+        self::assertCount(1, $failures);
+        self::assertSame($action->getId(), $failures->getFirst()->getActionId());
+        self::assertStringContainsString('e-mail', $failures->getFirst()->getMessage());
+    }
+
+    public function testEnteringAStatusIsNotEditingAnOrder(): void
+    {
+        $mailer = $this->recordingMailer();
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, SendCustomerEmailAction::getType(), [SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'order_confirmation']);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+
+        $this->runnerWith(new SendCustomerEmailAction($mailer))->onOrderEdited($this->edited($order, [['change' => 'discount', 'from' => '0.00', 'to' => '5.00']]));
+
+        self::assertSame([], $mailer->parametersOfMessagesSent('order_confirmation'));
+    }
+
+    /**
+     * @param list<array<string, string>> $changes
+     */
+    private function edited(Order $order, array $changes): OrderEditEvent
+    {
+        return new OrderEditEvent($order, new OrderEdit([]), new OrderEditOutcome(10.0, 10.0, 0.0, 0.0, $changes, true));
     }
 
     /**

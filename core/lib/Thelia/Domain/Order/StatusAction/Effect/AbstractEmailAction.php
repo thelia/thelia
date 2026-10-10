@@ -76,6 +76,7 @@ abstract readonly class AbstractEmailAction implements OrderStatusActionInterfac
             'order_ref' => $context->order->getRef(),
             'order_status_code' => $context->newStatus->getCode(),
             'previous_order_status_code' => $context->previousStatus?->getCode(),
+            'order_changes' => $context->changes,
         ];
     }
 }
