@@ -22,7 +22,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
 use Thelia\Domain\Order\EventListener\SendShippingEmailListener;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
 use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
 use Thelia\Mailer\MailerFactory;
@@ -62,7 +61,6 @@ final class SendShippingEmailListenerTest extends ActionIntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
         // Kept out of the way: what is asserted is the shipping e-mail alone.
         ConfigQuery::write(InvoiceRefAllocator::CONFIG_ENABLED, '0');

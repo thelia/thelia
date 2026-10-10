@@ -18,6 +18,7 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Core\File\XmlDescriptor;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
+use Thelia\Tools\TerminalText;
 
 /**
  * Class TemplateDescriptorValidator.
@@ -65,7 +66,7 @@ class TemplateDescriptorValidator
         }
 
         // A file of the theme, read by its developer: named by its path.
-        throw new InvalidDescriptorException(XmlDescriptor::printable(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors))));
+        throw new InvalidDescriptorException(TerminalText::onOneLine(\sprintf('%s file is not a valid template descriptor : %s', $this->xmlDescriptorPath, implode(', ', $errors))));
     }
 
     /**

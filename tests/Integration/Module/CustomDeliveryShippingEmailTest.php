@@ -23,7 +23,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\EventListener\SendShippingEmailListener;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleConfigQuery;
@@ -57,7 +56,6 @@ final class CustomDeliveryShippingEmailTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
         );
         ConfigQuery::write('store_email', 'shop@example.com');
     }

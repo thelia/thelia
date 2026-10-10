@@ -18,14 +18,15 @@ use Thelia\Tools\TerminalText;
 
 /**
  * Reads an XML file a module or a template ships (module.xml, template.xml, a Propel
- * schema.xml) and checks it against a schema, closed: what libxml has to say is the
- * reason given, never a warning of PHP, and a file that could not be read or checked is
- * never passed. The file and the schema are read by PHP and handed to libxml as bytes,
- * never as a path: a path is a URI to libxml, which decodes it. Bytes have no base: a
- * relative reference (an include of a schema, an entity of a descriptor) would resolve
- * against the working directory, so none is loaded (no network, no DTD, no entity), a
- * file that declares a document type is refused, and no schema of the core includes
- * another. A reason names a file, never where it is on the server.
+ * schema.xml) and, for a descriptor, checks it against a schema, closed: what libxml
+ * has to say is the reason given, never a warning of PHP, and a file that could not be
+ * read or checked is never passed. The file and the schema are read by PHP and handed
+ * to libxml as bytes, never as a path: a path is a URI to libxml, which decodes it.
+ * Bytes have no base: a relative reference (an include of a schema, an entity of a
+ * descriptor) would resolve against the working directory, so none is loaded (no
+ * network, no DTD, no entity), a file that declares a document type is refused by
+ * loadingErrors(), and no schema of the core includes another. A reason given here
+ * names a file, never its folder.
  */
 final class XmlDescriptor
 {
@@ -39,7 +40,8 @@ final class XmlDescriptor
      * path did: a reader that tells documents apart by it still can. A document type is
      * refused: an entity it declares is not resolved, and would be copied as it is into
      * whatever is written from the document (the combined Propel schema), which then
-     * could not be read.
+     * could not be read. After that refusal, $dom still holds the document; the callers
+     * drop it.
      *
      * @return list<string>
      */
@@ -120,7 +122,7 @@ final class XmlDescriptor
 
                 return false !== $schema && $dom->schemaValidateSource($schema);
             },
-            'the descriptor could not be checked against '.self::printable(basename($schemaFile)),
+            'the descriptor could not be checked against '.TerminalText::onOneLine(basename($schemaFile)),
             $schemaFile,
         );
     }
@@ -169,17 +171,6 @@ final class XmlDescriptor
     }
 
     /**
-     * The text fit to print in a reason, on one line: a value of the descriptor or a name
-     * of a file may carry a control character, a mark that reorders or hides what follows,
-     * a line break, or a byte that is not UTF-8, that a log, a terminal or a page would
-     * obey: the characters TerminalText replaces.
-     */
-    public static function printable(string $text): string
-    {
-        return TerminalText::onOneLine($text);
-    }
-
-    /**
      * Runs $ask with the errors of libxml kept for us, and any warning of PHP turned into
      * an exception (whatever the environment does with a warning, and whether the call
      * was silenced with @): what either has to say is the reason. The error mode of
@@ -196,8 +187,8 @@ final class XmlDescriptor
     private static function askingLibxml(\Closure $ask, string $refusal, string $file): array
     {
         $previousErrorHandling = libxml_use_internal_errors(true);
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
+        set_error_handler(static function (int $severity, string $message, string $script, int $line): bool {
+            throw new \ErrorException($message, 0, $severity, $script, $line);
         });
 
         try {
@@ -209,12 +200,12 @@ final class XmlDescriptor
 
             $said = self::saidByLibxml();
 
-            return [] === $said ? [self::printable($refusal)] : $said;
+            return [] === $said ? [TerminalText::onOneLine($refusal)] : $said;
         } catch (\ErrorException|\ValueError|\TypeError $notAnswered) {
             // The refusal, then what libxml and PHP had to say, each on its own.
             $saidByPhp = str_replace($file, basename($file), trim($notAnswered->getMessage()));
 
-            return array_values(array_unique(array_map(self::printable(...), [$refusal, ...self::saidByLibxml(), $saidByPhp])));
+            return array_values(array_unique(array_map(TerminalText::onOneLine(...), [$refusal, ...self::saidByLibxml(), $saidByPhp])));
         } finally {
             restore_error_handler();
             libxml_clear_errors();
@@ -230,7 +221,7 @@ final class XmlDescriptor
     private static function saidByLibxml(): array
     {
         return array_values(array_filter(array_map(
-            static fn (\LibXMLError $error): string => '' === trim($error->message) ? '' : self::printable(\sprintf('%s (Code %d) on line %d', trim($error->message), $error->code, $error->line)),
+            static fn (\LibXMLError $error): string => '' === trim($error->message) ? '' : TerminalText::onOneLine(\sprintf('%s (Code %d) on line %d', trim($error->message), $error->code, $error->line)),
             libxml_get_errors(),
         )));
     }
