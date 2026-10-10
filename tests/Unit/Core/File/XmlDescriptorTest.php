@@ -138,6 +138,33 @@ final class XmlDescriptorTest extends TestCase
         $refused = XmlDescriptor::schemaErrors($conforming, $this->workDir."/a\0.xsd");
         self::assertSame('the descriptor could not be checked against a?.xsd', $refused[0]);
         self::assertStringContainsString('null bytes', $refused[1]);
+
+        // A schema that is gone: PHP says so, naming the file and never its folder.
+        $gone = XmlDescriptor::schemaErrors($conforming, $this->workDir.'/gone.xsd');
+        self::assertSame('the descriptor could not be checked against gone.xsd', $gone[0]);
+        self::assertStringContainsString('gone.xsd', $gone[1]);
+        self::assertStringNotContainsString($this->workDir, implode(' ', $gone));
+    }
+
+    /**
+     * A descriptor that declares a document type is refused: an entity it declares is
+     * never resolved (a file of the server would be read into the descriptor), and would
+     * be copied as it is into whatever is written from the document.
+     */
+    public function testADocumentTypeIsRefusedAndItsEntitiesAreNeverResolved(): void
+    {
+        file_put_contents($this->workDir.'/secret.txt', 'the secret');
+        file_put_contents($this->workDir.'/external.xml', '<!DOCTYPE a [<!ENTITY secret SYSTEM "file://'.$this->workDir.'/secret.txt">]><a><b>&secret;</b></a>');
+        file_put_contents($this->workDir.'/internal.xml', '<!DOCTYPE a [<!ENTITY word "spelled out">]><a><b>&word;</b></a>');
+
+        $dom = new \DOMDocument();
+        self::assertSame(['it declares a document type, which none may'], XmlDescriptor::loadingErrors($dom, $this->workDir.'/external.xml'));
+        self::assertStringNotContainsString('the secret', (string) $dom->saveXML());
+        self::assertSame(['it declares a document type, which none may'], XmlDescriptor::loadingErrors(new \DOMDocument(), $this->workDir.'/internal.xml'));
+
+        $read = XmlDescriptor::read($this->workDir.'/external.xml');
+        self::assertInstanceOf(\SimpleXMLElement::class, $read);
+        self::assertSame('', (string) $read->b);
     }
 
     /**

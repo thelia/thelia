@@ -17,15 +17,15 @@ namespace Thelia\Core\File;
 use Thelia\Tools\TerminalText;
 
 /**
- * Reads an XML descriptor (module.xml, template.xml) and checks it against a schema,
- * closed: what libxml has to say is the reason given, never a warning of PHP, and a
- * descriptor that could not be read or checked is never passed. No network access for
- * an entity or a DTD a descriptor would point at. The descriptor and the schema are
- * read by PHP and handed to libxml as bytes, never as a path: a path is a URI to
- * libxml, which decodes it, and a module in a folder named "Mod%41ule" was looked for
- * as "ModAule" and refused. Bytes have no base: a relative reference (an include of a
- * schema, an entity of a descriptor) would resolve against the working directory, so
- * none is loaded (no DTD, no entity) and no schema of the core includes another.
+ * Reads an XML file a module or a template ships (module.xml, template.xml, a Propel
+ * schema.xml) and checks it against a schema, closed: what libxml has to say is the
+ * reason given, never a warning of PHP, and a file that could not be read or checked is
+ * never passed. The file and the schema are read by PHP and handed to libxml as bytes,
+ * never as a path: a path is a URI to libxml, which decodes it. Bytes have no base: a
+ * relative reference (an include of a schema, an entity of a descriptor) would resolve
+ * against the working directory, so none is loaded (no network, no DTD, no entity), a
+ * file that declares a document type is refused, and no schema of the core includes
+ * another. A reason names a file, never where it is on the server.
  */
 final class XmlDescriptor
 {
@@ -36,7 +36,10 @@ final class XmlDescriptor
     /**
      * Loads the descriptor into $dom: nothing once loaded, otherwise why it could not be.
      * Once loaded, the document knows its file (documentURI, baseURI), as one loaded by
-     * path did: a reader that tells documents apart by it still can.
+     * path did: a reader that tells documents apart by it still can. A document type is
+     * refused: an entity it declares is not resolved, and would be copied as it is into
+     * whatever is written from the document (the combined Propel schema), which then
+     * could not be read.
      *
      * @return list<string>
      */
@@ -50,7 +53,7 @@ final class XmlDescriptor
             return ['it is empty'];
         }
 
-        return self::askingLibxml(
+        $notLoaded = self::askingLibxml(
             static function () use ($dom, $file): bool {
                 $xml = file_get_contents($file);
 
@@ -63,7 +66,14 @@ final class XmlDescriptor
                 return true;
             },
             'it could not be loaded',
+            $file,
         );
+
+        if ([] === $notLoaded && null !== $dom->doctype) {
+            return ['it declares a document type, which none may'];
+        }
+
+        return $notLoaded;
     }
 
     /**
@@ -111,6 +121,7 @@ final class XmlDescriptor
                 return false !== $schema && $dom->schemaValidateSource($schema);
             },
             'the descriptor could not be checked against '.self::printable(basename($schemaFile)),
+            $schemaFile,
         );
     }
 
@@ -173,13 +184,16 @@ final class XmlDescriptor
      * an exception (whatever the environment does with a warning, and whether the call
      * was silenced with @): what either has to say is the reason. The error mode of
      * libxml and the error handler are given back as they were; the error buffer of
-     * libxml is emptied, before and after (libxml lets no error be put back).
+     * libxml is emptied, before and after (libxml lets no error be put back). libxml
+     * gets bytes and quotes no path; PHP, reading $file, would quote it whole (the file
+     * gone between the check and the read, the schema missing): the reasons name it by
+     * its name alone.
      *
      * @param \Closure(): bool $ask
      *
      * @return list<string> empty when $ask answered yes
      */
-    private static function askingLibxml(\Closure $ask, string $refusal): array
+    private static function askingLibxml(\Closure $ask, string $refusal, string $file): array
     {
         $previousErrorHandling = libxml_use_internal_errors(true);
         set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
@@ -198,7 +212,9 @@ final class XmlDescriptor
             return [] === $said ? [self::printable($refusal)] : $said;
         } catch (\ErrorException|\ValueError|\TypeError $notAnswered) {
             // The refusal, then what libxml and PHP had to say, each on its own.
-            return array_values(array_unique(array_map(self::printable(...), [$refusal, ...self::saidByLibxml(), trim($notAnswered->getMessage())])));
+            $saidByPhp = str_replace($file, basename($file), trim($notAnswered->getMessage()));
+
+            return array_values(array_unique(array_map(self::printable(...), [$refusal, ...self::saidByLibxml(), $saidByPhp])));
         } finally {
             restore_error_handler();
             libxml_clear_errors();
