@@ -44,8 +44,9 @@ final readonly class DeliveryModuleResourceBuilder
         Country $country,
         ?State $state,
         bool $onlyValid = false,
+        ?string $zipCode = null,
     ): ?DeliveryModuleResource {
-        $eligible = $this->eligibilityChecker->isEligible($module, $cart, $country, $state);
+        $eligible = $this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode);
 
         $postage = $this->postageQuerier->query($module, $cart, $address, $country, $state);
         $isValid = $eligible && $postage['valid'];

@@ -143,7 +143,7 @@ class CartGuard
             throw new MissingAddressException('Delivery address has no country');
         }
 
-        if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState())) {
+        if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState(), $address->getZipcode())) {
             throw new InvalidDeliveryException('Delivery module does not deliver to this address');
         }
 

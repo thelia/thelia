@@ -90,7 +90,7 @@ final readonly class DeliverySetupService
         $country = $deliveryAddress?->getCountry();
 
         if (null !== $country) {
-            $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $deliveryAddress->getState());
+            $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $deliveryAddress->getState(), $deliveryAddress->getZipcode());
 
             $cart
                 ->setPostage((string) ($estimate->getBestPostageAmount() ?? 0))
