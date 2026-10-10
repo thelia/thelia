@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
@@ -112,9 +113,8 @@ class SchemaLocator
             /** @var SplFileInfo $schemaFile */
             foreach ($moduleSchemas as $schemaFile) {
                 $schemaDocument = new \DOMDocument();
-                $isValid = $schemaDocument->load($schemaFile->getRealPath());
 
-                if ($isValid) {
+                if ([] === XmlDescriptor::loadingErrors($schemaDocument, (string) $schemaFile->getRealPath())) {
                     $schemaDocuments[] = $schemaDocument;
                 }
             }
@@ -245,7 +245,7 @@ class SchemaLocator
 
                 $externalSchemaDocument = new \DOMDocument();
 
-                if (!$externalSchemaDocument->load($externalSchemaPath)) {
+                if ([] !== XmlDescriptor::loadingErrors($externalSchemaDocument, $externalSchemaPath)) {
                     continue;
                 }
 

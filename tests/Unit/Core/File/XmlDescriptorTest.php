@@ -68,6 +68,8 @@ final class XmlDescriptorTest extends TestCase
         $dom = new \DOMDocument();
 
         self::assertSame([], XmlDescriptor::loadingErrors($dom, $folder.'/good.xml'));
+        self::assertSame($folder.'/good.xml', $dom->documentURI);
+        self::assertSame($folder.'/good.xml', $dom->baseURI);
         self::assertSame([], XmlDescriptor::schemaErrors($dom, $folder.'/a.xsd'));
 
         $read = XmlDescriptor::read($folder.'/good.xml');

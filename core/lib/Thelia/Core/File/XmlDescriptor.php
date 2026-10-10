@@ -23,7 +23,9 @@ use Thelia\Tools\TerminalText;
  * an entity or a DTD a descriptor would point at. The descriptor and the schema are
  * read by PHP and handed to libxml as bytes, never as a path: a path is a URI to
  * libxml, which decodes it, and a module in a folder named "Mod%41ule" was looked for
- * as "ModAule" and refused.
+ * as "ModAule" and refused. Bytes have no base: a relative reference (an include of a
+ * schema, an entity of a descriptor) would resolve against the working directory, so
+ * none is loaded (no DTD, no entity) and no schema of the core includes another.
  */
 final class XmlDescriptor
 {
@@ -33,6 +35,8 @@ final class XmlDescriptor
 
     /**
      * Loads the descriptor into $dom: nothing once loaded, otherwise why it could not be.
+     * Once loaded, the document knows its file (documentURI, baseURI), as one loaded by
+     * path did: a reader that tells documents apart by it still can.
      *
      * @return list<string>
      */
@@ -50,7 +54,13 @@ final class XmlDescriptor
             static function () use ($dom, $file): bool {
                 $xml = file_get_contents($file);
 
-                return false !== $xml && $dom->loadXML($xml, \LIBXML_NONET);
+                if (false === $xml || !$dom->loadXML($xml, \LIBXML_NONET)) {
+                    return false;
+                }
+
+                $dom->documentURI = $file;
+
+                return true;
             },
             'it could not be loaded',
         );
