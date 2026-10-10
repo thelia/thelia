@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
@@ -75,6 +76,65 @@ final class OrderStatusTransitionGuardTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
 
         self::assertSame(OrderStatus::CODE_REFUNDED, $this->reload($order)->getOrderStatus()->getCode());
+    }
+
+    public function testARefusedTransitionLeavesTheTransactionOfTheCallerCommittable(): void
+    {
+        // Nothing is written before the graph refuses: a caller inside its own
+        // transaction catches the refusal and goes on, and its commit still goes through.
+        // The test runs inside a transaction of its own, which stands for that caller.
+        $this->allowOnly(OrderStatus::CODE_SENT, [OrderStatus::CODE_REFUNDED]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+            self::fail('The transition sent -> not_paid should have been refused.');
+        } catch (OrderStatusTransitionRefusedException) {
+        }
+
+        $connection = $this->getPropelConnection();
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        self::assertFalse((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
+    }
+
+    public function testADatabaseFailureBeforeTheMoveIsRolledBackNotCommitted(): void
+    {
+        // Unlike a refusal, a failure of the database — a deadlock, a lost connection —
+        // may have cost the caller what it wrote already: its transaction must not commit
+        // as if nothing happened. A temporary table shadowing `order` for this connection
+        // stands for that failure here: the locked read of the status fails on MySQL and
+        // MariaDB alike, without the implicit commit LOCK TABLES would cause.
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $connection = $this->getPropelConnection();
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        $interrupt = static function () use ($connection): void {
+            $connection->exec('CREATE TEMPORARY TABLE `order` (id INT)');
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt, 129);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+            self::fail('The interrupted read of the status must fail the move.');
+        } catch (\Throwable $failure) {
+            self::assertNotInstanceOf(OrderStatusTransitionRefusedException::class, $failure);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $interrupt);
+            $connection->exec('DROP TEMPORARY TABLE IF EXISTS `order`');
+        }
+
+        self::assertTrue((new \ReflectionProperty(ConnectionWrapper::class, 'isUncommitable'))->getValue($connection));
+    }
+
+    public function testAnOrderDeletedMeanwhileIsSaidToBeGone(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_SENT]);
+        $staleView = clone $order;
+        $order->delete();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('no longer exists');
+
+        $this->moveOrderTo($staleView, OrderStatus::CODE_REFUNDED);
     }
 
     public function testAForcedTransitionBypassesTheGraph(): void

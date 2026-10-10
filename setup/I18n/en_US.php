@@ -1173,6 +1173,8 @@ return [
     'Order status - table row' => 'Order status - table row',
     'Order status - top' => 'Order status - top',
     'Order status transition override' => 'Order status transition override',
+    'Order payment capture' => 'Order payment capture',
+    'Awaiting capture' => 'Awaiting capture',
     'Orders - JavaScript' => 'Orders - JavaScript',
     'Orders - at the top' => 'Orders - at the top',
     'Orders - bottom' => 'Orders - bottom',

@@ -45,7 +45,7 @@ final readonly class OrderHistoryRecorder
      * MySQL refuses a user lock name longer than 64 bytes; MariaDB accepts 192. The
      * shorter of the two is the one a name has to fit.
      */
-    private const LOCK_NAME_MAX_LENGTH = 64;
+    private const LOCK_NAME_MAX_LENGTH = OrderLock::NAME_MAX_LENGTH;
 
     /**
      * How long a worker waits, in seconds, for the worker that is already writing the
@@ -56,6 +56,7 @@ final readonly class OrderHistoryRecorder
 
     public function __construct(
         private OrderHistoryActorResolver $actorResolver,
+        private OrderLock $orderLock = new OrderLock(),
     ) {
     }
 
@@ -264,44 +265,17 @@ final readonly class OrderHistoryRecorder
      * Takes the lock that serializes the check and the write for one couple
      * (order, event type), waiting at most {@see self::LOCK_TIMEOUT} seconds for it.
      *
-     * Returns false rather than throwing when the lock cannot be had — the caller then
-     * writes without checking. A lock is what makes the journal tidy, never what makes
-     * it work.
+     * False when the lock cannot be had — the caller then writes without checking. A
+     * lock is what makes the journal tidy, never what makes it work.
      */
     private function acquireLock(ConnectionInterface $connection, string $lockName): bool
     {
-        try {
-            $statement = $connection->prepare('SELECT GET_LOCK(?, ?)');
-            $statement->bindValue(1, $lockName, \PDO::PARAM_STR);
-            $statement->bindValue(2, self::LOCK_TIMEOUT, \PDO::PARAM_INT);
-            $statement->execute();
-
-            // 1 when granted, 0 when the wait ran out, NULL on a server-side error.
-            return '1' === (string) $statement->fetchColumn();
-        } catch (\Throwable $throwable) {
-            Tlog::getInstance()->warning(
-                'Order history deduplication lock {lock} could not be requested, writing unchecked: {ex}',
-                ['lock' => $lockName, 'ex' => $throwable],
-            );
-
-            return false;
-        }
+        return $this->orderLock->acquire($connection, $lockName, self::LOCK_TIMEOUT);
     }
 
     private function releaseLock(ConnectionInterface $connection, string $lockName): void
     {
-        try {
-            $statement = $connection->prepare('SELECT RELEASE_LOCK(?)');
-            $statement->bindValue(1, $lockName, \PDO::PARAM_STR);
-            $statement->execute();
-        } catch (\Throwable $throwable) {
-            // The server drops the lock when the connection goes, which is the only way
-            // this statement fails: nothing is leaked, but the failure is worth knowing.
-            Tlog::getInstance()->warning(
-                'Order history deduplication lock {lock} could not be released: {ex}',
-                ['lock' => $lockName, 'ex' => $throwable],
-            );
-        }
+        $this->orderLock->release($connection, $lockName);
     }
 
     /**

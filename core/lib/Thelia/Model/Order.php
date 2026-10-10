@@ -23,6 +23,10 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
+use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Service\PaymentAmount;
+use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
@@ -490,6 +494,48 @@ class Order extends BaseOrder
     public function isPaid(bool $exact = true): bool
     {
         return $this->getOrderStatus()->isPaid($exact);
+    }
+
+    /**
+     * Whether the buyer has done what paying asks of them: the order is paid or refunded,
+     * or its payment is authorized and only waits for the merchant's capture.
+     *
+     * An order on hold for capture answers false to isPaid() — its status stands for
+     * "not paid" so that nothing ships and nothing is invoiced — yet the amount is
+     * reserved on the buyer's card. The checkout reads this, not isPaid(): an authorized
+     * order presented again to its module, or cancelled to place a new one, would reserve
+     * the amount a second time. An authorization still waiting for the provider's answer
+     * counts: the amount may be reserved already.
+     *
+     * A cancelled order is never secured: whatever its journal still holds is released
+     * on the cancellation, and its cart is free to be ordered again.
+     */
+    public function isPaymentSecured(): bool
+    {
+        if ($this->isCancelled(false)) {
+            return false;
+        }
+
+        if ($this->isPaid(false) || $this->isRefunded(false)) {
+            return true;
+        }
+
+        if (OrderStatus::CODE_AWAITING_CAPTURE === $this->getOrderStatus()->getCode()) {
+            return true;
+        }
+
+        $totals = (new PaymentTransactionTotalsReader())->forOrder((int) $this->getId());
+
+        return $totals->hasSomethingLeftToCapture()
+            || $totals->hasPendingCapture()
+            // Money taken, whatever the status says: the move to paid may have been refused
+            // by the transition graph.
+            || PaymentAmount::isPositive($totals->netCaptured())
+            || OrderPaymentTransactionQuery::create()
+                ->filterByOrderId((int) $this->getId())
+                ->filterByTypeEnum(PaymentTransactionType::AUTHORIZATION)
+                ->filterByState(PaymentTransactionState::PENDING->value)
+                ->exists();
     }
 
     /**

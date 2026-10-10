@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,6 +32,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
+use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -357,16 +359,59 @@ class Order extends BaseAction implements EventSubscriberInterface
             throw new \LogicException('ORDER_UPDATE_STATUS was dispatched without a target status.');
         }
 
-        // Every entry point (back office, API, payment modules, commands) lands here,
-        // so this is where the transition graph is enforced.
-        $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
-
-        $event->setPreviousStatusId($order->getStatusId());
-
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
         // Prevent partial stock update on status change.
         $con->beginTransaction();
+        $expectedStatusId = $event->getExpectedStatusId();
+
+        try {
+            // The status the order has now, the row held until the commit: two workers
+            // moving the same order decide one after the other, each on what the other
+            // wrote, not on the object it happened to load.
+            $currentStatusId = $this->lockStatusOf($order, $con);
+
+            if (null === $expectedStatusId || $expectedStatusId === $currentStatusId) {
+                if ($currentStatusId !== (int) $order->getStatusId()) {
+                    $order->setStatusId($currentStatusId);
+                    // The status the database already holds: never written back from here.
+                    $order->resetModified(OrderTableMap::COL_STATUS_ID);
+                }
+
+                // Every entry point (back office, API, payment modules, commands) lands here,
+                // so this is where the transition graph is enforced.
+                $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+            }
+        } catch (OrderStatusTransitionRefusedException|\InvalidArgumentException $refusal) {
+            // A refusal writes nothing: the transaction is closed as it is, never rolled
+            // back, so that a caller inside a transaction of its own that catches the
+            // refusal can still commit what it wrote.
+            $con->commit();
+
+            throw $refusal;
+        } catch (\Throwable $failure) {
+            // A failure of the database may have undone the caller's work already: its
+            // transaction must not commit as if nothing happened.
+            $con->rollBack();
+
+            throw $failure;
+        }
+
+        if (null !== $expectedStatusId && $expectedStatusId !== $currentStatusId) {
+            $con->commit();
+            $event->stopPropagation();
+
+            Tlog::getInstance()->info(\sprintf(
+                'Order %s left status #%d before the move to status #%d was written: the move is dropped.',
+                (string) $order->getRef(),
+                $expectedStatusId,
+                $newStatus,
+            ));
+
+            return;
+        }
+
+        $event->setPreviousStatusId($currentStatusId);
 
         try {
             $this->updateQuantity($order, $newStatus, $dispatcher);
@@ -381,6 +426,21 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             throw $exception;
         }
+    }
+
+    private function lockStatusOf(ModelOrder $order, ConnectionInterface $con): int
+    {
+        $statement = $con->prepare('SELECT status_id FROM `order` WHERE id = ? FOR UPDATE');
+        $statement->bindValue(1, (int) $order->getId(), \PDO::PARAM_INT);
+        $statement->execute();
+        $statusId = $statement->fetchColumn();
+
+        // No row: PDO answers false, Propel's statement an empty string.
+        if (!is_numeric($statusId)) {
+            throw new \InvalidArgumentException(\sprintf('Order #%d no longer exists: its status cannot change.', (int) $order->getId()));
+        }
+
+        return (int) $statusId;
     }
 
     /**
@@ -405,9 +465,15 @@ class Order extends BaseAction implements EventSubscriberInterface
         // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
         // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
 
-        // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
-        // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-        if (OrderVersionQuery::create()->groupByStatusId()->filterById($order->getId())->count() > 1) {
+        // A move between two statuses that both stand for "not paid" (an authorization
+        // putting the order on hold for capture) leaves the stock as it is.
+        if ($order->isNotPaid(true) && $newStatus->isNotPaid(true)) {
+            return;
+        }
+
+        // We consider the ManageStockOnCreation flag only if the order has not yet left the
+        // "not paid" statuses: a stay on hold for capture is not a status change here.
+        if ($this->hasLeftNotPaid($order)) {
             // A status change occured. Ignore $manageStockOnCreation
             $manageStockOnCreation = false;
         } else {
@@ -437,6 +503,27 @@ class Order extends BaseAction implements EventSubscriberInterface
             .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
             .' = operation: '.$event->getOperation(),
         );
+    }
+
+    /**
+     * Whether the order ever held a status that does not stand for "not paid".
+     */
+    private function hasLeftNotPaid(ModelOrder $order): bool
+    {
+        $statusIds = OrderVersionQuery::create()
+            ->filterById($order->getId())
+            ->select(['StatusId'])
+            ->distinct()
+            ->find()
+            ->getData();
+
+        foreach (OrderStatusQuery::create()->findPks($statusIds) as $status) {
+            if (!$status->isNotPaid(true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
