@@ -76,7 +76,8 @@ final class DeliveryDateApiTest extends ApiTestCase
      */
     public function testTheAvailabilityListsEveryDayAndSaysNothingOfHowFullASlotIs(): void
     {
-        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Slot, 1, 7, [7]);
+        $closedWeekday = (int) (new \DateTimeImmutable($this->day(2)))->format('N');
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Slot, 1, 7, [$closedWeekday]);
         $slot = $this->settings()->addSlot($this->carrier, '09:00', '11:00', 2, ['en_US' => 'Morning']);
         $this->getService(DeliverySlotBooker::class)->book((int) $slot->getId(), $this->day(1), $this->getPropelConnection());
 
@@ -94,7 +95,7 @@ final class DeliveryDateApiTest extends ApiTestCase
         );
 
         foreach ($body['days'] as $day) {
-            if ('7' === (new \DateTimeImmutable($day['date']))->format('N')) {
+            if ($closedWeekday === (int) (new \DateTimeImmutable($day['date']))->format('N')) {
                 self::assertFalse($day['open']);
                 self::assertSame([], $day['slots']);
             }
