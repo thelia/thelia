@@ -153,7 +153,7 @@ class CartGuard
         // Named before the generic refusal: the buyer has to know which product is in the way.
         $this->refuseACarrierTheProductsExclude($cart, (int) $module->getId());
 
-        if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState())) {
+        if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState(), $address->getZipcode())) {
             throw new InvalidDeliveryException('Delivery module does not deliver to this address');
         }
 
