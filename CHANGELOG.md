@@ -8,8 +8,13 @@
 
 - An order lines export, `thelia.export.order_lines`, writes one row per order line with the references of the product and of the combination, the GTIN and the manufacturer part number frozen on the line, the quantity and the unit price, bounded by the same optional dates as the full order export. The two product price exports gain an `mpn` column, and the stock import an optional `mpn` column; a row of the stock import whose `ean` is not a GTIN is refused with the reason and the import goes on. A GTIN or a part number a spreadsheet would run as a formula is exported behind a leading quote.
 
+## Orders
+
+- An order can be edited after it is placed, until it is sent and as long as it has no invoice: quantities and unit prices of its lines, lines removed or added by reference or GTIN, discount and postage. `Thelia\Domain\Order\Edition\OrderEditor` checks the whole edit, applies it under a lock of the order row and undoes it whole on failure; the stock follows the lines when the order holds it. A paid order whose total changes is edited and the gap to refund or collect is shown, nothing is charged or refunded automatically. The edit is recorded in the order history (`order_edited`) and dispatches `TheliaEvents::ORDER_BEFORE_EDIT` and `ORDER_AFTER_EDIT`. It needs the new back-office resource `admin.order.edit`. Order status actions gain an `edit` trigger, on which only e-mail actions run, and the message `order_edited` is seeded to tell the customer what changed. See `docs/order-edition.md`.
+
 ## Behaviour changes
 
+- `order_status_action.trigger_type` can hold `edit` besides `enter` and `transition`. Code that reads the column itself, rather than through `OrderStatusActionTrigger`, meets the new value once a shop configures an action on an edit.
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 
 # 3.2.1

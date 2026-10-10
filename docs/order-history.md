@@ -36,9 +36,10 @@ erDiagram
     }
 ```
 
-The core writes eleven event types (`Thelia\Domain\Order\Enum\OrderHistoryEventType`):
+The core writes twelve event types (`Thelia\Domain\Order\Enum\OrderHistoryEventType`):
 `order_created`, `status_changed`, `address_updated`, `delivery_ref_updated`,
-`transaction_ref_updated`, `invoice_ref_allocated`, `email_sent`, `note`, and —
+`transaction_ref_updated`, `invoice_ref_allocated`, `email_sent`, `note`,
+`order_edited` (the changes and the totals before and after), and —
 because a return is a second story told about the order the merchant reads on
 one timeline — `return_opened`, `return_status_changed` (effective status codes)
 and `return_received`. The column stays a plain VARCHAR so a module can write
