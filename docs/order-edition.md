@@ -37,21 +37,30 @@ is removed.
   again.
 - A price typed by hand stays as typed and clears the promo of the line.
 - The taxes of a touched line are computed again for the country of the
-  invoice address. When the product no longer exists, its taxes are scaled.
-- The discount replaces the discount of the order.
+  invoice address, with the tax rule the product has now: when the rule changed
+  since the order, a corrected price takes the new rate, while the line keeps
+  the tax rule title it was placed with. When the product no longer exists, its
+  taxes are scaled.
+- The discount replaces the discount of the order. It is not checked against
+  the coupons the order used (`order_coupon`): the merchant types the amount
+  the order must carry.
 - The postage is never computed again: the merchant types it. Its tax keeps the
   ratio of the old postage, and is zero when the old postage was zero.
 - A quantity cannot go below what was already returned on the line, and the
   order keeps at least one product line.
 - When the order holds its stock (`StockPolicy`), the stock moves by the
-  difference, through `StockDecrementer`, as a change of status would.
+  difference, through `StockDecrementer`, as a change of status would. When it
+  does not hold it yet, a raised quantity and a line added are still checked
+  against the stock available, under `check-available-stock`.
+- A quantity or an amount must be a finite number up to 999,999,999.
 
 ## How an edit is applied
 
 `OrderEditor::apply(Order, OrderEdit, string $fingerprint)` checks the whole
 edit before writing anything, then writes it inside a savepoint, under a
 `SELECT ... FOR UPDATE` lock of the order row. Any failure rolls back to the
-savepoint, so a caller that already holds a transaction keeps it usable.
+savepoint and leaves the transaction without a nested rollback, so a caller
+that already holds a transaction can still commit its own work.
 
 `OrderEditor::fingerprint()` hashes the status, the invoice, the discount, the
 postage and every line. The back office sends the fingerprint read when the
@@ -59,7 +68,13 @@ form was displayed; an order changed since then is refused with
 `OrderEditConflictException` instead of being overwritten.
 
 `OrderEditor::preview()` runs the same code and undoes it: the totals shown
-before saving are the totals the order will have.
+before saving are the totals the order will have. Being the same code, a
+preview that adds a line saves an `OrderProduct` before undoing it, so the
+model events of a line (`ORDER_PRODUCT_BEFORE_CREATE`,
+`ORDER_PRODUCT_AFTER_CREATE`) and of the order are dispatched; a listener with
+an effect outside the database (a file, a call to another service) must not
+act on them while the order is being edited, or check `ORDER_BEFORE_EDIT`,
+which a preview does not dispatch.
 
 The result is an `OrderEditOutcome`: totals and taxes before and after, the
 list of changes, and whether the order was paid. `amountToRefund()` and
@@ -72,9 +87,10 @@ Exceptions extend `OrderException`: `OrderNotEditableException`,
 ## Events, history and e-mail
 
 - `TheliaEvents::ORDER_BEFORE_EDIT` is dispatched inside the transaction,
-  before any write; `TheliaEvents::ORDER_AFTER_EDIT` after the commit. Both
-  carry an `OrderEditEvent` (order, edit, outcome). A preview dispatches
-  neither.
+  before any write: a listener that throws refuses the edit.
+  `TheliaEvents::ORDER_AFTER_EDIT` is dispatched after the commit: a listener
+  that throws there is logged and the edit stands. Both carry an
+  `OrderEditEvent` (order, edit, outcome). A preview dispatches neither.
 - The history gets an `order_edited` line with the changes and the totals
   before and after (see `order-history.md`).
 - Order status actions gain the `edit` trigger
