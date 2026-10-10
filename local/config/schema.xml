@@ -1212,6 +1212,23 @@
     <column name="postage" type="FLOAT" />
     <behavior name="timestampable" />
   </table>
+  <table name="area_zip_code_rule" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="area_id" required="true" type="INTEGER" />
+    <column name="country_id" type="INTEGER" />
+    <column name="pattern" required="true" size="50" type="VARCHAR" />
+    <column defaultValue="0" name="excluded" required="true" type="BOOLEAN" />
+    <foreign-key foreignTable="area" name="fk_area_zip_code_rule_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="area_id" />
+    </foreign-key>
+    <foreign-key foreignTable="country" name="fk_area_zip_code_rule_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <index name="idx_area_zip_code_rule_area_id">
+      <index-column name="area_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="area_delivery_module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="area_id" required="true" type="INTEGER" />
