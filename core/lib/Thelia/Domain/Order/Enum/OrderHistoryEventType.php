@@ -31,6 +31,7 @@ enum OrderHistoryEventType: string
     case INVOICE_REF_ALLOCATED = 'invoice_ref_allocated';
     case EMAIL_SENT = 'email_sent';
     case NOTE = 'note';
+    case ORDER_EDITED = 'order_edited';
     case RETURN_OPENED = 'return_opened';
     case RETURN_STATUS_CHANGED = 'return_status_changed';
     case RETURN_RECEIVED = 'return_received';

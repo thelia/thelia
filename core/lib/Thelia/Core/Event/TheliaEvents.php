@@ -290,6 +290,13 @@ final class TheliaEvents
     public const ORDER_UPDATE_DELIVERY_REF = 'action.order.updateDeliveryRef';
     public const ORDER_UPDATE_TRANSACTION_REF = 'action.order.updateTransactionRef';
     public const ORDER_UPDATE_ADDRESS = 'action.order.updateAddress';
+
+    /**
+     * Before and after the lines, the discount or the postage of an order change
+     * (OrderEditEvent). A listener of the first that throws refuses the edit.
+     */
+    public const ORDER_BEFORE_EDIT = 'action.order.beforeEdit';
+    public const ORDER_AFTER_EDIT = 'action.order.afterEdit';
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';
     public const ORDER_PRODUCT_AFTER_CREATE = 'action.orderProduct.afterCreate';
 
