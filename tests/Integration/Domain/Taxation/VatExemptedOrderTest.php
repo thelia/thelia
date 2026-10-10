@@ -193,6 +193,17 @@ final class VatExemptedOrderTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testTheInvoiceStatesAPostageRateThatIsNotAHalfPoint(): void
+    {
+        $this->skipUnlessThePdfTemplateReadsThePostageTaxRateOffTheOrder();
+
+        self::assertSame(
+            '2.1 %',
+            $this->postageTaxRateOnTheInvoiceOf($this->orderWithPostageBilledTo('BE', null, new OrderPostage(102.10, 2.10, 'VAT 2.1'))),
+            'A postage of 100.00 plus 2.10 of tax is a 2.1 % postage: 2 % would have charged 2.00.',
+        );
+    }
+
     public function testEveryLocaleOfThePdfTemplateTranslatesTheReverseCharge(): void
     {
         $this->skipUnlessThePdfTemplateStatesTheReverseCharge();
