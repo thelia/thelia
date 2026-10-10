@@ -222,7 +222,7 @@ class SchemaCombiner
         foreach ($externalSchemaElementsToDelete as $externalSchemaElement) {
             // add a removal notice
             $externalSchemaRemovalNoticeComment = $databaseElement->ownerDocument->createComment(
-                \sprintf("external-schema reference to '%s' removed", $externalSchemaElement->getAttribute('filename')),
+                \sprintf("external-schema reference to '%s' removed", self::commentText($externalSchemaElement->getAttribute('filename'))),
             );
             $databaseElement->appendChild($externalSchemaRemovalNoticeComment);
 
@@ -418,15 +418,20 @@ class SchemaCombiner
     }
 
     /**
-     * Where a database element comes from, fit for a comment of the combined schema: the
-     * path of its document is a folder name a module ships, so it is printed through
-     * TerminalText and with no two dashes in a row, which would end the comment and let
-     * the rest of the name in as markup.
+     * Where a database element comes from: the path of its document, fit for a comment.
      */
     private static function origin(\DOMElement $databaseElement): string
     {
-        $path = XmlDescriptor::printable((string) $databaseElement->ownerDocument?->baseURI);
+        return self::commentText((string) $databaseElement->ownerDocument?->baseURI);
+    }
 
-        return (string) preg_replace('/-(?=-)/', '- ', $path);
+    /**
+     * A text a module ships (a folder name, a filename attribute), fit for a comment of
+     * the combined schema: printed through TerminalText, and with no two dashes in a row,
+     * which would end the comment and let the rest of the text in as markup.
+     */
+    private static function commentText(string $text): string
+    {
+        return (string) preg_replace('/-(?=-)/', '- ', XmlDescriptor::printable($text));
     }
 }
