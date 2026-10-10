@@ -212,6 +212,7 @@ final readonly class ShippingFacade
         ?int $addressId = null,
     ): array {
         [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
+        $country = $this->handleCountry($cart, $country);
 
         $modules = $this->getActiveDeliveryModules();
 
