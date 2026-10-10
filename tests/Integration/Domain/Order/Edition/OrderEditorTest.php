@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order\Edition;
 
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mime\Email;
 use Thelia\Core\Event\Order\OrderEditEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Edition\InvalidOrderEditException;
@@ -23,6 +25,10 @@ use Thelia\Domain\Order\Edition\OrderEditLine;
 use Thelia\Domain\Order\Edition\OrderEditor;
 use Thelia\Domain\Order\Edition\OrderNotEditableException;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
+use Thelia\Domain\Order\StatusAction\Effect\SendCustomerEmailAction;
+use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Order;
@@ -34,6 +40,8 @@ use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusAction;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
@@ -256,6 +264,45 @@ final class OrderEditorTest extends ActionIntegrationTestCase
 
         self::assertSame($fingerprint, $this->editor->fingerprint(OrderQuery::create()->findPk($order->getId())));
         self::assertSame(9.0, $this->stockOf($product));
+    }
+
+    public function testTheCustomerIsToldWhatChangedWhenTheShopAsksForIt(): void
+    {
+        if (!is_file(THELIA_TEMPLATE_DIR.'email/default/order_edited.txt.twig')) {
+            self::markTestSkipped('The installed mail theme has no template for an edited order yet.');
+        }
+
+        ConfigQuery::write('store_email', 'shop@example.com');
+        (new OrderStatusAction())
+            ->setTriggerType(OrderStatusActionTrigger::EDIT->value)
+            ->setToStatusId((int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID)->getId())
+            ->setActionType(SendCustomerEmailAction::getType())
+            ->setDecodedPayload([SendCustomerEmailAction::FIELD_MESSAGE_CODE => 'order_edited'])
+            ->setPosition(1)
+            ->setActive(true)
+            ->save();
+        $this->getService(OrderStatusActionRunner::class)->reset();
+        $product = $this->product(50.0, stock: 10);
+        $order = $this->order(OrderStatus::CODE_PAID, [[$product, 1]]);
+        $texts = [];
+        $listener = static function (MessageEvent $event) use (&$texts): void {
+            $message = $event->getMessage();
+
+            if ($message instanceof Email && !$event->isQueued()) {
+                $texts[] = (string) $message->getTextBody();
+            }
+        };
+        $this->dispatcher->addListener(MessageEvent::class, $listener);
+
+        try {
+            $this->apply($order, [OrderEditLine::keep((int) $this->lines($order)[0]->getId(), 2)]);
+        } finally {
+            $this->dispatcher->removeListener(MessageEvent::class, $listener);
+            ConfigQuery::resetCache();
+        }
+
+        self::assertCount(1, $texts);
+        self::assertStringContainsString($product->getRef().': quantity changed from 1 to 2', $texts[0]);
     }
 
     /**
