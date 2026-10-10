@@ -594,4 +594,37 @@ INNER JOIN (
     UNION ALL SELECT 'order_return_order_statuses', 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- ---------------------------------------------------------------------
+-- Postal code rules of a delivery zone
+--
+-- A zone holds countries and states; these rules narrow it down to postal codes:
+-- an exact code, a prefix or pattern with *, or a range "from...to", each one
+-- including or excluding, optionally for one country of the zone only. A zone
+-- without a rule accepts every postal code, as before.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `area_zip_code_rule`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `area_id` INTEGER NOT NULL,
+    `country_id` INTEGER,
+    `pattern` VARCHAR(50) NOT NULL,
+    `excluded` TINYINT(1) DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_area_zip_code_rule_area_id` (`area_id`),
+    INDEX `fi_area_zip_code_rule_country_id` (`country_id`),
+    CONSTRAINT `fk_area_zip_code_rule_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_area_zip_code_rule_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;
