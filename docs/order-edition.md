@@ -60,7 +60,11 @@ is removed.
 edit before writing anything, then writes it inside a savepoint, under a
 `SELECT ... FOR UPDATE` lock of the order row. Any failure rolls back to the
 savepoint and leaves the transaction without a nested rollback, so a caller
-that already holds a transaction can still commit its own work.
+that already holds a transaction can still commit its own work after a refusal
+or a preview. A failure thrown inside a model save (a listener of
+`ORDER_PRODUCT_AFTER_CREATE`, a database error) has already rolled back the
+nested transaction of that save, which Propel never lets the caller commit: the
+edit is undone all the same, and the caller must roll back.
 
 `OrderEditor::fingerprint()` hashes the status, the invoice, the discount, the
 postage and every line. The back office sends the fingerprint read when the
@@ -88,8 +92,10 @@ Exceptions extend `OrderException`: `OrderNotEditableException`,
 
 - `TheliaEvents::ORDER_BEFORE_EDIT` is dispatched inside the transaction,
   before any write: a listener that throws refuses the edit.
-  `TheliaEvents::ORDER_AFTER_EDIT` is dispatched after the commit: a listener
-  that throws there is logged and the edit stands. Both carry an
+  `TheliaEvents::ORDER_AFTER_EDIT` is dispatched once the editor committed: a
+  listener that throws there is logged and the edit stands. Inside a
+  transaction the caller opened, that commit is nested, and nothing is written
+  to the database until the caller commits. Both carry an
   `OrderEditEvent` (order, edit, outcome). A preview dispatches neither.
 - The history gets an `order_edited` line with the changes and the totals
   before and after (see `order-history.md`).

@@ -238,22 +238,30 @@ final readonly class OrderEditor
     /**
      * Back to the savepoint, then out of the transaction this edit opened without a rollback:
      * a nested rollback would leave the transaction of a caller impossible to commit, while
-     * the savepoint already undid everything the edit wrote. Only when the savepoint itself
-     * is gone (a deadlock rolls the whole transaction back) is the transaction rolled back.
+     * the savepoint already undid everything the edit wrote. That holds for a refusal and a
+     * preview; a failure thrown inside a model save has already rolled its own nested
+     * transaction back, which Propel never lets a caller commit.
+     *
+     * When the savepoint is gone while the transaction lives, the transaction is rolled
+     * back. Nothing here may hide the failure that brought the edit back.
      */
     private function undo(ConnectionInterface $connection): void
     {
-        if ($connection->inTransaction()) {
-            try {
-                $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
-                $connection->exec('RELEASE SAVEPOINT '.self::SAVEPOINT);
-                $connection->commit();
-            } catch (\Throwable) {
-                $connection->rollBack();
+        try {
+            if ($connection->inTransaction()) {
+                try {
+                    $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
+                    $connection->exec('RELEASE SAVEPOINT '.self::SAVEPOINT);
+                    $connection->commit();
+                } catch (\Throwable) {
+                    $connection->rollBack();
+                }
             }
+        } catch (\Throwable $failure) {
+            Tlog::getInstance()->addError('Could not leave the transaction of an order edit: '.$failure->getMessage());
+        } finally {
+            $this->forget();
         }
-
-        $this->forget();
     }
 
     /**
@@ -495,8 +503,12 @@ final readonly class OrderEditor
             // Nothing taken yet, but a raised quantity must still be one the shop can serve,
             // as a line added is.
             if ($delta > 0 && $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), true)) {
-                $available = (float) ProductSaleElementsQuery::create()->findPk($pseId, $connection)?->getQuantity();
-                $this->assertAvailable((float) $line->getQuantity() + $delta, $available, (string) $line->getProductRef());
+                $saleElements = ProductSaleElementsQuery::create()->findPk($pseId, $connection);
+
+                // A combination gone from the catalogue has no stock left to check.
+                if (null !== $saleElements) {
+                    $this->assertAvailable((float) $line->getQuantity() + $delta, (float) $saleElements->getQuantity(), (string) $line->getProductRef());
+                }
             }
 
             return;
