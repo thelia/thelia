@@ -75,10 +75,17 @@ The moving parts, all under `Thelia\Domain\Sale`:
 - `ReservedSalePriceResolver` / `ReservedSalePriceCatalog` — batch resolution;
   the catalog memoizes the visitor's whole entitled set once per request so a
   listing costs no query per card.
-- `ReservedSaleVisibility` — the single owner of the hiding rule, applied by the
-  product loops, the front API extensions, the product view check and the theme
-  sitemap. A product covered by two hidden sales stays visible to a customer
-  named on either one.
+- `ReservedSaleProductRule` — the hiding rule of the private drops. A product
+  covered by two hidden sales stays visible to a customer named on either one.
+  It is the first rule `Thelia\Domain\Catalog\Product\ProductVisibility`
+  applies, before the rules of the modules: the product loops, the front API
+  extensions, the listing facets, the quick order, the product view check and
+  the theme sitemap all read the catalog through it (see
+  [product-visibility.md](product-visibility.md)).
+- `ReservedSaleVisibility` — which operations a visitor is part of
+  (`applyToSales()`, `saleIsOpenToVisitorClause()`, `entitledSaleIds()`). Its
+  `applyTo()` and `visibleProductClause()` hand over to `ProductVisibility`, for
+  the callers that still read the catalog through it.
 - `CurrentCustomerProvider` — the visitor, read from the session first (the
   theme calls the API in process, where the token storage is empty), then from
   the JWT token storage (direct `/api/front` calls). Guest accounts are never
@@ -123,13 +130,14 @@ cron, as for every public sale.
 | Product/PSE loops, `sale` loop | Same filters; the `sale` loop also exposes `URL` and the countdown outputs. Price *sorting* still uses the raw columns. |
 | Rewritten URL | `sale` is a rewriting view; the URL is generated when the sale is created. |
 | Product view | The view check answers 404 for a hidden product, like an invisible one. |
+| Listing facets | A hidden product feeds no facet and is not counted (`/front/tfilters/products`). |
 | Theme sitemap | Hidden products excluded. |
 | Back office | Targeting block (public / named customers), shared customer picker (gated by the CUSTOMER right), countdown settings (refused without an end date), reserved badge with the recipient count. |
 
 ## Test map
 
 - `tests/Unit/Domain/Sale/SaleDiscountCalculatorTest`, `tests/Unit/Model/SaleTest`
-- `tests/Integration/Domain/Sale/` (audience, resolver, visibility)
+- `tests/Integration/Domain/Sale/` (audience, resolver, visibility), `tests/Unit/Domain/Sale/ReservedSaleVisibilityDelegationTest`
 - `tests/Integration/Action/ReservedSale*`, `ReservedProductViewCheckTest`
 - `tests/Api/Front/{SaleApiTest, ReservedSaleVisibilityApiTest, ReservedSalePriceApiTest}`
 - `tests/Http/Flexy/SaleShowcaseTest`, `tests/Unit/BackOfficeDefaultTwig/Form/SaleTypeTest`

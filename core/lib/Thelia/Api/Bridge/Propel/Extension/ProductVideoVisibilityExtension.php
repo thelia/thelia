@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\ProductSaleElementsProductVideo;
 use Thelia\Api\Resource\ProductVideo;
-use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\Map\ProductSaleElementsProductVideoTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\ProductVideoTableMap;
@@ -45,7 +45,7 @@ use Thelia\Model\ProductVideoQuery;
 final readonly class ProductVideoVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private ReservedSaleVisibility $reservedSaleVisibility,
+        private ProductVisibility $productVisibility,
     ) {
     }
 
@@ -72,7 +72,7 @@ final readonly class ProductVideoVisibilityExtension implements QueryCollectionE
             // joins the product to hydrate the relation, and a second join would
             // only repeat what it reads.
             $query->where($this->onAVisibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID));
-            $this->reservedSaleVisibility->applyTo($query, ProductVideoTableMap::COL_PRODUCT_ID);
+            $this->productVisibility->applyTo($query, ProductVideoTableMap::COL_PRODUCT_ID);
 
             return;
         }
@@ -96,15 +96,15 @@ final readonly class ProductVideoVisibilityExtension implements QueryCollectionE
                 $this->onAVisibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID),
             ));
 
-            $reservedSaleClause = $this->reservedSaleVisibility->visibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID);
+            $visibleProductClause = $this->productVisibility->visibleProductClause(ProductVideoTableMap::COL_PRODUCT_ID);
 
-            if (null !== $reservedSaleClause) {
+            if (null !== $visibleProductClause) {
                 $query->where(\sprintf(
                     '%s IN (SELECT %s FROM %s WHERE %s)',
                     ProductSaleElementsProductVideoTableMap::COL_PRODUCT_VIDEO_ID,
                     ProductVideoTableMap::COL_ID,
                     ProductVideoTableMap::TABLE_NAME,
-                    $reservedSaleClause,
+                    $visibleProductClause,
                 ));
             }
         }

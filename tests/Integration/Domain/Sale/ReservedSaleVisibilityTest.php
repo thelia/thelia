@@ -14,6 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Sale;
 
+use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Category;
@@ -143,6 +147,48 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
             $this->isVisible($product),
             'The operation that would show the product is over, and the one hiding it is not.',
         );
+    }
+
+    /**
+     * A rule of a module joins the reserved operations: each hides what it hides,
+     * and a product neither of them hides stays in the catalog.
+     */
+    public function testAModuleRuleAndAHiddenOperationEachHideTheirOwnProduct(): void
+    {
+        $hiddenByTheOperation = $this->catalogProduct();
+        $hiddenByTheRule = $this->catalogProduct();
+        $free = $this->catalogProduct();
+
+        $this->hiddenReservedSaleOn($hiddenByTheOperation, $this->newCustomer());
+
+        $rule = new class((int) $hiddenByTheRule->getId()) implements ProductVisibilityRuleInterface {
+            public function __construct(private readonly int $hiddenProductId)
+            {
+            }
+
+            public function visibleProductClause(string $productIdColumn, ?Customer $customer): ?string
+            {
+                return \sprintf('%s <> %d', $productIdColumn, $this->hiddenProductId);
+            }
+        };
+
+        $productVisibility = new ProductVisibility(
+            $this->getService(ReservedSaleProductRule::class),
+            $this->getService(CurrentCustomerProvider::class),
+            [$rule],
+        );
+        $this->forgetMemoisedAudience();
+
+        $isVisible = static function (Product $product) use ($productVisibility): bool {
+            $query = ProductQuery::create()->filterById($product->getId());
+            $productVisibility->applyTo($query, ProductTableMap::COL_ID);
+
+            return $query->count() > 0;
+        };
+
+        self::assertFalse($isVisible($hiddenByTheOperation));
+        self::assertFalse($isVisible($hiddenByTheRule));
+        self::assertTrue($isVisible($free));
     }
 
     private function isVisible(Product $product): bool

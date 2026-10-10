@@ -17,8 +17,8 @@ namespace Thelia\Domain\Sale;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\Customer;
-use Thelia\Model\Map\SaleProductTableMap;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\Sale;
 use Thelia\Model\SaleQuery;
@@ -38,24 +38,44 @@ use Thelia\Model\SaleQuery;
  * collection, an item read and a count all agree on what the catalog holds: a
  * product left reachable by its id is not hidden, it is only harder to find.
  *
- * A shop with no running reserved operation pays one indexed existence check per
- * request and nothing more — no criterion is added to any query, and the
- * statements are the ones it ran before the feature existed.
+ * A shop with no running reserved operation and no module rule pays one indexed
+ * existence check per request and nothing more: no criterion is added to any
+ * query, and the statements are the ones it ran before the feature existed.
+ *
+ * Which products the visitor sees is no longer decided here: ProductVisibility
+ * joins the private drops (ReservedSaleProductRule) to the rules of the modules.
+ * applyTo(), visibleProductClause(), hiddenSaleIds() and entitledHidingSaleIds()
+ * are kept and hand over to them, so that a caller reading the catalog through
+ * this class still gets every rule.
  */
 class ReservedSaleVisibility implements ResetInterface
 {
-    /** @var array<int, array{hidden: list<int>, entitled: list<int>}> the hiding operations each customer is out of, and in */
-    private array $hidingSaleIdsByCustomer = [];
+    private readonly ReservedSaleProductRule $reservedSaleProductRule;
+
+    private readonly ProductVisibility $productVisibility;
 
     public function __construct(
         private readonly SaleAudienceChecker $saleAudienceChecker,
         private readonly CurrentCustomerProvider $currentCustomerProvider,
+        ?ProductVisibility $productVisibility = null,
+        ?ReservedSaleProductRule $reservedSaleProductRule = null,
     ) {
+        // Both or neither: the rule given to one and not the other would keep two
+        // memories of the private drops, and reset() would empty only one of them.
+        if ((null === $productVisibility) !== (null === $reservedSaleProductRule)) {
+            throw new \InvalidArgumentException('Give ReservedSaleVisibility both its ProductVisibility and its ReservedSaleProductRule, or neither.');
+        }
+
+        // Built by hand when they are not given, so that a caller constructing this
+        // class with its first two arguments keeps the reserved operations.
+        $this->reservedSaleProductRule = $reservedSaleProductRule ?? new ReservedSaleProductRule($saleAudienceChecker, $currentCustomerProvider);
+        $this->productVisibility = $productVisibility ?? new ProductVisibility($this->reservedSaleProductRule, $currentCustomerProvider);
     }
 
     /**
-     * Whether any reserved operation is running in the shop at all — the gate every
-     * caller reads before doing anything more expensive.
+     * Whether any reserved operation is running in the shop at all. It says nothing
+     * about the rules of the modules: never read it to skip applyTo() or
+     * visibleProductClause(), which apply those rules whether an operation runs or not.
      */
     public function hasActiveReservedSale(): bool
     {
@@ -63,59 +83,20 @@ class ReservedSaleVisibility implements ResetInterface
     }
 
     /**
-     * Narrows a catalog query to the products the current visitor is allowed to see.
-     *
-     * A product is out of the catalog when a hidden operation covers it and none of
-     * the hidden operations covering it is open to the visitor. Being left out of one
-     * private drop is not what hides a product from somebody — being left out of every
-     * one of them is, and a customer named on one of two overlapping operations reads
-     * their catalog through the one they are part of.
-     *
-     * @param string $productIdColumn the qualified column holding the product id in
-     *                                the query being narrowed — `product.id` for the
-     *                                catalog itself, `product_sale_elements.product_id`
-     *                                for its sale elements
+     * Narrows a catalog query to the products the current visitor may see, through
+     * ProductVisibility: the private drops and the rules of the modules.
      */
     public function applyTo(ModelCriteria $query, string $productIdColumn): void
     {
-        $clause = $this->visibleProductClause($productIdColumn);
-
-        if (null !== $clause) {
-            $query->where($clause);
-        }
+        $this->productVisibility->applyTo($query, $productIdColumn);
     }
 
     /**
-     * The rule of {@see applyTo()} as a fragment, for a query that reaches the
-     * product through a subquery of its own: the combination links of a video
-     * carry no product column, the video they point at does.
-     *
-     * @return string|null null when no running operation hides anything from the visitor
+     * @return string|null null when nothing is hidden from the visitor
      */
     public function visibleProductClause(string $productIdColumn): ?string
     {
-        $hiddenSaleIds = $this->hiddenSaleIds();
-
-        if ([] === $hiddenSaleIds) {
-            return null;
-        }
-
-        $clause = \sprintf(
-            'NOT %s',
-            $this->coveredByAnyOfClause($productIdColumn, $hiddenSaleIds),
-        );
-
-        $entitledHidingSaleIds = $this->entitledHidingSaleIds();
-
-        if ([] !== $entitledHidingSaleIds) {
-            $clause = \sprintf(
-                '(%s OR %s)',
-                $clause,
-                $this->coveredByAnyOfClause($productIdColumn, $entitledHidingSaleIds),
-            );
-        }
-
-        return $clause;
+        return $this->productVisibility->visibleProductClause($productIdColumn);
     }
 
     /**
@@ -184,7 +165,7 @@ class ReservedSaleVisibility implements ResetInterface
      */
     public function hiddenSaleIds(): array
     {
-        return $this->hidingSaleIds()['hidden'];
+        return $this->reservedSaleProductRule->hiddenSaleIds();
     }
 
     /**
@@ -195,7 +176,7 @@ class ReservedSaleVisibility implements ResetInterface
      */
     public function entitledHidingSaleIds(): array
     {
-        return $this->hidingSaleIds()['entitled'];
+        return $this->reservedSaleProductRule->entitledHidingSaleIds();
     }
 
     public function currentCustomer(): ?Customer
@@ -205,72 +186,6 @@ class ReservedSaleVisibility implements ResetInterface
 
     public function reset(): void
     {
-        $this->hidingSaleIdsByCustomer = [];
-    }
-
-    /**
-     * Every running operation hiding its products, split into the ones the current
-     * visitor is out of and the ones they are part of.
-     *
-     * Answered from an indexed existence check first — most shops run no reserved
-     * operation at all, and those must not pay for a list nobody will read. The split
-     * is made here rather than by the database, so that both halves cost the one
-     * statement the single half used to.
-     *
-     * @return array{hidden: list<int>, entitled: list<int>}
-     */
-    private function hidingSaleIds(): array
-    {
-        if (!$this->hasActiveReservedSale()) {
-            return ['hidden' => [], 'entitled' => []];
-        }
-
-        $customer = $this->currentCustomer();
-        $customerId = (int) ($customer?->getId() ?? 0);
-
-        if (isset($this->hidingSaleIdsByCustomer[$customerId])) {
-            return $this->hidingSaleIdsByCustomer[$customerId];
-        }
-
-        $query = SaleQuery::create()
-            ->filterByActive(true)
-            ->filterByHideProducts(true)
-            ->filterByAudienceMode(Sale::AUDIENCE_MODE_PUBLIC, Criteria::NOT_EQUAL);
-
-        // The dates decide, not the active flag alone: the flag is only as fresh as
-        // the last run of the scheduled command, and an operation that ended ten
-        // minutes ago must not keep a product out of the catalog.
-        $this->saleAudienceChecker->filterByRunningDates($query);
-
-        /** @var list<int> $hidingSaleIds */
-        $hidingSaleIds = array_map('intval', $query->select(SaleTableMap::COL_ID)->find()->getData());
-
-        $entitledSaleIds = $this->saleAudienceChecker->getEntitledReservedSaleIds($customer);
-
-        return $this->hidingSaleIdsByCustomer[$customerId] = [
-            'hidden' => array_values(array_diff($hidingSaleIds, $entitledSaleIds)),
-            'entitled' => array_values(array_intersect($hidingSaleIds, $entitledSaleIds)),
-        ];
-    }
-
-    /**
-     * Whether the product the query is reading is part of any of these operations.
-     *
-     * The ids are read back from the database as integers, so they go into the
-     * statement as they are: there is no value here to bind, and a raw clause is what
-     * lets the same criterion be expressed against either column.
-     *
-     * @param list<int> $saleIds
-     */
-    private function coveredByAnyOfClause(string $productIdColumn, array $saleIds): string
-    {
-        return \sprintf(
-            'EXISTS (SELECT 1 FROM `%s` WHERE `%s`.`product_id` = %s AND `%s`.`sale_id` IN (%s))',
-            SaleProductTableMap::TABLE_NAME,
-            SaleProductTableMap::TABLE_NAME,
-            $productIdColumn,
-            SaleProductTableMap::TABLE_NAME,
-            implode(', ', $saleIds),
-        );
+        $this->reservedSaleProductRule->reset();
     }
 }

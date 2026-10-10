@@ -30,12 +30,14 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ChoiceFilterQuery;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
 
 readonly class FilterService
@@ -48,6 +50,7 @@ readonly class FilterService
         private readonly LangService $langService,
         private readonly RequestStack $requestStack,
         private readonly Translator $translator,
+        private readonly ?ProductVisibility $productVisibility = null,
     ) {
     }
 
@@ -205,6 +208,7 @@ readonly class FilterService
         $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds, $browsedBrandId): array {
             $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth);
             $this->restrictToVisibility($query, $visible);
+            $this->restrictToVisitorCatalog($query);
             $this->restrictToScope($query, $scopeIds);
             $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
@@ -266,6 +270,7 @@ readonly class FilterService
     {
         $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth);
         $this->restrictToVisibility($query, $visible);
+        $this->restrictToVisitorCatalog($query);
         $this->restrictToScope($query, $scopeIds);
         $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
@@ -525,6 +530,19 @@ readonly class FilterService
         }
 
         $query->filterByVisible(filter_var($visible, \FILTER_VALIDATE_BOOL) ? 1 : 0);
+    }
+
+    /**
+     * The facets describe the products the listing can show this visitor: a product
+     * hidden by a reserved operation or by a module rule must not lend its brand,
+     * features or attributes to them, nor be counted. The facets are a front
+     * resource only, so the back office is never narrowed here.
+     */
+    private function restrictToVisitorCatalog(ModelCriteria $query): void
+    {
+        if ($query instanceof ProductQuery) {
+            $this->productVisibility?->applyTo($query, ProductTableMap::COL_ID);
+        }
     }
 
     private function managePosition(array $filterObjects): array

@@ -17,9 +17,19 @@ namespace Thelia\Tests\Integration\Api;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\Sale\ReservedSaleProductRule;
+use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\Sale\SaleAudienceChecker;
+use Thelia\Model\Category;
 use Thelia\Model\ChoiceFilter;
+use Thelia\Model\Customer;
+use Thelia\Model\Feature;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\Product;
+use Thelia\Model\Sale;
 use Thelia\Model\Template;
 use Thelia\Test\IntegrationTestCase;
 
@@ -28,6 +38,10 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
     private FilterService $filterService;
 
     private int $categoryId = 0;
+
+    private Category $category;
+
+    private Feature $colour;
 
     protected function setUp(): void
     {
@@ -67,6 +81,92 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
                 'feature/Colour' => ['Red'],
             ],
             $this->facets(['visible' => '0']),
+        );
+    }
+
+    /**
+     * A product the visitor cannot see, here because a reserved operation hides it
+     * from everybody it does not name, lends nothing to the facets: no brand, no
+     * feature value, no count. The same rule hides it from the listing itself.
+     */
+    public function testAProductHiddenFromTheVisitorFeedsNoFacet(): void
+    {
+        $connection = $this->getPropelConnection();
+        $factory = $this->createFixtureFactory();
+        $currency = $factory->currency();
+
+        $reserved = $factory->product($this->category, $factory->taxRule(), $currency, ['ref' => 'RESERVED', 'visible' => 1]);
+        $reserved->setBrandId($factory->brand(['title' => 'Reserved brand'])->getId())->save($connection);
+        $this->holdValue($reserved, (int) $this->colour->getId(), (int) $factory->featureAv($this->colour, ['title' => 'Green'])->getId());
+
+        $sale = $factory->sale([
+            'active' => true,
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS,
+            'hideProducts' => true,
+            'startDate' => new \DateTime('-1 day'),
+            'endDate' => new \DateTime('+1 day'),
+        ]);
+        $factory->saleProduct($sale, $reserved);
+        $factory->saleCustomer($sale, $factory->customer($factory->customerTitle()));
+        $factory->saleOffsetCurrency($sale, $currency, 10.0);
+
+        // Both services answer from memory for the whole request.
+        $this->getService(SaleAudienceChecker::class)->reset();
+        $this->getService(ReservedSaleVisibility::class)->reset();
+
+        self::assertSame(
+            [
+                'brand/Brand' => ['Shown brand'],
+                'feature/Colour' => ['Blue'],
+            ],
+            $this->facets(['visible' => 'true']),
+        );
+    }
+
+    /**
+     * A rule of a module hides a product from the facets as a reserved operation
+     * does. The kernel of the tests is shared and its container is not to be
+     * changed, so the service is rebuilt from the container's own collaborators,
+     * with a product visibility holding the rule.
+     */
+    public function testAProductHiddenByAModuleRuleFeedsNoFacet(): void
+    {
+        $connection = $this->getPropelConnection();
+        $factory = $this->createFixtureFactory();
+
+        $ruled = $factory->product($this->category, $factory->taxRule(), $factory->currency(), ['ref' => 'RULED', 'visible' => 1]);
+        $ruled->setBrandId($factory->brand(['title' => 'Ruled brand'])->getId())->save($connection);
+        $this->holdValue($ruled, (int) $this->colour->getId(), (int) $factory->featureAv($this->colour, ['title' => 'Yellow'])->getId());
+
+        $rule = new class((int) $ruled->getId()) implements ProductVisibilityRuleInterface {
+            public function __construct(private readonly int $hiddenProductId)
+            {
+            }
+
+            public function visibleProductClause(string $productIdColumn, ?Customer $customer): ?string
+            {
+                return \sprintf('%s <> %d', $productIdColumn, $this->hiddenProductId);
+            }
+        };
+
+        // Without the rule the product feeds the facets: the fixture is one the rule has to work on.
+        self::assertContains('Ruled brand', $this->facets(['visible' => 'true'])['brand/Brand']);
+
+        $collaborators = [];
+
+        foreach (['filters', 'filterTypes', 'langService', 'requestStack', 'translator'] as $property) {
+            $collaborators[$property] = (new \ReflectionProperty($this->filterService, $property))->getValue($this->filterService);
+        }
+
+        $reservedSaleRule = new ReservedSaleProductRule($this->getService(SaleAudienceChecker::class), $this->getService(CurrentCustomerProvider::class));
+        $this->filterService = new FilterService(...$collaborators, productVisibility: new ProductVisibility($reservedSaleRule, $this->getService(CurrentCustomerProvider::class), [$rule]));
+
+        self::assertSame(
+            [
+                'brand/Brand' => ['Shown brand'],
+                'feature/Colour' => ['Blue'],
+            ],
+            $this->facets(['visible' => 'true']),
         );
     }
 
@@ -125,10 +225,12 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
         $category->setDefaultTemplateId($template->getId());
         $category->save($connection);
         $this->categoryId = (int) $category->getId();
+        $this->category = $category;
         $taxRule = $factory->taxRule();
         $currency = $factory->currency();
 
         $colour = $factory->feature(['title' => 'Colour']);
+        $this->colour = $colour;
 
         $choiceFilter = new ChoiceFilter();
         $choiceFilter->setCategoryId($category->getId());
