@@ -273,6 +273,36 @@ final readonly class ShippingFacade
     }
 
     /**
+     * The postal code of the cart's delivery address when it is the reason no carrier is
+     * offered: some active carrier serves the country, and the postal code rules of its
+     * zones refuse that code. Null otherwise, including when carriers are offered.
+     *
+     * A front office reads it to explain an empty list of carriers instead of only
+     * showing one.
+     */
+    public function postalCodeWithoutCarrier(Cart $cart): ?string
+    {
+        [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
+        $country = $this->handleCountry($cart, $country);
+
+        if (null === $zipCode || '' === trim($zipCode)) {
+            return null;
+        }
+
+        $servesTheCountry = false;
+
+        foreach ($this->getActiveDeliveryModules() as $module) {
+            if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
+                return null;
+            }
+
+            $servesTheCountry = $servesTheCountry || $this->eligibilityChecker->isEligible($module, $cart, $country, $state);
+        }
+
+        return $servesTheCountry ? $zipCode : null;
+    }
+
+    /**
      * Resolve the trio (Address?, Country?, State?) from arguments and/or the cart.
      *
      * Rules:
