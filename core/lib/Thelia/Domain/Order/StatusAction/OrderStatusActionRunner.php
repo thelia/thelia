@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\StatusAction;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Core\Event\Order\OrderEditEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
+use Thelia\Domain\Order\StatusAction\Effect\AbstractEmailAction;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\Exception\EmailNotSentException;
@@ -82,6 +84,41 @@ final class OrderStatusActionRunner
 
         foreach ($this->actionsFor($previousStatusId, $newStatusId) as $action) {
             $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => $context($payload, $order, $previousStatus, $newStatus));
+        }
+    }
+
+    /**
+     * The actions configured on editing an order in its status, run once the edit is
+     * written, with what it changed. Only e-mails: the edit moves the stock and the totals
+     * itself, an action doing it again at each edit would do it twice.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_AFTER_EDIT, priority: 5)]
+    public function onOrderEdited(OrderEditEvent $event): void
+    {
+        $order = $event->getOrder();
+        $status = $this->catalog->get((int) $order->getStatusId());
+        $changes = $event->getOutcome()?->changes ?? [];
+
+        if (null === $status || [] === $changes) {
+            return;
+        }
+
+        $actions = OrderStatusActionQuery::create()
+            ->filterByActive(true)
+            ->filterByTriggerType(OrderStatusActionTrigger::EDIT->value)
+            ->filterByToStatusId($this->catalog->equivalentIds((int) $status->getId()), \Propel\Runtime\ActiveQuery\Criteria::IN)
+            ->orderByPosition()
+            ->orderById()
+            ->find();
+
+        foreach ($actions as $action) {
+            if (!$this->registry->get($action->getActionType()) instanceof AbstractEmailAction) {
+                $this->recordFailure($action, $order, \sprintf('Only e-mail actions run when an order is edited: "%s" is not one.', $action->getActionType()));
+
+                continue;
+            }
+
+            $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => new OrderStatusActionContext($order, $status, $status, $payload, $changes));
         }
     }
 

@@ -31,6 +31,8 @@ final readonly class OrderStatusActionContext
         public ?OrderStatus $previousStatus,
         public OrderStatus $newStatus,
         public array $payload,
+        /** What an edit of the order changed, for an action fired by it (OrderEditOutcome::$changes). */
+        public array $changes = [],
     ) {
     }
 }
