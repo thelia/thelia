@@ -8,8 +8,13 @@
 
 - An order lines export, `thelia.export.order_lines`, writes one row per order line with the references of the product and of the combination, the GTIN and the manufacturer part number frozen on the line, the quantity and the unit price, bounded by the same optional dates as the full order export. The two product price exports gain an `mpn` column, and the stock import an optional `mpn` column; a row of the stock import whose `ean` is not a GTIN is refused with the reason and the import goes on. A GTIN or a part number a spreadsheet would run as a formula is exported behind a leading quote.
 
+## Fixed
+
+- The `lang` argument of the loops that extend `BaseI18nLoop` (`country`, `title`, `module`, `product`, and so on) now chooses the language their texts are read in, as it did in Thelia 2. It was declared but ignored: the texts always came in the language of the session, so a document printed for a customer in another language than the administrator's, or rendered by a command, named countries and civilities in the wrong language. The argument takes a language id or a locale; without it, the language of the session applies, then the default one.
+
 ## Behaviour changes
 
+- A loop given a `lang` argument that names no language now throws an `InvalidArgumentException`, as `ModelCriteriaTools::getI18n()` does, instead of silently reading the language of the session. A template that passes a misspelled or removed language to a loop fails on its next render.
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 
 # 3.2.1
