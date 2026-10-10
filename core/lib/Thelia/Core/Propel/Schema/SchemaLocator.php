@@ -98,8 +98,8 @@ class SchemaLocator
                     // generated at this point.
                     error_log(\sprintf(
                         '[thelia] Module "%s" is active in the database but its directory was not found on disk. Its Propel schema will be skipped; run "module:deactivate %s" to clean up.',
-                        $moduleCode,
-                        $moduleCode,
+                        XmlDescriptor::printable($moduleCode),
+                        XmlDescriptor::printable($moduleCode),
                     ));
 
                     continue;
@@ -118,7 +118,7 @@ class SchemaLocator
                 if ([] === $notLoaded) {
                     $schemaDocuments[] = $schemaDocument;
                 } else {
-                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', $moduleCode), $notLoaded);
+                    $this->skip((string) $schemaFile->getRealPath(), \sprintf('module "%s"', XmlDescriptor::printable($moduleCode)), $notLoaded);
                 }
             }
 
@@ -171,8 +171,8 @@ class SchemaLocator
                 // yet: Propel models are not generated at this point.
                 error_log(\sprintf(
                     '[thelia] Module "%s" could not be validated (%s). Its dependencies will be skipped.',
-                    $module,
-                    $exception->getMessage(),
+                    XmlDescriptor::printable($module),
+                    XmlDescriptor::printable($exception->getMessage()),
                 ));
 
                 continue;

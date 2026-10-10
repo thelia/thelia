@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Propel\Schema;
 
+use Thelia\Core\File\XmlDescriptor;
+
 /**
  * Combine Propel schemas describing databases into a single schema per database.
  */
@@ -369,7 +371,7 @@ class SchemaCombiner
 
         // add a source schema start marker
         $fileStartMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("Start of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
+            \sprintf("Start of schema from '%s'", self::origin($sourceDatabaseElement)),
         );
         $globalDatabaseElement->appendChild($fileStartMarkerComment);
 
@@ -381,7 +383,7 @@ class SchemaCombiner
 
         // and a source schema end marker
         $fileEndMarkerComment = $globalDatabaseElement->ownerDocument->createComment(
-            \sprintf("End of schema from '%s'", $sourceDatabaseElement->ownerDocument->baseURI),
+            \sprintf("End of schema from '%s'", self::origin($sourceDatabaseElement)),
         );
         $globalDatabaseElement->appendChild($fileEndMarkerComment);
 
@@ -407,13 +409,24 @@ class SchemaCombiner
         );
         $globalDatabaseElement->appendChild($externalSchemaIncludeComment);
 
-        // include the external schema
-        $externalSchemaInclude = $globalDatabaseElement->ownerDocument->createElement(
-            'external-schema',
-            $externalDatabaseElement->ownerDocument->baseURI,
-        );
+        // include the external schema (as a text node: createElement() escapes nothing)
+        $externalSchemaInclude = $globalDatabaseElement->ownerDocument->createElement('external-schema');
+        $externalSchemaInclude->appendChild($globalDatabaseElement->ownerDocument->createTextNode(self::origin($externalDatabaseElement)));
         $globalDatabaseElement->appendChild($externalSchemaInclude);
 
         $this->externalSchemaDatabaseElements[$database][] = $externalDatabaseElement;
+    }
+
+    /**
+     * Where a database element comes from, fit for a comment of the combined schema: the
+     * path of its document is a folder name a module ships, so it is printed through
+     * TerminalText and with no two dashes in a row, which would end the comment and let
+     * the rest of the name in as markup.
+     */
+    private static function origin(\DOMElement $databaseElement): string
+    {
+        $path = XmlDescriptor::printable((string) $databaseElement->ownerDocument?->baseURI);
+
+        return (string) preg_replace('/-(?=-)/', '- ', $path);
     }
 }

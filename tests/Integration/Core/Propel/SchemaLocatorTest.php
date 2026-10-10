@@ -47,7 +47,8 @@ final class SchemaLocatorTest extends IntegrationTestCase
      */
     public function testTheSchemasOfAModuleInAFolderThatReadsAsAUriAreFound(): void
     {
-        $this->localModuleDir = sys_get_temp_dir().'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        // The keys are real paths: the temporary directory is a link on some hosts.
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
         $configDir = $this->localModuleDir.'/Mod%41ule/Config';
         $filesystem = new Filesystem();
         $filesystem->dumpFile($configDir.'/schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
@@ -66,7 +67,7 @@ final class SchemaLocatorTest extends IntegrationTestCase
      */
     public function testASchemaThatCannotBeReadIsSkippedAndSaidSo(): void
     {
-        $this->localModuleDir = sys_get_temp_dir().'/thelia-schema-locator-'.bin2hex(random_bytes(4));
+        $this->localModuleDir = realpath(sys_get_temp_dir()).'/thelia-schema-locator-'.bin2hex(random_bytes(4));
         $configDir = $this->localModuleDir.'/Broken/Config';
         $filesystem = new Filesystem();
         $filesystem->dumpFile($configDir.'/schema.xml', '<?xml version="1.0"?><database name="TheliaMain"><table name="sample_one"><column name="id" type="INTEGER" primaryKey="true"/></table></database>');
