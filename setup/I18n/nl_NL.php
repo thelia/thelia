@@ -415,4 +415,6 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Payment reminder of an unpaid order sent to the customer' => 'Betalingsherinnering voor een onbetaalde bestelling naar de klant verzonden',
+    'Your order {{ order_ref }} is waiting for its payment' => 'Je bestelling {{ order_ref }} wacht op betaling',
 ];

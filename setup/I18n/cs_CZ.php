@@ -31,4 +31,6 @@ return [
     'Your subscription to %store newsletter' => 'Váš odběr novinek z obchodu {{ config("store_name") }}',
     'Promotion' => 'Akce',
     'Newness' => 'Novinka',
+    'Payment reminder of an unpaid order sent to the customer' => 'Připomínka platby nezaplacené objednávky odeslaná zákazníkovi',
+    'Your order {{ order_ref }} is waiting for its payment' => 'Vaše objednávka {{ order_ref }} čeká na zaplacení',
 ];

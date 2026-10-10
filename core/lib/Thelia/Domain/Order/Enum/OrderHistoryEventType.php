@@ -30,6 +30,8 @@ enum OrderHistoryEventType: string
     case TRANSACTION_REF_UPDATED = 'transaction_ref_updated';
     case INVOICE_REF_ALLOCATED = 'invoice_ref_allocated';
     case EMAIL_SENT = 'email_sent';
+    case PAYMENT_REMINDER_SENT = 'payment_reminder_sent';
+    case PAYMENT_REMINDER_FAILED = 'payment_reminder_failed';
     case NOTE = 'note';
     case RETURN_OPENED = 'return_opened';
     case RETURN_STATUS_CHANGED = 'return_status_changed';

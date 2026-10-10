@@ -302,4 +302,29 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Payment reminder of an unpaid order
+--
+-- The mail the reminder schedule sends (order:remind-unpaid). The schedule
+-- itself is left unset: a shop starts reminding only once its merchant
+-- writes one.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('order_payment_reminder', NULL, 'order_payment_reminder.txt', 'order_payment_reminder.html', NOW(), NOW());
+
+-- Read back by name rather than from LAST_INSERT_ID(): on a replay the insert
+-- above is ignored and hands back no id at all.
+SET @order_payment_reminder_message_id := (SELECT `id` FROM `message` WHERE `name` = 'order_payment_reminder');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@order_payment_reminder_message_id, 'cs_CZ', 'Připomínka platby nezaplacené objednávky odeslaná zákazníkovi', 'Vaše objednávka {{ order_ref }} čeká na zaplacení'),
+    (@order_payment_reminder_message_id, 'de_DE', 'Zahlungserinnerung für eine unbezahlte Bestellung an den Kunden gesendet', 'Ihre Bestellung {{ order_ref }} wartet auf die Zahlung'),
+    (@order_payment_reminder_message_id, 'en_US', 'Payment reminder of an unpaid order sent to the customer', 'Your order {{ order_ref }} is waiting for its payment'),
+    (@order_payment_reminder_message_id, 'es_ES', 'Recordatorio de pago de un pedido impagado enviado al cliente', 'Tu pedido {{ order_ref }} está pendiente de pago'),
+    (@order_payment_reminder_message_id, 'fr_FR', 'Relance de paiement d''une commande impayée envoyée au client', 'Votre commande {{ order_ref }} attend son paiement'),
+    (@order_payment_reminder_message_id, 'it_IT', 'Promemoria di pagamento di un ordine non pagato inviato al cliente', 'Il tuo ordine {{ order_ref }} è in attesa di pagamento'),
+    (@order_payment_reminder_message_id, 'nl_NL', 'Betalingsherinnering voor een onbetaalde bestelling naar de klant verzonden', 'Je bestelling {{ order_ref }} wacht op betaling'),
+    (@order_payment_reminder_message_id, 'ru_RU', 'Напоминание об оплате неоплаченного заказа отправлено клиенту', 'Ваш заказ {{ order_ref }} ожидает оплаты');
+
 SET FOREIGN_KEY_CHECKS = 1;
