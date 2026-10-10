@@ -91,9 +91,11 @@ final readonly class DeliveryDateCalendar
     /**
      * The window of the carrier counted from today, or null when it offers no date.
      *
-     * @param string|null $locale the language of the slot titles; a slot with no title in it is shown by its hours
+     * @param \DateTimeImmutable|null $now    the moment the window is drawn at: its day is today, and a slot of
+     *                                        today whose hours are over is no longer available
+     * @param string|null             $locale the language of the slot titles; a slot with no title in it is shown by its hours
      */
-    public function offerFor(Module $module, ?\DateTimeImmutable $today = null, ?string $locale = null): ?DeliveryDateOffer
+    public function offerFor(Module $module, ?\DateTimeImmutable $now = null, ?string $locale = null): ?DeliveryDateOffer
     {
         $rule = DeliveryDateRuleQuery::create()->findOneByModuleId($module->getId());
         $choiceMode = $this->resolveChoiceMode($module, $rule);
@@ -102,7 +104,10 @@ final readonly class DeliveryDateCalendar
             return null;
         }
 
-        $today = ($today ?? new \DateTimeImmutable('today'))->setTime(0, 0);
+        $now ??= new \DateTimeImmutable('now');
+        $today = $now->setTime(0, 0);
+        $todayKey = $today->format('Y-m-d');
+        $timeOfDay = $now->format('H:i');
         $first = $today->modify(\sprintf('+%d days', max(0, $rule->getMinimumDelayDays())));
         $last = $today->modify(\sprintf('+%d days', min(self::MAXIMUM_HORIZON_DAYS, max(0, $rule->getHorizonDays()))));
 
@@ -126,13 +131,15 @@ final readonly class DeliveryDateCalendar
 
             foreach ($slots as $slotId => $slot) {
                 $taken = $bookings[$slotId][$key] ?? 0;
+                // A slot of today whose hours are over can no longer be honoured.
+                $over = $key === $todayKey && $slot['end'] <= $timeOfDay;
 
                 $daySlots[] = new DeliverySlotOffer(
                     $slotId,
                     $slot['title'],
                     $slot['start'],
                     $slot['end'],
-                    $open && (null === $slot['capacity'] || $taken < $slot['capacity']),
+                    $open && !$over && (null === $slot['capacity'] || $taken < $slot['capacity']),
                 );
             }
 
