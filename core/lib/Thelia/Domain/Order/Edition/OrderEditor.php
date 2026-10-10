@@ -30,8 +30,11 @@ use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\Map\OrderPostageTaxTableMap;
+use Thelia\Model\Map\OrderProductAttributeCombinationTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
@@ -58,11 +61,18 @@ use Thelia\Model\ProductSaleElementsQuery;
  *
  * An edit is checked whole before anything is written, applied under a lock of the order
  * row, refused when the order changed since it was composed, and undone whole when any
- * part fails. A preview runs the same code and undoes it.
+ * part fails. A preview runs the same code and undoes it: the model events of the lines
+ * it writes are dispatched, the edit events are not.
  */
 final readonly class OrderEditor
 {
     private const SAVEPOINT = 'thelia_order_edit';
+
+    /**
+     * Above it a quantity or an amount is a typing mistake, and the price columns,
+     * DECIMAL(16,6), could no longer hold it once multiplied or taxed.
+     */
+    private const MAX_NUMBER = 999_999_999.0;
 
     /**
      * Statuses an order can be edited in, compared through the equivalence of custom ones:
@@ -161,12 +171,12 @@ final readonly class OrderEditor
         $orderId = (int) $order->getId();
         $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
         $connection->beginTransaction();
-        // A savepoint rather than the transaction alone: it undoes the edit for real even
-        // inside a transaction a caller already opened, where a nested rollback undoes
-        // nothing until the outermost one.
-        $connection->exec('SAVEPOINT '.self::SAVEPOINT);
 
         try {
+            // A savepoint rather than the transaction alone: it undoes the edit for real even
+            // inside a transaction a caller already opened, where a nested rollback undoes
+            // nothing until the outermost one.
+            $connection->exec('SAVEPOINT '.self::SAVEPOINT);
             $statement = $connection->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE');
             $statement->execute([':id' => $orderId]);
             $order = $this->fresh($orderId, $connection);
@@ -214,16 +224,33 @@ final readonly class OrderEditor
             throw $failure;
         }
 
-        $this->dispatcher->dispatch(new OrderEditEvent($edited, $edit, $outcome), TheliaEvents::ORDER_AFTER_EDIT);
+        try {
+            $this->dispatcher->dispatch(new OrderEditEvent($edited, $edit, $outcome), TheliaEvents::ORDER_AFTER_EDIT);
+        } catch (\Throwable $failure) {
+            // The edit is committed: a listener failing now cannot take it back, and an error
+            // would have the merchant save it again against an order that already changed.
+            Tlog::getInstance()->addError(\sprintf('A listener failed after order %s was edited: %s', (string) $edited->getRef(), $failure->getMessage()));
+        }
 
         return $outcome;
     }
 
+    /**
+     * Back to the savepoint, then out of the transaction this edit opened without a rollback:
+     * a nested rollback would leave the transaction of a caller impossible to commit, while
+     * the savepoint already undid everything the edit wrote. Only when the savepoint itself
+     * is gone (a deadlock rolls the whole transaction back) is the transaction rolled back.
+     */
     private function undo(ConnectionInterface $connection): void
     {
         if ($connection->inTransaction()) {
-            $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
-            $connection->rollBack();
+            try {
+                $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
+                $connection->exec('RELEASE SAVEPOINT '.self::SAVEPOINT);
+                $connection->commit();
+            } catch (\Throwable) {
+                $connection->rollBack();
+            }
         }
 
         $this->forget();
@@ -249,11 +276,11 @@ final readonly class OrderEditor
         $added = [];
 
         foreach ($edit->lines as $lineEdit) {
-            if ($lineEdit->quantity <= 0) {
+            if ($lineEdit->quantity <= 0 || !self::isReasonable($lineEdit->quantity)) {
                 throw new InvalidOrderEditException(self::trans('Order %ref: a quantity is a positive number.', ['%ref' => $ref]));
             }
 
-            if (null !== $lineEdit->unitPrice && (!is_numeric($lineEdit->unitPrice) || (float) $lineEdit->unitPrice < 0)) {
+            if (null !== $lineEdit->unitPrice && (!is_numeric($lineEdit->unitPrice) || (float) $lineEdit->unitPrice < 0 || !self::isReasonable((float) $lineEdit->unitPrice))) {
                 throw new InvalidOrderEditException(self::trans('Order %ref: "%price" is not a price.', ['%ref' => $ref, '%price' => $lineEdit->unitPrice]));
             }
 
@@ -334,7 +361,7 @@ final readonly class OrderEditor
 
             if (round($discount, 6) !== round((float) $order->getDiscount(), 6)) {
                 $changes[] = ['change' => 'discount', 'from' => self::money((float) $order->getDiscount()), 'to' => self::money($discount)];
-                $order->setDiscount((string) $discount);
+                $order->setDiscount(self::number($discount));
             }
         }
 
@@ -367,7 +394,7 @@ final readonly class OrderEditor
         if ($stockHeld && $virtualContext->useStock) {
             $this->decrement((int) $pse->getId(), $lineEdit->quantity, (string) $product->getRef(), $connection);
         } elseif ($this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock)) {
-            $this->stockPolicy->assertStockIsAvailable($lineEdit->quantity, (float) $pse->getQuantity(), (string) $product->getRef());
+            $this->assertAvailable($lineEdit->quantity, (float) $pse->getQuantity(), (string) $product->getRef());
         }
 
         $line = $this->orderProductFactory->createOrderProduct(
@@ -402,13 +429,13 @@ final readonly class OrderEditor
         $product = ProductSaleElementsQuery::create()->findPk($line->getProductSaleElementsId(), $connection)?->getProduct($connection);
 
         $wasInPromo = 1 === (int) $line->getWasInPromo();
-        $line->setPrice((string) $price)->setPromoPrice((string) $price)->setWasInPromo(0);
+        $line->setPrice(self::number($price))->setPromoPrice(self::number($price))->setWasInPromo(0);
 
         if (null === $product) {
             foreach ($taxes as $tax) {
                 $amount = $wasInPromo ? (float) $tax->getPromoAmount() : (float) $tax->getAmount();
                 $scaled = $previous > 0 ? round($amount * $price / $previous, 6) : 0.0;
-                $tax->setAmount((string) $scaled)->setPromoAmount((string) $scaled)->save($connection);
+                $tax->setAmount(self::number($scaled))->setPromoAmount(self::number($scaled))->save($connection);
             }
 
             return;
@@ -430,12 +457,12 @@ final readonly class OrderEditor
     {
         $previous = (float) $order->getPostage();
         $factor = $previous > 0 ? $postage / $previous : 0.0;
-        $order->setPostage((string) $postage)->setPostageTax((string) round((float) $order->getPostageTax() * $factor, 2));
+        $order->setPostage(self::number($postage))->setPostageTax(self::number(round((float) $order->getPostageTax() * $factor, 2)));
 
         foreach (OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->find($connection) as $share) {
             $share
-                ->setUntaxedAmount((string) round((float) $share->getUntaxedAmount() * $factor, 6))
-                ->setAmount((string) round((float) $share->getAmount() * $factor, 6))
+                ->setUntaxedAmount(self::number(round((float) $share->getUntaxedAmount() * $factor, 6)))
+                ->setAmount(self::number(round((float) $share->getAmount() * $factor, 6)))
                 ->save($connection);
         }
     }
@@ -460,7 +487,18 @@ final readonly class OrderEditor
     {
         $pseId = $line->getProductSaleElementsId();
 
-        if (!$stockHeld || null === $pseId || 1 === (int) $line->getVirtual() || 0.0 === $delta) {
+        if (null === $pseId || 1 === (int) $line->getVirtual() || 0.0 === $delta) {
+            return;
+        }
+
+        if (!$stockHeld) {
+            // Nothing taken yet, but a raised quantity must still be one the shop can serve,
+            // as a line added is.
+            if ($delta > 0 && $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), true)) {
+                $available = (float) ProductSaleElementsQuery::create()->findPk($pseId, $connection)?->getQuantity();
+                $this->assertAvailable((float) $line->getQuantity() + $delta, $available, (string) $line->getProductRef());
+            }
+
             return;
         }
 
@@ -483,6 +521,15 @@ final readonly class OrderEditor
                 allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
                 connection: $connection,
             );
+        } catch (TheliaProcessException $shortage) {
+            throw new InvalidOrderEditException(self::trans('Not enough stock of %product for this quantity.', ['%product' => $productRef]), 0, $shortage);
+        }
+    }
+
+    private function assertAvailable(float $quantity, float $available, string $productRef): void
+    {
+        try {
+            $this->stockPolicy->assertStockIsAvailable($quantity, $available, $productRef);
         } catch (TheliaProcessException $shortage) {
             throw new InvalidOrderEditException(self::trans('Not enough stock of %product for this quantity.', ['%product' => $productRef]), 0, $shortage);
         }
@@ -517,7 +564,7 @@ final readonly class OrderEditor
 
     private function amount(string $amount, Order $order): float
     {
-        if (!is_numeric($amount) || (float) $amount < 0) {
+        if (!is_numeric($amount) || (float) $amount < 0 || !self::isReasonable((float) $amount)) {
             throw new InvalidOrderEditException(self::trans('Order %ref: "%price" is not a price.', ['%ref' => (string) $order->getRef(), '%price' => $amount]));
         }
 
@@ -548,7 +595,14 @@ final readonly class OrderEditor
         OrderTableMap::clearInstancePool();
         OrderProductTableMap::clearInstancePool();
         OrderProductTaxTableMap::clearInstancePool();
+        OrderProductAttributeCombinationTableMap::clearInstancePool();
+        OrderPostageTaxTableMap::clearInstancePool();
         ProductSaleElementsTableMap::clearInstancePool();
+    }
+
+    private static function isReasonable(float $number): bool
+    {
+        return is_finite($number) && abs($number) <= self::MAX_NUMBER;
     }
 
     private static function number(float|int|string|null $value): string

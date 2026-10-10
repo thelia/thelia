@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order\Edition;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Event\Order\OrderEditEvent;
@@ -31,6 +32,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderHistoryQuery;
@@ -207,6 +209,9 @@ final class OrderEditorTest extends ActionIntegrationTestCase
         yield 'a negative price' => [static fn (self $test, Order $order): array => [OrderEditLine::keep((int) $test->lines($order)[0]->getId(), 1, '-1.00')]];
         yield 'an unknown product' => [static fn (self $test, Order $order): array => [OrderEditLine::keep((int) $test->lines($order)[0]->getId(), 1), OrderEditLine::add(987654321, 1)]];
         yield 'a line of another order' => [static fn (self $test, Order $order): array => [OrderEditLine::keep(987654321, 1)]];
+        yield 'an infinite price' => [static fn (self $test, Order $order): array => [OrderEditLine::keep((int) $test->lines($order)[0]->getId(), 1, '1e999')]];
+        yield 'an infinite quantity' => [static fn (self $test, Order $order): array => [OrderEditLine::keep((int) $test->lines($order)[0]->getId(), \INF)]];
+        yield 'a price the column cannot hold' => [static fn (self $test, Order $order): array => [OrderEditLine::keep((int) $test->lines($order)[0]->getId(), 1, '99999999999')]];
     }
 
     /**
@@ -266,6 +271,72 @@ final class OrderEditorTest extends ActionIntegrationTestCase
         self::assertSame(9.0, $this->stockOf($product));
     }
 
+    public function testAnEditFailingAfterItsFirstWritesIsUndoneWhole(): void
+    {
+        $product = $this->product(50.0, stock: 10);
+        $added = $this->product(30.0, stock: 10);
+        $order = $this->order(OrderStatus::CODE_PAID, [[$product, 1]]);
+        $fingerprint = $this->editor->fingerprint($order);
+        // The kept line is raised and its stock taken before the added line fails.
+        $failure = static function (): void {
+            throw new \RuntimeException('A module failed on the added line');
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PRODUCT_AFTER_CREATE, $failure);
+
+        try {
+            $this->apply($order, [OrderEditLine::keep((int) $this->lines($order)[0]->getId(), 3), OrderEditLine::add((int) $this->pseOf($added)->getId(), 1)]);
+            self::fail('The edit went through.');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('A module failed on the added line', $exception->getMessage());
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PRODUCT_AFTER_CREATE, $failure);
+        }
+
+        self::assertSame($fingerprint, $this->editor->fingerprint(OrderQuery::create()->findPk($order->getId())));
+        self::assertSame(9.0, $this->stockOf($product));
+        self::assertSame(10.0, $this->stockOf($added));
+    }
+
+    public function testATransactionTheCallerOpenedCanStillBeCommittedAfterAPreviewOrARefusal(): void
+    {
+        $order = $this->order(OrderStatus::CODE_PAID, [[$this->product(50.0, stock: 10), 1]]);
+        $line = (int) $this->lines($order)[0]->getId();
+        $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $this->editor->preview($order, new OrderEdit([OrderEditLine::keep($line, 3)]));
+
+            try {
+                $this->apply($order, [OrderEditLine::keep($line, 0)]);
+            } catch (InvalidOrderEditException) {
+            }
+
+            self::assertTrue($connection->isCommitable(), 'The edit undid itself, not the work of its caller.');
+        } finally {
+            $connection->commit();
+        }
+    }
+
+    public function testRaisingAQuantityBeyondTheStockIsRefusedWhenTheOrderDoesNotHoldIt(): void
+    {
+        $product = $this->product(50.0, stock: 3);
+        $order = $this->order(OrderStatus::CODE_NOT_PAID, [[$product, 1]]);
+
+        $this->expectException(InvalidOrderEditException::class);
+        $this->apply($order, [OrderEditLine::keep((int) $this->lines($order)[0]->getId(), 5)]);
+    }
+
+    public function testAddingMoreThanTheStockSaysWhichProductIsShort(): void
+    {
+        $short = $this->product(30.0, stock: 1);
+        $order = $this->order(OrderStatus::CODE_NOT_PAID, [[$this->product(50.0, stock: 10), 1]]);
+
+        $this->expectException(InvalidOrderEditException::class);
+        $this->expectExceptionMessage($short->getRef());
+        $this->apply($order, [...$this->kept($order), OrderEditLine::add((int) $this->pseOf($short)->getId(), 2)]);
+    }
+
     public function testTheCustomerIsToldWhatChangedWhenTheShopAsksForIt(): void
     {
         if (!is_file(THELIA_TEMPLATE_DIR.'email/default/order_edited.txt.twig')) {
@@ -284,12 +355,17 @@ final class OrderEditorTest extends ActionIntegrationTestCase
         $this->getService(OrderStatusActionRunner::class)->reset();
         $product = $this->product(50.0, stock: 10);
         $order = $this->order(OrderStatus::CODE_PAID, [[$product, 1]]);
+        // A reference is typed by the merchant: the HTML mail must show it, not run it.
+        $reference = $product->getRef().'<i>&';
+        $this->lines($order)[0]->setProductRef($reference)->save();
         $texts = [];
-        $listener = static function (MessageEvent $event) use (&$texts): void {
+        $htmls = [];
+        $listener = static function (MessageEvent $event) use (&$texts, &$htmls): void {
             $message = $event->getMessage();
 
             if ($message instanceof Email && !$event->isQueued()) {
                 $texts[] = (string) $message->getTextBody();
+                $htmls[] = (string) $message->getHtmlBody();
             }
         };
         $this->dispatcher->addListener(MessageEvent::class, $listener);
@@ -302,7 +378,9 @@ final class OrderEditorTest extends ActionIntegrationTestCase
         }
 
         self::assertCount(1, $texts);
-        self::assertStringContainsString($product->getRef().': quantity changed from 1 to 2', $texts[0]);
+        self::assertStringContainsString($reference.': quantity changed from 1 to 2', $texts[0]);
+        self::assertStringContainsString(htmlspecialchars($reference).': quantity changed from 1 to 2', $htmls[0]);
+        self::assertStringNotContainsString('<i>&', $htmls[0]);
     }
 
     /**
