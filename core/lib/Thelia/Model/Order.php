@@ -215,18 +215,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * Compute this order amount with taxes. The tax amount is returned in the $tax parameter.
-     *
-     * The order amount is only available once the order is persisted in database.
-     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
-     *
-     * @param float|int $tax             (output only) returns the tax amount for this order
-     * @param bool      $includePostage  if true, the postage cost is included to the total
-     * @param bool      $includeDiscount if true, the discount will be included to the total
-     *
-     * @throws PropelException
-     */
-    /**
      * The totals of the lines read by getTotalAmount(), by order and rounding mode.
      *
      * @var array<string, object|false|null>
@@ -242,6 +230,18 @@ class Order extends BaseOrder
         self::$totalAmountQueryResults = [];
     }
 
+    /**
+     * Compute this order amount with taxes. The tax amount is returned in the $tax parameter.
+     *
+     * The order amount is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @param float|int $tax             (output only) returns the tax amount for this order
+     * @param bool      $includePostage  if true, the postage cost is included to the total
+     * @param bool      $includeDiscount if true, the discount will be included to the total
+     *
+     * @throws PropelException
+     */
     public function getTotalAmount(float|int &$tax = 0, bool $includePostage = true, bool $includeDiscount = true): float
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
