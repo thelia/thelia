@@ -49,6 +49,22 @@ final class OrderHistoryRecorderTest extends ActionIntegrationTestCase
         );
     }
 
+    public function testTheStatusLeftIsTheOneTheOrderHadNotTheOneTheCallerRemembered(): void
+    {
+        // A caller moves the order with an object loaded before another worker moved it:
+        // the core decides on the status the order has, and the history says the same.
+        $order = $this->factory->order();
+        $staleView = clone $order;
+        $this->changeStatus($order, OrderStatus::CODE_PAID);
+
+        $this->changeStatus($staleView, OrderStatus::CODE_SENT);
+
+        self::assertSame(
+            ['from' => OrderStatus::CODE_PAID, 'to' => OrderStatus::CODE_SENT],
+            $this->entriesOf($order, OrderHistoryEventType::STATUS_CHANGED)[0]->getDecodedPayload(),
+        );
+    }
+
     public function testAnEventDispatchedOutsideAnyHttpSessionIsAuthoredByTheSystem(): void
     {
         $order = $this->factory->order();

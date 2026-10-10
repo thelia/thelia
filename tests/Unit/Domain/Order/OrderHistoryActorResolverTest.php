@@ -15,6 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Order;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
@@ -80,12 +84,82 @@ final class OrderHistoryActorResolverTest extends TestCase
         self::assertNull($actor->adminId);
     }
 
-    private function resolverFor(?Admin $admin, ?Customer $customer): OrderHistoryActorResolver
+    public function testAnAdministratorAuthenticatedByTokenIsTheAuthorWithoutABackOfficeSession(): void
+    {
+        $admin = new Admin();
+        $admin->setId(9)->setLogin('api-admin');
+
+        $actor = $this->resolverFor(null, null, $admin)->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::ADMIN, $actor->actorType);
+        self::assertSame('api-admin', $actor->label);
+        self::assertSame(9, $actor->adminId);
+    }
+
+    public function testACustomerTokenNeverMakesAnAdministratorAndLeavesTheModuleTheAuthor(): void
+    {
+        $tokenCustomer = new Customer();
+        $tokenCustomer->setRef('CUS-7');
+
+        $actor = $this->resolverFor(null, null, $tokenCustomer)->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::MODULE, $actor->actorType);
+        self::assertSame('Paybox', $actor->label);
+        self::assertNull($actor->adminId);
+    }
+
+    public function testTheAdministratorOfTheTokenWinsOverABackOfficeSessionOfTheSameBrowser(): void
+    {
+        $sessionAdmin = new Admin();
+        $sessionAdmin->setId(7)->setLogin('alice');
+        $tokenAdmin = new Admin();
+        $tokenAdmin->setId(9)->setLogin('api-admin');
+
+        $actor = $this->resolverFor($sessionAdmin, null, $tokenAdmin, '/api/admin/orders/12/capture')->resolve();
+
+        self::assertSame('api-admin', $actor->label);
+        self::assertSame(9, $actor->adminId);
+    }
+
+    public function testAModuleReportingOutsideTheBackOfficeIsTheAuthorEvenWithAnAdministratorInSession(): void
+    {
+        // The provider's return lands in a browser where an administrator is also signed
+        // in to the back office: the module reported the movement, not the administrator.
+        $admin = new Admin();
+        $admin->setId(7)->setLogin('alice');
+
+        $actor = $this->resolverFor($admin, null, null, '/payment/paybox/return')->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::MODULE, $actor->actorType);
+        self::assertSame('Paybox', $actor->label);
+    }
+
+    public function testABackOfficeGestureThroughAModuleStaysTheAdministrators(): void
+    {
+        $admin = new Admin();
+        $admin->setId(7)->setLogin('alice');
+
+        $actor = $this->resolverFor($admin, null, null, '/admin/order/update/12/payment-capture')->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::ADMIN, $actor->actorType);
+        self::assertSame('alice', $actor->label);
+    }
+
+    private function resolverFor(?Admin $admin, ?Customer $customer, ?UserInterface $tokenUser = null, ?string $path = null): OrderHistoryActorResolver
     {
         $securityContext = $this->createMock(SecurityContext::class);
         $securityContext->method('getAdminUser')->willReturn($admin);
         $securityContext->method('getCustomerUser')->willReturn($customer);
 
-        return new OrderHistoryActorResolver($securityContext);
+        $security = $this->createMock(Security::class);
+        $security->method('getUser')->willReturn($tokenUser);
+
+        $requestStack = new RequestStack();
+
+        if (null !== $path) {
+            $requestStack->push(Request::create($path));
+        }
+
+        return new OrderHistoryActorResolver($securityContext, $security, $requestStack);
     }
 }

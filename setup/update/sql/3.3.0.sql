@@ -302,4 +302,139 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 2
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Payment journal of an order
+--
+-- One line per money movement (authorization, capture, refund, void) a payment
+-- module, an administrator or the shop made on an order. An installed shop
+-- gets the table empty: its orders keep their transaction reference on
+-- `order`.`transaction_ref` and show no movement until their next payment
+-- event, which is what happened to them as far as the shop knows.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `order_payment_transaction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `type` VARCHAR(20) NOT NULL COMMENT 'the movement: authorization, capture, refund or void',
+    `state` VARCHAR(20) NOT NULL COMMENT 'the outcome: pending, succeeded or failed',
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the amount moved, in the currency of the line',
+    `currency_id` INTEGER NOT NULL,
+    `psp_reference` VARCHAR(100) COLLATE 'utf8mb4_bin' COMMENT 'the reference the payment provider gave this movement, as it gave it',
+    `parent_id` INTEGER COMMENT 'the authorization a capture or a void applies to',
+    `payment_module_id` INTEGER COMMENT 'the payment module behind the movement, NULL once that module is gone',
+    `actor_type` VARCHAR(20) NOT NULL COMMENT 'which kind of author acted: admin, module or system',
+    `actor_label` VARCHAR(255) COMMENT 'the author label snapshot (admin login, module code), kept when the author is deleted',
+    `admin_id` INTEGER COMMENT 'the administrator who triggered the movement, NULL once that admin is gone',
+    `error_code` VARCHAR(50) COMMENT 'the error code the provider answered, when the movement failed',
+    `error_message` TEXT COMMENT 'the error message the provider answered, kept for the back office, never for the customer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_payment_transaction_reference_UNIQUE` (`order_id`, `type`, `psp_reference`),
+    INDEX `fi_order_payment_transaction_currency_id` (`currency_id`),
+    INDEX `fi_order_payment_transaction_parent_id` (`parent_id`),
+    INDEX `fi_order_payment_transaction_payment_module_id` (`payment_module_id`),
+    INDEX `fi_order_payment_transaction_admin_id` (`admin_id`),
+    CONSTRAINT `fk_order_payment_transaction_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_payment_transaction_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_payment_transaction_parent_id`
+        FOREIGN KEY (`parent_id`)
+        REFERENCES `order_payment_transaction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_payment_transaction_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_payment_transaction_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The status of an order whose payment is authorized and not yet taken. A custom
+-- status equivalent to not_paid, not a canonical one: isPaid() and every module
+-- reading the status keep their answer. Seeded only when no status has the code,
+-- so a shop that created its own under that code, or replays the script, keeps it.
+-- The next position comes from a derived table: an aggregate straight in the SELECT
+-- would still produce its one row when the WHERE finds the status, and insert it twice.
+INSERT INTO `order_status` (`code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`)
+SELECT 'awaiting_capture', 'not_paid', '#ffc107', `next`.`position`, 0, NOW(), NOW()
+FROM (SELECT COALESCE(MAX(`position`), 0) + 1 AS `position` FROM `order_status`) AS `next`
+WHERE NOT EXISTS (SELECT 1 FROM `order_status` WHERE `code` = 'awaiting_capture');
+
+SET @awaiting_capture_status_id := (SELECT `id` FROM `order_status` WHERE `code` = 'awaiting_capture');
+
+-- Only for the languages the shop has, the way the hook titles above are added: a
+-- language added later gets its row from setup/I18n.
+INSERT IGNORE INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`)
+SELECT @awaiting_capture_status_id, `wording`.`locale`, `wording`.`title`, '', '', ''
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Čeká na stržení platby' AS `title`
+    UNION ALL SELECT 'de_DE', 'Warten auf Einzug'
+    UNION ALL SELECT 'en_US', 'Awaiting capture'
+    UNION ALL SELECT 'es_ES', 'Pendiente de captura'
+    UNION ALL SELECT 'fr_FR', 'En attente de capture'
+    UNION ALL SELECT 'it_IT', 'In attesa di cattura'
+    UNION ALL SELECT 'nl_NL', 'Wacht op incasso'
+    UNION ALL SELECT 'ru_RU', 'Ожидает списания'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
+
+-- Taking money an authorization holds is a right of its own, granted profile by
+-- profile, distinct from editing orders.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.payment-capture', NOW(), NOW());
+
+SET @payment_capture_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.payment-capture');
+
+-- Only for the languages the shop has, the way the hook titles above are added: a
+-- language added later gets its row from setup/I18n.
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT @payment_capture_resource_id, `wording`.`locale`, `wording`.`title`, NULL, NULL, NULL
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Stržení platby objednávky' AS `title`
+    UNION ALL SELECT 'de_DE', 'Einzug der Bestellzahlung'
+    UNION ALL SELECT 'en_US', 'Order payment capture'
+    UNION ALL SELECT 'es_ES', 'Captura del pago del pedido'
+    UNION ALL SELECT 'fr_FR', 'Capture du paiement d\'une commande'
+    UNION ALL SELECT 'it_IT', 'Cattura del pagamento dell\'ordine'
+    UNION ALL SELECT 'nl_NL', 'Incasso van de orderbetaling'
+    UNION ALL SELECT 'ru_RU', 'Списание оплаты заказа'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
+
+
+-- Giving money back is a right of its own too, distinct from editing orders and from
+-- taking money.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.payment-refund', NOW(), NOW());
+
+SET @payment_refund_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.payment-refund');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT @payment_refund_resource_id, `wording`.`locale`, `wording`.`title`, NULL, NULL, NULL
+FROM (
+    SELECT 'cs_CZ' AS `locale`, 'Vrácení platby objednávky' AS `title`
+    UNION ALL SELECT 'de_DE', 'Erstattung der Bestellzahlung'
+    UNION ALL SELECT 'en_US', 'Order payment refund'
+    UNION ALL SELECT 'es_ES', 'Reembolso del pago del pedido'
+    UNION ALL SELECT 'fr_FR', 'Remboursement du paiement d\'une commande'
+    UNION ALL SELECT 'it_IT', 'Rimborso del pagamento dell\'ordine'
+    UNION ALL SELECT 'nl_NL', 'Terugbetaling van de orderbetaling'
+    UNION ALL SELECT 'ru_RU', 'Возврат оплаты заказа'
+) AS `wording`
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
+
 SET FOREIGN_KEY_CHECKS = 1;

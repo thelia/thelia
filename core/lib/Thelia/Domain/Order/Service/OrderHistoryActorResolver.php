@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Service;
 
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Order\DTO\OrderHistoryActor;
@@ -24,30 +27,42 @@ use Thelia\Model\Customer;
 /**
  * Names the author of an order history entry.
  *
- * The order of the checks is the order of precedence: admin in session, then an
- * explicitly provided module code, then customer in session, then system.
+ * The order of the checks is the order of precedence: the administrator the request
+ * authenticated by token, then the administrator in session, then an explicitly provided
+ * module code, then the customer in session, then system.
  *
- * A back-office gesture stays the admin's even when it is dispatched through a module
- * (an admin triggering a manual refund through a payment module is still the admin).
- * But a module that names itself is trusted over the customer in session: a payment
- * gateway's synchronous return (BasePaymentModuleController::confirmPayment) runs
- * inside the customer's own HTTP session, and without this precedence a "paid" status
- * change would be attributed to the customer instead of the module that reported it.
- * Nothing here assumes an HTTP request exists — the console and the workers go through
- * the same code and land on SYSTEM, which is a real answer and not a failure to look.
+ * The token comes first: it is what authenticated the request at hand, while a
+ * back-office session may only share the browser. A back-office gesture stays the admin's
+ * even when it is dispatched through a module (an admin triggering a manual refund
+ * through a payment module is still the admin). Outside the back office, a module that
+ * names itself is trusted over whoever is in session: a payment gateway's synchronous
+ * return (BasePaymentModuleController::confirmPayment) runs inside the buyer's own HTTP
+ * session — possibly one where an administrator is signed in too — and without this
+ * precedence a "paid" status change would be attributed to them instead of the module
+ * that reported it. Nothing here assumes an HTTP request exists — the console and the
+ * workers go through the same code and land on SYSTEM, which is a real answer and not a
+ * failure to look.
  */
 final readonly class OrderHistoryActorResolver
 {
+    /**
+     * The Symfony security token is where an administrator authenticated on the admin
+     * API by a JWT is found: that administrator holds no back-office session. Optional
+     * so that the resolver still works where the security bundle is not wired.
+     */
     public function __construct(
         private SecurityContext $securityContext,
+        private ?Security $security = null,
+        private ?RequestStack $requestStack = null,
     ) {
     }
 
     public function resolve(?string $moduleCode = null): OrderHistoryActor
     {
-        $adminUser = $this->securityContext->getAdminUser();
+        $hasModuleCode = null !== $moduleCode && '' !== $moduleCode;
+        $adminUser = $this->actingAdministrator($moduleCode);
 
-        if ($adminUser instanceof UserInterface) {
+        if (null !== $adminUser) {
             return new OrderHistoryActor(
                 OrderHistoryActorType::ADMIN,
                 $adminUser->getUsername(),
@@ -55,7 +70,7 @@ final readonly class OrderHistoryActorResolver
             );
         }
 
-        if (null !== $moduleCode && '' !== $moduleCode) {
+        if ($hasModuleCode) {
             return new OrderHistoryActor(OrderHistoryActorType::MODULE, $moduleCode);
         }
 
@@ -69,5 +84,44 @@ final readonly class OrderHistoryActorResolver
         }
 
         return OrderHistoryActor::system();
+    }
+
+    /**
+     * The administrator the change is made by, under the precedence above, or null when
+     * it is made by a module, a customer or the shop itself.
+     */
+    public function actingAdministrator(?string $moduleCode = null): ?UserInterface
+    {
+        // Only an administrator: a customer holding a front API token is the customer.
+        $tokenUser = $this->security?->getUser();
+
+        if ($tokenUser instanceof Admin) {
+            return $tokenUser;
+        }
+
+        if (null !== $moduleCode && '' !== $moduleCode && !$this->isBackOfficeOrUnknownRequest()) {
+            return null;
+        }
+
+        $sessionAdmin = $this->securityContext->getAdminUser();
+
+        return $sessionAdmin instanceof UserInterface ? $sessionAdmin : null;
+    }
+
+    /**
+     * Without a request to look at, the administrator in session keeps the precedence it
+     * always had.
+     */
+    private function isBackOfficeOrUnknownRequest(): bool
+    {
+        $request = $this->requestStack?->getMainRequest();
+
+        if (null === $request) {
+            return true;
+        }
+
+        $path = RequestPath::decoded($request);
+
+        return '/admin' === $path || str_starts_with($path, '/admin/');
     }
 }

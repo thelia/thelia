@@ -107,9 +107,12 @@ final readonly class AdminApiPermissionListener
 
         $user = $this->security->getUser();
 
-        // Anyone else is already turned away by the ROLE_ADMIN rule on ^/api/admin.
+        // The ROLE_ADMIN rule on ^/api/admin turns everybody else away first, but the
+        // admin API does not lean on a firewall rule a module or a configuration can
+        // edit, reorder or shadow: a customer token, or no user at all, is refused here
+        // as well.
         if (!$user instanceof Admin) {
-            return;
+            throw new AccessDeniedHttpException('You are not allowed to perform this action.');
         }
 
         if (AdminResources::SUPERADMINISTRATOR === $user->getPermissions()) {

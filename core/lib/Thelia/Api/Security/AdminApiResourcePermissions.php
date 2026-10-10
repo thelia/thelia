@@ -55,6 +55,9 @@ use Thelia\Api\Resource\Order;
 use Thelia\Api\Resource\OrderAddress;
 use Thelia\Api\Resource\OrderCoupon;
 use Thelia\Api\Resource\OrderHistory;
+use Thelia\Api\Resource\OrderPaymentCapture;
+use Thelia\Api\Resource\OrderPaymentSummary;
+use Thelia\Api\Resource\OrderPaymentTransaction;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
 use Thelia\Api\Resource\OrderReturn;
@@ -135,6 +138,10 @@ final readonly class AdminApiResourcePermissions
         OrderAddress::class => AdminResources::ORDER,
         OrderCoupon::class => AdminResources::ORDER,
         OrderHistory::class => AdminResources::ORDER,
+        OrderPaymentTransaction::class => AdminResources::ORDER,
+        OrderPaymentSummary::class => AdminResources::ORDER,
+        // Taking money is not editing the order: the capture answers to its own right.
+        OrderPaymentCapture::class => AdminResources::ORDER_PAYMENT_CAPTURE,
         OrderProduct::class => AdminResources::ORDER,
         OrderProductTax::class => AdminResources::ORDER,
         OrderStatus::class => AdminResources::ORDER_STATUS,
