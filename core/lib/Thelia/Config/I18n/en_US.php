@@ -31,6 +31,7 @@ return [
     '%type% visibility updated' => '%type% visibility updated',
     'A company registration number is required as soon as a company name is given.' => 'A company registration number is required as soon as a company name is given.',
     'A company registration number may only contain up to 20 letters and digits.' => 'A company registration number may only contain up to 20 letters and digits.',
+    'A French VAT number is FR, a two character key, then the 9 digits of the SIREN.' => 'A French VAT number is FR, a two character key, then the 9 digits of the SIREN.',
     'A Hook with code %name already exists. Please choose another code.' => 'A Hook with code %name already exists. Please choose another code.',
     'A comma separated list of email addresses' => 'A comma separated list of email addresses',
     'A currency with code "%name" already exists.' => 'A currency with code "%name" already exists.',
