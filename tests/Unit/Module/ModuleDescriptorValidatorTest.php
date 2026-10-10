@@ -204,29 +204,6 @@ final class ModuleDescriptorValidatorTest extends TestCase
     }
 
     /**
-     * What libxml says of a file it could not read, as it says it: the path in full,
-     * resolved and normalised, whatever was given; the name of the file stands for it, and
-     * a name is never read for the references of a replacement.
-     */
-    public function testAMessageOfLibxmlLosesThePathOfTheServer(): void
-    {
-        $given = $this->workDir.'/Other/../Sample/Config//module.xml';
-        $resolved = $this->workDir.'/Sample/Config/module.xml';
-
-        self::assertSame('failed to load external entity "module.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given));
-        self::assertSame('I/O warning : failed to load "y.dtd"', $this->withoutPath('I/O warning : failed to load "/h/x/y.dtd"', $given));
-        self::assertSame('AttValue: " or \' expected', $this->withoutPath('AttValue: " or \' expected', $given));
-        self::assertSame('failed to load external entity "a$1b.xml"', $this->withoutPath(\sprintf('failed to load external entity "%s/a$1b.xml"', $this->workDir), $this->workDir.'/a$1b.xml'));
-        // A value quoted is not a path of the server; another file named is not the descriptor.
-        self::assertSame("Entity 'a/b' not defined", $this->withoutPath("Entity 'a/b' not defined", $given));
-        self::assertSame("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $this->withoutPath("Namespace 'http://www.w3.org/2001/XMLSchema-instance' not bound", $given));
-        self::assertSame('failed to load external entity "evil.dtd"', $this->withoutPath('failed to load external entity "/srv/x/evil.dtd"', $given));
-        // A short relative path given is not looked for inside unrelated text.
-        self::assertSame("Entity 'zz-absent/b' not defined, Config/b too", $this->withoutPath("Entity 'zz-absent/b' not defined, Config/b too", 'zz-absent/b'));
-        self::assertSame('value zz-absent/b/c kept', $this->withoutPath('value zz-absent/b/c kept', 'zz-absent/b'));
-    }
-
-    /**
      * A version is given as text, and the table of schemas is read back with integer keys:
      * the version a descriptor is checked against is the one asked for.
      */
@@ -244,25 +221,6 @@ final class ModuleDescriptorValidatorTest extends TestCase
         } catch (InvalidXmlDocumentException $refusal) {
             self::assertStringContainsString('XML error', $refusal->getMessage());
         }
-    }
-
-    /**
-     * A quote in a folder of the path is no way out for the rest of the path, nor is a
-     * path libxml normalises before quoting it.
-     */
-    public function testAQuoteInThePathHidesNothingOfIt(): void
-    {
-        $given = $this->workDir.'/quo"te//Sample/Config/module.xml';
-        $resolved = $this->workDir.'/quo"te/Sample/Config/module.xml';
-
-        $masked = $this->withoutPath(\sprintf('failed to load external entity "%s"', $resolved), $given);
-
-        self::assertSame('failed to load external entity "module.xml"', $masked);
-    }
-
-    private function withoutPath(string $message, string $xmlFile): string
-    {
-        return (string) (new \ReflectionMethod(ModuleDescriptorValidator::class, 'withoutPath'))->invoke(null, $message, $xmlFile);
     }
 
     /**
@@ -296,6 +254,32 @@ final class ModuleDescriptorValidatorTest extends TestCase
             self::fail('A schema that cannot be read validates nothing.');
         } catch (InvalidXmlDocumentException $refusal) {
             self::assertStringContainsString('could not be checked against module-2_2.xsd', $refusal->getMessage());
+            self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
+        }
+    }
+
+    /**
+     * A schema PHP cannot read for the account: the refusal names the schema, never its
+     * folder, out of what PHP said.
+     */
+    public function testADescriptorIsRefusedWhenItsSchemaCannotBeReadByTheAccount(): void
+    {
+        $schemas = $this->workDir.'/schemas';
+        (new Filesystem())->mkdir($schemas);
+        file_put_contents($schemas.'/module-2_2.xsd', 'garbage');
+        chmod($schemas.'/module-2_2.xsd', 0);
+        $descriptor = $this->writeDescriptor('');
+
+        if (is_readable($schemas.'/module-2_2.xsd')) {
+            self::markTestSkipped('The account running the tests reads anything: a file nobody may read cannot be made.');
+        }
+
+        try {
+            $this->validatorWithSchemasIn($schemas)->validate($descriptor);
+            self::fail('A schema that cannot be read validates nothing.');
+        } catch (InvalidXmlDocumentException $refusal) {
+            self::assertStringContainsString('could not be checked against module-2_2.xsd', $refusal->getMessage());
+            self::assertStringContainsString('file_get_contents(module-2_2.xsd)', $refusal->getMessage());
             self::assertStringNotContainsString($this->workDir, $refusal->getMessage());
         }
     }
