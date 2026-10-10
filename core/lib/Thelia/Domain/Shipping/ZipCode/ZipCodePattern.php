@@ -17,7 +17,9 @@ namespace Thelia\Domain\Shipping\ZipCode;
 /**
  * One postal code pattern of a delivery zone, in the syntax merchants already know from
  * other shops: an exact code ("75001"), a pattern where * stands for any characters
- * ("20*", "75*"), or a range of numeric codes ("75001...75020", bounds included).
+ * ("20*", "75*"), or a range of numeric codes ("75001...75020", bounds included). A
+ * range matches the codes of the length of its bounds only, so "01000...01999" takes
+ * "01500" and neither "1500" nor "001500".
  *
  * Codes are compared in their normal form: upper case, without spaces or hyphens, so
  * "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001".
@@ -25,6 +27,9 @@ namespace Thelia\Domain\Shipping\ZipCode;
 final readonly class ZipCodePattern
 {
     private const RANGE_SEPARATOR = '...';
+
+    /** The length of the `pattern` column of `area_zip_code_rule`. */
+    public const MAX_LENGTH = 50;
 
     private function __construct(
         private string $pattern,
@@ -42,11 +47,15 @@ final readonly class ZipCodePattern
             throw new \InvalidArgumentException('A postal code pattern needs at least one character other than *.');
         }
 
+        if (\strlen($normalized) > self::MAX_LENGTH) {
+            throw new \InvalidArgumentException('A postal code pattern is 50 characters long at most.');
+        }
+
         if (str_contains($normalized, self::RANGE_SEPARATOR)) {
             [$from, $to] = explode(self::RANGE_SEPARATOR, $normalized, 2);
 
-            if (!ctype_digit($from) || !ctype_digit($to) || (int) $from > (int) $to) {
-                throw new \InvalidArgumentException('A postal code range goes from a number to a greater or equal number, as in 75001...75020.');
+            if (!ctype_digit($from) || !ctype_digit($to) || \strlen($from) !== \strlen($to) || strcmp($from, $to) > 0) {
+                throw new \InvalidArgumentException('A postal code range goes from a number to a greater or equal number of the same length, as in 75001...75020.');
             }
         }
 
@@ -69,7 +78,12 @@ final readonly class ZipCodePattern
         if (str_contains($this->pattern, self::RANGE_SEPARATOR)) {
             [$from, $to] = explode(self::RANGE_SEPARATOR, $this->pattern, 2);
 
-            return ctype_digit($zipCode) && (int) $zipCode >= (int) $from && (int) $zipCode <= (int) $to;
+            // Digits of one length compare as strings: no integer overflow, and the leading
+            // zeros count.
+            return ctype_digit($zipCode)
+                && \strlen($zipCode) === \strlen($from)
+                && strcmp($zipCode, $from) >= 0
+                && strcmp($zipCode, $to) <= 0;
         }
 
         if (str_contains($this->pattern, '*')) {
