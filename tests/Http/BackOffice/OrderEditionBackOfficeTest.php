@@ -170,8 +170,9 @@ final class OrderEditionBackOfficeTest extends WebIntegrationTestCase
         $crawler = $this->client->request('POST', $form->getUri(), $values);
 
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
-        self::assertNotSame('', $crawler->filter('[data-testid="order-edit-error"]')->text(''));
+        self::assertStringContainsString('did not send every line', $crawler->filter('[data-testid="order-edit-error"]')->text(''));
         self::assertCount(2, $this->lines($order));
+        self::assertSame(1.0, (float) OrderProductQuery::create()->findPk($lines[1]->getId())->getQuantity());
     }
 
     public function testWithoutTheEditionRightThereIsNoButtonAndNoPage(): void
