@@ -414,7 +414,6 @@ CREATE TABLE `product_sale_elements`
     INDEX `idx_product_sale_element_product_id` (`product_id`),
     INDEX `ref` (`ref`),
     INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
-    INDEX `idx_product_sale_elements_ean_code` (`ean_code`),
     INDEX `idx_product_sale_elements_mpn` (`mpn`),
     INDEX `idx_product_sale_elements_manufacturer_brand_id` (`manufacturer_brand_id`),
     CONSTRAINT `fk_product_sale_element_product_id`
@@ -4810,62 +4809,6 @@ CREATE TABLE `tag_element`
             REFERENCES `tag` (`id`)
             ON UPDATE RESTRICT
             ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
-
--- ---------------------------------------------------------------------
--- customer_list
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `customer_list`;
-
-CREATE TABLE `customer_list`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `customer_id` INTEGER NOT NULL COMMENT 'the customer who created the list and owns it',
-    `type` VARCHAR(32) DEFAULT 'purchase' NOT NULL COMMENT 'the sort of list, one of the CustomerListType values',
-    `title` VARCHAR(255) NOT NULL,
-    `shared` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the list is shared with the company of its owner',
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-    PRIMARY KEY (`id`),
-    INDEX `idx_customer_list_customer_id_type` (`customer_id`, `type`),
-    INDEX `idx_customer_list_shared` (`shared`),
-    CONSTRAINT `fk_customer_list_customer_id`
-        FOREIGN KEY (`customer_id`)
-            REFERENCES `customer` (`id`)
-            ON UPDATE RESTRICT
-            ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
-
--- ---------------------------------------------------------------------
--- customer_list_item
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `customer_list_item`;
-
-CREATE TABLE `customer_list_item`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `customer_list_id` INTEGER NOT NULL,
-    `ref` VARCHAR(255) NOT NULL COMMENT 'the reference as the customer entered it, kept when the sale element is gone',
-    `product_sale_elements_id` INTEGER COMMENT 'the sale element the reference was resolved to, null once it left the catalog',
-    `quantity` INTEGER NOT NULL,
-    `position` INTEGER DEFAULT 0 NOT NULL,
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-    PRIMARY KEY (`id`),
-    INDEX `idx_customer_list_item_customer_list_id_position` (`customer_list_id`, `position`),
-    INDEX `fk_customer_list_item_product_sale_elements_idx` (`product_sale_elements_id`),
-    CONSTRAINT `fk_customer_list_item_customer_list_id`
-        FOREIGN KEY (`customer_list_id`)
-            REFERENCES `customer_list` (`id`)
-            ON UPDATE RESTRICT
-            ON DELETE CASCADE,
-    CONSTRAINT `fk_customer_list_item_product_sale_elements_id`
-        FOREIGN KEY (`product_sale_elements_id`)
-            REFERENCES `product_sale_elements` (`id`)
-            ON UPDATE RESTRICT
-            ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 # This restores the fkey checks, after having unset them earlier
