@@ -39,6 +39,7 @@ use Thelia\Model\CountryArea;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
+use Thelia\Model\State;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -203,6 +204,31 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
         self::assertNotContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('20090'))));
         self::assertContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('69001'))));
+    }
+
+    public function testAGuestIsListedTheCarriersOfTheZoneOfItsState(): void
+    {
+        $state = (new State())->setCountryId($this->country->getId())->setIsocode('XQ1')->setVisible(1);
+        $state->save($this->getPropelConnection());
+        $area = (new Area())->setName('State zone');
+        $area->save($this->getPropelConnection());
+        (new CountryArea())->setAreaId($area->getId())->setCountryId($this->country->getId())->setStateId($state->getId())->save($this->getPropelConnection());
+        (new AreaDeliveryModule())->setAreaId($area->getId())->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+        $cart = $this->guestCartShippedTo('69001');
+        $cart->getCartAddressRelatedByAddressDeliveryId()->setStateId($state->getId())->save($this->getPropelConnection());
+
+        self::assertContains($this->module->getId(), $this->offeredModuleIds($cart), 'The list reads the state of the cart, as the guard does.');
+    }
+
+    public function testAListForACountryAloneReadsThePostalCodeOfTheCartAddressInIt(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $facade = $this->getService(ShippingFacade::class);
+        $ids = static fn (array $offers): array => array_map(static fn ($offer): int => (int) $offer->getDeliveryModule()->getId(), $offers);
+
+        self::assertNotContains($this->module->getId(), $ids($facade->listValidMethods($this->guestCartShippedTo('20090'), $this->country)));
+        self::assertContains($this->module->getId(), $ids($facade->listValidMethods($this->guestCartShippedTo('69001'), $this->country)));
     }
 
     public function testTheApiPassingACountryAndAnAddressFollowsThePostalCodeOfTheAddress(): void

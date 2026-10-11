@@ -328,7 +328,11 @@ final readonly class ShippingFacade
         if (null !== $country) {
             // Explicit (country/state) context over address; the address still gives its
             // postal code when it is in that country, as the API passes both.
-            $address = null === $addressId ? null : AddressQuery::create()->findPk($addressId);
+            if (null === $addressId) {
+                return [null, $country, $state, $this->cartZipCodeIn($cart, $country)];
+            }
+
+            $address = AddressQuery::create()->findPk($addressId);
             $zipCode = null !== $address && $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
 
             return [null, $country, $state, $zipCode];
@@ -348,10 +352,22 @@ final readonly class ShippingFacade
         if (null === $address) {
             // A guest: no customer address behind the cart's copy, whose country
             // handleCountry() reads, and whose postal code goes with it.
-            return [null, null, null, $cartAddress?->getZipcode()];
+            return [null, null, $cartAddress?->getState(), $cartAddress?->getZipcode()];
         }
 
         return [$address, $address->getCountry(), $address->getState(), $cartAddress->getZipcode()];
+    }
+
+    /**
+     * The postal code of the cart's delivery address when that address is in the given
+     * country, as the postage estimate reads it: a list and an estimate for one cart and
+     * one country never judge two different codes.
+     */
+    private function cartZipCodeIn(Cart $cart, Country $country): ?string
+    {
+        $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+        return null !== $cartAddress && $cartAddress->getCountryId() === $country->getId() ? $cartAddress->getZipcode() : null;
     }
 
     /**
