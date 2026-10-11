@@ -81,5 +81,6 @@ final class ZipCodePatternTest extends TestCase
     {
         self::assertSame('SW1A1AA', (string) ZipCodePattern::fromString(' sw1a 1aa '));
         self::assertSame('75001...75020', (string) ZipCodePattern::fromString('75 001...75-020'));
+        self::assertSame('7*1', (string) ZipCodePattern::fromString('7***1'), 'One star per gap.');
     }
 }

@@ -103,6 +103,9 @@ final readonly class ZipCodePattern
     private static function normalizePattern(string $pattern): string
     {
         // The range separator survives the normal form, the hyphens and spaces do not.
-        return implode(self::RANGE_SEPARATOR, array_map(self::normalize(...), explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
+        $normalized = implode(self::RANGE_SEPARATOR, array_map(self::normalize(...), explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
+
+        // "**" means "*": one star per gap keeps the expression linear.
+        return (string) preg_replace('/\*+/', '*', $normalized);
     }
 }
