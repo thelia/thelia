@@ -155,3 +155,14 @@ for component in "${COMPONENTS[@]}"; do
         publish "$name" "$subdirectory" "$repository" "$branch"
     done
 done
+
+# A new maintenance branch is never published until it is added to
+# MAINTAINED_BRANCHES (and to split.yml): say so, and fail when asked to.
+mapfile -t unpublished < <(git -C "$source" for-each-ref --format='%(refname:lstrip=2)' refs/heads \
+    | grep -E '^([3-9]|[1-9][0-9])\.[0-9]+$' \
+    | grep -vxF -f <(printf '%s\n' "${MAINTAINED_BRANCHES[@]}") || true)
+if [[ ${#unpublished[@]} -gt 0 ]]; then
+    message="maintenance branch(es) ${unpublished[*]} not published: add them to MAINTAINED_BRANCHES and to split.yml"
+    [[ "${SPLIT_REQUIRE_KNOWN_BRANCHES:-}" != 1 ]] || fail "$message"
+    echo "::warning::$message"
+fi
