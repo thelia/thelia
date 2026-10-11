@@ -52,7 +52,10 @@ The postal code is passed by:
 The postal code goes with the address it belongs to: the cart's copy for the cart's own
 address (a guest's cart address points to no customer address), the customer address for
 an `addressId`, also when a country is given next to it as the API does, provided the
-address is in that country. A country given alone carries no postal code.
+address is in that country. A country given alone takes the postal code of the cart's
+delivery address when that address is in the country, as the postage estimate does.
+
+A postal code that is not valid UTF-8 normalises to nothing, and counts as unknown.
 
 `ShippingFacade::postalCodeWithoutCarrier()` names the postal code of the cart's
 address when it is the reason no carrier is offered: some active carrier serves the
