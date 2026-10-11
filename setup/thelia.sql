@@ -1230,6 +1230,36 @@ CREATE TABLE `area`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- area_zip_code_rule
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `area_zip_code_rule`;
+
+CREATE TABLE `area_zip_code_rule`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `area_id` INTEGER NOT NULL,
+    `country_id` INTEGER,
+    `pattern` VARCHAR(50) NOT NULL,
+    `excluded` TINYINT(1) DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_area_zip_code_rule_area_id` (`area_id`),
+    INDEX `fi_area_zip_code_rule_country_id` (`country_id`),
+    CONSTRAINT `fk_area_zip_code_rule_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_area_zip_code_rule_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- area_delivery_module
 -- ---------------------------------------------------------------------
 
