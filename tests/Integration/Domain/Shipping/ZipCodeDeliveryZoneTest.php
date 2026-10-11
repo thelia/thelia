@@ -14,9 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
+use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Api\State\Provider\DeliveryModuleProvider;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
@@ -84,6 +92,26 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
         self::assertTrue($this->isEligible('75 011'));
         self::assertFalse($this->isEligible('75116'));
+    }
+
+    public function testAnExclusionWinsOverAnInclusionOfTheSameZone(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75016', excluded: true);
+        $this->rule($area, '75*');
+
+        self::assertFalse($this->isEligible('75016'));
+        self::assertTrue($this->isEligible('75015'));
+        self::assertFalse($this->isEligible('69001'), 'The inclusion limits the zone to Paris.');
+    }
+
+    public function testAnAlphanumericCodeIsComparedInItsNormalForm(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, 'K1A*', excluded: true);
+
+        self::assertFalse($this->isEligible('k1a 0b1'));
+        self::assertTrue($this->isEligible('M5V 3L9'));
     }
 
     public function testAnotherZoneOfTheCarrierCanAcceptWhatTheFirstOneRefuses(): void
@@ -167,6 +195,16 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
     }
 
+    public function testTheFrontApiListsTheCarriersOfAGuestFromThePostalCodeOfItsCart(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('20090'))));
+        self::assertContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('69001'))));
+    }
+
     public function testTheApiPassingACountryAndAnAddressFollowsThePostalCodeOfTheAddress(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -223,6 +261,32 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             ->filterByType(2)
             ->filterById($this->module->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
             ->update(['Activate' => 0], $this->getPropelConnection());
+    }
+
+    /**
+     * What GET /api/front/delivery_modules answers for a session holding the cart.
+     *
+     * @return list<mixed>
+     */
+    private function frontApiListFor(Cart $cart): array
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $session->setSessionCart($cart);
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $provider = new DeliveryModuleProvider(
+            $requestStack,
+            $session,
+            $this->getService(SecurityContext::class),
+            $this->getService(AddressService::class),
+            $this->dispatcher(),
+            $this->getService(ShippingFacade::class),
+        );
+
+        return array_values((array) $provider->provide(new GetCollection()));
     }
 
     private function zoneServedByTheModule(): Area
