@@ -48,7 +48,7 @@ jobs:
     timeout-minutes: 15
     environment: publish-downstream
     env:
-      SPLIT_MODE: dry-run
+      SPLIT_MODE: publish
     steps:
       - name: Install git-filter-repo
         run: |
