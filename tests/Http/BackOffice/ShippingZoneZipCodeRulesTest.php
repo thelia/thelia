@@ -68,6 +68,21 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         self::assertStringContainsString('20*', $row->text());
     }
 
+    public function testARuleForACountryThatLeftTheZoneDoesNotReadAsEveryCountry(): void
+    {
+        $area = $this->area();
+        $foreign = $this->factory()->country(['isoalpha2' => 'XU', 'isoalpha3' => 'XUX', 'isocode' => '994']);
+        $rule = $this->rule($area, '20*', true);
+        $rule->setCountryId($foreign->getId())->save($this->getPropelConnection());
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders($this->zoneUrl($area));
+
+        $row = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rule-'.$rule->getId().'"]');
+        self::assertStringContainsString('A country that left the zone', $row->text());
+        self::assertStringNotContainsString('Every country of the zone', $row->text());
+    }
+
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
     {
         $area = $this->area();
