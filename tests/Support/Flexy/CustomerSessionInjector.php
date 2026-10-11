@@ -17,6 +17,8 @@ namespace Thelia\Tests\Support\Flexy;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\Cart;
 use Thelia\Model\Customer;
 
 /**
@@ -31,14 +33,25 @@ final class CustomerSessionInjector implements EventSubscriberInterface
 {
     private ?Customer $customer = null;
 
+    private ?Cart $cart = null;
+
     public function setCustomer(Customer $customer): void
     {
         $this->customer = $customer;
     }
 
+    /**
+     * The cart the session points at, as the cart of a signed-in customer would be.
+     */
+    public function setCart(Cart $cart): void
+    {
+        $this->cart = $cart;
+    }
+
     public function clear(): void
     {
         $this->customer = null;
+        $this->cart = null;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -59,6 +72,10 @@ final class CustomerSessionInjector implements EventSubscriberInterface
         }
 
         $session->set('thelia.customer_user', $this->customer);
+
+        if (null !== $this->cart) {
+            $session->set(Session::SESSION_CART_ID_NAME, $this->cart->getId());
+        }
     }
 
     public static function getSubscribedEvents(): array

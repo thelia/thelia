@@ -305,6 +305,11 @@ final class TheliaEvents
     public const ORDER_RETURN_REASON_DELETE = 'action.deleteOrderReturnReason';
     public const ORDER_RETURN_REASON_UPDATE_POSITION = 'action.updateOrderReturnReasonPosition';
 
+    /** Purchase lists a customer keeps and recalls into a cart. */
+    public const PURCHASE_LIST_CREATE = 'action.purchaseList.create';
+    public const PURCHASE_LIST_UPDATE = 'action.purchaseList.update';
+    public const PURCHASE_LIST_DELETE = 'action.purchaseList.delete';
+
     /** Sent on image processing. */
     public const IMAGE_PROCESS = 'action.processImage';
 

@@ -24,6 +24,7 @@ use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerListQuery;
 use Thelia\Model\CustomerVersionQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\NewsletterQuery;
@@ -85,6 +86,7 @@ final readonly class CustomerAnonymizer
             $this->anonymizeOrderHistory($customer, $connection);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
+            $this->deleteCustomerLists($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
             $this->deleteTagAttachments($customer, $connection);
             $this->anonymizeAccount($customer, $connection);
@@ -276,6 +278,18 @@ final readonly class CustomerAnonymizer
         }
 
         CartAddressQuery::create()->filterById($cartAddressIds)->delete($connection);
+    }
+
+    /**
+     * The lists the customer kept go with the account. The foreign key cascade
+     * does not run, since the customer row stays; their lines follow the list
+     * through the cascade on `customer_list_item`.
+     */
+    private function deleteCustomerLists(Customer $customer, ConnectionInterface $connection): void
+    {
+        CustomerListQuery::create()
+            ->filterByCustomerId($customer->getId())
+            ->delete($connection);
     }
 
     private function deleteAddresses(Customer $customer, ConnectionInterface $connection): void

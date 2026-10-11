@@ -158,6 +158,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // Resolving references answers with titles, prices and stock levels for up
+            // to five hundred lines at a time: without a cap, a signed-in account walks
+            // the catalog and measures its stock. Thirty a minute leaves a buyer room to
+            // correct a table line by line.
+            'quick_order_per_customer' => [
+                'policy' => 'sliding_window',
+                'limit' => 30,
+                'interval' => '1 minute',
+            ],
         ],
     ], prepend: true);
 };
