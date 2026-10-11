@@ -55,17 +55,30 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         $crawler = $this->deliveryStepOfAGuest(excluding: '20*');
 
         self::assertStringNotContainsString('No carrier delivers to the postal code', $crawler->text());
+        self::assertStringContainsString('No delivery method is available for this order.', $crawler->text());
+    }
+
+    public function testThePostalCodeIsPrintedAsTextNotAsMarkup(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+
+        // The snack bar prints its text raw; the code typed by the buyer must not be markup.
+        $crawler = $this->deliveryStepOfAGuest(excluding: '<*', zipCode: '<b>20</b>');
+
+        self::assertStringContainsString('No carrier delivers to the postal code <b>20</b>.', $crawler->text());
+        self::assertSame(0, $crawler->filter('.SnackBar-message b')->count(), 'The postal code became an element of the page.');
     }
 
     /**
      * The guest identifies, then a zone served by an active carrier takes their country
      * with one exclusion, before the delivery step is displayed.
      */
-    private function deliveryStepOfAGuest(string $excluding): Crawler
+    private function deliveryStepOfAGuest(string $excluding, string $zipCode = self::GUEST_ZIP_CODE): Crawler
     {
         $this->openASessionWithACart();
         $this->client->submit($this->guestFormOf($this->requestIdentificationPage(), [
-            'flexybundle_form_guest_checkout[zipcode]' => self::GUEST_ZIP_CODE,
+            'flexybundle_form_guest_checkout[zipcode]' => $zipCode,
         ]));
         $this->assertResponseRedirectsTo('/checkout/delivery');
 
