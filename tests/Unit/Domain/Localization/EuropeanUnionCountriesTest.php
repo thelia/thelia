@@ -66,4 +66,13 @@ final class EuropeanUnionCountriesTest extends TestCase
         yield 'lower case is accepted' => ['fr', true];
         yield 'unknown code' => ['ZZ', false];
     }
+
+    public function testTheVatPrefixesAreReturnedInUpperCaseWhateverTheCaseOfTheCountryCode(): void
+    {
+        $countries = new EuropeanUnionCountries();
+
+        self::assertSame(['FR'], $countries->vatPrefixesFor('fr'));
+        self::assertSame(['GR', 'EL'], $countries->vatPrefixesFor('gr'));
+        self::assertSame([], $countries->vatPrefixesFor('ch'));
+    }
 }

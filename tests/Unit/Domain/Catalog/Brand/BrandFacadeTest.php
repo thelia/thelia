@@ -143,4 +143,48 @@ final class BrandFacadeTest extends TestCase
 
         $this->facade->updatePosition(3, 2);
     }
+
+    public function testABrandCreatedWithoutAVisibilityIsVisible(): void
+    {
+        $brand = $this->createMock(Brand::class);
+
+        $this->dispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::callback(static function (BrandCreateEvent $event) use ($brand): bool {
+                    self::assertTrue($event->getVisible());
+
+                    $event->setBrand($brand);
+
+                    return true;
+                }),
+                TheliaEvents::BRAND_CREATE,
+            )
+            ->willReturnArgument(0);
+
+        $this->facade->create(new BrandCreateDTO(title: 'Puma', locale: 'en_US'));
+    }
+
+    public function testAnUpdateGivingNoVisibilityMakesTheBrandVisible(): void
+    {
+        $brand = $this->createMock(Brand::class);
+
+        $this->dispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::callback(static function (BrandUpdateEvent $event) use ($brand): bool {
+                    self::assertTrue($event->getVisible());
+
+                    $event->setBrand($brand);
+
+                    return true;
+                }),
+                TheliaEvents::BRAND_UPDATE,
+            )
+            ->willReturnArgument(0);
+
+        $this->facade->update(5, new BrandUpdateDTO(title: 'Puma', locale: 'en_US'));
+    }
 }

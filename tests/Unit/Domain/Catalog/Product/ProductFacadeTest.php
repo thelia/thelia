@@ -305,4 +305,43 @@ class ProductFacadeTest extends TestCase
 
         return $product;
     }
+
+    public function testProductUpdateDTOToArrayCarriesTheBasePriceWeightTaxCurrencyStockAndTemplate(): void
+    {
+        $dto = new ProductUpdateDTO(
+            ref: 'UPD-REF',
+            title: 'Updated Title',
+            locale: 'fr_FR',
+            defaultCategoryId: 15,
+            basePrice: 49.9,
+            baseWeight: 0.8,
+            taxRuleId: 2,
+            currencyId: 1,
+            baseQuantity: 12,
+            templateId: 6,
+        );
+
+        $this->assertSame(
+            [
+                'ref' => 'UPD-REF',
+                'title' => 'Updated Title',
+                'locale' => 'fr_FR',
+                'default_category' => 15,
+                'visible' => true,
+                'virtual' => false,
+                'price' => 49.9,
+                'weight' => 0.8,
+                'tax_rule' => 2,
+                'currency' => 1,
+                'quantity' => 12,
+                'template_id' => 6,
+                'chapo' => null,
+                'description' => null,
+                'postscriptum' => null,
+                'brand_id' => null,
+                'virtual_document_id' => null,
+            ],
+            $dto->toArray(),
+        );
+    }
 }
