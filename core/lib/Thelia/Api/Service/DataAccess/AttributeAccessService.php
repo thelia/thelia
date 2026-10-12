@@ -427,7 +427,8 @@ class AttributeAccessService
         }
 
         // The pair the cart exposes gives the factor to untax a share of the
-        // discount; the last line takes the untaxed rounding remainder too.
+        // discount; the last line takes the untaxed rounding remainder too, and
+        // as with the taxed shares no line takes more than what is left.
         $untaxedDiscount = round($cart->getCalculatedDiscount(false, $taxCountry, $taxState), 2);
         $untaxFactor = $untaxedDiscount / $storedTaxedDiscount;
 
@@ -438,7 +439,7 @@ class AttributeAccessService
         foreach ($taxedAmounts as $index => $taxedAmount) {
             $amount = $index === $lastIndex
                 ? round($untaxedDiscount - $allocatedUntaxed, 2)
-                : round($taxedAmount * $untaxFactor, 2);
+                : min(round($taxedAmount * $untaxFactor, 2), round($untaxedDiscount - $allocatedUntaxed, 2));
 
             $allocatedUntaxed = round($allocatedUntaxed + $amount, 2);
 

@@ -192,6 +192,28 @@ final class CartPromotionAttributesTest extends ActionIntegrationPromotionTestCa
     }
 
     /**
+     * Seven promotions share a stored discount of five cents: every share rounds up
+     * to a cent, so the shares run out before the last lines. No listed amount may
+     * then turn negative, with or without taxes.
+     */
+    public function testNoListedAmountIsNegativeWhenTheSharesRoundUpPastTheStoredDiscount(): void
+    {
+        for ($promotion = 1; $promotion <= 7; ++$promotion) {
+            $this->automaticPromotion(effects: ['amount' => 1.0], conditions: $this->atLeastLines(1), title: 'One euro off '.$promotion);
+        }
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+
+        $cart->setDiscount('0.05')->save();
+
+        $discounts = $this->attributeAccess->attributeCart('discounts');
+
+        self::assertSame([0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0], array_column($discounts, 'taxed_amount'));
+        self::assertSame([0.01, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0], array_column($discounts, 'amount'));
+    }
+
+    /**
      * An automatic promotion carries no code: it has nothing to show in the
      * "your coupon" block, which lists what the customer typed in and can remove.
      */

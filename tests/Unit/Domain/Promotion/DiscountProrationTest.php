@@ -54,6 +54,25 @@ final class DiscountProrationTest extends TestCase
         self::assertSame(1.07, round(array_sum($prorated), 2));
     }
 
+    /**
+     * Four shares of half a cent each round up to a cent: the first two use up
+     * the two cents stored, and the others get nothing rather than a negative
+     * amount on the last line.
+     */
+    public function testNoLineGoesNegativeWhenRoundingUpWouldOvershootTheTarget(): void
+    {
+        self::assertSame([0.01, 0.01, 0.0, 0.0], DiscountProration::prorate([1.0, 1.0, 1.0, 1.0], 0.02));
+    }
+
+    /**
+     * Three shares of a cent and a half round up to two cents: the third one is cut
+     * down to the cent the first two left, and the last line gets nothing.
+     */
+    public function testALineIsCutDownToWhatTheLinesBeforeItLeft(): void
+    {
+        self::assertSame([0.02, 0.02, 0.01, 0.0], DiscountProration::prorate([3.0, 3.0, 3.0, 1.0], 0.05));
+    }
+
     public function testASingleAmountBecomesTheTargetItself(): void
     {
         self::assertSame([3.0], DiscountProration::prorate([5.0], 3.0));
