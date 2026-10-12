@@ -51,6 +51,11 @@ final class CouponAbstractTest extends TestCase
         self::assertSame(0.0, $this->couponSetWith([])->exec());
     }
 
+    public function testTheExpirationDateIsReturnedAsGiven(): void
+    {
+        self::assertEquals(new \DateTime('2030-01-01'), $this->couponSetWith([])->getExpirationDate());
+    }
+
     public function testTheIdOfTheCouponRowItWasBuiltFromIsExposed(): void
     {
         $coupon = $this->couponSetWith([])->setCouponModelId(12);
