@@ -43,6 +43,8 @@ final class SharedCacheKeyCollectorTest extends TestCase
         yield 'a resource without a name of its own' => ['/api/front/currencies/1', ['currencies-1']];
         yield 'a list of such resources' => ['/api/front/product_images', ['product_images']];
         yield 'the languages' => ['/api/front/languages', ['languages']];
+        yield 'the sales' => ['/api/front/sales', ['sales']];
+        yield 'a sale' => ['/api/front/sales/1', ['sales-1']];
         yield 'the videos of products' => ['/api/front/product_videos', ['product_videos']];
         yield 'the associations of products' => ['/api/front/product_associations', ['product_associations']];
         yield 'the filters of a listing' => ['/api/front/tfilters/products', ['tfilters']];
@@ -65,6 +67,7 @@ final class SharedCacheKeyCollectorTest extends TestCase
     public static function listedPaths(): iterable
     {
         yield 'the languages' => ['/api/front/languages'];
+        yield 'the sales' => ['/api/front/sales?active=true&itemsPerPage=1000'];
         yield 'the videos of products' => ['/api/front/product_videos?product=42'];
         yield 'the associations of products' => ['/api/front/product_associations'];
         yield 'the filters of a listing' => ['/api/front/tfilters/products'];
@@ -101,7 +104,6 @@ final class SharedCacheKeyCollectorTest extends TestCase
         yield 'an account' => ['/api/front/account/customers/7'];
         yield 'a cart' => ['/api/front/carts/1'];
         yield 'a prefix of a longer name' => ['/api/front/products_to_check/1'];
-        yield 'the sales' => ['/api/front/sales/1'];
     }
 
     public function testMoreKeysThanTheLimitMakeThePageIncomplete(): void
