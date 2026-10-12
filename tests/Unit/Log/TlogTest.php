@@ -153,6 +153,25 @@ final class TlogTest extends TestCase
         $this->loggerAt(Tlog::DEBUG)->error('Order {id} refused for {name}, {missing} stays', ['id' => 12, 'name' => 'Ada']);
     }
 
+    public function testALineLoggedThroughASubclassNamesTheCallerOfTheSubclass(): void
+    {
+        $logger = new class extends Tlog {
+            public function __construct()
+            {
+            }
+
+            public function error($message, array $context = []): void
+            {
+                parent::error($message, $context);
+            }
+        };
+        $logger->setLevel(Tlog::DEBUG)->setFiles('*')->setPrefix('[#FUNCTION()] ')->setDestinations(TlogDestinationText::class);
+
+        $this->expectOutputString('['.__FUNCTION__."()] Refused\n");
+
+        $logger->error('Refused');
+    }
+
     // interpolate() is part of what a subclass inherits; its result is covered above.
     public function testASubclassCanInterpolateAMessage(): void
     {
