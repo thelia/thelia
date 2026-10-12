@@ -110,8 +110,9 @@ final class CSVSerializerTest extends TestCase
 
             $expected = "reference,title,price\nCH-01,\"Blue chair\",49.9\nTA-02,\"Oak table\",199";
 
-            self::assertSame($expected, file_get_contents($file));
+            // Reading the file would clear the stat cache: the size is asked before the content.
             self::assertSame(\strlen($expected), $fileObject->getSize(), 'The size read once the file is finalized must not be a stale one.');
+            self::assertSame($expected, file_get_contents($file));
         } finally {
             unlink($file);
         }
