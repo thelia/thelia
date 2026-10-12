@@ -247,6 +247,7 @@ readonly class PostageTaxBreakdownCalculator
      *
      * Every share is rounded to the cent and the largest one takes what the
      * rounding left over, so the shares always add up to the amount exactly.
+     * A share never takes more than what is left, so none is negative.
      *
      * @param list<float> $bases
      *
@@ -267,7 +268,9 @@ readonly class PostageTaxBreakdownCalculator
                 continue;
             }
 
-            $shares[$index] = round($amount * $base / $total, 2);
+            // Shares rounded up can add up to more than the amount before the
+            // largest one: each is capped by what is left.
+            $shares[$index] = min(round($amount * $base / $total, 2), round($amount - $distributed, 2));
             $distributed += $shares[$index];
         }
 
