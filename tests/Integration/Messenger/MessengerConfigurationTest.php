@@ -14,10 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Messenger;
 
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Mime\Email;
@@ -75,11 +77,46 @@ final class MessengerConfigurationTest extends IntegrationTestCase
      */
     public function testAHeavyJobIsNeverRetriedOnItsOwn(): void
     {
+        self::assertFalse($this->retryStrategyOf('async_heavy')->isRetryable(new Envelope(new RunImportJob(1)), new \RuntimeException('Connection lost.')));
+    }
+
+    /**
+     * A mail the server refuses is tried three more times, 30 seconds, 2 minutes then 8
+     * minutes apart, which outlasts a mail server restarting. Then it is set aside.
+     */
+    public function testAJobIsTriedThreeMoreTimesWithGrowingDelaysThenSetAside(): void
+    {
+        $strategy = $this->retryStrategyOf('async');
+        $refused = new TransportException('Connection refused.');
+
+        foreach ([0 => 30000, 1 => 120000, 2 => 480000] as $retriesMade => $delay) {
+            $envelope = $this->mailRetried($retriesMade);
+
+            self::assertTrue($strategy->isRetryable($envelope, $refused), \sprintf('After %d retries the job is tried again.', $retriesMade));
+            // Symfony spreads the delays by up to a tenth either way, so that jobs that
+            // failed together are not all retried at the same instant.
+            $waited = $strategy->getWaitingTime($envelope, $refused);
+            self::assertGreaterThanOrEqual((int) ($delay * 0.9), $waited, \sprintf('The delay of retry %d.', $retriesMade + 1));
+            self::assertLessThanOrEqual((int) ($delay * 1.1), $waited, \sprintf('The delay of retry %d.', $retriesMade + 1));
+        }
+
+        self::assertFalse($strategy->isRetryable($this->mailRetried(3), $refused), 'After three retries the job is set aside.');
+    }
+
+    private function mailRetried(int $times): Envelope
+    {
+        $mail = new SendEmailMessage((new Email())->to('buyer@example.com')->text('Hello'));
+
+        return new Envelope($mail, 0 === $times ? [] : [new RedeliveryStamp($times)]);
+    }
+
+    private function retryStrategyOf(string $transport): RetryStrategyInterface
+    {
         $strategies = static::getContainer()->get('messenger.retry_strategy_locator');
         \assert($strategies instanceof \Psr\Container\ContainerInterface);
-        $strategy = $strategies->get('async_heavy');
+        $strategy = $strategies->get($transport);
         \assert($strategy instanceof RetryStrategyInterface);
 
-        self::assertFalse($strategy->isRetryable(new Envelope(new RunImportJob(1)), new \RuntimeException('Connection lost.')));
+        return $strategy;
     }
 }
