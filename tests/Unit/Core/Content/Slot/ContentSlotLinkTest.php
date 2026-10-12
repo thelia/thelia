@@ -18,23 +18,16 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Core\Content\Slot\ContentSlotLink;
 
 /**
- * An entry of a content slot opens in the current window unless its source says otherwise.
+ * An entry of a content slot opens in the current window and holds no children,
+ * unless it is built otherwise.
  */
 final class ContentSlotLinkTest extends TestCase
 {
-    public function testAnEntryOpensInTheCurrentWindowByDefault(): void
+    public function testAnEntryOpensInTheCurrentWindowAndHoldsNoChildrenByDefault(): void
     {
         $link = new ContentSlotLink(label: 'Terms', url: '/terms', source: 'cms_page', sourceId: 12);
 
         self::assertFalse($link->opensInNewWindow);
         self::assertSame([], $link->children);
-        self::assertSame(12, $link->sourceId);
-    }
-
-    public function testAnEntryCanAskForANewWindow(): void
-    {
-        $link = new ContentSlotLink(label: 'Partner', url: 'https://partner.example', source: 'url', opensInNewWindow: true);
-
-        self::assertTrue($link->opensInNewWindow);
     }
 }

@@ -29,6 +29,13 @@ use Thelia\Core\Template\TemplateHelperInterface;
  */
 final class ParserResolverSelectionTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // The resolver keeps the parser it picked in a static property: left there,
+        // a mock of this test would answer getCurrentParser() in the tests that follow.
+        (new \ReflectionProperty(ParserResolver::class, 'currentParser'))->setValue(null, null);
+    }
+
     /**
      * @return iterable<string, array{string|null}>
      */

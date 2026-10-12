@@ -69,7 +69,7 @@ final class ViewRendererTest extends TestCase
         $this->renderer($parser)->render($this->request('product'));
     }
 
-    public function testTheViewIsCheckedWithTheIdTheRequestCarriesBeforeItIsRendered(): void
+    public function testTheViewIsCheckedWithTheIdTheRequestCarries(): void
     {
         $request = $this->request('product');
         $request->attributes->set('product_id', 12);

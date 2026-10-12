@@ -44,6 +44,13 @@ use Thelia\Core\View\ViewRenderer;
  */
 final class ParserResolverTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // The resolver keeps the parser it picked in a static property: left there,
+        // a mock of this test would answer getCurrentParser() in the tests that follow.
+        (new \ReflectionProperty(ParserResolver::class, 'currentParser'))->setValue(null, null);
+    }
+
     public static function unknownViewProvider(): iterable
     {
         yield 'service worker probed by browsers' => ['sw.js'];

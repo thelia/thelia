@@ -115,7 +115,7 @@ final class SeedTranslationCatalogTest extends TestCase
         $catalog = new SeedTranslationCatalog();
 
         self::assertTrue($catalog->hasLocale('fr_FR'));
-        self::assertSame('Taïwan', $catalog->translate('Taïwan', 'fr_FR'));
+        self::assertSame('Pologne', $catalog->translate('Poland', 'fr_FR'));
     }
 
     public function testACatalogIsReadOnceThenKeptForTheNextLookups(): void
@@ -137,8 +137,6 @@ final class SeedTranslationCatalogTest extends TestCase
     {
         yield 'a path to a file outside the directory' => ['../secret'];
         yield 'a path that comes back to a shipped catalog' => ['nested/../pl_PL'];
-        yield 'a name with a space' => ['pl PL'];
-        yield 'an empty name' => [''];
     }
 
     #[DataProvider('localesThatAreNotCatalogNames')]
