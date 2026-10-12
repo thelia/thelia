@@ -416,22 +416,11 @@ readonly class ApiResourcePropelTransformerService
 
             if ($operation instanceof Put && !$property->isInitialized($data)) {
                 foreach ($property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF) as $groupAttribute) {
-                    $propertyGroups = null;
-
-                    if (isset($groupAttribute->getArguments()[0])) {
-                        $propertyGroups = $groupAttribute->getArguments()[0];
-                    }
-
-                    if (isset($groupAttribute->getArguments()['groups'])) {
-                        $propertyGroups = $groupAttribute->getArguments()['groups'];
-                    }
-
-                    if (!$property) {
-                        continue 2;
-                    }
-
-                    $contextGroups = $operation->getDenormalizationContext()['groups'];
-                    $isInContext = [] !== array_intersect($contextGroups, $propertyGroups);
+                    $arguments = $groupAttribute->getArguments();
+                    $propertyGroups = (array) ($arguments['groups'] ?? $arguments[0] ?? []);
+                    $contextGroups = (array) ($operation->getDenormalizationContext()['groups'] ?? []);
+                    // An operation that names no write group lets the client write every property.
+                    $isInContext = [] === $contextGroups || [] !== array_intersect($contextGroups, $propertyGroups);
 
                     foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                         if ($isInContext && 'array' !== $property->getType()?->getName()) {
