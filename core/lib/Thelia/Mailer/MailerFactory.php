@@ -27,6 +27,7 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigService;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\EventListener\OrderEmailHistoryListener;
+use Thelia\Mailer\EventListener\SentMailGuardListener;
 use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -69,8 +70,17 @@ class MailerFactory
     ) {
     }
 
+    /**
+     * Hands the message to the mailer: to the queue when the shop has one. The mail
+     * gets an identifier that travels with it, so a worker sends it once even when the
+     * queue hands it out twice ({@see SentMailGuardListener}).
+     */
     public function send(Email $message): void
     {
+        if (!$message->getHeaders()->has(SentMailGuardListener::MAIL_ID_HEADER)) {
+            $message->getHeaders()->addTextHeader(SentMailGuardListener::MAIL_ID_HEADER, SentMailGuardListener::newMailId());
+        }
+
         $this->mailer->send($message);
     }
 
