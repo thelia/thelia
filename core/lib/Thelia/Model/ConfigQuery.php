@@ -116,20 +116,21 @@ class ConfigQuery extends BaseConfigQuery
             self::initCache(self::findAllAsMap());
         }
 
-        if (!\array_key_exists($search, self::$cache)) {
-            // The snapshot above is exhaustive: a name missing from it has no
-            // row in the table, it is not a lookup that has not run yet.
-            return $default;
-        }
-
         // An environment variable wins over the stored value, but only for the process
         // that has it set. Applying it here rather than caching the result is what
         // keeps the cached snapshot readable by a process started with another
-        // environment, and this one readable by no one else.
+        // environment, and this one readable by no one else. It also overrides a
+        // variable that has no row in the table yet.
         $envName = self::$envNames[$search] ??= Config::getEnvNameFor($search);
 
         if (isset($_ENV[$envName])) {
             return (string) $_ENV[$envName];
+        }
+
+        if (!\array_key_exists($search, self::$cache)) {
+            // The snapshot above is exhaustive: a name missing from it has no
+            // row in the table, it is not a lookup that has not run yet.
+            return $default;
         }
 
         // The default only applies to a variable that does not exist yet: a stored
