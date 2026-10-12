@@ -22,6 +22,7 @@ use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 
 /**
@@ -69,6 +70,8 @@ abstract class CouponAbstract implements CouponInterface
     protected bool $isRemovingPostage = false;
     protected int $maxUsage = -1;
     protected bool $isAvailableOnSpecialOffers = false;
+
+    /** @var CouponCountry[] */
     protected array $freeShippingForCountries = [];
 
     /** @var CouponModule[] */
@@ -138,10 +141,10 @@ abstract class CouponAbstract implements CouponInterface
             : .0;
 
         $this->freeShippingForCountries = $freeShippingForCountries instanceof ObjectCollection
-            ? $freeShippingForCountries->toArray()
+            ? $freeShippingForCountries->getData()
             : $freeShippingForCountries;
         $this->freeShippingForModules = $freeShippingForModules instanceof ObjectCollection
-            ? $freeShippingForModules->toArray()
+            ? $freeShippingForModules->getData()
             : $freeShippingForModules;
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
