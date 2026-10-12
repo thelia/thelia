@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Propel\Generator\Builder\Om\Mixin;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Test\TestToken;
 
 /**
  * Override a Propel model class builder.
@@ -30,7 +31,7 @@ trait ImplementationClassTrait
     public function getClassFilePath(): string
     {
         return rtrim((new Filesystem())->makePathRelative(
-            THELIA_ROOT.'var'.DS.'propel'.DS.$_SERVER['APP_ENV'].DS.'model'.DS
+            THELIA_ROOT.'var'.DS.'propel'.DS.$_SERVER['APP_ENV'].TestToken::suffix().DS.'model'.DS
             .parent::getClassFilePath(),
             THELIA_ROOT,
         ), '/');

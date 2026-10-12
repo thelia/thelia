@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Propel\Generator\Builder;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Test\TestToken;
 
 class ResolverBuilder extends \Propel\Generator\Builder\ResolverBuilder
 {
@@ -24,7 +25,7 @@ class ResolverBuilder extends \Propel\Generator\Builder\ResolverBuilder
     public function getClassFilePath(): string
     {
         return rtrim((new Filesystem())->makePathRelative(
-            THELIA_ROOT.'var'.DS.'propel'.DS.$_SERVER['APP_ENV'].DS.'database'.DS
+            THELIA_ROOT.'var'.DS.'propel'.DS.$_SERVER['APP_ENV'].TestToken::suffix().DS.'database'.DS
             .parent::getClassFilePath(),
             THELIA_ROOT,
         ), '/');
