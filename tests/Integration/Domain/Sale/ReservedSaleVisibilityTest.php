@@ -218,6 +218,31 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * A reserved operation that is not running is open to nobody, whether another
+     * reserved operation happens to run or not: one being prepared stays out of
+     * the front until it starts.
+     */
+    public function testAReservedOperationThatIsNotRunningIsHiddenWhetherAnotherOneRunsOrNot(): void
+    {
+        $public = $this->factory->sale(['active' => true]);
+        $draft = $this->factory->sale(['active' => false, 'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS]);
+        $namedOnTheDraft = $this->newCustomer();
+        $this->factory->saleCustomer($draft, $namedOnTheDraft);
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'no reserved operation runs');
+
+        $this->runningReservedSaleNaming($this->newCustomer());
+        $this->forgetMemoisedAudience();
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'another reserved operation runs');
+
+        $this->loginAsCustomerInSession($namedOnTheDraft);
+        $this->forgetMemoisedAudience();
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'the customer the draft names');
+    }
+
     public function testNoEntitlementIsReadWhileNoReservedOperationRuns(): void
     {
         $customer = $this->newCustomer();
