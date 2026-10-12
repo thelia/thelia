@@ -30,6 +30,8 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\TheliaHttpKernel;
 use Thelia\Core\View\ViewRenderer;
 use Thelia\Domain\Order\Exception\OrderException;
+use Thelia\Log\Destination\TlogDestinationText;
+use Thelia\Log\Tlog;
 use Thelia\Tests\Support\Log\SilencedTlog;
 
 /**
@@ -146,6 +148,24 @@ final class ViewRendererTest extends TestCase
         $request->attributes->set('_view', null);
 
         $this->expectException(NotFoundHttpException::class);
+
+        $this->renderer($this->parserRendering('<h1>Home</h1>'))->render($request);
+    }
+
+    public function testARequestWithoutAViewIsLoggedAsAnError(): void
+    {
+        $logger = (new \ReflectionClass(Tlog::class))->newInstanceWithoutConstructor()
+            ->setLevel(Tlog::DEBUG)
+            ->setFiles('*')
+            ->setPrefix('#LEVEL: ')
+            ->setDestinations(TlogDestinationText::class);
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, $logger);
+
+        $request = Request::create('/');
+        $request->attributes->set('_view', '');
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectOutputRegex('/^ERROR: No view found\s*$/');
 
         $this->renderer($this->parserRendering('<h1>Home</h1>'))->render($request);
     }
