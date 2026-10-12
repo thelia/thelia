@@ -46,6 +46,7 @@ final class ProductWithPSECreateDTOTest extends TestCase
                 'is_new' => false,
                 'is_default' => true,
                 'ean_code' => null,
+                // No tax rule: ProductFacade::createWithPSE() keeps the default rule the product was created with.
                 'tax_rule_id' => 0,
                 'from_default_currency' => false,
                 'mpn' => null,

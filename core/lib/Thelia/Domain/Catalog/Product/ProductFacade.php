@@ -356,7 +356,9 @@ final readonly class ProductFacade
                 ->setIsnew($pseUpdateDTO->isNew ? 1 : 0)
                 ->setIsdefault(true)
                 ->setEanCode($pseUpdateDTO->eanCode)
-                ->setTaxRuleId($pseUpdateDTO->taxRuleId)
+                // The update writes its tax rule on the product: without one from the
+                // caller, it keeps the default rule the product was just created with.
+                ->setTaxRuleId($dto->taxRuleId ?? $product->getTaxRuleId())
                 ->setFromDefaultCurrency(0);
 
             $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
