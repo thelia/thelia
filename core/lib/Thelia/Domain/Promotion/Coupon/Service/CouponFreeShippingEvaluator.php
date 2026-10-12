@@ -42,7 +42,7 @@ class CouponFreeShippingEvaluator
             // If the list is empty, the shipping is free for all countries.
             $couponCountries = $coupon->getFreeShippingForCountries();
 
-            if (!$couponCountries->isEmpty()) {
+            if ([] !== $couponCountries) {
                 $countryValid = false;
 
                 /** @var CouponCountry $couponCountry */
@@ -62,7 +62,7 @@ class CouponFreeShippingEvaluator
             // If the list is empty, the shipping is free for all methods.
             $couponModules = $coupon->getFreeShippingForModules();
 
-            if (!$couponModules->isEmpty()) {
+            if ([] !== $couponModules) {
                 $moduleValid = false;
 
                 /** @var CouponModule $couponModule */

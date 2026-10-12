@@ -19,6 +19,8 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process.
@@ -192,12 +194,12 @@ interface CouponInterface
     public function drawBackOfficeInputs(): string;
 
     /**
-     * @return array list of country IDs for which shipping is free. All if empty
+     * @return CouponCountry[] list of countries for which shipping is free. All if empty
      */
     public function getFreeShippingForCountries(): array;
 
     /**
-     * @return array list of module IDs for which shipping is free. All if empty
+     * @return CouponModule[] list of delivery modules for which shipping is free. All if empty
      */
     public function getFreeShippingForModules(): array;
 
