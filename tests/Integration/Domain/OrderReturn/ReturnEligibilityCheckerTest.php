@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\OrderReturn;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnComposer;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -268,6 +269,110 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
 
         $this->expectException(ReturnNotAllowedException::class);
         $this->checker->assertReturnable($order, $customer, $line, 0.1);
+    }
+
+    /**
+     * A shop that takes back only what it has shipped lists the sent status: a
+     * paid order still waiting for its parcel cannot be returned, through any of
+     * the paths that ask this gate.
+     */
+    public function testOnlyTheListedOrderStatusesOpenAReturn(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, ' sent ,');
+        [$paidOrder, $paidCustomer] = $this->paidOrderWithProduct();
+        [$sentOrder, $sentCustomer] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_SENT);
+
+        self::assertSame([OrderStatus::CODE_SENT], $this->checker->openingStatusCodes());
+        self::assertFalse($this->checker->isWithinReturnWindow($paidOrder));
+        self::assertFalse($this->checker->isReturnable($paidOrder));
+        self::assertTrue($this->checker->isWithinReturnWindow($sentOrder));
+        $this->checker->assertOrderReturnable($sentOrder, $sentCustomer);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->checker->assertOrderReturnable($paidOrder, $paidCustomer);
+    }
+
+    /**
+     * A listed status does not have to be a paid one: the list replaces the rule,
+     * it does not narrow it.
+     */
+    public function testAListedStatusOpensAReturnEvenWhenItIsNotAPaidOne(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, OrderStatus::CODE_NOT_PAID);
+        [$order] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_NOT_PAID);
+
+        self::assertTrue($this->checker->isWithinReturnWindow($order));
+    }
+
+    public function testAnEmptyListOpensAReturnOnAnyPaidStatus(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, '');
+        [$paidOrder] = $this->paidOrderWithProduct();
+        [$processingOrder] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_PROCESSING);
+        [$unpaidOrder] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_NOT_PAID);
+
+        self::assertSame([], $this->checker->openingStatusCodes());
+        self::assertTrue($this->checker->isWithinReturnWindow($paidOrder));
+        self::assertTrue($this->checker->isWithinReturnWindow($processingOrder));
+        self::assertFalse($this->checker->isWithinReturnWindow($unpaidOrder));
+    }
+
+    /**
+     * A shop that settles an exchange with a new parcel lets the goods it shipped
+     * again be returned in turn: with the cumulative count off, the returns already
+     * opened on a line hold nothing and each request is bounded by the ordered
+     * quantity alone.
+     */
+    public function testEachRequestIsBoundedByTheOrderedQuantityAloneWhenTheCountIsNotCumulative(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY, '0');
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 2.0);
+
+        $this->openReturn($order, $customer, $line, 2.0, OrderReturnStatus::CODE_SETTLED);
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertFalse($this->checker->isQuantityCumulative());
+        self::assertSame(2.0, $this->checker->remainingReturnableQuantity($line));
+        self::assertTrue($this->checker->isReturnable($order));
+        $this->checker->assertReturnable($order, $customer, $line, 2.0);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->checker->assertReturnable($order, $customer, $line, 3.0);
+    }
+
+    /**
+     * Turning the cumulative count off frees the earlier returns, not the request
+     * being written: one ordered unit split over two lines of the same request is
+     * still refused.
+     */
+    public function testASingleRequestStillCannotClaimMoreThanTheOrderedQuantity(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY, '0');
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 2.0);
+
+        $this->openReturn($order, $customer, $line, 2.0, OrderReturnStatus::CODE_REQUESTED);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->getService(OrderReturnComposer::class)->priceRequestedLines($order, $customer, [
+            ['order_product' => $line, 'quantity' => 1.5],
+            ['order_product' => $line, 'quantity' => 1.0],
+        ]);
+    }
+
+    public function testTheCountIsCumulativeByDefault(): void
+    {
+        self::assertSame('1', ConfigQuery::read(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY));
+        self::assertTrue($this->checker->isQuantityCumulative());
+    }
+
+    public function testTheCountIsCumulativeOnAShopWithoutTheSetting(): void
+    {
+        ConfigQuery::create()->filterByName(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY)->delete($this->getPropelConnection());
+        ConfigQuery::resetCache();
+
+        self::assertTrue($this->checker->isQuantityCumulative());
     }
 
     /**

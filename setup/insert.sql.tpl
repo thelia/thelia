@@ -105,7 +105,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (94, 'video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW()),
 (95, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
 (96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
-(97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW())
+(97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW()),
+(98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
+(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2309,7 +2311,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, '{{ locale }}', {{ intl('Allow module installation from ZIP files.', locale) }}, NULL, NULL, NULL),
     (95, '{{ locale }}', {{ intl('Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)', locale) }}, NULL, NULL, NULL),
     (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL),
-    (97, '{{ locale }}', {{ intl('Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (97, '{{ locale }}', {{ intl('Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL),
+    (98, '{{ locale }}', {{ intl('Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)', locale) }}, NULL, NULL, NULL),
+    (99, '{{ locale }}', {{ intl('Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4147,18 +4151,22 @@ breadcrumb of the theme read "Your cart", so that is what the cart step is calle
 A shop that upgrades has to read exactly what it read yesterday.
 */
 INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'de_DE', 'Ihr Warenkorb'),
     (1, 'en_US', 'Your cart'),
     (1, 'es_ES', 'Tu carrito'),
     (1, 'fr_FR', 'Votre panier'),
     (1, 'it_IT', 'Il tuo carrello'),
+    (2, 'de_DE', 'Lieferung'),
     (2, 'en_US', 'Delivery'),
     (2, 'es_ES', 'Envío'),
     (2, 'fr_FR', 'Livraison'),
     (2, 'it_IT', 'Consegna'),
+    (3, 'de_DE', 'Zahlung'),
     (3, 'en_US', 'Payment'),
     (3, 'es_ES', 'Pago'),
     (3, 'fr_FR', 'Paiement'),
     (3, 'it_IT', 'Pagamento'),
+    (4, 'de_DE', 'Bestätigung'),
     (4, 'en_US', 'Confirmation'),
     (4, 'es_ES', 'Confirmación'),
     (4, 'fr_FR', 'Confirmation'),

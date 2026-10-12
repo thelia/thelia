@@ -656,4 +656,60 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@delivery_date_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
     (@delivery_date_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- German titles of the checkout steps
+--
+-- 3.1.0 named the four steps of the checkout in English, Spanish, French
+-- and Italian only, while the shop ships German. A German storefront drew
+-- its progress trail in the shop language instead ("Paiement" on a German
+-- page of a French shop). The step is found by its code, as in 3.1.0, and
+-- INSERT IGNORE keeps a German title the merchant already wrote, so the
+-- statement can be replayed.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `checkout_step_i18n` (`id`, `locale`, `title`)
+    SELECT `checkout_step`.`id`, 'de_DE', `wording`.`title`
+    FROM `checkout_step`
+    JOIN (
+        SELECT 'cart' AS `code`, 'Ihr Warenkorb' AS `title`
+        UNION ALL SELECT 'delivery', 'Lieferung'
+        UNION ALL SELECT 'payment', 'Zahlung'
+        UNION ALL SELECT 'confirmation', 'Bestätigung'
+    ) AS `wording` ON `wording`.`code` = `checkout_step`.`code`;
+
+-- ---------------------------------------------------------------------
+-- Cumulative count of the returned quantity of an order line
+--
+-- 1, the rule until now: the returns already opened on a line hold part of
+-- its quantity.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'order_return_cumulative_quantity' AS `name`, 'en_US' AS `locale`, 'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' AS `title`
+    UNION ALL SELECT 'order_return_cumulative_quantity', 'fr_FR', 'Les retours déjà ouverts sur une ligne de commande retiennent une part de sa quantité (1), ou chaque demande de retour n''est bornée que par la quantité commandée (0)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
+-- ---------------------------------------------------------------------
+-- Order statuses a return may be opened on
+--
+-- Empty: any paid status, the rule until now.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('order_return_order_statuses', '', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'order_return_order_statuses' AS `name`, 'en_US' AS `locale`, 'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)' AS `title`
+    UNION ALL SELECT 'order_return_order_statuses', 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
 SET FOREIGN_KEY_CHECKS = 1;
