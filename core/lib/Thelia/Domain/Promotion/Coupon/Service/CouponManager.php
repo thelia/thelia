@@ -310,7 +310,7 @@ class CouponManager implements ResetInterface
                 // If the list is empty, the shipping is free for all countries.
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
-                if (!$couponCountries->isEmpty()) {
+                if ([] !== $couponCountries) {
                     if (null === $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId()) {
                         continue;
                     }
@@ -336,7 +336,7 @@ class CouponManager implements ResetInterface
                 // If the list is empty, the shipping is free for all methods.
                 $couponModules = $coupon->getFreeShippingForModules();
 
-                if (!$couponModules->isEmpty()) {
+                if ([] !== $couponModules) {
                     $moduleValid = false;
 
                     $shippingModuleId = $cart->getDeliveryModuleId();
