@@ -56,6 +56,22 @@ final class CouponAbstractTest extends TestCase
         self::assertEquals(new \DateTime('2030-01-01'), $this->couponSetWith([])->getExpirationDate());
     }
 
+    public function testChangingTheReturnedExpirationDateLeavesTheCouponUntouched(): void
+    {
+        $expirationDate = new \DateTime('+1 month');
+        $coupon = $this->couponSetWith([], expirationDate: clone $expirationDate);
+
+        $coupon->getExpirationDate()->modify('-1 year');
+
+        self::assertEquals($expirationDate, $coupon->getExpirationDate());
+        self::assertFalse($coupon->isExpired());
+    }
+
+    public function testACouponPastItsExpirationDateIsExpired(): void
+    {
+        self::assertTrue($this->couponSetWith([], expirationDate: new \DateTime('-1 day'))->isExpired());
+    }
+
     public function testTheIdOfTheCouponRowItWasBuiltFromIsExposed(): void
     {
         $coupon = $this->couponSetWith([])->setCouponModelId(12);
@@ -71,6 +87,7 @@ final class CouponAbstractTest extends TestCase
         ?string $title = null,
         ?string $shortDescription = null,
         ?string $description = null,
+        \DateTime $expirationDate = new \DateTime('2030-01-01'),
     ): CouponAbstract {
         $translator = $this->createStub(Translator::class);
 
@@ -102,7 +119,7 @@ final class CouponAbstractTest extends TestCase
             false,
             true,
             -1,
-            new \DateTime('2030-01-01'),
+            $expirationDate,
             [],
             [],
             false,
