@@ -41,6 +41,15 @@ final class ContentSlotServiceTest extends TestCase
         self::assertSame(['Second'], self::labels($service->links('header_links', 'en_US')));
     }
 
+    public function testEveryLinkOfTheOwnerIsReturnedInOrder(): void
+    {
+        $service = new ContentSlotService([
+            new FixedContentSlotResolver(['header_links' => [self::link('Shop'), self::link('Blog'), self::link('Contact')]]),
+        ]);
+
+        self::assertSame(['Shop', 'Blog', 'Contact'], self::labels($service->links('header_links', 'en_US')));
+    }
+
     public function testAnEmptyAnswerOwnsTheSlotAndStopsTheLookup(): void
     {
         $service = new ContentSlotService([

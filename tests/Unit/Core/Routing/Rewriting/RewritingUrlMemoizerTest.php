@@ -83,6 +83,35 @@ final class RewritingUrlMemoizerTest extends TestCase
         self::assertTrue($memoizer->has('category', 42, 'en_US'));
     }
 
+    public function testAnOutcomeStoredWithSetIsWhatRememberReturns(): void
+    {
+        $memoizer = new RewritingUrlMemoizer();
+        $memoizer->set('category', 1, 'en_US', '/category?category_id=1', '/summer.html');
+
+        $remembered = $memoizer->remember('category', 1, 'en_US', static function (): array {
+            throw new \LogicException('The outcome was stored, nothing is left to compute.');
+        });
+
+        self::assertSame(['url' => '/category?category_id=1', 'rewrittenUrl' => '/summer.html'], $remembered);
+    }
+
+    public function testAViewNameAndAnIdThatReadAsAnotherPairAreTwoKeys(): void
+    {
+        $memoizer = new RewritingUrlMemoizer();
+        $memoizer->set('product', 12, null, '/product?product_id=12', null);
+
+        self::assertFalse($memoizer->has('product1', 2, null));
+    }
+
+    public function testAnIdAndALocaleThatReadAsAnotherPairAreTwoKeys(): void
+    {
+        $memoizer = new RewritingUrlMemoizer();
+        $memoizer->set('product', 12, null, '/product?product_id=12', null);
+
+        self::assertFalse($memoizer->has('product', 1, '2'));
+        self::assertTrue($memoizer->has('product', 12, null));
+    }
+
     public function testHasReflectsWhatWasCachedIncludingNullValues(): void
     {
         $memoizer = new RewritingUrlMemoizer();
