@@ -20,19 +20,26 @@ declare(strict_types=1);
 // checked at all. Without the notice, such a change would look as quiet as a well
 // tested one.
 //
-// Usage: php .github/scripts/mutation-summary.php <infection.json> <summary.md>
+// Usage: php .github/scripts/mutation-summary.php <infection.json> <summary.md> [<scope>]
+//
+// <scope> names what a run other than the pull request check mutated and with
+// which suites (the nightly run: "Domain/Order, unit and integration suites").
 
-if (3 !== $argc) {
-    fwrite(\STDERR, "Usage: php mutation-summary.php <infection.json> <summary.md>\n");
+if (3 !== $argc && 4 !== $argc) {
+    fwrite(\STDERR, "Usage: php mutation-summary.php <infection.json> <summary.md> [<scope>]\n");
     exit(2);
 }
 
 [, $reportPath, $summaryPath] = $argv;
+$scope = $argv[3] ?? null;
+$heading = null === $scope ? "### Mutation testing\n\n" : "### Mutation testing: {$scope}\n\n";
+$tests = null === $scope ? 'unit tests' : 'tests';
+$test = null === $scope ? 'unit test' : 'test';
 
 if (!is_file($reportPath)) {
     file_put_contents(
         $summaryPath,
-        "### Mutation testing\n\nInfection wrote no report: the log of the previous step tells why.\n",
+        $heading."Infection wrote no report: the log of the previous step tells why.\n",
         \FILE_APPEND,
     );
     exit(0);
@@ -47,7 +54,7 @@ $relativePath = static fn (array $mutant): string => str_starts_with($mutant['mu
 
 $stats = $report['stats'];
 
-$summary = "### Mutation testing\n\n";
+$summary = $heading;
 
 if (0 === $stats['totalMutantsCount']) {
     $summary .= "The changed lines hold nothing to mutate.\n";
@@ -57,9 +64,9 @@ if (0 === $stats['totalMutantsCount']) {
 
 // Label, count, shown even when the count is zero.
 $rows = [
-    ['Killed by a unit test', $stats['killedCount'], true],
-    ['Escaped: no unit test noticed the change', $stats['escapedCount'], true],
-    ['Not checked: no unit test executes the line', $stats['notCoveredCount'], true],
+    ["Killed by a {$test}", $stats['killedCount'], true],
+    ["Escaped: no {$test} noticed the change", $stats['escapedCount'], true],
+    ["Not checked: no {$test} executes the line", $stats['notCoveredCount'], true],
     ['Timed out (counted as killed)', $stats['timeOutCount'], false],
     ['Made PHP fail (counted as killed)', $stats['errorCount'] + $stats['syntaxErrorCount'], false],
 ];
@@ -72,7 +79,7 @@ foreach ($rows as [$label, $count, $shownWhenZero]) {
 }
 
 $summary .= sprintf(
-    "\nMutation score: %s %% of all the mutants, %s %% of those on lines the unit tests execute.\n",
+    "\nMutation score: %s %% of all the mutants, %s %% of those on lines the {$tests} execute.\n",
     round((float) $stats['msi'], 1),
     round((float) $stats['coveredCodeMsi'], 1),
 );
@@ -97,7 +104,9 @@ foreach ($report['uncovered'] as $mutant) {
 
 if ([] !== $uncoveredLines) {
     ksort($uncoveredLines);
-    $summary .= "\n#### Lines no unit test executes\n\nThe integration, API and HTTP suites may run them, but mutation testing does not run those suites.\n\n";
+    $summary .= null === $scope
+        ? "\n#### Lines no unit test executes\n\nThe integration, API and HTTP suites may run them, but mutation testing does not run those suites.\n\n"
+        : "\n#### Lines no test of this run executes\n\nThe API and HTTP suites may run them; this run does not.\n\n";
 
     foreach ($uncoveredLines as $file => $lines) {
         $lines = array_keys($lines);
@@ -117,7 +126,7 @@ if ([] !== $uncoveredLines) {
         foreach ($ranges as [$start, $end]) {
             $labels[] = $start === $end ? (string) $start : "{$start}-{$end}";
             echo sprintf(
-                "::notice file=%s,line=%d,endLine=%d,title=Not checked by mutation testing::No unit test executes this code, so mutation testing cannot tell whether a test would notice a change to it.\n",
+                "::notice file=%s,line=%d,endLine=%d,title=Not checked by mutation testing::No {$test} executes this code, so mutation testing cannot tell whether a test would notice a change to it.\n",
                 strtr($file, ['%' => '%25', ',' => '%2C', ':' => '%3A']),
                 $start,
                 $end,
