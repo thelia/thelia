@@ -229,12 +229,6 @@ parameters:
 			path: core/lib/Thelia/Core/TheliaKernel.php
 
 		-
-			message: '#^Class Thelia\\ImportExport\\Export\\DateTime not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/DataTransfer/Export/AbstractExport.php
-
-		-
 			message: '#^Variable \$description on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1

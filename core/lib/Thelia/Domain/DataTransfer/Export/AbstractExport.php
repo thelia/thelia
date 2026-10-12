@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\Export\DateTime;
 use Thelia\Model\Lang;
 
 /**
@@ -462,7 +461,7 @@ abstract class AbstractExport implements \Iterator
     public function beforeSerialize(array $data): array
     {
         foreach ($data as &$value) {
-            if ($value instanceof DateTime) {
+            if ($value instanceof \DateTimeInterface) {
                 $value = $value->format('Y-m-d H:i:s');
             }
         }
