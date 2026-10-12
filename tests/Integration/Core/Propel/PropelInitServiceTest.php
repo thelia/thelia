@@ -83,6 +83,8 @@ final class PropelInitServiceTest extends IntegrationTestCase
             new SchemaLocator(THELIA_CONF_DIR, THELIA_MODULE_DIR, THELIA_LOCAL_MODULE_DIR),
         );
 
+        $connectionManager = Propel::getServiceContainer()->getConnectionManager('TheliaMain');
+
         try {
             // Normal kernel boot, before the module exists: builds and
             // requires the init file once in this very process.
@@ -110,6 +112,9 @@ final class PropelInitServiceTest extends IntegrationTestCase
                 fn () => $this->removeProbeModule(),
                 fn () => $this->removeProbeModuleRow(),
                 fn () => $this->restoreTheRealDatabaseMap(),
+                // The probe's init file installs a connection built from the
+                // environment, which can name another database than the suite's.
+                static fn () => Propel::getServiceContainer()->setConnectionManager($connectionManager),
             ] as $cleanupStep) {
                 try {
                     $cleanupStep();
@@ -118,6 +123,12 @@ final class PropelInitServiceTest extends IntegrationTestCase
                 }
             }
         }
+
+        self::assertSame(
+            $connectionManager,
+            Propel::getServiceContainer()->getConnectionManager('TheliaMain'),
+            'The probe build must hand the connection of the suite back: every later test would otherwise run against the database it read from the environment.',
+        );
     }
 
     private function writeProbeModule(): void
