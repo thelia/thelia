@@ -24,7 +24,7 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -415,7 +415,7 @@ readonly class ApiResourcePropelTransformerService
             $propelSetter = $this->determinePropelSetterName($property, $setterForced);
 
             if ($operation instanceof Put && !$property->isInitialized($data)) {
-                foreach ($property->getAttributes(Groups::class) as $groupAttribute) {
+                foreach ($property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF) as $groupAttribute) {
                     $propertyGroups = null;
 
                     if (isset($groupAttribute->getArguments()[0])) {
@@ -519,7 +519,7 @@ readonly class ApiResourcePropelTransformerService
     private function isReadOnlyFor(\ReflectionProperty $property, Operation $operation): bool
     {
         $writeGroups = $operation->getDenormalizationContext()['groups'] ?? [];
-        $declared = $property->getAttributes(Groups::class);
+        $declared = $property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         if ([] === $writeGroups || [] === $declared) {
             return false;
