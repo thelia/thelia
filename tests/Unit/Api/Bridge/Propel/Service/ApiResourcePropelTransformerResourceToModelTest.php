@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
@@ -46,9 +46,6 @@ use Thelia\Tests\Unit\Api\Bridge\Propel\Service\Fixture\RecordingProduct;
  * resource is written as the foreign key of its model, a null never overwrites a NOT NULL column,
  * and a PUT, which replaces the row, resets what its payload left out without touching what the
  * operation does not let the client write. A resource carrying an id addresses an existing row.
- *
- * The fixtures declare their groups with Serializer\Annotation\Groups: it is the class the
- * transformer looks the groups up by, and an attribute is matched by its name, not its alias.
  */
 final class ApiResourcePropelTransformerResourceToModelTest extends TestCase
 {
