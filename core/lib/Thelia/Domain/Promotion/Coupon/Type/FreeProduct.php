@@ -44,12 +44,12 @@ class FreeProduct extends AbstractRemoveOnProducts
 
     public function setFieldsValue(array $effects): void
     {
-        $this->offeredProductId = $effects[self::OFFERED_PRODUCT_ID]
-            ? (int) $effects[self::OFFERED_PRODUCT_ID]
-            : null;
-        $this->offeredCategoryId = $effects[self::OFFERED_CATEGORY_ID]
-            ? (int) $effects[self::OFFERED_CATEGORY_ID]
-            : null;
+        $this->offeredProductId = empty($effects[self::OFFERED_PRODUCT_ID])
+            ? null
+            : (int) $effects[self::OFFERED_PRODUCT_ID];
+        $this->offeredCategoryId = empty($effects[self::OFFERED_CATEGORY_ID])
+            ? null
+            : (int) $effects[self::OFFERED_CATEGORY_ID];
     }
 
     public function getCartItemDiscount(CartItem $cartItem): float
