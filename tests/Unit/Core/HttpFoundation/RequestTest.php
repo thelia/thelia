@@ -46,6 +46,7 @@ final class RequestTest extends TestCase
 
         self::assertSame('/catalog/shoes', Request::create('/catalog/shoes/')->getPathInfo());
         self::assertSame('/catalog/shoes', Request::create('/catalog/shoes')->getPathInfo());
+        self::assertSame('/catalog/', Request::create('/catalog//')->getPathInfo());
     }
 
     public function testTheRootPathIsKeptWhenTheShopAllowsSlashEndedUris(): void
