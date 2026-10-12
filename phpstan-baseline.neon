@@ -205,12 +205,6 @@ parameters:
 			path: core/lib/Thelia/Core/Template/Loop/Auth.php
 
 		-
-			message: '#^Class Thelia\\Model\\ExportQuery referenced with incorrect case\: Thelia\\Model\\ExportQUery\.$#'
-			identifier: class.nameCase
-			count: 1
-			path: core/lib/Thelia/Core/Template/Loop/ImportExportType.php
-
-		-
 			message: '#^Variable \$feature_availability on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
@@ -229,18 +223,6 @@ parameters:
 			path: core/lib/Thelia/Core/TheliaKernel.php
 
 		-
-			message: '#^Class Thelia\\ImportExport\\Export\\DateTime not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/DataTransfer/Export/AbstractExport.php
-
-		-
-			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponAbstract\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
-
-		-
 			message: '#^Variable \$description on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
@@ -257,39 +239,3 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
-
-		-
-			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponInterface\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponInterface.php
-
-		-
-			message: '#^Class Thelia\\Model\\DateTime not found\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Parameter \$endDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Parameter \$startDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Tools\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Tools/I18n.php
-
-		-
-			message: '#^Method Thelia\\Tools\\I18n\:\:getDateTimeFromForm\(\) has invalid return type Thelia\\Tools\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Tools/I18n.php

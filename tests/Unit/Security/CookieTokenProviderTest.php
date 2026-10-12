@@ -28,6 +28,12 @@ final class CookieTokenProviderTest extends TestCase
         self::assertSame('/', $options['path']);
     }
 
+    public function testTheCookieExpiresAtTheGivenTime(): void
+    {
+        // Without an expiry the browser keeps a session cookie, and clearing it with a past date would not work.
+        self::assertSame(1_700_000_000, $this->buildOptions(1_700_000_000, false)['expires']);
+    }
+
     public function testTheSecureFlagFollowsTheGivenConnection(): void
     {
         self::assertTrue($this->buildOptions(time(), true)['secure']);

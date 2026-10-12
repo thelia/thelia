@@ -85,6 +85,39 @@ final class CSVSerializerTest extends TestCase
     }
 
     /**
+     * A delimiter that is neither of the list separators, a pipe, still splits the cells of a line.
+     */
+    public function testACellHoldingTheDelimiterIsEnclosed(): void
+    {
+        self::assertSame("\"Rue|Neuve\"|Paris\n", (new CSVSerializer())->setDelimiter('|')->serialize(['address' => 'Rue|Neuve', 'city' => 'Paris']));
+    }
+
+    public function testTheFileStartsWithTheNamesOfTheColumnsOfTheFirstRow(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'thelia-csv-');
+        self::assertIsString($file);
+
+        try {
+            $serializer = new CSVSerializer();
+            $fileObject = new \SplFileObject($file, 'w+');
+
+            $serializer->prepareFile($fileObject);
+            $fileObject->fwrite($serializer->serialize(['reference' => 'CH-01', 'title' => 'Blue chair', 'price' => 49.9]));
+            $fileObject->fwrite($serializer->serialize(['reference' => 'TA-02', 'title' => 'Oak table', 'price' => 199]));
+            // The size is read while the rows are written, as an export reports its progress.
+            $fileObject->getSize();
+            $serializer->finalizeFile($fileObject);
+
+            $expected = "reference,title,price\nCH-01,\"Blue chair\",49.9\nTA-02,\"Oak table\",199";
+
+            self::assertSame($expected, file_get_contents($file));
+            self::assertSame(\strlen($expected), $fileObject->getSize(), 'The size read once the file is finalized must not be a stale one.');
+        } finally {
+            unlink($file);
+        }
+    }
+
+    /**
      * @return iterable<string, array{array<string, mixed>}>
      */
     public static function rowsWithoutFormulaNorListSeparator(): iterable

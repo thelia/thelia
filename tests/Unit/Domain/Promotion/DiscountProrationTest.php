@@ -42,6 +42,37 @@ final class DiscountProrationTest extends TestCase
         self::assertSame(10.0, round(array_sum($prorated), 2));
     }
 
+    /**
+     * A stored discount of 1.067 is distributed as 1.07: 40/50 of it is 0.856,
+     * hence 0.86, and the last line takes the remaining 0.21.
+     */
+    public function testASubCentTargetIsRoundedToTheCentBeforeBeingDistributed(): void
+    {
+        $prorated = DiscountProration::prorate([40.0, 10.0], 1.067);
+
+        self::assertSame([0.86, 0.21], $prorated);
+        self::assertSame(1.07, round(array_sum($prorated), 2));
+    }
+
+    /**
+     * Four shares of half a cent each round up to a cent: the first two use up
+     * the two cents stored, and the others get nothing rather than a negative
+     * amount on the last line.
+     */
+    public function testNoLineGoesNegativeWhenRoundingUpWouldOvershootTheTarget(): void
+    {
+        self::assertSame([0.01, 0.01, 0.0, 0.0], DiscountProration::prorate([1.0, 1.0, 1.0, 1.0], 0.02));
+    }
+
+    /**
+     * Three shares of a cent and a half round up to two cents: the third one is cut
+     * down to the cent the first two left, and the last line gets nothing.
+     */
+    public function testALineIsCutDownToWhatTheLinesBeforeItLeft(): void
+    {
+        self::assertSame([0.02, 0.02, 0.01, 0.0], DiscountProration::prorate([3.0, 3.0, 3.0, 1.0], 0.05));
+    }
+
     public function testASingleAmountBecomesTheTargetItself(): void
     {
         self::assertSame([3.0], DiscountProration::prorate([5.0], 3.0));
@@ -66,6 +97,12 @@ final class DiscountProrationTest extends TestCase
     public function testTheFactorIsTheScaleBetweenPricedAndStored(): void
     {
         self::assertSame(0.5, DiscountProration::factor([5.0, 3.0], 4.0));
+    }
+
+    public function testTheFactorScalesOntoTheTargetRoundedToTheCent(): void
+    {
+        // 4.567 is stored as 4.57, and 4.57 over the 8.0 priced is 0.57125.
+        self::assertSame(0.57125, DiscountProration::factor([6.0, 2.0], 4.567));
     }
 
     public function testTheFactorIsZeroWhenThereIsNothingToScale(): void

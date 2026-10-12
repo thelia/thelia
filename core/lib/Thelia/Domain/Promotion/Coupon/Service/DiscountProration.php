@@ -20,6 +20,7 @@ namespace Thelia\Domain\Promotion\Coupon\Service;
  * and rounded when it was written — so the per-promotion amounts shown to the
  * customer are scaled onto it, and the rounding remainder lands on the last
  * line: the listed amounts always add up to the stored discount, to the cent.
+ * A line never takes more than the lines before it left, so none is negative.
  */
 final class DiscountProration
 {
@@ -64,7 +65,9 @@ final class DiscountProration
                 break;
             }
 
-            $amount = round($rawAmount * $factor, 2);
+            // Shares rounded up can add up to more than the target before the
+            // last line: each one is capped by what is left.
+            $amount = min(round($rawAmount * $factor, 2), round($target - $allocated, 2));
             $allocated = round($allocated + $amount, 2);
             $prorated[] = $amount;
         }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Core\Event\Image;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Thelia\Action\Image;
@@ -43,6 +44,19 @@ final class ImageEventOptionsHashTest extends TestCase
         );
     }
 
+    /**
+     * Each option keeps its own place in the hash: a width of 12 and a height of 3 must
+     * not read as a width of 1 and a height of 23.
+     */
+    #[Test]
+    public function twoSizesWhoseDigitsRunTogetherGetTwoHashes(): void
+    {
+        self::assertNotSame(
+            (new ImageEvent())->setWidth(12)->setHeight(3)->getOptionsHash(),
+            (new ImageEvent())->setWidth(1)->setHeight(23)->getOptionsHash(),
+        );
+    }
+
     #[Test]
     public function theBackgroundColorIsPartOfTheHash(): void
     {
@@ -59,6 +73,53 @@ final class ImageEventOptionsHashTest extends TestCase
             $this->resize(480, 360)->getOptionsHash(),
             $this->resize(480, 360)->getOptionsHash(),
         );
+    }
+
+    /**
+     * Each option alone must move the hash, otherwise two renditions that differ by that
+     * option alone would be written over one another in the image cache.
+     *
+     * @return \Generator<string, array{\Closure(ImageEvent): ImageEvent}>
+     */
+    public static function singleOptionChanges(): \Generator
+    {
+        yield 'the width' => [static fn (ImageEvent $event): ImageEvent => $event->setWidth(481)];
+        yield 'the height' => [static fn (ImageEvent $event): ImageEvent => $event->setHeight(361)];
+        yield 'the resize mode' => [static fn (ImageEvent $event): ImageEvent => $event->setResizeMode((string) Image::KEEP_IMAGE_RATIO)];
+        yield 'the background color' => [static fn (ImageEvent $event): ImageEvent => $event->setBackgroundColor('#000000')];
+        yield 'the effects' => [static fn (ImageEvent $event): ImageEvent => $event->setEffects(['gray_scale', 'mirror'])];
+        yield 'the rotation' => [static fn (ImageEvent $event): ImageEvent => $event->setRotation(180)];
+        yield 'the zoom' => [static fn (ImageEvent $event): ImageEvent => $event->setAllowZoom(false)];
+        yield 'the quality' => [static fn (ImageEvent $event): ImageEvent => $event->setQuality(90)];
+    }
+
+    /**
+     * @param \Closure(ImageEvent): ImageEvent $change
+     */
+    #[Test]
+    #[DataProvider('singleOptionChanges')]
+    public function changingOneOptionAloneChangesTheHash(\Closure $change): void
+    {
+        self::assertNotSame($this->fullyOptioned()->getOptionsHash(), $change($this->fullyOptioned())->getOptionsHash());
+    }
+
+    /**
+     * The hash names a file in the image cache: a new hash orphans every rendition already
+     * on disk, which is generated again on its next request. It only changes on purpose.
+     */
+    #[Test]
+    public function theHashOfAGivenSetOfOptionsStaysStable(): void
+    {
+        self::assertSame('00ab70b9199b13e87f8f3776328cd1f0', $this->fullyOptioned()->getOptionsHash());
+    }
+
+    private function fullyOptioned(): ImageEvent
+    {
+        return $this->resize(480, 360)
+            ->setBackgroundColor('#ffffff')
+            ->setEffects(['gray_scale', 'negative'])
+            ->setRotation(90)
+            ->setAllowZoom(true);
     }
 
     private function resize(int $width, int $height): ImageEvent

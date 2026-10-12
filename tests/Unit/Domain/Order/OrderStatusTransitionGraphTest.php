@@ -111,4 +111,32 @@ final class OrderStatusTransitionGraphTest extends TestCase
 
         self::assertNotContains(7, $graph->unreachableStatusIds([1, 2, 7]));
     }
+
+    public function testATargetDeclaredByTwoEquivalentStatusesIsListedOnce(): void
+    {
+        $graph = new OrderStatusTransitionGraph([2 => [3, 6], 7 => [3]], self::EQUIVALENTS);
+
+        self::assertSame([3, 6], $graph->targetsFrom(7));
+    }
+
+    public function testEveryStatusNoTransitionLeadsToIsReportedWhenNoStatusIsFree(): void
+    {
+        $graph = new OrderStatusTransitionGraph(
+            [1 => [2], 2 => [1], 3 => [1], 4 => [1]],
+            self::EQUIVALENTS,
+        );
+
+        self::assertSame([3, 4], $graph->unreachableStatusIds([1, 2, 3, 4]));
+    }
+
+    public function testAStatusMissingFromTheEquivalencesStandsForItself(): void
+    {
+        $graph = new OrderStatusTransitionGraph([10 => [11]], []);
+
+        self::assertFalse($graph->isFree(10));
+        self::assertTrue($graph->allows(10, 11));
+        self::assertFalse($graph->allows(10, 12));
+        self::assertSame([11], $graph->targetsFrom(10));
+        self::assertTrue($graph->isFree(11));
+    }
 }

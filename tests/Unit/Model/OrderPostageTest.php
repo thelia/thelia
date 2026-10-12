@@ -45,6 +45,33 @@ final class OrderPostageTest extends TestCase
         $this->assertSame(2.0, $postage->getAmountTax());
     }
 
+    /**
+     * 10.00 of postage at 20% VAT carries 1.6666... of tax: it is kept to the cent,
+     * rounded to the nearest, whether it comes through the constructor or the setter.
+     */
+    public function testTheTaxOfAPostageIsKeptToTheNearestCent(): void
+    {
+        $tax = 10.0 - 10.0 / 1.2;
+
+        $constructed = new OrderPostage(10.0, $tax);
+        $set = new OrderPostage(10.0);
+        $set->setAmountTax($tax);
+
+        $this->assertSame(1.67, $constructed->getAmountTax());
+        $this->assertSame(1.67, $set->getAmountTax());
+        $this->assertEqualsWithDelta(8.33, $set->getUntaxedAmount(), 0.001);
+    }
+
+    public function testATaxBelowHalfACentIsRoundedDown(): void
+    {
+        $constructed = new OrderPostage(5.0, 0.834);
+        $set = new OrderPostage(5.0);
+        $set->setAmountTax(0.834);
+
+        $this->assertSame(0.83, $constructed->getAmountTax());
+        $this->assertSame(0.83, $set->getAmountTax());
+    }
+
     public function testLoadFromPostageAcceptsAFloat(): void
     {
         $postage = OrderPostage::loadFromPostage(12.5);

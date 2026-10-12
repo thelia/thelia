@@ -64,6 +64,38 @@ final class DeliveryPickupLocationProviderTest extends TestCase
         self::assertSame('from the context', $event->getAddress());
     }
 
+    public function testTheRequestBeingHandledWinsOverTheMainOne(): void
+    {
+        $stack = new RequestStack();
+        $stack->push(new Request(['address' => 'from the main request', 'radius' => '900']));
+        $stack->push(new Request(['address' => 'from the sub-request', 'radius' => '300']));
+
+        $event = $this->provide($stack, []);
+
+        self::assertSame('from the sub-request', $event->getAddress());
+        self::assertSame(300, $event->getRadius());
+    }
+
+    public function testTheQueryStringWinsOverTheBodyOfTheRequest(): void
+    {
+        $stack = new RequestStack();
+        $stack->push(new Request(['address' => 'from the query string'], ['address' => 'from the body']));
+
+        $event = $this->provide($stack, []);
+
+        self::assertSame('from the query string', $event->getAddress());
+    }
+
+    public function testTheBodyIsReadWhenTheQueryStringHoldsNone(): void
+    {
+        $stack = new RequestStack();
+        $stack->push(new Request([], ['address' => 'from the body']));
+
+        $event = $this->provide($stack, []);
+
+        self::assertSame('from the body', $event->getAddress());
+    }
+
     /**
      * @param array<string, mixed> $context
      */

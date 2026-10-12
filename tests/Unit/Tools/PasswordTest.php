@@ -109,6 +109,11 @@ final class PasswordTest extends TestCase
         self::assertCount(10, array_unique($passwords));
     }
 
+    public function testGenerateHexaRandomIsEightCharactersLongByDefault(): void
+    {
+        self::assertSame(8, \strlen(Password::generateHexaRandom()));
+    }
+
     public function testGenerateHexaRandomOnlyContainsHexUpperAndDigits(): void
     {
         $hex = Password::generateHexaRandom(32);

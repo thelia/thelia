@@ -160,6 +160,61 @@ final class PriceSegmentBuilderTest extends TestCase
         self::assertEqualsWithDelta(81.0, $segments[0]->result->untaxedPrice, 0.000001);
     }
 
+    /**
+     * A rule opening in the middle of another one's window does not run before it
+     * opens: January gets the first rule alone, February both.
+     */
+    public function testARuleOpeningLaterDoesNotPriceThePeriodBeforeItOpens(): void
+    {
+        $segments = (new PriceSegmentBuilder())->build(
+            [
+                $this->effect(1, EffectType::Percentage, 10.0, '2027-01-01 00:00:00', '2027-03-01 00:00:00', priority: 10),
+                $this->effect(2, EffectType::Percentage, 20.0, '2027-02-01 00:00:00', '2027-03-01 00:00:00', priority: 20),
+            ],
+            100.0,
+            new FlatRateTaxCalculator(),
+        );
+
+        self::assertCount(2, $segments);
+        [$january, $february] = $segments;
+
+        self::assertSame('2027-01-01 00:00:00', $january->validFrom?->format('Y-m-d H:i:s'));
+        self::assertSame('2027-02-01 00:00:00', $january->validUntil?->format('Y-m-d H:i:s'));
+        self::assertSame([1], $january->result->appliedRuleIds);
+        self::assertEqualsWithDelta(90.0, $january->result->untaxedPrice, 0.000001);
+
+        self::assertSame('2027-02-01 00:00:00', $february->validFrom?->format('Y-m-d H:i:s'));
+        self::assertSame('2027-03-01 00:00:00', $february->validUntil?->format('Y-m-d H:i:s'));
+        self::assertSame([1, 2], $february->result->appliedRuleIds);
+        // 120 TTC, 10% then 20% -> 86.4 TTC -> 72 HT
+        self::assertEqualsWithDelta(72.0, $february->result->untaxedPrice, 0.000001);
+    }
+
+    public function testRulesHandedLatestFirstStillGivePeriodsInChronologicalOrder(): void
+    {
+        $segments = (new PriceSegmentBuilder())->build(
+            [
+                $this->effect(1, EffectType::Percentage, 10.0, '2027-03-01 00:00:00', '2027-04-01 00:00:00'),
+                $this->effect(2, EffectType::Percentage, 20.0, '2027-01-01 00:00:00', '2027-02-01 00:00:00'),
+            ],
+            100.0,
+            new FlatRateTaxCalculator(),
+        );
+
+        self::assertCount(2, $segments);
+        [$january, $march] = $segments;
+
+        self::assertSame('2027-01-01 00:00:00', $january->validFrom?->format('Y-m-d H:i:s'));
+        self::assertSame('2027-02-01 00:00:00', $january->validUntil?->format('Y-m-d H:i:s'));
+        self::assertSame(2, $january->result->ruleId);
+        self::assertEqualsWithDelta(80.0, $january->result->untaxedPrice, 0.000001);
+
+        self::assertSame('2027-03-01 00:00:00', $march->validFrom?->format('Y-m-d H:i:s'));
+        self::assertSame('2027-04-01 00:00:00', $march->validUntil?->format('Y-m-d H:i:s'));
+        self::assertSame(1, $march->result->ruleId);
+        self::assertEqualsWithDelta(90.0, $march->result->untaxedPrice, 0.000001);
+    }
+
     private function effect(
         int $id,
         EffectType $type,

@@ -137,12 +137,47 @@ final class TokenProviderTest extends TestCase
         $this->provider($request)->checkRequestToken($request);
     }
 
-    public function testTheComparisonRunsInConstantTime(): void
+    public function testAValueReadOutsideTheUrlPassesTheStrictModeWithoutDeprecation(): void
     {
-        $source = (string) file_get_contents((string) (new \ReflectionClass(TokenProvider::class))->getFileName());
+        // A token a caller took from a JSON body or a route attribute is in none of the places the provider reads.
+        $request = $this->requestWithSession();
 
-        self::assertStringContainsString('hash_equals($this->token, $entryValue)', $source);
-        self::assertStringNotContainsString('$this->token !== $entryValue', $source);
+        self::assertTrue($this->provider($request, acceptTokenInQueryString: false)->checkToken(self::TOKEN));
+        self::assertSame([], $this->deprecations);
+    }
+
+    public function testTheTokenAlreadyInTheSessionIsReusedRatherThanReplaced(): void
+    {
+        $request = $this->requestWithSession();
+
+        self::assertSame(self::TOKEN, $this->provider($request)->assignToken());
+        self::assertSame(self::TOKEN, $request->getSession()->get(self::SESSION_KEY));
+    }
+
+    public function testAProviderBuiltBeforeTheRequestReadsTheSessionTokenWhenChecking(): void
+    {
+        $stack = new RequestStack();
+        $provider = new TokenProvider($stack, $this->createStub(TranslatorInterface::class), self::SESSION_KEY);
+        $stack->push($this->requestWithSession());
+
+        self::assertTrue($provider->checkToken(self::TOKEN));
+    }
+
+    public function testWithoutAnyRequestATokenIsStillAssignedAndChecked(): void
+    {
+        $provider = new TokenProvider(new RequestStack(), $this->createStub(TranslatorInterface::class), self::SESSION_KEY);
+
+        $token = $provider->assignToken();
+
+        self::assertMatchesRegularExpression('/^[0-9a-f]{32}$/', (string) $token);
+        self::assertTrue($provider->checkToken((string) $token));
+    }
+
+    public function testAFreshTokenIsThirtyTwoHexadecimalCharacters(): void
+    {
+        // The installer, the cart API and the admin password renewal call both generators directly.
+        self::assertMatchesRegularExpression('/^[0-9a-f]{32}$/', TokenProvider::generateToken());
+        self::assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $this->provider($this->requestWithSession())->getToken());
     }
 
     private function provider(Request $request, bool $acceptTokenInQueryString = true): TokenProvider

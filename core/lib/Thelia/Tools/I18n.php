@@ -38,13 +38,13 @@ class I18n
      * @param Lang   $lang Object containing date format
      * @param string $date String to convert
      *
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getDateTimeFromForm(Lang $lang, string $date): DateTime|false
+    public function getDateTimeFromForm(Lang $lang, string $date): \DateTime|false
     {
         $currentDateFormat = $lang->getDateFormat();
 
-        return DateTime::createFromFormat($currentDateFormat, $date);
+        return \DateTime::createFromFormat($currentDateFormat, $date);
     }
 
     public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
@@ -125,6 +125,10 @@ class I18n
     {
         $str = trim((string) $str, "\"'");
 
+        if ('' === $str) {
+            return '""';
+        }
+
         $return = 'CONCAT(';
         $len = \strlen($str);
 
@@ -132,8 +136,6 @@ class I18n
             $return .= 'CHAR('.\ord($str[$i]).'),';
         }
 
-        $return = $i > 0 ? substr($return, 0, -1) : '""';
-
-        return $return.')';
+        return substr($return, 0, -1).')';
     }
 }

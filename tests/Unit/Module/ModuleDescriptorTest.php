@@ -53,6 +53,14 @@ final class ModuleDescriptorTest extends TestCase
         ModuleDescriptor::enabledByDefault($this->descriptor('<enabled-by-default>maybe</enabled-by-default>'), 'vendor/acme/modules/Acme/Config/module.xml');
     }
 
+    public function testTheQuotedValueIsShownWithoutTheWhitespaceAroundIt(): void
+    {
+        $this->expectException(InvalidModuleDescriptorException::class);
+        $this->expectExceptionMessage('must be 0 or 1, "maybe" given.');
+
+        ModuleDescriptor::enabledByDefault($this->descriptor("<enabled-by-default>\n    maybe\n</enabled-by-default>"), 'module.xml');
+    }
+
     public function testTheQuotedValueStaysOnTheLineOfTheError(): void
     {
         $this->expectException(InvalidModuleDescriptorException::class);

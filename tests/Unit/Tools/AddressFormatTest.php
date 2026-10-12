@@ -86,4 +86,37 @@ final class AddressFormatTest extends TestCase
         self::assertStringStartsWith('<address', $formatted);
         self::assertStringContainsString('Mountain View', $formatted);
     }
+
+    public function testFormatNamesTheCountryInTheLanguageOfTheLocale(): void
+    {
+        $address = (new Address())
+            ->withCountryCode('DE')
+            ->withAddressLine1('Unter den Linden 1')
+            ->withPostalCode('10117')
+            ->withLocality('Berlin')
+            ->withGivenName('Anna')
+            ->withFamilyName('Schmidt');
+
+        $french = AddressFormat::getInstance()->format($address, 'fr_FR', html: false);
+        $english = AddressFormat::getInstance()->format($address, 'en', html: false);
+
+        self::assertSame("Anna Schmidt\nUnter den Linden 1\n10117 Berlin\nAllemagne", $french);
+        self::assertSame("Anna Schmidt\nUnter den Linden 1\n10117 Berlin\nGermany", $english);
+    }
+
+    public function testFormatWithoutALocaleNamesTheCountryInEnglish(): void
+    {
+        $address = (new Address())
+            ->withCountryCode('DE')
+            ->withAddressLine1('Unter den Linden 1')
+            ->withPostalCode('10117')
+            ->withLocality('Berlin')
+            ->withGivenName('Anna')
+            ->withFamilyName('Schmidt');
+
+        self::assertSame(
+            "Anna Schmidt\nUnter den Linden 1\n10117 Berlin\nGermany",
+            AddressFormat::getInstance()->format($address, html: false),
+        );
+    }
 }

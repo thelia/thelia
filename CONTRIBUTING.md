@@ -41,6 +41,20 @@ ddev exec composer test       # PHPUnit suites: unit, integration, api, http-fle
 
 Write commit messages in English, in the imperative, with a type prefix, for example `fix: prevent double tax on free shipping`. Keep one concern per commit.
 
+## Mutation testing
+
+Mutation testing checks that the unit tests would notice a bug. [Infection](https://infection.github.io) makes small changes to the core code, for example negating a condition or moving a boundary, and runs the unit tests again. When no test fails, the change is an escaped mutant: a test is missing, or it does not check the result closely enough.
+
+```bash
+ddev exec composer test:mutation   # the core lines your branch changes since origin/main
+```
+
+If your clone names the main repository differently, pass its branch: `ddev exec composer test:mutation -- --git-diff-base=upstream/main`. The report counts separately the changed lines that no unit test executes, because mutation testing cannot check them. `ddev exec php vendor/bin/infection` checks every core line the unit tests execute and takes a few minutes.
+
+Infection reads the code coverage through PCOV. The DDEV configuration installs it and keeps it off for everything else; run `ddev restart` after pulling a change to `.ddev/`.
+
+Pull requests that change `core/lib/Thelia` get the same check from the `mutation` workflow. It annotates the changed lines on the pull request and does not block the merge.
+
 ## Database and schema changes
 
 The SQL files in `setup/` are generated, not edited by hand. If you change reference or demo data, edit `setup/insert.sql.tpl` and regenerate the SQL:

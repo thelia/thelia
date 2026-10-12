@@ -30,6 +30,19 @@ final class FragmentTest extends TestCase
         $this->assertFalse(isset($fragment->missing));
     }
 
+    public function testATemplateCanAskForAKeyByName(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            'menu' => '{{ fragment.get("url") }}|{{ fragment.get("missing") is null ? "none" : "set" }}',
+        ]));
+
+        $html = $twig->render('menu', [
+            'fragment' => new Fragment(['url' => 'https://example.com']),
+        ]);
+
+        $this->assertSame('https://example.com|none', $html);
+    }
+
     public function testTwigCanReadFragmentAttributes(): void
     {
         $twig = new Environment(new ArrayLoader([

@@ -27,6 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Thelia\Core\Security\EventListener\AuthenticationFailureLogListener;
 
 /**
@@ -92,6 +93,39 @@ final class AuthenticationFailureLogListenerTest extends TestCase
         self::assertSame(LogLevel::WARNING, $logger->records[0]['level']);
         self::assertStringContainsString(self::CALLER, $logger->records[0]['line']);
         self::assertStringContainsString('/api/admin/token/refresh', $logger->records[0]['line']);
+    }
+
+    public function testARefusedTokenRefreshOnThePathWithATrailingSlashIsRecordedToo(): void
+    {
+        $logger = new RecordingLogger();
+        $listener = new AuthenticationFailureLogListener($logger);
+
+        $listener->onTokenRefreshResponse(
+            $this->response('/api/front/token/refresh/', Response::HTTP_UNAUTHORIZED),
+        );
+
+        self::assertCount(1, $logger->records);
+        self::assertStringContainsString('/api/front/token/refresh/', $logger->records[0]['line']);
+    }
+
+    public function testALoginRefusedBeforeAnyPassportNamesTheLastIdentifierTyped(): void
+    {
+        $logger = new RecordingLogger();
+        $listener = new AuthenticationFailureLogListener($logger);
+        $request = Request::create('/api/admin/login', 'POST', server: ['REMOTE_ADDR' => self::CALLER]);
+        $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, 'thelia');
+
+        $listener->onLoginFailure(new LoginFailureEvent(
+            new BadCredentialsException(),
+            $this->createMock(AuthenticatorInterface::class),
+            $request,
+            null,
+            'adminLogin',
+            null,
+        ));
+
+        self::assertCount(1, $logger->records);
+        self::assertStringContainsString('"identifier":"thelia"', $logger->records[0]['line']);
     }
 
     public function testAnAcceptedTokenRefreshLeavesNoTrace(): void

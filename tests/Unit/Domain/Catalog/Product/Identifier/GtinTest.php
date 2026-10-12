@@ -112,4 +112,54 @@ final class GtinTest extends TestCase
         self::assertStringContainsString('8, 12, 13 or 14', $lengthRefusal);
         self::assertStringContainsString('11', $lengthRefusal);
     }
+
+    public function testTheRefusalOfACodeWithLettersNamesTheCodeAndTheReason(): void
+    {
+        self::assertSame(
+            'The GTIN "40063813339A1" is refused: a GTIN is made of digits only.',
+            InvalidGtinException::describe('40063813339A1', GtinViolation::NotDigits),
+        );
+    }
+
+    public function testTheRefusalOfAWrongLengthCountsTheDigitsOnceTheSeparatorsAreDropped(): void
+    {
+        self::assertSame(
+            'The GTIN "0360 0029-145" is refused: a GTIN has 8, 12, 13 or 14 digits, this one has 11.',
+            InvalidGtinException::describe('0360 0029-145', GtinViolation::Length),
+        );
+    }
+
+    public function testTheRefusalOfAWrongCheckDigitNamesTheCodeAndTheReason(): void
+    {
+        self::assertSame(
+            'The GTIN "4006381333932" is refused: its check digit is wrong, the code was probably mistyped.',
+            InvalidGtinException::describe('4006381333932', GtinViolation::CheckDigit),
+        );
+    }
+
+    public function testTheRefusalNamesTheCombinationWhenItHasAReference(): void
+    {
+        self::assertSame(
+            'The GTIN "4006381333932" of the combination PSE-1 is refused: its check digit is wrong, the code was probably mistyped.',
+            InvalidGtinException::describe('4006381333932', GtinViolation::CheckDigit, 'PSE-1'),
+        );
+    }
+
+    public function testACombinationWithoutAUsableReferenceIsNotNamedInTheRefusal(): void
+    {
+        $expected = 'The GTIN "4006381333932" is refused: its check digit is wrong, the code was probably mistyped.';
+
+        self::assertSame($expected, InvalidGtinException::describe('4006381333932', GtinViolation::CheckDigit, null));
+        self::assertSame($expected, InvalidGtinException::describe('4006381333932', GtinViolation::CheckDigit, ''));
+    }
+
+    public function testTheExceptionCarriesTheMessageOfItsRefusal(): void
+    {
+        $exception = new InvalidGtinException('03600029145', GtinViolation::Length, 'PSE-2');
+
+        self::assertSame(
+            'The GTIN "03600029145" of the combination PSE-2 is refused: a GTIN has 8, 12, 13 or 14 digits, this one has 11.',
+            $exception->getMessage(),
+        );
+    }
 }

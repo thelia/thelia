@@ -21,6 +21,26 @@ use Thelia\Condition\SerializableCondition;
 
 final class ConditionCollectionTest extends TestCase
 {
+    public function testNextMovesOnToTheFollowingCondition(): void
+    {
+        $a = $this->makeCondition();
+        $b = $this->makeCondition();
+
+        $collection = new ConditionCollection();
+        $collection[] = $a;
+        $collection[] = $b;
+
+        $collection->rewind();
+        $collection->next();
+
+        self::assertSame(1, $collection->key());
+        self::assertSame($b, $collection->current());
+
+        $collection->next();
+
+        self::assertFalse($collection->valid());
+    }
+
     public function testAnEmptyCollectionHasCountZero(): void
     {
         self::assertCount(0, new ConditionCollection());
@@ -72,6 +92,23 @@ final class ConditionCollectionTest extends TestCase
         $collection[] = $c;
 
         self::assertSame([$a, $b, $c], iterator_to_array($collection, false));
+    }
+
+    /**
+     * A coupon's conditions are checked more than once in a request (cart, then
+     * checkout): every walk through the collection starts over from the first one.
+     */
+    public function testEveryIterationStartsFromTheFirstCondition(): void
+    {
+        $a = $this->makeCondition();
+        $b = $this->makeCondition();
+
+        $collection = new ConditionCollection();
+        $collection[] = $a;
+        $collection[] = $b;
+
+        self::assertSame([$a, $b], iterator_to_array($collection, false));
+        self::assertSame([$a, $b], iterator_to_array($collection, false));
     }
 
     public function testToStringReturnsJsonOfSerializableConditions(): void

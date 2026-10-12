@@ -124,6 +124,70 @@ final class ReferenceQuantityLinesTest extends TestCase
         $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('A', 1)]));
     }
 
+    public function testTheQuantitiesOfOneReferenceCannotAddUpPastTheMaximum(): void
+    {
+        $this->expectException(InvalidReferenceQuantityException::class);
+        $this->expectExceptionMessage('The quantity of reference "A" is at most 999999.');
+
+        new ReferenceQuantityLines([new ReferenceQuantity('A', 600_000), new ReferenceQuantity('A', 600_000)]);
+    }
+
+    public function testAReferenceOfTheMaximumLengthIsKeptWhateverItsCharacters(): void
+    {
+        $accented = str_repeat('é', ReferenceQuantityLines::MAX_REFERENCE_LENGTH);
+        $plain = str_repeat('a', ReferenceQuantityLines::MAX_REFERENCE_LENGTH);
+
+        $lines = new ReferenceQuantityLines([new ReferenceQuantity($accented, 1), new ReferenceQuantity($plain, 1)]);
+
+        self::assertSame([$accented, $plain], array_map(static fn (ReferenceQuantity $line): string => $line->reference, $lines->all()));
+    }
+
+    public function testASaleElementIdIsNotReadAsTheEndOfTheReference(): void
+    {
+        $lines = new ReferenceQuantityLines([
+            new ReferenceQuantity('A1', 2, 1),
+            new ReferenceQuantity('A', 3, 11),
+        ]);
+
+        self::assertSame([['A1', 2, 1], ['A', 3, 11]], array_map(
+            static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity, $line->productSaleElementsId],
+            $lines->all(),
+        ));
+    }
+
+    public function testMergingMatchesReferencesCaseInsensitivelyBeyondAscii(): void
+    {
+        $lowerCaseCurrent = (new ReferenceQuantityLines([new ReferenceQuantity('éclair', 1)]))
+            ->merge(new ReferenceQuantityLines([new ReferenceQuantity('ÉCLAIR', 2)]));
+        $upperCaseCurrent = (new ReferenceQuantityLines([new ReferenceQuantity('ÉCLAIR', 1)]))
+            ->merge(new ReferenceQuantityLines([new ReferenceQuantity('éclair', 2)]));
+
+        self::assertSame([['éclair', 3]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $lowerCaseCurrent->all()));
+        self::assertSame([['ÉCLAIR', 3]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $upperCaseCurrent->all()));
+    }
+
+    public function testAGivenSaleElementJoinsTheLineHoldingTheSameOneAmongSeveral(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11), new ReferenceQuantity('TSHIRT', 1, 12)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('tshirt', 2, 12)]));
+
+        self::assertSame([[11, 1], [12, 3]], array_map(
+            static fn (ReferenceQuantity $line): array => [$line->productSaleElementsId, $line->quantity],
+            $merged->all(),
+        ));
+    }
+
+    public function testAGivenSaleElementOfTheOnlyLineOfAReferenceJoinsItWhenItIsTheSame(): void
+    {
+        $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11)]);
+        $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('tshirt', 2, 11)]));
+
+        self::assertSame([[11, 3]], array_map(
+            static fn (ReferenceQuantity $line): array => [$line->productSaleElementsId, $line->quantity],
+            $merged->all(),
+        ));
+    }
+
     public function testFiveHundredLinesFit(): void
     {
         self::assertCount(ReferenceQuantityLines::MAX_LINES, new ReferenceQuantityLines(self::distinctLines(ReferenceQuantityLines::MAX_LINES)));

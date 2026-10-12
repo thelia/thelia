@@ -61,6 +61,32 @@ final class VersionTest extends TestCase
         yield 'tilde major mismatch' => ['3.0.0', '~2.4'];
     }
 
+    public function testABareVersionUsesTheDefaultComparisonGiven(): void
+    {
+        // Module and template validators read a bare "thelia" version as a minimum.
+        self::assertTrue(Version::test('3.2.1', '3.1', false, '>='));
+        self::assertFalse(Version::test('3.0.4', '3.1', false, '>='));
+    }
+
+    public function testAShortConstraintIsCompletedWithZerosUnlessStrict(): void
+    {
+        self::assertTrue(Version::test('2.1.0', '2.1'));
+        self::assertFalse(Version::test('2.1.0', '2.1', true));
+    }
+
+    public function testAShortEqualityConstraintDoesNotMatchALaterRelease(): void
+    {
+        self::assertFalse(Version::test('2.1.5', '2.1'));
+    }
+
+    public function testParseRejectionNamesTheInvalidVersion(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('not-a-version');
+
+        Version::parse('not-a-version');
+    }
+
     public function testParseBreaksDownASemanticVersion(): void
     {
         $parsed = Version::parse('2.4.3');

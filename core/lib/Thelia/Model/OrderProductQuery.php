@@ -28,8 +28,8 @@ class OrderProductQuery extends BaseOrderProductQuery
 {
     public static function getSaleStats(
         $productRef,
-        ?DateTime $startDate = null,
-        ?DateTime $endDate = null,
+        ?\DateTime $startDate = null,
+        ?\DateTime $endDate = null,
         $orderStatusIdList = null,
         $customerId = null,
     ) {
@@ -39,21 +39,21 @@ class OrderProductQuery extends BaseOrderProductQuery
             $orderStatusIdList = OrderStatusQuery::getPaidStatusIdList();
         }
 
-        if (null !== $customerId || $startDate instanceof DateTime || $endDate instanceof DateTime || \count($orderStatusIdList) > 0) {
+        if (null !== $customerId || $startDate instanceof \DateTime || $endDate instanceof \DateTime || \count($orderStatusIdList) > 0) {
             $subQuery = $query->useOrderQuery();
 
             if (null !== $customerId) {
                 $subQuery->filterByCustomerId($customerId);
             }
 
-            if ($startDate instanceof DateTime) {
+            if ($startDate instanceof \DateTime) {
                 $subQuery->filterByCreatedAt(
                     \sprintf('%s 00:00:00', $startDate->format('Y-m-d')),
                     Criteria::GREATER_EQUAL,
                 );
             }
 
-            if ($startDate instanceof DateTime) {
+            if ($endDate instanceof \DateTime) {
                 $subQuery->filterByCreatedAt(
                     \sprintf('%s 23:59:59', $endDate->format('Y-m-d')),
                     Criteria::LESS_EQUAL,

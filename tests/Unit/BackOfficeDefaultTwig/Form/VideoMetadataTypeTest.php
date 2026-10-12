@@ -31,6 +31,20 @@ use Symfony\Component\Validator\Validation;
  */
 final class VideoMetadataTypeTest extends TestCase
 {
+    /** @var list<string> the files the uploads were written to, deleted after each test */
+    private array $temporaryFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->temporaryFiles as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+
+        $this->temporaryFiles = [];
+    }
+
     protected function setUp(): void
     {
         // The core is tested against the tip of the theme, which may predate the
@@ -106,8 +120,10 @@ final class VideoMetadataTypeTest extends TestCase
 
     private function uploadedFile(): UploadedFile
     {
-        $path = tempnam(sys_get_temp_dir(), 'video').'.mp4';
+        $placeholder = tempnam(sys_get_temp_dir(), 'video');
+        $path = $placeholder.'.mp4';
         file_put_contents($path, 'not a real video');
+        array_push($this->temporaryFiles, $placeholder, $path);
 
         return new UploadedFile($path, 'demo.mp4', 'video/mp4', null, true);
     }

@@ -308,4 +308,50 @@ class AddressFacadeTest extends TestCase
 
         return $address;
     }
+
+    public function testAnAddressDTOHandsEveryFieldOverUnderTheNameTheFormsUse(): void
+    {
+        $dto = new AddressDTO(
+            label: 'Office',
+            firstname: 'Jane',
+            lastname: 'Smith',
+            address1: '456 Main Street',
+            zipcode: '69001',
+            city: 'Lyon',
+            countryId: 64,
+            titleId: 2,
+            address2: 'Building B',
+            address3: 'Floor 3',
+            phone: '0123456789',
+            cellphone: '0612345678',
+            company: 'ACME Corp',
+            stateId: 10,
+            isDefault: true,
+            siret: '12345678901234',
+            vatNumber: 'FR12345678901',
+        );
+
+        $this->assertSame(
+            [
+                'label' => 'Office',
+                'title' => 2,
+                'firstname' => 'Jane',
+                'lastname' => 'Smith',
+                'address1' => '456 Main Street',
+                'address2' => 'Building B',
+                'address3' => 'Floor 3',
+                'zipcode' => '69001',
+                'city' => 'Lyon',
+                'country' => 64,
+                'state' => 10,
+                'phone' => '0123456789',
+                'cellphone' => '0612345678',
+                'company' => 'ACME Corp',
+                'siret' => '12345678901234',
+                'vat_number' => 'FR12345678901',
+                'is_default' => true,
+            ],
+            $dto->toArray(),
+        );
+    }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Install\I18n;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Install\I18n\SeedTranslationCatalog;
@@ -107,6 +108,48 @@ final class SeedTranslationCatalogTest extends TestCase
                 'fr_FR',
             ),
         );
+    }
+
+    public function testTheShippedCatalogsAreUsedWhenNoDirectoryIsGiven(): void
+    {
+        $catalog = new SeedTranslationCatalog();
+
+        self::assertTrue($catalog->hasLocale('fr_FR'));
+        self::assertSame('Pologne', $catalog->translate('Poland', 'fr_FR'));
+    }
+
+    public function testACatalogIsReadOnceThenKeptForTheNextLookups(): void
+    {
+        $catalog = new SeedTranslationCatalog($this->directory);
+
+        self::assertSame('Polska', $catalog->translate('Poland', 'pl_PL'));
+
+        $this->filesystem->remove($this->directory.'/pl_PL.php');
+
+        self::assertSame('Polska', $catalog->translate('Poland', 'pl_PL'));
+        self::assertTrue($catalog->hasLocale('pl_PL'));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function localesThatAreNotCatalogNames(): iterable
+    {
+        yield 'a path to a file outside the directory' => ['../secret'];
+        yield 'a path that comes back to a shipped catalog' => ['nested/../pl_PL'];
+    }
+
+    #[DataProvider('localesThatAreNotCatalogNames')]
+    public function testOnlyAPlainLocaleCodeNamesACatalog(string $locale): void
+    {
+        $this->filesystem->mkdir($this->directory.'/catalogs/nested');
+        $this->filesystem->copy($this->directory.'/pl_PL.php', $this->directory.'/catalogs/pl_PL.php');
+        $this->filesystem->dumpFile($this->directory.'/secret.php', '<?php return ["Poland" => "Leaked"];');
+
+        $catalog = new SeedTranslationCatalog($this->directory.'/catalogs');
+
+        self::assertFalse($catalog->hasLocale($locale));
+        self::assertNull($catalog->translate('Poland', $locale));
     }
 
     /**

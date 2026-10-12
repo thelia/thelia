@@ -106,6 +106,46 @@ final class LoggingDefaultsTest extends TestCase
         self::assertSame('rotating_file', $handlers['deprecations_rotating']['type']);
     }
 
+    #[Test]
+    public function theChannelsTheDefaultHandlersRouteOnAreDeclared(): void
+    {
+        $container = $this->container();
+        LoggingDefaults::prependTo($container);
+
+        $configuration = (new Processor())->processConfiguration(
+            new Configuration(),
+            $container->getExtensionConfig('monolog'),
+        );
+
+        self::assertSame(['deprecation', 'security'], $configuration['channels']);
+    }
+
+    #[Test]
+    public function everyHandlerTheShopNamesReplacesItsDefault(): void
+    {
+        $container = $this->container([
+            'handlers' => [
+                'audit' => [
+                    'type' => 'stream',
+                    'path' => '%kernel.logs_dir%/audit.log',
+                ],
+                'console' => [
+                    'type' => 'stream',
+                    'path' => 'php://stdout',
+                ],
+            ],
+        ]);
+
+        $handlers = $this->handlersOf($container);
+
+        self::assertSame('stream', $handlers['console']['type']);
+        self::assertArrayNotHasKey(
+            'channels',
+            $handlers['console'],
+            'The console handler the shop wrote must not inherit the channels of the default one.',
+        );
+    }
+
     /**
      * @return array<string, array<string, mixed>>
      */
