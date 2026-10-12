@@ -198,7 +198,7 @@ class BaseFacade implements FacadeInterface
         return $count;
     }
 
-    public function getNbArticlesInCartIncludeQuantity(): int
+    public function getNbArticlesInCartIncludeQuantity(): int|float
     {
         $cartItems = $this->getCart()?->getCartItems() ?? [];
         $quantity = 0;
