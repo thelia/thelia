@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Tools;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Model\Lang;
 use Thelia\Tools\I18n;
 
 final class I18nTest extends TestCase
@@ -30,6 +31,16 @@ final class I18nTest extends TestCase
     {
         self::assertSame(I18n::realEscape('ab'), I18n::realEscape('"ab"'));
         self::assertSame(I18n::realEscape('ab'), I18n::realEscape("'ab'"));
+    }
+
+    public function testADatePickedInTheFormatOfTheLanguageBecomesADate(): void
+    {
+        $lang = (new Lang())->setDateFormat('d/m/Y');
+
+        $date = (new I18n())->getDateTimeFromForm($lang, '25/12/2026');
+
+        self::assertInstanceOf(\DateTime::class, $date);
+        self::assertSame('2026-12-25', $date->format('Y-m-d'));
     }
 
     /**

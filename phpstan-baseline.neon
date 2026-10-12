@@ -269,15 +269,3 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Call to static method createFromFormat\(\) on an unknown class Thelia\\Tools\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Tools/I18n.php
-
-		-
-			message: '#^Method Thelia\\Tools\\I18n\:\:getDateTimeFromForm\(\) has invalid return type Thelia\\Tools\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Tools/I18n.php

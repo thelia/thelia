@@ -38,13 +38,13 @@ class I18n
      * @param Lang   $lang Object containing date format
      * @param string $date String to convert
      *
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getDateTimeFromForm(Lang $lang, string $date): DateTime|false
+    public function getDateTimeFromForm(Lang $lang, string $date): \DateTime|false
     {
         $currentDateFormat = $lang->getDateFormat();
 
-        return DateTime::createFromFormat($currentDateFormat, $date);
+        return \DateTime::createFromFormat($currentDateFormat, $date);
     }
 
     public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
