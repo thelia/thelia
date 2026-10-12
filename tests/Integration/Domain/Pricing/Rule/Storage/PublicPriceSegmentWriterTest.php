@@ -14,15 +14,31 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing\Rule\Storage;
 
+use Monolog\Handler\TestHandler;
+use Monolog\Level;
+use Monolog\Logger;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Propel;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Pricing\Rule\Engine\PriceSegmentBuilder;
 use Thelia\Domain\Pricing\Rule\Scope\ScopeMaterializer;
+use Thelia\Domain\Pricing\Rule\Storage\BasePriceLoader;
 use Thelia\Domain\Pricing\Rule\Storage\PublicPriceReader;
 use Thelia\Domain\Pricing\Rule\Storage\PublicPriceSegmentWriter;
+use Thelia\Domain\Pricing\Rule\Storage\RuleEffectFactory;
+use Thelia\Domain\Pricing\Rule\Storage\ScopeReader;
+use Thelia\Domain\Pricing\Rule\Storage\TaxCalculatorLoader;
 use Thelia\Model\CatalogPriceRule;
+use Thelia\Model\CatalogPriceRuleCriterionQuery;
 use Thelia\Model\CatalogPriceRulePriceQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\CatalogPriceRuleTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
@@ -162,19 +178,6 @@ final class PublicPriceSegmentWriterTest extends ActionIntegrationTestCase
         self::assertSame([], $this->reader->currentPrices([$pse->getId()], $secondary));
     }
 
-    public function testASaleElementWithoutAnyPriceRowStopsNothing(): void
-    {
-        $product = $this->catalogProduct();
-        $priced = $this->defaultPseFor($product);
-        $unpriced = $this->factory->productSaleElement($product);
-        $this->runningRuleOn($product, ['percentageValue' => 20.0]);
-
-        $written = $this->writer->recomputeForProductSaleElements([$priced->getId(), $unpriced->getId()]);
-
-        self::assertSame($this->visibleCurrencies(), $written);
-        self::assertArrayNotHasKey($unpriced->getId(), $this->reader->currentPrices([$unpriced->getId()], $this->currency));
-    }
-
     public function testAReservedRuleAndATurnedOffRuleStoreNothing(): void
     {
         $product = $this->catalogProduct();
@@ -231,6 +234,229 @@ final class PublicPriceSegmentWriterTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta($this->untaxed($product, 60.0), $price->untaxedPrice, 0.000001);
     }
 
+    public function testRecomputingNoSaleElementWritesNothing(): void
+    {
+        self::assertSame(0, $this->writer->recomputeForProductSaleElements([]));
+    }
+
+    public function testTheWriterClosesTheTransactionItOpens(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $this->runningRuleOn($product, ['percentageValue' => 20.0]);
+        $connection = Propel::getWriteConnection(CatalogPriceRuleTableMap::DATABASE_NAME);
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        $levels = $connection->getNestedTransactionCount();
+
+        $this->writer->recomputeForProductSaleElements([$pse->getId()]);
+
+        self::assertSame($levels, $connection->getNestedTransactionCount());
+    }
+
+    public function testAnIdThatIsNotAnIntegerNeverWidensTheDelete(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $this->runningRuleOn($product, ['percentageValue' => 20.0]);
+        $this->writer->recomputeForProductSaleElements([$pse->getId()]);
+
+        self::assertSame(0, $this->writer->recomputeForProductSaleElements(['0) OR (1 = 1']));
+
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($pse));
+    }
+
+    public function testACurrencyWhereNoRuleHasAValueDoesNotStopTheCurrenciesAfterIt(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $lastCurrency = $this->factory->currency(['code' => 'XTS', 'symbol' => 'X', 'rate' => 1.0, 'visible' => 1]);
+        $rule = $this->runningRuleOn($product, ['effectType' => CatalogPriceRule::EFFECT_TYPE_AMOUNT]);
+        $this->factory->catalogPriceRuleEffectCurrency($rule, $lastCurrency, 10.0);
+        // The writer walks the visible currencies in the order the database answers
+        // them, with no ORDER BY: the currencies without a value only come before
+        // the one with a value if that order is the order of creation. Checked
+        // here, so the test says so the day it stops holding.
+        $visibleIds = CurrencyQuery::create()->filterByVisible(1)->find()->getColumnValues('Id');
+        self::assertGreaterThan(1, \count($visibleIds));
+        self::assertSame($lastCurrency->getId(), end($visibleIds), 'the currency with a value is walked last');
+
+        self::assertSame(1, $this->writer->recomputeForProductSaleElements([$pse->getId()]));
+
+        self::assertArrayHasKey($pse->getId(), $this->reader->currentPrices([$pse->getId()], $lastCurrency));
+    }
+
+    /**
+     * The writer walks the sale elements in the order the database answers them,
+     * with no ORDER BY: the unpriced one is created between two priced ones, so it
+     * sits in the middle whether that order is ascending or descending.
+     */
+    public function testASaleElementWithoutABasePriceDoesNotStopTheOtherSaleElements(): void
+    {
+        $first = $this->catalogProduct();
+        $unpriced = $this->factory->productSaleElement($first);
+        $second = $this->catalogProduct();
+        $rule = $this->factory->catalogPriceRule(['percentageValue' => 20.0, 'active' => true]);
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $first->getId());
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $second->getId());
+        $this->materializer->materializeRule($rule);
+        $firstPse = $this->defaultPseFor($first);
+        $secondPse = $this->defaultPseFor($second);
+
+        $written = $this->writer->recomputeForProductSaleElements([$firstPse->getId(), $unpriced->getId(), $secondPse->getId()]);
+
+        self::assertSame(2 * $this->visibleCurrencies(), $written);
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($firstPse));
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($secondPse));
+        self::assertSame(0, $this->storedPricesOf($unpriced));
+    }
+
+    public function testAPriceTakenBelowZeroIsFlooredAtZeroAndReported(): void
+    {
+        $log = new TestHandler();
+        $writer = $this->writerLoggingTo(new Logger('test', [$log]));
+        $flooredProduct = $this->catalogProduct();
+        $floored = $this->defaultPseFor($flooredProduct);
+        $amountRule = $this->runningRuleOn($flooredProduct, ['effectType' => CatalogPriceRule::EFFECT_TYPE_AMOUNT]);
+        $this->factory->catalogPriceRuleEffectCurrency($amountRule, $this->currency, 1000.0);
+        $keptProduct = $this->catalogProduct();
+        $kept = $this->defaultPseFor($keptProduct);
+        $this->runningRuleOn($keptProduct, ['percentageValue' => 20.0]);
+
+        $writer->recomputeForProductSaleElements([$floored->getId(), $kept->getId()]);
+
+        self::assertEqualsWithDelta(0.0, $this->reader->currentPrices([$floored->getId()], $this->currency)[$floored->getId()]->untaxedPrice, 0.000001);
+        $records = $log->getRecords();
+        self::assertCount(1, $records, 'only the price taken below zero is reported');
+        self::assertSame(Level::Warning, $records[0]->level);
+        self::assertSame([
+            'product_sale_elements_id' => $floored->getId(),
+            'currency_id' => $this->currency->getId(),
+            'rule_ids' => [$amountRule->getId()],
+        ], $records[0]->context);
+    }
+
+    public function testAFailureWhileComputingWritesNothingAndClosesTheTransaction(): void
+    {
+        $writer = $this->writerLoggingTo(new class extends AbstractLogger {
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                throw new \RuntimeException('The log is unavailable.');
+            }
+        });
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $rule = $this->runningRuleOn($product, ['effectType' => CatalogPriceRule::EFFECT_TYPE_AMOUNT]);
+        $this->factory->catalogPriceRuleEffectCurrency($rule, $this->currency, 1000.0);
+        $connection = Propel::getWriteConnection(CatalogPriceRuleTableMap::DATABASE_NAME);
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
+        $levels = $connection->getNestedTransactionCount();
+
+        $thrown = null;
+
+        try {
+            $writer->recomputeForProductSaleElements([$pse->getId()]);
+        } catch (\Throwable $throwable) {
+            $thrown = $throwable;
+        }
+
+        self::assertInstanceOf(\RuntimeException::class, $thrown, 'the failure is passed on to the caller');
+        self::assertSame('The log is unavailable.', $thrown->getMessage());
+
+        self::assertSame($levels, $connection->getNestedTransactionCount());
+        self::assertSame(0, $this->storedPricesOf($pse));
+    }
+
+    public function testRecomputingEverythingRewritesTheCoveredSaleElementsAndClearsTheOnesNoRuleCoversAnyMore(): void
+    {
+        $alreadyPriced = $this->defaultPseFor($this->catalogProduct());
+        $notYetPriced = $this->defaultPseFor($this->catalogProduct());
+        $rule = $this->factory->catalogPriceRule(['percentageValue' => 20.0, 'active' => true]);
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $alreadyPriced->getProductId());
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $notYetPriced->getProductId());
+        $this->materializer->materializeRule($rule);
+        $this->writer->recomputeForProductSaleElements([$alreadyPriced->getId()]);
+
+        $leftBehind = [$this->defaultPseFor($this->catalogProduct()), $this->defaultPseFor($this->catalogProduct())];
+        $movedRule = $this->factory->catalogPriceRule(['percentageValue' => 30.0, 'active' => true]);
+
+        foreach ($leftBehind as $pse) {
+            $this->factory->catalogPriceRuleCriterion($movedRule, CatalogPriceRule::CRITERION_PRODUCT, $pse->getProductId());
+        }
+
+        $this->materializer->materializeRule($movedRule);
+        $this->writer->recomputeForProductSaleElements([$leftBehind[0]->getId(), $leftBehind[1]->getId()]);
+        // The rule now targets a category with nothing in it: the prices stored for
+        // its former scope are only found by reading the stored prices themselves.
+        CatalogPriceRuleCriterionQuery::create()->filterByCatalogPriceRuleId($movedRule->getId())->delete();
+        $this->factory->catalogPriceRuleCriterion($movedRule, CatalogPriceRule::CRITERION_CATEGORY, $this->factory->category()->getId());
+        $this->materializer->materializeRule($movedRule);
+
+        $written = $this->writer->recomputeAll(1);
+
+        // Whatever else the table holds was rewritten too: what is left in it is
+        // exactly what the run wrote, each sale element counted once.
+        self::assertSame(CatalogPriceRulePriceQuery::create()->count(), $written);
+
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($alreadyPriced));
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($notYetPriced));
+        self::assertSame(0, $this->storedPricesOf($leftBehind[0]));
+        self::assertSame(0, $this->storedPricesOf($leftBehind[1]));
+    }
+
+    public function testAChunkSizeBelowOneStillRecomputesEverything(): void
+    {
+        $product = $this->catalogProduct();
+        $this->runningRuleOn($product, ['percentageValue' => 20.0]);
+
+        $written = $this->writer->recomputeAll(0);
+
+        self::assertSame(CatalogPriceRulePriceQuery::create()->count(), $written);
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($this->defaultPseFor($product)));
+    }
+
+    public function testPurgingAsOfAnInstantKeepsTheSegmentsStillRunningThen(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $this->runningRuleOn($product, [
+            'percentageValue' => 20.0,
+            'startDate' => new \DateTime('2020-01-01 00:00:00'),
+            'endDate' => new \DateTime('2020-02-01 00:00:00'),
+        ]);
+        $justBeforeTheEnd = new \DateTimeImmutable('2020-01-31 23:59:59');
+        $atTheEnd = new \DateTimeImmutable('2020-02-01 00:00:00');
+        $overJustBeforeTheEnd = $this->segmentsOverAt($justBeforeTheEnd);
+        $overAtTheEnd = $this->segmentsOverAt($atTheEnd);
+        $this->writer->recomputeForProductSaleElements([$pse->getId()], new \DateTimeImmutable('2019-06-01'));
+
+        self::assertSame($overJustBeforeTheEnd, $this->writer->purgeExpired($justBeforeTheEnd));
+        self::assertSame($this->visibleCurrencies(), $this->storedPricesOf($pse));
+        self::assertSame($overAtTheEnd - $overJustBeforeTheEnd + $this->visibleCurrencies(), $this->writer->purgeExpired($atTheEnd));
+        self::assertSame(0, $this->storedPricesOf($pse));
+    }
+
+    private function writerLoggingTo(LoggerInterface $logger): PublicPriceSegmentWriter
+    {
+        return new PublicPriceSegmentWriter(
+            $this->getService(ScopeReader::class),
+            $this->getService(BasePriceLoader::class),
+            $this->getService(TaxCalculatorLoader::class),
+            $this->getService(RuleEffectFactory::class),
+            $this->getService(PriceSegmentBuilder::class),
+            $logger,
+        );
+    }
+
+    private function segmentsOverAt(\DateTimeImmutable $instant): int
+    {
+        return CatalogPriceRulePriceQuery::create()->filterByValidUntil($instant, Criteria::LESS_EQUAL)->count();
+    }
+
+    private function storedPricesOf(ProductSaleElements $pse): int
+    {
+        return CatalogPriceRulePriceQuery::create()->filterByProductSaleElementsId($pse->getId())->count();
+    }
+
     private function runningRuleOn(Product $product, array $overrides): CatalogPriceRule
     {
         $rule = $this->factory->catalogPriceRule($overrides + ['active' => true]);
@@ -283,7 +509,7 @@ final class PublicPriceSegmentWriterTest extends ActionIntegrationTestCase
 
     private function visibleCurrencies(): int
     {
-        return \Thelia\Model\CurrencyQuery::create()->filterByVisible(1)->count();
+        return CurrencyQuery::create()->filterByVisible(1)->count();
     }
 
     private function catalogProduct(): Product

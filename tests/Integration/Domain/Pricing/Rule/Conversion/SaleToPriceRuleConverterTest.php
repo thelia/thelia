@@ -15,12 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Pricing\Rule\Conversion;
 
 use Thelia\Domain\Pricing\Rule\Conversion\SaleToPriceRuleConverter;
+use Thelia\Domain\Pricing\Rule\Exception\InvalidCatalogPriceRuleException;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleCustomerQuery;
 use Thelia\Model\CatalogPriceRuleProductSaleElementsQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\Lang;
 use Thelia\Model\Product;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -119,6 +122,187 @@ final class SaleToPriceRuleConverterTest extends ActionIntegrationTestCase
         self::assertSame(CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS, (int) $rule->getAudienceMode());
         self::assertSame([$customer->getId()], array_map('intval', CatalogPriceRuleCustomerQuery::create()->filterByCatalogPriceRuleId($rule->getId())->select('CustomerId')->find()->getData()));
         self::assertSame('VIP', $rule->setLocale('en_US')->getTitle());
+    }
+
+    public function testTheRulesComeOutWithTheSettingsOfANewRule(): void
+    {
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $rule = $this->converter->convert($sale)->rules[0];
+
+        self::assertSame(100, (int) $rule->getPriority());
+        self::assertFalse((bool) $rule->getStopProcessing(), 'the rules after it still apply');
+        self::assertTrue((bool) $rule->getIncludeSubcategories());
+    }
+
+    public function testAProductNarrowedToSeveralAttributeValuesKeepsThemAll(): void
+    {
+        $size = $this->factory->attribute();
+        $small = $this->factory->attributeAv($size);
+        $large = $this->factory->attributeAv($size);
+        $product = $this->catalogProduct();
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $product, $small);
+        $this->factory->saleProduct($sale, $product, $large);
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $result = $this->converter->convert($sale);
+
+        self::assertCount(1, $result->rules);
+        self::assertEqualsCanonicalizing([$small->getId(), $large->getId()], $result->rules[0]->getCriteriaByType()[CatalogPriceRule::CRITERION_ATTRIBUTE_AV]);
+    }
+
+    public function testProductsNarrowedToTheSameAttributeValuesInAnotherOrderShareOneRule(): void
+    {
+        $size = $this->factory->attribute();
+        $small = $this->factory->attributeAv($size);
+        $large = $this->factory->attributeAv($size);
+        $first = $this->catalogProduct();
+        $second = $this->catalogProduct();
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $first, $large);
+        $this->factory->saleProduct($sale, $first, $small);
+        $this->factory->saleProduct($sale, $second, $small);
+        $this->factory->saleProduct($sale, $second, $large);
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $result = $this->converter->convert($sale);
+
+        self::assertCount(1, $result->rules);
+        self::assertSame([], $result->warnings);
+        self::assertEqualsCanonicalizing([$first->getId(), $second->getId()], $result->rules[0]->getCriteriaByType()[CatalogPriceRule::CRITERION_PRODUCT]);
+    }
+
+    public function testAnAttributeValueListedTwiceForAProductCountsOnce(): void
+    {
+        $size = $this->factory->attribute();
+        $large = $this->factory->attributeAv($size);
+        $first = $this->catalogProduct();
+        $second = $this->catalogProduct();
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $first, $large);
+        $this->factory->saleProduct($sale, $first, $large);
+        $this->factory->saleProduct($sale, $second, $large);
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $result = $this->converter->convert($sale);
+
+        self::assertCount(1, $result->rules);
+        self::assertEqualsCanonicalizing([$first->getId(), $second->getId()], $result->rules[0]->getCriteriaByType()[CatalogPriceRule::CRITERION_PRODUCT]);
+    }
+
+    public function testTheTitleIsReadInTheDefaultLanguageWhateverLanguageTheSaleWasLastReadIn(): void
+    {
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+        $otherLocale = 'fr_FR' === $defaultLocale ? 'de_DE' : 'fr_FR';
+        $sale = $this->sale(['locale' => $defaultLocale, 'title' => 'Winter sale']);
+        $sale->setLocale($otherLocale)->setTitle('Soldes d\'hiver')->save();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $rule = $this->converter->convert($sale)->rules[0];
+
+        self::assertSame('Winter sale', $rule->setLocale($defaultLocale)->getTitle());
+    }
+
+    public function testASaleWithoutATitleInTheDefaultLanguageIsRefusedWithASentence(): void
+    {
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+        $sale = $this->sale(['locale' => 'fr_FR' === $defaultLocale ? 'de_DE' : 'fr_FR', 'title' => 'Soldes']);
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $this->expectException(InvalidCatalogPriceRuleException::class);
+        $this->expectExceptionMessage('A catalog price rule needs a title.');
+
+        $this->converter->convert($sale);
+    }
+
+    public function testAPercentageLeftEmptyIsRefusedWithASentence(): void
+    {
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        (new SaleOffsetCurrency())->setSaleId($sale->getId())->setCurrencyId($this->currency->getId())->setPriceOffsetValue(null)->save();
+
+        $this->expectException(InvalidCatalogPriceRuleException::class);
+        $this->expectExceptionMessage('A percentage rule needs a percentage between 0 and 100.');
+
+        $this->converter->convert($sale);
+    }
+
+    /**
+     * The only case where the default currency carries no percentage at all: every
+     * other sale here types one in it.
+     */
+    public function testAPercentageTypedOnlyInAnotherCurrencyIsTaken(): void
+    {
+        $secondary = $this->factory->currency(['code' => 'CHF', 'symbol' => 'CHF', 'rate' => 1.1]);
+        self::assertNotSame(Currency::getDefaultCurrency()->getId(), $secondary->getId());
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, $secondary, 15.0);
+
+        $result = $this->converter->convert($sale);
+
+        self::assertEqualsWithDelta(15.0, (float) $result->rules[0]->getPercentageValue(), 0.0001);
+        self::assertSame([], $result->warnings);
+    }
+
+    public function testThePercentageOfTheDefaultCurrencyWinsWhereverItComesInTheList(): void
+    {
+        $formerDefault = Currency::getDefaultCurrency();
+        $newDefault = $this->factory->currency(['code' => 'CHF', 'symbol' => 'CHF', 'rate' => 1.1, 'byDefault' => 1]);
+        $formerDefault->setByDefault(0)->save();
+        (new \ReflectionProperty(Currency::class, 'defaultCurrency'))->setValue(null, null);
+        self::assertSame($newDefault->getId(), Currency::getDefaultCurrency()->getId());
+        self::assertLessThan($newDefault->getId(), $formerDefault->getId(), 'the default currency comes second in the list');
+
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, $formerDefault, 20.0);
+        $this->factory->saleOffsetCurrency($sale, $newDefault, 10.0);
+
+        $result = $this->converter->convert($sale);
+
+        self::assertEqualsWithDelta(10.0, (float) $result->rules[0]->getPercentageValue(), 0.0001);
+        self::assertCount(1, $result->warnings);
+    }
+
+    public function testTheSamePercentageInEveryCurrencyGivesNoWarning(): void
+    {
+        $sale = $this->saleWithPercentages(20.0, 20.0);
+
+        self::assertSame([], $this->converter->convert($sale)->warnings);
+    }
+
+    public function testPercentagesApartBeyondTheStoredPrecisionGiveNoWarning(): void
+    {
+        $sale = $this->saleWithPercentages(1.00001, 1.00002);
+
+        self::assertSame([], $this->converter->convert($sale)->warnings);
+    }
+
+    public function testPercentagesApartAtTheStoredPrecisionGiveAWarning(): void
+    {
+        $sale = $this->saleWithPercentages(10.0001, 10.0002);
+
+        self::assertSame(
+            ['The sale typed a different percentage per currency; the rule takes the percentage of the default currency for every currency.'],
+            $this->converter->convert($sale)->warnings,
+        );
+    }
+
+    private function saleWithPercentages(float $inTheDefaultCurrency, float $inAnother): Sale
+    {
+        $secondary = $this->factory->currency(['code' => 'CHF', 'symbol' => 'CHF', 'rate' => 1.1]);
+        $sale = $this->sale();
+        $this->factory->saleProduct($sale, $this->catalogProduct());
+        $this->factory->saleOffsetCurrency($sale, Currency::getDefaultCurrency(), $inTheDefaultCurrency);
+        $this->factory->saleOffsetCurrency($sale, $secondary, $inAnother);
+
+        return $sale;
     }
 
     private function sale(array $overrides = []): Sale

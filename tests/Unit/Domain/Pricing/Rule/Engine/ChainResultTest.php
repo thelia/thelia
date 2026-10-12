@@ -55,4 +55,12 @@ final class ChainResultTest extends TestCase
 
         self::assertFalse($january->sameAs($february));
     }
+
+    public function testPricesHalfAMillionthApartAreAnotherResult(): void
+    {
+        $january = new ChainResult(0.0000005, 3, true, [3]);
+        $february = new ChainResult(0.0, 3, true, [3]);
+
+        self::assertFalse($january->sameAs($february));
+    }
 }
