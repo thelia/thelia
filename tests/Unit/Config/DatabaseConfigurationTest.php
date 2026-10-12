@@ -117,6 +117,14 @@ final class DatabaseConfigurationTest extends TestCase
         ]);
     }
 
+    public function testADatabaseNodeWithoutAnyConnectionIsRefused(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("The 'database' node must contain a 'connection' node or a 'connections' node.");
+
+        $this->process([]);
+    }
+
     public function testAConnectionNodeCanBeBuiltOnItsOwn(): void
     {
         $node = (new DatabaseConfiguration())->buildConnectionNode('replica', false)->getNode(true);
