@@ -1,0 +1,31 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "core/lib/Thelia"
+        ],
+        "excludes": [
+            // Base classes and helpers of the test suites, not shop code.
+            "Test"
+        ]
+    },
+    // Infection reads the core classes by reflection, and the models extend the Propel
+    // base classes generated in var/propel/test. This file builds them when they are
+    // missing, without a database, and registers them with the autoloader.
+    "bootstrap": "phpstan_autoload.php",
+    // The unit suite only: it needs no database, so the mutants run in parallel.
+    "testFrameworkExtraArgs": "--testsuite=unit",
+    // PCOV stays off outside the coverage run. Left to itself it only watches src/.
+    "initialTestsPhpOptions": "-d pcov.enabled=1 -d pcov.directory=core/lib/Thelia",
+    "threads": "max",
+    "tmpDir": "var/cache-ci/infection",
+    "logs": {
+        "text": "var/infection/infection.log",
+        "summary": "var/infection/summary.log",
+        "json": "var/infection/infection.json",
+        "html": "var/infection/infection.html"
+    },
+    "mutators": {
+        "@default": true
+    }
+}
