@@ -60,8 +60,9 @@ class MatchForXArticles extends ConditionAbstract
             self::CART_QUANTITY => $operators[self::CART_QUANTITY],
         ];
 
+        // The back-office posts the quantity as a string and the "equal" comparison is strict.
         $this->values = [
-            self::CART_QUANTITY => $values[self::CART_QUANTITY],
+            self::CART_QUANTITY => (int) $values[self::CART_QUANTITY],
         ];
 
         return $this;
