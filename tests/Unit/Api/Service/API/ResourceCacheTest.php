@@ -17,7 +17,11 @@ namespace Thelia\Tests\Unit\Api\Service\API;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Thelia\Api\Service\API\ResourceCache;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\Sale\ReservedSaleProductRule;
 
 /**
  * The cross-request cache of the data access layer keys on the path, the format
@@ -59,6 +63,22 @@ final class ResourceCacheTest extends TestCase
     }
 
     /**
+     * A module rule narrows the catalog per visitor whether or not it hides anything
+     * from the visitor at hand: the catalog paths step aside while it is declared,
+     * and the other paths keep their cache.
+     */
+    public function testTheCatalogIsBypassedWhileAModuleDeclaresAVisibilityRule(): void
+    {
+        $rule = $this->createStub(ProductVisibilityRuleInterface::class);
+        $cache = $this->cache(hasActiveReservedSale: false, productVisibilityRules: [$rule]);
+
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['first']));
+        self::assertSame(['second'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['second']));
+        self::assertSame(['first'], $cache->remember('key', self::NEUTRAL_PATH, static fn (): array => ['first']));
+        self::assertSame(['first'], $cache->remember('key', self::NEUTRAL_PATH, static fn (): array => ['second']));
+    }
+
+    /**
      * The bypass is aimed at the two paths a price travels on. Everything else the
      * allow list holds answers the same thing to everybody, reserved operation or
      * not, and keeps its cache.
@@ -91,7 +111,10 @@ final class ResourceCacheTest extends TestCase
         self::assertSame(['computed'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['computed']));
     }
 
-    private function cache(bool $hasActiveReservedSale): ResourceCache
+    /**
+     * @param list<ProductVisibilityRuleInterface> $productVisibilityRules
+     */
+    private function cache(bool $hasActiveReservedSale, array $productVisibilityRules = []): ResourceCache
     {
         $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);
         $pricingActivityChecker->method('hasVisitorDependentPricing')->willReturn($hasActiveReservedSale);
@@ -103,6 +126,11 @@ final class ResourceCacheTest extends TestCase
             allowedPrefixes: ['/api/front/products', '/api/front/product_sale_elements', '/api/front/countries'],
             visitorDependentPricePrefixes: ['/api/front/products', '/api/front/product_sale_elements'],
             pricingActivityChecker: $pricingActivityChecker,
+            productVisibility: new ProductVisibility(
+                $this->createStub(ReservedSaleProductRule::class),
+                $this->createStub(CurrentCustomerProvider::class),
+                $productVisibilityRules,
+            ),
         );
     }
 }

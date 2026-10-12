@@ -18,15 +18,15 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductSaleElements;
-use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Hides the products of a reserved operation from the front callers it is not
- * open to, when the operation asked for it.
+ * Hides from the front callers the products they may not see: the private drops
+ * of the reserved operations and the rules of the modules (ProductVisibility).
  *
  * Filtering in the query means the collection, the item read and the count are
  * bounded by the same rule: a product left reachable by its id is not hidden,
@@ -37,10 +37,10 @@ use Thelia\Model\ProductSaleElementsQuery;
  * The admin endpoints are left alone: they sit behind ROLE_ADMIN, and a
  * back-office user setting an operation up has to see what is in it.
  */
-final readonly class ReservedSaleVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final readonly class ProductVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
-        private ReservedSaleVisibility $reservedSaleVisibility,
+        private ProductVisibility $productVisibility,
     ) {
     }
 
@@ -66,7 +66,7 @@ final readonly class ReservedSaleVisibilityExtension implements QueryCollectionE
             return;
         }
 
-        $this->reservedSaleVisibility->applyTo($query, $productIdColumn);
+        $this->productVisibility->applyTo($query, $productIdColumn);
     }
 
     private function productIdColumnOf(ModelCriteria $query, string $resourceClass): ?string
