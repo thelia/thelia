@@ -28,6 +28,9 @@ final class SharedCachePurgerFactoryTest extends TestCase
     /** @var list<array{string, string, array<string, list<string>>}> */
     private array $requests = [];
 
+    /** @var list<array<string, mixed>> */
+    private array $requestOptions = [];
+
     #[DataProvider('silentDrivers')]
     public function testWithoutAProxyNothingIsSent(string $driver): void
     {
@@ -142,10 +145,50 @@ final class SharedCachePurgerFactoryTest extends TestCase
         $purger->purge(['product-42']);
     }
 
+    public function testAProxyAddressWithoutASchemeFailsWhenAPurgeIsAttemptedNotWhenTheServiceIsBuilt(): void
+    {
+        $purger = SharedCachePurgerFactory::create('varnish', 'varnish:6081', '', $this->client());
+
+        self::assertInstanceOf(UnavailableSharedCachePurger::class, $purger);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('SHARED_CACHE_PURGE_URLS is not usable');
+
+        $purger->purge(['product-42']);
+    }
+
+    public function testNoRedirectIsFollowedSoTheSecretStaysWithTheProxyItWasMeantFor(): void
+    {
+        $purger = SharedCachePurgerFactory::create('varnish', 'http://varnish:6081', 's3cret', $this->client());
+
+        $purger->purge(['products']);
+
+        self::assertSame(0, $this->requestOptions[0]['max_redirects']);
+    }
+
+    public function testAProxyThatIsDownDoesNotKeepTheOthersFromBeingPurged(): void
+    {
+        $client = new MockHttpClient(function (string $method, string $url): MockResponse {
+            $this->requests[] = [$method, $url, []];
+
+            return 'http://down:6081/' === $url ? new MockResponse('', ['http_code' => 503]) : new MockResponse('');
+        });
+        $purger = SharedCachePurgerFactory::create('varnish', 'http://down:6081, http://up:6081', '', $client);
+
+        try {
+            $purger->purge(['products']);
+            self::fail('The failure of a proxy must be reported.');
+        } catch (\RuntimeException $exception) {
+            self::assertStringContainsString('1 of 2 proxies could not be purged', $exception->getMessage());
+        }
+
+        self::assertContains('http://up:6081/', array_column($this->requests, 1));
+    }
+
     private function client(): MockHttpClient
     {
         return new MockHttpClient(function (string $method, string $url, array $options): MockResponse {
             $this->requests[] = [$method, $url, $options['normalized_headers']];
+            $this->requestOptions[] = $options;
 
             return new MockResponse('');
         });

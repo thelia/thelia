@@ -275,17 +275,88 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertSame($before, $this->snapshot($response));
     }
 
-    #[DataProvider('everyMode')]
-    public function testAPageAnnouncesWhatItRead(SharedCacheMode $mode): void
+    #[DataProvider('announcingModes')]
+    public function testAPageAnnouncesWhatItReadToAProxyThatIsNotNamed(SharedCacheMode $mode): void
     {
         $this->mode($mode);
-        $collector = $this->collector('/api/front/products/42', '/api/front/categories', '/api/front/brands/3');
         $response = $this->sessionResponse();
 
-        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $collector);
+        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $this->readingAProduct());
 
-        self::assertSame('thelia product-42 categories brand-3', $response->headers->get('Surrogate-Key'));
+        self::assertSame('thelia, product-42, categories, brand-3', $response->headers->get('Surrogate-Key'));
         self::assertSame('thelia product-42 categories brand-3', $response->headers->get('xkey'));
+    }
+
+    #[DataProvider('announcingModes')]
+    public function testVarnishReadsTheXkeyHeaderOnly(SharedCacheMode $mode): void
+    {
+        $this->mode($mode);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $this->readingAProduct(), 'varnish');
+
+        self::assertSame('thelia product-42 categories brand-3', $response->headers->get('xkey'));
+        self::assertFalse($response->headers->has('Surrogate-Key'));
+    }
+
+    #[DataProvider('announcingModes')]
+    public function testSouinReadsTheSurrogateKeyHeaderOnly(SharedCacheMode $mode): void
+    {
+        $this->mode($mode);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $this->readingAProduct(), 'souin');
+
+        self::assertSame('thelia, product-42, categories, brand-3', $response->headers->get('Surrogate-Key'));
+        self::assertFalse($response->headers->has('xkey'));
+    }
+
+    public function testADisabledSharedCacheTagsNothing(): void
+    {
+        $this->mode(SharedCacheMode::DISABLED);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response, null, HttpKernelInterface::MAIN_REQUEST, $this->readingAProduct());
+
+        self::assertFalse($response->headers->has('Surrogate-Key'));
+        self::assertFalse($response->headers->has('xkey'));
+    }
+
+    #[DataProvider('announcingModes')]
+    public function testAShareablePageVariesOnTheHeadersTheProxyForwards(SharedCacheMode $mode): void
+    {
+        $this->mode($mode);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response);
+
+        self::assertEqualsCanonicalizing(['X-Forwarded-Proto', 'X-Forwarded-Port', 'X-Forwarded-Host'], $response->getVary());
+    }
+
+    public function testAPageThatIsNotSharedKeepsItsVary(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $request = $this->request('/horatio.html', 'product');
+        $request->cookies->set('PHPSESSID', 'abc');
+
+        $this->handle($request, $response);
+
+        self::assertSame([], $response->getVary());
+    }
+
+    private function readingAProduct(): SharedCacheKeyCollector
+    {
+        return $this->collector('/api/front/products/42', '/api/front/categories', '/api/front/brands/3');
+    }
+
+    /**
+     * @return iterable<string, array{SharedCacheMode}>
+     */
+    public static function announcingModes(): iterable
+    {
+        yield 'announce' => [SharedCacheMode::ANNOUNCE];
+        yield 'enabled' => [SharedCacheMode::ENABLED];
     }
 
     /**
@@ -435,6 +506,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         ?PricingActivityChecker $checker = null,
         int $requestType = HttpKernelInterface::MAIN_REQUEST,
         ?SharedCacheKeyCollector $collector = null,
+        string $driver = '',
     ): void {
         if (null === $checker) {
             $checker = $this->createStub(PricingActivityChecker::class);
@@ -443,7 +515,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
 
         $collector ??= new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
 
-        (new SharedCacheListener(new SharedCachePolicy($checker, $collector), $collector))
+        (new SharedCacheListener(new SharedCachePolicy($checker, $collector), $collector, $driver))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, $requestType, $response));
     }
 

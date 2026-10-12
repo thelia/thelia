@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\SharedCache;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
+use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\Brand\BrandEvent;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\DefaultActionEvent;
@@ -29,9 +33,11 @@ use Thelia\Core\SharedCache\SharedCacheKey;
 use Thelia\Core\SharedCache\SharedCachePurgeQueue;
 use Thelia\Core\SharedCache\SharedCachePurgerInterface;
 use Thelia\Model\Brand;
+use Thelia\Model\Cart;
 use Thelia\Model\Content;
 use Thelia\Model\Folder;
 use Thelia\Model\Product;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Unit\Core\SharedCache\RecordingSharedCachePurger;
 
@@ -41,12 +47,15 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
 
     private SharedCacheInvalidationListener $listener;
 
+    private ResourceCache&MockObject $resourceCache;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->purger = new RecordingSharedCachePurger();
-        $this->listener = new SharedCacheInvalidationListener(new SharedCachePurgeQueue($this->purger));
+        $this->resourceCache = $this->createMock(ResourceCache::class);
+        $this->listener = new SharedCacheInvalidationListener(new SharedCachePurgeQueue($this->purger), $this->resourceCache);
     }
 
     public function testAProductChangePurgesThatProductAndWhatListsProducts(): void
@@ -54,7 +63,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
         $this->listener->flush();
 
-        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image']], $this->purger->calls);
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters']], $this->purger->calls);
     }
 
     public function testAProductChangeLeavesTheOtherPagesAlone(): void
@@ -74,7 +83,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onCatalogueChange(new UpdatePositionEvent(7, 1), TheliaEvents::CATEGORY_UPDATE_POSITION);
         $this->listener->flush();
 
-        self::assertSame([['category-7', 'categories', 'products']], $this->purger->calls);
+        self::assertSame([['category-7', 'categories', 'products', 'tfilters']], $this->purger->calls);
     }
 
     public function testAVisibilityToggleIsFoundByItsObjectId(): void
@@ -90,7 +99,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onCatalogueChange(new BrandEvent((new Brand())->setId(3)), TheliaEvents::BRAND_UPDATE);
         $this->listener->flush();
 
-        self::assertSame([['brand-3', 'brands', 'products']], $this->purger->calls);
+        self::assertSame([['brand-3', 'brands', 'products', 'tfilters']], $this->purger->calls);
     }
 
     public function testAContentChangePurgesTheContentAndItsLists(): void
@@ -157,5 +166,101 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->flush();
 
         self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
+    #[DataProvider('eventsThatCarryNoProductId')]
+    public function testAnEventNamingAJunctionRowInsteadOfTheProductPurgesTheWholeShop(string $eventName): void
+    {
+        $this->listener->onWholeShopChange();
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+        self::assertArrayHasKey($eventName, SharedCacheInvalidationListener::getSubscribedEvents());
+        self::assertSame('onWholeShopChange', SharedCacheInvalidationListener::getSubscribedEvents()[$eventName][0]);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function eventsThatCarryNoProductId(): iterable
+    {
+        yield 'content position' => [TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION];
+        yield 'accessory position' => [TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION];
+        yield 'association position' => [TheliaEvents::PRODUCT_UPDATE_ASSOCIATION_POSITION];
+        yield 'combination position' => [TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION];
+    }
+
+    #[DataProvider('eventsThatChangeWhatEveryPageShows')]
+    public function testAChangeThatReachesEveryPageIsSubscribedAsAWholeShopChange(string $eventName): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        self::assertArrayHasKey($eventName, $subscribed);
+        self::assertSame('onWholeShopChange', $subscribed[$eventName][0]);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function eventsThatChangeWhatEveryPageShows(): iterable
+    {
+        yield 'tax rule' => [TheliaEvents::TAX_RULE_UPDATE];
+        yield 'tax' => [TheliaEvents::TAX_UPDATE];
+        yield 'currency rates' => [TheliaEvents::CURRENCY_UPDATE_RATES];
+        yield 'default currency' => [TheliaEvents::CURRENCY_SET_DEFAULT];
+        yield 'product video' => [TheliaEvents::PRODUCT_VIDEO_UPDATE];
+        yield 'template feature' => [TheliaEvents::TEMPLATE_ADD_FEATURE];
+        yield 'configuration' => [TheliaEvents::CONFIG_SETVALUE];
+        yield 'language' => [TheliaEvents::LANG_TOGGLEACTIVE];
+        yield 'import' => [TheliaEvents::IMPORT_SUCCESS];
+        yield 'module activation' => [TheliaEvents::MODULE_TOGGLE_ACTIVATION];
+    }
+
+    public function testAProductWrittenThroughTheApiPurgesThatProduct(): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters']], $this->purger->calls);
+    }
+
+    public function testADeletionThroughTheApiPurgesToo(): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_DELETE));
+        $this->listener->flush();
+
+        self::assertNotSame([], $this->purger->calls);
+    }
+
+    public function testACatalogueModelWithoutAFamilyPurgesTheWholeShop(): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, new ProductSaleElements(), ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
+    public function testAWriteThroughTheApiOutsideTheCataloguePurgesNothing(): void
+    {
+        $this->resourceCache->expects(self::never())->method('clear');
+
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, new Cart(), ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([], $this->purger->calls);
+    }
+
+    public function testTheResourceCachePoolIsClearedWithEveryPurge(): void
+    {
+        $this->resourceCache->expects(self::exactly(3))->method('clear');
+
+        $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
+        $this->listener->onWholeShopChange();
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
+    }
+
+    public function testTheListenerHearsTheWritesOfTheApi(): void
+    {
+        self::assertArrayHasKey(ResourcePersistedEvent::class, SharedCacheInvalidationListener::getSubscribedEvents());
     }
 }

@@ -17,6 +17,8 @@ namespace Thelia\Core\SharedCache;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
+use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\TheliaEvents;
 
 final class SharedCacheInvalidationListener implements EventSubscriberInterface
@@ -36,20 +38,16 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::PRODUCT_UPDATE_SEO => self::PRODUCT,
         TheliaEvents::PRODUCT_ADD_CONTENT => self::PRODUCT,
         TheliaEvents::PRODUCT_REMOVE_CONTENT => self::PRODUCT,
-        TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION => self::PRODUCT,
         TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT => self::PRODUCT,
         TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => self::PRODUCT,
         TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => self::PRODUCT,
         TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_TOGGLE_VISIBILITY => self::PRODUCT,
-        TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION => self::PRODUCT,
         TheliaEvents::PRODUCT_COMBINATION_GENERATION => self::PRODUCT,
         TheliaEvents::PRODUCT_SET_TEMPLATE => self::PRODUCT,
         TheliaEvents::PRODUCT_ADD_ACCESSORY => self::PRODUCT,
         TheliaEvents::PRODUCT_REMOVE_ACCESSORY => self::PRODUCT,
-        TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => self::PRODUCT,
         TheliaEvents::PRODUCT_ADD_ASSOCIATION => self::PRODUCT,
         TheliaEvents::PRODUCT_REMOVE_ASSOCIATION => self::PRODUCT,
-        TheliaEvents::PRODUCT_UPDATE_ASSOCIATION_POSITION => self::PRODUCT,
         TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => self::PRODUCT,
         TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => self::PRODUCT,
         TheliaEvents::PRODUCT_ADD_CATEGORY => self::PRODUCT,
@@ -124,10 +122,83 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::PRODUCT_ASSOCIATION_TYPE_DELETE,
         TheliaEvents::PRODUCT_ASSOCIATION_TYPE_UPDATE_POSITION,
         TheliaEvents::PRODUCT_ASSOCIATION_TYPE_TOGGLE_VISIBLE,
+        TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION,
+        TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION,
+        TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION,
+        TheliaEvents::PRODUCT_UPDATE_ASSOCIATION_POSITION,
+        TheliaEvents::PRODUCT_VIDEO_CREATE,
+        TheliaEvents::PRODUCT_VIDEO_UPDATE,
+        TheliaEvents::PRODUCT_VIDEO_DELETE,
+        TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION,
+        TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY,
+        TheliaEvents::TAX_CREATE,
+        TheliaEvents::TAX_UPDATE,
+        TheliaEvents::TAX_DELETE,
+        TheliaEvents::TAX_RULE_CREATE,
+        TheliaEvents::TAX_RULE_UPDATE,
+        TheliaEvents::TAX_RULE_DELETE,
+        TheliaEvents::TAX_RULE_SET_DEFAULT,
+        TheliaEvents::TAX_RULE_TAXES_UPDATE,
+        TheliaEvents::CURRENCY_CREATE,
+        TheliaEvents::CURRENCY_UPDATE,
+        TheliaEvents::CURRENCY_DELETE,
+        TheliaEvents::CURRENCY_SET_DEFAULT,
+        TheliaEvents::CURRENCY_SET_VISIBLE,
+        TheliaEvents::CURRENCY_UPDATE_RATES,
+        TheliaEvents::CURRENCY_UPDATE_POSITION,
+        TheliaEvents::TEMPLATE_CREATE,
+        TheliaEvents::TEMPLATE_UPDATE,
+        TheliaEvents::TEMPLATE_DELETE,
+        TheliaEvents::TEMPLATE_DUPLICATE,
+        TheliaEvents::TEMPLATE_ADD_ATTRIBUTE,
+        TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE,
+        TheliaEvents::TEMPLATE_ADD_FEATURE,
+        TheliaEvents::TEMPLATE_DELETE_FEATURE,
+        TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION,
+        TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION,
+        TheliaEvents::CONFIG_CREATE,
+        TheliaEvents::CONFIG_SETVALUE,
+        TheliaEvents::CONFIG_UPDATE,
+        TheliaEvents::CONFIG_DELETE,
+        TheliaEvents::LANG_UPDATE,
+        TheliaEvents::LANG_CREATE,
+        TheliaEvents::LANG_DELETE,
+        TheliaEvents::LANG_DEFAULTBEHAVIOR,
+        TheliaEvents::LANG_URL,
+        TheliaEvents::LANG_TOGGLEDEFAULT,
+        TheliaEvents::LANG_TOGGLEACTIVE,
+        TheliaEvents::LANG_TOGGLEVISIBLE,
+        TheliaEvents::HOOK_CREATE,
+        TheliaEvents::HOOK_UPDATE,
+        TheliaEvents::HOOK_DELETE,
+        TheliaEvents::HOOK_TOGGLE_NATIVE,
+        TheliaEvents::HOOK_TOGGLE_ACTIVATION,
+        TheliaEvents::MODULE_HOOK_CREATE,
+        TheliaEvents::MODULE_HOOK_UPDATE,
+        TheliaEvents::MODULE_HOOK_DELETE,
+        TheliaEvents::MODULE_HOOK_UPDATE_POSITION,
+        TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION,
+        TheliaEvents::MODULE_TOGGLE_ACTIVATION,
+        TheliaEvents::META_DATA_CREATE,
+        TheliaEvents::META_DATA_UPDATE,
+        TheliaEvents::META_DATA_DELETE,
+        TheliaEvents::IMPORT_SUCCESS,
     ];
 
-    public function __construct(private readonly SharedCachePurgeQueue $queue)
-    {
+    private const MODEL_FAMILIES = [
+        'Product' => self::PRODUCT,
+        'Category' => self::CATEGORY,
+        'Content' => self::CONTENT,
+        'Folder' => self::FOLDER,
+        'Brand' => self::BRAND,
+    ];
+
+    private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Lang|Config|Hook|Module)#';
+
+    public function __construct(
+        private readonly SharedCachePurgeQueue $queue,
+        private readonly ResourceCache $resourceCache,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -145,6 +216,8 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             $subscribed[$eventName] = ['onWholeShopChange', -255];
         }
 
+        $subscribed[ResourcePersistedEvent::class] = ['onResourceChange', -255];
+
         return $subscribed;
     }
 
@@ -153,12 +226,30 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $family = self::FAMILIES[$eventName] ?? null;
         $id = null === $family ? null : $this->idOf($event, $family);
 
+        $this->resourceCache->clear();
         $this->queue->add(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, $id));
     }
 
     public function onWholeShopChange(): void
     {
+        $this->resourceCache->clear();
         $this->queue->add([SharedCacheKey::ALL]);
+    }
+
+    public function onResourceChange(ResourcePersistedEvent $event): void
+    {
+        $model = $event->getModel();
+
+        if (1 !== preg_match(self::CATALOGUE_MODEL, $model::class)) {
+            return;
+        }
+
+        $this->resourceCache->clear();
+
+        $family = self::MODEL_FAMILIES[substr(strrchr($model::class, '\\') ?: '', 1)] ?? null;
+        $id = null !== $family && method_exists($model, 'getId') ? $model->getId() : null;
+
+        $this->queue->add(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, (int) $id));
     }
 
     public function flush(): void
