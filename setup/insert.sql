@@ -2309,6 +2309,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (95, 'cs_CZ', NULL, NULL, NULL, NULL),
     (96, 'cs_CZ', NULL, NULL, NULL, NULL),
     (97, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (98, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2371,6 +2372,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (95, 'de_DE', NULL, NULL, NULL, NULL),
     (96, 'de_DE', NULL, NULL, NULL, NULL),
     (97, 'de_DE', NULL, NULL, NULL, NULL),
+    (98, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2496,6 +2498,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (95, 'es_ES', NULL, NULL, NULL, NULL),
     (96, 'es_ES', NULL, NULL, NULL, NULL),
     (97, 'es_ES', NULL, NULL, NULL, NULL),
+    (98, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2621,6 +2624,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (95, 'it_IT', NULL, NULL, NULL, NULL),
     (96, 'it_IT', NULL, NULL, NULL, NULL),
     (97, 'it_IT', NULL, NULL, NULL, NULL),
+    (98, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2683,6 +2687,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (95, 'nl_NL', NULL, NULL, NULL, NULL),
     (96, 'nl_NL', NULL, NULL, NULL, NULL),
     (97, 'nl_NL', NULL, NULL, NULL, NULL),
+    (98, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2744,7 +2749,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'ru_RU', NULL, NULL, NULL, NULL),
     (95, 'ru_RU', NULL, NULL, NULL, NULL),
     (96, 'ru_RU', NULL, NULL, NULL, NULL),
-    (97, 'ru_RU', NULL, NULL, NULL, NULL)
+    (97, 'ru_RU', NULL, NULL, NULL, NULL),
+    (98, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
