@@ -54,9 +54,11 @@ final class FileUploadConstraints
         return [
             'allowedMimeTypes' => array_keys($policy['validMimeTypes']),
             'allowedExtensions' => array_values(array_unique($extensions)),
-            'forbiddenExtensions' => array_values(array_unique(
-                [...$policy['extBlackList'], ...FileConfiguration::SERVER_EXECUTABLE_EXTENSIONS],
-            )),
+            'forbiddenExtensions' => array_values(array_unique([
+                ...$policy['extBlackList'],
+                ...FileConfiguration::SERVER_EXECUTABLE_EXTENSIONS,
+                ...('document' === $fileType ? FileConfiguration::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS : []),
+            ])),
         ];
     }
 }

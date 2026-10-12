@@ -84,6 +84,15 @@ class DeliveryModule extends AbstractTranslatableResource
     ])]
     public ?bool $valid = true;
 
+    /**
+     * What the buyer picks with this carrier: none, date (a day) or slot (a slot of a day).
+     * The days on offer are read from /front/delivery_modules/{id}/delivery_dates.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+    ])]
+    public string $deliveryDateChoice = 'none';
+
     #[Groups([self::GROUP_FRONT_READ])]
     public I18nCollection $i18ns;
 
@@ -131,6 +140,18 @@ class DeliveryModule extends AbstractTranslatableResource
     public function setDeliveryMode(?string $deliveryMode): self
     {
         $this->deliveryMode = $deliveryMode;
+
+        return $this;
+    }
+
+    public function getDeliveryDateChoice(): string
+    {
+        return $this->deliveryDateChoice;
+    }
+
+    public function setDeliveryDateChoice(string $deliveryDateChoice): self
+    {
+        $this->deliveryDateChoice = $deliveryDateChoice;
 
         return $this;
     }

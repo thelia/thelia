@@ -40,7 +40,7 @@ use Thelia\Model\OrderStatus;
  *  - the order belongs to the customer opening the return;
  *  - a virtual product is never returnable;
  *  - the requested quantity may not exceed the ordered quantity, cumulative
- *    open requests included.
+ *    open requests included, unless the shop counts each request on its own.
  *
  * A refused or expired return frees the quantity it held.
  */
@@ -57,6 +57,15 @@ final class ReturnEligibilityChecker
      * lists `sent`, and the return button, the form and every opening path follow.
      */
     public const ORDER_STATUSES_CONFIG_KEY = 'order_return_order_statuses';
+
+    /**
+     * Whether the returns already opened on a line hold part of its quantity.
+     * On by default: a unit sent back once cannot be asked back a second time.
+     * A shop that settles an exchange with a new parcel turns it off, so the
+     * goods it shipped again can be returned in turn: each request is then
+     * bounded by the ordered quantity alone.
+     */
+    public const CUMULATIVE_QUANTITY_CONFIG_KEY = 'order_return_cumulative_quantity';
 
     /**
      * Quantities are floats - Thelia sells by weight and by length as much as
@@ -106,6 +115,14 @@ final class ReturnEligibilityChecker
         $codes = $this->openingStatusCodes();
 
         return [] === $codes ? $status->isPaid(false) : $status->hasStatusHelper($codes);
+    }
+
+    /**
+     * Whether the open returns of a line hold part of its returnable quantity.
+     */
+    public function isQuantityCumulative(): bool
+    {
+        return '0' !== ConfigQuery::read(self::CUMULATIVE_QUANTITY_CONFIG_KEY, '1');
     }
 
     /**
@@ -261,13 +278,20 @@ final class ReturnEligibilityChecker
 
     /**
      * The quantity of the line that can still be returned: the ordered quantity
-     * minus the quantities already requested by open returns.
+     * minus the quantities already requested by open returns, or the ordered
+     * quantity itself when the shop does not count the returns cumulatively.
      *
      * @param int|null $excludeReturnId a return to leave out of the cumulative count,
      *                                  typically the one being edited
      */
     public function remainingReturnableQuantity(OrderProduct $orderProduct, ?int $excludeReturnId = null): float
     {
+        if (!$this->isQuantityCumulative()) {
+            $ordered = round((float) $orderProduct->getQuantity(), self::QUANTITY_PRECISION);
+
+            return $ordered > 0 ? $ordered : 0.0;
+        }
+
         $consumingStatusIds = $this->consumingStatusIds();
 
         $query = OrderReturnLineQuery::create()

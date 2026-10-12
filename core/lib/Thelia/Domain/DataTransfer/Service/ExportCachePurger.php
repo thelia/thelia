@@ -23,21 +23,31 @@ class ExportCachePurger
 
     public function purgeOldExportFiles(string $directory): int
     {
-        if (!is_dir($directory)) {
-            return 0;
-        }
-
-        $finder = new Finder();
-        $finder->files()->in($directory)->date('before '.self::EXPORT_CACHE_MAX_AGE_DAYS.' days ago');
-
-        $fileSystem = new Filesystem();
         $deletedCount = 0;
+        $fileSystem = new Filesystem();
 
-        foreach ($finder as $oldExportFile) {
+        foreach ($this->oldExportFiles($directory) as $oldExportFile) {
             $fileSystem->remove($oldExportFile->getRealPath());
             ++$deletedCount;
         }
 
         return $deletedCount;
+    }
+
+    public function countOldExportFiles(string $directory): int
+    {
+        return iterator_count($this->oldExportFiles($directory));
+    }
+
+    /**
+     * @return \Traversable<\SplFileInfo>
+     */
+    private function oldExportFiles(string $directory): \Traversable
+    {
+        if (!is_dir($directory)) {
+            return new \EmptyIterator();
+        }
+
+        return (new Finder())->files()->in($directory)->date('before '.self::EXPORT_CACHE_MAX_AGE_DAYS.' days ago')->getIterator();
     }
 }

@@ -317,6 +317,7 @@ return [
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration checkout consents' => 'Configuration des consentements du tunnel de commande',
     'Configuration gift wrappings' => 'Configuration des emballages cadeaux',
+    'Configuration delivery dates' => 'Configuration des dates de livraison',
     'Configuration checkout steps' => 'Configuration des étapes du tunnel de commande',
     'Catalog price rules' => 'Règles de prix catalogue',
     'Configuration variables' => 'Variables de configuration',
@@ -1547,5 +1548,9 @@ return [
     'Newness' => 'Nouveauté',
     'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d\'un autre État membre (nécessite un module de vérification)',
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Nombre de jours pendant lesquels la vérification d\'un numéro de TVA permet l\'exonération (0 ou moins revient à 90)',
+    'Shipping notice sent to the customer' => 'Avis d\'expédition envoyé au client',
+    'Your order {{ order_ref }} has been shipped' => 'Votre commande {{ order_ref }} a été expédiée',
+    'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)',
+    'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' => 'Les retours déjà ouverts sur une ligne de commande retiennent une part de sa quantité (1), ou chaque demande de retour n\'est bornée que par la quantité commandée (0)',
     'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)' => 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)',
 ];

@@ -37,29 +37,29 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
             throw new \RuntimeException('City and zipcode are required');
         }
 
-        $stateId = $this->requestParam('stateId');
+        $stateId = $this->requestParam('stateId', $context);
         $state = $stateId
             ? (StateQuery::create())->filterById($stateId)->findOne()
             : null;
-        $countryId = $this->requestParam('countryId');
+        $countryId = $this->requestParam('countryId', $context);
         $country = $countryId
             ? (CountryQuery::create())->filterById($countryId)->findOne()
             : null;
-        $radius = $this->requestParam('radius');
-        $maxRelays = $this->requestParam('maxRelays');
-        $orderWeight = $this->requestParam('orderWeight');
+        $radius = $this->requestParam('radius', $context);
+        $maxRelays = $this->requestParam('maxRelays', $context);
+        $orderWeight = $this->requestParam('orderWeight', $context);
 
         $pickupLocationEvent = new PickupLocationEvent(
             null,
             null !== $radius ? (int) $radius : null,
             null !== $maxRelays ? (int) $maxRelays : null,
-            $this->requestParam('address'),
+            $this->requestParam('address', $context),
             $uriVariables['city'],
             $uriVariables['zipcode'],
             null !== $orderWeight ? (int) $orderWeight : null,
             $state,
             $country,
-            $this->requestParam('moduleIds'),
+            $this->requestParam('moduleIds', $context),
         );
 
         $this->dispatcher->dispatch($pickupLocationEvent, TheliaEvents::MODULE_DELIVERY_GET_PICKUP_LOCATIONS);
@@ -67,8 +67,20 @@ readonly class DeliveryPickupLocationProvider implements ProviderInterface
         return $pickupLocationEvent->getLocations();
     }
 
-    private function requestParam(string $key): mixed
+    /**
+     * The parameter as the operation was asked for it: the filters of the context first, which is where a caller that
+     * is not an HTTP request (`DataAccessService::resources()`, a front theme) puts them, then the current request.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function requestParam(string $key, array $context): mixed
     {
+        $filters = $context['filters'] ?? [];
+
+        if (\is_array($filters) && \array_key_exists($key, $filters)) {
+            return $filters[$key];
+        }
+
         $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
 
         return $request?->query->get($key) ?? $request?->request->get($key);

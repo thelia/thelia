@@ -17,6 +17,7 @@ namespace Thelia\Domain\Shipping\Service;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\Resource\ModuleI18n as DeliveryModuleI18nResource;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -29,6 +30,7 @@ final readonly class DeliveryModuleResourceBuilder
         private DeliveryModuleEligibilityChecker $eligibilityChecker,
         private DeliveryPostageQuerier $postageQuerier,
         private DeliveryOptionsProvider $optionsProvider,
+        private DeliveryDateCalendar $deliveryDateCalendar,
     ) {
     }
 
@@ -59,7 +61,8 @@ final readonly class DeliveryModuleResourceBuilder
             ->setValid($isValid)
             ->setDeliveryMode($postage['deliveryMode'])
             ->setPosition($module->getPosition())
-            ->setOptions($options);
+            ->setOptions($options)
+            ->setDeliveryDateChoice($this->deliveryDateCalendar->choiceModeOf($module)->value);
 
         foreach ($module->getModuleI18ns() as $i18n) {
             $resource->addI18n(new DeliveryModuleI18nResource($i18n->toArray()), $i18n->getLocale());

@@ -124,7 +124,8 @@ final class CartItemOfferedLineApiTest extends ApiTestCase
         $taxRule = $factory->taxRule();
         $currency = $factory->currency();
 
-        $boughtLine = $factory->cartItem($cart, $factory->product($category, $taxRule, $currency));
+        // In stock: a change of quantity goes through the cart, which checks it.
+        $boughtLine = $factory->cartItem($cart, $factory->product($category, $taxRule, $currency, ['baseQuantity' => 10]));
 
         $coupon = $factory->coupon(['code' => null, 'triggerMode' => 'automatic']);
         $offeredLine = $factory->cartItem(

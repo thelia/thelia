@@ -41,6 +41,12 @@ the one it moves to, and applies each database migration in order. It offers to 
 database up first; on a large database, take the manual backup above instead. If a
 migration fails, the script stops and offers to restore that backup.
 
+Those two directories are often written by the web server user. When the script cannot
+delete some of their files, it moves the directory aside (`var/cache/<env>.previous-…`),
+where nothing loads it, prints the command that deletes it as its owner, and goes on. When
+it cannot even move the directory, it stops with code `8` before touching the database and
+prints that command: run it, or run the script as the web server user, then start again.
+
 In a deployment pipeline, pass `--no-interaction` (or `-n`, or `--yes`): every question is
 answered yes, the backup and the restore after a failure included. The script exits with
 `0` when the update succeeds and when the database is already on the version of the code,

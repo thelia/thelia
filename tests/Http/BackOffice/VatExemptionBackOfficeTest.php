@@ -245,6 +245,19 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('ACME SPRL', $reloaded->getVatVerifiedName());
     }
 
+    public function testAVerifierThatFailsLeavesTheVerificationAsItWasInsteadOfAnErrorPage(): void
+    {
+        $this->skipUnlessTheReverificationAnswersAVerifierThatThrows();
+
+        $this->installVerifierAnswering(new \RuntimeException('The verifier is broken.'));
+        $address = $this->verifiedAddressOnItsSheet();
+
+        $this->postReverification($address, $this->reverificationToken());
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+        self::assertSame('ACME SPRL', $this->reloaded($address)->getVatVerifiedName());
+    }
+
     public function testAReverificationWithoutItsTokenNeverReachesTheVerifier(): void
     {
         $this->skipUnlessTheThemeShowsTheVerificationState();
@@ -305,18 +318,22 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(VatExemptionMode::DISABLED->value, ConfigQuery::create()->findOneByName(VatExemptionMode::CONFIG_KEY)?->getValue());
     }
 
-    private function installVerifierAnswering(VatVerificationResult $answer): object
+    private function installVerifierAnswering(VatVerificationResult|\Throwable $answer): object
     {
         $verifier = new class($answer) implements VatNumberVerifierInterface {
             public int $calls = 0;
 
-            public function __construct(private readonly VatVerificationResult $answer)
+            public function __construct(private readonly VatVerificationResult|\Throwable $answer)
             {
             }
 
             public function verify(string $vatNumber, string $countryIsoAlpha2): VatVerificationResult
             {
                 ++$this->calls;
+
+                if ($this->answer instanceof \Throwable) {
+                    throw $this->answer;
+                }
 
                 return $this->answer;
             }
@@ -367,6 +384,19 @@ final class VatExemptionBackOfficeTest extends WebIntegrationTestCase
         self::assertNotNull($reloaded);
 
         return $reloaded;
+    }
+
+    private function skipUnlessTheReverificationAnswersAVerifierThatThrows(): void
+    {
+        if (!class_exists(self::VERIFICATION_CONTROLLER_CLASS)) {
+            self::markTestSkipped('The installed back-office theme offers no re-verification.');
+        }
+
+        $source = (string) file_get_contents((string) (new \ReflectionClass(self::VERIFICATION_CONTROLLER_CLASS))->getFileName());
+
+        if (!str_contains($source, 'VatVerificationResult::undetermined()')) {
+            self::markTestSkipped('The installed back-office theme lets a failing verifier through as an error page.');
+        }
     }
 
     private function skipUnlessTheReverificationSparesAnUnansweredCheck(): void

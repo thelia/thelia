@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Controller\Front\CartController;
 use Thelia\Api\State\Processor\CartCreationProcessor;
@@ -175,6 +176,22 @@ class Cart implements PropelResourceInterface
 
     #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?bool $isVatExempted = null;
+
+    /**
+     * The delivery day the buyer picked for the carrier of the cart, as Y-m-d, null while
+     * none is picked. Written through the checkout delivery date operation only, which
+     * judges it against what the carrier offers.
+     */
+    #[Column(propelFieldName: 'deliveryDay')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $deliveryDate = null;
+
+    /**
+     * The slot of that day the buyer picked, for a carrier that offers slots.
+     */
+    #[Column(propelFieldName: 'chosenDeliverySlotId')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    public ?int $deliverySlotId = null;
 
     public function getId(): ?int
     {
@@ -409,5 +426,29 @@ class Cart implements PropelResourceInterface
     public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new CartTableMap();
+    }
+
+    public function getDeliveryDate(): ?string
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(?string $deliveryDate): self
+    {
+        $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
+    public function getDeliverySlotId(): ?int
+    {
+        return $this->deliverySlotId;
+    }
+
+    public function setDeliverySlotId(?int $deliverySlotId): self
+    {
+        $this->deliverySlotId = $deliverySlotId;
+
+        return $this;
     }
 }

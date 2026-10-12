@@ -83,6 +83,46 @@ final class CheckoutVatVerificationApiTest extends ApiTestCase
         self::assertFalse($this->getService(VatExemptionResolver::class)->isExemptedForCart($cart));
     }
 
+    public function testChoosingAgainAnAddressVerifiedAgainCarriesTheNewVerificationToTheCart(): void
+    {
+        $france = CountryQuery::create()->findOneByIsoalpha2('FR');
+        $belgium = CountryQuery::create()->findOneByIsoalpha2('BE');
+        self::assertNotNull($france);
+        self::assertNotNull($belgium);
+
+        ConfigQuery::write(VatExemptionMode::CONFIG_KEY, VatExemptionMode::VERIFIED_VAT_NUMBER->value);
+        ConfigQuery::write('store_vat_exempt', '0');
+        ConfigQuery::write('store_country', (string) $france->getId());
+
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $address = $factory->address($customer, $belgium, null, ['zipcode' => '1000', 'city' => 'Bruxelles']);
+        $cart = $factory->cart($customer);
+        $factory->cartItem($cart, $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => 100]));
+
+        $verify = $this->getPropelConnection()->prepare(
+            'UPDATE `address` SET `company` = ?, `vat_number` = ?, `vat_verified_at` = ?, `vat_verified_name` = ? WHERE `id` = ?'
+        );
+        $verify->execute(['Acme', 'BE0123456789', (new \DateTime('-20 days'))->format('Y-m-d H:i:s'), 'Acme SPRL', $address->getId()]);
+        AddressTableMap::clearInstancePool();
+
+        $token = $this->authenticateAsCustomer($customer);
+        $url = '/api/front/account/checkout/'.$cart->getId().'/invoice_address';
+        self::assertJsonResponseSuccessful($this->jsonRequest('POST', $url, ['addressId' => $address->getId()], token: $token));
+
+        $verify->execute(['Acme', 'BE0123456789', (new \DateTime('-1 day'))->format('Y-m-d H:i:s'), 'Acme Renamed SPRL', $address->getId()]);
+        AddressTableMap::clearInstancePool();
+        self::assertJsonResponseSuccessful($this->jsonRequest('POST', $url, ['addressId' => $address->getId()], token: $token));
+
+        CartTableMap::clearInstancePool();
+        CartAddressTableMap::clearInstancePool();
+        $cart->reload(true);
+        $copy = CartAddressQuery::create()->findPk($cart->getAddressInvoiceId());
+        self::assertNotNull($copy);
+        self::assertSame('Acme Renamed SPRL', $copy->getVatVerifiedName());
+        self::assertGreaterThan(new \DateTime('-2 days'), $copy->getVatVerifiedAt());
+    }
+
     public function testChoosingAgainAnAddressWhoseVerificationExpiredAsksForANewOne(): void
     {
         $lifetime = ConfigQuery::getVatVerificationLifetimeDays();

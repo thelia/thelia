@@ -25,6 +25,7 @@ namespace Thelia\Api\Bridge\Propel\MetaData;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -33,6 +34,7 @@ use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
 use Thelia\Api\Bridge\Propel\State\PropelItemProvider;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Bridge\Propel\State\PropelRemoveProcessor;
+use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Resource\PropelResourceInterface;
 
 final readonly class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
@@ -74,6 +76,16 @@ final readonly class PropelResourceCollectionMetadataFactory implements Resource
 
         if (null === $operation->getProcessor()) {
             $operation = $operation->withProcessor($this->getProcessor($operation));
+        }
+
+        // A file is served as it is stored. Left to API Platform, a caller asking for
+        // HTML first, as a browser does, has the request answered with the API
+        // documentation page instead, and the controller never gets the resource.
+        if ($operation instanceof HttpOperation && BinaryFileController::class === $operation->getController()) {
+            $operation = $operation->withExtraProperties([
+                ...($operation->getExtraProperties() ?? []),
+                '_api_disable_swagger_provider' => true,
+            ]);
         }
 
         return $operation;

@@ -48,6 +48,8 @@ final readonly class MediaFacade
 
     public function uploadImage(ImageUploadDTO $dto): FileModelInterface
     {
+        $this->guardUpload($dto->uploadedFile, 'image');
+
         $model = $this->fileManager->getModelInstance('image', $dto->parentType);
         $model->setParentId($dto->parentId);
         $model->setLocale($dto->locale);
@@ -187,6 +189,8 @@ final readonly class MediaFacade
 
     public function uploadDocument(DocumentUploadDTO $dto): FileModelInterface
     {
+        $this->guardUpload($dto->uploadedFile, 'document');
+
         $model = $this->fileManager->getModelInstance('document', $dto->parentType);
         $model->setParentId($dto->parentId);
         $model->setLocale($dto->locale);
@@ -369,11 +373,6 @@ final readonly class MediaFacade
     /**
      * Applies the shop upload policy to a video before anything is written.
      *
-     * The policy lives here rather than in each caller: the video library is
-     * published into the web space by symbolic link, so a file the shop accepts is
-     * a file the shop serves. A back-office screen calling the facade gets the same
-     * refusal the API gets, and a caller that forgets to ask cannot be the hole.
-     *
      * @throws ProcessFileException when the file may not be uploaded
      */
     private function guardUploadedVideo(?UploadedFile $uploadedFile): void
@@ -382,7 +381,22 @@ final readonly class MediaFacade
             return;
         }
 
-        $this->fileProcessorService->validateUpload($uploadedFile, 'video');
+        $this->guardUpload($uploadedFile, 'video');
+    }
+
+    /**
+     * Applies the shop upload policy for $objectType before anything is written.
+     *
+     * The policy lives here rather than in each caller: images, documents and videos
+     * are published into the web space by symbolic link, so a file the shop accepts is
+     * a file the shop serves. A back-office screen calling the facade gets the same
+     * refusal the API gets, and a caller that forgets to ask cannot be the hole.
+     *
+     * @throws ProcessFileException when the file may not be uploaded
+     */
+    private function guardUpload(UploadedFile $uploadedFile, string $objectType): void
+    {
+        $this->fileProcessorService->validateUpload($uploadedFile, $objectType);
         $this->fileProcessorService->sanitizeUpload($uploadedFile);
     }
 

@@ -18,17 +18,22 @@ namespace Thelia\Domain\DataTransfer\Export;
  * Keeps a text a spreadsheet would run as a formula from being run when the export is
  * opened: a leading quote makes it a plain text cell again.
  *
- * Meant for columns an administrator types freely and a person opens in a spreadsheet,
- * such as a manufacturer part number, not for amounts: a negative price starts with a
- * minus sign too.
+ * A plain number keeps its sign: `-5.00` or `+33612345678` cannot call anything, and a
+ * quote would turn a negative amount into text.
  */
 final class SpreadsheetFormulaGuard
 {
     private const array FORMULA_TRIGGERS = ['=', '+', '-', '@', "\t", "\r"];
 
+    private const string PLAIN_NUMBER = '/^[+-]?[0-9]+(?:[.,][0-9]+)?$/D';
+
     public static function neutralize(mixed $value): mixed
     {
         if (!\is_string($value) || '' === $value || !\in_array($value[0], self::FORMULA_TRIGGERS, true)) {
+            return $value;
+        }
+
+        if (1 === preg_match(self::PLAIN_NUMBER, $value)) {
             return $value;
         }
 
