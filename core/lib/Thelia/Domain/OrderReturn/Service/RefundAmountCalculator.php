@@ -105,7 +105,8 @@ final readonly class RefundAmountCalculator
 
         if ($return->getIncludePostage()) {
             $order = $return->getOrder();
-            $total += (float) $order->getPostage() + (float) $order->getPostageTax();
+            // Stored tax included, like the postage of a cart.
+            $total += (float) $order->getPostage();
         }
 
         return $total;
