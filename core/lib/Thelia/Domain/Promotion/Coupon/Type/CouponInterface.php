@@ -17,7 +17,6 @@ namespace Thelia\Domain\Promotion\Coupon\Type;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\Exception\InvalidConditionException;
-use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 
 /**
@@ -57,7 +56,7 @@ interface CouponInterface
      *                                                     on special offer price
      * @param bool             $isEnabled                  False if Coupon is disabled by admin
      * @param int              $maxUsage                   How many usage left
-     * @param DateTime         $expirationDate             When the Code is expiring
+     * @param \DateTime        $expirationDate             When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
      * @param bool             $perCustomerUsageCount      true if usage count is per customer only
@@ -134,7 +133,7 @@ interface CouponInterface
     /**
      * Return Coupon expiration date.
      */
-    public function getExpirationDate(): DateTime;
+    public function getExpirationDate(): \DateTime;
 
     /**
      * Check if the Coupon can be used against a
