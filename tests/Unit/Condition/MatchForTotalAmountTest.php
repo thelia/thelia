@@ -128,6 +128,7 @@ final class MatchForTotalAmountTest extends FacadeBackedTestCase
     public function testAnOperatorTheConditionDoesNotOfferIsRejected(string $priceOperator, string $currencyOperator): void
     {
         $this->expectException(InvalidConditionOperatorException::class);
+        $this->expectExceptionMessage('Invalid Operator for Condition '.MatchForTotalAmount::class.' on parameter ');
 
         (new MatchForTotalAmount($this->facadeWithEUR()))->setValidatorsFromForm(
             [
@@ -154,7 +155,7 @@ final class MatchForTotalAmountTest extends FacadeBackedTestCase
     public function testAnAmountThatIsNotStrictlyPositiveIsRejected(string $amount): void
     {
         $this->expectException(InvalidConditionValueException::class);
-        $this->expectExceptionMessage('on parameter price');
+        $this->expectExceptionMessage('Invalid Parameter for Condition '.MatchForTotalAmount::class.' on parameter price');
 
         (new MatchForTotalAmount($this->facadeWithEUR()))->setValidatorsFromForm(
             [
@@ -171,7 +172,7 @@ final class MatchForTotalAmountTest extends FacadeBackedTestCase
     public function testACurrencyTheShopDoesNotSellIsRejected(): void
     {
         $this->expectException(InvalidConditionValueException::class);
-        $this->expectExceptionMessage('on parameter currency');
+        $this->expectExceptionMessage('Invalid Parameter for Condition '.MatchForTotalAmount::class.' on parameter currency');
 
         $this->buildCondition($this->facadeWithEUR(), Operators::SUPERIOR_OR_EQUAL, 100, 'USD');
     }
