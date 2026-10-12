@@ -95,6 +95,16 @@ final class TotpTest extends TestCase
         self::assertNull($totp->matchingStep($secret, $totp->codeAt($secret, $step - 1), $now, $step));
     }
 
+    public function testACodeOfAStepAfterTheLastUsedOneIsAccepted(): void
+    {
+        $totp = new Totp();
+        $secret = Base32::encode(self::RFC_SECRET);
+        $now = 1_700_000_000;
+        $step = $totp->stepAt($now);
+
+        self::assertSame($step, $totp->matchingStep($secret, $totp->codeAt($secret, $step), $now, $step - 1));
+    }
+
     public static function malformedCodes(): iterable
     {
         yield 'empty' => [''];

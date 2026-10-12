@@ -100,6 +100,45 @@ final class AuthenticationReturnUrlTest extends TestCase
         self::assertSame(self::DEFAULT, $service->consume(self::DEFAULT));
     }
 
+    public function testTheSignInPageReadsTheRequestedDestination(): void
+    {
+        [$service] = $this->serviceFor('/customer/login', [AuthenticationReturnUrl::PARAMETER => '/checkout/cart']);
+
+        self::assertSame('/checkout/cart', $service->requested());
+    }
+
+    public function testTheSignInPageIgnoresADestinationLeavingTheShop(): void
+    {
+        [$service] = $this->serviceFor('/customer/login', [AuthenticationReturnUrl::PARAMETER => 'https://evil.example.net/pwn']);
+
+        self::assertNull($service->requested());
+    }
+
+    public function testCapturingWithoutASessionKeepsTheParameterOfTheRequest(): void
+    {
+        $stack = new RequestStack();
+        $stack->push(Request::create('/customer/login?'.http_build_query([AuthenticationReturnUrl::PARAMETER => '/checkout/cart'])));
+        $service = new AuthenticationReturnUrl($stack);
+
+        $service->capture();
+
+        self::assertSame('/checkout/cart', $service->consume(self::DEFAULT));
+    }
+
+    public function testARememberedUrlOfAnotherHostIsNotFollowed(): void
+    {
+        $session = $this->session();
+        $this->serviceFor(
+            'https://shop.example.com/customer/login',
+            [AuthenticationReturnUrl::PARAMETER => 'https://shop.example.com/checkout/cart'],
+            $session,
+        )[0]->capture();
+
+        $onAnotherHost = $this->serviceFor('https://other.example.com/customer/login', session: $session)[0];
+
+        self::assertSame(self::DEFAULT, $onAnotherHost->consume(self::DEFAULT));
+    }
+
     /**
      * @return array{AuthenticationReturnUrl, Request}
      */

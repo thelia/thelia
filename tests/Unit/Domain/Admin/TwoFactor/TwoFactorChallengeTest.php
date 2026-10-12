@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Admin\TwoFactor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Domain\Admin\TwoFactor\TwoFactorChallenge;
 use Thelia\Model\Admin;
@@ -83,6 +84,56 @@ final class TwoFactorChallengeTest extends TestCase
         (new TwoFactorChallenge())->start($session, $this->admin(), false, null);
 
         self::assertNotSame($idBeforeThePassword, $session->getId());
+    }
+
+    public function testStartingAChallengeDestroysTheSessionKeptBeforeThePassword(): void
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects(self::once())->method('migrate')->with(true);
+
+        (new TwoFactorChallenge())->start($session, $this->admin(), false, null);
+    }
+
+    public function testAChallengeStartedFromTheRememberMeCookieSaysSo(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $challenge = new TwoFactorChallenge();
+
+        $challenge->start($session, $this->admin(), false, null, true);
+
+        self::assertTrue($challenge->startedFromRememberMeCookie($session));
+    }
+
+    public function testWithoutAChallengeNothingWasStartedFromTheRememberMeCookie(): void
+    {
+        self::assertFalse((new TwoFactorChallenge())->startedFromRememberMeCookie(new Session(new MockArraySessionStorage())));
+    }
+
+    public function testClearingTheChallengeForgetsIt(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $challenge = new TwoFactorChallenge();
+        $challenge->start($session, $this->admin(), true, '/admin/orders');
+
+        $challenge->clear($session);
+
+        self::assertFalse($session->has(TwoFactorChallenge::SESSION_KEY));
+        self::assertFalse($challenge->rememberMeRequested($session));
+    }
+
+    public function testAChallengeWithoutItsAttemptCounterIsIgnored(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $session->set(TwoFactorChallenge::SESSION_KEY, [
+            'admin_id' => 42,
+            'expires_at' => time() + TwoFactorChallenge::LIFETIME_SECONDS,
+            'remember_me' => true,
+            'success_url' => '/admin/orders',
+        ]);
+        $challenge = new TwoFactorChallenge();
+
+        self::assertFalse($challenge->rememberMeRequested($session));
+        self::assertNull($challenge->successUrl($session));
     }
 
     private function admin(): Admin
