@@ -303,6 +303,10 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
             $manyPses[] = $this->extraPseWithPrice($product, $currency)->getId();
         }
 
+        // The first resolution of a test warms what the core memoises for a request
+        // (configuration, tax rules): measured cold, it would count those reads too.
+        $this->resolver->resolve($onePse, $currency, $customer);
+
         $forOne = $this->recordSqlQueries(function () use ($onePse, $currency, $customer): void {
             self::assertCount(1, $this->resolver->resolve($onePse, $currency, $customer));
         });
