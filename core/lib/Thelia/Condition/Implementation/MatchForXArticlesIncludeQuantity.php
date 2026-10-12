@@ -35,10 +35,12 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
 
     public function isMatching(): bool
     {
+        // Both sides as floats: the units of a cart may be decimal, and the
+        // "equal" comparison is strict.
         return $this->conditionValidator->variableOpComparison(
-            $this->facade->getNbArticlesInCartIncludeQuantity(),
+            (float) $this->facade->getNbArticlesInCartIncludeQuantity(),
             $this->operators[self::CART_QUANTITY],
-            $this->values[self::CART_QUANTITY],
+            (float) $this->values[self::CART_QUANTITY],
         );
     }
 
