@@ -41,25 +41,13 @@ use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Test\TestToken;
 
 final class ModuleActionTest extends ActionIntegrationTestCase
 {
     private const SAMPLE_PREFIX = 'ZipUpgrade';
 
-    private const SAMPLE_CODE = 'ZipUpgradeSample';
-
-    private const SAMPLE_NAMESPACE = 'ZipUpgradeSample\ZipUpgradeSample';
-
-    private const LOCAL_SAMPLE_CODE = 'ZipUpgradeLocalSample';
-
-    private const LOCAL_SAMPLE_NAMESPACE = 'ZipUpgradeLocalSample\ZipUpgradeLocalSample';
-
     private const DECLARED_HOOK_CODE = 'zipupgradesample.declared';
-
-    /**
-     * Where the sample module records the lifecycle methods Thelia calls on it.
-     */
-    private const CALL_LOG = '/tmp/thelia-zip-upgrade-sample-calls.log';
 
     /**
      * @var list<string> the temporary directories standing in for an uploaded archive
@@ -155,7 +143,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         $moduleHook
             ->setModuleId($module->getId())
             ->setHookId($hookId)
-            ->setClassname('ZipUpgradeSample\Hook\SampleHook')
+            ->setClassname(self::sampleCode().'\Hook\SampleHook')
             ->setMethod('onSomething')
             ->setActive(true)
             ->setHookActive(true)
@@ -205,7 +193,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         $ignored
             ->setModuleId($module->getId())
             ->setHookId($hookId)
-            ->setClassname('ZipUpgradeSample\Hook\SampleHook')
+            ->setClassname(self::sampleCode().'\Hook\SampleHook')
             ->setMethod('onSomething')
             ->save();
 
@@ -277,7 +265,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         $module = $this->installSampleModule('1.0.0');
         $module->setActivate(BaseModule::IS_ACTIVATED)->save();
 
-        $order = $this->factory->order(null, ['paymentModuleCode' => self::SAMPLE_CODE]);
+        $order = $this->factory->order(null, ['paymentModuleCode' => self::sampleCode()]);
         self::assertSame($module->getId(), $order->getPaymentModuleId());
 
         $upgraded = $this->upgradeSampleModule('2.0.0');
@@ -303,8 +291,8 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         $moduleId = $module->getId();
 
         $order = $this->factory->order(null, [
-            'paymentModuleCode' => self::SAMPLE_CODE,
-            'deliveryModuleCode' => self::SAMPLE_CODE,
+            'paymentModuleCode' => self::sampleCode(),
+            'deliveryModuleCode' => self::sampleCode(),
         ]);
         $orderId = $order->getId();
 
@@ -344,13 +332,13 @@ final class ModuleActionTest extends ActionIntegrationTestCase
     {
         $this->installSampleModule('1.0.0');
 
-        file_put_contents(self::CALL_LOG, '');
+        file_put_contents(self::callLog(), '');
 
         $this->upgradeSampleModule('2.0.0');
 
         self::assertSame(
             "update 1.0.0 2.0.0\n",
-            file_get_contents(self::CALL_LOG),
+            file_get_contents(self::callLog()),
             'An upgrade must call update() on the module, not install() again.',
         );
     }
@@ -359,7 +347,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
     {
         $this->installSampleModule('1.0.0', ['Config/dropped-in-2.0.0.txt' => 'obsolete']);
 
-        $droppedFile = THELIA_MODULE_DIR.self::SAMPLE_CODE.DS.'Config'.DS.'dropped-in-2.0.0.txt';
+        $droppedFile = THELIA_MODULE_DIR.self::sampleCode().DS.'Config'.DS.'dropped-in-2.0.0.txt';
         self::assertFileExists($droppedFile);
 
         $this->upgradeSampleModule('2.0.0');
@@ -372,14 +360,14 @@ final class ModuleActionTest extends ActionIntegrationTestCase
 
     public function testUpgradeOfAModuleInstalledLocallyStaysInLocalModules(): void
     {
-        $localDirectory = THELIA_LOCAL_MODULE_DIR.self::LOCAL_SAMPLE_CODE;
+        $localDirectory = THELIA_LOCAL_MODULE_DIR.self::localSampleCode();
 
-        $this->writeModuleFiles($localDirectory, self::LOCAL_SAMPLE_CODE, self::LOCAL_SAMPLE_NAMESPACE, '1.0.0');
+        $this->writeModuleFiles($localDirectory, self::localSampleCode(), self::localSampleNamespace(), '1.0.0');
 
         $module = new Module();
         $module
-            ->setCode(self::LOCAL_SAMPLE_CODE)
-            ->setFullNamespace(self::LOCAL_SAMPLE_NAMESPACE)
+            ->setCode(self::localSampleCode())
+            ->setFullNamespace(self::localSampleNamespace())
             ->setVersion('1.0.0')
             ->setType(BaseModule::PAYMENT_MODULE_TYPE)
             ->setCategory('payment')
@@ -387,14 +375,14 @@ final class ModuleActionTest extends ActionIntegrationTestCase
             ->save();
 
         $this->dispatchInstall(
-            self::LOCAL_SAMPLE_CODE,
-            self::LOCAL_SAMPLE_NAMESPACE,
-            $this->buildArchive(self::LOCAL_SAMPLE_CODE, self::LOCAL_SAMPLE_NAMESPACE, '2.0.0'),
+            self::localSampleCode(),
+            self::localSampleNamespace(),
+            $this->buildArchive(self::localSampleCode(), self::localSampleNamespace(), '2.0.0'),
             '2.0.0',
         );
 
         self::assertDirectoryDoesNotExist(
-            THELIA_MODULE_DIR.self::LOCAL_SAMPLE_CODE,
+            THELIA_MODULE_DIR.self::localSampleCode(),
             'Upgrading a module installed in local/modules must not leave a second copy in vendor/thelia/modules.',
         );
         self::assertStringContainsString(
@@ -432,7 +420,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         HookQuery::create()->filterByCode(self::DECLARED_HOOK_CODE)->delete();
 
         $this->getService(ModuleManagement::class)->updateModule(
-            new \SplFileInfo(THELIA_MODULE_DIR.self::SAMPLE_CODE.DS.'Config'.DS.'module.xml'),
+            new \SplFileInfo(THELIA_MODULE_DIR.self::sampleCode().DS.'Config'.DS.'module.xml'),
             static::getContainer(),
         );
 
@@ -446,24 +434,66 @@ final class ModuleActionTest extends ActionIntegrationTestCase
     {
         $module = $this->installSampleModule('1.0.0');
 
-        $this->expectExceptionMessageMatches('/already installed as "'.self::SAMPLE_CODE.'"/');
+        $this->expectExceptionMessageMatches('/already installed as "'.self::sampleCode().'"/');
 
         $this->dispatchInstall(
-            'ZipUpgradeRenamed',
-            self::SAMPLE_NAMESPACE,
-            $this->buildArchive(self::SAMPLE_CODE, self::SAMPLE_NAMESPACE, '2.0.0'),
+            self::samplePrefix().'Renamed',
+            self::sampleNamespace(),
+            $this->buildArchive(self::sampleCode(), self::sampleNamespace(), '2.0.0'),
             '2.0.0',
         );
 
         self::assertSame('1.0.0', ModuleQuery::create()->findPk($module->getId())->getVersion());
     }
 
+    /**
+     * The sample modules land in vendor/thelia/modules and local/modules, which every test
+     * process shares: a process running with a TEST_TOKEN names them after its number
+     * (ZipUpgrade2Sample), so that one process never removes or rewrites the module another
+     * one is installing. The number sits between the prefix and a capital letter, so the
+     * cleanup of one process cannot match the modules of another (2 and 21 included).
+     * Without a token, the names stay ZipUpgradeSample and its siblings.
+     */
+    private static function samplePrefix(): string
+    {
+        return self::SAMPLE_PREFIX.(TestToken::current() ?? '');
+    }
+
+    private static function sampleCode(): string
+    {
+        return self::samplePrefix().'Sample';
+    }
+
+    private static function sampleNamespace(): string
+    {
+        return self::sampleCode().'\\'.self::sampleCode();
+    }
+
+    private static function localSampleCode(): string
+    {
+        return self::samplePrefix().'LocalSample';
+    }
+
+    private static function localSampleNamespace(): string
+    {
+        return self::localSampleCode().'\\'.self::localSampleCode();
+    }
+
+    /**
+     * Where the sample module records the lifecycle methods Thelia calls on it, one file per
+     * test process.
+     */
+    private static function callLog(): string
+    {
+        return '/tmp/thelia-zip-upgrade-sample-calls'.TestToken::suffix().'.log';
+    }
+
     private function installSampleModule(string $version, array $extraFiles = []): Module
     {
         return $this->dispatchInstall(
-            self::SAMPLE_CODE,
-            self::SAMPLE_NAMESPACE,
-            $this->buildArchive(self::SAMPLE_CODE, self::SAMPLE_NAMESPACE, $version, $extraFiles),
+            self::sampleCode(),
+            self::sampleNamespace(),
+            $this->buildArchive(self::sampleCode(), self::sampleNamespace(), $version, $extraFiles),
             $version,
         );
     }
@@ -471,9 +501,9 @@ final class ModuleActionTest extends ActionIntegrationTestCase
     private function upgradeSampleModule(string $version): Module
     {
         return $this->dispatchInstall(
-            self::SAMPLE_CODE,
-            self::SAMPLE_NAMESPACE,
-            $this->buildArchive(self::SAMPLE_CODE, self::SAMPLE_NAMESPACE, $version),
+            self::sampleCode(),
+            self::sampleNamespace(),
+            $this->buildArchive(self::sampleCode(), self::sampleNamespace(), $version),
             $version,
         );
     }
@@ -539,7 +569,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
 
     private function moduleClassSource(string $moduleNamespace, string $className): string
     {
-        $callLog = var_export(self::CALL_LOG, true);
+        $callLog = var_export(self::callLog(), true);
         $hookCode = var_export(self::DECLARED_HOOK_CODE, true);
 
         return <<<PHP
@@ -636,7 +666,7 @@ final class ModuleActionTest extends ActionIntegrationTestCase
      */
     private function removeSampleModules(): void
     {
-        $modules = ModuleQuery::create()->filterByCode(self::SAMPLE_PREFIX.'%', Criteria::LIKE)->find();
+        $modules = ModuleQuery::create()->filterByCode(self::samplePrefix().'%', Criteria::LIKE)->find();
 
         foreach ($modules as $module) {
             OrderQuery::create()->filterByPaymentModuleId($module->getId())->delete();
@@ -647,9 +677,9 @@ final class ModuleActionTest extends ActionIntegrationTestCase
 
         $this->filesystem->remove(array_merge(
             $this->archiveDirectories,
-            glob(THELIA_MODULE_DIR.self::SAMPLE_PREFIX.'*') ?: [],
-            glob(THELIA_LOCAL_MODULE_DIR.self::SAMPLE_PREFIX.'*') ?: [],
-            [self::CALL_LOG],
+            glob(THELIA_MODULE_DIR.self::samplePrefix().'[A-Z]*') ?: [],
+            glob(THELIA_LOCAL_MODULE_DIR.self::samplePrefix().'[A-Z]*') ?: [],
+            [self::callLog()],
         ));
 
         $this->archiveDirectories = [];

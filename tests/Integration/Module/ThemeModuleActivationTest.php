@@ -30,6 +30,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\TestToken;
 
 /**
  * Applying a theme (template:set) installs the modules the theme's composer.json requires.
@@ -45,23 +46,26 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
     private const string SAMPLE_PREFIX = 'ThemeShipSample';
 
-    private const string NEW_CODE = 'ThemeShipSampleNew';
+    // The sample modules and the theme link live in vendor/thelia/modules and templates/,
+    // which every test process shares: each name is completed by sample(), which slips the
+    // number of the process in when it runs with a TEST_TOKEN (ThemeShipSample2New).
+    private const string NEW = 'New';
 
-    private const string NEW_INACTIVE_CODE = 'ThemeShipSampleNewInactive';
+    private const string NEW_INACTIVE = 'NewInactive';
 
-    private const string INACTIVE_CODE = 'ThemeShipSampleInactive';
+    private const string INACTIVE = 'Inactive';
 
-    private const string SWITCHED_OFF_CODE = 'ThemeShipSampleSwitchedOff';
+    private const string SWITCHED_OFF = 'SwitchedOff';
 
-    private const string PARENT_CODE = 'ThemeShipSampleParent';
+    private const string PARENT = 'Parent';
 
-    private const string FAILING_CODE = 'ThemeShipSampleFailing';
+    private const string FAILING = 'Failing';
 
     // A class PHP loads once per process: a module whose class must fail to load needs a
     // code no other test declares a valid class for.
-    private const string BROKEN_CODE = 'ThemeShipSampleBroken';
+    private const string BROKEN = 'Broken';
 
-    private const string THEME_NAME = 'ThemeShipSampleTheme';
+    private const string THEME = 'Theme';
 
     private Filesystem $filesystem;
 
@@ -98,16 +102,16 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
     public function testApplyingAThemeOnlyActivatesTheModulesItBrings(): void
     {
         // Brought by the theme: not on the shop's disk, unknown to the module table.
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW), self::sample(self::NEW), '');
         // Brought by the theme too, and declared to ship inactive.
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE, self::NEW_INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW_INACTIVE), self::sample(self::NEW_INACTIVE), '<enabled-by-default>0</enabled-by-default>');
         // Registered by the install, declared to ship inactive.
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
         // Registered by the install as active, switched off by the merchant since.
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::SWITCHED_OFF_CODE, self::SWITCHED_OFF_CODE, '');
-        $this->registerSampleModule(self::SWITCHED_OFF_CODE);
-        $themeDir = $this->writeTheme([self::NEW_CODE, self::NEW_INACTIVE_CODE, self::INACTIVE_CODE, self::SWITCHED_OFF_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::SWITCHED_OFF), self::sample(self::SWITCHED_OFF), '');
+        $this->registerSampleModule(self::sample(self::SWITCHED_OFF));
+        $themeDir = $this->writeTheme([self::sample(self::NEW), self::sample(self::NEW_INACTIVE), self::sample(self::INACTIVE), self::sample(self::SWITCHED_OFF)]);
 
         $output = new BufferedOutput();
         /** @var ModuleManagement $moduleManagement */
@@ -115,18 +119,18 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $modules = $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
         $written = $output->fetch();
 
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE), 'A module the theme brings is installed and activated.');
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::NEW_CODE] ?? null, 'The module handed back for the module the theme brings carries the state its activation wrote, not the one its installation did.');
-        self::assertStringNotContainsString(self::NEW_CODE.' is required by the theme but', $written, 'A module the theme brings and activates is not reported inactive.');
-        self::assertStringContainsString('Module '.self::NEW_CODE.' successfully installed and activated.', $written, 'A module the theme brings and activates is announced.');
-        self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_CODE, 'The module the theme brings is copied where the shop keeps its modules.');
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE), 'A module the theme brings is registered but left inactive when its descriptor says so.');
-        self::assertDirectoryExists(THELIA_MODULE_DIR.self::NEW_INACTIVE_CODE, 'The module the theme brings is copied even though it ships inactive.');
-        self::assertStringContainsString(self::NEW_INACTIVE_CODE.' is required by the theme but ships inactive', $written);
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'A module declaring <enabled-by-default>0</enabled-by-default> stays inactive even though the theme requires it.');
-        self::assertStringContainsString(self::INACTIVE_CODE.' is required by the theme but ships inactive', $written);
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE), 'A module the merchant switched off is not switched back on by the theme.');
-        self::assertStringContainsString(self::SWITCHED_OFF_CODE.' is required by the theme but is registered inactive', $written);
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::NEW)), 'A module the theme brings is installed and activated.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::sample(self::NEW)] ?? null, 'The module handed back for the module the theme brings carries the state its activation wrote, not the one its installation did.');
+        self::assertStringNotContainsString(self::sample(self::NEW).' is required by the theme but', $written, 'A module the theme brings and activates is not reported inactive.');
+        self::assertStringContainsString('Module '.self::sample(self::NEW).' successfully installed and activated.', $written, 'A module the theme brings and activates is announced.');
+        self::assertDirectoryExists(THELIA_MODULE_DIR.self::sample(self::NEW), 'The module the theme brings is copied where the shop keeps its modules.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::NEW_INACTIVE)), 'A module the theme brings is registered but left inactive when its descriptor says so.');
+        self::assertDirectoryExists(THELIA_MODULE_DIR.self::sample(self::NEW_INACTIVE), 'The module the theme brings is copied even though it ships inactive.');
+        self::assertStringContainsString(self::sample(self::NEW_INACTIVE).' is required by the theme but ships inactive', $written);
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'A module declaring <enabled-by-default>0</enabled-by-default> stays inactive even though the theme requires it.');
+        self::assertStringContainsString(self::sample(self::INACTIVE).' is required by the theme but ships inactive', $written);
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::SWITCHED_OFF)), 'A module the merchant switched off is not switched back on by the theme.');
+        self::assertStringContainsString(self::sample(self::SWITCHED_OFF).' is required by the theme but is registered inactive', $written);
     }
 
     /**
@@ -137,22 +141,22 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAHardDependencyIsActivatedEvenIfItShipsInactive(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::PARENT_CODE, self::PARENT_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
-        $this->registerSampleModule(self::PARENT_CODE);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::PARENT), self::sample(self::PARENT), '', '<required><module>'.self::sample(self::INACTIVE).'</module></required>');
+        $this->registerSampleModule(self::sample(self::PARENT));
 
         // The same event ModuleManagement::install() dispatches: the dependency check is
         // what carries the recursive activation (Action\Module::checkToggleActivation).
-        $event = new ModuleToggleActivationEvent((int) ModuleQuery::create()->findOneByCode(self::PARENT_CODE)?->getId());
+        $event = new ModuleToggleActivationEvent((int) ModuleQuery::create()->findOneByCode(self::sample(self::PARENT))?->getId());
         $event->setNoCheck(false);
         $event->setRecursive(true);
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getService('event_dispatcher');
         $dispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::PARENT_CODE));
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'The dependency of an activated module is activated with it, even though it ships inactive.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::PARENT)));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'The dependency of an activated module is activated with it, even though it ships inactive.');
     }
 
     /**
@@ -163,10 +167,10 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testADependencyActivatedEarlierInTheLoopIsReadActiveInItsTurn(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::PARENT_CODE, self::PARENT_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $themeDir = $this->writeTheme([self::PARENT_CODE, self::INACTIVE_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::PARENT), self::sample(self::PARENT), '', '<required><module>'.self::sample(self::INACTIVE).'</module></required>');
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $themeDir = $this->writeTheme([self::sample(self::PARENT), self::sample(self::INACTIVE)]);
 
         $output = new BufferedOutput();
         /** @var ModuleManagement $moduleManagement */
@@ -174,12 +178,12 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $modules = $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
         $written = $output->fetch();
 
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::PARENT_CODE), 'The module the theme brings is activated.');
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'Its dependency is activated with it, even though it ships inactive.');
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::INACTIVE_CODE] ?? null, 'The module handed back for the dependency carries its current state.');
-        self::assertStringNotContainsString(self::INACTIVE_CODE.' is required by the theme but', $written, 'A dependency activated earlier in the loop is not reported missing in its turn.');
-        self::assertStringContainsString('Module '.self::PARENT_CODE.' successfully installed and activated.', $written);
-        self::assertStringNotContainsString('Module '.self::INACTIVE_CODE.' successfully installed', $written, 'A dependency activated on the way is not announced: the theme did not bring it.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::PARENT)), 'The module the theme brings is activated.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'Its dependency is activated with it, even though it ships inactive.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::sample(self::INACTIVE)] ?? null, 'The module handed back for the dependency carries its current state.');
+        self::assertStringNotContainsString(self::sample(self::INACTIVE).' is required by the theme but', $written, 'A dependency activated earlier in the loop is not reported missing in its turn.');
+        self::assertStringContainsString('Module '.self::sample(self::PARENT).' successfully installed and activated.', $written);
+        self::assertStringNotContainsString('Module '.self::sample(self::INACTIVE).' successfully installed', $written, 'A dependency activated on the way is not announced: the theme did not bring it.');
     }
 
     /**
@@ -189,10 +193,10 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testADependencyActivatedLaterInTheLoopIsReportedActive(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::PARENT_CODE, self::PARENT_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $themeDir = $this->writeTheme([self::INACTIVE_CODE, self::PARENT_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::PARENT), self::sample(self::PARENT), '', '<required><module>'.self::sample(self::INACTIVE).'</module></required>');
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $themeDir = $this->writeTheme([self::sample(self::INACTIVE), self::sample(self::PARENT)]);
 
         $output = new BufferedOutput();
         /** @var ModuleManagement $moduleManagement */
@@ -200,9 +204,9 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $modules = $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
         $written = $output->fetch();
 
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'The dependency is activated by the module listed after it.');
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::INACTIVE_CODE] ?? null, 'The module handed back for the dependency carries the state the rest of the loop left it in.');
-        self::assertStringNotContainsString(self::INACTIVE_CODE.' is required by the theme but', $written, 'A dependency activated later in the loop is not reported inactive.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'The dependency is activated by the module listed after it.');
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->statesOf($modules)[self::sample(self::INACTIVE)] ?? null, 'The module handed back for the dependency carries the state the rest of the loop left it in.');
+        self::assertStringNotContainsString(self::sample(self::INACTIVE).' is required by the theme but', $written, 'A dependency activated later in the loop is not reported inactive.');
     }
 
     /**
@@ -212,26 +216,26 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testTheCommandSumsUpTheThemeModulesAndEnablesTheTheme(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $themePath = $this->installTheme([self::NEW_CODE, self::INACTIVE_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW), self::sample(self::NEW), '');
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $themePath = $this->installTheme([self::sample(self::NEW), self::sample(self::INACTIVE)]);
 
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::once())->method('enableThemeAsBundle')->with($themePath);
-        $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::THEME_NAME);
+        $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::sample(self::THEME));
         // The autoloader of the project is not regenerated from a test.
         $composerHelper = $this->createMock(ComposerHelper::class);
         $composerHelper->expects(self::once())->method('dumpAutoload');
 
         $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::SUCCESS, $tester->getStatusCode(), $tester->getDisplay());
-        self::assertStringContainsString(self::INACTIVE_CODE.' is required by the theme but ships inactive', $tester->getDisplay());
+        self::assertStringContainsString(self::sample(self::INACTIVE).' is required by the theme but ships inactive', $tester->getDisplay());
         self::assertStringContainsString('2 theme modules found, 1 active.', $tester->getDisplay());
         self::assertStringContainsString('Autoload dump completed successfully', $tester->getDisplay());
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::NEW)));
     }
 
     /**
@@ -241,11 +245,11 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testARefusedDescriptorIsReportedOnTheErrorLine(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '<enabled-by-default>maybe</enabled-by-default>');
-        $this->installTheme([self::FAILING_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::FAILING), self::sample(self::FAILING), '<enabled-by-default>maybe</enabled-by-default>');
+        $this->installTheme([self::sample(self::FAILING)]);
 
         $tester = new CommandTester($this->setTemplateCommand($this->createMock(TheliaTemplateHelper::class), $this->createMock(ComposerHelper::class)));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
         self::assertMatchesRegularExpression('/^ERROR: .*not a valid file.*\(Code \d+\).*$/m', $tester->getDisplay());
@@ -257,11 +261,11 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testTheTraceOfAFailedModuleIsPrintedInVerboseMode(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
-        $this->installTheme([self::FAILING_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::FAILING), self::sample(self::FAILING), '', '', '99.0.0');
+        $this->installTheme([self::sample(self::FAILING)]);
 
         $tester = new CommandTester($this->setTemplateCommand($this->createMock(TheliaTemplateHelper::class), $this->createMock(ComposerHelper::class)));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
         self::assertMatchesRegularExpression('/^#0 \S+\(\d+\): \S+\(\)$/m', $tester->getDisplay());
@@ -273,17 +277,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAFailedAutoloadDumpIsPrintedAndTheThemeIsEnabled(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $this->installTheme([self::INACTIVE_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '<enabled-by-default>0</enabled-by-default>');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $this->installTheme([self::sample(self::INACTIVE)]);
 
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
-        $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::THEME_NAME);
+        $templateHelper->expects(self::once())->method('setConfigToTemplate')->with(self::anything(), self::sample(self::THEME));
         $composerHelper = $this->createMock(ComposerHelper::class);
         $composerHelper->method('dumpAutoload')->willThrowException(new \RuntimeException("Could not scan\e[31m vendor"));
 
         $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::SUCCESS, $tester->getStatusCode(), $tester->getDisplay());
         self::assertStringContainsString('Composer dump-autoload failed: Could not scan?[31m vendor', $tester->getDisplay());
@@ -297,8 +301,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testTheCommandStopsWithoutEnablingTheThemeWhenAModuleCannotBeActivated(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
-        $this->installTheme([self::FAILING_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::FAILING), self::sample(self::FAILING), '', '', '99.0.0');
+        $this->installTheme([self::sample(self::FAILING)]);
 
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::never())->method('enableThemeAsBundle');
@@ -307,22 +311,22 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $composerHelper->expects(self::never())->method('dumpAutoload');
 
         $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
-        self::assertStringContainsString('ERROR: The module '.self::FAILING_CODE.' requires Thelia 99.0.0 or newer', $tester->getDisplay());
+        self::assertStringContainsString('ERROR: The module '.self::sample(self::FAILING).' requires Thelia 99.0.0 or newer', $tester->getDisplay());
         self::assertStringNotContainsString('theme modules found', $tester->getDisplay());
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::FAILING_CODE), 'Its installation registered it inactive, and the row stays: nothing is ever removed on the theme\'s behalf.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::FAILING)), 'Its installation registered it inactive, and the row stays: nothing is ever removed on the theme\'s behalf.');
 
         // Run again: the module is now one the shop knows, left inactive and named, and the
         // theme is enabled. The stop only holds for the run that met the failure.
         $replayTemplateHelper = $this->createMock(TheliaTemplateHelper::class);
         $replayTemplateHelper->expects(self::once())->method('enableThemeAsBundle');
         $replayTester = new CommandTester($this->setTemplateCommand($replayTemplateHelper, $this->createMock(ComposerHelper::class)));
-        $replayTester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $replayTester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::SUCCESS, $replayTester->getStatusCode(), $replayTester->getDisplay());
-        self::assertStringContainsString('Module '.self::FAILING_CODE.' is required by the theme but is registered inactive', $replayTester->getDisplay());
+        self::assertStringContainsString('Module '.self::sample(self::FAILING).' is required by the theme but is registered inactive', $replayTester->getDisplay());
         self::assertStringContainsString('left as it is, and the theme goes on without it', $replayTester->getDisplay(), 'The second run says the theme is enabled without the module.');
     }
 
@@ -332,9 +336,9 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAFailureAfterAModuleWasActivatedStopsTheCommand(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '', '99.0.0');
-        $this->installTheme([self::NEW_CODE, self::FAILING_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW), self::sample(self::NEW), '');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::FAILING), self::sample(self::FAILING), '', '', '99.0.0');
+        $this->installTheme([self::sample(self::NEW), self::sample(self::FAILING)]);
 
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::never())->method('enableThemeAsBundle');
@@ -342,11 +346,11 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $composerHelper->expects(self::never())->method('dumpAutoload');
 
         $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE));
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::FAILING_CODE));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::NEW)));
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::FAILING)));
     }
 
     /**
@@ -355,8 +359,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAModuleWhoseClassDoesNotLoadStopsTheCommandTheSameWay(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::BROKEN_CODE, self::BROKEN_CODE, '', '', '3.0.0', '\\ThemeShipSampleMissing\\ParentModule');
-        $this->installTheme([self::BROKEN_CODE]);
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::BROKEN), self::sample(self::BROKEN), '', '', '3.0.0', '\\ThemeShipSampleMissing\\ParentModule');
+        $this->installTheme([self::sample(self::BROKEN)]);
 
         $templateHelper = $this->createMock(TheliaTemplateHelper::class);
         $templateHelper->expects(self::never())->method('enableThemeAsBundle');
@@ -364,12 +368,12 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $composerHelper->expects(self::never())->method('dumpAutoload');
 
         $tester = new CommandTester($this->setTemplateCommand($templateHelper, $composerHelper));
-        $tester->execute(['type' => 'backOffice', 'name' => self::THEME_NAME]);
+        $tester->execute(['type' => 'backOffice', 'name' => self::sample(self::THEME)]);
 
         self::assertSame(SetTemplate::FAILURE, $tester->getStatusCode(), $tester->getDisplay());
         self::assertStringContainsString('ERROR: ', $tester->getDisplay());
         self::assertStringContainsString('ERROR: Class "ThemeShipSampleMissing\\ParentModule" not found', $tester->getDisplay());
-        self::assertNull(ModuleQuery::create()->findOneByCode(self::BROKEN_CODE));
+        self::assertNull(ModuleQuery::create()->findOneByCode(self::sample(self::BROKEN)));
     }
 
     /**
@@ -379,26 +383,26 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testInstallModuleLeavesAModuleShippingInactiveInactive(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE, self::NEW_INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW_INACTIVE), self::sample(self::NEW_INACTIVE), '<enabled-by-default>0</enabled-by-default>');
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
 
-        $module = $moduleManagement->installModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE);
+        $module = $moduleManagement->installModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW_INACTIVE));
 
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $module->getActivate());
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE));
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::NEW_INACTIVE)));
     }
 
     public function testInstallModuleActivatesAModuleThatSaysNothing(): void
     {
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE, self::NEW_CODE, '');
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW), self::sample(self::NEW), '');
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
 
-        $module = $moduleManagement->installModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_CODE);
+        $module = $moduleManagement->installModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW));
 
         self::assertSame(BaseModule::IS_ACTIVATED, $module->getActivate());
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::NEW_CODE));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::NEW)));
     }
 
     /**
@@ -408,17 +412,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAModuleKnownUnderAFormerNamespaceKeepsTheStateTheMerchantChose(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::SWITCHED_OFF_CODE, self::SWITCHED_OFF_CODE, '');
-        $this->registerSampleModule(self::SWITCHED_OFF_CODE, 0, 'FormerVendor\\'.self::SWITCHED_OFF_CODE);
-        $rowId = ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE)?->getId();
-        $themeDir = $this->writeTheme([self::SWITCHED_OFF_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::SWITCHED_OFF), self::sample(self::SWITCHED_OFF), '');
+        $this->registerSampleModule(self::sample(self::SWITCHED_OFF), 0, 'FormerVendor\\'.self::sample(self::SWITCHED_OFF));
+        $rowId = ModuleQuery::create()->findOneByCode(self::sample(self::SWITCHED_OFF))?->getId();
+        $themeDir = $this->writeTheme([self::sample(self::SWITCHED_OFF)]);
 
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
         $moduleManagement->installModulesFromTemplatePath($themeDir, new BufferedOutput());
 
-        self::assertSame($rowId, ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE)?->getId(), 'The merchant\'s row is the one kept.');
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE), 'A module the merchant switched off is not switched back on because its namespace changed.');
+        self::assertSame($rowId, ModuleQuery::create()->findOneByCode(self::sample(self::SWITCHED_OFF))?->getId(), 'The merchant\'s row is the one kept.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::SWITCHED_OFF)), 'A module the merchant switched off is not switched back on because its namespace changed.');
     }
 
     /**
@@ -427,17 +431,17 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAModuleThatShipsInactiveActivatesNoneOfItsRequiredModules(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::NEW_INACTIVE_CODE, self::NEW_INACTIVE_CODE, '<enabled-by-default>0</enabled-by-default>', '<required><module>'.self::INACTIVE_CODE.'</module></required>');
-        $themeDir = $this->writeTheme([self::NEW_INACTIVE_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::NEW_INACTIVE), self::sample(self::NEW_INACTIVE), '<enabled-by-default>0</enabled-by-default>', '<required><module>'.self::sample(self::INACTIVE).'</module></required>');
+        $themeDir = $this->writeTheme([self::sample(self::NEW_INACTIVE)]);
 
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
         $moduleManagement->installModulesFromTemplatePath($themeDir, new BufferedOutput());
 
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::NEW_INACTIVE_CODE));
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'A module shipped inactive switches on none of its required modules.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::NEW_INACTIVE)));
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'A module shipped inactive switches on none of its required modules.');
     }
 
     /**
@@ -446,10 +450,10 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testTheRequiredModulesOfAModuleThatFailsStayActive(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::FAILING_CODE, self::FAILING_CODE, '', '<required><module>'.self::INACTIVE_CODE.'</module></required>', '99.0.0');
-        $themeDir = $this->writeTheme([self::FAILING_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $this->writeSampleModule($this->themeVendorDir().'/thelia/modules/'.self::sample(self::FAILING), self::sample(self::FAILING), '', '<required><module>'.self::sample(self::INACTIVE).'</module></required>', '99.0.0');
+        $themeDir = $this->writeTheme([self::sample(self::FAILING)]);
 
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
@@ -461,8 +465,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
             self::assertStringContainsString('requires Thelia 99.0.0', $exception->getMessage());
         }
 
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::FAILING_CODE));
-        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::INACTIVE_CODE), 'Its required module was activated before the module failed, and stays active.');
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::FAILING)));
+        self::assertSame(BaseModule::IS_ACTIVATED, $this->activationOf(self::sample(self::INACTIVE)), 'Its required module was activated before the module failed, and stays active.');
     }
 
     /**
@@ -472,10 +476,10 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAModuleRegisteredUnderTheCodeOfItsNamespaceKeepsItsRow(): void
     {
-        $directoryName = 'ThemeShipSampleRenamedDirectory';
-        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::SWITCHED_OFF_CODE, '');
-        $this->registerSampleModule(self::SWITCHED_OFF_CODE, 0, 'FormerVendor\\'.self::SWITCHED_OFF_CODE);
-        $rowId = ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE)?->getId();
+        $directoryName = self::sample('RenamedDirectory');
+        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::sample(self::SWITCHED_OFF), '');
+        $this->registerSampleModule(self::sample(self::SWITCHED_OFF), 0, 'FormerVendor\\'.self::sample(self::SWITCHED_OFF));
+        $rowId = ModuleQuery::create()->findOneByCode(self::sample(self::SWITCHED_OFF))?->getId();
 
         /** @var ModuleManagement $moduleManagement */
         $moduleManagement = $this->getService(ModuleManagement::class);
@@ -483,7 +487,7 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
         self::assertSame($rowId, $module->getId(), 'The row registered under the code of the namespace is the one handed back.');
         self::assertNull(ModuleQuery::create()->findOneByCode($directoryName), 'No row is installed under the name of the directory.');
-        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::SWITCHED_OFF_CODE));
+        self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf(self::sample(self::SWITCHED_OFF)));
     }
 
     /**
@@ -492,8 +496,8 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAModuleRegisteredUnderItsDirectoryNameKeepsItsRow(): void
     {
-        $directoryName = 'ThemeShipSampleDirectory';
-        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::SWITCHED_OFF_CODE, '');
+        $directoryName = self::sample('Directory');
+        $this->writeSampleModule(THELIA_MODULE_DIR.$directoryName, self::sample(self::SWITCHED_OFF), '');
         $this->registerSampleModule($directoryName, 0, 'FormerVendor\\'.$directoryName);
         $rowId = ModuleQuery::create()->findOneByCode($directoryName)?->getId();
 
@@ -502,7 +506,7 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $module = $moduleManagement->installModule(THELIA_MODULE_DIR.$directoryName);
 
         self::assertSame($rowId, $module->getId(), 'The row registered under the directory name is the one handed back.');
-        self::assertNull(ModuleQuery::create()->findOneByCode(self::SWITCHED_OFF_CODE), 'No second row is installed under the code of the namespace.');
+        self::assertNull(ModuleQuery::create()->findOneByCode(self::sample(self::SWITCHED_OFF)), 'No second row is installed under the code of the namespace.');
         self::assertSame(BaseModule::IS_NOT_ACTIVATED, $this->activationOf($directoryName));
     }
 
@@ -512,11 +516,11 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
      */
     public function testAMandatoryModuleLeftInactiveIsReportedAsMandatory(): void
     {
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::SWITCHED_OFF_CODE, self::SWITCHED_OFF_CODE, '');
-        $this->registerSampleModule(self::SWITCHED_OFF_CODE, BaseModule::IS_MANDATORY);
-        $this->writeSampleModule(THELIA_MODULE_DIR.self::INACTIVE_CODE, self::INACTIVE_CODE, '');
-        $this->registerSampleModule(self::INACTIVE_CODE);
-        $themeDir = $this->writeTheme([self::SWITCHED_OFF_CODE, self::INACTIVE_CODE]);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::SWITCHED_OFF), self::sample(self::SWITCHED_OFF), '');
+        $this->registerSampleModule(self::sample(self::SWITCHED_OFF), BaseModule::IS_MANDATORY);
+        $this->writeSampleModule(THELIA_MODULE_DIR.self::sample(self::INACTIVE), self::sample(self::INACTIVE), '');
+        $this->registerSampleModule(self::sample(self::INACTIVE));
+        $themeDir = $this->writeTheme([self::sample(self::SWITCHED_OFF), self::sample(self::INACTIVE)]);
 
         $output = new BufferedOutput();
         /** @var ModuleManagement $moduleManagement */
@@ -524,8 +528,24 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
         $moduleManagement->installModulesFromTemplatePath($themeDir, $output);
         $written = $output->fetch();
 
-        self::assertStringContainsString('Module '.self::SWITCHED_OFF_CODE.' is mandatory but is registered inactive: activate it from the back-office.', $written);
-        self::assertStringNotContainsString('Module '.self::INACTIVE_CODE.' is mandatory', $written);
+        self::assertStringContainsString('Module '.self::sample(self::SWITCHED_OFF).' is mandatory but is registered inactive: activate it from the back-office.', $written);
+        self::assertStringNotContainsString('Module '.self::sample(self::INACTIVE).' is mandatory', $written);
+    }
+
+    /**
+     * The name of a sample module, directory or theme: ThemeShipSampleNew without a token,
+     * ThemeShipSample2New for the test process numbered 2. The number sits between the
+     * prefix and a capital letter, so the cleanup of one process cannot match the samples
+     * of another (2 and 21 included).
+     */
+    private static function sample(string $name): string
+    {
+        return self::samplePrefix().$name;
+    }
+
+    private static function samplePrefix(): string
+    {
+        return self::SAMPLE_PREFIX.(TestToken::current() ?? '');
     }
 
     private function setTemplateCommand(TheliaTemplateHelper $templateHelper, ComposerHelper $composerHelper): SetTemplate
@@ -650,12 +670,12 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
     private static function themeLink(): string
     {
-        return THELIA_TEMPLATE_DIR.'backOffice'.DS.self::THEME_NAME;
+        return THELIA_TEMPLATE_DIR.'backOffice'.DS.self::sample(self::THEME);
     }
 
     private static function removeSampleFiles(): void
     {
-        (new Filesystem())->remove([...(glob(THELIA_MODULE_DIR.self::SAMPLE_PREFIX.'*') ?: []), self::themeLink()]);
+        (new Filesystem())->remove([...(glob(THELIA_MODULE_DIR.self::samplePrefix().'[A-Z]*') ?: []), self::themeLink()]);
     }
 
     /**
@@ -714,7 +734,7 @@ final class ThemeModuleActivationTest extends IntegrationTestCase
 
     private function removeSampleModules(): void
     {
-        ModuleQuery::create()->filterByCode(self::SAMPLE_PREFIX.'%', Criteria::LIKE)->delete();
+        ModuleQuery::create()->filterByCode(self::samplePrefix().'%', Criteria::LIKE)->delete();
         ModuleQuery::resetActivated();
 
         self::removeSampleFiles();
