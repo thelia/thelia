@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Log;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use Thelia\Log\Destination\TlogDestinationText;
 use Thelia\Log\Tlog;
 
@@ -57,6 +58,19 @@ final class TlogTest extends TestCase
         $this->expectOutputString("WARNING: First\nWARNING: Second\n");
 
         $this->loggerAt(Tlog::DEBUG)->addWarning('First', 'Second');
+    }
+
+    /**
+     * Tlog is a PSR-3 logger: a caller that only knows the interface names the level
+     * with a LogLevel string.
+     */
+    public function testAPsrLevelNameIsUnderstood(): void
+    {
+        $this->expectOutputString("WARNING: Stock is running low\nERROR: Payment refused\n");
+
+        $logger = $this->loggerAt(Tlog::DEBUG);
+        $logger->log(LogLevel::WARNING, 'Stock is running low');
+        $logger->log(LogLevel::ERROR, 'Payment refused');
     }
 
     /**

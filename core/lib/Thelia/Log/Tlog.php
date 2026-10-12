@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Log;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 
@@ -48,6 +49,18 @@ class Tlog implements LoggerInterface
         600 => 'CRITICAL',
         700 => 'ALERT',
         800 => 'EMERGENCY',
+    ];
+
+    /** The levels a PSR-3 caller names, on the scale above. */
+    private const PSR_LEVELS = [
+        LogLevel::DEBUG => self::DEBUG,
+        LogLevel::INFO => self::INFO,
+        LogLevel::NOTICE => self::NOTICE,
+        LogLevel::WARNING => self::WARNING,
+        LogLevel::ERROR => self::ERROR,
+        LogLevel::CRITICAL => self::CRITICAL,
+        LogLevel::ALERT => self::ALERT,
+        LogLevel::EMERGENCY => self::EMERGENCY,
     ];
 
     public const DEFAULT_LEVEL = self::ERROR;
@@ -275,6 +288,8 @@ class Tlog implements LoggerInterface
 
     public function log(mixed $level, $message, array $context = []): void
     {
+        $level = self::PSR_LEVELS[$level] ?? $level;
+
         if ($this->level > $level || !\array_key_exists($level, $this->levels)) {
             return;
         }
