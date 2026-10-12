@@ -9,6 +9,10 @@
 
 - An order lines export, `thelia.export.order_lines`, writes one row per order line with the references of the product and of the combination, the GTIN and the manufacturer part number frozen on the line, the quantity and the unit price, bounded by the same optional dates as the full order export. The two product price exports gain an `mpn` column, and the stock import an optional `mpn` column; a row of the stock import whose `ean` is not a GTIN is refused with the reason and the import goes on. A GTIN or a part number a spreadsheet would run as a formula is exported behind a leading quote.
 
+## Tests
+
+- The test suites can run in several processes at once. With `TEST_TOKEN=2`, `composer test:prepare` creates the database `test_2` and the suites use it, with their own container cache, Propel models, cache pools and lock directory. A module's tests get the same suffix from `Thelia\Test\TestToken` for anything they write into a directory the processes share.
+
 ## Fixed
 
 - The `lang` argument of the loops that extend `BaseI18nLoop` (`country`, `title`, `module`, `product`, and so on) now chooses the language their texts are read in, as it did in Thelia 2. It was declared but ignored: the texts always came in the language of the session, so a document printed for a customer in another language than the administrator's, or rendered by a command, named countries and civilities in the wrong language. The argument takes a language id or a locale; without it, the language of the session applies, then the default one.
