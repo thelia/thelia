@@ -108,6 +108,26 @@ final class InternalViewsDeclarationTest extends TestCase
         InternalViewsDeclaration::readFrom($this->templateDirectory);
     }
 
+    public function testAViewNameMadeOfSpacesOnlyIsReported(): void
+    {
+        $this->writeDeclaration("internal:\n    - address\n    - '   '\n");
+
+        $this->expectException(TemplateException::class);
+        $this->expectExceptionMessageMatches('/must contain a list of view names/');
+
+        InternalViewsDeclaration::readFrom($this->templateDirectory);
+    }
+
+    public function testTheFileIsNamedWithoutADoubledSeparatorWhenTheDirectoryEndsWithOne(): void
+    {
+        $this->writeDeclaration("internal: address\n");
+
+        $this->expectException(TemplateException::class);
+        $this->expectExceptionMessage(\sprintf('The "internal" key of %s/config/views.yaml must contain a list of view names.', $this->templateDirectory));
+
+        InternalViewsDeclaration::readFrom($this->templateDirectory.'/');
+    }
+
     private function writeDeclaration(string $content): void
     {
         (new Filesystem())->dumpFile(

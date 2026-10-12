@@ -29,4 +29,19 @@ final class InvalidModuleDescriptorExceptionTest extends TestCase
 
         self::assertSame("<enabled-by-default> in ?[31mAcme?[0m/Config/module.xml?\n\tmust be 0 or 1", $exception->getMessage());
     }
+
+    public function testTheCodeIsZeroUnlessGiven(): void
+    {
+        self::assertSame(0, (new InvalidModuleDescriptorException('<mandatory> must be 0 or 1'))->getCode());
+    }
+
+    public function testTheCodeAndThePreviousExceptionAreKept(): void
+    {
+        $previous = new \RuntimeException('Unreadable');
+
+        $exception = new InvalidModuleDescriptorException('module.xml is not readable', 7, $previous);
+
+        self::assertSame(7, $exception->getCode());
+        self::assertSame($previous, $exception->getPrevious());
+    }
 }
