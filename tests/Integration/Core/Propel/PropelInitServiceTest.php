@@ -26,12 +26,12 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\TestToken;
 
 final class PropelInitServiceTest extends IntegrationTestCase
 {
     private const TEST_ENVIRONMENT = 'propel_init_service_test';
 
-    private const PROBE_MODULE_CODE = 'PropelInitServiceReloadProbe';
     private const PROBE_TABLE_NAME = 'propel_init_service_reload_probe';
 
     // A module row committed outside any transaction is required so that
@@ -134,12 +134,12 @@ final class PropelInitServiceTest extends IntegrationTestCase
     private function writeProbeModule(): void
     {
         $fs = new Filesystem();
-        $moduleDir = THELIA_LOCAL_MODULE_DIR.self::PROBE_MODULE_CODE.DS;
+        $moduleDir = THELIA_LOCAL_MODULE_DIR.self::probeModuleCode().DS;
 
-        $fs->dumpFile($moduleDir.'Config'.DS.'module.xml', <<<'XML'
+        $fs->dumpFile($moduleDir.'Config'.DS.'module.xml', str_replace('__CODE__', self::probeModuleCode(), <<<'XML'
             <?xml version="1.0" encoding="UTF-8"?>
             <module>
-                <fullnamespace>PropelInitServiceReloadProbe\PropelInitServiceReloadProbe</fullnamespace>
+                <fullnamespace>__CODE__\__CODE__</fullnamespace>
                 <descriptive locale="en_US">
                     <title>Propel init service reload probe</title>
                 </descriptive>
@@ -152,11 +152,11 @@ final class PropelInitServiceTest extends IntegrationTestCase
                 <thelia>3.0.0</thelia>
                 <stability>dev</stability>
             </module>
-            XML);
+            XML));
 
         $schema = <<<'XML'
             <?xml version="1.0" encoding="UTF-8"?>
-            <database name="TheliaMain" namespace="PropelInitServiceReloadProbe\Model">
+            <database name="TheliaMain" namespace="__CODE__\Model">
                 <table name="__TABLE_NAME__">
                     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
                     <column name="title" type="VARCHAR" size="255" />
@@ -169,30 +169,39 @@ final class PropelInitServiceTest extends IntegrationTestCase
 
         $fs->dumpFile(
             $moduleDir.'Config'.DS.'schema.xml',
-            str_replace('__TABLE_NAME__', self::PROBE_TABLE_NAME, $schema),
+            str_replace(['__TABLE_NAME__', '__CODE__'], [self::PROBE_TABLE_NAME, self::probeModuleCode()], $schema),
         );
+    }
+
+    /**
+     * The probe module is written into local/modules, which test processes running
+     * side by side share (TestToken): each one writes its own.
+     */
+    private static function probeModuleCode(): string
+    {
+        return 'PropelInitService'.(TestToken::current() ?? '').'ReloadProbe';
     }
 
     private function removeProbeModule(): void
     {
-        (new Filesystem())->remove(THELIA_LOCAL_MODULE_DIR.self::PROBE_MODULE_CODE);
+        (new Filesystem())->remove(THELIA_LOCAL_MODULE_DIR.self::probeModuleCode());
     }
 
     private function activateProbeModuleRow(): void
     {
         (new Module())
-            ->setCode(self::PROBE_MODULE_CODE)
+            ->setCode(self::probeModuleCode())
             ->setVersion('1.0.0')
             ->setType(BaseModule::CLASSIC_MODULE_TYPE)
             ->setCategory('classic')
             ->setActivate(BaseModule::IS_ACTIVATED)
-            ->setFullNamespace('PropelInitServiceReloadProbe\\PropelInitServiceReloadProbe')
+            ->setFullNamespace(self::probeModuleCode().'\\'.self::probeModuleCode())
             ->save();
     }
 
     private function removeProbeModuleRow(): void
     {
-        ModuleQuery::create()->findOneByCode(self::PROBE_MODULE_CODE)?->delete();
+        ModuleQuery::create()->findOneByCode(self::probeModuleCode())?->delete();
     }
 
     /**

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Support\Trait;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Test\TestToken;
 
 /**
  * Provides helpers for tests that need temporary files
@@ -60,6 +61,14 @@ trait CreatesTestFiles
 
     protected function createUploadedFile(string $path, string $originalName, string $mimeType): UploadedFile
     {
+        // The stored name is built from this one and from the row id, which is the
+        // same in every copy of the database: processes running side by side
+        // (TestToken) would otherwise write and delete each other's media files.
+        // A name built to test how unusual names are cleaned is left as it is.
+        if (1 === preg_match('/^([A-Za-z0-9_-]+)(\.[A-Za-z0-9]+)$/', $originalName, $parts)) {
+            $originalName = $parts[1].TestToken::suffix().$parts[2];
+        }
+
         return new UploadedFile($path, $originalName, $mimeType, null, true);
     }
 
