@@ -1677,4 +1677,5 @@ return [
     'Shipping notice sent to the customer' => 'Shipping notice sent to the customer',
     'Your order {{ order_ref }} has been shipped' => 'Your order {{ order_ref }} has been shipped',
     'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)',
+    'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' => 'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)',
 ];
