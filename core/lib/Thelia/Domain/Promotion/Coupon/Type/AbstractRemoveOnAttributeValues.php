@@ -76,11 +76,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             $freeShippingForModules,
             $perCustomerUsageCount,
         );
-        $attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
-        if (!\is_array($attributeAvList)) {
-            $attributeAvList = [$attributeAvList];
-        }
-        $this->attributeAvList = $attributeAvList;
+        $this->attributeAvList = $this->effectIdList($effects[self::ATTRIBUTES_AV_LIST] ?? []);
 
         $this->attribute = (int) ($effects[self::ATTRIBUTE] ?? 0);
 
