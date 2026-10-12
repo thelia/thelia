@@ -23,6 +23,7 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
@@ -145,6 +146,31 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * A reserved operation that is not running is open to nobody, whether another
+     * reserved operation happens to run or not: one being prepared stays out of
+     * the front until it starts.
+     */
+    public function testAReservedOperationThatIsNotRunningIsHiddenWhetherAnotherOneRunsOrNot(): void
+    {
+        $public = $this->factory->sale(['active' => true]);
+        $draft = $this->factory->sale(['active' => false, 'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS]);
+        $namedOnTheDraft = $this->newCustomer();
+        $this->factory->saleCustomer($draft, $namedOnTheDraft);
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'no reserved operation runs');
+
+        $this->runningReservedSaleNaming($this->newCustomer());
+        $this->forgetMemoisedAudience();
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'another reserved operation runs');
+
+        $this->loginAsCustomerInSession($namedOnTheDraft);
+        $this->forgetMemoisedAudience();
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]), 'the customer the draft names');
+    }
+
     private function isVisible(Product $product): bool
     {
         $query = ProductQuery::create()->filterById($product->getId());
@@ -177,6 +203,32 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
         $this->factory->saleOffsetCurrency($sale, $this->currency, 10.0);
 
         return $sale;
+    }
+
+    private function runningReservedSaleNaming(Customer $customer): Sale
+    {
+        $sale = $this->factory->sale([
+            'active' => true,
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS,
+            'startDate' => new \DateTime('-1 day'),
+            'endDate' => new \DateTime('+1 day'),
+        ]);
+        $this->factory->saleCustomer($sale, $customer);
+
+        return $sale;
+    }
+
+    /**
+     * @param list<Sale> $sales
+     *
+     * @return list<int>
+     */
+    private function visibleSaleIds(array $sales): array
+    {
+        $query = SaleQuery::create()->filterById(array_map(static fn (Sale $sale): int => $sale->getId(), $sales));
+        $this->visibility->applyToSales($query);
+
+        return array_map(static fn (Sale $sale): int => $sale->getId(), iterator_to_array($query->find()));
     }
 
     private function newCustomer(): Customer
