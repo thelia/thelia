@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Domain\Media;
 
+use Imagine\Gmagick\Imagine as GmagickImagine;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine as ImagickImagine;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Media\Enum\ImageFormat;
 use Thelia\Domain\Media\Service\ImageFormatCapabilities;
@@ -42,5 +45,15 @@ final class ImageFormatCapabilitiesTest extends TestCase
             ])),
             $capabilities->supportedFormats()
         );
+    }
+
+    /**
+     * The driver is read off the Imagine instance LiipImagine encodes with.
+     */
+    public function testTheDriverIsTheOneTheImagineInstanceIs(): void
+    {
+        self::assertSame('imagick', (new ImageFormatCapabilities($this->createStub(ImagickImagine::class)))->driver());
+        self::assertSame('gmagick', (new ImageFormatCapabilities($this->createStub(GmagickImagine::class)))->driver());
+        self::assertSame('gd', (new ImageFormatCapabilities($this->createStub(ImagineInterface::class)))->driver());
     }
 }

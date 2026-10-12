@@ -94,4 +94,14 @@ final class ImageFormatTest extends TestCase
         // to the next, and a shared default would hand AVIF a JPEG's quality.
         self::assertNotSame(ImageFormat::Avif->defaultQuality(), ImageFormat::Webp->defaultQuality());
     }
+
+    /**
+     * These are the measured defaults a fresh shop encodes with: the same number would not
+     * give AVIF and WebP the same picture, so each keeps its own.
+     */
+    public function testEachFormatDefaultsToItsMeasuredQuality(): void
+    {
+        self::assertSame(50, ImageFormat::Avif->defaultQuality());
+        self::assertSame(75, ImageFormat::Webp->defaultQuality());
+    }
 }
