@@ -123,6 +123,28 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
         self::assertSame(0.0, round($this->calculator->lineRefundForProduct($orderProduct, 1.0), 2));
     }
 
+    /**
+     * The postage is stored tax included: carried back, it refunds what the
+     * customer paid for it, its tax already in it.
+     */
+    public function testTheReturnedPostageIsRefundedAsTheCustomerPaidForIt(): void
+    {
+        $order = $this->factory->order(null, [
+            'statusCode' => OrderStatus::CODE_PAID,
+            'postage' => '6.000000',
+            'postageTax' => '1.000000',
+        ]);
+        $orderProduct = $this->orderProduct($order, price: '30.000000', quantity: 1.0, unitTax: '6.000000');
+
+        $withPostage = $this->returnOf($order, [[$orderProduct, 1.0]]);
+        $withPostage->setIncludePostage(true)->save($this->getPropelConnection());
+        $withoutPostage = $this->returnOf($order, [[$orderProduct, 1.0]]);
+
+        self::assertSame(42.0, round($order->getTotalAmount(), 2));
+        self::assertSame(42.0, round($this->calculator->compute($withPostage), 2));
+        self::assertSame(36.0, round($this->calculator->compute($withoutPostage), 2));
+    }
+
     private function discountedOrder(): Order
     {
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
