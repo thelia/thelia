@@ -125,6 +125,10 @@ class I18n
     {
         $str = trim((string) $str, "\"'");
 
+        if ('' === $str) {
+            return '""';
+        }
+
         $return = 'CONCAT(';
         $len = \strlen($str);
 
@@ -132,8 +136,6 @@ class I18n
             $return .= 'CHAR('.\ord($str[$i]).'),';
         }
 
-        $return = $i > 0 ? substr($return, 0, -1) : '""';
-
-        return $return.')';
+        return substr($return, 0, -1).')';
     }
 }

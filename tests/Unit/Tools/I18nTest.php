@@ -32,6 +32,15 @@ final class I18nTest extends TestCase
         self::assertSame(I18n::realEscape('ab'), I18n::realEscape("'ab'"));
     }
 
+    /**
+     * An empty string, or one made of quotes only, is still a valid SQL literal.
+     */
+    public function testRealEscapeTurnsAnEmptyStringIntoAnEmptyLiteral(): void
+    {
+        self::assertSame('""', I18n::realEscape(''));
+        self::assertSame('""', I18n::realEscape('""'));
+    }
+
     public function testRealEscapeEncodesEachCharacterIndividually(): void
     {
         $escaped = I18n::realEscape('foo');
