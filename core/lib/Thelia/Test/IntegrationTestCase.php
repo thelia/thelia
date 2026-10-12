@@ -53,6 +53,18 @@ use Thelia\Model\TaxRuleQuery;
  */
 abstract class IntegrationTestCase extends KernelTestCase
 {
+    /**
+     * Each test opens its transaction under a hundred nested levels. Propel only
+     * counts a nested level, it sends nothing to the database: code under test
+     * that commits a transaction it did not open (a commit() left without its
+     * beginTransaction()) takes the counter down instead of committing the rows
+     * of the test, which would then stay in the database for every test after
+     * it. tearDown() still rolls everything back, and the test fails saying so.
+     * One level would not be enough: such code is often called more than once
+     * in a test.
+     */
+    protected const int TEST_TRANSACTION_LEVELS = 100;
+
     protected bool $useTransaction = true;
 
     private ?ConnectionInterface $connection = null;
@@ -98,7 +110,10 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         if ($this->useTransaction) {
             $this->connection = Propel::getConnection('TheliaMain');
-            $this->connection->beginTransaction();
+
+            for ($level = 0; $level < self::TEST_TRANSACTION_LEVELS; ++$level) {
+                $this->connection->beginTransaction();
+            }
         }
 
         // Propel caches ActiveRecord instances in a per-class in-memory
@@ -111,6 +126,10 @@ abstract class IntegrationTestCase extends KernelTestCase
 
     protected function tearDown(): void
     {
+        $closedByTheCodeUnderTest = $this->useTransaction
+            && $this->connection instanceof ConnectionWrapper
+            && $this->connection->getNestedTransactionCount() < self::TEST_TRANSACTION_LEVELS;
+
         if ($this->useTransaction && $this->connection instanceof ConnectionInterface && $this->connection->inTransaction()) {
             // A test that fails while application code is inside its own
             // Propel "nested transaction" leaves the nesting counter above 1.
@@ -128,6 +147,10 @@ abstract class IntegrationTestCase extends KernelTestCase
         $this->forgetWhatTheTestLeftInMemory();
 
         parent::tearDown();
+
+        if ($closedByTheCodeUnderTest) {
+            self::fail('The code under test committed or rolled back a database transaction it did not open.');
+        }
     }
 
     /**

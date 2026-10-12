@@ -12,6 +12,7 @@
 ## Tests
 
 - The test suites can run in several processes at once. With `TEST_TOKEN=2`, `composer test:prepare` creates the database `test_2` and the suites use it, with their own container cache, Propel models, cache pools and lock directory. A module's tests get the same suffix from `Thelia\Test\TestToken` for anything they write into a directory the processes share.
+- An integration test fails, with a message that says why, when the code under test commits or rolls back a transaction it did not open, and the rows of that test no longer stay in the test database for the tests that follow. `IntegrationTestCase` opens the transaction of each test under nested levels, which such a commit only counts down.
 
 ## Fixed
 
