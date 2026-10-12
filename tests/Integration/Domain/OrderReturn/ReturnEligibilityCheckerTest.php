@@ -39,6 +39,8 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class ReturnEligibilityCheckerTest extends IntegrationTestCase
 {
+    use SecondConnectionTrait;
+
     private ReturnEligibilityChecker $checker;
 
     private FixtureFactory $factory;
@@ -46,6 +48,7 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->deleteTheLinesAKilledTestLeft();
         $this->checker = $this->getService(ReturnEligibilityChecker::class);
         $this->factory = $this->createFixtureFactory();
 
@@ -59,7 +62,13 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         ConfigQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
 
-        parent::tearDown();
+        try {
+            parent::tearDown();
+        } finally {
+            // Once the test transaction is rolled back, which is what releases the
+            // lock the test took on them, and even when the teardown fails.
+            $this->deleteTheCommittedLines();
+        }
     }
 
     public function testAnEligibleOrderCanBeOpened(): void
@@ -375,9 +384,176 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         self::assertTrue($this->checker->isQuantityCumulative());
     }
 
+    public function testTheFeatureSwitchIsTheShopSetting(): void
+    {
+        self::assertTrue($this->checker->isFeatureEnabled());
+
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '0');
+
+        self::assertFalse($this->checker->isFeatureEnabled());
+    }
+
+    public function testTheOpeningStatusesAreAListWhateverSeparatorsSurroundThem(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, ', sent,, paid');
+
+        self::assertSame([OrderStatus::CODE_SENT, OrderStatus::CODE_PAID], $this->checker->openingStatusCodes());
+    }
+
+    public function testEveryLineStillReturnableIsOfferedWithWhatIsLeftOfIt(): void
+    {
+        [$order, $customer, $untouched] = $this->paidOrderWithProduct();
+        $fullyReturned = $this->orderProduct($order, quantity: 2.0);
+        $partlyReturned = $this->orderProduct($order, quantity: 3.0);
+
+        $this->openReturn($order, $customer, $partlyReturned, 1.0, OrderReturnStatus::CODE_REQUESTED);
+        $this->openReturn($order, $customer, $fullyReturned, 2.0, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertSame(
+            [[$untouched->getId(), 1.0], [$partlyReturned->getId(), 2.0]],
+            array_map(
+                static fn (array $line): array => [$line['order_product']->getId(), $line['remaining']],
+                $this->checker->returnableLines($order),
+            ),
+        );
+    }
+
+    public function testAnOrderWhoseLinesAreAllReturnedIsNoLongerReturnable(): void
+    {
+        [$order, $customer, $line] = $this->paidOrderWithProduct();
+
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertSame([], $this->checker->returnableLines($order));
+        self::assertFalse($this->checker->isReturnable($order));
+    }
+
     /**
-     * @return array{Order, Customer}
+     * Every status but the refused and expired ones keeps the quantity it was
+     * opened for: a return accepted, received or settled has not given it back.
      */
+    public function testEveryReturnStillOpenHoldsItsQuantity(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 7.0);
+
+        foreach ([
+            OrderReturnStatus::CODE_REQUESTED,
+            OrderReturnStatus::CODE_INFO_AWAITED,
+            OrderReturnStatus::CODE_ACCEPTED,
+            OrderReturnStatus::CODE_RECEIVED,
+            OrderReturnStatus::CODE_SETTLED,
+            OrderReturnStatus::CODE_REFUSED,
+            OrderReturnStatus::CODE_EXPIRED,
+        ] as $statusCode) {
+            $this->openReturn($order, $customer, $line, 1.0, $statusCode);
+        }
+
+        self::assertSame(2.0, $this->checker->remainingReturnableQuantity($line));
+    }
+
+    public function testTheReturnBeingEditedDoesNotHoldItsOwnQuantity(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 3.0);
+
+        $edited = $this->openReturn($order, $customer, $line, 2.0, OrderReturnStatus::CODE_REQUESTED);
+
+        self::assertSame(3.0, $this->checker->remainingReturnableQuantity($line, (int) $edited->getId()));
+        $this->checker->assertReturnable($order, $customer, $line, 3.0, (int) $edited->getId());
+    }
+
+    public function testAZeroQuantityIsRefused(): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 2.0);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->expectExceptionMessage('The returned quantity must be positive.');
+        $this->checker->assertReturnable($order, $customer, $line, 0.0);
+    }
+
+    public function testAQuantitySoldByWeightIsReturnableToTheGramWhenTheCountIsNotCumulative(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY, '0');
+        [$order] = $this->paidOrderWithProduct();
+        $line = $this->storedOrderProduct($this->orderProduct($order, quantity: 2.5));
+
+        self::assertSame(2.5, $this->checker->remainingReturnableQuantity($line));
+    }
+
+    public function testALineOrderedAtZeroHasNothingToReturnWhenTheCountIsNotCumulative(): void
+    {
+        // Pins the 0.0 fallback itself; `>` and `>=` give the same answer at zero.
+        ConfigQuery::write(ReturnEligibilityChecker::CUMULATIVE_QUANTITY_CONFIG_KEY, '0');
+        [$order] = $this->paidOrderWithProduct();
+        $line = $this->orderProduct($order, quantity: 0.0);
+
+        self::assertSame(0.0, $this->checker->remainingReturnableQuantity($line));
+    }
+
+    /**
+     * Two requests for the same line must not both read the quantity still
+     * returnable before either has written its return. The line is committed
+     * from a connection of its own, so that this second connection, standing
+     * for the second request, sees it and can try to take it.
+     */
+    public function testALockedLineCannotBeTakenByASecondRequest(): void
+    {
+        [$order] = $this->paidOrderWithProduct();
+        $line = $this->committedOrderProduct($order, quantity: 2.0);
+
+        self::assertTrue($this->aSecondRequestCanTakeTheLine($line), 'Guard: nothing holds the line yet.');
+
+        $this->checker->lockLine($line);
+
+        self::assertFalse($this->aSecondRequestCanTakeTheLine($line), 'A second request took a line the first one holds.');
+    }
+
+    public function testAReturnThatDoesNotCarryThePostageLeavesItToAnother(): void
+    {
+        [$order, $customer, $line] = $this->paidOrderWithProduct();
+
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_REQUESTED);
+
+        $this->checker->assertPostageNotAlreadyReturned($order);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testARefusedOrExpiredReturnGivesThePostageBack(): void
+    {
+        [$order, $customer, $line] = $this->paidOrderWithProduct();
+
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_REFUSED, includePostage: true);
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_EXPIRED, includePostage: true);
+
+        $this->checker->assertPostageNotAlreadyReturned($order);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testASettledReturnStillHoldsThePostage(): void
+    {
+        [$order, $customer, $line] = $this->paidOrderWithProduct();
+
+        $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_SETTLED, includePostage: true);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->checker->assertPostageNotAlreadyReturned($order);
+    }
+
+    public function testTheReturnBeingEditedDoesNotHoldItsOwnPostage(): void
+    {
+        [$order, $customer, $line] = $this->paidOrderWithProduct();
+
+        $edited = $this->openReturn($order, $customer, $line, 1.0, OrderReturnStatus::CODE_REQUESTED, includePostage: true);
+
+        $this->checker->assertPostageNotAlreadyReturned($order, (int) $edited->getId());
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->expectExceptionMessage('The postage of this order is already included in another return.');
+        $this->checker->assertPostageNotAlreadyReturned($order);
+    }
+
     private function shipmentRecordedDaysAgo(Order $order, int $days): void
     {
         $this->statusChangeRecordedDaysAgo($order, $days, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT);
@@ -405,6 +581,9 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
             ->save($this->getPropelConnection());
     }
 
+    /**
+     * @return array{Order, Customer, OrderProductModel}
+     */
     private function paidOrderWithProduct(
         string $statusCode = OrderStatus::CODE_PAID,
         int $placedDaysAgo = 1,
@@ -415,9 +594,9 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         $order->setCreatedAt(new \DateTime(\sprintf('-%d days', $placedDaysAgo)));
         $order->save($this->getPropelConnection());
 
-        $this->orderProduct($order, quantity: 1.0);
+        $line = $this->orderProduct($order, quantity: 1.0);
 
-        return [$order, $customer];
+        return [$order, $customer, $line];
     }
 
     private function orderProduct(Order $order, float $quantity, bool $virtual = false): OrderProductModel
@@ -459,13 +638,15 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         OrderProductModel $orderProduct,
         float $quantity,
         string $statusCode,
+        bool $includePostage = false,
     ): OrderReturn {
         $status = OrderReturnStatusQuery::create()->findOneByCode($statusCode);
 
         $return = (new OrderReturn())
             ->setOrder($order)
             ->setCustomer($customer)
-            ->setOrderReturnStatus($status);
+            ->setOrderReturnStatus($status)
+            ->setIncludePostage($includePostage);
         $return->save($this->getPropelConnection());
 
         (new OrderReturnLine())
