@@ -94,6 +94,32 @@ final class ResourceCacheTest extends TestCase
         );
     }
 
+    public function testAPathOutsideTheAllowListIsNeverCached(): void
+    {
+        $cache = $this->cache(hasActiveReservedSale: false);
+
+        self::assertSame(['first'], $cache->remember('key', '/api/front/carts/1', static fn (): array => ['first']));
+        self::assertSame(['second'], $cache->remember('key', '/api/front/carts/1', static fn (): array => ['second']));
+    }
+
+    public function testTheCatalogIsCachedWhenNoProductVisibilityIsWired(): void
+    {
+        $pricingActivityChecker = $this->createStub(PricingActivityChecker::class);
+        $pricingActivityChecker->method('hasVisitorDependentPricing')->willReturn(false);
+
+        $cache = new ResourceCache(
+            new ArrayAdapter(),
+            enabled: true,
+            ttl: 60,
+            allowedPrefixes: ['/api/front/products'],
+            visitorDependentPricePrefixes: ['/api/front/products'],
+            pricingActivityChecker: $pricingActivityChecker,
+        );
+
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['first']));
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['second']));
+    }
+
     public function testTheSaleOperationsAreNeverAskedAboutWhenTheCacheIsOff(): void
     {
         $pricingActivityChecker = $this->createMock(PricingActivityChecker::class);

@@ -133,6 +133,15 @@ final class ProductVisibilityTest extends TestCase
         $this->visibility(null, [$anonymousRule], null)->visibleProductClause('product.id');
     }
 
+    public function testTheVisitorIsLookedUpOnceForAllTheRules(): void
+    {
+        $currentCustomerProvider = $this->createMock(CurrentCustomerProvider::class);
+        $currentCustomerProvider->expects(self::once())->method('getCurrentCustomer')->willReturn(null);
+
+        (new ProductVisibility($this->reservedSaleRule(null), $currentCustomerProvider, [$this->rule(null), $this->rule(null)]))
+            ->visibleProductClause('product.id');
+    }
+
     /**
      * A module declares its rule by implementing the interface, and nothing else:
      * the tag and the iterator bring it to the visibility, as the kernel builds it.
