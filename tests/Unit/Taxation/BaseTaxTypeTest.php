@@ -26,6 +26,7 @@ use Thelia\Type\FloatType;
  * Tests the abstract base class via its two concrete price/percent and
  * fix-amount implementations. Everything below stays away from getTitle()
  * and getRequirementsDefinition() which require Translator initialization.
+ * A failure names the requirement at fault, between backquotes.
  */
 final class BaseTaxTypeTest extends TestCase
 {
@@ -41,6 +42,7 @@ final class BaseTaxTypeTest extends TestCase
     {
         $this->expectException(TaxEngineException::class);
         $this->expectExceptionCode(TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
+        $this->expectExceptionMessage('`percent`');
 
         (new PricePercentTaxType())->getRequirement('percent');
     }
@@ -99,6 +101,7 @@ final class BaseTaxTypeTest extends TestCase
 
         $this->expectException(TaxEngineException::class);
         $this->expectExceptionCode(TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
+        $this->expectExceptionMessage('`percent`');
 
         $type->loadRequirements([]);
     }
@@ -116,6 +119,7 @@ final class BaseTaxTypeTest extends TestCase
 
         $this->expectException(TaxEngineException::class);
         $this->expectExceptionCode(TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
+        $this->expectExceptionMessage('`percent`');
 
         $type->loadRequirements(['percent' => 'not-a-float']);
     }

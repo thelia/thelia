@@ -155,6 +155,37 @@ class CurrencyFacadeTest extends TestCase
         $this->assertSame($currency, $result);
     }
 
+    public function testUpdateOfAHiddenDefaultCurrencyCarriesBothFlags(): void
+    {
+        $dto = new CurrencyUpdateDTO(
+            name: 'Euro',
+            code: 'EUR',
+            symbol: '€',
+            locale: 'fr_FR',
+            visible: false,
+            isDefault: true,
+        );
+
+        $currency = $this->createCurrencyMock(1);
+
+        $this->dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(static function (CurrencyUpdateEvent $event) use ($currency) {
+                    self::assertSame(0, $event->getVisible());
+                    self::assertSame(1, $event->getIsDefault());
+
+                    $event->setCurrency($currency);
+
+                    return true;
+                }),
+                TheliaEvents::CURRENCY_UPDATE
+            );
+
+        $this->assertSame($currency, $this->facade->update(1, $dto));
+    }
+
     public function testCurrencyCreateDTOToArray(): void
     {
         $dto = new CurrencyCreateDTO(

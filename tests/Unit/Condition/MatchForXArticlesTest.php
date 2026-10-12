@@ -14,17 +14,34 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Condition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Tests\Support\Log\SilencedTlog;
 
 /**
- * Failure paths (invalid operator / non-positive quantity) construct a
- * Tlog instance that hits ConfigQuery — see MatchForTotalAmountTest for
- * the full note. Only the happy `isMatching()` path is covered here.
+ * An article count condition compares the number of articles in the cart with a
+ * strictly positive whole quantity. The exceptions rejecting a bad form log an
+ * error, so the logger reads a configuration sending it nowhere instead of the
+ * database.
  */
 final class MatchForXArticlesTest extends FacadeBackedTestCase
 {
+    use SilencedTlog;
+
+    protected function setUp(): void
+    {
+        $this->silenceTlog();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTlog();
+    }
+
     public function testServiceIdIsStable(): void
     {
         $condition = new MatchForXArticles($this->makeFacade());
@@ -56,6 +73,51 @@ final class MatchForXArticlesTest extends FacadeBackedTestCase
         );
 
         self::assertFalse($condition->isMatching());
+    }
+
+    public function testACartWithFewerArticlesMatchesTheLessThanOperator(): void
+    {
+        $facade = $this->makeFacade();
+        $facade->method('getNbArticlesInCart')->willReturn(2);
+
+        $condition = (new MatchForXArticles($facade))->setValidatorsFromForm(
+            [MatchForXArticles::CART_QUANTITY => Operators::INFERIOR],
+            [MatchForXArticles::CART_QUANTITY => 3],
+        );
+
+        self::assertTrue($condition->isMatching());
+    }
+
+    public function testAListOperatorIsRejected(): void
+    {
+        $this->expectException(InvalidConditionOperatorException::class);
+
+        (new MatchForXArticles($this->makeFacade()))->setValidatorsFromForm(
+            [MatchForXArticles::CART_QUANTITY => Operators::IN],
+            [MatchForXArticles::CART_QUANTITY => 3],
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function quantitiesThatAreNotACount(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'a negative quantity' => ['-2'];
+        yield 'a word instead of a number' => ['three'];
+    }
+
+    #[DataProvider('quantitiesThatAreNotACount')]
+    public function testAQuantityThatIsNotStrictlyPositiveIsRejected(string $quantity): void
+    {
+        $this->expectException(InvalidConditionValueException::class);
+        $this->expectExceptionMessage('on parameter quantity');
+
+        (new MatchForXArticles($this->makeFacade()))->setValidatorsFromForm(
+            [MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL],
+            [MatchForXArticles::CART_QUANTITY => $quantity],
+        );
     }
 
     /**

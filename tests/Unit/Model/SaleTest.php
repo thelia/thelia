@@ -160,6 +160,39 @@ final class SaleTest extends TestCase
         self::assertTrue($sale->shouldDisplayCountdown(new \DateTime('2026-01-01 00:00:00')));
     }
 
+    /**
+     * Even on the stroke of the end, a lead-hours countdown without a number of hours
+     * has no threshold: it stays hidden rather than counting from zero hours.
+     */
+    public function testTheLeadHoursCountdownWithoutANumberOfHoursStaysHiddenUpToTheEnd(): void
+    {
+        $sale = (new Sale())
+            ->setCountdownMode(Sale::COUNTDOWN_MODE_LEAD_HOURS)
+            ->setEndDate(new \DateTime('2026-01-10 12:00:00'));
+
+        self::assertFalse($sale->shouldDisplayCountdown(new \DateTime('2026-01-10 12:00:00')));
+    }
+
+    public function testAskingForTheCountdownLeavesTheEndDateUntouched(): void
+    {
+        $sale = $this->saleEndingWithLeadHours(48);
+
+        $sale->shouldDisplayCountdown(new \DateTime('2026-01-09 00:00:00'));
+
+        self::assertSame('2026-01-10 12:00:00', $sale->getEndDate('Y-m-d H:i:s'));
+    }
+
+    public function testASaleHasAnEndDateOnlyOnceOneIsSet(): void
+    {
+        $sale = new Sale();
+
+        self::assertFalse($sale->hasEndDate());
+
+        $sale->setEndDate(new \DateTime('2026-01-10 12:00:00'));
+
+        self::assertTrue($sale->hasEndDate());
+    }
+
     private function saleEndingWithLeadHours(int $leadHours): Sale
     {
         return (new Sale())
