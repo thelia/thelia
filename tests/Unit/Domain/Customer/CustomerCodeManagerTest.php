@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Domain\Customer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -49,6 +50,47 @@ final class CustomerCodeManagerTest extends TestCase
         self::assertFalse($manager->requestCode($customer));
     }
 
+    public function testAnActivationCodeIsSavedAndMailedWithItsExpiryAndTheCustomer(): void
+    {
+        $customer = $this->createMock(Customer::class);
+        $customer->expects(self::once())->method('setConfirmationTokenWithExpiry')->with(48)->willReturn('654321');
+        $customer->expects(self::once())->method('save');
+
+        $mailerFactory = $this->createMock(MailerFactory::class);
+        $mailerFactory
+            ->expects(self::once())
+            ->method('sendEmailToCustomer')
+            ->with('customer_send_code', $customer, ['code' => '654321', 'expiryTime' => 48, 'customer' => $customer]);
+
+        (new CustomerCodeManager($mailerFactory, $this->limiterAllowing(3)))->createCodeAndSendIt($customer, 48);
+    }
+
+    public function testAnActivationCodeIsValidForADayByDefault(): void
+    {
+        $customer = $this->createMock(Customer::class);
+        $customer->expects(self::once())->method('setConfirmationTokenWithExpiry')->with(24)->willReturn('123456');
+
+        $mailerFactory = $this->createMock(MailerFactory::class);
+        $mailerFactory
+            ->expects(self::once())
+            ->method('sendEmailToCustomer')
+            ->with('customer_send_code', $customer, ['code' => '123456', 'expiryTime' => 24, 'customer' => $customer]);
+
+        (new CustomerCodeManager($mailerFactory, $this->limiterAllowing(3)))->createCodeAndSendIt($customer);
+    }
+
+    public function testARequestedCodeIsValidForADayByDefault(): void
+    {
+        $customer = $this->customer('pending@example.com');
+        $customer->expects(self::once())->method('setConfirmationTokenWithExpiry')->with(24);
+        $customer->expects(self::once())->method('save');
+
+        $mailerFactory = $this->createMock(MailerFactory::class);
+        $mailerFactory->expects(self::once())->method('sendEmailToCustomer');
+
+        self::assertTrue((new CustomerCodeManager($mailerFactory, $this->limiterAllowing(3)))->requestCode($customer));
+    }
+
     private function limiterAllowing(int $limit): CustomerEmailRequestLimiter
     {
         $requestStack = new RequestStack();
@@ -74,7 +116,7 @@ final class CustomerCodeManagerTest extends TestCase
         );
     }
 
-    private function customer(string $email): Customer
+    private function customer(string $email): Customer&MockObject
     {
         $customer = $this->createMock(Customer::class);
         $customer->method('getEmail')->willReturn($email);
