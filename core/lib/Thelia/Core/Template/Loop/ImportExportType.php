@@ -25,7 +25,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
 use Thelia\Model\Export;
-use Thelia\Model\ExportQUery;
+use Thelia\Model\ExportQuery;
 use Thelia\Model\Import as ImportModel;
 use Thelia\Model\ImportQuery;
 use Thelia\Tools\URL;
@@ -87,7 +87,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
      */
     public function buildModelCriteria(): ModelCriteria
     {
-        /** @var ImportQuery|ExportQUery $query */
+        /** @var ImportQuery|ExportQuery $query */
         $query = $this->getQueryModel();
 
         $this->configureI18nProcessing($query, ['TITLE', 'DESCRIPTION']);
@@ -183,7 +183,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     abstract protected function getBaseUrl(): string;
 
-    abstract protected function getQueryModel(): ImportQuery|ExportQUery;
+    abstract protected function getQueryModel(): ImportQuery|ExportQuery;
 
     abstract protected function getCategoryName(): string;
 }
