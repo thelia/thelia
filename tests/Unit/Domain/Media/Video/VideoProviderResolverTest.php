@@ -19,11 +19,12 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Media\Video\UnsupportedVideoUrlException;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Domain\Media\Video\VideoProviderResolver;
+use Thelia\Model\ConfigQuery;
 
 /**
- * Every test hands the resolver its own platform list, so nothing here reaches
- * the shop configuration and the cases a shop cannot produce (a single platform
- * enabled, all of them) are testable.
+ * Most tests hand the resolver its own platform list, so the cases a shop cannot
+ * produce (a single platform enabled, all of them) are testable. The two that read
+ * the shop configuration give it a cache of their own and clear it afterwards.
  */
 final class VideoProviderResolverTest extends TestCase
 {
@@ -136,6 +137,93 @@ final class VideoProviderResolverTest extends TestCase
         self::assertSame('https://player.vimeo.com', VideoProvider::Vimeo->frameSource());
         self::assertSame('https://www.dailymotion.com', VideoProvider::Dailymotion->frameSource());
         self::assertNull(VideoProvider::File->frameSource());
+    }
+
+    public function testPlatformCodesAreReadCaseInsensitivelyAndTrimmed(): void
+    {
+        self::assertSame(
+            [VideoProvider::Vimeo, VideoProvider::Youtube],
+            $this->resolver(' Vimeo ,YouTube')->enabledProviders(),
+        );
+    }
+
+    public function testTheShopConfigurationIsReadWhenTheCallerHoldsNoList(): void
+    {
+        ConfigQuery::initCache([VideoProviderResolver::PROVIDERS_VARIABLE => 'vimeo']);
+
+        try {
+            $enabled = (new VideoProviderResolver())->enabledProviders();
+        } finally {
+            ConfigQuery::resetCache();
+        }
+
+        self::assertSame([VideoProvider::Vimeo], $enabled);
+    }
+
+    public function testAShopWithoutTheVariableGetsTheShippedDefault(): void
+    {
+        ConfigQuery::initCache([]);
+
+        try {
+            $enabled = (new VideoProviderResolver())->enabledProviders();
+        } finally {
+            ConfigQuery::resetCache();
+        }
+
+        self::assertSame([VideoProvider::Youtube, VideoProvider::Vimeo, VideoProvider::Dailymotion], $enabled);
+    }
+
+    /**
+     * @return \Generator<string, array{string, VideoProvider, string}>
+     */
+    public static function addressesWrittenTheWayMerchantsPasteThem(): \Generator
+    {
+        yield 'surrounded by spaces' => ['  https://youtu.be/dQw4w9WgXcQ  ', VideoProvider::Youtube, 'dQw4w9WgXcQ'];
+        yield 'followed by a line break' => ["https://vimeo.com/76979871\n", VideoProvider::Vimeo, '76979871'];
+        yield 'with an upper case scheme' => ['HTTPS://youtu.be/dQw4w9WgXcQ', VideoProvider::Youtube, 'dQw4w9WgXcQ'];
+        yield 'with an upper case host' => ['https://YOUTU.BE/dQw4w9WgXcQ', VideoProvider::Youtube, 'dQw4w9WgXcQ'];
+        yield 'with an upper case www prefix' => ['https://WWW.dailymotion.com/video/x8abcde', VideoProvider::Dailymotion, 'x8abcde'];
+        yield 'dailymotion player' => ['https://www.dailymotion.com/embed/video/x8abcde', VideoProvider::Dailymotion, 'x8abcde'];
+    }
+
+    #[DataProvider('addressesWrittenTheWayMerchantsPasteThem')]
+    public function testAnAddressIsRecognisedWhateverItsCaseAndSurroundingSpaces(string $url, VideoProvider $provider, string $externalId): void
+    {
+        $resolved = $this->resolver()->resolve($url);
+
+        self::assertSame($provider, $resolved->provider);
+        self::assertSame($externalId, $resolved->externalId);
+    }
+
+    /**
+     * @return \Generator<string, array{string}>
+     */
+    public static function addressesWithTheWrongPathShape(): \Generator
+    {
+        yield 'youtube embed with a trailing segment' => ['https://www.youtube.com/embed/dQw4w9WgXcQ/extra'];
+        yield 'youtube embed without identifier' => ['https://www.youtube.com/embed'];
+        yield 'youtube home page' => ['https://www.youtube.com/'];
+        yield 'vimeo video with a trailing segment' => ['https://vimeo.com/video/76979871/extra'];
+        yield 'dailymotion video with a trailing segment' => ['https://www.dailymotion.com/video/x8abcde/extra'];
+        yield 'dailymotion player with a trailing segment' => ['https://www.dailymotion.com/embed/video/x8abcde/extra'];
+        yield 'dailymotion path starting with something else' => ['https://www.dailymotion.com/foo/video/x8abcde'];
+        yield 'dailymotion embed without the video segment' => ['https://www.dailymotion.com/embed/foo/x8abcde'];
+        yield 'dailymotion player without identifier' => ['https://www.dailymotion.com/embed/video'];
+        yield 'dailymotion short link with a trailing segment' => ['https://dai.ly/x8abcde/extra'];
+    }
+
+    #[DataProvider('addressesWithTheWrongPathShape')]
+    public function testAnAddressWhosePathIsNotThePlatformsIsRefused(string $url): void
+    {
+        $this->expectException(UnsupportedVideoUrlException::class);
+
+        $this->resolver()->resolve($url);
+    }
+
+    public function testAHostedFileIsNeverIssuedAnIdentifierYetStillHasALabel(): void
+    {
+        self::assertFalse(VideoProvider::File->hasIdentifierShape('dQw4w9WgXcQ'));
+        self::assertSame('File', VideoProvider::File->label());
     }
 
     private function resolver(string $providers = self::ALL_PROVIDERS): VideoProviderResolver
