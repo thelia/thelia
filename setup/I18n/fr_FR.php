@@ -1552,4 +1552,5 @@ return [
     'Your order {{ order_ref }} has been shipped' => 'Votre commande {{ order_ref }} a été expédiée',
     'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)',
     'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' => 'Les retours déjà ouverts sur une ligne de commande retiennent une part de sa quantité (1), ou chaque demande de retour n\'est bornée que par la quantité commandée (0)',
+    'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)' => 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)',
 ];

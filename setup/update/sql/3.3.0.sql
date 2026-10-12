@@ -577,4 +577,21 @@ INNER JOIN (
     UNION ALL SELECT 'order_return_cumulative_quantity', 'fr_FR', 'Les retours déjà ouverts sur une ligne de commande retiennent une part de sa quantité (1), ou chaque demande de retour n''est bornée que par la quantité commandée (0)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- ---------------------------------------------------------------------
+-- Order statuses a return may be opened on
+--
+-- Empty: any paid status, the rule until now.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('order_return_order_statuses', '', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'order_return_order_statuses' AS `name`, 'en_US' AS `locale`, 'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)' AS `title`
+    UNION ALL SELECT 'order_return_order_statuses', 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
 SET FOREIGN_KEY_CHECKS = 1;
