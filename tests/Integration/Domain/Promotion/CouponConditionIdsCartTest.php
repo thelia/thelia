@@ -22,6 +22,7 @@ use Thelia\Condition\Implementation\CartContainsCategories;
 use Thelia\Condition\Implementation\CartContainsProducts;
 use Thelia\Condition\Implementation\ForSomeCustomers;
 use Thelia\Condition\Implementation\MatchBillingCountries;
+use Thelia\Condition\Implementation\MatchDeliveryCountries;
 use Thelia\Condition\Operators;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Cart;
@@ -112,6 +113,21 @@ final class CouponConditionIdsCartTest extends ActionIntegrationPromotionTestCas
         $this->addItem($cart, $this->product());
 
         self::assertSame(5.0, $this->cartDiscount($cart), 'The billing address of the customer is in the country of the condition.');
+    }
+
+    public function testADeliveryCountryConditionSavedByTheBackOfficeMatches(): void
+    {
+        $customer = $this->signedInCustomer();
+        $country = $this->factory->country();
+        $this->promotionWhen('thelia.condition.match_delivery_countries', MatchDeliveryCountries::COUNTRIES_LIST, Operators::IN, [$country->getId()]);
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        $cartAddress = $this->factory->cartAddress($this->factory->address($customer, $country), $country);
+        $cart->setAddressDeliveryId($cartAddress->getId())->save();
+        $this->recomputeDiscount();
+
+        self::assertSame(5.0, $this->cartDiscount($cart), 'The cart is delivered to the country of the condition.');
     }
 
     public function testAConditionStoredWithIntegerIdsStillMatches(): void
