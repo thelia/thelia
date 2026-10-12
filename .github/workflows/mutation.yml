@@ -1,0 +1,106 @@
+name: mutation
+
+# Mutation testing of the core lines a pull request adds or changes. Infection
+# alters each line in small ways (a condition negated, a boundary moved, a value
+# replaced) and reruns the unit tests that execute it. A change no test notices
+# is an escaped mutant, shown as a warning on the line. A changed line that no
+# unit test executes cannot be checked: it gets a notice, so that a quiet run
+# never passes for a well tested change. The job summary lists both.
+#
+# The job gives advice and blocks nothing: the branch protection does not require
+# it. It runs the unit suite only, which needs no database, so the mutants run in
+# parallel. `composer test:mutation` runs the same check locally.
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'core/lib/Thelia/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    name: Mutation testing of the changed lines
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Without a token, Flex silently skips the thelia/thelia-recipes endpoint
+      # and the GitHub archives the theme branches are downloaded from are rate
+      # limited per runner IP.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The merge commit of the pull request and its first parent, the tip of
+          # main it is tested against: the changed lines are the diff between them.
+          fetch-depth: 2
+
+      - name: Find the changed core files
+        id: changes
+        # Infection stops with an error when the diff leaves it no source file (a
+        # pull request that only deletes core files, or only touches core/lib/Thelia/Test).
+        run: |
+          files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- core/lib/Thelia ':!core/lib/Thelia/Test' | grep '\.php$' || true)
+          echo "$files"
+          if [ -n "$files" ]; then echo "found=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Setup PHP
+        if: steps.changes.outputs.found
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: post_max_size=20M
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+          coverage: pcov
+
+      - name: Leave PCOV off outside the coverage run
+        if: steps.changes.outputs.found
+        # Enabled, PCOV slows every mutant run down. infection.json5 switches it on
+        # for the coverage run only, as it does in the DDEV setup (.ddev/php/pcov.ini).
+        run: |
+          echo 'pcov.enabled=0' | sudo tee "$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')/99-pcov-off.ini"
+          php -r 'echo "pcov.enabled is now ", ini_get("pcov.enabled"), PHP_EOL;'
+
+      - name: Resolve the themes from their development branch
+        if: steps.changes.outputs.found
+        # Same resolution as the test workflow, which runs the unit suite against the
+        # tip of the themes.
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Locate the Composer download cache
+        if: steps.changes.outputs.found
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Composer download cache
+        if: steps.changes.outputs.found
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        if: steps.changes.outputs.found
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Mutate the changed lines
+        if: steps.changes.outputs.found
+        # HEAD~1 is the tip of main the pull request is merged into.
+        run: composer test:mutation -- --git-diff-base=HEAD~1 --logger-github=true
+
+      - name: Summarise the mutants
+        if: always() && steps.changes.outputs.found
+        run: php .github/scripts/mutation-summary.php var/infection/infection.json "$GITHUB_STEP_SUMMARY"
