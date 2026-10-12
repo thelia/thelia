@@ -89,6 +89,18 @@ final class CacheAdapterFactoryTest extends TestCase
         CacheAdapterFactory::create('probe', 0, 'sqlite://var/cache.db', sys_get_temp_dir());
     }
 
+    /**
+     * A database DSN is the likeliest mistake: the error has to say which
+     * schemes the variable takes rather than how the backend failed.
+     */
+    public function testARejectedSchemeIsAnsweredWithTheSchemesTheVariableTakes(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('the scheme is not one of redis://, rediss://, valkey://, valkeys://, memcached://');
+
+        CacheAdapterFactory::create('probe', 0, 'mysql://shop:s3cr3t@db.example.org/shop', sys_get_temp_dir());
+    }
+
     public function testTheErrorNeverRepeatsThePassword(): void
     {
         try {

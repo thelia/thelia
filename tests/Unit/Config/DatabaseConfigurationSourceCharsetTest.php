@@ -65,6 +65,24 @@ final class DatabaseConfigurationSourceCharsetTest extends TestCase
     }
 
     #[Test]
+    public function aCharacterSetNamedFirstInTheDsnIsKept(): void
+    {
+        self::assertSame(
+            'mysql:charset=latin1;host=localhost;dbname=shop',
+            DatabaseConfigurationSource::withCharset('mysql:charset=latin1;host=localhost;dbname=shop'),
+        );
+    }
+
+    #[Test]
+    public function aCharacterSetAfterASpaceInTheDsnIsKept(): void
+    {
+        self::assertSame(
+            'mysql:host=localhost; dbname=shop; charset=latin1',
+            DatabaseConfigurationSource::withCharset('mysql:host=localhost; dbname=shop; charset=latin1'),
+        );
+    }
+
+    #[Test]
     public function aDsnOfAnotherDriverIsLeftAlone(): void
     {
         self::assertSame(

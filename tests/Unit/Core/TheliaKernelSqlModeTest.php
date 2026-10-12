@@ -27,6 +27,8 @@ use Thelia\Log\Tlog;
  */
 final class TheliaKernelSqlModeTest extends TestCase
 {
+    private const SERVER_QUERY = 'SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode';
+
     private string $cacheDir;
 
     protected function setUp(): void
@@ -86,6 +88,125 @@ final class TheliaKernelSqlModeTest extends TestCase
 
         self::assertNotContains('ONLY_FULL_GROUP_BY', $modes);
         self::assertContains('STRICT_TRANS_TABLES', $modes);
+    }
+
+    public function testAServerNeedingNoCorrectionIsLeftAlone(): void
+    {
+        self::assertSame(
+            [self::SERVER_QUERY],
+            $this->statementsSent('10.11.11-MariaDB-log', 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'),
+        );
+    }
+
+    public function testMariaDbMissingNoEngineSubstitutionGetsItForTheSession(): void
+    {
+        self::assertSame(
+            [self::SERVER_QUERY, "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"],
+            $this->statementsSent('10.11.11-MariaDB-log', 'STRICT_TRANS_TABLES'),
+        );
+    }
+
+    public function testAnEmptyServerSqlModeOnlyGainsNoEngineSubstitution(): void
+    {
+        self::assertSame(
+            [self::SERVER_QUERY, "SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION';"],
+            $this->statementsSent('10.11.11-MariaDB-log', ''),
+        );
+    }
+
+    public function testMySqlMissingNoEngineSubstitutionGetsItForTheSession(): void
+    {
+        self::assertSame(
+            [self::SERVER_QUERY, "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"],
+            $this->statementsSent('8.0.40', 'STRICT_TRANS_TABLES'),
+        );
+    }
+
+    public function testKernelsSharingACacheDirectoryAskTheServerOnce(): void
+    {
+        $setSession = "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';";
+
+        self::assertSame(
+            [self::SERVER_QUERY, $setSession, $setSession],
+            $this->statementsSent('8.0.40', 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES', kernels: 2),
+        );
+    }
+
+    public function testAVerdictInTheCacheDirectoryIsAppliedWithoutAskingTheServer(): void
+    {
+        $this->writeVerdict(['modes' => ['STRICT_TRANS_TABLES', 'NO_ENGINE_SUBSTITUTION'], 'canUpdate' => true, 'logs' => []]);
+
+        self::assertSame(
+            ["SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"],
+            $this->statementsSent('8.0.40', 'ONLY_FULL_GROUP_BY'),
+        );
+    }
+
+    /**
+     * A verdict written by an earlier version may lack an entry: the server is
+     * asked again rather than the session being set from half a verdict.
+     */
+    public function testAnIncompleteVerdictIsProbedAgain(): void
+    {
+        $this->writeVerdict(['modes' => ['ONLY_FULL_GROUP_BY'], 'canUpdate' => true]);
+
+        self::assertSame(
+            [self::SERVER_QUERY, "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"],
+            $this->statementsSent('8.0.40', 'STRICT_TRANS_TABLES'),
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $verdict
+     */
+    private function writeVerdict(array $verdict): void
+    {
+        file_put_contents(
+            $this->cacheDir.'/check_mysql_configurations.php',
+            '<?php return '.var_export($verdict, true).';',
+        );
+    }
+
+    /**
+     * @return list<string> every statement the kernels sent, in order
+     */
+    private function statementsSent(string $version, string $globalSqlMode, int $kernels = 1): array
+    {
+        $fetcher = $this->createMock(PDODataFetcher::class);
+        $fetcher->method('fetch')->willReturn(['version' => $version, 'global_sql_mode' => $globalSqlMode]);
+
+        $statements = [];
+
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->method('query')->willReturnCallback(
+            static function (string $statement) use ($fetcher, &$statements) {
+                $statements[] = $statement;
+
+                return $fetcher;
+            }
+        );
+
+        for ($booted = 0; $booted < $kernels; ++$booted) {
+            $kernel = new class($this->cacheDir) extends TheliaKernel {
+                public function __construct(private readonly string $sqlModeCacheDir)
+                {
+                }
+
+                public function getCacheDir(): string
+                {
+                    return $this->sqlModeCacheDir;
+                }
+
+                public function resolveSqlMode(ConnectionInterface $con): void
+                {
+                    $this->checkMySQLConfigurations($con);
+                }
+            };
+
+            $kernel->resolveSqlMode($connection);
+        }
+
+        return $statements;
     }
 
     /**
