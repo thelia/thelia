@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Promotion;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
@@ -70,6 +72,16 @@ final class CouponAbstractTest extends TestCase
     public function testACouponPastItsExpirationDateIsExpired(): void
     {
         self::assertTrue($this->couponSetWith([], expirationDate: new \DateTime('-1 day'))->isExpired());
+    }
+
+    public function testChangingTheReturnedConditionsLeavesTheCouponUntouched(): void
+    {
+        $coupon = $this->couponSetWith([])->setConditions(new ConditionCollection());
+
+        $conditions = $coupon->getConditions();
+        $conditions[] = $this->createStub(ConditionInterface::class);
+
+        self::assertCount(0, $coupon->getConditions());
     }
 
     public function testTheIdOfTheCouponRowItWasBuiltFromIsExposed(): void
