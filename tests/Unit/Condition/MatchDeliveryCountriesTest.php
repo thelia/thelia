@@ -16,13 +16,17 @@ namespace Thelia\Tests\Unit\Condition;
 
 use Thelia\Condition\Exception\InvalidConditionOperatorException;
 use Thelia\Condition\Exception\InvalidConditionValueException;
+use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\MatchDeliveryCountries;
 use Thelia\Condition\Operators;
+use Thelia\Model\Address;
+use Thelia\Model\Customer;
 use Thelia\Tests\Support\Log\SilencedTlog;
 
 /**
  * A country condition keeps the countries chosen in the form, needs at least one of them,
- * and says which condition refused the form.
+ * and says which condition refused the form. The delivery country condition matches a cart
+ * by the country of its delivery address.
  */
 final class MatchDeliveryCountriesTest extends FacadeBackedTestCase
 {
@@ -36,6 +40,28 @@ final class MatchDeliveryCountriesTest extends FacadeBackedTestCase
     protected function tearDown(): void
     {
         $this->restoreTlog();
+    }
+
+    public function testACartDeliveredToOneOfTheCountriesMatches(): void
+    {
+        self::assertTrue($this->conditionDeliveringTo(64, Operators::IN, [64, 75])->isMatching());
+    }
+
+    public function testACartDeliveredToAnotherCountryDoesNotMatch(): void
+    {
+        self::assertFalse($this->conditionDeliveringTo(13, Operators::IN, [64, 75])->isMatching());
+    }
+
+    public function testTheNotInOperatorMatchesACartDeliveredOutsideTheCountries(): void
+    {
+        self::assertTrue($this->conditionDeliveringTo(13, Operators::OUT, [64, 75])->isMatching());
+    }
+
+    public function testACartWithoutADeliveryAddressCannotBeChecked(): void
+    {
+        $this->expectException(UnmatchableConditionException::class);
+
+        $this->conditionDeliveringTo(null, Operators::IN, [64])->isMatching();
     }
 
     public function testAConditionWithoutAnyCountryIsRefusedUnderItsOwnName(): void
@@ -99,5 +125,20 @@ final class MatchDeliveryCountriesTest extends FacadeBackedTestCase
     public function testTheConditionIsNamedThroughTheFacadeTranslator(): void
     {
         self::assertSame('Delivery country', (new MatchDeliveryCountries(parent::makeFacade()))->getName());
+    }
+
+    /**
+     * @param list<int> $countryIds
+     */
+    private function conditionDeliveringTo(?int $countryId, string $operator, array $countryIds): MatchDeliveryCountries
+    {
+        $facade = $this->makeFacade();
+        $facade->method('getCustomer')->willReturn(new Customer());
+        $facade->method('getDeliveryAddress')->willReturn(null === $countryId ? null : (new Address())->setCountryId($countryId));
+
+        return (new MatchDeliveryCountries($facade))->setValidatorsFromForm(
+            [MatchDeliveryCountries::COUNTRIES_LIST => $operator],
+            [MatchDeliveryCountries::COUNTRIES_LIST => $countryIds],
+        );
     }
 }
