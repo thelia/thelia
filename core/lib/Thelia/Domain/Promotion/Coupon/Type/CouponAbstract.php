@@ -21,7 +21,6 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\Type\DateTime;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
@@ -250,7 +249,7 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Return Coupon expiration date.
      */
-    public function getExpirationDate(): DateTime
+    public function getExpirationDate(): \DateTime
     {
         return clone $this->expirationDate;
     }
