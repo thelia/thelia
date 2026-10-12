@@ -44,6 +44,19 @@ final class ImageEventOptionsHashTest extends TestCase
         );
     }
 
+    /**
+     * Each option keeps its own place in the hash: a width of 12 and a height of 3 must
+     * not read as a width of 1 and a height of 23.
+     */
+    #[Test]
+    public function twoSizesWhoseDigitsRunTogetherGetTwoHashes(): void
+    {
+        self::assertNotSame(
+            (new ImageEvent())->setWidth(12)->setHeight(3)->getOptionsHash(),
+            (new ImageEvent())->setWidth(1)->setHeight(23)->getOptionsHash(),
+        );
+    }
+
     #[Test]
     public function theBackgroundColorIsPartOfTheHash(): void
     {
@@ -77,6 +90,7 @@ final class ImageEventOptionsHashTest extends TestCase
         yield 'the effects' => [static fn (ImageEvent $event): ImageEvent => $event->setEffects(['gray_scale', 'mirror'])];
         yield 'the rotation' => [static fn (ImageEvent $event): ImageEvent => $event->setRotation(180)];
         yield 'the zoom' => [static fn (ImageEvent $event): ImageEvent => $event->setAllowZoom(false)];
+        yield 'the quality' => [static fn (ImageEvent $event): ImageEvent => $event->setQuality(90)];
     }
 
     /**
@@ -90,13 +104,13 @@ final class ImageEventOptionsHashTest extends TestCase
     }
 
     /**
-     * The hash names a file in the image cache: it has to stay the same from one release to
-     * the next, or every rendition already on disk is orphaned and generated again.
+     * The hash names a file in the image cache: a new hash orphans every rendition already
+     * on disk, which is generated again on its next request. It only changes on purpose.
      */
     #[Test]
     public function theHashOfAGivenSetOfOptionsStaysStable(): void
     {
-        self::assertSame('c5f6db192d76c8c26c96cad4b1bef9e5', $this->fullyOptioned()->getOptionsHash());
+        self::assertSame('00ab70b9199b13e87f8f3776328cd1f0', $this->fullyOptioned()->getOptionsHash());
     }
 
     private function fullyOptioned(): ImageEvent
