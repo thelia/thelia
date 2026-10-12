@@ -19,11 +19,22 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
+use Thelia\Core\Hook\ModuleHookConfigurationStore;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Country;
+use Thelia\Model\Currency;
+use Thelia\Model\Lang;
+use Thelia\Model\ModuleConfigQuery;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderReturnStatusQuery;
+use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\TaxRuleQuery;
 
 /**
  * Base class for Thelia integration tests.
@@ -114,7 +125,45 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         $this->connection = null;
 
+        $this->forgetWhatTheTestLeftInMemory();
+
         parent::tearDown();
+    }
+
+    /**
+     * The core memoises rows for the length of a request: the default country,
+     * currency and language, the tax rules of a product, the order statuses, the
+     * shop configuration. A test is one request, and its rows are rolled back
+     * with it, so the next test would read rows that no longer exist, or ids the
+     * database hands out again to other rows: the cart of a session without one
+     * was the cart a previous test had left there, with a currency rolled back since. The
+     * configuration is also kept in a cache shared between processes, which a
+     * test can fill with values it never committed.
+     */
+    private function forgetWhatTheTestLeftInMemory(): void
+    {
+        if (static::$booted && static::getContainer()->has(ConfigCacheService::class)) {
+            static::getContainer()->get(ConfigCacheService::class)->initCacheConfigs(true);
+        }
+
+        ConfigQuery::resetCache();
+        Country::resetDefaultCountryCache();
+        Lang::resetActiveLangsCache();
+        ModuleQuery::resetActivated();
+        ModuleConfigQuery::resetConfigCache();
+        OrderReturnStatusQuery::resetCache();
+
+        foreach ([
+            [Currency::class, 'defaultCurrency', null],
+            [Lang::class, 'defaultLanguage', null],
+            [TaxRuleQuery::class, 'caches', []],
+            [OrderStatusQuery::class, 'statusIdListsCache', []],
+            [OrderStatusQuery::class, 'statusModelCache', []],
+            [ModuleHookConfigurationStore::class, 'configuration', null],
+            [Session::class, 'transientCart', null],
+        ] as [$class, $property, $emptyValue]) {
+            (new \ReflectionProperty($class, $property))->setValue(null, $emptyValue);
+        }
     }
 
     /**
