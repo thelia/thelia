@@ -21,11 +21,13 @@ use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Cart;
 
 /**
  * The coupon conditions that compare a number of articles or the cart total,
- * saved the way the back-office saves them, then evaluated on a real cart.
+ * saved the way the back-office saves them: the posted number is a string,
+ * stored as it comes, while the cart counts and sums with integers and floats.
  */
 final class CouponConditionValuesCartTest extends ActionIntegrationPromotionTestCase
 {
@@ -38,6 +40,47 @@ final class CouponConditionValuesCartTest extends ActionIntegrationPromotionTest
         }
 
         parent::setUp();
+    }
+
+    public function testAnArticleCountEqualToTheCartMatches(): void
+    {
+        $this->promotionWhen('thelia.condition.match_for_x_articles', [
+            MatchForXArticles::CART_QUANTITY => ['operator' => Operators::EQUAL, 'value' => '2'],
+        ]);
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        $this->addItem($cart, $this->product());
+
+        self::assertSame(5.0, $this->cartDiscount($cart), 'The cart holds exactly two articles.');
+    }
+
+    public function testAQuantityEqualToTheCartMatches(): void
+    {
+        $this->promotionWhen('thelia.condition.match_for_x_articles_include_quantity', [
+            MatchForXArticles::CART_QUANTITY => ['operator' => Operators::EQUAL, 'value' => '3'],
+        ]);
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product(), quantity: 3);
+
+        self::assertSame(5.0, $this->cartDiscount($cart), 'The cart holds exactly three units.');
+    }
+
+    public function testACartTotalEqualToTheConditionMatches(): void
+    {
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        $total = $this->facade()->getCartTotalTaxPrice();
+        self::assertGreaterThan(0.0, $total);
+
+        $this->promotionWhen('thelia.condition.match_for_total_amount', [
+            MatchForTotalAmount::CART_TOTAL => ['operator' => Operators::EQUAL, 'value' => (string) $total],
+            MatchForTotalAmount::CART_CURRENCY => ['operator' => Operators::EQUAL, 'value' => $this->session()->getCurrency(true)->getCode()],
+        ]);
+        $this->recomputeDiscount();
+
+        self::assertSame(5.0, $this->cartDiscount($cart), 'The cart total is the amount of the condition.');
     }
 
     public function testAnArticleCountAboveTheThresholdMatches(): void
@@ -141,6 +184,14 @@ final class CouponConditionValuesCartTest extends ActionIntegrationPromotionTest
         $conditions[] = $condition;
 
         $this->automaticPromotion(conditions: $this->getService(ConditionFactory::class)->serializeConditionCollection($conditions));
+    }
+
+    private function facade(): FacadeInterface
+    {
+        $facade = $this->getService('thelia.facade');
+        self::assertInstanceOf(FacadeInterface::class, $facade);
+
+        return $facade;
     }
 
     /**

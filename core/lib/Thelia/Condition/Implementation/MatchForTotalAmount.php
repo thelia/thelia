@@ -71,8 +71,9 @@ class MatchForTotalAmount extends ConditionAbstract
             self::CART_TOTAL => $operators[self::CART_TOTAL],
             self::CART_CURRENCY => $operators[self::CART_CURRENCY],
         ];
+        // The back-office posts the amount as a string and the "equal" comparison is strict.
         $this->values = [
-            self::CART_TOTAL => $values[self::CART_TOTAL],
+            self::CART_TOTAL => (float) $values[self::CART_TOTAL],
             self::CART_CURRENCY => $values[self::CART_CURRENCY],
         ];
 
