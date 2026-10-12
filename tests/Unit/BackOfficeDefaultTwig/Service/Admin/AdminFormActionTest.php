@@ -99,9 +99,15 @@ final class AdminFormActionTest extends TestCase
             ->willThrowException(new FormValidationException('field required'));
 
         $errorRenderer = $this->createMock(AdminFormErrorRenderer::class);
-        $errorRenderer->expects(self::once())
-            ->method('fail')
-            ->with('Language creation', self::isInstanceOf(FormValidationException::class), $form);
+        if (self::themeRendersFailures()) {
+            $errorRenderer->expects(self::once())
+                ->method('fail')
+                ->with('Language creation', self::isInstanceOf(FormValidationException::class), $form);
+        } else {
+            $errorRenderer->expects(self::once())
+                ->method('setup')
+                ->with('Language creation', 'field required', $form, self::isInstanceOf(FormValidationException::class));
+        }
 
         $events = $this->createMock(EventDispatcherInterface::class);
         $events->expects(self::never())->method('dispatch');
@@ -189,7 +195,7 @@ final class AdminFormActionTest extends TestCase
             ->willThrowException(new \RuntimeException('invalid token'));
 
         $errorRenderer = $this->createMock(AdminFormErrorRenderer::class);
-        $errorRenderer->expects(self::once())->method('fail');
+        $errorRenderer->expects(self::once())->method(self::themeRendersFailures() ? 'fail' : 'setup');
 
         $events = $this->createMock(EventDispatcherInterface::class);
         $events->expects(self::never())->method('dispatch');
@@ -265,5 +271,14 @@ final class AdminFormActionTest extends TestCase
         $translator->method('trans')->willReturnArgument(0);
 
         return $translator;
+    }
+
+    /**
+     * The CI of the core installs the theme from its main branch: these tests follow
+     * the renderer of the theme installed, before and after AdminFormErrorRenderer::fail().
+     */
+    private static function themeRendersFailures(): bool
+    {
+        return method_exists(AdminFormErrorRenderer::class, 'fail');
     }
 }

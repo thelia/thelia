@@ -52,6 +52,13 @@ return static function (ContainerConfigurator $container): void {
                 'thelia.cache.security' => [
                     'adapter' => 'cache.app',
                 ],
+                // The mails a worker handed to the mail server, by the identifier
+                // MailerFactory gives them: a job handed out twice by the queue is
+                // not mailed twice. A cache clear leaves it in place; each item
+                // carries its own lifetime.
+                'thelia.cache.sent_mails' => [
+                    'adapter' => 'cache.app',
+                ],
             ],
         ],
         'rate_limiter' => [

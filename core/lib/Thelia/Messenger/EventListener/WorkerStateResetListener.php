@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Messenger\EventListener;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Cache\ConfigCacheService;
@@ -54,6 +56,7 @@ final readonly class WorkerStateResetListener
         private RewritingUrlMemoizer $rewritingUrlMemoizer,
         private ProductPriceCurrencyListener $productPriceCurrencyListener,
         private Translator $translator,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -61,11 +64,20 @@ final readonly class WorkerStateResetListener
      * A worker keeps every model it ever read in Propel's instance pool, and hands a
      * later job the copy an earlier one loaded: pooling is off for its whole life,
      * as it is in the tests.
+     *
+     * The listeners of the end of the command are loaded now too: a cache clear made
+     * by the shop asks the worker to stop, and deletes the container files the worker
+     * would load them from once stopped. Loaded while the files are there, the command
+     * ends as any other, with its exit code, instead of failing on a file that is gone.
      */
     #[AsEventListener]
     public function onWorkerStarted(WorkerStartedEvent $event): void
     {
         Propel::disableInstancePooling();
+
+        foreach ([ConsoleEvents::TERMINATE, ConsoleEvents::ERROR] as $eventName) {
+            $this->eventDispatcher->getListeners($eventName);
+        }
     }
 
     #[AsEventListener(priority: 4096)]
