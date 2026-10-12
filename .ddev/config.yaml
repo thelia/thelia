@@ -17,3 +17,8 @@ web_environment:
     - DATABASE_NAME=db
     - DATABASE_USER=db
     - DATABASE_PASSWORD=db
+# PCOV measures the code coverage that mutation testing starts from (composer
+# test:mutation). php/pcov.ini leaves it off: enabled, it slows every PHP process
+# down by about a quarter. Infection switches it on for its coverage run only.
+webimage_extra_packages:
+    - php${DDEV_PHP_VERSION}-pcov
