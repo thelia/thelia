@@ -208,6 +208,27 @@ final class RulePreviewServiceTest extends ActionIntegrationTestCase
         self::assertTrue($preview->lines[0]->changedByTheRule);
     }
 
+    /**
+     * A rule not saved yet gets the next id when it is, which puts it after every
+     * rule of the same priority: the preview must chain it there already.
+     */
+    public function testANewRuleComesAfterTheRunningRulesOfTheSamePriority(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $running = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'priority' => 100, 'stopProcessing' => true]);
+        $this->factory->catalogPriceRuleCriterion($running, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $this->getService(RuleRepricer::class)->afterRuleChanged($running);
+
+        $preview = $this->preview->preview($this->definition([
+            'percentageValue' => 30.0,
+            'priority' => 100,
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency);
+
+        self::assertEqualsWithDelta(90.0, $preview->lines[0]->untaxedAfter, 0.000001, 'the running rule comes first and stops the chain');
+        self::assertFalse($preview->lines[0]->changedByTheRule);
+    }
+
     public function testASaleElementWithoutAPriceIsCountedButNotPriced(): void
     {
         $product = $this->catalogProduct($this->category);

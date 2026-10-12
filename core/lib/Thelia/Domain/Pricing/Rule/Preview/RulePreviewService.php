@@ -182,7 +182,9 @@ class RulePreviewService
     {
         $draft = new CatalogPriceRule();
         $draft
-            ->setId($editedRuleId ?? 0)
+            // Rules of the same priority chain by id: a rule not saved yet will get
+            // the highest one, so it comes after all of them.
+            ->setId($editedRuleId ?? \PHP_INT_MAX)
             ->setActive(true)
             ->setPriority($definition->getPriority())
             ->setStopProcessing($definition->isStopProcessing())
