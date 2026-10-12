@@ -22,6 +22,7 @@ use Thelia\Model\CatalogPriceRuleQuery;
 use Thelia\Model\Category;
 use Thelia\Model\Currency;
 use Thelia\Model\Product;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 /**
@@ -65,6 +66,20 @@ final class RulePreviewServiceTest extends ActionIntegrationTestCase
         self::assertTrue($preview->lines[0]->changedByTheRule);
         self::assertGreaterThan($preview->lines[0]->untaxedAfter, $preview->lines[0]->taxedAfter);
         self::assertSame($rulesBefore, CatalogPriceRuleQuery::create()->count(), 'nothing was stored');
+    }
+
+    public function testEveryLineNamesTheSaleElementItPrices(): void
+    {
+        $first = $this->catalogProduct($this->category);
+        $second = $this->catalogProduct($this->category);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_CATEGORY => [$this->category->getId()]],
+        ]), $this->currency);
+
+        self::assertCount(2, $preview->lines);
+        self::assertSame($this->defaultSaleElementRef($first), $preview->lines[0]->reference);
+        self::assertSame($this->defaultSaleElementRef($second), $preview->lines[1]->reference);
     }
 
     public function testThePreviewChainsWithTheRulesAlreadyRunning(): void
@@ -116,6 +131,145 @@ final class RulePreviewServiceTest extends ActionIntegrationTestCase
         self::assertCount(2, $preview->lines);
     }
 
+    public function testASampleOfOneShowsOneLine(): void
+    {
+        $this->catalogProduct($this->category);
+        $this->catalogProduct($this->category);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_CATEGORY => [$this->category->getId()]],
+        ]), $this->currency, sampleSize: 1);
+
+        self::assertCount(1, $preview->lines);
+    }
+
+    public function testASampleSizeBelowOneStillShowsOneLine(): void
+    {
+        $this->catalogProduct($this->category);
+        $this->catalogProduct($this->category);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_CATEGORY => [$this->category->getId()]],
+        ]), $this->currency, sampleSize: 0);
+
+        self::assertSame(2, $preview->affectedProductCount);
+        self::assertCount(1, $preview->lines);
+    }
+
+    public function testThePreviewPricesWithTheRulesRunningAtTheGivenMoment(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $scheduled = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'startDate' => new \DateTime('+1 day')]);
+        $this->factory->catalogPriceRuleCriterion($scheduled, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $this->getService(RuleRepricer::class)->afterRuleChanged($scheduled);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency, now: new \DateTimeImmutable('+2 days'));
+
+        self::assertEqualsWithDelta(90.0, $preview->lines[0]->untaxedBefore, 0.000001, 'the scheduled rule runs at that moment');
+        self::assertEqualsWithDelta(72.0, $preview->lines[0]->untaxedAfter, 0.000001);
+    }
+
+    public function testACategoryCriterionWithoutSubcategoriesLeavesTheirProductsOut(): void
+    {
+        $child = $this->factory->category(['parent' => $this->category->getId()]);
+        $inParent = $this->catalogProduct($this->category);
+        $this->catalogProduct($child);
+
+        $preview = $this->preview->preview($this->definition([
+            'includeSubcategories' => false,
+            'criteria' => [CatalogPriceRule::CRITERION_CATEGORY => [$this->category->getId()]],
+        ]), $this->currency);
+
+        self::assertSame(1, $preview->affectedProductCount);
+        self::assertSame($inParent->getId(), $preview->lines[0]->productId);
+    }
+
+    public function testAnEditedRuleKeepsItsPlaceAmongRulesOfTheSamePriority(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $repricer = $this->getService(RuleRepricer::class);
+        $edited = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'priority' => 100]);
+        $this->factory->catalogPriceRuleCriterion($edited, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $repricer->afterRuleChanged($edited);
+        $newer = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'priority' => 100, 'stopProcessing' => true]);
+        $this->factory->catalogPriceRuleCriterion($newer, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $repricer->afterRuleChanged($newer);
+
+        $preview = $this->preview->preview($this->definition([
+            'percentageValue' => 30.0,
+            'priority' => 100,
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency, editedRuleId: $edited->getId());
+
+        self::assertEqualsWithDelta(90.0, $preview->lines[0]->untaxedBefore, 0.000001);
+        self::assertEqualsWithDelta(63.0, $preview->lines[0]->untaxedAfter, 0.000001, 'the edited rule keeps its place before the newer one, which then stops the chain');
+        self::assertTrue($preview->lines[0]->changedByTheRule);
+    }
+
+    public function testASaleElementWithoutAPriceIsCountedButNotPriced(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $this->factory->productSaleElement($product);
+        $next = $this->catalogProduct($this->category);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId(), $next->getId()]],
+        ]), $this->currency);
+
+        self::assertSame(3, $preview->affectedSaleElementCount);
+        self::assertCount(2, $preview->lines);
+        self::assertSame($this->defaultSaleElementRef($product), $preview->lines[0]->reference);
+        self::assertSame($next->getId(), $preview->lines[1]->productId, 'the sale element without a price is skipped, the sample goes on');
+    }
+
+    public function testARunningRuleWithoutAValueInTheCurrencyLeavesThePriceAlone(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $amount = $this->factory->catalogPriceRule(['active' => true, 'effectType' => CatalogPriceRule::EFFECT_TYPE_AMOUNT]);
+        $this->factory->catalogPriceRuleCriterion($amount, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $this->getService(RuleRepricer::class)->afterRuleChanged($amount);
+
+        $preview = $this->preview->preview($this->definition([
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency);
+
+        self::assertEqualsWithDelta(100.0, $preview->lines[0]->untaxedBefore, 0.000001);
+        self::assertEqualsWithDelta(80.0, $preview->lines[0]->untaxedAfter, 0.000001);
+    }
+
+    public function testADefinitionWithoutAValueChangesNothing(): void
+    {
+        $product = $this->catalogProduct($this->category);
+
+        $preview = $this->preview->preview($this->definition([
+            'percentageValue' => null,
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency);
+
+        self::assertEqualsWithDelta(100.0, $preview->lines[0]->untaxedBefore, 0.000001);
+        self::assertEqualsWithDelta(100.0, $preview->lines[0]->untaxedAfter, 0.000001);
+        self::assertFalse($preview->lines[0]->changedByTheRule);
+    }
+
+    public function testADefinitionWithoutAValueChangesNothingUnderARunningRule(): void
+    {
+        $product = $this->catalogProduct($this->category);
+        $running = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0]);
+        $this->factory->catalogPriceRuleCriterion($running, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $this->getService(RuleRepricer::class)->afterRuleChanged($running);
+
+        $preview = $this->preview->preview($this->definition([
+            'percentageValue' => null,
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), $this->currency);
+
+        self::assertEqualsWithDelta(90.0, $preview->lines[0]->untaxedBefore, 0.000001);
+        self::assertEqualsWithDelta(90.0, $preview->lines[0]->untaxedAfter, 0.000001);
+        self::assertFalse($preview->lines[0]->changedByTheRule);
+    }
+
     private function definition(array $overrides): CatalogPriceRuleCreateEvent
     {
         return (new CatalogPriceRuleCreateEvent())
@@ -125,8 +279,18 @@ final class RulePreviewServiceTest extends ActionIntegrationTestCase
             ->setPriority($overrides['priority'] ?? 100)
             ->setStopProcessing($overrides['stopProcessing'] ?? false)
             ->setEffectType(CatalogPriceRule::EFFECT_TYPE_PERCENTAGE)
-            ->setPercentageValue($overrides['percentageValue'] ?? 20.0)
+            ->setPercentageValue(\array_key_exists('percentageValue', $overrides) ? $overrides['percentageValue'] : 20.0)
+            ->setIncludeSubcategories($overrides['includeSubcategories'] ?? true)
             ->setCriteria($overrides['criteria'] ?? []);
+    }
+
+    private function defaultSaleElementRef(Product $product): string
+    {
+        return (string) ProductSaleElementsQuery::create()
+            ->filterByProductId($product->getId())
+            ->filterByIsDefault(true)
+            ->findOne()
+            ->getRef();
     }
 
     private function catalogProduct(Category $category): Product
