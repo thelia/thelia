@@ -1,0 +1,140 @@
+name: mutation-nightly
+
+# Mutation testing of the core with the unit AND the integration suites, one domain
+# of core/lib/Thelia/Domain per job. Most of the core is executed by the integration
+# tests only, which the pull request check (mutation.yml, unit suite) cannot run in a
+# few minutes. Advisory: nothing requires it; the job summary lists the mutants no
+# test noticed, domain by domain, and the reports are kept as an artifact.
+#
+# A pull request that changes this workflow or its Infection configuration runs it
+# on one domain, so that a broken nightly shows before it is merged.
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - .github/workflows/mutation-nightly.yml
+      - infection.integration.json5
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  domains:
+    name: List the domains
+    runs-on: ubuntu-latest
+    outputs:
+      domains: ${{ steps.list.outputs.domains }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List the domains of the core
+        id: list
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            domains='["Promotion"]'
+          else
+            domains=$(find core/lib/Thelia/Domain -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | jq -R . | jq -cs .)
+          fi
+          echo "$domains"
+          echo "domains=$domains" >> "$GITHUB_OUTPUT"
+
+  mutate:
+    name: Mutation testing of Domain/${{ matrix.domain }}
+    needs: domains
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # The organisation shares a pool of concurrent jobs with the pull requests.
+      max-parallel: 8
+      matrix:
+        domain: ${{ fromJSON(needs.domains.outputs.domains) }}
+    timeout-minutes: 60
+    env:
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      DOMAIN_PATH: core/lib/Thelia/Domain/${{ matrix.domain }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          # Enabled, PCOV slows every mutant run down: infection.integration.json5
+          # switches it on for the coverage run only.
+          ini-values: post_max_size=20M, pcov.enabled=0
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+          coverage: pcov
+
+      - name: Prepare the test database credentials
+        run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
+
+      - name: Resolve the themes from their development branch
+        # Same resolution as the test workflow.
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Locate the Composer download cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Composer download cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Build the test databases
+        # One for the coverage run, then one per Infection thread (TEST_TOKEN=1..4),
+        # each with its own container, models and caches (Thelia\Test\TestToken).
+        run: |
+          php bin/test-prepare
+          php bin/console importmap:install --env=test --no-debug
+          php bin/console tailwind:build --env=test --no-debug
+          php bin/console sass:build --env=test --no-debug
+          php bin/console cache:warmup --env=test --no-debug
+          for token in 1 2 3 4; do
+            TEST_TOKEN=$token php bin/test-prepare
+            TEST_TOKEN=$token php bin/console cache:warmup --env=test --no-debug
+          done
+
+      - name: Mutate the domain
+        run: |
+          # --with-uncovered: the score is then over every mutant of the domain, and
+          # the summary lists the lines neither suite executes.
+          php vendor/bin/infection -c infection.integration.json5 --no-progress --with-uncovered \
+            --filter="$DOMAIN_PATH/" \
+            --initial-tests-php-options="-d pcov.enabled=1 -d pcov.directory=$DOMAIN_PATH -d error_log=var/log/infection-initial-tests.log"
+
+      - name: Summarise the mutants
+        if: always()
+        run: php .github/scripts/mutation-summary.php var/infection-integration/infection.json "$GITHUB_STEP_SUMMARY" "Domain/${{ matrix.domain }}, unit and integration suites"
+
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-${{ matrix.domain }}
+          path: var/infection-integration/
+          if-no-files-found: ignore
+          retention-days: 30

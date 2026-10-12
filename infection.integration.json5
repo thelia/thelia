@@ -1,0 +1,37 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    // The nightly run of the mutation-nightly workflow, one domain of the core at a
+    // time (--filter). It adds the integration suite to the unit suite: most of the
+    // core is executed by the integration tests only.
+    "source": {
+        "directories": [
+            "core/lib/Thelia"
+        ],
+        "excludes": [
+            // Base classes and helpers of the test suites, not shop code.
+            "Test"
+        ]
+    },
+    "bootstrap": "phpstan_autoload.php",
+    "testFrameworkExtraArgs": "--testsuite=unit,integration",
+    // The workflow narrows pcov.directory to the domain under test. Infection stops
+    // the coverage run on the first line written to STDERR, and the kernel reports
+    // a broken or missing module there through error_log(), as some integration
+    // tests set up on purpose: those lines go to a file instead.
+    "initialTestsPhpOptions": "-d pcov.enabled=1 -d pcov.directory=core/lib/Thelia -d error_log=var/log/infection-initial-tests.log",
+    // Each thread runs its mutants as TEST_TOKEN=1..4, on its own database and
+    // caches: bin/test-prepare builds one per token beforehand (Thelia\Test\TestToken).
+    "threads": 4,
+    // An integration test boots the kernel: a mutant covered by many of them takes
+    // longer than the default ten seconds without hanging.
+    "timeout": 120,
+    "tmpDir": "var/cache-ci/infection-integration",
+    "logs": {
+        "text": "var/infection-integration/infection.log",
+        "summary": "var/infection-integration/summary.log",
+        "json": "var/infection-integration/infection.json"
+    },
+    "mutators": {
+        "@default": true
+    }
+}
