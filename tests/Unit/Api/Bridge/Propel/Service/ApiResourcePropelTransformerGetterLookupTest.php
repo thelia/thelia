@@ -24,7 +24,7 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\TypeCasterService;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
-use Thelia\Model\Product;
+use Thelia\Tests\Unit\Api\Bridge\Propel\Service\Fixture\RecordingProduct;
 
 /**
  * Writing a resource into its Propel model reads each property through the getter the resource
@@ -35,7 +35,7 @@ final class ApiResourcePropelTransformerGetterLookupTest extends TestCase
 {
     public function testABooleanReadByAnIsGetterReachesTheModel(): void
     {
-        $product = new Product();
+        $product = new RecordingProduct();
 
         $this->transformer()->resourceToModel($this->resource($product), new Post(denormalizationContext: []));
 
@@ -44,7 +44,7 @@ final class ApiResourcePropelTransformerGetterLookupTest extends TestCase
 
     public function testAPropertyWithoutAGetterIsLeftOutOfTheModel(): void
     {
-        $model = new class extends Product {
+        $model = new class extends RecordingProduct {
             public mixed $basisPoints = 'untouched';
 
             public function setBasisPoints(int $basisPoints): static
