@@ -39,11 +39,11 @@ final class SharedCacheKey
     public static function forChange(string $family, int $id): array
     {
         return match ($family) {
-            'product' => ['product-'.$id, 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image'],
-            'category' => ['category-'.$id, 'categories', 'products'],
+            'product' => ['product-'.$id, 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters'],
+            'category' => ['category-'.$id, 'categories', 'products', 'tfilters'],
             'content' => ['content-'.$id, 'contents'],
             'folder' => ['folder-'.$id, 'folders', 'contents'],
-            'brand' => ['brand-'.$id, 'brands', 'products'],
+            'brand' => ['brand-'.$id, 'brands', 'products', 'tfilters'],
             default => [self::ALL],
         };
     }

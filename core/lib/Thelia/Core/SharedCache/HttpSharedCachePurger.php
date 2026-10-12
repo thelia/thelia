@@ -20,14 +20,31 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 #[Exclude]
 final readonly class HttpSharedCachePurger implements SharedCachePurgerInterface
 {
-    public function __construct(private PurgerInterface $purger)
+    /**
+     * @param list<PurgerInterface> $purgers
+     */
+    public function __construct(private array $purgers)
     {
     }
 
     public function purge(array $keys): void
     {
-        if ([] !== $keys) {
-            $this->purger->purge($keys);
+        if ([] === $keys) {
+            return;
+        }
+
+        $failures = [];
+
+        foreach ($this->purgers as $purger) {
+            try {
+                $purger->purge($keys);
+            } catch (\Throwable $exception) {
+                $failures[] = $exception->getMessage();
+            }
+        }
+
+        if ([] !== $failures) {
+            throw new \RuntimeException(\sprintf('%d of %d proxies could not be purged: %s', \count($failures), \count($this->purgers), implode(' | ', $failures)));
         }
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\SharedCache;
 
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\HttpCache\SouinPurger;
 use ApiPlatform\HttpCache\SurrogateKeysPurger;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
@@ -54,21 +55,36 @@ final class SharedCachePurgerFactory
             return new UnavailableSharedCachePurger(\sprintf('SHARED_CACHE_PURGER is "%s" but SHARED_CACHE_PURGE_URLS lists no proxy.', $driver));
         }
 
-        $options = ['timeout' => 2.0, 'max_duration' => 5.0];
+        $options = ['timeout' => 2.0, 'max_duration' => 5.0, 'max_redirects' => 0];
         if ('' !== $secret) {
             $options['headers'] = [self::SECRET_HEADER => $secret];
         }
 
-        $client ??= HttpClient::create();
-        $clients = array_map(
-            static fn (string $uri): HttpClientInterface => ScopingHttpClient::forBaseUri($client, $uri, $options),
-            $baseUris,
-        );
+        try {
+            $client ??= HttpClient::create();
+            $purgers = array_map(
+                static fn (string $uri): PurgerInterface => self::purgerFor(
+                    $driver,
+                    [ScopingHttpClient::forBaseUri($client, $uri, $options)],
+                ),
+                $baseUris,
+            );
+        } catch (\Throwable $exception) {
+            return new UnavailableSharedCachePurger(\sprintf('SHARED_CACHE_PURGE_URLS is not usable: %s', $exception->getMessage()));
+        }
 
-        return new HttpSharedCachePurger(match ($driver) {
+        return new HttpSharedCachePurger($purgers);
+    }
+
+    /**
+     * @param list<HttpClientInterface> $clients
+     */
+    private static function purgerFor(string $driver, array $clients): PurgerInterface
+    {
+        return match ($driver) {
             'varnish' => new VarnishXKeyPurger($clients),
             'souin' => new SouinPurger($clients),
             default => new SurrogateKeysPurger($clients),
-        });
+        };
     }
 }
