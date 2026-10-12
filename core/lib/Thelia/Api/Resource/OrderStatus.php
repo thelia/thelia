@@ -121,6 +121,7 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
+        Order::GROUP_FRONT_READ,
         self::GROUP_FRONT_READ,
     ])]
     public ?string $equivalentCode = null;

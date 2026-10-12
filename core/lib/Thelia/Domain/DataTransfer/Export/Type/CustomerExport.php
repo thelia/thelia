@@ -32,8 +32,8 @@ class CustomerExport extends JsonFileAbstractExport
     protected array $orderAndAliases = [
         'customer_ref' => 'ref',
         'customer_title_i18n_long' => 'title',
-        'customer_firstname' => 'last_name',
-        'customer_lastname' => 'first_name',
+        'customer_firstname' => 'first_name',
+        'customer_lastname' => 'last_name',
         'customer_email' => 'email',
         'customer_discount' => 'discount',
         'newsletter_id' => 'is_registered_to_newsletter',

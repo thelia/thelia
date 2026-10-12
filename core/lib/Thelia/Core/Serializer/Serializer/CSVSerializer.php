@@ -15,14 +15,21 @@ declare(strict_types=1);
 namespace Thelia\Core\Serializer\Serializer;
 
 use Thelia\Core\Serializer\AbstractSerializer;
+use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
 
 /**
  * Class CSVSerializer.
+ *
+ * A CSV file is opened in a spreadsheet, so a text cell the spreadsheet would run as a
+ * formula is written as text, whatever export produced it.
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class CSVSerializer extends AbstractSerializer
 {
+    /** Both separators a spreadsheet may split a line on, whichever one the file uses. */
+    private const string LIST_SEPARATORS = ',;';
+
     protected string $delimiter = ',';
     protected string $enclosure = '"';
 
@@ -98,15 +105,37 @@ class CSVSerializer extends AbstractSerializer
             if (\is_array($value)) {
                 $value = \gettype($value);
             }
+
+            $value = SpreadsheetFormulaGuard::neutralize($value);
+        }
+        unset($value);
+
+        return $this->row($data);
+    }
+
+    /**
+     * Writes a line as fputcsv() does, which encloses a field holding the delimiter, the
+     * enclosure, a space or a line break, and also encloses a field holding either list
+     * separator: a spreadsheet set to the other one, as French ones are, splits a bare
+     * `Rue;=1+2` into two cells and runs the second one.
+     *
+     * @param array<mixed> $fields
+     */
+    private function row(array $fields): string
+    {
+        $cells = [];
+
+        foreach ($fields as $field) {
+            $cell = (string) $field;
+
+            if (false !== strpbrk($cell, $this->delimiter.$this->enclosure.self::LIST_SEPARATORS." \t\r\n")) {
+                $cell = $this->enclosure.str_replace($this->enclosure, $this->enclosure.$this->enclosure, $cell).$this->enclosure;
+            }
+
+            $cells[] = $cell;
         }
 
-        $fd = fopen('php://memory', 'w+');
-        fputcsv($fd, $data, $this->delimiter, $this->enclosure, $this->escape);
-        rewind($fd);
-        $csvRow = stream_get_contents($fd);
-        fclose($fd);
-
-        return (string) $csvRow;
+        return implode($this->delimiter, $cells)."\n";
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void

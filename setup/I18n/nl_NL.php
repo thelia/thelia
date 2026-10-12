@@ -415,4 +415,6 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Shipping notice sent to the customer' => 'Verzendbericht naar de klant verzonden',
+    'Your order {{ order_ref }} has been shipped' => 'Je bestelling {{ order_ref }} is verzonden',
 ];

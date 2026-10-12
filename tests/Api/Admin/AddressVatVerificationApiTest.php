@@ -64,6 +64,24 @@ final class AddressVatVerificationApiTest extends ApiTestCase
         self::assertNull($reloaded->getVatVerifiedName());
     }
 
+    public function testMovingTheAddressToAnotherCountryAloneIsRefusedWhileTheNumberStaysForeign(): void
+    {
+        $address = $this->verifiedBelgianAddress();
+        $germany = CountryQuery::create()->findOneByIsoalpha2('DE');
+        self::assertNotNull($germany);
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/addresses/'.$address->getId(),
+            ['country' => '/api/admin/countries/'.$germany->getId(), 'zipcode' => '10115', 'city' => 'Berlin'],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertNotNull($this->reloaded($address)->getVatVerifiedAt(), 'A refused patch changes nothing.');
+    }
+
     public function testPatchingAnotherFieldKeepsTheVerification(): void
     {
         $address = $this->verifiedBelgianAddress();
@@ -82,6 +100,78 @@ final class AddressVatVerificationApiTest extends ApiTestCase
         self::assertSame('Liège', $reloaded->getCity());
         self::assertNotNull($reloaded->getVatVerifiedAt());
         self::assertSame('Acme SPRL', $reloaded->getVatVerifiedName());
+    }
+
+    public function testPuttingTheWritableFieldsKeepsTheVerificationOfAnUnchangedNumber(): void
+    {
+        $address = $this->verifiedBelgianAddress();
+        $token = $this->authenticateAsAdmin();
+
+        $current = $this->readAddress($address, $token);
+
+        $response = $this->jsonRequest('PUT', '/api/admin/addresses/'.$address->getId(), [
+            'customerTitle' => $this->iri($current['customerTitle']),
+            'label' => $current['label'],
+            'firstname' => $current['firstname'],
+            'lastname' => $current['lastname'],
+            'address1' => $current['address1'],
+            'zipcode' => $current['zipcode'],
+            'city' => 'Liège',
+            'country' => $this->iri($current['country']),
+            'company' => $current['company'],
+            'vatNumber' => $current['vatNumber'],
+        ], $token);
+
+        self::assertJsonResponseSuccessful($response);
+
+        $reloaded = $this->reloaded($address);
+        self::assertSame('Liège', $reloaded->getCity(), 'Control: the PUT was applied.');
+        self::assertSame('BE0123456789', $reloaded->getVatNumber(), 'Control: the number did not change.');
+        self::assertNotNull(
+            $reloaded->getVatVerifiedAt(),
+            'The number and the country are the same: the PUT must not blank the verification.',
+        );
+        self::assertSame('Acme SPRL', $reloaded->getVatVerifiedName());
+    }
+
+    public function testPuttingBackWhatTheApiReturnedKeepsTheVerificationOfAnUnchangedNumber(): void
+    {
+        $address = $this->verifiedBelgianAddress();
+        $token = $this->authenticateAsAdmin();
+
+        $payload = $this->readAddress($address, $token);
+        unset($payload['@context'], $payload['@id'], $payload['@type'], $payload['id']);
+        $payload['city'] = 'Liège';
+        foreach ($payload as $field => $value) {
+            $payload[$field] = $this->iri($value);
+        }
+
+        $response = $this->jsonRequest('PUT', '/api/admin/addresses/'.$address->getId(), $payload, $token);
+
+        self::assertJsonResponseSuccessful($response);
+
+        $reloaded = $this->reloaded($address);
+        self::assertSame('Liège', $reloaded->getCity(), 'Control: the PUT was applied.');
+        self::assertNotNull(
+            $reloaded->getVatVerifiedAt(),
+            'The number and the country are the same: the PUT must not blank the verification.',
+        );
+    }
+
+    private function iri(mixed $value): mixed
+    {
+        return \is_array($value) && isset($value['@id']) ? $value['@id'] : $value;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function readAddress(Address $address, string $token): array
+    {
+        $response = $this->jsonRequest('GET', '/api/admin/addresses/'.$address->getId(), [], $token);
+        self::assertJsonResponseSuccessful($response);
+
+        return json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
     }
 
     private function verifiedBelgianAddress(): Address

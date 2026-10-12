@@ -17,6 +17,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\File\DocumentCacheProtection;
 use Thelia\Exception\DocumentException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -76,6 +77,8 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
+        $this->protectCacheDirectory();
+
         if (!file_exists($originalDocumentPathInCache)) {
             if (!file_exists($sourceFile)) {
                 throw new DocumentException(\sprintf('Source document file %s does not exists.', $sourceFile));
@@ -99,6 +102,18 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         // Update the event with file path and file URL
         $event->setDocumentPath($documentUrl);
         $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+    }
+
+    /**
+     * Apache serves the published documents itself (see DocumentCacheProtection).
+     *
+     * @throws DocumentException
+     */
+    private function protectCacheDirectory(): void
+    {
+        if (!DocumentCacheProtection::protect($this->getCachePath())) {
+            throw new DocumentException('Failed to write .htaccess in the document cache directory');
+        }
     }
 
     public static function getSubscribedEvents(): array

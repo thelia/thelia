@@ -35,6 +35,7 @@ use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
 use Thelia\Exception\TheliaProcessException;
@@ -70,6 +71,7 @@ readonly class OrderFacade
         private RequestStack $requestStack,
         private GiftWrappingLineFactory $giftWrappingLineFactory,
         private ExemptedVatCalculator $exemptedVatCalculator,
+        private DeliverySlotBooker $deliverySlotBooker,
     ) {
     }
 
@@ -259,7 +261,20 @@ readonly class OrderFacade
                 OrderAddressQuery::create()->findPk($placedOrder->getDeliveryOrderAddressId())?->getState(),
                 (string) $lang->getLocale(),
                 $connection,
+                $vatExempted,
             );
+
+            // The place in the delivery slot, taken by a conditional update like the stock
+            // above: the guard that ran before the transaction read a count, this is what
+            // decides between two buyers racing for the last place. A refusal rolls the
+            // whole order back.
+            if (null !== $placedOrder->getDeliverySlotId() && null !== $placedOrder->getDeliveryDate()) {
+                $this->deliverySlotBooker->book(
+                    (int) $placedOrder->getDeliverySlotId(),
+                    (string) $placedOrder->getDeliveryDate('Y-m-d'),
+                    $connection,
+                );
+            }
 
             // Allocate the ref from the gapless sequence as the very last
             // operation: the counter lock is only held for the commit window,

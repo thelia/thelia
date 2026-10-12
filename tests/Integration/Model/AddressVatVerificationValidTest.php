@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Model\Address;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -46,6 +47,42 @@ final class AddressVatVerificationValidTest extends IntegrationTestCase
         $address->setVatVerifiedAt(new \DateTime('-91 days'))->save($this->getPropelConnection());
 
         self::assertFalse($address->getVatVerificationValid());
+    }
+
+    public function testTheConfiguredLifetimeDecidesWhenAVerificationExpires(): void
+    {
+        ConfigQuery::write('vat_verification_lifetime_days', '30');
+
+        $address = $this->address();
+        $address->setVatVerifiedAt(new \DateTime('-29 days'))->save($this->getPropelConnection());
+        self::assertTrue($address->getVatVerificationValid());
+
+        $address->setVatVerifiedAt(new \DateTime('-31 days'))->save($this->getPropelConnection());
+        self::assertFalse($address->getVatVerificationValid());
+    }
+
+    #[DataProvider('unusableLifetimes')]
+    public function testAnUnusableLifetimeFallsBackToTheDefaultInsteadOfNeverExpiring(string $configured): void
+    {
+        ConfigQuery::write('vat_verification_lifetime_days', $configured);
+
+        self::assertSame(ConfigQuery::DEFAULT_VAT_VERIFICATION_LIFETIME_DAYS, ConfigQuery::getVatVerificationLifetimeDays());
+
+        $address = $this->address();
+        $address->setVatVerifiedAt(new \DateTime('-'.(ConfigQuery::DEFAULT_VAT_VERIFICATION_LIFETIME_DAYS + 1).' days'))->save($this->getPropelConnection());
+
+        self::assertFalse($address->getVatVerificationValid(), 'A lifetime of "'.$configured.'" kept an old verification exempting.');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function unusableLifetimes(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'negative' => ['-5'];
+        yield 'not a number' => ['abc'];
+        yield 'empty' => [''];
     }
 
     private function address(): Address

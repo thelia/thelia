@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Taxation\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Checkout\Service\GiftWrappingProvider;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -40,6 +41,7 @@ readonly class ExemptedVatCalculator
 {
     public function __construct(
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
+        private GiftWrappingProvider $giftWrappingProvider,
     ) {
     }
 
@@ -77,9 +79,23 @@ readonly class ExemptedVatCalculator
             $vat -= $vat * $discount / $untaxedTotal;
         }
 
-        $vat += $postageVat;
+        $vat += $postageVat + $this->giftWrappingVat($cart, $country, $state);
 
         return round(max(0.0, $vat), 2);
+    }
+
+    private function giftWrappingVat(Cart $cart, Country $country, ?State $state): float
+    {
+        $giftWrapping = $this->giftWrappingProvider->findActive(
+            null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId()
+        );
+
+        if (null === $giftWrapping) {
+            return 0.0;
+        }
+
+        return $this->giftWrappingProvider->taxedPrice($giftWrapping, $country, $state)
+            - round((float) $giftWrapping->getPrice(), 2);
     }
 
     private function lineTotal(float $unitPrice, float $quantity): float
