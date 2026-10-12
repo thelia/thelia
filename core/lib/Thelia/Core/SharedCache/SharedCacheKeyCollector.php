@@ -36,6 +36,7 @@ final class SharedCacheKeyCollector implements ResetInterface
         '/api/front/feature_values',
         '/api/front/attributes',
         '/api/front/attribute_values',
+        '/api/front/languages',
         '/api/front/countries',
         '/api/front/currencies',
         '/api/front/taxes',

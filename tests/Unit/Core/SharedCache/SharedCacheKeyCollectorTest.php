@@ -42,7 +42,32 @@ final class SharedCacheKeyCollectorTest extends TestCase
         yield 'what hangs under a product' => ['/api/front/products/42/product_images', ['product-42']];
         yield 'a resource without a name of its own' => ['/api/front/currencies/1', ['currencies-1']];
         yield 'a list of such resources' => ['/api/front/product_images', ['product_images']];
+        yield 'the languages' => ['/api/front/languages', ['languages']];
+        yield 'the videos of products' => ['/api/front/product_videos', ['product_videos']];
+        yield 'the associations of products' => ['/api/front/product_associations', ['product_associations']];
+        yield 'the filters of a listing' => ['/api/front/tfilters/products', ['tfilters']];
         yield 'not a front path' => ['/api/admin/products/42', []];
+    }
+
+    #[DataProvider('listedPaths')]
+    public function testReadingAListedResourceKeepsThePageComplete(string $path): void
+    {
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
+
+        $collector->record($path);
+
+        self::assertTrue($collector->isComplete());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function listedPaths(): iterable
+    {
+        yield 'the languages' => ['/api/front/languages'];
+        yield 'the videos of products' => ['/api/front/product_videos?product=42'];
+        yield 'the associations of products' => ['/api/front/product_associations'];
+        yield 'the filters of a listing' => ['/api/front/tfilters/products'];
     }
 
     public function testEveryReadIsKeptOnceInTheOrderItWasMade(): void
