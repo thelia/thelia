@@ -361,8 +361,20 @@ class MailerFactory
             ? (TheliaRequest::$isAdminEnv ? $session->getAdminLang() : $session->getLang())
             : null;
 
+        $languageHandedToParser = false;
+
         if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
             $this->setLanguageSession($session, $requiredLang);
+
+            // Without a session (a command, a scheduled task) the parser has no language to
+            // read: the template would be rendered in the default language of the translator
+            // whatever the customer speaks. The language of the message is handed over instead.
+            if (null === $session) {
+                $parser->assign('locale', $requiredLang->getLocale());
+                $parser->assign('lang_code', $requiredLang->getCode());
+                $parser->assign('lang_id', $requiredLang->getId());
+                $languageHandedToParser = true;
+            }
         }
 
         try {
@@ -378,6 +390,14 @@ class MailerFactory
             // failure so the request survives it, which would otherwise leave the visitor's
             // session in the language of an email they never received.
             $this->setLanguageSession($session, $currentLang);
+
+            // The parser is shared and keeps what it is assigned: the language handed over above
+            // must not leak into the next render without a session (another mail, a PDF).
+            if ($languageHandedToParser) {
+                $parser->assign('locale', null);
+                $parser->assign('lang_code', null);
+                $parser->assign('lang_id', null);
+            }
         }
     }
 
