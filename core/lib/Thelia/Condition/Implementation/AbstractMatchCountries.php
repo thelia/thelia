@@ -67,7 +67,8 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         }
 
         $this->operators = [self::COUNTRIES_LIST => $operators[self::COUNTRIES_LIST]];
-        $this->values = [self::COUNTRIES_LIST => $values[self::COUNTRIES_LIST]];
+        // The back-office posts the ids as strings and the comparison is strict: store them as integers.
+        $this->values = [self::COUNTRIES_LIST => array_map('\intval', $values[self::COUNTRIES_LIST])];
 
         return $this;
     }
