@@ -251,21 +251,3 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
-
-		-
-			message: '#^Class Thelia\\Model\\DateTime not found\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Parameter \$endDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Model/OrderProductQuery.php
-
-		-
-			message: '#^Parameter \$startDate of method Thelia\\Model\\OrderProductQuery\:\:getSaleStats\(\) has invalid type Thelia\\Model\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Model/OrderProductQuery.php
