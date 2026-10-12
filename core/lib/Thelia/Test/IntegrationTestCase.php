@@ -184,6 +184,7 @@ abstract class IntegrationTestCase extends KernelTestCase
             [OrderStatusQuery::class, 'statusModelCache', []],
             [ModuleHookConfigurationStore::class, 'configuration', null],
             [Session::class, 'transientCart', null],
+            [Request::class, 'isAdminEnv', false],
         ] as [$class, $property, $emptyValue]) {
             (new \ReflectionProperty($class, $property))->setValue(null, $emptyValue);
         }
