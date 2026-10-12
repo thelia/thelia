@@ -27,10 +27,12 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\Trait\LogsInAsCustomer;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 /**
  * The rule the catalog is narrowed by, on the shared class every caller goes
@@ -43,6 +45,7 @@ use Thelia\Test\Trait\LogsInAsCustomer;
 final class ReservedSaleVisibilityTest extends IntegrationTestCase
 {
     use LogsInAsCustomer;
+    use RecordsSqlQueries;
 
     private ReservedSaleVisibility $visibility;
     private FixtureFactory $factory;
@@ -191,6 +194,50 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
         self::assertTrue($isVisible($free));
     }
 
+    public function testAVisitorIsShownOnlyTheOperationsOpenToEverybody(): void
+    {
+        $public = $this->factory->sale(['active' => true]);
+        $reserved = $this->runningReservedSaleNaming($this->newCustomer());
+
+        self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $reserved]));
+    }
+
+    public function testACustomerIsShownTheOperationsOpenToEverybodyAndTheOnesNamingThem(): void
+    {
+        $customer = $this->newCustomer();
+        $public = $this->factory->sale(['active' => true]);
+        $theirs = $this->runningReservedSaleNaming($customer);
+        $someoneElses = $this->runningReservedSaleNaming($this->newCustomer());
+
+        $this->loginAsCustomerInSession($customer);
+        $this->forgetMemoisedAudience();
+
+        self::assertEqualsCanonicalizing(
+            [$public->getId(), $theirs->getId()],
+            $this->visibleSaleIds([$public, $theirs, $someoneElses]),
+        );
+    }
+
+    public function testNoEntitlementIsReadWhileNoReservedOperationRuns(): void
+    {
+        $customer = $this->newCustomer();
+        $public = $this->factory->sale(['active' => true]);
+        $draft = $this->factory->sale(['active' => false, 'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS]);
+        $this->factory->saleCustomer($draft, $customer);
+
+        $this->loginAsCustomerInSession($customer);
+        $this->forgetMemoisedAudience();
+
+        $statements = $this->recordSqlQueries(function () use ($public, $draft): void {
+            self::assertSame([$public->getId()], $this->visibleSaleIds([$public, $draft]));
+        });
+
+        self::assertSame(
+            [],
+            array_values(array_filter($statements, static fn (string $statement): bool => str_contains($statement, '`sale_customer`'))),
+        );
+    }
+
     private function isVisible(Product $product): bool
     {
         $query = ProductQuery::create()->filterById($product->getId());
@@ -223,6 +270,32 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
         $this->factory->saleOffsetCurrency($sale, $this->currency, 10.0);
 
         return $sale;
+    }
+
+    private function runningReservedSaleNaming(Customer $customer): Sale
+    {
+        $sale = $this->factory->sale([
+            'active' => true,
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS,
+            'startDate' => new \DateTime('-1 day'),
+            'endDate' => new \DateTime('+1 day'),
+        ]);
+        $this->factory->saleCustomer($sale, $customer);
+
+        return $sale;
+    }
+
+    /**
+     * @param list<Sale> $sales
+     *
+     * @return list<int>
+     */
+    private function visibleSaleIds(array $sales): array
+    {
+        $query = SaleQuery::create()->filterById(array_map(static fn (Sale $sale): int => $sale->getId(), $sales));
+        $this->visibility->applyToSales($query);
+
+        return array_map(static fn (Sale $sale): int => $sale->getId(), iterator_to_array($query->find()));
     }
 
     private function newCustomer(): Customer
