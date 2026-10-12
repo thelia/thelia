@@ -74,12 +74,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $freeShippingForModules,
             $perCustomerUsageCount,
         );
-        $categoryList = $effects[self::CATEGORIES_LIST] ?? [];
-        if (!\is_array($categoryList)) {
-            $categoryList = [$categoryList];
-        }
-
-        $this->category_list = $categoryList;
+        $this->category_list = $this->effectIdList($effects[self::CATEGORIES_LIST] ?? []);
 
         $this->setFieldsValue($effects);
 

@@ -75,11 +75,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             $freeShippingForModules,
             $perCustomerUsageCount,
         );
-        $effectProductList = $effects[self::PRODUCTS_LIST] ?? [];
-        if (\is_string($effectProductList)) {
-            $effectProductList = [$effectProductList];
-        }
-        $this->product_list = $effectProductList;
+        $this->product_list = $this->effectIdList($effects[self::PRODUCTS_LIST] ?? []);
 
         $categoryId = $effects[self::CATEGORY_ID] ?? 0;
         if (\is_string($categoryId)) {
