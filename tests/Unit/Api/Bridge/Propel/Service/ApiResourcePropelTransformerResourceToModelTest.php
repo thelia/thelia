@@ -362,6 +362,42 @@ final class ApiResourcePropelTransformerResourceToModelTest extends TestCase
         self::assertSame([[null]], $product->calls['setNote'] ?? null);
     }
 
+    public function testAPutResetsAPropertyItsPayloadLeftOutWhoseGroupIsGivenAsASingleName(): void
+    {
+        $product = new RecordingProduct();
+        $resource = new #[CompositeIdentifiers(['product', 'category'])] class($product) extends ReplacedResource {
+            #[Groups('product:write')]
+            public ?string $note;
+
+            public function getNote(): ?string
+            {
+                return $this->note;
+            }
+        };
+
+        $this->put($resource);
+
+        self::assertSame([[null]], $product->calls['setNote'] ?? null);
+    }
+
+    public function testAPutWhoseOperationNamesNoWriteGroupResetsWhatItsPayloadLeftOut(): void
+    {
+        $product = new RecordingProduct();
+        $resource = new #[CompositeIdentifiers(['product', 'category'])] class($product) extends ReplacedResource {
+            #[Groups(['product:write'])]
+            public ?string $note;
+
+            public function getNote(): ?string
+            {
+                return $this->note;
+            }
+        };
+
+        $this->put($resource, []);
+
+        self::assertSame([[null]], $product->calls['setNote'] ?? null);
+    }
+
     public function testAPutLeavesAlonePropertiesItsOperationDoesNotLetTheClientWrite(): void
     {
         $product = new RecordingProduct();
@@ -736,11 +772,11 @@ final class ApiResourcePropelTransformerResourceToModelTest extends TestCase
         };
     }
 
-    private function put(PropelResourceInterface $resource): void
+    private function put(PropelResourceInterface $resource, array $denormalizationContext = ['groups' => ['product:write']]): void
     {
         $this->transformer()->resourceToModel(
             $resource,
-            new Put(denormalizationContext: ['groups' => ['product:write']]),
+            new Put(denormalizationContext: $denormalizationContext),
             ['request' => new Request()],
         );
     }
