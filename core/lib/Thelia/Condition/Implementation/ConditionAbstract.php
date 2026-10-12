@@ -78,7 +78,7 @@ abstract class ConditionAbstract implements ConditionInterface
         );
 
         if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(self::class, $parameterName);
+            throw new InvalidConditionOperatorException(static::class, $parameterName);
         }
 
         return $this;
@@ -177,7 +177,7 @@ abstract class ConditionAbstract implements ConditionInterface
         }
 
         if (!$currencyFound) {
-            throw new InvalidConditionValueException(self::class, 'currency');
+            throw new InvalidConditionValueException(static::class, 'currency');
         }
 
         return true;
@@ -195,7 +195,7 @@ abstract class ConditionAbstract implements ConditionInterface
         $floatType = new FloatType();
 
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
-            throw new InvalidConditionValueException(self::class, 'price');
+            throw new InvalidConditionValueException(static::class, 'price');
         }
 
         return true;
