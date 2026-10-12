@@ -155,6 +155,40 @@ final class PriceChainEvaluatorTest extends TestCase
         self::assertTrue($result->displayInitialPrice);
     }
 
+    public function testTheCatalogPriceStaysHiddenWhenNoAppliedRuleAsksForIt(): void
+    {
+        $single = (new PriceChainEvaluator())->evaluate(
+            [$this->effect(1, 10, EffectType::Percentage, 10.0, displayInitialPrice: false)],
+            100.0,
+            new FlatRateTaxCalculator(),
+        );
+        $chained = (new PriceChainEvaluator())->evaluate(
+            [
+                $this->effect(1, 10, EffectType::Percentage, 10.0, displayInitialPrice: false),
+                $this->effect(2, 20, EffectType::Percentage, 10.0, displayInitialPrice: false),
+            ],
+            100.0,
+            new FlatRateTaxCalculator(),
+        );
+
+        self::assertFalse($single->displayInitialPrice);
+        self::assertFalse($chained->displayInitialPrice);
+    }
+
+    public function testARuleSkippedByTheStopFlagCannotShowTheCatalogPrice(): void
+    {
+        $result = (new PriceChainEvaluator())->evaluate(
+            [
+                $this->effect(1, 10, EffectType::FixedPrice, 9.90, stop: true, displayInitialPrice: false),
+                $this->effect(2, 20, EffectType::Percentage, 10.0, displayInitialPrice: true),
+            ],
+            100.0,
+            new FlatRateTaxCalculator(),
+        );
+
+        self::assertFalse($result->displayInitialPrice);
+    }
+
     private function effect(
         int $id,
         int $priority,

@@ -14,19 +14,35 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Condition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\MatchDeliveryModules;
 use Thelia\Condition\Operators;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Cart;
+use Thelia\Tests\Support\Log\SilencedTlog;
 
 /**
- * The empty-list path builds an InvalidConditionValueException, whose
- * constructor pulls in Tlog and ConfigQuery — see CartContainsProductsTest for
- * the same note. Only the evaluation paths are covered here.
+ * A delivery module condition takes a non-empty list of modules with the in or out
+ * operator. The exceptions rejecting a bad form log an error, so the logger reads a
+ * configuration sending it nowhere instead of the database.
  */
 final class MatchDeliveryModulesTest extends FacadeBackedTestCase
 {
+    use SilencedTlog;
+
+    protected function setUp(): void
+    {
+        $this->silenceTlog();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTlog();
+    }
+
     public function testServiceIdIsStable(): void
     {
         $condition = new MatchDeliveryModules($this->makeFacade());
@@ -86,6 +102,51 @@ final class MatchDeliveryModulesTest extends FacadeBackedTestCase
         $this->expectException(UnmatchableConditionException::class);
 
         $condition->isMatching();
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function comparisonOperators(): iterable
+    {
+        yield 'equal to' => [Operators::EQUAL];
+        yield 'greater than' => [Operators::SUPERIOR];
+    }
+
+    #[DataProvider('comparisonOperators')]
+    public function testAnOperatorOtherThanInOrOutIsRejected(string $operator): void
+    {
+        $this->expectException(InvalidConditionOperatorException::class);
+
+        (new MatchDeliveryModules($this->makeFacade()))->setValidatorsFromForm(
+            [MatchDeliveryModules::MODULES_LIST => $operator],
+            [MatchDeliveryModules::MODULES_LIST => [4]],
+        );
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function formsWithoutASelection(): iterable
+    {
+        yield 'an empty list' => [[MatchDeliveryModules::MODULES_LIST => []]];
+        yield 'no list at all' => [[]];
+        yield 'a list left blank' => [[MatchDeliveryModules::MODULES_LIST => null]];
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    #[DataProvider('formsWithoutASelection')]
+    public function testAFormWithoutASelectionIsRejected(array $values): void
+    {
+        $this->expectException(InvalidConditionValueException::class);
+        $this->expectExceptionMessage('on parameter delivery_modules');
+
+        (new MatchDeliveryModules($this->makeFacade()))->setValidatorsFromForm(
+            [MatchDeliveryModules::MODULES_LIST => Operators::OUT],
+            $values,
+        );
     }
 
     /**

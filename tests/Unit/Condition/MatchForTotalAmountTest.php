@@ -14,20 +14,34 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Condition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Condition\Exception\InvalidConditionOperatorException;
+use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
+use Thelia\Tests\Support\Log\SilencedTlog;
 
 /**
- * Unit coverage is limited to the `isMatching()` path because both
- * InvalidConditionValueException and InvalidConditionOperatorException
- * construct a Tlog instance in their constructor, which in turn reaches
- * into ConfigQuery (Propel). Those failure paths are exercised in the
- * integration layer where the database is available.
+ * A cart total condition compares the cart total with a strictly positive amount in
+ * a currency the shop sells. The exceptions rejecting a bad form log an error, so
+ * the logger reads a configuration sending it nowhere instead of the database.
  */
 final class MatchForTotalAmountTest extends FacadeBackedTestCase
 {
+    use SilencedTlog;
+
+    protected function setUp(): void
+    {
+        $this->silenceTlog();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTlog();
+    }
+
     public function testServiceIdIsStable(): void
     {
         $condition = new MatchForTotalAmount($this->facadeWithEUR());
@@ -88,6 +102,78 @@ final class MatchForTotalAmountTest extends FacadeBackedTestCase
         );
 
         self::assertTrue($condition->isMatching());
+    }
+
+    public function testACartBelowTheAmountMatchesTheLessThanOperator(): void
+    {
+        $facade = $this->facadeWithEUR();
+        $facade->method('getCartTotalTaxPrice')->willReturn(49.99);
+        $facade->method('getCheckoutCurrency')->willReturn('EUR');
+
+        $condition = $this->buildCondition($facade, Operators::INFERIOR, 50, 'EUR');
+
+        self::assertTrue($condition->isMatching());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function operatorsThatCompareNothing(): iterable
+    {
+        yield 'a list operator on the amount' => [Operators::IN, Operators::EQUAL];
+        yield 'an ordering operator on the currency' => [Operators::SUPERIOR, Operators::SUPERIOR];
+    }
+
+    #[DataProvider('operatorsThatCompareNothing')]
+    public function testAnOperatorTheConditionDoesNotOfferIsRejected(string $priceOperator, string $currencyOperator): void
+    {
+        $this->expectException(InvalidConditionOperatorException::class);
+
+        (new MatchForTotalAmount($this->facadeWithEUR()))->setValidatorsFromForm(
+            [
+                MatchForTotalAmount::CART_TOTAL => $priceOperator,
+                MatchForTotalAmount::CART_CURRENCY => $currencyOperator,
+            ],
+            [
+                MatchForTotalAmount::CART_TOTAL => '100',
+                MatchForTotalAmount::CART_CURRENCY => 'EUR',
+            ],
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function amountsThatAreNotAThreshold(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'a negative amount' => ['-10'];
+    }
+
+    #[DataProvider('amountsThatAreNotAThreshold')]
+    public function testAnAmountThatIsNotStrictlyPositiveIsRejected(string $amount): void
+    {
+        $this->expectException(InvalidConditionValueException::class);
+        $this->expectExceptionMessage('on parameter price');
+
+        (new MatchForTotalAmount($this->facadeWithEUR()))->setValidatorsFromForm(
+            [
+                MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
+                MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
+            ],
+            [
+                MatchForTotalAmount::CART_TOTAL => $amount,
+                MatchForTotalAmount::CART_CURRENCY => 'EUR',
+            ],
+        );
+    }
+
+    public function testACurrencyTheShopDoesNotSellIsRejected(): void
+    {
+        $this->expectException(InvalidConditionValueException::class);
+        $this->expectExceptionMessage('on parameter currency');
+
+        $this->buildCondition($this->facadeWithEUR(), Operators::SUPERIOR_OR_EQUAL, 100, 'USD');
     }
 
     private function buildCondition(

@@ -50,10 +50,10 @@ final class ConditionEvaluatorTest extends TestCase
         yield 'out false' => ['a', Operators::OUT, ['a', 'b'], false];
     }
 
-    public function testVariableOpComparisonThrowsOnUnknownOperator(): void
+    public function testVariableOpComparisonThrowsOnUnknownOperatorAndNamesIt(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Unrecognized operator');
+        $this->expectExceptionMessage('Unrecognized operator invalid');
 
         (new ConditionEvaluator())->variableOpComparison(1, 'invalid', 2);
     }
