@@ -76,6 +76,17 @@ final class ConfigTest extends TestCase
         self::assertSame('smtp.example.com', ConfigQuery::read('thelia-test.mail.smtp-host'));
     }
 
+    public function testAnEnvironmentVariableOverridesAConfigurationVariableThatHasNoRowYet(): void
+    {
+        ConfigQuery::initCache([]);
+
+        self::assertSame('localhost', ConfigQuery::read('thelia-test.mail.smtp-host', 'localhost'));
+
+        $_ENV[self::ENV_NAME] = 'smtp.example.com';
+
+        self::assertSame('smtp.example.com', ConfigQuery::read('thelia-test.mail.smtp-host', 'localhost'));
+    }
+
     public function testAnEnvironmentValueIsReadAsAString(): void
     {
         ConfigQuery::initCache(['thelia-test.mail.smtp-host' => 'localhost']);

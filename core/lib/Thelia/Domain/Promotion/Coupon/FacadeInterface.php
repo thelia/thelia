@@ -41,7 +41,7 @@ interface FacadeInterface
     /**
      * Return an Address a CouponManager can process.
      */
-    public function getDeliveryAddress(): Address;
+    public function getDeliveryAddress(): ?Address;
 
     /**
      * @return Country the delivery country

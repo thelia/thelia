@@ -16,10 +16,12 @@ namespace Thelia\Tests\Unit\Core\Template\Validator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\Validator\TemplateDescriptor;
 use Thelia\Core\Template\Validator\TemplateValidator;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Reading a template.xml gives the descriptor the back-office shows for the template, and refuses
@@ -29,18 +31,35 @@ final class TemplateValidatorTest extends TestCase
 {
     private string $templateDirectory;
 
+    private ?Translator $translator;
+
     protected function setUp(): void
     {
         $this->templateDirectory = sys_get_temp_dir().'/thelia-template-validator-'.uniqid('', true);
+        $this->translator = $this->translatorInstance()->getValue();
+        // Without a translator the refusal is built with sprintf(): each test starts there.
+        $this->translatorInstance()->setValue(null, null);
     }
 
     protected function tearDown(): void
     {
         (new Filesystem())->remove($this->templateDirectory);
+        $this->translatorInstance()->setValue(null, $this->translator);
     }
 
     public function testATemplateThatNeedsANewerTheliaIsRefused(): void
     {
+        $this->writeDescriptor(theliaVersion: '99.0.0');
+
+        $this->expectException(TemplateException::class);
+        $this->expectExceptionMessage('The template "a-template" requires Thelia 99.0.0 or newer');
+
+        $this->descriptor();
+    }
+
+    public function testTheRefusalNamesTheTemplateAndTheTheliaVersionWhenTheTranslatorIsAvailable(): void
+    {
+        new Translator(new RequestStack());
         $this->writeDescriptor(theliaVersion: '99.0.0');
 
         $this->expectException(TemplateException::class);
@@ -127,6 +146,11 @@ final class TemplateValidatorTest extends TestCase
             ],
             $this->descriptor()->getAuthors(),
         );
+    }
+
+    private function translatorInstance(): \ReflectionProperty
+    {
+        return new \ReflectionProperty(Translator::class, 'instance');
     }
 
     private function descriptor(): TemplateDescriptor

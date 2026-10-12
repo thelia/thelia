@@ -24,7 +24,7 @@ use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -415,23 +415,12 @@ readonly class ApiResourcePropelTransformerService
             $propelSetter = $this->determinePropelSetterName($property, $setterForced);
 
             if ($operation instanceof Put && !$property->isInitialized($data)) {
-                foreach ($property->getAttributes(Groups::class) as $groupAttribute) {
-                    $propertyGroups = null;
-
-                    if (isset($groupAttribute->getArguments()[0])) {
-                        $propertyGroups = $groupAttribute->getArguments()[0];
-                    }
-
-                    if (isset($groupAttribute->getArguments()['groups'])) {
-                        $propertyGroups = $groupAttribute->getArguments()['groups'];
-                    }
-
-                    if (!$property) {
-                        continue 2;
-                    }
-
-                    $contextGroups = $operation->getDenormalizationContext()['groups'];
-                    $isInContext = [] !== array_intersect($contextGroups, $propertyGroups);
+                foreach ($property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF) as $groupAttribute) {
+                    $arguments = $groupAttribute->getArguments();
+                    $propertyGroups = (array) ($arguments['groups'] ?? $arguments[0] ?? []);
+                    $contextGroups = (array) ($operation->getDenormalizationContext()['groups'] ?? []);
+                    // An operation that names no write group lets the client write every property.
+                    $isInContext = [] === $contextGroups || [] !== array_intersect($contextGroups, $propertyGroups);
 
                     foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                         if ($isInContext && 'array' !== $property->getType()?->getName()) {
@@ -519,7 +508,7 @@ readonly class ApiResourcePropelTransformerService
     private function isReadOnlyFor(\ReflectionProperty $property, Operation $operation): bool
     {
         $writeGroups = $operation->getDenormalizationContext()['groups'] ?? [];
-        $declared = $property->getAttributes(Groups::class);
+        $declared = $property->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         if ([] === $writeGroups || [] === $declared) {
             return false;

@@ -64,6 +64,17 @@ class DatabaseConfiguration implements ConfigurationInterface
                 "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both.",
             );
 
+        // Without either, the shop would boot with no connection at all and fail far
+        // from its configuration.
+        $databaseNode
+            ->validate()
+            ->ifTrue(
+                static fn ($database): bool => empty($database['connection']) && empty($database['connections']),
+            )
+            ->thenInvalid(
+                "The 'database' node must contain a 'connection' node or a 'connections' node.",
+            );
+
         return $treeBuilder;
     }
 
