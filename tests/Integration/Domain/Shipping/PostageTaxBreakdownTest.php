@@ -112,6 +112,29 @@ final class PostageTaxBreakdownTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(11.51, $postage->getAmount(), 0.0001);
     }
 
+    /**
+     * Four rates share two cents of postage: every share of half a cent rounds up,
+     * so the shares run out before the largest one, which then takes what is left
+     * instead of a negative amount.
+     */
+    public function testNoShareOfATinyPostageIsNegative(): void
+    {
+        $fixtures = $this->createMixedRateCart([
+            ['percent' => '20', 'title' => 'VAT 20', 'price' => '100.00'],
+            ['percent' => '10', 'title' => 'VAT 10', 'price' => '100.00'],
+            ['percent' => '5.5', 'title' => 'VAT 5.5', 'price' => '100.00'],
+            ['percent' => '2.1', 'title' => 'VAT 2.1', 'price' => '100.00'],
+        ]);
+        ConfigQuery::write(PostageTaxStrategy::CONFIG_KEY, PostageTaxStrategy::PRO_RATA->value);
+
+        $postage = $this->quotePostage($fixtures, new OrderPostage(0.024, 0.004, 'VAT 20'));
+
+        $untaxedShares = array_map(static fn (PostageTaxLine $line): float => $line->untaxedAmount, $postage->getTaxBreakdown());
+        sort($untaxedShares);
+
+        self::assertSame([0.0, 0.0, 0.01, 0.01], $untaxedShares);
+    }
+
     public function testHighestRateTaxesTheWholePostageAtTheDearestRateOfTheCart(): void
     {
         $fixtures = $this->createMixedRateCart();
@@ -284,20 +307,23 @@ final class PostageTaxBreakdownTest extends ActionIntegrationTestCase
     }
 
     /**
-     * A cart worth 200.00 at 20 % and 100.00 at 5.5 %, tax excluded.
+     * A cart worth 200.00 at 20 % and 100.00 at 5.5 %, tax excluded, unless other
+     * lines are given: one product per line, at its own rate and price.
+     *
+     * @param list<array{percent: string, title: string, price: string}> $lines
      *
      * @return array{cart: Cart, customer: Customer, currency: Currency, deliveryModule: Module, paymentModule: Module, deliveryAddressId: int, invoiceAddressId: int}
      */
-    private function createMixedRateCart(): array
+    private function createMixedRateCart(array $lines = [
+        ['percent' => '20', 'title' => 'VAT 20', 'price' => '200.00'],
+        ['percent' => '5.5', 'title' => 'VAT 5.5', 'price' => '100.00'],
+    ]): array
     {
         $currency = $this->factory->currency();
         $customerTitle = $this->factory->customerTitle();
         $customer = $this->factory->customer($customerTitle);
         $country = $this->factory->country();
         $category = $this->factory->category();
-
-        $standardRate = $this->createTaxRule($country, '20', 'VAT 20');
-        $reducedRate = $this->createTaxRule($country, '5.5', 'VAT 5.5');
 
         $deliveryAddress = $this->createCartAddress($customerTitle->getId(), $country->getId());
         $invoiceAddress = $this->createCartAddress($customerTitle->getId(), $country->getId());
@@ -317,8 +343,10 @@ final class PostageTaxBreakdownTest extends ActionIntegrationTestCase
             ->setPaymentModuleId($paymentModule->getId());
         $cart->save($this->getPropelConnection());
 
-        $this->addCartItem($cart, $this->factory->product($category, $standardRate, $currency, ['baseQuantity' => 100]), '200.00');
-        $this->addCartItem($cart, $this->factory->product($category, $reducedRate, $currency, ['baseQuantity' => 100]), '100.00');
+        foreach ($lines as $line) {
+            $taxRule = $this->createTaxRule($country, $line['percent'], $line['title']);
+            $this->addCartItem($cart, $this->factory->product($category, $taxRule, $currency, ['baseQuantity' => 100]), $line['price']);
+        }
 
         return [
             'cart' => $cart,
