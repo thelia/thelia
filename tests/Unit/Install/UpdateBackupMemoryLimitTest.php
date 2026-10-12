@@ -74,9 +74,10 @@ final class UpdateBackupMemoryLimitTest extends TestCase
         $initialLimit = \ini_get('memory_limit');
         $limitInBytes = Update::parseMemoryLimit($memoryLimit);
 
-        // PHP refuses, with a warning, a limit below what the process already uses:
-        // a long run (unit and integration suites in one process) can be past 96 MB.
-        if ($limitInBytes < 0 || $limitInBytes > memory_get_usage()) {
+        // PHP refuses, with a warning, a limit below the memory the process has
+        // already reserved from the system (memory_get_usage(true), not the part of
+        // it in use): a long run, coverage on, can be past 96 MB.
+        if ($limitInBytes < 0 || $limitInBytes > memory_get_usage(true)) {
             ini_set('memory_limit', $memoryLimit);
         }
 
