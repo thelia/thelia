@@ -60,6 +60,21 @@ final class OrderReturnComposerTest extends IntegrationTestCase
         }
     }
 
+    /**
+     * The postage is stored tax included: what carrying it back adds to the
+     * refund is what the customer paid for it.
+     */
+    public function testTheReturnedPostageAddsWhatTheCustomerPaidForIt(): void
+    {
+        $order = $this->factory->order(null, [
+            'statusCode' => OrderStatus::CODE_PAID,
+            'postage' => '6.000000',
+            'postageTax' => '1.000000',
+        ]);
+
+        self::assertSame(6.0, $this->composer->postageRefund($order));
+    }
+
     public function testThePostageCannotBeReturnedTwiceByTwoOpenReturns(): void
     {
         $customer = $this->factory->customer($this->factory->customerTitle());
