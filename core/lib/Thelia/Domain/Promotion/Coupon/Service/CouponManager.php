@@ -544,7 +544,8 @@ class CouponManager implements ResetInterface
                         ->setCount($newCount)
                         ->save();
 
-                    return $usageLeft - $newCount;
+                    // getUsagesLeft() already took the previous usages off.
+                    return $usageLeft - 1;
                 }
 
                 $coupon->setMaxUsage(--$usageLeft);
@@ -591,7 +592,7 @@ class CouponManager implements ResetInterface
                         ->setCount($newCount)
                         ->save();
 
-                    return $usageLeft - $newCount;
+                    return $usageLeft + 1;
                 }
             } else {
                 // Ad one usage to coupon

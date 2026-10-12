@@ -180,6 +180,19 @@ final class CouponManagerTest extends ActionIntegrationTestCase
         self::assertSame([], $this->couponManager->getCurrentCoupons());
     }
 
+    public function testCountingAPerCustomerUsageReturnsTheUsagesTheCustomerHasLeft(): void
+    {
+        $coupon = $this->factory->coupon(['maxUsage' => 3, 'perCustomerUsageCount' => true]);
+        $customerId = $this->factory->customer($this->factory->customerTitle())->getId();
+
+        self::assertSame(2, $this->couponManager->decrementQuantity($coupon, $customerId));
+        self::assertSame(1, $this->couponManager->decrementQuantity($coupon, $customerId));
+        self::assertSame(1, $coupon->getUsagesLeft($customerId));
+
+        self::assertSame(2, $this->couponManager->incrementQuantity($coupon, $customerId));
+        self::assertSame(2, $coupon->getUsagesLeft($customerId));
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */
