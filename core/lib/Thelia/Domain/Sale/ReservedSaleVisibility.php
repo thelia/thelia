@@ -105,11 +105,9 @@ class ReservedSaleVisibility implements ResetInterface
      */
     public function applyToSales(SaleQuery $query): void
     {
-        if (!$this->hasActiveReservedSale()) {
-            return;
-        }
-
-        $entitledSaleIds = $this->entitledSaleIds();
+        // While no reserved operation runs, none is open to anybody: the visitor is
+        // left with the public ones, without asking which they are named on.
+        $entitledSaleIds = $this->hasActiveReservedSale() ? $this->entitledSaleIds() : [];
 
         if ([] === $entitledSaleIds) {
             $query->filterByAudienceMode(Sale::AUDIENCE_MODE_PUBLIC);
