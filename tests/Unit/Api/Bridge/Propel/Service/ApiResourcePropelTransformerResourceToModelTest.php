@@ -398,6 +398,24 @@ final class ApiResourcePropelTransformerResourceToModelTest extends TestCase
         self::assertSame([[null]], $product->calls['setNote'] ?? null);
     }
 
+    public function testAPutWhoseOperationNamesItsWriteGroupAsASingleNameResetsWhatItsPayloadLeftOut(): void
+    {
+        $product = new RecordingProduct();
+        $resource = new #[CompositeIdentifiers(['product', 'category'])] class($product) extends ReplacedResource {
+            #[Groups(['product:write'])]
+            public ?string $note;
+
+            public function getNote(): ?string
+            {
+                return $this->note;
+            }
+        };
+
+        $this->put($resource, ['groups' => 'product:write']);
+
+        self::assertSame([[null]], $product->calls['setNote'] ?? null);
+    }
+
     public function testAPutLeavesAlonePropertiesItsOperationDoesNotLetTheClientWrite(): void
     {
         $product = new RecordingProduct();
