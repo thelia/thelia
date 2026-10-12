@@ -50,6 +50,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.*",
+        "infection/infection": "^0.35",
         "phpstan/phpstan": "2.*",
         "phpstan/extension-installer": "1.*",
         "phpunit/phpunit": "11.5.*",
@@ -103,6 +104,9 @@
         ],
         "test:http-backoffice": [
             "@phpc ./vendor/bin/phpunit --testsuite http-backoffice"
+        ],
+        "test:mutation": [
+            "@phpc ./vendor/bin/infection --git-diff-lines --git-diff-base=origin/main --with-uncovered"
         ],
         "test": [
             "@test:prepare",
@@ -199,7 +203,8 @@
             "phpstan/extension-installer": true,
             "symfony/flex": true,
             "symfony/runtime": true,
-            "composer/installers": true
+            "composer/installers": true,
+            "infection/extension-installer": false
         }
     }
 }
