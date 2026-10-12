@@ -159,6 +159,31 @@ final class VatExemptionResolverTest extends IntegrationTestCase
         self::assertSame(VatExemptionState::EXEMPTED, $this->resolver()->stateForCart($this->cartBilledTo('BE', new \DateTime('-10 days'))));
     }
 
+    public function testTheStateOfABuyerOutsideTheUnionSaysNothingOfItsNumber(): void
+    {
+        self::assertSame(VatExemptionState::NOT_APPLICABLE, $this->resolver()->stateForCart($this->cartBilledTo('CH', new \DateTime('-10 days'))));
+    }
+
+    public function testANumberMadeOfBlanksIsNoNumberAtAll(): void
+    {
+        $cart = $this->cartBilledTo('BE', new \DateTime('-10 days'));
+        $cart->getCartAddressRelatedByAddressInvoiceId()->setVatNumber('   ')->save($this->getPropelConnection());
+
+        self::assertSame(VatExemptionState::NOT_APPLICABLE, $this->resolver()->stateForCart($cart));
+    }
+
+    public function testAShopCountryCodeWrittenInLowerCaseStillRecognizesABuyerAtHome(): void
+    {
+        ConfigQuery::write('store_country', (string) $this->countryOf('fr')->getId());
+
+        self::assertSame(VatExemptionState::NOT_APPLICABLE, $this->resolver()->stateForCart($this->cartBilledTo('FR', new \DateTime('-10 days'))));
+    }
+
+    public function testABuyerCountryCodeWrittenInLowerCaseIsStillAtHomeInTheShopsCountry(): void
+    {
+        self::assertSame(VatExemptionState::NOT_APPLICABLE, $this->resolver()->stateForCart($this->cartBilledTo('fr', new \DateTime('-10 days'))));
+    }
+
     private function resolver(): VatExemptionResolver
     {
         return $this->getService(VatExemptionResolver::class);
