@@ -43,8 +43,8 @@ final class ApplicationTest extends TestCase
 
     private ?bool $installed;
 
-    /** @var array{server: mixed, env: mixed, process: string|false} */
-    private array $databaseHost;
+    /** @var array<string, array{server: mixed, env: mixed, process: string|false}> */
+    private array $databaseEnvironment = [];
 
     protected function setUp(): void
     {
@@ -57,27 +57,31 @@ final class ApplicationTest extends TestCase
         $this->installed = $this->installedProperty()->getValue();
         $this->installedProperty()->setValue(null, null);
 
-        $this->databaseHost = [
-            'server' => $_SERVER['DATABASE_HOST'] ?? null,
-            'env' => $_ENV['DATABASE_HOST'] ?? null,
-            'process' => getenv('DATABASE_HOST'),
-        ];
-        $this->setDatabaseHost('');
+        foreach (['DATABASE_HOST', 'DATABASE_PORT'] as $name) {
+            $this->databaseEnvironment[$name] = [
+                'server' => $_SERVER[$name] ?? null,
+                'env' => $_ENV[$name] ?? null,
+                'process' => getenv($name),
+            ];
+        }
+        $this->setEnvironment('DATABASE_HOST', '');
     }
 
     protected function tearDown(): void
     {
-        unset($_SERVER['DATABASE_HOST'], $_ENV['DATABASE_HOST']);
+        foreach ($this->databaseEnvironment as $name => $saved) {
+            unset($_SERVER[$name], $_ENV[$name]);
 
-        if (null !== $this->databaseHost['server']) {
-            $_SERVER['DATABASE_HOST'] = $this->databaseHost['server'];
+            if (null !== $saved['server']) {
+                $_SERVER[$name] = $saved['server'];
+            }
+
+            if (null !== $saved['env']) {
+                $_ENV[$name] = $saved['env'];
+            }
+
+            putenv(false === $saved['process'] ? $name : $name.'='.$saved['process']);
         }
-
-        if (null !== $this->databaseHost['env']) {
-            $_ENV['DATABASE_HOST'] = $this->databaseHost['env'];
-        }
-
-        putenv(false === $this->databaseHost['process'] ? 'DATABASE_HOST' : 'DATABASE_HOST='.$this->databaseHost['process']);
 
         $this->installedProperty()->setValue(null, $this->installed);
         Propel::setServiceContainer($this->propelServiceContainer);
@@ -164,12 +168,14 @@ final class ApplicationTest extends TestCase
     }
 
     /**
-     * The shop's config table answers through the Propel connection; nothing
-     * listens on the database host, so no real server can answer instead.
+     * The shop's config table answers through the Propel connection; the database
+     * port is one nothing listens on, so no real server can answer instead, not
+     * even the MySQL a CI runner keeps on 127.0.0.1:3306.
      */
     private function installShop(): void
     {
-        $this->setDatabaseHost('127.0.0.1');
+        $this->setEnvironment('DATABASE_HOST', '127.0.0.1');
+        $this->setEnvironment('DATABASE_PORT', '1');
 
         $result = $this->createMock(PDODataFetcher::class);
         $result->method('fetch')->willReturn(['id' => 1]);
@@ -183,10 +189,10 @@ final class ApplicationTest extends TestCase
         $serviceContainer->setConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME, $connection);
     }
 
-    private function setDatabaseHost(string $host): void
+    private function setEnvironment(string $name, string $value): void
     {
-        $_SERVER['DATABASE_HOST'] = $_ENV['DATABASE_HOST'] = $host;
-        putenv('DATABASE_HOST='.$host);
+        $_SERVER[$name] = $_ENV[$name] = $value;
+        putenv($name.'='.$value);
     }
 
     private function installedProperty(): \ReflectionProperty
