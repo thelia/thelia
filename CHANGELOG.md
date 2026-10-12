@@ -24,6 +24,9 @@
 
 - A combination saved with a new `ean_code` that is not a GTIN is refused, wherever it comes from: a 422 on `eanCode` from the admin API, a refused row with its reason from the stock import, an `InvalidGtinException` from a module that saves the model. A code is stored without the spaces and hyphens typed in it. An integration that wrote free text or a mistyped code in that field gets the refusal on its next write of the code; codes already stored stay as they are until they change.
 
+## Fixed
+
+- The four checkout steps have a German title. They were seeded in English, Spanish, French and Italian only, so a German storefront drew its progress trail in the shop language ("Paiement" on a German page of a French shop). A fresh install seeds the German titles, and `3.3.0.sql` adds them to an installed shop without touching a title the merchant already wrote.
 ## Breaking changes
 
 - The delivery dates add a constructor argument to four services. `Thelia\Api\State\Processor\CheckoutSelectionProcessor::__construct()` takes `Thelia\Domain\Cart\CartFacade`, `Thelia\Domain\Cart\Service\CartGuard::__construct()` takes `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard`, `Thelia\Domain\Order\OrderFacade::__construct()` takes `Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker`, and `Thelia\Domain\Shipping\Service\DeliveryModuleResourceBuilder::__construct()` takes `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar`, each after what it took and without a default. A module instantiating one of them itself has to pass it; a module reading it from the container has nothing to do.

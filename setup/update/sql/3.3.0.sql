@@ -538,4 +538,25 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@delivery_date_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
     (@delivery_date_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- German titles of the checkout steps
+--
+-- 3.1.0 named the four steps of the checkout in English, Spanish, French
+-- and Italian only, while the shop ships German. A German storefront drew
+-- its progress trail in the shop language instead ("Paiement" on a German
+-- page of a French shop). The step is found by its code, as in 3.1.0, and
+-- INSERT IGNORE keeps a German title the merchant already wrote, so the
+-- statement can be replayed.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `checkout_step_i18n` (`id`, `locale`, `title`)
+    SELECT `checkout_step`.`id`, 'de_DE', `wording`.`title`
+    FROM `checkout_step`
+    JOIN (
+        SELECT 'cart' AS `code`, 'Ihr Warenkorb' AS `title`
+        UNION ALL SELECT 'delivery', 'Lieferung'
+        UNION ALL SELECT 'payment', 'Zahlung'
+        UNION ALL SELECT 'confirmation', 'Bestätigung'
+    ) AS `wording` ON `wording`.`code` = `checkout_step`.`code`;
+
 SET FOREIGN_KEY_CHECKS = 1;
