@@ -65,6 +65,7 @@ readonly class GiftWrappingLineFactory
         ?State $taxState,
         string $locale,
         ConnectionInterface $connection,
+        bool $vatExempted = false,
     ): ?OrderProduct {
         $giftWrapping = $this->giftWrappingProvider->findActive(
             null === $cart->getGiftWrappingId() ? null : (int) $cart->getGiftWrappingId()
@@ -76,7 +77,7 @@ readonly class GiftWrappingLineFactory
 
         $untaxedPrice = (float) $giftWrapping->getPrice();
         $taxRule = $giftWrapping->getTaxRule();
-        $taxes = $this->computeTaxes($taxRule, $taxCountry, $taxState, $untaxedPrice, $locale);
+        $taxes = $vatExempted ? [] : $this->computeTaxes($taxRule, $taxCountry, $taxState, $untaxedPrice, $locale);
         $taxRuleI18n = $this->translationProvider->getTaxRuleTranslation($locale, (int) $giftWrapping->getTaxRuleId());
 
         $orderProduct = (new OrderProduct())

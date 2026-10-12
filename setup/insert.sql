@@ -104,7 +104,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (93, 'videos_library_path', 'local/media/videos', 0, 0, NOW(), NOW()),
 (94, 'video_providers', 'youtube,vimeo,dailymotion', 0, 0, NOW(), NOW()),
 (95, 'vat_exemption_mode', 'disabled', 0, 0, NOW(), NOW()),
-(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW())
+(96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
+(97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2222,7 +2223,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (55, 'admin.order.status-force', NOW(), NOW()),
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
-(58, 'admin.configuration.gift-wrapping', NOW(), NOW())
+(58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
+(59, 'admin.configuration.delivery-date', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2235,7 +2237,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
-(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW())
+(10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
+(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW())
 ;
 
 /**
@@ -2304,6 +2307,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'cs_CZ', NULL, NULL, NULL, NULL),
     (95, 'cs_CZ', NULL, NULL, NULL, NULL),
     (96, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (97, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2365,6 +2369,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'de_DE', 'Modulinstallation aus ZIP-Dateien zulassen.', NULL, NULL, NULL),
     (95, 'de_DE', NULL, NULL, NULL, NULL),
     (96, 'de_DE', NULL, NULL, NULL, NULL),
+    (97, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2426,6 +2431,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'en_US', 'Allow module installation from ZIP files.', NULL, NULL, NULL),
     (95, 'en_US', 'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)', NULL, NULL, NULL),
     (96, 'en_US', 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', NULL, NULL, NULL),
+    (97, 'en_US', 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2487,6 +2493,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'es_ES', 'Permitir la instalación del módulo desde archivos ZIP.', NULL, NULL, NULL),
     (95, 'es_ES', NULL, NULL, NULL, NULL),
     (96, 'es_ES', NULL, NULL, NULL, NULL),
+    (97, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2548,6 +2555,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
     (95, 'fr_FR', 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d\'un autre État membre (nécessite un module de vérification)', NULL, NULL, NULL),
     (96, 'fr_FR', 'Nombre de jours pendant lesquels la vérification d\'un numéro de TVA permet l\'exonération (0 ou moins revient à 90)', NULL, NULL, NULL),
+    (97, 'fr_FR', 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2609,6 +2617,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'it_IT', NULL, NULL, NULL, NULL),
     (95, 'it_IT', NULL, NULL, NULL, NULL),
     (96, 'it_IT', NULL, NULL, NULL, NULL),
+    (97, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2670,6 +2679,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (73, 'nl_NL', NULL, NULL, NULL, NULL),
     (95, 'nl_NL', NULL, NULL, NULL, NULL),
     (96, 'nl_NL', NULL, NULL, NULL, NULL),
+    (97, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2730,7 +2740,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (72, 'ru_RU', NULL, NULL, NULL, NULL),
     (73, 'ru_RU', NULL, NULL, NULL, NULL),
     (95, 'ru_RU', NULL, NULL, NULL, NULL),
-    (96, 'ru_RU', NULL, NULL, NULL, NULL)
+    (96, 'ru_RU', NULL, NULL, NULL, NULL),
+    (97, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
@@ -15419,6 +15430,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'cs_CZ', NULL, NULL, NULL, NULL),
     (57, 'cs_CZ', NULL, NULL, NULL, NULL),
     (58, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (59, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15476,6 +15488,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'de_DE', NULL, NULL, NULL, NULL),
     (57, 'de_DE', 'Katalogpreisregeln', NULL, NULL, NULL),
     (58, 'de_DE', NULL, NULL, NULL, NULL),
+    (59, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15533,6 +15546,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'en_US', 'Configuration / Tag', NULL, NULL, NULL),
     (57, 'en_US', 'Catalog price rules', NULL, NULL, NULL),
     (58, 'en_US', 'Configuration gift wrappings', NULL, NULL, NULL),
+    (59, 'en_US', 'Configuration delivery dates', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15590,6 +15604,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'es_ES', NULL, NULL, NULL, NULL),
     (57, 'es_ES', 'Reglas de precios del catálogo', NULL, NULL, NULL),
     (58, 'es_ES', NULL, NULL, NULL, NULL),
+    (59, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15647,6 +15662,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'fr_FR', 'Configuration / Étiquette', NULL, NULL, NULL),
     (57, 'fr_FR', 'Règles de prix catalogue', NULL, NULL, NULL),
     (58, 'fr_FR', 'Configuration des emballages cadeaux', NULL, NULL, NULL),
+    (59, 'fr_FR', 'Configuration des dates de livraison', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15704,6 +15720,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'it_IT', NULL, NULL, NULL, NULL),
     (57, 'it_IT', 'Regole di prezzo del catalogo', NULL, NULL, NULL),
     (58, 'it_IT', NULL, NULL, NULL, NULL),
+    (59, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15761,6 +15778,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'nl_NL', NULL, NULL, NULL, NULL),
     (57, 'nl_NL', 'Catalogusprijsregels', NULL, NULL, NULL),
     (58, 'nl_NL', NULL, NULL, NULL, NULL),
+    (59, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15817,7 +15835,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (55, 'ru_RU', 'Принудительное изменение статуса заказа', NULL, NULL, NULL),
     (56, 'ru_RU', NULL, NULL, NULL, NULL),
     (57, 'ru_RU', 'Правила цен каталога', NULL, NULL, NULL),
-    (58, 'ru_RU', NULL, NULL, NULL, NULL)
+    (58, 'ru_RU', NULL, NULL, NULL, NULL),
+    (59, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 
@@ -15832,6 +15851,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'cs_CZ', NULL, 'Potvrďte svůj účet v obchodě {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'cs_CZ', NULL, 'Váš aktivační kód pro {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'cs_CZ', NULL, 'Aktualizace k vašemu vrácení {{ return_ref }}', NULL, NULL),
+    (11, 'cs_CZ', NULL, 'Vaše objednávka {{ order_ref }} byla odeslána', NULL, NULL),
     (1, 'de_DE', 'Bestellbestätigung den Kunden gesendet', 'Ihre Bestellung {{ order_ref }} bei {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'de_DE', 'An den Kunden gesendeter Link zum Zurücksetzen des Passworts', 'Setzen Sie Ihr Passwort für {{ config(\"store_name\") }} zurück', NULL, NULL),
     (3, 'de_DE', 'Gesendete Nachricht wenn eine neue Bestellung erteilt wird.', 'Neue Bestellung {{ order_ref }} für {{ config(\"store_name\") }}', NULL, NULL),
@@ -15842,6 +15862,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'de_DE', NULL, 'Bestätigen Sie Ihr Konto bei {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'de_DE', NULL, 'Ihr Aktivierungscode für {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'de_DE', 'Aktualisierung des Rückgabestatus an den Kunden gesendet', 'Aktualisierung zu Ihrer Rückgabe {{ return_ref }}', NULL, NULL),
+    (11, 'de_DE', 'Versandbestätigung an den Kunden gesendet', 'Ihre Bestellung {{ order_ref }} wurde versandt', NULL, NULL),
     (1, 'en_US', 'Order confirmation sent to the customer', 'Your order {{ order_ref }} at {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'en_US', 'Password reset link sent to the customer', 'Reset your password on {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {{ order_ref }} placed on {{ config(\"store_name\") }}', NULL, NULL),
@@ -15852,6 +15873,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your {{ config(\"store_name\") }} account', NULL, NULL),
     (9, 'en_US', 'Mail sent to the customer with the code that activates the account', 'Your {{ config(\"store_name\") }} activation code', NULL, NULL),
     (10, 'en_US', 'Return status update sent to the customer', 'Update on your return {{ return_ref }}', NULL, NULL),
+    (11, 'en_US', 'Shipping notice sent to the customer', 'Your order {{ order_ref }} has been shipped', NULL, NULL),
     (1, 'es_ES', 'Confirmación de la orden enviada al cliente', 'Su orden {{ order_ref }} en {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'es_ES', 'Enlace de restablecimiento de contraseña enviado al cliente', 'Restablezca su contraseña en {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'es_ES', 'Mensaje enviado al propietario de la tienda cuando se envía una nueva orden', 'Nueva orden {{ order_ref }} ubicada en {{ config(\"store_name\") }}', NULL, NULL),
@@ -15862,6 +15884,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'es_ES', NULL, 'Confirma tu cuenta en {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'es_ES', NULL, 'Tu código de activación de {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'es_ES', 'Actualización del estado de la devolución enviada al cliente', 'Actualización de tu devolución {{ return_ref }}', NULL, NULL),
+    (11, 'es_ES', 'Aviso de envío enviado al cliente', 'Tu pedido {{ order_ref }} ha sido enviado', NULL, NULL),
     (1, 'fr_FR', 'Confirmation de commande envoyée au client', 'Votre commande {{ order_ref }} chez {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'fr_FR', 'Lien de réinitialisation du mot de passe envoyé au client', 'Réinitialisez votre mot de passe sur {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d\'une nouvelle commande.', 'Nouvelle commande {{ order_ref }} reçue sur {{ config(\"store_name\") }}', NULL, NULL),
@@ -15872,6 +15895,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'fr_FR', 'E-mail de confirmation de création de compte client', 'Confirmez la création de votre compte {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'fr_FR', 'E-mail envoyé au client avec le code d\'activation de son compte', 'Votre code d\'activation {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'fr_FR', 'Mise à jour du statut de retour envoyée au client', 'Mise à jour de votre retour {{ return_ref }}', NULL, NULL),
+    (11, 'fr_FR', 'Avis d\'expédition envoyé au client', 'Votre commande {{ order_ref }} a été expédiée', NULL, NULL),
     (1, 'it_IT', NULL, 'Il tuo ordine {{ order_ref }} su {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'it_IT', NULL, 'Reimposta la tua password su {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'it_IT', NULL, 'Nuovo ordine {{ order_ref }} su {{ config(\"store_name\") }}', NULL, NULL),
@@ -15882,6 +15906,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'it_IT', NULL, 'Conferma il tuo account {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'it_IT', NULL, 'Il tuo codice di attivazione {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'it_IT', NULL, 'Aggiornamento sul tuo reso {{ return_ref }}', NULL, NULL),
+    (11, 'it_IT', NULL, 'Il tuo ordine {{ order_ref }} è stato spedito', NULL, NULL),
     (1, 'nl_NL', 'Bevestiging van de bestelling verzonden naar de klant', 'Uw bestelling {{ order_ref }} bij {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'nl_NL', 'Link om het wachtwoord opnieuw in te stellen, verzonden naar de klant', 'Stel uw wachtwoord opnieuw in op {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'nl_NL', 'Bericht dat naar de winkelier wordt verzonden bij een nieuwe bestelling', 'Nieuwe bestelling {{ order_ref }} op {{ config(\"store_name\") }}', NULL, NULL),
@@ -15892,6 +15917,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, 'nl_NL', 'E-mail naar de klant om zijn account te bevestigen', 'Bevestig uw {{ config(\"store_name\") }}-account', NULL, NULL),
     (9, 'nl_NL', 'E-mail naar de klant met de code die het account activeert', 'Uw activatiecode voor {{ config(\"store_name\") }}', NULL, NULL),
     (10, 'nl_NL', 'Update van de retourstatus naar de klant verzonden', 'Update over je retour {{ return_ref }}', NULL, NULL),
+    (11, 'nl_NL', 'Verzendbericht naar de klant verzonden', 'Je bestelling {{ order_ref }} is verzonden', NULL, NULL),
     (1, 'ru_RU', 'Подтверждение заказа отосланное клиенту', 'Ваш заказ {{ order_ref }} в {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'ru_RU', 'Ссылка для сброса пароля, отправленная клиенту', 'Сбросьте пароль на {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'ru_RU', 'Сообщение отсылаемое владельцу магазина при новом заказе', 'Новый заказ {{ order_ref }} размещен в {{ config(\"store_name\") }}', NULL, NULL),
@@ -15901,7 +15927,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (7, 'ru_RU', 'Письмо подтверждения подписки на рассылку новостей', 'Подписка на рассылку новостей {{ config(\"store_name\") }}', NULL, NULL),
     (8, 'ru_RU', NULL, 'Подтвердите аккаунт в {{ config(\"store_name\") }}', NULL, NULL),
     (9, 'ru_RU', NULL, 'Ваш код активации для {{ config(\"store_name\") }}', NULL, NULL),
-    (10, 'ru_RU', 'Обновление статуса возврата отправлено клиенту', 'Обновление по вашему возврату {{ return_ref }}', NULL, NULL)
+    (10, 'ru_RU', 'Обновление статуса возврата отправлено клиенту', 'Обновление по вашему возврату {{ return_ref }}', NULL, NULL),
+    (11, 'ru_RU', 'Уведомление об отправке отправлено клиенту', 'Ваш заказ {{ order_ref }} отправлен', NULL, NULL)
 ;
 
 /**
@@ -16020,18 +16047,22 @@ breadcrumb of the theme read "Your cart", so that is what the cart step is calle
 A shop that upgrades has to read exactly what it read yesterday.
 */
 INSERT INTO `checkout_step_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'de_DE', 'Ihr Warenkorb'),
     (1, 'en_US', 'Your cart'),
     (1, 'es_ES', 'Tu carrito'),
     (1, 'fr_FR', 'Votre panier'),
     (1, 'it_IT', 'Il tuo carrello'),
+    (2, 'de_DE', 'Lieferung'),
     (2, 'en_US', 'Delivery'),
     (2, 'es_ES', 'Envío'),
     (2, 'fr_FR', 'Livraison'),
     (2, 'it_IT', 'Consegna'),
+    (3, 'de_DE', 'Zahlung'),
     (3, 'en_US', 'Payment'),
     (3, 'es_ES', 'Pago'),
     (3, 'fr_FR', 'Paiement'),
     (3, 'it_IT', 'Pagamento'),
+    (4, 'de_DE', 'Bestätigung'),
     (4, 'en_US', 'Confirmation'),
     (4, 'es_ES', 'Confirmación'),
     (4, 'fr_FR', 'Confirmation'),

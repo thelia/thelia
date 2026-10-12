@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
 
 final class OrderApiTest extends ApiTestCase
@@ -137,5 +141,25 @@ final class OrderApiTest extends ApiTestCase
         $response = $this->jsonRequest('GET', '/api/admin/orders/999999', token: $token);
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testGetOrderGivesTheCarrierPageFollowingTheParcel(): void
+    {
+        $carrier = new Module();
+        $carrier
+            ->setCode('AdminOrderApiTestCarrier')
+            ->setType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->setActivate(BaseModule::IS_ACTIVATED)
+            ->setFullNamespace('AdminOrderApiTestCarrier\\AdminOrderApiTestCarrier')
+            ->save($this->getPropelConnection());
+        ModuleConfigQuery::create()->setConfigValue($carrier->getId(), OrderTrackingUrlResolver::TRACKING_URL_CONFIG_KEY, 'https://carrier.example/%ID%');
+        $order = $this->createFixtureFactory()->order(null, ['deliveryModuleCode' => 'AdminOrderApiTestCarrier']);
+        $order->setDeliveryRef('6A12')->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest('GET', '/api/admin/orders/'.$order->getId(), token: $this->authenticateAsAdmin());
+        ModuleConfigQuery::resetConfigCache();
+
+        self::assertJsonResponseSuccessful($response);
+        self::assertSame('https://carrier.example/6A12', json_decode($response->getContent(), true)['deliveryTrackingUrl'] ?? null);
     }
 }

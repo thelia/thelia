@@ -104,6 +104,26 @@ final class VatExemptionResolverTest extends IntegrationTestCase
         self::assertFalse($this->resolver()->isExemptedForCart($cart));
     }
 
+    public function testAShopCountryThatNoLongerExistsExemptsNothingInsteadOfFailing(): void
+    {
+        $cart = $this->cartBilledTo('BE', new \DateTime('-10 days'));
+        self::assertTrue($this->resolver()->isExemptedForCart($cart), 'Control: the cart exempts while the shop country exists.');
+
+        ConfigQuery::write('store_country', '2147483647');
+
+        self::assertFalse($this->resolver()->isExemptedForCart($cart));
+    }
+
+    public function testAVerifiedNumberOfAnotherMemberStateExemptsNothing(): void
+    {
+        $cart = $this->cartBilledTo('BE', new \DateTime('-10 days'));
+        self::assertTrue($this->resolver()->isExemptedForCart($cart), 'Control: a Belgian number on a Belgian address exempts.');
+
+        $cart->getCartAddressRelatedByAddressInvoiceId()->setVatNumber('DE136695976')->save($this->getPropelConnection());
+
+        self::assertFalse($this->resolver()->isExemptedForCart($cart));
+    }
+
     public function testACartWithNoBillingAddressIsTaxed(): void
     {
         self::assertFalse($this->resolver()->isExemptedForCart($this->factory->cart()));

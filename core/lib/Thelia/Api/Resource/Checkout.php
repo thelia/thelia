@@ -115,6 +115,29 @@ use Thelia\Api\State\Provider\CheckoutValidationProvider;
             processor: CheckoutSelectionProcessor::class,
         ),
         new Post(
+            uriTemplate: '/front/account/checkout/{cartId}/delivery_date',
+            status: 200,
+            openapi: new OpenApiOperation(
+                summary: 'Choose the day, and the slot, the order is delivered on',
+                description: 'Records the delivery day, and the slot of that day for a carrier that offers slots, on the cart. The choice is judged against what the carrier of the cart offers at that moment; a null day clears it. A carrier change drops the choice.',
+                responses: [
+                    '200' => new OpenApiResponse(
+                        description: 'The choice was taken: the cart with its deliveryDate and deliverySlotId.',
+                        content: new \ArrayObject(['application/json' => ['example' => self::CART_EXAMPLE]]),
+                    ),
+                    '404' => new OpenApiResponse(description: 'No such cart — the same answer for a cart of another account.'),
+                    '422' => new OpenApiResponse(description: 'The day or the slot was refused, in the shape GET .../validation answers: delivery-date-missing, delivery-date-unavailable, delivery-slot-full or delivery-invalid (no carrier on the cart yet).'),
+                ],
+            ),
+            normalizationContext: ['groups' => [Cart::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ_SINGLE]],
+            denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE]],
+            security: self::FRONT_SECURITY,
+            input: CheckoutDeliveryDateInput::class,
+            output: Cart::class,
+            read: false,
+            processor: CheckoutSelectionProcessor::class,
+        ),
+        new Post(
             uriTemplate: '/front/account/checkout/{cartId}/payment_module',
             status: 200,
             openapi: new OpenApiOperation(

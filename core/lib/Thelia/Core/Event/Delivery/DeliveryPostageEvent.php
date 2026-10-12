@@ -21,6 +21,7 @@ use Thelia\Domain\Checkout\Enum\DeliveryMode;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
+use Thelia\Model\Module;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 use Thelia\Module\BaseModuleInterface;
@@ -45,6 +46,32 @@ class DeliveryPostageEvent extends ActionEvent
         protected ?Country $country = null,
         protected ?State $state = null,
     ) {
+        // The day the buyer picked, for a module that prices or plans by the day. Absent
+        // until the buyer has picked one, which is after the carriers were first quoted. The
+        // day belongs to the carrier of the cart: another carrier quoted for the same cart is
+        // not handed it.
+        $day = $cart->getDeliveryDate('Y-m-d');
+
+        if (null !== $day && $this->isTheCarrierOfTheCart()) {
+            $this->deliveryDate = \DateTime::createFromFormat('!Y-m-d', $day) ?: null;
+        }
+    }
+
+    private function isTheCarrierOfTheCart(): bool
+    {
+        $cartCarrierId = $this->cart->getDeliveryModuleId();
+
+        if (null === $cartCarrierId) {
+            return false;
+        }
+
+        $moduleId = match (true) {
+            $this->module instanceof Module => $this->module->getId(),
+            $this->module instanceof BaseModuleInterface => $this->module->getModuleModel()->getId(),
+            default => null,
+        };
+
+        return null !== $moduleId && (int) $moduleId === (int) $cartCarrierId;
     }
 
     public function getCart(): Cart

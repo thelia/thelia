@@ -1527,4 +1527,6 @@ return [
     'Catalog price rules' => 'Правила цен каталога',
     'Promotion' => 'Акция',
     'Newness' => 'Новинка',
+    'Shipping notice sent to the customer' => 'Уведомление об отправке отправлено клиенту',
+    'Your order {{ order_ref }} has been shipped' => 'Ваш заказ {{ order_ref }} отправлен',
 ];

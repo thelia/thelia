@@ -21,7 +21,6 @@ use Thelia\Domain\Legal\Enum\VatVerificationStatus;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Map\AddressTableMap;
-use Thelia\Model\Map\CartAddressTableMap;
 
 class VatVerification extends BaseAction implements EventSubscriberInterface
 {
@@ -54,12 +53,18 @@ class VatVerification extends BaseAction implements EventSubscriberInterface
 
         $this->addressStillCarrying($event)->update($values);
 
-        CartAddressQuery::create()
+        $copies = CartAddressQuery::create()
             ->filterByAddressId($address->getId())
             ->filterByVatNumber($event->getVerifiedVatNumber())
             ->filterByCountryId($event->getVerifiedCountryId())
-            ->update($values);
-        CartAddressTableMap::clearInstancePool();
+            ->find();
+
+        foreach ($copies as $copy) {
+            $copy
+                ->setVatVerifiedAt($verifiedAt)
+                ->setVatVerifiedName($verifiedName)
+                ->save();
+        }
 
         $address
             ->setVatVerifiedAt($verifiedAt)
