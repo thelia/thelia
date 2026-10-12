@@ -70,7 +70,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Return an Address a CouponManager can process.
      */
-    public function getDeliveryAddress(): Address
+    public function getDeliveryAddress(): ?Address
     {
         try {
             return AddressQuery::create()->findPk(
