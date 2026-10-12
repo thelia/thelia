@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Condition;
 
+use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Exception\InvalidConditionOperatorException;
 use Thelia\Condition\Exception\InvalidConditionValueException;
 use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\MatchDeliveryCountries;
 use Thelia\Condition\Operators;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Model\Address;
 use Thelia\Model\Customer;
 use Thelia\Tests\Support\Log\SilencedTlog;
@@ -122,9 +125,29 @@ final class MatchDeliveryCountriesTest extends FacadeBackedTestCase
         );
     }
 
+    public function testASingleCountryIsTurnedIntoAList(): void
+    {
+        $condition = (new MatchDeliveryCountries(parent::makeFacade()))->setValidatorsFromForm(
+            [MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN],
+            [MatchDeliveryCountries::COUNTRIES_LIST => 64],
+        );
+
+        self::assertSame([MatchDeliveryCountries::COUNTRIES_LIST => [64]], $condition->getValidators()['setValues']);
+    }
+
     public function testTheConditionIsNamedThroughTheFacadeTranslator(): void
     {
-        self::assertSame('Delivery country', (new MatchDeliveryCountries(parent::makeFacade()))->getName());
+        $translator = $this->createMock(Translator::class);
+        $translator->expects(self::once())
+            ->method('trans')
+            ->with('Delivery country', [])
+            ->willReturn('Pays de livraison');
+
+        $facade = $this->createMock(FacadeInterface::class);
+        $facade->method('getTranslator')->willReturn($translator);
+        $facade->method('getConditionEvaluator')->willReturn(new ConditionEvaluator());
+
+        self::assertSame('Pays de livraison', (new MatchDeliveryCountries($facade))->getName());
     }
 
     /**

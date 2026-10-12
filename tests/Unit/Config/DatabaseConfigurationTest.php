@@ -30,7 +30,7 @@ final class DatabaseConfigurationTest extends TestCase
     {
         $configuration = $this->process(['connection' => ['dsn' => 'mysql:host=db.example.org;dbname=shop']]);
 
-        self::assertSame(
+        self::assertSameSettings(
             [
                 'dsn' => 'mysql:host=db.example.org;dbname=shop',
                 'driver' => 'mysql',
@@ -40,6 +40,14 @@ final class DatabaseConfigurationTest extends TestCase
             ],
             $configuration['connection'],
         );
+    }
+
+    public function testAConnectionWithAnEmptyDsnIsRefused(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "database.connection.dsn" cannot contain an empty value');
+
+        $this->process(['connection' => ['dsn' => '']]);
     }
 
     public function testNamedConnectionsAreReadWhenTheTheliaOneIsAmongThem(): void
@@ -58,23 +66,28 @@ final class DatabaseConfigurationTest extends TestCase
         ]);
 
         self::assertSame(
+            [DatabaseConfiguration::THELIA_CONNECTION_NAME, 'Reporting'],
+            array_keys($configuration['connections']),
+        );
+        self::assertSameSettings(
             [
-                DatabaseConfiguration::THELIA_CONNECTION_NAME => [
-                    'dsn' => 'mysql:host=main.example.org;dbname=shop',
-                    'user' => 'shop',
-                    'driver' => 'mysql',
-                    'password' => '',
-                    'classname' => ConnectionWrapper::class,
-                ],
-                'Reporting' => [
-                    'dsn' => 'mysql:host=replica.example.org;dbname=shop',
-                    'password' => 'secret',
-                    'driver' => 'mysql',
-                    'user' => 'root',
-                    'classname' => ConnectionWrapper::class,
-                ],
+                'dsn' => 'mysql:host=main.example.org;dbname=shop',
+                'user' => 'shop',
+                'driver' => 'mysql',
+                'password' => '',
+                'classname' => ConnectionWrapper::class,
             ],
-            $configuration['connections'],
+            $configuration['connections'][DatabaseConfiguration::THELIA_CONNECTION_NAME],
+        );
+        self::assertSameSettings(
+            [
+                'dsn' => 'mysql:host=replica.example.org;dbname=shop',
+                'password' => 'secret',
+                'driver' => 'mysql',
+                'user' => 'root',
+                'classname' => ConnectionWrapper::class,
+            ],
+            $configuration['connections']['Reporting'],
         );
         self::assertArrayNotHasKey('connection', $configuration);
     }
@@ -109,10 +122,22 @@ final class DatabaseConfigurationTest extends TestCase
         $node = (new DatabaseConfiguration())->buildConnectionNode('replica', false)->getNode(true);
 
         self::assertSame('replica', $node->getName());
-        self::assertSame(
+        self::assertSameSettings(
             ['dsn' => 'mysql:host=replica.example.org', 'driver' => 'mysql', 'user' => 'root', 'password' => '', 'classname' => ConnectionWrapper::class],
             $node->finalize($node->normalize(['dsn' => 'mysql:host=replica.example.org'])),
         );
+    }
+
+    /**
+     * @param array<string, mixed> $expected
+     * @param array<string, mixed> $actual
+     */
+    private static function assertSameSettings(array $expected, array $actual): void
+    {
+        ksort($expected);
+        ksort($actual);
+
+        self::assertSame($expected, $actual);
     }
 
     /**

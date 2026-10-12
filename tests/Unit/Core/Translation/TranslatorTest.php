@@ -45,7 +45,7 @@ final class TranslatorTest extends TestCase
 
         $this->requestStack = new RequestStack();
         $this->translator = new Translator($this->requestStack);
-        $this->translator->setLocale('fr_FR');
+        $this->translator->setLocale('en_US');
         $this->translator->addLoader('array', new ArrayLoader());
     }
 
@@ -58,7 +58,7 @@ final class TranslatorTest extends TestCase
     public function testTheLocaleIsTheOneOfTheSessionLanguage(): void
     {
         $session = new Session(new MockArraySessionStorage());
-        $session->set('thelia.current.lang', (new Lang())->setLocale('de_DE'));
+        $session->setLang((new Lang())->setLocale('de_DE'));
         $request = new Request();
         $request->setSession($session);
         $this->requestStack->push($request);
@@ -70,7 +70,26 @@ final class TranslatorTest extends TestCase
     {
         $this->requestStack->push(new Request());
 
-        self::assertSame('fr_FR', $this->translator->getLocale());
+        self::assertSame('en_US', $this->translator->getLocale());
+    }
+
+    public function testWithoutAnyRequestTheTranslatorLocaleIsKept(): void
+    {
+        self::assertSame('en_US', $this->translator->getLocale());
+    }
+
+    public function testAMessageWithoutLocaleIsTranslatedInTheLocaleOfTheSession(): void
+    {
+        $this->translator->addResource('array', ['Hello' => 'Bonjour'], 'fr_FR', 'core');
+        $this->translator->addResource('array', ['Hello' => 'Hello there'], 'en_US', 'core');
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->setLang((new Lang())->setLocale('fr_FR'));
+        $request = new Request();
+        $request->setSession($session);
+        $this->requestStack->push($request);
+
+        self::assertSame('Bonjour', $this->translator->trans('Hello'));
     }
 
     public function testAMessageIsTranslatedInTheCoreDomainByDefault(): void
@@ -111,7 +130,7 @@ final class TranslatorTest extends TestCase
         self::assertSame('Bonjour du cœur', $this->translator->trans('Hello', [], 'core', 'fr_FR', true, false));
     }
 
-    public function testAMissingMessageIsReturnedAsIsOrEmptyOnRequest(): void
+    public function testAMissingMessageIsReturnedAsIsOrEmptyWhenAskedTo(): void
     {
         self::assertSame('Hello Alice', $this->translator->trans('Hello %name%', ['%name%' => 'Alice'], 'core', 'fr_FR'));
         self::assertSame('', $this->translator->trans('Hello %name%', ['%name%' => 'Alice'], 'core', 'fr_FR', false));
