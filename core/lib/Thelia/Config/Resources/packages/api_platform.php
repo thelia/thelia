@@ -14,10 +14,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Thelia\Core\TheliaKernel;
+
 return static function (ContainerConfigurator $container): void {
     $container->extension('api_platform', [
         'title' => 'Thelia API',
-        'version' => '3.3.0',
+        'version' => TheliaKernel::THELIA_VERSION,
         'show_webby' => false,
         'serializer' => [
             'hydra_prefix' => true,
