@@ -68,7 +68,8 @@ class ForSomeCustomers extends ConditionAbstract
         }
 
         $this->operators = [self::CUSTOMERS_LIST => $operators[self::CUSTOMERS_LIST]];
-        $this->values = [self::CUSTOMERS_LIST => $values[self::CUSTOMERS_LIST]];
+        // The back-office posts the ids as strings and the comparison is strict: store them as integers.
+        $this->values = [self::CUSTOMERS_LIST => array_map('\intval', $values[self::CUSTOMERS_LIST])];
 
         return $this;
     }
