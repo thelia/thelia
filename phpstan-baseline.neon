@@ -235,12 +235,6 @@ parameters:
 			path: core/lib/Thelia/Domain/DataTransfer/Export/AbstractExport.php
 
 		-
-			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponAbstract\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
-
-		-
 			message: '#^Variable \$description on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
@@ -257,12 +251,6 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php
-
-		-
-			message: '#^Method Thelia\\Domain\\Promotion\\Coupon\\Type\\CouponInterface\:\:getExpirationDate\(\) has invalid return type Thelia\\Coupon\\Type\\DateTime\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponInterface.php
 
 		-
 			message: '#^Class Thelia\\Model\\DateTime not found\.$#'
