@@ -56,17 +56,12 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          ini-values: post_max_size=20M
+          # Enabled, PCOV slows every mutant run down: it stays off, and infection.json5
+          # switches it on for the coverage run only, as in the DDEV setup
+          # (.ddev/php/pcov.ini). These values are written after the coverage driver's.
+          ini-values: post_max_size=20M, pcov.enabled=0
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
           coverage: pcov
-
-      - name: Leave PCOV off outside the coverage run
-        if: steps.changes.outputs.found
-        # Enabled, PCOV slows every mutant run down. infection.json5 switches it on
-        # for the coverage run only, as it does in the DDEV setup (.ddev/php/pcov.ini).
-        run: |
-          echo 'pcov.enabled=0' | sudo tee "$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')/99-pcov-off.ini"
-          php -r 'echo "pcov.enabled is now ", ini_get("pcov.enabled"), PHP_EOL;'
 
       - name: Resolve the themes from their development branch
         if: steps.changes.outputs.found
