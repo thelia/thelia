@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Thelia\Test\TestToken;
 
 return static function (ContainerConfigurator $configurator, ContainerBuilder $container): void {
     // Symfony inlines the cache key seed when the container is compiled and
@@ -38,6 +39,7 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
         ->set('env(THELIA_CACHE_PREFIX_SEED)', $installation)
         // Outside var/cache/<env> on purpose: emptying the shop cache, from the
         // back office or with cache:clear, must not take the API refresh tokens
-        // with it. Pools are emptied one by one with cache:pool:clear.
-        ->set('thelia.cache.directory', '%kernel.project_dir%/var/pools/%kernel.environment%');
+        // with it. Pools are emptied one by one with cache:pool:clear. Test
+        // processes running side by side keep their pools apart (TestToken).
+        ->set('thelia.cache.directory', '%kernel.project_dir%/var/pools/%kernel.environment%'.TestToken::suffix());
 };

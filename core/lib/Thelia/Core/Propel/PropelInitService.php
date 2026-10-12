@@ -46,6 +46,7 @@ use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\TheliaKernel;
 use Thelia\Log\Tlog;
+use Thelia\Test\TestToken;
 
 class PropelInitService
 {
@@ -414,7 +415,9 @@ class PropelInitService
 
     public function getPropelCacheDir(): string
     {
-        return THELIA_ROOT.'var'.DS.'propel'.DS.$this->environment.DS;
+        // A test process running next to others builds its models against its own
+        // database (see TestToken); a module activation rebuilds them in place.
+        return THELIA_ROOT.'var'.DS.'propel'.DS.$this->environment.TestToken::suffix().DS;
     }
 
     public function getPropelConfigDir(): string

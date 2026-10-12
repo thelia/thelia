@@ -88,6 +88,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Test\TestToken;
 
 class TheliaKernel extends Kernel
 {
@@ -105,11 +106,19 @@ class TheliaKernel extends Kernel
 
     public function __construct(string $environment, bool $debug)
     {
+        if ('test' === $environment) {
+            // bin/console in the test environment (cache:warmup after test-prepare)
+            // must compile the container of the same database as the test bootstrap.
+            TestToken::useOwnDatabase();
+        }
+
         $loader = new ClassLoader();
 
-        $loader->addPsr4('', THELIA_ROOT.\sprintf('var/propel/%s/model', $environment));
+        // Same directory as PropelInitService::getPropelCacheDir().
+        $propelDirectory = $environment.TestToken::suffix();
+        $loader->addPsr4('', THELIA_ROOT.\sprintf('var/propel/%s/model', $propelDirectory));
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT.\sprintf('var/propel/%s/database/TheliaMain', $environment));
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT.\sprintf('var/propel/%s/database/TheliaMain', $propelDirectory));
         $loader->register();
 
         parent::__construct($environment, $debug);
@@ -438,7 +447,12 @@ class TheliaKernel extends Kernel
     public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR.$this->environment;
+            // Test processes running side by side each compile their own container:
+            // it holds the database it was built for, and the caches written at
+            // runtime (shop configuration, pools, routes) would cross otherwise.
+            $suffix = 'test' === $this->environment ? TestToken::suffix() : '';
+
+            return THELIA_CACHE_DIR.$this->environment.$suffix;
         }
 
         return parent::getCacheDir();
