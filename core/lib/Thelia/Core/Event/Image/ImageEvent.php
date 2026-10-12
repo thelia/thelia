@@ -69,14 +69,22 @@ class ImageEvent extends CachedFileEvent
     }
 
     /**
-     * @return string a hash identifiying the processing options
+     * @return string a hash identifying the processing options, which names the
+     *                cache file of the rendition: two renditions that differ in
+     *                any option get two hashes
      */
     public function getOptionsHash(): string
     {
-        return md5(
-            $this->width.$this->height.$this->resize_mode.$this->background_color.implode(',', $this->effects)
-            .$this->rotation.$this->allowZoom,
-        );
+        return md5(serialize([
+            $this->width,
+            $this->height,
+            $this->resize_mode,
+            $this->background_color,
+            $this->effects,
+            $this->rotation,
+            $this->allowZoom,
+            $this->quality,
+        ]));
     }
 
     public function getCategory(): string
