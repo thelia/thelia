@@ -25,6 +25,7 @@ use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
 use Thelia\Model\Cart;
@@ -39,6 +40,7 @@ class CartGuard
         private readonly DeliveryPostageQuerier $deliveryPostageQuerier,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly ContainerInterface $container,
+        private readonly DeliveryDateGuard $deliveryDateGuard,
     ) {
     }
 
@@ -150,6 +152,10 @@ class CartGuard
         if (!$quote['valid']) {
             throw new InvalidDeliveryException('Delivery module does not accept this cart');
         }
+
+        // Last, once the carrier itself is settled: the day only means something for a
+        // carrier that will ship this cart to this address.
+        $this->deliveryDateGuard->check($cart, $module);
     }
 
     /**

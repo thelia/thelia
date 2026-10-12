@@ -23,8 +23,23 @@ class OrderAddress extends BaseOrderAddress
     public function preUpdate(?ConnectionInterface $con = null): bool
     {
         $this->dropVatVerificationWhenTheNumberChanges();
+        $this->keepTheBuyerOfAnExemptOrder($con);
 
         return parent::preUpdate($con);
+    }
+
+    private function keepTheBuyerOfAnExemptOrder(?ConnectionInterface $con): void
+    {
+        if (1 !== (int) $this->getVatExempted() || !$this->isColumnModified(OrderAddressTableMap::COL_COMPANY)) {
+            return;
+        }
+
+        $frozenCompany = OrderAddressQuery::create()
+            ->filterById($this->getId())
+            ->select('Company')
+            ->findOne($con);
+
+        $this->setCompany($frozenCompany);
     }
 
     private function dropVatVerificationWhenTheNumberChanges(): void

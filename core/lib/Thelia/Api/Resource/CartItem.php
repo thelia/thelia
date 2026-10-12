@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Security\CartItemVoter;
+use Thelia\Api\State\Processor\FrontCartItemProcessor;
 use Thelia\Model\Map\CartItemTableMap;
 
 #[ApiResource(
@@ -61,8 +62,14 @@ use Thelia\Model\Map\CartItemTableMap;
 // ever written by the promotion itself.
 #[ApiResource(
     operations: [
+        // The writes go through the cart (FrontCartItemProcessor), never straight
+        // into the table: the cart prices the line, checks the stock, and lets a
+        // module refuse it. An addition names the caller's cart, the only write
+        // that takes one.
         new Post(
             uriTemplate: '/front/cart_items',
+            denormalizationContext: ['groups' => [self::GROUP_FRONT_WRITE, self::GROUP_FRONT_CREATE]],
+            processor: FrontCartItemProcessor::class,
         ),
         new GetCollection(
             uriTemplate: '/front/cart_items',
@@ -75,10 +82,12 @@ use Thelia\Model\Map\CartItemTableMap;
         new Put(
             uriTemplate: '/front/cart_items/{id}',
             security: 'is_granted("'.CartItemVoter::MUTABLE.'", object)',
+            processor: FrontCartItemProcessor::class,
         ),
         new Delete(
             uriTemplate: '/front/cart_items/{id}',
             security: 'is_granted("'.CartItemVoter::MUTABLE.'", object)',
+            processor: FrontCartItemProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
@@ -94,6 +103,7 @@ class CartItem implements PropelResourceInterface
     public const GROUP_FRONT_READ = 'front:cart_item:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:cart_item:read:single';
     public const GROUP_FRONT_WRITE = 'front:cart_item:write';
+    public const GROUP_FRONT_CREATE = 'front:cart_item:create';
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ])]
     public ?int $id = null;
@@ -109,7 +119,7 @@ class CartItem implements PropelResourceInterface
     public Product $product;
 
     #[Relation(targetResource: Cart::class)]
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_FRONT_CREATE])]
     public Cart $cart;
 
     #[Relation(targetResource: ProductSaleElements::class)]

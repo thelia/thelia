@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
@@ -24,10 +25,50 @@ use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\Cart as BaseCart;
+use Thelia\Model\Map\CartTableMap;
 
 class Cart extends BaseCart
 {
     use TaxCalculatorResolverTrait;
+
+    /**
+     * A delivery day is a promise of the carrier it was picked for: it falls with that carrier,
+     * whichever way the carrier changes — the buyer picking another one, a theme resetting it
+     * after an address change, the postage failing and taking it off. Done here rather than
+     * in each of those paths so that none of them, nor one written later, can leave a day
+     * behind that the new carrier never offered.
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        // A day written in the same save as its carrier is the new choice, not a leftover.
+        if (!$this->isNew()
+            && $this->isColumnModified(CartTableMap::COL_DELIVERY_MODULE_ID)
+            && !$this->isColumnModified(CartTableMap::COL_DELIVERY_DATE)) {
+            $this->setDeliveryDate(null);
+            $this->setDeliverySlotId(null);
+        }
+
+        return parent::preSave($con);
+    }
+
+    /**
+     * The delivery day picked, as Y-m-d: a calendar day of the shop, never an instant.
+     */
+    public function getDeliveryDay(): ?string
+    {
+        $day = $this->getDeliveryDate('Y-m-d');
+
+        return \is_string($day) ? $day : null;
+    }
+
+    /**
+     * Named apart from the column getter so the API reads it without being able to write
+     * it: the day and the slot are only set through the checkout, which judges them.
+     */
+    public function getChosenDeliverySlotId(): ?int
+    {
+        return null === $this->getDeliverySlotId() ? null : (int) $this->getDeliverySlotId();
+    }
 
     /**
      * Duplicate the current existing cart. Only the token is changed.
@@ -354,7 +395,7 @@ class Cart extends BaseCart
         }
 
         return round(
-            $this->createTaxCalculator()
+            $this->createCartTaxCalculator($this)
                 ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
                 ->getTaxedPrice($untaxedPrice),
             2,

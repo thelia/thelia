@@ -104,6 +104,15 @@ final readonly class OrderFingerprint
             $fingerprint['vat_exempted'] = true;
         }
 
+        // The day and the slot are copied on the order and a slot place is taken with it, so
+        // an order placed for another day no longer describes this cart. Added only when
+        // there is one, like the exemption above: the fingerprint frozen on an unpaid order
+        // placed before dates existed must keep matching its cart.
+        if (null !== $cart->getDeliveryDate()) {
+            $fingerprint['delivery_date'] = $cart->getDeliveryDate('Y-m-d');
+            $fingerprint['delivery_slot'] = null === $cart->getDeliverySlotId() ? null : (int) $cart->getDeliverySlotId();
+        }
+
         return $fingerprint;
     }
 

@@ -37,8 +37,10 @@ final class CartItemVoter extends Voter
      * Owning the line is not enough to change it: a line a promotion offered
      * belongs to that promotion, which puts it there and takes it back on its
      * own. This is the API side of the lock Action\Cart holds on the event
-     * side — the front PUT and DELETE go through PropelPersistProcessor and
-     * PropelRemoveProcessor, which dispatch no cart event at all.
+     * side: the front PUT and DELETE go through the cart, which passes over an
+     * offered line with a warning in the log, so without this vote a DELETE
+     * would be answered a 204 for a line still there, and a PUT would fail on
+     * the line the cart does not hand back.
      */
     public const MUTABLE = 'THELIA_CART_ITEM_MUTABLE';
 

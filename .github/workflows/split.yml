@@ -1,0 +1,101 @@
+# Publishes core/, setup/ and local/config/ to thelia/core, thelia/setup and
+# thelia/config, the repositories Packagist serves. The work is done by
+# .github/scripts/split-downstream.sh, always taken from main.
+#
+# - main is published once the tests of its tip have passed;
+# - the maintenance branches have no CI and are published every hour;
+# - any maintainer can run it by hand for one branch (its tip).
+#
+# The deploy keys live in the publish-downstream environment, which only main
+# can use: workflow_run and schedule always run from main, and a manual run from
+# another branch is refused the keys.
+name: split
+
+on:
+  workflow_run:
+    workflows: [ test ]
+    types: [ completed ]
+    branches: [ main ]
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to publish
+        type: choice
+        options: [ main, '3.2', '3.1' ]
+        default: main
+
+permissions: {}
+
+# Every run publishes whole branches, so a pending run replaced by a newer one
+# loses nothing. main and the maintenance branches queue apart.
+concurrency:
+  group: split-${{ github.event_name == 'schedule' && 'maintenance' || inputs.branch || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  split:
+    # A green test run of a push to main of this repository, never a pull request
+    if: >-
+      github.event_name != 'workflow_run' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository)
+    # The commit ids depend on the git-filter-repo version: changing the image
+    # must be checked against the published history first (SPLIT_MODE=check).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: publish-downstream
+    env:
+      SPLIT_MODE: publish
+    steps:
+      - name: Install git-filter-repo
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq git-filter-repo
+          git filter-repo --version
+
+      - name: Clone the full history
+        id: source
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          git clone --quiet --bare "https://github.com/$GITHUB_REPOSITORY.git" "$RUNNER_TEMP/source.git"
+          git -C "$RUNNER_TEMP/source.git" show refs/heads/main:.github/scripts/split-downstream.sh > "$RUNNER_TEMP/split-downstream.sh"
+          # Never publish an untested tip: when main has moved on since the
+          # tested commit, the test run of the new tip will publish it.
+          tip="$(git -C "$RUNNER_TEMP/source.git" rev-parse refs/heads/main)"
+          if [[ -n "$TESTED_SHA" && "$TESTED_SHA" != "$tip" ]]; then
+            echo "::notice::main is now at $tip, past the tested $TESTED_SHA: nothing to publish"
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install the deploy keys
+        if: steps.source.outputs.skip != 'true'
+        env:
+          KEY_CORE: ${{ secrets.SPLIT_KEY_CORE }}
+          KEY_SETUP: ${{ secrets.SPLIT_KEY_SETUP }}
+          KEY_CONFIG: ${{ secrets.SPLIT_KEY_CONFIG }}
+        run: |
+          umask 077
+          mkdir "$RUNNER_TEMP/keys"
+          printf '%s\n' "$KEY_CORE" > "$RUNNER_TEMP/keys/core"
+          printf '%s\n' "$KEY_SETUP" > "$RUNNER_TEMP/keys/setup"
+          printf '%s\n' "$KEY_CONFIG" > "$RUNNER_TEMP/keys/config"
+          # github.com host key, as published by GET /meta
+          echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$RUNNER_TEMP/known_hosts"
+
+      - name: Publish
+        if: steps.source.outputs.skip != 'true'
+        env:
+          BRANCHES: ${{ github.event_name == 'schedule' && '3.2 3.1' || inputs.branch || 'main' }}
+          # The hourly run turns red when a maintenance branch is left unpublished
+          SPLIT_REQUIRE_KNOWN_BRANCHES: ${{ github.event_name == 'schedule' && '1' || '' }}
+          SPLIT_KEY_DIR: ${{ runner.temp }}/keys
+          SPLIT_KNOWN_HOSTS: ${{ runner.temp }}/known_hosts
+        run: bash "$RUNNER_TEMP/split-downstream.sh" "$RUNNER_TEMP/source.git" $BRANCHES
+
+      - name: Remove the deploy keys
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

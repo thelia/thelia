@@ -303,6 +303,242 @@ JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
 -- ---------------------------------------------------------------------
+-- Shipping e-mail
+--
+-- The customer is told their order has left, with the carrier, the tracking
+-- number and the tracking page, when the order enters the "sent" status. No
+-- e-mail existed for it, so a shop that upgrades loses nothing by receiving it
+-- switched on; INSERT IGNORE leaves alone a shop that already chose a value.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('order_shipped_email_enabled', '1', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'order_shipped_email_enabled' AS `name`, 'en_US' AS `locale`, 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' AS `title`
+    UNION ALL SELECT 'order_shipped_email_enabled', 'fr_FR', 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('order_shipped', NULL, 'order_shipped.txt', 'order_shipped.html', NOW(), NOW());
+
+-- Read back by name rather than from LAST_INSERT_ID(): on a replay the insert
+-- above is ignored and hands back no id at all.
+SET @order_shipped_message_id := (SELECT `id` FROM `message` WHERE `name` = 'order_shipped');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@order_shipped_message_id, 'cs_CZ', NULL, 'Vaše objednávka {{ order_ref }} byla odeslána'),
+    (@order_shipped_message_id, 'de_DE', 'Versandbestätigung an den Kunden gesendet', 'Ihre Bestellung {{ order_ref }} wurde versandt'),
+    (@order_shipped_message_id, 'en_US', 'Shipping notice sent to the customer', 'Your order {{ order_ref }} has been shipped'),
+    (@order_shipped_message_id, 'es_ES', 'Aviso de envío enviado al cliente', 'Tu pedido {{ order_ref }} ha sido enviado'),
+    (@order_shipped_message_id, 'fr_FR', 'Avis d''expédition envoyé au client', 'Votre commande {{ order_ref }} a été expédiée'),
+    (@order_shipped_message_id, 'it_IT', NULL, 'Il tuo ordine {{ order_ref }} è stato spedito'),
+    (@order_shipped_message_id, 'nl_NL', 'Verzendbericht naar de klant verzonden', 'Je bestelling {{ order_ref }} is verzonden'),
+    (@order_shipped_message_id, 'ru_RU', 'Уведомление об отправке отправлено клиенту', 'Ваш заказ {{ order_ref }} отправлен');
+
+-- ---------------------------------------------------------------------
+-- Delivery day and slot picked by the buyer
+--
+-- A carrier that accepts dates lets the buyer pick a day, and a slot of that
+-- day when it offers slots. The settings live in four tables; the choice is
+-- held on the cart and copied on the order. A shop that updates gets the
+-- tables empty: no carrier has a rule, so the delivery step is unchanged until
+-- the merchant sets one.
+--
+-- Tables are created only if missing and every column, index and key is
+-- guarded, so the script can be replayed.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `delivery_date_rule`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `choice_mode` VARCHAR(16) DEFAULT 'none' NOT NULL COMMENT 'what the buyer picks: none, date or slot',
+    `minimum_delay_days` INTEGER DEFAULT 0 NOT NULL COMMENT 'how many days after today the first day offered is',
+    `horizon_days` INTEGER DEFAULT 30 NOT NULL COMMENT 'how many days after today the last day offered is',
+    `closed_weekdays` VARCHAR(20) COMMENT 'the days of the week the carrier does not deliver, ISO numbers from 1 (Monday) to 7 (Sunday) separated by commas; NULL follows the shop days',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `delivery_date_rule_module_id_UNIQUE` (`module_id`),
+    CONSTRAINT `fk_delivery_date_rule_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `delivery_slot`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `start_time` TIME NOT NULL COMMENT 'the local hour the slot starts at',
+    `end_time` TIME NOT NULL COMMENT 'the local hour the slot ends at',
+    `capacity` INTEGER COMMENT 'how many orders the slot takes on a given day, NULL for no limit',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_delivery_slot_module_id` (`module_id`),
+    CONSTRAINT `fk_delivery_slot_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `delivery_slot_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `delivery_slot_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `delivery_slot` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `delivery_closure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER COMMENT 'the carrier the closure applies to, NULL for the whole shop',
+    `start_date` DATE NOT NULL,
+    `end_date` DATE NOT NULL,
+    `label` VARCHAR(255) COMMENT 'a note for the merchant, never shown to the buyer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_delivery_closure_module_id_end_date` (`module_id`, `end_date`),
+    CONSTRAINT `fk_delivery_closure_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `delivery_slot_booking`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `delivery_slot_id` INTEGER NOT NULL,
+    `delivery_date` DATE NOT NULL,
+    `booked` INTEGER DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `delivery_slot_booking_slot_date_UNIQUE` (`delivery_slot_id`, `delivery_date`),
+    CONSTRAINT `fk_delivery_slot_booking_delivery_slot_id`
+        FOREIGN KEY (`delivery_slot_id`)
+        REFERENCES `delivery_slot` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'delivery_date');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD `delivery_date` DATE NULL COMMENT ''the delivery day the buyer picked for the selected carrier, NULL while they picked none'' AFTER `gift_message`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'delivery_slot_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD `delivery_slot_id` INTEGER NULL COMMENT ''the slot of that day the buyer picked, when the carrier offers slots'' AFTER `delivery_date`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_delivery_slot_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_delivery_slot_id` (`delivery_slot_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_constraint := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_delivery_slot_id');
+SET @statement := IF(@add_constraint, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_delivery_slot_id` FOREIGN KEY (`delivery_slot_id`) REFERENCES `delivery_slot` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT', 'DO 0');
+PREPARE add_constraint_statement FROM @statement;
+EXECUTE add_constraint_statement;
+DEALLOCATE PREPARE add_constraint_statement;
+
+-- The order keeps the day and the hours of the slot: a slot edited or deleted from the
+-- carrier settings afterwards does not change what the order says. `order_version`
+-- mirrors every column of `order`.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'delivery_date');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `delivery_date` DATE NULL COMMENT ''the day the buyer asked for, in the shop time zone, NULL when the carrier offered no date'' AFTER `gift_message`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'delivery_slot_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `delivery_slot_id` INTEGER NULL COMMENT ''the slot the buyer picked, NULL once that slot is deleted from the carrier settings'' AFTER `delivery_date`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'delivery_slot_start');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `delivery_slot_start` TIME NULL COMMENT ''the local hour the picked slot started at, copied off the slot'' AFTER `delivery_slot_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'delivery_slot_end');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `delivery_slot_end` TIME NULL COMMENT ''the local hour the picked slot ended at, copied off the slot'' AFTER `delivery_slot_start`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'delivery_date');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `delivery_date` DATE NULL COMMENT ''the day the buyer asked for, in the shop time zone, NULL when the carrier offered no date'' AFTER `gift_message`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'delivery_slot_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `delivery_slot_id` INTEGER NULL COMMENT ''the slot the buyer picked, NULL once that slot is deleted from the carrier settings'' AFTER `delivery_date`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'delivery_slot_start');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `delivery_slot_start` TIME NULL COMMENT ''the local hour the picked slot started at, copied off the slot'' AFTER `delivery_slot_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'delivery_slot_end');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `delivery_slot_end` TIME NULL COMMENT ''the local hour the picked slot ended at, copied off the slot'' AFTER `delivery_slot_start`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'idx_order_delivery_slot_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `idx_order_delivery_slot_id` (`delivery_slot_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_constraint := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `CONSTRAINT_NAME` = 'fk_order_delivery_slot_id');
+SET @statement := IF(@add_constraint, 'ALTER TABLE `order` ADD CONSTRAINT `fk_order_delivery_slot_id` FOREIGN KEY (`delivery_slot_id`) REFERENCES `delivery_slot` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT', 'DO 0');
+PREPARE add_constraint_statement FROM @statement;
+EXECUTE add_constraint_statement;
+DEALLOCATE PREPARE add_constraint_statement;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.delivery-date', NOW(), NOW());
+
+SET @delivery_date_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.delivery-date');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@delivery_date_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'en_US', 'Configuration delivery dates', NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'fr_FR', 'Configuration des dates de livraison', NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@delivery_date_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
+
+-- ---------------------------------------------------------------------
 -- German titles of the checkout steps
 --
 -- 3.1.0 named the four steps of the checkout in English, Spanish, French

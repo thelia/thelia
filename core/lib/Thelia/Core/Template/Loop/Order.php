@@ -356,6 +356,11 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('DELIVERY_REF', $order->getDeliveryRef())
                 // Printed on the picking list and the delivery note, never on the invoice.
                 ->set('GIFT_MESSAGE', $order->getGiftMessage())
+                // The day and the hours the buyer asked for, as Y-m-d and H:i: the documents
+                // format them in their own language. Null when the carrier offered no date.
+                ->set('DELIVERY_DATE', $order->getDeliveryDate('Y-m-d'))
+                ->set('DELIVERY_SLOT_START', $order->getDeliverySlotStart('H:i'))
+                ->set('DELIVERY_SLOT_END', $order->getDeliverySlotEnd('H:i'))
                 ->set('INVOICE_REF', $order->getInvoiceRef())
                 ->set('VIRTUAL', $hasVirtualDownload)
                 ->set('POSTAGE', $order->getPostage())

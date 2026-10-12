@@ -114,6 +114,41 @@ final class AttributeAccessServiceTest extends IntegrationTestCase
         self::assertSame('verification_expired', $this->attributeAccess->attributeCart('vat_exemption_state'));
     }
 
+    public function testCartAttributesTellWhyAVerificationThatFellStopsExempting(): void
+    {
+        $factory = $this->createFixtureFactory();
+        ConfigQuery::write(VatExemptionMode::CONFIG_KEY, VatExemptionMode::VERIFIED_VAT_NUMBER->value);
+        ConfigQuery::write('store_vat_exempt', '0');
+        $shopCountry = $factory->country(['isocode' => 'FR', 'isoalpha2' => 'FR', 'isoalpha3' => 'FRX', 'shopCountry' => true]);
+        ConfigQuery::write('store_country', (string) $shopCountry->getId());
+
+        $buyerCountry = $factory->country(['isocode' => 'BE', 'isoalpha2' => 'BE', 'isoalpha3' => 'BEX']);
+        $invoiceAddress = $factory->cartAddress(null, $buyerCountry, $factory->customerTitle());
+        $invoiceAddress
+            ->setVatNumber('BE0123456789')
+            ->setVatVerifiedAt(new \DateTime('-10 days'))
+            ->save($this->getPropelConnection());
+
+        $cart = $factory->cart();
+        $cart->setAddressInvoiceId($invoiceAddress->getId())->save($this->getPropelConnection());
+
+        static::getContainer()->get('request_stack')->getCurrentRequest()->getSession()->setSessionCart($cart);
+
+        self::assertSame('exempted', $this->attributeAccess->attributeCart('vat_exemption_state'));
+
+        $invoiceAddress->setVatVerifiedAt(null)->save($this->getPropelConnection());
+        $cart->reload(true);
+
+        self::assertFalse($this->attributeAccess->attributeCart('is_vat_exempted'));
+        self::assertSame('not_verified', $this->attributeAccess->attributeCart('vat_exemption_state'));
+        self::assertSame('BE0123456789', $this->attributeAccess->attributeCart('invoice_vat_number'), 'The summary names the number it refuses to exempt.');
+
+        $invoiceAddress->setVatNumber(null)->save($this->getPropelConnection());
+        $cart->reload(true);
+
+        self::assertSame('not_applicable', $this->attributeAccess->attributeCart('vat_exemption_state'));
+    }
+
     public function testOrderAttributesExposeTheFrozenVatExemptionState(): void
     {
         $order = $this->createFixtureFactory()->order();
