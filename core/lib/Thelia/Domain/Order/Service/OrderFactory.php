@@ -18,6 +18,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
@@ -32,6 +33,7 @@ readonly class OrderFactory
     public function __construct(
         private DeliveryDateCalendar $deliveryDateCalendar,
         private SaleUnitContext $saleUnitContext,
+        private DeliveryTimeEstimator $deliveryTimeEstimator,
     ) {
     }
 
@@ -72,8 +74,26 @@ readonly class OrderFactory
         $order->setGiftMessage($cart->getGiftMessage());
 
         $this->copyDeliveryDate($cart, $order);
+        $this->freezeDeliveryEstimate($cart, $order);
 
         return $order;
+    }
+
+    /**
+     * The interval the delivery step announced, kept on the order so that the e-mails and
+     * the order pages repeat what the buyer was told, whatever the carrier delays become.
+     * An order with a picked day has no use for an estimate.
+     */
+    private function freezeDeliveryEstimate(CartModel $cart, ModelOrder $order): void
+    {
+        $module = null === $order->getDeliveryDate() && null !== $order->getDeliveryModuleId()
+            ? ModuleQuery::create()->findPk($order->getDeliveryModuleId())
+            : null;
+        $estimate = null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);
+
+        $order
+            ->setEstimatedDeliveryFrom($estimate?->earliestDay())
+            ->setEstimatedDeliveryTo($estimate?->latestDay());
     }
 
     /**

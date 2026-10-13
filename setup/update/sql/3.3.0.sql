@@ -1092,4 +1092,68 @@ INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `descrip
     (@price_filter_id, 'nl_NL', 'Prijs', NULL),
     (@price_filter_id, 'ru_RU', 'Цена', NULL);
 
+-- ---------------------------------------------------------------------
+-- Estimated delivery dates
+--
+-- A carrier announces when a parcel arrives from its preparation and
+-- transit days, in working days of the delivery date calendar; a product
+-- can need more days before it is shipped. The order keeps the interval
+-- it was told, which does not move when the delays change afterwards.
+-- NULL everywhere: nothing is announced until the merchant sets delays.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'delivery_date_rule' AND `COLUMN_NAME` = 'preparation_days');
+SET @statement := IF(@add_column, 'ALTER TABLE `delivery_date_rule` ADD `preparation_days` INTEGER NULL COMMENT ''working days of the shop the order takes to be prepared before it is shipped, NULL when the carrier announces no delivery estimate'' AFTER `closed_weekdays`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'delivery_date_rule' AND `COLUMN_NAME` = 'transit_min_days');
+SET @statement := IF(@add_column, 'ALTER TABLE `delivery_date_rule` ADD `transit_min_days` INTEGER NULL COMMENT ''the fewest working days of the carrier a parcel travels, NULL when the carrier announces no delivery estimate'' AFTER `preparation_days`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'delivery_date_rule' AND `COLUMN_NAME` = 'transit_max_days');
+SET @statement := IF(@add_column, 'ALTER TABLE `delivery_date_rule` ADD `transit_max_days` INTEGER NULL COMMENT ''the most working days of the carrier a parcel travels, NULL when the carrier announces no delivery estimate'' AFTER `transit_min_days`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `COLUMN_NAME` = 'availability_delay_days');
+SET @statement := IF(@add_column, 'ALTER TABLE `product` ADD `availability_delay_days` INTEGER NULL COMMENT ''working days the product needs before it can be shipped, added to the preparation days of the carrier; NULL when the product adds none'' AFTER `guest_checkout_forbidden`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_version' AND `COLUMN_NAME` = 'availability_delay_days');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_version` ADD `availability_delay_days` INTEGER NULL COMMENT ''working days the product needs before it can be shipped, added to the preparation days of the carrier; NULL when the product adds none'' AFTER `guest_checkout_forbidden`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'estimated_delivery_from');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `estimated_delivery_from` DATE NULL COMMENT ''the earliest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay'' AFTER `sale_unit_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'estimated_delivery_to');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD `estimated_delivery_to` DATE NULL COMMENT ''the latest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay'' AFTER `estimated_delivery_from`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'estimated_delivery_from');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `estimated_delivery_from` DATE NULL COMMENT ''the earliest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay'' AFTER `sale_unit_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'estimated_delivery_to');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD `estimated_delivery_to` DATE NULL COMMENT ''the latest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay'' AFTER `estimated_delivery_from`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

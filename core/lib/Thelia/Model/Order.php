@@ -610,6 +610,24 @@ class Order extends BaseOrder
     }
 
     /**
+     * The earliest day of the delivery interval announced when the order was placed, as
+     * Y-m-d, null when its carrier announced none.
+     */
+    public function getEstimatedDeliveryFromDay(): ?string
+    {
+        $day = $this->getEstimatedDeliveryFrom('Y-m-d');
+
+        return \is_string($day) ? $day : null;
+    }
+
+    public function getEstimatedDeliveryToDay(): ?string
+    {
+        $day = $this->getEstimatedDeliveryTo('Y-m-d');
+
+        return \is_string($day) ? $day : null;
+    }
+
+    /**
      * Check if the current status of this order is CANCELED.
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one

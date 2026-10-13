@@ -56,15 +56,15 @@ class DeliveryModuleOption
     private string $image;
 
     #[ApiProperty(
-        description: 'Minimum delivery date',
-        example: '2025-10-01T00:00:00Z',
+        description: 'The earliest day the parcel is expected, as a Y-m-d day of the shop; null when the carrier announces no estimate',
+        example: '2025-10-01',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private ?string $minimumDeliveryDate = null;
 
     #[ApiProperty(
-        description: 'Maximum delivery date',
-        example: '2025-10-05T00:00:00Z',
+        description: 'The latest day the parcel is expected, as a Y-m-d day of the shop; null when the carrier announces no estimate',
+        example: '2025-10-05',
     )]
     #[Groups([DeliveryModule::GROUP_FRONT_READ])]
     private ?string $maximumDeliveryDate = null;
