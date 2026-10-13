@@ -14,13 +14,22 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
+use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Api\Bridge\Propel\Event\DeliveryModuleOptionEvent;
+use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\Resource\DeliveryModuleOption;
+use Thelia\Api\State\Provider\DeliveryModuleProvider;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\LoopExecutor;
+use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
@@ -269,6 +278,73 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         // Taking the estimate off is all three null.
         $rule = $this->settings()->saveDeliveryDelays($this->carrier, null, null, null);
         self::assertFalse(DeliveryTimeEstimator::announcesAnEstimate($rule));
+    }
+
+    /**
+     * Dev check: GET /api/front/delivery_modules lists the carrier with the interval on the
+     * two dates its options already carried, for the cart of the session.
+     */
+    public function testTheFrontApiListsTheIntervalOnTheOptionsOfTheCarrier(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        [$cart] = $this->cartReadyToPay();
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $this->getPropelConnection());
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->setSessionCart($cart);
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $provider = new DeliveryModuleProvider(
+            $requestStack,
+            $session,
+            $this->getService(SecurityContext::class),
+            $this->getService(AddressService::class),
+            $this->dispatcher(),
+            $this->getService(ShippingFacade::class),
+        );
+
+        $listed = null;
+        foreach ((array) $provider->provide(new GetCollection()) as $module) {
+            if ($module instanceof DeliveryModuleResource && $module->getId() === $this->carrier->getId()) {
+                $listed = $module;
+            }
+        }
+
+        self::assertNotNull($listed, 'The front API lists the carrier.');
+        $option = $listed->getOptions()[0] ?? null;
+        self::assertInstanceOf(DeliveryModuleOption::class, $option);
+        self::assertSame([$this->day(2), $this->day(3)], [$option->getMinimumDeliveryDate(), $option->getMaximumDeliveryDate()]);
+    }
+
+    /**
+     * Dev check: a command that writes an e-mail has no request; the estimate is the same.
+     */
+    public function testTheEstimateNeedsNoRequest(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        [$cart] = $this->cartReadyToPay();
+        $requestStack = $this->getService(RequestStack::class);
+        $popped = [];
+
+        while (null !== $request = $requestStack->pop()) {
+            $popped[] = $request;
+        }
+
+        try {
+            $estimate = $this->getService(DeliveryTimeEstimator::class)->estimateForCart($this->carrier, $cart);
+        } finally {
+            foreach (array_reverse($popped) as $request) {
+                $requestStack->push($request);
+            }
+        }
+
+        self::assertNotNull($estimate);
+        self::assertSame([$this->day(2), $this->day(3)], [$estimate->earliestDay(), $estimate->latestDay()]);
     }
 
     /**
