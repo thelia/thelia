@@ -79,7 +79,35 @@ final class SharedCachePurgeQueueTest extends TestCase
         self::assertCount(1, $purger->calls);
         self::assertCount(1, $logger->records);
         self::assertSame('error', $logger->records[0][0]);
-        self::assertStringContainsString('proxy down', $logger->records[0][1]);
+        self::assertSame('proxy down', $logger->contexts[0]['message']);
+    }
+
+    public function testAFailureIsLoggedWithItsDetailsInTheContext(): void
+    {
+        $purger = new RecordingSharedCachePurger(new \RuntimeException('proxy down'));
+        $logger = new TestLogger();
+        $queue = new SharedCachePurgeQueue($purger, $logger);
+        $queue->add(['product-42', 'category-7']);
+
+        $queue->flush();
+
+        self::assertStringNotContainsString('proxy down', $logger->records[0][1]);
+        self::assertStringNotContainsString('product-42', $logger->records[0][1]);
+        self::assertSame(2, $logger->contexts[0]['count']);
+        self::assertSame('proxy down', $logger->contexts[0]['message']);
+    }
+
+    public function testTheAddressOfAProxyNeverReachesTheLogWithItsPassword(): void
+    {
+        $purger = new RecordingSharedCachePurger(new \RuntimeException('1 of 1 proxies could not be purged: Could not resolve host "http://purger:s3cret@varnish:6081/"'));
+        $logger = new TestLogger();
+        $queue = new SharedCachePurgeQueue($purger, $logger);
+        $queue->add(['product-42']);
+
+        $queue->flush();
+
+        self::assertStringNotContainsString('s3cret', (string) json_encode([$logger->records, $logger->contexts]));
+        self::assertStringContainsString('varnish:6081', $logger->contexts[0]['message']);
     }
 
     public function testResettingForgetsWhatWasQueued(): void

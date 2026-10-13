@@ -156,6 +156,56 @@ final class SharedCachePurgerFactoryTest extends TestCase
         $purger->purge(['product-42']);
     }
 
+    public function testTheLoginOfAProxyAddressTravelsAsBasicAuthenticationNotInTheAddress(): void
+    {
+        $purger = SharedCachePurgerFactory::create('varnish', 'http://purger:s3cret@varnish:6081', '', $this->client());
+
+        $purger->purge(['products']);
+
+        self::assertSame('http://varnish:6081/', $this->requests[0][1]);
+        self::assertSame(['Authorization: Basic '.base64_encode('purger:s3cret')], $this->requests[0][2]['authorization']);
+    }
+
+    #[DataProvider('addressesThatCannotBeUsed')]
+    public function testAnAddressThatCannotBeUsedNeverReachesTheMessageOfTheFailure(string $address): void
+    {
+        $purger = SharedCachePurgerFactory::create('varnish', $address, '', $this->client());
+
+        self::assertInstanceOf(UnavailableSharedCachePurger::class, $purger);
+
+        try {
+            $purger->purge(['products']);
+            self::fail('An address that cannot be used must fail.');
+        } catch (\RuntimeException $exception) {
+            self::assertStringNotContainsString('s3cret', $exception->getMessage());
+            self::assertStringNotContainsString('pa/ss', $exception->getMessage());
+            self::assertStringContainsString('entry 1', $exception->getMessage());
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function addressesThatCannotBeUsed(): iterable
+    {
+        yield 'no scheme' => ['user:s3cret@varnish:6081'];
+        yield 'a slash in the password' => ['http://user:pa/ss@varnish:6081'];
+        yield 'a scheme that is not http' => ['ftp://user:s3cret@varnish:6081'];
+        yield 'no host' => ['http://user:s3cret@'];
+    }
+
+    public function testTheEntryThatFailsIsTheOneThatIsNamed(): void
+    {
+        $purger = SharedCachePurgerFactory::create('varnish', 'http://varnish-1:6081, varnish-2:6081', '', $this->client());
+
+        try {
+            $purger->purge(['products']);
+            self::fail('An address that cannot be used must fail.');
+        } catch (\RuntimeException $exception) {
+            self::assertStringContainsString('entry 2', $exception->getMessage());
+        }
+    }
+
     public function testNoRedirectIsFollowedSoTheSecretStaysWithTheProxyItWasMeantFor(): void
     {
         $purger = SharedCachePurgerFactory::create('varnish', 'http://varnish:6081', 's3cret', $this->client());

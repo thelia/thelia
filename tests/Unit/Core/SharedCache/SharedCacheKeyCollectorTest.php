@@ -40,11 +40,13 @@ final class SharedCacheKeyCollectorTest extends TestCase
         yield 'a list of products' => ['/api/front/products', ['products']];
         yield 'a list of categories' => ['/api/front/categories', ['categories']];
         yield 'what hangs under a product' => ['/api/front/products/42/product_images', ['product-42']];
-        yield 'a resource without a name of its own' => ['/api/front/currencies/1', ['currencies-1']];
+        yield 'a resource without a name of its own' => ['/api/front/currencies/1', ['currencies']];
+        yield 'a combination, which a product change purges by its list' => ['/api/front/product_sale_elements/12', ['product_sale_elements']];
+        yield 'an image of a product' => ['/api/front/product_images/5', ['product_images']];
         yield 'a list of such resources' => ['/api/front/product_images', ['product_images']];
         yield 'the languages' => ['/api/front/languages', ['languages']];
         yield 'the sales' => ['/api/front/sales', ['sales']];
-        yield 'a sale' => ['/api/front/sales/1', ['sales-1']];
+        yield 'a sale' => ['/api/front/sales/1', ['sales']];
         yield 'the videos of products' => ['/api/front/product_videos', ['product_videos']];
         yield 'the associations of products' => ['/api/front/product_associations', ['product_associations']];
         yield 'the filters of a listing' => ['/api/front/tfilters/products', ['tfilters']];
@@ -69,6 +71,7 @@ final class SharedCacheKeyCollectorTest extends TestCase
         yield 'the languages' => ['/api/front/languages'];
         yield 'the sales' => ['/api/front/sales?active=true&itemsPerPage=1000'];
         yield 'the videos of products' => ['/api/front/product_videos?product=42'];
+        yield 'the videos a product page reads through its combinations' => ['/api/front/product_sale_elements_product_video?productSaleElement=12'];
         yield 'the associations of products' => ['/api/front/product_associations'];
         yield 'the filters of a listing' => ['/api/front/tfilters/products'];
     }

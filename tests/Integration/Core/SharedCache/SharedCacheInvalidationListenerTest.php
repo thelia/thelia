@@ -22,22 +22,32 @@ use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\Brand\BrandEvent;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\DefaultActionEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\Folder\FolderEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\SharedCache\NullSharedCachePurger;
 use Thelia\Core\SharedCache\SharedCacheInvalidationListener;
 use Thelia\Core\SharedCache\SharedCacheKey;
+use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePurgeQueue;
 use Thelia\Core\SharedCache\SharedCachePurgerInterface;
+use Thelia\Model\Area;
 use Thelia\Model\Brand;
 use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
+use Thelia\Model\Event\ConfigEvent;
 use Thelia\Model\Folder;
+use Thelia\Model\MetaData;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\RewritingUrl;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Unit\Core\SharedCache\RecordingSharedCachePurger;
 
@@ -48,6 +58,13 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
     private SharedCacheInvalidationListener $listener;
 
     private ResourceCache&MockObject $resourceCache;
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
+    }
 
     protected function setUp(): void
     {
@@ -63,7 +80,70 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
         $this->listener->flush();
 
-        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters']], $this->purger->calls);
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'tfilters']], $this->purger->calls);
+    }
+
+    public function testAFeatureValueChangePurgesThatProductOnly(): void
+    {
+        $this->listener->onCatalogueChange(new FeatureProductUpdateEvent(42, 3, 'blue'), TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', 42)], $this->purger->calls);
+    }
+
+    public function testAFeatureValueDeletionPurgesThatProductOnly(): void
+    {
+        $this->listener->onCatalogueChange(new FeatureProductDeleteEvent(42, 3), TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', 42)], $this->purger->calls);
+    }
+
+    public function testACloneIsPurgedAsTheProductItCreated(): void
+    {
+        $event = new ProductCloneEvent('CLONE-1', 'en_US', (new Product())->setId(42));
+        $event->setClonedProduct((new Product())->setId(77));
+
+        $this->listener->onCatalogueChange($event, TheliaEvents::PRODUCT_CLONE);
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', 77)], $this->purger->calls);
+    }
+
+    public function testAHiddenCombinationIsPurgedAsItsProduct(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $combination = $factory->productSaleElement($product);
+
+        $this->listener->onCatalogueChange(
+            new ProductSaleElementToggleVisibilityEvent((int) $combination->getId()),
+            TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_TOGGLE_VISIBILITY,
+        );
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $this->purger->calls);
+    }
+
+    public function testAWriteOfTheShopConfigurationReachesTheListenerThroughPropel(): void
+    {
+        $purger = new RecordingSharedCachePurger();
+        static::getContainer()->set(SharedCachePurgerInterface::class, $purger);
+
+        ConfigQuery::write('shared_cache_probe', 'one');
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $purger->calls);
+    }
+
+    public function testADeletedSettingIsSubscribedAsAWholeShopChange(): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        foreach ([ConfigEvent::POST_SAVE, ConfigEvent::POST_DELETE] as $eventName) {
+            self::assertArrayHasKey($eventName, $subscribed);
+            self::assertSame('onWholeShopChange', $subscribed[$eventName][0]);
+        }
     }
 
     public function testAProductChangeLeavesTheOtherPagesAlone(): void
@@ -171,12 +251,10 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
     #[DataProvider('eventsThatCarryNoProductId')]
     public function testAnEventNamingAJunctionRowInsteadOfTheProductPurgesTheWholeShop(string $eventName): void
     {
-        $this->listener->onWholeShopChange();
-        $this->listener->flush();
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
 
-        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
-        self::assertArrayHasKey($eventName, SharedCacheInvalidationListener::getSubscribedEvents());
-        self::assertSame('onWholeShopChange', SharedCacheInvalidationListener::getSubscribedEvents()[$eventName][0]);
+        self::assertArrayHasKey($eventName, $subscribed);
+        self::assertSame('onWholeShopChange', $subscribed[$eventName][0]);
     }
 
     /**
@@ -214,6 +292,41 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         yield 'language' => [TheliaEvents::LANG_TOGGLEACTIVE];
         yield 'import' => [TheliaEvents::IMPORT_SUCCESS];
         yield 'module activation' => [TheliaEvents::MODULE_TOGGLE_ACTIVATION];
+        yield 'translation file written' => [TheliaEvents::TRANSLATION_WRITE_FILE];
+        yield 'image saved' => [TheliaEvents::IMAGE_SAVE];
+        yield 'image updated' => [TheliaEvents::IMAGE_UPDATE];
+        yield 'image position' => [TheliaEvents::IMAGE_UPDATE_POSITION];
+        yield 'image visibility' => [TheliaEvents::IMAGE_TOGGLE_VISIBILITY];
+        yield 'image deleted' => [TheliaEvents::IMAGE_DELETE];
+        yield 'document saved' => [TheliaEvents::DOCUMENT_SAVE];
+        yield 'document updated' => [TheliaEvents::DOCUMENT_UPDATE];
+        yield 'document position' => [TheliaEvents::DOCUMENT_UPDATE_POSITION];
+        yield 'document visibility' => [TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY];
+        yield 'document deleted' => [TheliaEvents::DOCUMENT_DELETE];
+        yield 'country created' => [TheliaEvents::COUNTRY_CREATE];
+        yield 'country updated' => [TheliaEvents::COUNTRY_UPDATE];
+        yield 'country deleted' => [TheliaEvents::COUNTRY_DELETE];
+        yield 'default country' => [TheliaEvents::COUNTRY_TOGGLE_DEFAULT];
+        yield 'country visibility' => [TheliaEvents::COUNTRY_TOGGLE_VISIBILITY];
+        yield 'state created' => [TheliaEvents::STATE_CREATE];
+        yield 'state updated' => [TheliaEvents::STATE_UPDATE];
+        yield 'state deleted' => [TheliaEvents::STATE_DELETE];
+        yield 'state visibility' => [TheliaEvents::STATE_TOGGLE_VISIBILITY];
+        yield 'delivery area created' => [TheliaEvents::AREA_CREATE];
+        yield 'delivery area updated' => [TheliaEvents::AREA_UPDATE];
+        yield 'delivery area deleted' => [TheliaEvents::AREA_DELETE];
+        yield 'country added to an area' => [TheliaEvents::AREA_ADD_COUNTRY];
+        yield 'country removed from an area' => [TheliaEvents::AREA_REMOVE_COUNTRY];
+        yield 'area postage' => [TheliaEvents::AREA_POSTAGE_UPDATE];
+        yield 'module updated' => [TheliaEvents::MODULE_UPDATE];
+        yield 'module position' => [TheliaEvents::MODULE_UPDATE_POSITION];
+        yield 'module deleted' => [TheliaEvents::MODULE_DELETE];
+        yield 'hook deactivated' => [TheliaEvents::HOOK_DEACTIVATION];
+        yield 'hooks created for a module' => [TheliaEvents::HOOK_CREATE_ALL];
+        yield 'feature added to every template' => [TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES];
+        yield 'feature removed from every template' => [TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES];
+        yield 'attribute added to every template' => [TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES];
+        yield 'attribute removed from every template' => [TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES];
     }
 
     public function testAProductWrittenThroughTheApiPurgesThatProduct(): void
@@ -221,7 +334,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
         $this->listener->flush();
 
-        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters']], $this->purger->calls);
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'tfilters']], $this->purger->calls);
     }
 
     public function testADeletionThroughTheApiPurgesToo(): void
@@ -229,7 +342,26 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_DELETE));
         $this->listener->flush();
 
-        self::assertNotSame([], $this->purger->calls);
+        self::assertSame([SharedCacheKey::forChange('product', 42)], $this->purger->calls);
+    }
+
+    #[DataProvider('modelsWrittenThroughTheApiThatHaveNoFamily')]
+    public function testAModelOutsideTheFivePagesFamiliesPurgesTheWholeShopWhenTheApiWritesIt(object $model): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, $model, ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
+    /**
+     * @return iterable<string, array{object}>
+     */
+    public static function modelsWrittenThroughTheApiThatHaveNoFamily(): iterable
+    {
+        yield 'a delivery area' => [new Area()];
+        yield 'a meta data' => [new MetaData()];
+        yield 'a rewriting url' => [new RewritingUrl()];
     }
 
     public function testACatalogueModelWithoutAFamilyPurgesTheWholeShop(): void
@@ -250,8 +382,21 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         self::assertSame([], $this->purger->calls);
     }
 
+    public function testAShopThatDoesNotShareLeavesTheResourceCacheToItsOwnListener(): void
+    {
+        $this->resourceCache->expects(self::never())->method('clear');
+
+        $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
+        $this->listener->onWholeShopChange();
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
     public function testTheResourceCachePoolIsClearedWithEveryPurge(): void
     {
+        ConfigQuery::write(SharedCacheMode::CONFIG_KEY, SharedCacheMode::ENABLED->value);
         $this->resourceCache->expects(self::exactly(3))->method('clear');
 
         $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);

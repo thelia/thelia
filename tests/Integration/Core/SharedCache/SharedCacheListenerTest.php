@@ -18,9 +18,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheListener;
@@ -32,8 +35,21 @@ use Thelia\Test\IntegrationTestCase;
 
 final class SharedCacheListenerTest extends IntegrationTestCase
 {
+    private array $trustedProxies = [];
+
+    private int $trustedHeaderSet = 0;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->trustedProxies = Request::getTrustedProxies();
+        $this->trustedHeaderSet = Request::getTrustedHeaderSet();
+    }
+
     protected function tearDown(): void
     {
+        Request::setTrustedProxies($this->trustedProxies, $this->trustedHeaderSet);
         ConfigQuery::resetCache();
 
         parent::tearDown();
@@ -113,6 +129,70 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertTrue($response->headers->hasCacheControlDirective('private'));
         self::assertFalse($response->headers->hasCacheControlDirective('public'));
         self::assertNotSame([], $response->headers->getCookies());
+    }
+
+    #[DataProvider('cookiesThatAreNotTheSession')]
+    public function testAnnouncingStaysSilentWhenTheResponseSetsAnotherCookie(Cookie $cookie): void
+    {
+        $this->mode(SharedCacheMode::ANNOUNCE);
+        $response = $this->sessionResponse();
+        $response->headers->setCookie($cookie);
+
+        $this->handle($this->request('/horatio.html', 'product'), $response);
+
+        self::assertFalse($response->headers->has('Surrogate-Control'));
+        self::assertNotSame([], $response->headers->getCookies());
+    }
+
+    /**
+     * @return iterable<string, array{Cookie}>
+     */
+    public static function cookiesThatAreNotTheSession(): iterable
+    {
+        yield 'remember me' => [Cookie::create('remember', 'x', 0, '/', null, false, true, false, 'strict')];
+        yield 'affiliation' => [Cookie::create('ref', 'partner-7', 0, '/', null, false, false, false, 'lax')];
+        yield 'a cart that is kept' => [Cookie::create('thelia_cart', 'token', time() + 3600, '/', null, false, true, false, 'lax')];
+    }
+
+    public function testTheSessionCookieIsTheOneTheSessionOfTheRequestIsNamed(): void
+    {
+        $this->mode(SharedCacheMode::ANNOUNCE);
+        $request = $this->request('/horatio.html', 'product');
+        $request->setSession(new Session(new MockArraySessionStorage('THELIA_SID')));
+
+        $named = new Response('<html></html>');
+        $named->headers->setCookie(Cookie::create('THELIA_SID', 'abc', 0, '/', null, false, true, false, 'lax'));
+        $this->handle($request, $named);
+
+        $other = new Response('<html></html>');
+        $other->headers->setCookie(Cookie::create('PHPSESSID', 'abc', 0, '/', null, false, true, false, 'lax'));
+        $this->handle($request, $other);
+
+        self::assertSame('max-age=300', $named->headers->get('Surrogate-Control'));
+        self::assertFalse($other->headers->has('Surrogate-Control'));
+    }
+
+    public function testTheListenerRunsAfterTheSessionListenerOfSymfony(): void
+    {
+        $dispatcher = static::getContainer()->get('event_dispatcher');
+        $own = null;
+        $session = null;
+
+        foreach ($dispatcher->getListeners(KernelEvents::RESPONSE) as $listener) {
+            if (!\is_array($listener)) {
+                continue;
+            }
+
+            $own = $listener[0] instanceof SharedCacheListener ? $listener : $own;
+            $session = $listener[0] instanceof AbstractSessionListener ? $listener : $session;
+        }
+
+        self::assertNotNull($own, 'The shared cache listener is not registered on kernel.response.');
+        self::assertNotNull($session, 'The session listener is not registered on kernel.response.');
+        self::assertLessThan(
+            $dispatcher->getListenerPriority(KernelEvents::RESPONSE, $session),
+            $dispatcher->getListenerPriority(KernelEvents::RESPONSE, $own),
+        );
     }
 
     public function testADisabledShopIsLeftAsItWas(): void
@@ -331,6 +411,33 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         $this->handle($this->request('/horatio.html', 'product'), $response);
 
         self::assertEqualsCanonicalizing(['X-Forwarded-Proto', 'X-Forwarded-Port', 'X-Forwarded-Host'], $response->getVary());
+    }
+
+    #[DataProvider('announcingModes')]
+    public function testAPageVariesOnTheForwardedHeadersTheShopTrusts(SharedCacheMode $mode): void
+    {
+        Request::setTrustedProxies(['10.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_FORWARDED);
+        $this->mode($mode);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response);
+
+        self::assertEqualsCanonicalizing(
+            ['X-Forwarded-Proto', 'X-Forwarded-Port', 'X-Forwarded-Host', 'X-Forwarded-Prefix', 'Forwarded'],
+            $response->getVary(),
+        );
+    }
+
+    public function testAHeaderTheShopDoesNotTrustIsNotAddedToTheVary(): void
+    {
+        Request::setTrustedProxies(['10.0.0.1'], Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PROTO);
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+
+        $this->handle($this->request('/horatio.html', 'product'), $response);
+
+        self::assertNotContains('X-Forwarded-Prefix', $response->getVary());
+        self::assertNotContains('Forwarded', $response->getVary());
     }
 
     public function testAPageThatIsNotSharedKeepsItsVary(): void

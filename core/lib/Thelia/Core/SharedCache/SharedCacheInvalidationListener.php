@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Event\ConfigEvent;
+use Thelia\Model\ProductSaleElementsQuery;
 
 final class SharedCacheInvalidationListener implements EventSubscriberInterface
 {
@@ -183,6 +185,41 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::META_DATA_UPDATE,
         TheliaEvents::META_DATA_DELETE,
         TheliaEvents::IMPORT_SUCCESS,
+        TheliaEvents::TRANSLATION_WRITE_FILE,
+        TheliaEvents::IMAGE_SAVE,
+        TheliaEvents::IMAGE_UPDATE,
+        TheliaEvents::IMAGE_UPDATE_POSITION,
+        TheliaEvents::IMAGE_TOGGLE_VISIBILITY,
+        TheliaEvents::IMAGE_DELETE,
+        TheliaEvents::DOCUMENT_SAVE,
+        TheliaEvents::DOCUMENT_UPDATE,
+        TheliaEvents::DOCUMENT_UPDATE_POSITION,
+        TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY,
+        TheliaEvents::DOCUMENT_DELETE,
+        TheliaEvents::COUNTRY_CREATE,
+        TheliaEvents::COUNTRY_UPDATE,
+        TheliaEvents::COUNTRY_DELETE,
+        TheliaEvents::COUNTRY_TOGGLE_DEFAULT,
+        TheliaEvents::COUNTRY_TOGGLE_VISIBILITY,
+        TheliaEvents::STATE_CREATE,
+        TheliaEvents::STATE_UPDATE,
+        TheliaEvents::STATE_DELETE,
+        TheliaEvents::STATE_TOGGLE_VISIBILITY,
+        TheliaEvents::AREA_CREATE,
+        TheliaEvents::AREA_UPDATE,
+        TheliaEvents::AREA_DELETE,
+        TheliaEvents::AREA_ADD_COUNTRY,
+        TheliaEvents::AREA_REMOVE_COUNTRY,
+        TheliaEvents::AREA_POSTAGE_UPDATE,
+        TheliaEvents::MODULE_UPDATE,
+        TheliaEvents::MODULE_UPDATE_POSITION,
+        TheliaEvents::MODULE_DELETE,
+        TheliaEvents::HOOK_DEACTIVATION,
+        TheliaEvents::HOOK_CREATE_ALL,
+        TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES,
+        TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES,
+        TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES,
+        TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES,
     ];
 
     private const MODEL_FAMILIES = [
@@ -193,7 +230,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         'Brand' => self::BRAND,
     ];
 
-    private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Lang|Config|Hook|Module)#';
+    private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Area|Lang|Config|Hook|Module|MetaData|RewritingUrl)#';
 
     public function __construct(
         private readonly SharedCachePurgeQueue $queue,
@@ -216,6 +253,8 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             $subscribed[$eventName] = ['onWholeShopChange', -255];
         }
 
+        $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
+        $subscribed[ConfigEvent::POST_DELETE] = ['onWholeShopChange', -255];
         $subscribed[ResourcePersistedEvent::class] = ['onResourceChange', -255];
 
         return $subscribed;
@@ -226,13 +265,13 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $family = self::FAMILIES[$eventName] ?? null;
         $id = null === $family ? null : $this->idOf($event, $family);
 
-        $this->resourceCache->clear();
+        $this->clearTheResourceCache();
         $this->queue->add(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, $id));
     }
 
     public function onWholeShopChange(): void
     {
-        $this->resourceCache->clear();
+        $this->clearTheResourceCache();
         $this->queue->add([SharedCacheKey::ALL]);
     }
 
@@ -244,7 +283,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             return;
         }
 
-        $this->resourceCache->clear();
+        $this->clearTheResourceCache();
 
         $family = self::MODEL_FAMILIES[substr(strrchr($model::class, '\\') ?: '', 1)] ?? null;
         $id = null !== $family && method_exists($model, 'getId') ? $model->getId() : null;
@@ -257,11 +296,22 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $this->queue->flush();
     }
 
+    private function clearTheResourceCache(): void
+    {
+        if (SharedCacheMode::DISABLED === SharedCacheMode::fromShopConfiguration()) {
+            return;
+        }
+
+        $this->resourceCache->clear();
+    }
+
     private function idOf(object $event, string $family): ?int
     {
-        $getter = 'get'.ucfirst($family);
+        foreach (['get'.ucfirst($family), 'getCloned'.ucfirst($family)] as $getter) {
+            if (!method_exists($event, $getter)) {
+                continue;
+            }
 
-        if (method_exists($event, $getter)) {
             $subject = $event->{$getter}();
 
             if (\is_object($subject) && method_exists($subject, 'getId') && null !== $subject->getId()) {
@@ -269,8 +319,14 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             }
         }
 
-        if (method_exists($event, 'getObjectId') && null !== $event->getObjectId()) {
-            return (int) $event->getObjectId();
+        foreach (['get'.ucfirst($family).'Id', 'getObjectId'] as $getter) {
+            if (method_exists($event, $getter) && null !== $event->{$getter}()) {
+                return (int) $event->{$getter}();
+            }
+        }
+
+        if (self::PRODUCT === $family && method_exists($event, 'getProductSaleElementId')) {
+            return ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())?->getProductId();
         }
 
         return null;

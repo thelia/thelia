@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Model\ConfigQuery;
 
 final readonly class SharedCacheListener
 {
@@ -56,12 +57,14 @@ final readonly class SharedCacheListener
             return;
         }
 
-        $response->setVary(self::FORWARDED_HEADERS, false);
+        $response->setVary($this->forwardedHeaders(), false);
 
         $ttl = SharedCachePolicy::ttl();
 
         if (SharedCacheMode::ANNOUNCE === $mode) {
-            $response->headers->set('Surrogate-Control', 'max-age='.$ttl);
+            if ($this->carriesOnlyTheCookiesAProxyMayStrip($request, $response)) {
+                $response->headers->set('Surrogate-Control', 'max-age='.$ttl);
+            }
 
             return;
         }
@@ -85,6 +88,54 @@ final readonly class SharedCacheListener
         if ('varnish' !== $driver) {
             $response->headers->set('Surrogate-Key', implode(', ', $keys));
         }
+    }
+
+    /**
+     * The absolute URLs of a page are built from the forwarded headers the shop
+     * trusts: a page is only the same page for two visitors who sent the same
+     * values, whatever the proxy lets through.
+     *
+     * @return list<string>
+     */
+    private function forwardedHeaders(): array
+    {
+        $headers = self::FORWARDED_HEADERS;
+
+        if ([] === Request::getTrustedProxies()) {
+            return $headers;
+        }
+
+        $trusted = Request::getTrustedHeaderSet();
+
+        if (0 !== ($trusted & Request::HEADER_X_FORWARDED_PREFIX)) {
+            $headers[] = 'X-Forwarded-Prefix';
+        }
+
+        if (0 !== ($trusted & Request::HEADER_FORWARDED)) {
+            $headers[] = 'Forwarded';
+        }
+
+        return $headers;
+    }
+
+    private function carriesOnlyTheCookiesAProxyMayStrip(Request $request, Response $response): bool
+    {
+        $sessionName = $request->hasSession() ? $request->getSession()->getName() : 'PHPSESSID';
+        $cartName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
+
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === $sessionName) {
+                continue;
+            }
+
+            if ($cookie->getName() === $cartName && $cookie->isCleared()) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     private function makePublic(Response $response, int $ttl): void
