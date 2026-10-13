@@ -29,6 +29,8 @@ local/media/documents/*
 local/media/images/*
 local/media/videos/*
 local/library/*
+local/backup/*
+!local/backup/.gitkeep
 !local/media/images/store/favicon.png
 !local/media/images/store/thelia.svg
 !local/media/images/store/banner.png
