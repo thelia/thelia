@@ -3,17 +3,21 @@
 # Publishes subdirectories of this repository to their downstream repositories
 # (thelia/core, thelia/setup, thelia/config), which Packagist serves.
 #
-# The history is rewritten with `git filter-repo --subdirectory-filter`, the
-# same command the former manual extractor ran, so the published commits keep
-# the SHAs they already have downstream. A push is never forced and never
-# carries tags: release tags are created on the downstream repositories by the
-# release procedure.
+# A published commit is never rewritten again. Each run looks for the commit of
+# the branch that the downstream head was made from, rewrites only the commits
+# that came after it with `git filter-repo --subdirectory-filter`, and grafts
+# them onto the downstream head. A branch that does not exist downstream yet
+# starts from the published commit of main it was cut from.
 #
-# filter-repo also rewrites the commit ids quoted in messages ("cherry picked
-# from commit ...") when the quoted commit belongs to the rewritten history, so
-# a commit's new id depends on which refs are rewritten together. Every run
-# therefore rewrites the same set: all the maintained branches and every tag,
-# which is what the manual extractor did.
+# Rewriting the whole history on every run is not stable: filter-repo replaces
+# a commit id quoted in a message ("cherry picked from commit ...") only when it
+# has already rewritten the quoted commit, so the id of a published commit
+# changes with the order in which the branches and tags are walked. The grafted
+# commits keep the ids quoted in their messages unchanged, those of this
+# repository.
+#
+# A push is never forced and never carries tags: release tags are created on the
+# downstream repositories by the release procedure.
 #
 # Usage: split-downstream.sh <bare-source-clone> <branch>...
 #
@@ -34,7 +38,7 @@ readonly COMPONENTS=(
     'config:local/config:thelia/config:main'
 )
 
-# Branches rewritten together on every run (see above), published or not
+# Branches this script may publish
 readonly MAINTAINED_BRANCHES=(main 3.1 3.2)
 
 readonly mode="${SPLIT_MODE:-check}"
@@ -60,29 +64,89 @@ case "$mode" in
 esac
 
 command -v git-filter-repo >/dev/null || fail 'git-filter-repo is not installed'
-# A shallow history rewrites into orphan commits with other ids
+# A shallow history hides the commits the downstream head was made from
 [[ "$(git -C "$source" rev-parse --is-shallow-repository)" == false ]] \
     || fail "$source is a shallow clone, the full history is required"
 
-rewrite() {
-    local name="$1" subdirectory="$2"
-    local work="$workspace/$name"
+# What the rewrite keeps of a commit: the tree of the subdirectory, the author
+# and the committer, dates included. The message is left out, its quoted commit
+# ids may have been rewritten.
+readonly IDENTITY_FORMAT='%an%x1f%ae%x1f%ad%x1f%cn%x1f%ce%x1f%cd'
 
-    git clone --quiet --bare --no-local "$source" "$work"
-    local refs=() branch
-    for branch in "${MAINTAINED_BRANCHES[@]}"; do
-        refs+=("refs/heads/$branch")
-    done
-    mapfile -t -O "${#refs[@]}" refs < <(git -C "$work" for-each-ref --format='%(refname)' refs/tags)
+# Prints "<commit of the branch> <published commit made from it>" for the most
+# recent commit of the branch found in the published history.
+find_base() {
+    local work="$1" subdirectory="$2" branch="$3" published_ref="$4"
+
+    local -A published_commits=()
+    local commit fingerprint
+    while IFS=$'\x1f' read -r commit fingerprint; do
+        published_commits["$fingerprint"]="$commit"
+    done < <(git -C "$work" log --date=raw --format="%H%x1f%T%x1f$IDENTITY_FORMAT" "$published_ref")
+
+    while read -r commit; do
+        fingerprint="$(git -C "$work" rev-parse "$commit:$subdirectory")"$'\x1f'
+        fingerprint+="$(git -C "$work" log -1 --date=raw --format="$IDENTITY_FORMAT" "$commit")"
+        if [[ -n "${published_commits[$fingerprint]:-}" ]]; then
+            echo "$commit ${published_commits[$fingerprint]}"
+            return
+        fi
+    done < <(git -C "$work" rev-list "refs/heads/$branch" -- "$subdirectory")
+}
+
+# Rewrites the commits of the branch that came after $base and grafts them onto
+# $published, which was made from $base.
+graft() {
+    local work="$1" subdirectory="$2" branch="$3" base="$4" published="$5"
+
+    if [[ -z "$(git -C "$work" rev-list -1 "$base..refs/heads/$branch" -- "$subdirectory")" ]]; then
+        git -C "$work" update-ref "refs/heads/$branch" "$published"
+        return
+    fi
+
+    # Outside the range, only $base may be a parent (a pruned commit hands its
+    # grafted parent over to its child): any other one would drag the history
+    # of this whole repository downstream.
     git -C "$work" filter-repo --force --quiet --prune-empty always \
-        --subdirectory-filter "$subdirectory" --refs "${refs[@]}"
+        --subdirectory-filter "$subdirectory" --preserve-commit-hashes \
+        --commit-callback "
+for index, parent in enumerate(commit.parents):
+    if parent == b'$base':
+        commit.parents[index] = b'$published'
+    elif isinstance(parent, bytes) and parent != b'$published':
+        raise SystemExit('parent ' + parent.decode() + ' is outside the rewritten range')
+" \
+        --refs "^$base" "refs/heads/$branch"
 }
 
 publish() {
     local name="$1" subdirectory="$2" repository="$3" branch="$4"
-    local work="$workspace/$name"
+    local work="$workspace/$name-$branch"
 
     echo "::group::$subdirectory ($branch) -> $repository"
+
+    git clone --quiet --bare --no-local "$source" "$work"
+
+    local remote lineage="$branch"
+    remote="$(git ls-remote "https://github.com/$repository.git" "refs/heads/$branch" | cut -f1)"
+    [[ -n "$remote" ]] || lineage=main
+    git -C "$work" fetch --quiet --no-tags "https://github.com/$repository.git" \
+        "+refs/heads/$lineage:refs/published/$lineage"
+    if [[ -n "$remote" && "$(git -C "$work" rev-parse "refs/published/$lineage")" != "$remote" ]]; then
+        fail "$repository $branch: the downstream branch moved during the run"
+    fi
+
+    local base published
+    read -r base published < <(find_base "$work" "$subdirectory" "$branch" "refs/published/$lineage") || true
+    [[ -n "${base:-}" ]] \
+        || fail "$repository $branch: no commit of $branch is published on $lineage downstream"
+    if [[ -n "$remote" && "$published" != "$remote" ]]; then
+        fail "$repository $branch: downstream $remote was not made from a commit of $branch; refusing to rewrite published history"
+    fi
+    echo "$repository $branch: $published was made from $base"
+
+    graft "$work" "$subdirectory" "$branch" "$base" "$published" \
+        || fail "$repository $branch: the rewrite of the commits after $base failed"
 
     local head expected_tree actual_tree
     head="$(git -C "$work" rev-parse "refs/heads/$branch")"
@@ -91,9 +155,6 @@ publish() {
     [[ "$actual_tree" == "$expected_tree" ]] \
         || fail "$repository $branch: rewritten tree $actual_tree differs from $subdirectory ($expected_tree)"
 
-    local remote
-    remote="$(git ls-remote "https://github.com/$repository.git" "refs/heads/$branch" | cut -f1)"
-
     if [[ "$remote" == "$head" ]]; then
         echo "$repository $branch: up to date ($head)"
         [[ "$mode" != dry-run ]] || push "$name" "$repository" "$branch"
@@ -101,17 +162,9 @@ publish() {
         return
     fi
 
-    if [[ -n "$remote" ]] && git -C "$work" cat-file -e "$remote^{commit}" 2>/dev/null \
-        && git -C "$work" merge-base --is-ancestor "$head" "$remote"; then
-        echo "$repository $branch: downstream $remote already contains $head"
-        echo '::endgroup::'
-        return
-    fi
-
     if [[ -z "$remote" ]]; then
         echo "$repository $branch: branch does not exist downstream, it will be created at $head"
-    elif ! git -C "$work" cat-file -e "$remote^{commit}" 2>/dev/null \
-        || ! git -C "$work" merge-base --is-ancestor "$remote" "$head"; then
+    elif ! git -C "$work" merge-base --is-ancestor "$remote" "$head"; then
         fail "$repository $branch: downstream $remote is not an ancestor of $head; refusing to rewrite published history"
     else
         echo "$repository $branch: $remote..$head, $(git -C "$work" rev-list --count "$remote..$head") new commit(s)"
@@ -131,7 +184,7 @@ push() {
     local push_options=()
     [[ "$mode" == dry-run ]] && push_options+=(--dry-run)
     GIT_SSH_COMMAND="ssh -i $key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SPLIT_KNOWN_HOSTS" \
-        git -C "$workspace/$name" push --no-tags "${push_options[@]}" \
+        git -C "$workspace/$name-$branch" push --no-tags "${push_options[@]}" \
         "git@github.com:$repository.git" "refs/heads/$branch:refs/heads/$branch"
 }
 
@@ -145,13 +198,8 @@ done
 
 for component in "${COMPONENTS[@]}"; do
     IFS=':' read -r name subdirectory repository branches <<< "$component"
-    rewritten=0
     for branch in "$@"; do
         [[ " $branches " == *" $branch "* ]] || continue
-        if [[ $rewritten == 0 ]]; then
-            rewrite "$name" "$subdirectory"
-            rewritten=1
-        fi
         publish "$name" "$subdirectory" "$repository" "$branch"
     done
 done
