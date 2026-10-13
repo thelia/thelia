@@ -20,6 +20,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\OrderShipment;
 use Thelia\Module\DeliveryTrackingUrlProviderInterface;
 
 /**
@@ -68,6 +69,37 @@ final class OrderTrackingUrlResolver implements ResetInterface
         $source = $this->sourceOf($moduleId);
 
         if ($source instanceof DeliveryTrackingUrlProviderInterface) {
+            return $this->askTheModule($source, $order);
+        }
+
+        return null === $source ? null : self::fill($source, $number);
+    }
+
+    /**
+     * The carrier page following one parcel of the order: the shipment's own number
+     * with the shipment's own carrier. A module that builds the address itself reads
+     * the order, so it is asked only for the parcel the order points at (same carrier,
+     * same number); another parcel of that carrier has no address, rather than the
+     * wrong one.
+     */
+    public function resolveShipment(OrderShipment $shipment): ?string
+    {
+        $number = trim((string) $shipment->getDeliveryRef());
+        $moduleId = $shipment->getDeliveryModuleId();
+
+        if ('' === $number || null === $moduleId) {
+            return null;
+        }
+
+        $source = $this->sourceOf($moduleId);
+
+        if ($source instanceof DeliveryTrackingUrlProviderInterface) {
+            $order = $shipment->getOrder();
+
+            if (null === $order || $moduleId !== $order->getDeliveryModuleId() || $number !== trim((string) $order->getDeliveryRef())) {
+                return null;
+            }
+
             return $this->askTheModule($source, $order);
         }
 

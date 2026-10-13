@@ -288,6 +288,16 @@ final class TheliaEvents
     public const ORDER_SEND_CONFIRMATION_EMAIL = 'action.order.sendOrderConfirmationEmail';
     public const ORDER_SEND_NOTIFICATION_EMAIL = 'action.order.sendOrderNotificationEmail';
     public const ORDER_UPDATE_DELIVERY_REF = 'action.order.updateDeliveryRef';
+
+    /**
+     * Shipments: a parcel, or a set of parcels leaving together, carrying part or all
+     * of an order. Dispatched once the shipment is committed, to announce what
+     * happened (history, e-mails, modules), never to perform it: the writer is
+     * \Thelia\Domain\Shipping\Service\OrderShipmentManager.
+     */
+    public const ORDER_SHIPMENT_CREATE = 'action.order.shipment.create';
+    public const ORDER_SHIPMENT_SHIP = 'action.order.shipment.ship';
+    public const ORDER_SHIPMENT_CANCEL = 'action.order.shipment.cancel';
     public const ORDER_UPDATE_TRANSACTION_REF = 'action.order.updateTransactionRef';
     public const ORDER_UPDATE_ADDRESS = 'action.order.updateAddress';
     public const ORDER_PRODUCT_BEFORE_CREATE = 'action.orderProduct.beforeCreate';

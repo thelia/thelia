@@ -2139,6 +2139,11 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 (5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
+-- Where an order sits once some of its parcels left and some are still to go: a
+-- custom status, equivalent to paid, the merchant may rename, recolour or delete.
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(7, 'partially_shipped', 'paid', '#20c997', 7, 0, NOW(), NOW());
+
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
 (2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
@@ -15244,48 +15249,56 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (4, 'cs_CZ', NULL, '', '', ''),
     (5, 'cs_CZ', NULL, '', '', ''),
     (6, 'cs_CZ', NULL, '', '', ''),
+    (7, 'cs_CZ', 'Částečně odesláno', '', '', ''),
     (1, 'de_DE', 'Nicht bezahlt', '', '', ''),
     (2, 'de_DE', 'Bezahlt', '', '', ''),
     (3, 'de_DE', 'Bearbeitung', '', '', ''),
     (4, 'de_DE', 'Gesendet', '', '', ''),
     (5, 'de_DE', 'Storniert', '', '', ''),
     (6, 'de_DE', 'Zrückerstattet', '', '', ''),
+    (7, 'de_DE', 'Teilweise versandt', '', '', ''),
     (1, 'en_US', 'Not paid', '', '', ''),
     (2, 'en_US', 'Paid', '', '', ''),
     (3, 'en_US', 'Processing', '', '', ''),
     (4, 'en_US', 'Sent', '', '', ''),
     (5, 'en_US', 'Canceled', '', '', ''),
     (6, 'en_US', 'Refunded', '', '', ''),
+    (7, 'en_US', 'Partially shipped', '', '', ''),
     (1, 'es_ES', 'No pagados', '', '', ''),
     (2, 'es_ES', 'Pagado', '', '', ''),
     (3, 'es_ES', 'Procesando', '', '', ''),
     (4, 'es_ES', 'Enviado', '', '', ''),
     (5, 'es_ES', 'Cancelado', '', '', ''),
     (6, 'es_ES', 'Reembolsado', '', '', ''),
+    (7, 'es_ES', 'Enviado parcialmente', '', '', ''),
     (1, 'fr_FR', 'Non payée', '', '', ''),
     (2, 'fr_FR', 'Payée', '', '', ''),
     (3, 'fr_FR', 'Traitement', '', '', ''),
     (4, 'fr_FR', 'Envoyée', '', '', ''),
     (5, 'fr_FR', 'Annulée', '', '', ''),
     (6, 'fr_FR', 'Remboursé', '', '', ''),
+    (7, 'fr_FR', 'Partiellement expédiée', '', '', ''),
     (1, 'it_IT', NULL, '', '', ''),
     (2, 'it_IT', NULL, '', '', ''),
     (3, 'it_IT', NULL, '', '', ''),
     (4, 'it_IT', NULL, '', '', ''),
     (5, 'it_IT', NULL, '', '', ''),
     (6, 'it_IT', NULL, '', '', ''),
+    (7, 'it_IT', 'Parzialmente spedito', '', '', ''),
     (1, 'nl_NL', 'Niet betaald', '', '', ''),
     (2, 'nl_NL', 'Betaald', '', '', ''),
     (3, 'nl_NL', 'In behandeling', '', '', ''),
     (4, 'nl_NL', 'Verzonden', '', '', ''),
     (5, 'nl_NL', 'Geannuleerd', '', '', ''),
     (6, 'nl_NL', 'Terugbetaald', '', '', ''),
+    (7, 'nl_NL', 'Gedeeltelijk verzonden', '', '', ''),
     (1, 'ru_RU', 'Не оплачен', '', '', ''),
     (2, 'ru_RU', 'Оплачен', '', '', ''),
     (3, 'ru_RU', 'В обработке', '', '', ''),
     (4, 'ru_RU', 'Выслан', '', '', ''),
     (5, 'ru_RU', 'Отменен', '', '', ''),
-    (6, 'ru_RU', 'Возвращен', '', '', '')
+    (6, 'ru_RU', 'Возвращен', '', '', ''),
+    (7, 'ru_RU', 'Частично отправлен', '', '', '')
 ;
 
 INSERT INTO `order_return_status_i18n`(`id`, `locale`, `title`) VALUES

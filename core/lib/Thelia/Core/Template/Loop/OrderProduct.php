@@ -40,6 +40,7 @@ use Thelia\Type\BooleanOrBothType;
  * @method int         getOrder()
  * @method int[]       getId()
  * @method bool|string getVirtual()
+ * @method int|null    getShipment()
  */
 class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -51,6 +52,9 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('order', null, true),
             Argument::createIntListTypeArgument('id'),
             Argument::createBooleanOrBothTypeArgument('virtual', BooleanOrBothType::ANY),
+            // A delivery note of one shipment lists only the lines that shipment carries,
+            // with the quantity it carries: the rest of the order leaves in another parcel.
+            Argument::createIntTypeArgument('shipment'),
         );
     }
 
@@ -97,6 +101,17 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $search->filterById($this->getId(), Criteria::IN);
         }
 
+        $shipment = $this->getShipment();
+
+        if (null !== $shipment) {
+            // One item per (shipment, order line) at most, so this join adds no row to
+            // the tax rows summed above. MAX() keeps the column valid whatever the SQL mode.
+            $search
+                ->joinOrderShipmentItem('osi', Criteria::INNER_JOIN)
+                ->where('osi.OrderShipmentId = ?', $shipment, \PDO::PARAM_INT)
+                ->withColumn('MAX(`osi`.QUANTITY)', 'SHIPMENT_QUANTITY');
+        }
+
         $search->orderById(Criteria::ASC);
 
         return $search;
@@ -111,6 +126,12 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
+            // Every total below is the one of the quantity this document is about: the
+            // whole line, or the part of it a given shipment carries.
+            $quantity = null !== $this->getShipment()
+                ? (float) $orderProduct->getVirtualColumn('SHIPMENT_QUANTITY')
+                : $orderProduct->getQuantity();
+
             // The loop walks orders of several shops' worth of history at once
             // in the back office, and the rounding an order was invoiced with
             // depends on when it was placed.
@@ -121,17 +142,17 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
             if (ConfigQuery::isOrderWithLegacyRounding($orderProduct->getOrderId())) {
-                $totalTax = round($tax * $orderProduct->getQuantity(), 2);
-                $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
+                $totalTax = round($tax * $quantity, 2);
+                $totalPromoTax = round($promoTax * $quantity, 2);
 
                 $taxedPrice = (float) $orderProduct->getPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_TAX');
                 $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
-                $totalPrice = $orderProduct->getPrice() * $orderProduct->getQuantity();
-                $totalPromoPrice = $orderProduct->getPromoPrice() * $orderProduct->getQuantity();
+                $totalPrice = $orderProduct->getPrice() * $quantity;
+                $totalPromoPrice = $orderProduct->getPromoPrice() * $quantity;
 
-                $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
-                $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+                $totalTaxedPrice = round($taxedPrice, 2) * $quantity;
+                $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $quantity;
             } elseif ($roundingOfSums) {
                 // Same rounding as CartItem::getTotalTaxedPrice() under this mode:
                 // the quantity multiplies the unit amount at full precision, and
@@ -143,11 +164,11 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $taxedPrice = (float) $orderProduct->getPrice() + $tax;
                 $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + $promoTax;
 
-                $totalPrice = round((float) $orderProduct->getPrice() * $orderProduct->getQuantity(), 2);
-                $totalPromoPrice = round((float) $orderProduct->getPromoPrice() * $orderProduct->getQuantity(), 2);
+                $totalPrice = round((float) $orderProduct->getPrice() * $quantity, 2);
+                $totalPromoPrice = round((float) $orderProduct->getPromoPrice() * $quantity, 2);
 
-                $totalTaxedPrice = round($taxedPrice * $orderProduct->getQuantity(), 2);
-                $totalTaxedPromoPrice = round($taxedPromoPrice * $orderProduct->getQuantity(), 2);
+                $totalTaxedPrice = round($taxedPrice * $quantity, 2);
+                $totalTaxedPromoPrice = round($taxedPromoPrice * $quantity, 2);
 
                 // Rounding the tax of the line on its own would leave the three
                 // totals disagreeing by a cent, and an invoice whose lines and
@@ -161,19 +182,19 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $tax = round((float) $tax, 2);
                 $promoTax = round((float) $promoTax, 2);
 
-                $totalTax = $tax * $orderProduct->getQuantity();
-                $totalPromoTax = $promoTax * $orderProduct->getQuantity();
+                $totalTax = $tax * $quantity;
+                $totalPromoTax = $promoTax * $quantity;
 
                 $taxedPrice = round((float) $orderProduct->getPrice(), 2) + $tax;
                 $taxedPromoPrice = round((float) $orderProduct->getPromoPrice(), 2) + $promoTax;
 
                 // Price calculation should use the same rounding method as in CartItem::getTotalTaxedPromoPrice()
                 // For each order line, we first round the taxed price, then we multiply by the quantity.
-                $totalPrice = round((float) $orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
-                $totalPromoPrice = round((float) $orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
+                $totalPrice = round((float) $orderProduct->getPrice(), 2) * $quantity;
+                $totalPromoPrice = round((float) $orderProduct->getPromoPrice(), 2) * $quantity;
 
-                $totalTaxedPrice = $taxedPrice * $orderProduct->getQuantity();
-                $totalTaxedPromoPrice = $taxedPromoPrice * $orderProduct->getQuantity();
+                $totalTaxedPrice = $taxedPrice * $quantity;
+                $totalTaxedPromoPrice = $taxedPromoPrice * $quantity;
             }
 
             $loopResultRow->set('ID', $orderProduct->getId())
@@ -193,7 +214,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 // What the line stands for — a good, or a service the shop invoiced beside
                 // them. A picking list leaves the services out, an invoice states them.
                 ->set('LINE_TYPE', $orderProduct->getLineType())
-                ->set('QUANTITY', $orderProduct->getQuantity())
+                ->set('QUANTITY', $quantity)
 
                 ->set('PRICE', $orderProduct->getPrice())
                 ->set('PRICE_TAX', $tax)

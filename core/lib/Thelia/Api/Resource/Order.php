@@ -239,6 +239,15 @@ class Order implements PropelResourceInterface
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public array $orderProducts = [];
 
+    /**
+     * The parcels the order left in, oldest first, each with its lines, tracking
+     * number and carrier page: an order shipped at once has exactly one. Read only,
+     * a shipment is opened through its own resource.
+     */
+    #[Relation(targetResource: OrderShipment::class)]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public array $orderShipments = [];
+
     #[Relation(targetResource: OrderCoupon::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public array $orderCoupons = [];
@@ -612,6 +621,24 @@ class Order implements PropelResourceInterface
     public function setOrderProducts(array $orderProducts): self
     {
         $this->orderProducts = $orderProducts;
+
+        return $this;
+    }
+
+    /**
+     * @return list<OrderShipment>
+     */
+    public function getOrderShipments(): array
+    {
+        return $this->orderShipments;
+    }
+
+    /**
+     * @param list<OrderShipment> $orderShipments
+     */
+    public function setOrderShipments(array $orderShipments): self
+    {
+        $this->orderShipments = $orderShipments;
 
         return $this;
     }

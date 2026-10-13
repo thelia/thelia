@@ -52,6 +52,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderCoupon;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
@@ -944,6 +945,37 @@ final class FixtureFactory
         $order->save($this->connection);
 
         return $order;
+    }
+
+    /**
+     * Adds a line to an order, the way the checkout snapshots a sale element into
+     * it. Nothing is read from the catalog: the reference, title and prices are
+     * the snapshot values, and the sale element id defaults to the first one.
+     *
+     * Overrides read: `quantity` (1), `price` and `promoPrice` ('10.000000'),
+     * `productSaleElementsId` (1), `virtual` (0), `lineType` ('product'),
+     * `title`, `productRef`, `productSaleElementsRef`.
+     */
+    public function orderProduct(Order $order, array $overrides = []): OrderProduct
+    {
+        $n = $this->next();
+
+        $line = new OrderProduct();
+        $line->setOrderId((int) $order->getId());
+        $line->setProductRef($overrides['productRef'] ?? 'ORDER-LINE-'.$n);
+        $line->setProductSaleElementsRef($overrides['productSaleElementsRef'] ?? 'ORDER-LINE-PSE-'.$n);
+        $line->setProductSaleElementsId((int) ($overrides['productSaleElementsId'] ?? 1));
+        $line->setTitle($overrides['title'] ?? 'Order line '.$n);
+        $line->setQuantity((float) ($overrides['quantity'] ?? 1.0));
+        $line->setPrice((string) ($overrides['price'] ?? '10.000000'));
+        $line->setPromoPrice((string) ($overrides['promoPrice'] ?? '10.000000'));
+        $line->setWasNew(1);
+        $line->setWasInPromo(0);
+        $line->setVirtual((int) ($overrides['virtual'] ?? 0));
+        $line->setLineType($overrides['lineType'] ?? OrderProduct::LINE_TYPE_PRODUCT);
+        $line->save($this->connection);
+
+        return $line;
     }
 
     public function tag(array $overrides = []): Tag

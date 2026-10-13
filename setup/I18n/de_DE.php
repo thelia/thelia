@@ -1119,4 +1119,5 @@ return [
     'Newness' => 'Neuheit',
     'Shipping notice sent to the customer' => 'Versandbestätigung an den Kunden gesendet',
     'Your order {{ order_ref }} has been shipped' => 'Ihre Bestellung {{ order_ref }} wurde versandt',
+    'Partially shipped' => 'Teilweise versandt',
 ];

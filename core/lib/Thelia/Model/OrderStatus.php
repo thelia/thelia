@@ -29,6 +29,13 @@ class OrderStatus extends BaseOrderStatus
     public const CODE_REFUNDED = 'refunded';
 
     /**
+     * The status seeded for an order some of whose parcels left and some are still to go.
+     * Not canonical: a custom status, equivalent to paid, that the merchant may rename or
+     * delete; the code is read when a shipment leaves, and nothing happens when it is gone.
+     */
+    public const CODE_PARTIALLY_SHIPPED = 'partially_shipped';
+
+    /**
      * The canonical status codes, the only values a custom status may declare as its equivalence.
      */
     public const CANONICAL_CODES = [
