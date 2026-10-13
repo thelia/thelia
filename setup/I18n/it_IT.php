@@ -434,4 +434,5 @@ return [
     'Promotion' => 'Promozione',
     'Newness' => 'Novità',
     'Your order {{ order_ref }} has been shipped' => 'Il tuo ordine {{ order_ref }} è stato spedito',
+    'Partially shipped' => 'Parzialmente spedito',
 ];

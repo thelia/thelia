@@ -594,4 +594,130 @@ INNER JOIN (
     UNION ALL SELECT 'order_return_order_statuses', 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- ---------------------------------------------------------------------
+-- Shipments
+--
+-- An order may now leave in several parcels, each with its own lines,
+-- tracking number and delivery note: a shipment. A shipment is a draft
+-- while the merchant composes it, shipped once handed to the carrier,
+-- cancelled when given up before it left. The tracking number the order
+-- itself carries stays, the delivery modules keep writing it there.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `order_shipment`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `ref` VARCHAR(55) NOT NULL COMMENT 'the shipment number: the order reference followed by the rank of the shipment in the order',
+    `status` VARCHAR(20) DEFAULT 'draft' NOT NULL COMMENT 'draft while being composed, shipped once handed to the carrier, cancelled when given up before it left',
+    `delivery_module_id` INTEGER COMMENT 'the carrier module the parcel left with, NULL once that module is gone',
+    `delivery_module_title` VARCHAR(255) COMMENT 'the carrier name snapshot, kept when the module is gone',
+    `delivery_ref` VARCHAR(100) COMMENT 'the tracking number the carrier gave for this parcel',
+    `shipped_at` DATETIME COMMENT 'when the parcel was handed to the carrier, NULL while it is a draft',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_shipment_ref_UNIQUE` (`ref`),
+    INDEX `idx_order_shipment_order_id` (`order_id`),
+    INDEX `idx_order_shipment_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_order_shipment_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_shipment_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `order_shipment_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_shipment_id` INTEGER NOT NULL,
+    `order_product_id` INTEGER NOT NULL,
+    `quantity` FLOAT NOT NULL COMMENT 'how much of the order line this shipment carries',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_shipment_item_line_UNIQUE` (`order_shipment_id`, `order_product_id`),
+    INDEX `idx_order_shipment_item_order_shipment_id` (`order_shipment_id`),
+    INDEX `idx_order_shipment_item_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_order_shipment_item_order_shipment_id`
+        FOREIGN KEY (`order_shipment_id`)
+        REFERENCES `order_shipment` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_shipment_item_order_product_id`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- The partially shipped status
+--
+-- Where an order sits once some of its parcels left and some are still to
+-- go. A custom status, declared equivalent to paid so that the stock, the
+-- invoice and the documents keep behaving as on a paid order; the merchant
+-- may rename it, recolour it or delete it. Listed after the existing ones.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `order_status` (`code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`)
+SELECT 'partially_shipped', 'paid', '#20c997', `ranks`.`next_position`, 0, NOW(), NOW()
+FROM (SELECT COALESCE(MAX(`position`), 0) + 1 AS `next_position` FROM `order_status`) AS `ranks`;
+
+-- Read back by code rather than from LAST_INSERT_ID(): on a replay the insert
+-- above is ignored and hands back no id at all.
+SET @partially_shipped_status_id := (SELECT `id` FROM `order_status` WHERE `code` = 'partially_shipped');
+
+INSERT IGNORE INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+    (@partially_shipped_status_id, 'cs_CZ', 'Částečně odesláno', '', '', ''),
+    (@partially_shipped_status_id, 'de_DE', 'Teilweise versandt', '', '', ''),
+    (@partially_shipped_status_id, 'en_US', 'Partially shipped', '', '', ''),
+    (@partially_shipped_status_id, 'es_ES', 'Enviado parcialmente', '', '', ''),
+    (@partially_shipped_status_id, 'fr_FR', 'Partiellement expédiée', '', '', ''),
+    (@partially_shipped_status_id, 'it_IT', 'Parzialmente spedito', '', '', ''),
+    (@partially_shipped_status_id, 'nl_NL', 'Gedeeltelijk verzonden', '', '', ''),
+    (@partially_shipped_status_id, 'ru_RU', 'Частично отправлен', '', '', '');
+
+-- ---------------------------------------------------------------------
+-- The orders that left before shipments existed
+--
+-- Each of them is shown as a single shipment carrying all its lines, so that
+-- the customer account and the order sheet read the same whatever the age of
+-- the order. An order in a sent status gets a shipped shipment, dated from its
+-- last change; an order that only carries a tracking number, the label printed
+-- but the order not marked sent, gets a draft, shipped when the order is.
+--
+-- Replayable: an order that already has a shipment is left alone, and only a
+-- shipment with no line at all, which the application never writes, receives
+-- the lines of its order.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `order_shipment` (`order_id`, `ref`, `status`, `delivery_module_id`, `delivery_module_title`, `delivery_ref`, `shipped_at`, `created_at`, `updated_at`)
+SELECT
+    `o`.`id`,
+    CONCAT(`o`.`ref`, '-1'),
+    IF(`s`.`code` = 'sent' OR `s`.`equivalent_code` = 'sent', 'shipped', 'draft'),
+    `m`.`id`,
+    `o`.`delivery_module_title`,
+    NULLIF(`o`.`delivery_ref`, ''),
+    IF(`s`.`code` = 'sent' OR `s`.`equivalent_code` = 'sent', `o`.`updated_at`, NULL),
+    NOW(),
+    NOW()
+FROM `order` AS `o`
+INNER JOIN `order_status` AS `s` ON `s`.`id` = `o`.`status_id`
+LEFT JOIN `module` AS `m` ON `m`.`id` = `o`.`delivery_module_id`
+WHERE (`s`.`code` = 'sent' OR `s`.`equivalent_code` = 'sent' OR (`o`.`delivery_ref` IS NOT NULL AND `o`.`delivery_ref` <> ''))
+  AND NOT EXISTS (SELECT 1 FROM `order_shipment` AS `existing` WHERE `existing`.`order_id` = `o`.`id`);
+
+INSERT IGNORE INTO `order_shipment_item` (`order_shipment_id`, `order_product_id`, `quantity`, `created_at`, `updated_at`)
+SELECT `sh`.`id`, `op`.`id`, `op`.`quantity`, NOW(), NOW()
+FROM `order_shipment` AS `sh`
+INNER JOIN `order_product` AS `op` ON `op`.`order_id` = `sh`.`order_id`
+WHERE NOT EXISTS (SELECT 1 FROM `order_shipment_item` AS `existing` WHERE `existing`.`order_shipment_id` = `sh`.`id`);
+
 SET FOREIGN_KEY_CHECKS = 1;
