@@ -1,3 +1,34 @@
+# 3.2.2
+
+Maintenance release of the 3.2 line. It fixes coupons and automatic promotions, the refund of a return that carries the postage, and a reserved operation that showed to every visitor while it was not running. It ships `setup/update/sql/3.2.2.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.2.2 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
+
+## Fixed
+
+- A return that carries the postage back refunds what the customer paid for it. The postage of an order is stored tax included, and the refund added its tax a second time: a 6.00 postage holding 1.00 of tax refunded 7.00.
+- A coupon that offers the postage no longer fails when the shop checks whether the postage is free: when the postage of a cart or an order is set, in the postage estimate, and in the `is_delivery_free` attribute of the API. Since 3.0.0-beta1 a coupon kept its countries and delivery modules as arrays of plain values, and `CouponManager::isCouponRemovingPostage()` and `CouponFreeShippingEvaluator::isCouponRemovingPostage()` failed on them with an `Error`. `getFreeShippingForCountries()` and `getFreeShippingForModules()` of `CouponInterface` now return the `CouponCountry` and `CouponModule` rows their callers read.
+- The coupons that remove an amount or a percentage on products, categories or attribute values, and the free product coupon, apply to every product, category or attribute value selected in the back-office. The back-office saved only the first entry of the list, and the ids it stored never matched a cart line because they were read back as strings, so such a coupon discounted nothing. A coupon of these types saved from the back-office kept only that first entry: open it, select the whole list again and save it.
+- The coupon conditions on products, categories, customers, delivery countries and billing countries match the ids saved from the back-office. Since 3.0.0 they compared the integer ids of the cart, the customer and its addresses with the ids the back-office stores as strings, so the "in" operator never matched and "not in" always did, even for a listed product. The ids are now read as integers, which also fixes the conditions already saved: there is nothing to save again.
+- The coupon conditions on the number of articles, the number of units and the cart total match with the "equal to" operator. Since 3.0.0 the comparison is strict, and the number the back-office saves is a string, so "equal to" never matched. The number is now read as an integer, or as a float for the total, which also fixes the conditions already saved.
+- A coupon condition on the number of units in the cart no longer fails with a `TypeError` as soon as the cart holds a line. Since 3.0.0, `BaseFacade::getNbArticlesInCartIncludeQuantity()` declared an `int` and returned the sum of the line quantities, which are floats: adding a product to the cart failed while such a coupon was in use or such an automatic promotion was enabled. It returns the exact sum again, as in Thelia 2, so a product sold by weight counts for its decimal quantity, and `FacadeInterface` declares `int|float` (an implementation that declares `int` stays compatible).
+- The delivery country condition of a coupon matches a cart by the country of its delivery address again. Since 3.0.0 it refused every cart, with or without a delivery address. `FacadeInterface::getDeliveryAddress()` now returns `null` when the cart has no delivery address yet, instead of failing with a `TypeError`.
+- A free product coupon whose effects hold no offered product or offered category, as the API can store them, is read without the two "Undefined array key" warnings it raised on every cart evaluation since 2.0.3. It offers nothing, as before.
+- `getExpirationDate()` of `CouponInterface` and `CouponAbstract` returns a `\DateTime`. Both declared a class that does not exist, so a call failed with a `TypeError`, and PHP refused to load a coupon type that implements the interface with a `\DateTime` return type.
+- A reserved operation that is not running stays out of the operations a front-office visitor can list, the `sale` loop with `active` at `0` or `*` included. While no reserved operation was running, `ReservedSaleVisibility::applyToSales()` left every operation in, so an operation being prepared for named customers showed to anybody.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+A coupon that removes an amount or a percentage on products, categories or attribute values, and a free product coupon, kept only the first entry of its list when it was saved from the back-office: open each of them, select the whole list again and save it. The coupon conditions need nothing: the values already saved are read correctly from now on.
+
+A module that calls `getFreeShippingForCountries()` or `getFreeShippingForModules()` on a coupon now gets `CouponCountry` and `CouponModule` rows instead of arrays of plain values. In `FacadeInterface`, `getDeliveryAddress()` may return `null` and `getNbArticlesInCartIncludeQuantity()` a float; an implementation that declares the former return types stays compatible.
+
 # 3.2.1
 
 Security and maintenance release of the 3.2 line, without any breaking change. It ships `setup/update/sql/3.2.1.sql`, which renames the tax types a shop migrated from Thelia 2 still stores under their Thelia 2 class, declares the back-office hooks the Twig templates call, and records the new version. `thelia/setup` ships as 3.2.1 with this core; `thelia/config` does not change and stays at 3.2.0. The core refuses a back-office theme `thelia/backoffice-default-twig-template` older than 1.2.2, which carries the same CSV export fix: update it to 1.2.2, and the front theme `thelia/flexy` to 1.2.1, at the same time.
