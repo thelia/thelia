@@ -39,6 +39,9 @@ Written through `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSetting
 | Closed days of the week of a carrier | `delivery_date_rule.closed_weekdays` | NULL follows the shop; an empty string means every day is open |
 | Slots | `delivery_slot` (+ `delivery_slot_i18n.title`) | Local start and end hours, the same every open day; `capacity` in orders, NULL for no limit |
 | Exceptional closures | `delivery_closure` | Both days included; `module_id` NULL closes the whole shop |
+| Cutoff hour of the shop | config `delivery_cutoff_time` | `H:i`; an order at or after it is prepared the next working day; empty for none |
+| Preparation and transit days of a carrier | `delivery_date_rule.preparation_days`, `transit_min_days`, `transit_max_days` | Working days; both transit bounds set the estimate on, all three NULL take it off; 0 is a delay. Any carrier, whether it accepts dates or not |
+| Availability delay of a product | `product.availability_delay_days` | Working days added to the preparation; NULL adds none |
 
 ## How a day is judged
 
@@ -55,6 +58,25 @@ Written through `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSetting
 The three exceptions extend `InvalidDeliveryException`, so a caller that already sends the buyer back to the delivery step does so for them too.
 
 The choice falls by itself when the carrier of the cart changes (`Cart::preSave()`). `CartFacade::dropDeliveryDateIfNoLongerPossible()` takes off a day that became impossible and says whether it did, for a theme to tell the buyer.
+
+## Estimated delivery
+
+The buyer picks nothing here: each carrier announces the days a parcel is expected between, before the order. `DeliveryTimeEstimator` reads the delays and the calendar, `DeliveryIntervalCalculator` counts:
+
+- The day the order comes in is the first day of preparation, unless the shop is closed that day or the order comes in at or after the cutoff: preparation starts on the next working day of the shop. The parcel leaves at the end of the last day of preparation; zero days of preparation leave the same day, like one.
+- The transit counts working days of the carrier from the day after the parcel leaves; zero days deliver that day, or on the next day the carrier works.
+- Preparation days follow the shop closed days of the week and the shop closures; transit days follow the carrier closed days of the week (or the shop's) and the closures of the carrier and of the shop.
+- The slowest product of the cart adds its `availability_delay_days` to the preparation.
+
+So one day of preparation and two of transit deliver an order of Tuesday morning on Thursday, and on Friday once the cutoff is passed.
+
+| Where | What is shown |
+|---|---|
+| Delivery options (delivery step, `GET /api/front/delivery_modules`) | `minimumDeliveryDate` and `maximumDeliveryDate`, `Y-m-d`, filled by `DeliveryOptionsProvider` unless the module wrote its own (an empty string counts as none) |
+| Order | `order.estimated_delivery_from` / `estimated_delivery_to`, the interval announced when the order was placed (`OrderFactory`); it does not move when the delays change. Empty when the buyer picked a day. Order API: `estimatedDeliveryFrom`, `estimatedDeliveryTo` |
+| Product page | `ShippingFacade::estimateProductDelivery($product, $cart)`: the soonest of the active carriers delivering to the delivery address of the cart, else the default address of its customer, else the default country of the shop, with that country, for the theme to name it. Null for a virtual product or when no carrier there announces delays |
+
+The estimate reads neither the session nor the request, and counts days in the time zone PHP runs in, so a command that writes an e-mail gets the same days as the delivery step. A product page is cacheable: a theme that caches it shows days that age with the cache.
 
 ## Capacity
 
