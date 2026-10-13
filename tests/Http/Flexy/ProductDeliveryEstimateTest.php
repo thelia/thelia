@@ -90,6 +90,12 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
         self::assertStringContainsString($this->spelled(2), $text);
         self::assertStringContainsString($this->spelled(3), $text);
         self::assertStringContainsString((string) $country->setLocale('en_US')->getTitle(), $text);
+
+        // The estimate depends on the visitor's address and on today: a shared cache would
+        // hand one visitor's days to another, and keep them after they are past.
+        $cacheControl = (string) $this->client->getResponse()->headers->get('Cache-Control');
+        self::assertStringContainsString('private', $cacheControl);
+        self::assertStringNotContainsString('s-maxage', $cacheControl);
     }
 
     public function testNoCarrierWithDelaysAnnouncesNothing(): void
