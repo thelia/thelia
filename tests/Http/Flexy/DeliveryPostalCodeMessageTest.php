@@ -27,10 +27,28 @@ use Thelia\Module\BaseModule;
 /**
  * The delivery step of a guest whose postal code no zone takes: the step names the postal
  * code, instead of only saying that no delivery method is available.
+ *
+ * The step belongs to the theme, which ships as its own package: a theme older than the
+ * message is reported as skipped rather than failed.
  */
 final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 {
+    /**
+     * Written as a string on purpose: `::class` on a missing import resolves silently in
+     * the current namespace, and the guard would then skip the whole file for ever.
+     */
+    private const DELIVERY_STEP_COMPONENT = 'FlexyBundle\\Components\\Organisms\\Delivery\\Base';
+
     private const GUEST_ZIP_CODE = '75002';
+
+    protected function setUp(): void
+    {
+        if (!method_exists(self::DELIVERY_STEP_COMPONENT, 'getPostalCodeWithoutCarrier')) {
+            self::markTestSkipped('The installed front-office theme does not name the postal code no carrier delivers to.');
+        }
+
+        parent::setUp();
+    }
 
     public function testTheDeliveryStepNamesThePostalCodeNoCarrierDeliversTo(): void
     {
