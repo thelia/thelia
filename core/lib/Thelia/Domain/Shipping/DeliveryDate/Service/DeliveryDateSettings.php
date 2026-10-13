@@ -40,6 +40,7 @@ final readonly class DeliveryDateSettings
 {
     public function __construct(
         private DeliveryDateCalendar $calendar,
+        private DeliveryEstimateCalendar $estimateCalendar,
     ) {
     }
 
@@ -57,6 +58,7 @@ final readonly class DeliveryDateSettings
     public function saveShopClosedWeekdays(iterable $weekdays): void
     {
         ConfigQuery::write(ClosedWeekdays::SHOP_CONFIG_NAME, ClosedWeekdays::format($weekdays), false, true);
+        $this->estimateCalendar->reset();
     }
 
     /**
@@ -64,7 +66,7 @@ final readonly class DeliveryDateSettings
      */
     public function shopCutoffTime(): ?string
     {
-        return DeliveryTimeEstimator::cutoff();
+        return $this->estimateCalendar->cutoff();
     }
 
     /**
@@ -79,6 +81,7 @@ final readonly class DeliveryDateSettings
         }
 
         ConfigQuery::write(DeliveryTimeEstimator::CUTOFF_CONFIG_NAME, $cutoff, false, true);
+        $this->estimateCalendar->reset();
     }
 
     public function ruleOf(Module $module): ?DeliveryDateRule
@@ -123,6 +126,7 @@ final readonly class DeliveryDateSettings
             ->setHorizonDays($horizonDays)
             ->setClosedWeekdays(null === $closedWeekdays ? null : ClosedWeekdays::format($closedWeekdays))
             ->save();
+        $this->estimateCalendar->reset();
 
         return $rule;
     }
@@ -161,6 +165,7 @@ final readonly class DeliveryDateSettings
             ->setTransitMinDays($transitMinDays)
             ->setTransitMaxDays($transitMaxDays)
             ->save();
+        $this->estimateCalendar->reset();
 
         return $rule;
     }
@@ -253,6 +258,7 @@ final readonly class DeliveryDateSettings
             ->setEndDate($end->format('Y-m-d'))
             ->setLabel('' === $label ? null : $label);
         $closure->save();
+        $this->estimateCalendar->reset();
 
         return $closure;
     }
@@ -263,6 +269,7 @@ final readonly class DeliveryDateSettings
     public function deleteClosure(DeliveryClosure $closure): void
     {
         $closure->delete();
+        $this->estimateCalendar->reset();
     }
 
     /**
