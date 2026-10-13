@@ -506,10 +506,6 @@ final class CheckoutConsentsTest extends GuestCheckoutTestCase
             TheliaEvents::MODULE_PAYMENT_IS_VALID,
             static function (IsValidPaymentEvent $event): void {
                 $event->setValidModule(true);
-                // Read by the payment listing the step renders, and left uninitialised
-                // by a listener that answers before the module does.
-                $event->setMinimumAmount(0);
-                $event->setMaximumAmount(0);
                 $event->stopPropagation();
             },
             512,
