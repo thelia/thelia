@@ -39,7 +39,7 @@ final class SharedCacheKey
     public static function forChange(string $family, int $id): array
     {
         return match ($family) {
-            'product' => ['product-'.$id, 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_associations', 'tfilters'],
+            'product' => ['product-'.$id, 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'tfilters'],
             'category' => ['category-'.$id, 'categories', 'products', 'tfilters'],
             'content' => ['content-'.$id, 'contents'],
             'folder' => ['folder-'.$id, 'folders', 'contents'],
@@ -62,7 +62,7 @@ final class SharedCacheKey
             return [];
         }
 
-        if (isset($matches[2]) && '' !== $matches[2]) {
+        if (isset($matches[2]) && '' !== $matches[2] && isset(self::SINGULARS[$matches[1]])) {
             return [self::item($matches[1], $matches[2])];
         }
 

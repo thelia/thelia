@@ -59,7 +59,10 @@ final class SharedCachePurgeQueue implements ResetInterface
         try {
             $this->purger->purge($keys);
         } catch (\Throwable $exception) {
-            $this->logger->error(\sprintf('Shared cache purge of %d key(s) failed: %s', \count($keys), $exception->getMessage()));
+            $this->logger->error('Shared cache purge of {count} key(s) failed: {message}', [
+                'count' => \count($keys),
+                'message' => (string) preg_replace('#(://)[^/@\s]+@#', '$1', $exception->getMessage()),
+            ]);
         }
     }
 

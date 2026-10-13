@@ -21,8 +21,12 @@ final class TestLogger extends AbstractLogger
     /** @var list<array{string, string}> */
     public array $records = [];
 
+    /** @var list<array<string, mixed>> */
+    public array $contexts = [];
+
     public function log($level, string|\Stringable $message, array $context = []): void
     {
         $this->records[] = [(string) $level, (string) $message];
+        $this->contexts[] = $context;
     }
 }
