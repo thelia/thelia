@@ -308,6 +308,19 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?string $deliverySlotEnd = null;
 
+    /**
+     * The delivery interval announced when the order was placed, as Y-m-d days of the shop,
+     * kept as it was said: it does not follow later changes of the carrier delays. Null
+     * when the carrier announced none, or when the buyer picked a day.
+     */
+    #[Column(propelFieldName: 'estimatedDeliveryFromDay')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $estimatedDeliveryFrom = null;
+
+    #[Column(propelFieldName: 'estimatedDeliveryToDay')]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?string $estimatedDeliveryTo = null;
+
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
@@ -737,6 +750,30 @@ class Order implements PropelResourceInterface
     public function setDeliverySlotEnd(?string $deliverySlotEnd): self
     {
         $this->deliverySlotEnd = $deliverySlotEnd;
+
+        return $this;
+    }
+
+    public function getEstimatedDeliveryFrom(): ?string
+    {
+        return $this->estimatedDeliveryFrom;
+    }
+
+    public function setEstimatedDeliveryFrom(?string $estimatedDeliveryFrom): self
+    {
+        $this->estimatedDeliveryFrom = $estimatedDeliveryFrom;
+
+        return $this;
+    }
+
+    public function getEstimatedDeliveryTo(): ?string
+    {
+        return $this->estimatedDeliveryTo;
+    }
+
+    public function setEstimatedDeliveryTo(?string $estimatedDeliveryTo): self
+    {
+        $this->estimatedDeliveryTo = $estimatedDeliveryTo;
 
         return $this;
     }
