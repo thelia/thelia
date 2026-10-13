@@ -271,6 +271,35 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertFalse(DeliveryTimeEstimator::announcesAnEstimate($rule));
     }
 
+    /**
+     * The delivery step estimates every carrier it lists: past the first one, which loads
+     * the delays and the calendar, another carrier costs no query.
+     */
+    public function testEstimatingMoreCarriersCostsNoMoreQueries(): void
+    {
+        [$cart] = $this->cartReadyToPay();
+        $carriers = ModuleQuery::create()->limit(4)->find($this->getPropelConnection())->getData();
+        self::assertCount(4, $carriers);
+        foreach ($carriers as $carrier) {
+            $this->settings()->saveDeliveryDelays($carrier, 1, 2, 3);
+        }
+        $estimator = $this->getService(DeliveryTimeEstimator::class);
+        self::assertNotNull($estimator->estimateForCart($carriers[0], $cart));
+
+        $connection = $this->getPropelConnection();
+        $connection->useDebug(true);
+        $before = $connection->getQueryCount();
+
+        foreach (\array_slice($carriers, 1) as $carrier) {
+            self::assertNotNull($estimator->estimateForCart($carrier, $cart));
+        }
+
+        $queries = $connection->getQueryCount() - $before;
+        $connection->useDebug(false);
+
+        self::assertSame(0, $queries, \sprintf('Three more carriers cost %d queries.', $queries));
+    }
+
     public function testTheCutoffMustBeAnHour(): void
     {
         $this->expectException(InvalidDeliveryDateSettingsException::class);

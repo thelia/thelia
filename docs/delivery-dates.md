@@ -76,7 +76,7 @@ So one day of preparation and two of transit deliver an order of Tuesday morning
 | Order | `order.estimated_delivery_from` / `estimated_delivery_to`, the interval announced when the order was placed (`OrderFactory`); it does not move when the delays change. Empty when the buyer picked a day. Order API: `estimatedDeliveryFrom`, `estimatedDeliveryTo` |
 | Product page | `ShippingFacade::estimateProductDelivery($product, $cart)`: the soonest of the active carriers delivering to the delivery address of the cart, else the default address of its customer, else the default country of the shop, with that country, for the theme to name it. Null for a virtual product or when no carrier there announces delays |
 
-The estimate reads neither the session nor the request, and counts days in the time zone PHP runs in, so a command that writes an e-mail gets the same days as the delivery step. A product page is cacheable: a theme that caches it shows days that age with the cache.
+`DeliveryEstimateCalendar` loads the delays of every carrier, the closures and the shop settings once per request, so listing or comparing several carriers costs no query per carrier; `DeliveryDateSettings` empties it on every write. The estimate reads neither the session nor the request, and counts days in the time zone PHP runs in, so a command that writes an e-mail gets the same days as the delivery step. A product page is cacheable: a theme that caches it shows days that age with the cache.
 
 ## Capacity
 
