@@ -20,6 +20,7 @@ use Thelia\Api\Resource\DeliveryModuleOption;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
@@ -194,6 +195,15 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertNotNull($order);
         self::assertSame($this->day(2), $order->getEstimatedDeliveryFromDay());
         self::assertSame($this->day(3), $order->getEstimatedDeliveryToDay());
+
+        // Recette 7: the confirmation e-mail reads the order loop.
+        $row = null;
+        foreach ($this->getService(LoopExecutor::class)->execute('order', ['id' => $orderId, 'customer' => $customer->getId()]) as $result) {
+            $row = $result->getVarVal();
+        }
+        self::assertIsArray($row);
+        self::assertSame($this->day(2), $row['ESTIMATED_DELIVERY_FROM']);
+        self::assertSame($this->day(3), $row['ESTIMATED_DELIVERY_TO']);
     }
 
     public function testAnOrderWithoutDelaysOrWithAPickedDayCarriesNoEstimate(): void
