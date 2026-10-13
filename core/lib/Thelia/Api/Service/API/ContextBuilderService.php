@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Service\API;
 
 use ApiPlatform\Metadata\Operation;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 readonly class ContextBuilderService
 {
@@ -34,6 +35,15 @@ readonly class ContextBuilderService
             'resource_class' => $resourceClass,
             'filters' => $parameters,
             'groups' => $operation->getNormalizationContext()['groups'] ?? null,
+            // The normalizers key their attribute cache on a serialization of the context, once for every item
+            // of a collection. What ResourceService adds next to it (the result in extra_variables, the request)
+            // and the operation metadata do not change which attributes are read: serialized for each item, the
+            // result made a collection quadratic in its size. API Platform's SerializerContextBuilder list, plus
+            // the two keys of ResourceService. Being in the context, it replaces any default_context list.
+            AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => [
+                'root_operation', 'operation', 'object', 'data', 'property_metadata',
+                'circular_reference_limit_counters', 'debug_trace_id', 'extra_variables', 'request',
+            ],
         ];
     }
 
