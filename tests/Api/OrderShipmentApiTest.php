@@ -107,10 +107,10 @@ final class OrderShipmentApiTest extends ApiTestCase
         self::assertSame($line->getId(), $parcel['orderShipmentItems'][0]['orderProduct']['id'] ?? null);
     }
 
-    public function testTheOrderReadByItsOwnerListsItsParcels(): void
+    public function testTheOrderReadByItsOwnerListsItsParcelsWithTheirCarrierPage(): void
     {
         $owner = $this->customer();
-        [$order, $line] = $this->paidOrderWithALine($owner, 2.0);
+        [$order, $line] = $this->paidOrderWithALine($owner, 2.0, $this->carrier());
         $this->shipped($order, $line, 1.0, 'PARCEL-1');
         $this->shipped($order, $line, 1.0, 'PARCEL-2');
 
@@ -120,6 +120,11 @@ final class OrderShipmentApiTest extends ApiTestCase
 
         self::assertSame(['PARCEL-1', 'PARCEL-2'], array_column($read['orderShipments'], 'deliveryRef'));
         self::assertSame([$order->getRef().'-1', $order->getRef().'-2'], array_column($read['orderShipments'], 'ref'));
+        self::assertSame(
+            ['https://carrier.example/track?parcel=PARCEL-1', 'https://carrier.example/track?parcel=PARCEL-2'],
+            array_column($read['orderShipments'], 'trackingUrl'),
+            'Each parcel read through its order carries its own carrier page.',
+        );
     }
 
     public function testAnAdministratorOpensAParcelThatLeavesAtOnce(): void
