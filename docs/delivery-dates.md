@@ -87,6 +87,7 @@ The place in a slot is taken in the transaction of `OrderFacade::createOrder()`,
 `order.delivery_date`, `delivery_slot_id` (NULL once the slot is deleted) and the hours `delivery_slot_start` / `delivery_slot_end`, copied when the order is placed: editing or deleting a slot afterwards changes nothing on placed orders. The date is information of the order, never a state: a day gone by blocks no transition.
 
 - Loop `order`: `DELIVERY_DATE` (Y-m-d), `DELIVERY_SLOT_START`, `DELIVERY_SLOT_END` (H:i).
+- Loop `order`: `ESTIMATED_DELIVERY_FROM`, `ESTIMATED_DELIVERY_TO` (Y-m-d), the interval announced when the order was placed; the order e-mails of the default mail template repeat it.
 - Customer data export: `delivery_date` and `delivery_slot` per order.
 
 ## Front API
