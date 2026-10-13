@@ -25,8 +25,8 @@ use Thelia\Module\PaymentModuleInterface;
 class IsValidPaymentEvent extends BasePaymentEvent
 {
     protected bool $validModule = false;
-    protected float $minimumAmount;
-    protected float $maximumAmount;
+    protected ?float $minimumAmount = null;
+    protected ?float $maximumAmount = null;
 
     /**
      * IsValidPaymentEvent constructor.
@@ -60,7 +60,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
         return $this;
     }
 
-    public function getMinimumAmount(): float
+    public function getMinimumAmount(): ?float
     {
         return $this->minimumAmount;
     }
@@ -72,7 +72,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
         return $this;
     }
 
-    public function getMaximumAmount(): float
+    public function getMaximumAmount(): ?float
     {
         return $this->maximumAmount;
     }
