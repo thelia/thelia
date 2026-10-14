@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\SharedCache;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -62,9 +63,15 @@ final readonly class SharedCachePolicy
 
     public const MAX_TTL = 86400;
 
+    /**
+     * @param string[] $neverSharedPrefixes the first segments of the addresses that are never
+     *                                      shared, the parameter `thelia.shared_cache.never_shared_prefixes`
+     */
     public function __construct(
         private PricingActivityChecker $pricingActivityChecker,
         private SharedCacheKeyCollector $keyCollector,
+        #[Autowire(param: 'thelia.shared_cache.never_shared_prefixes')]
+        private array $neverSharedPrefixes = self::SENSITIVE_PREFIXES,
     ) {
     }
 
@@ -122,7 +129,7 @@ final readonly class SharedCachePolicy
     {
         $segment = strtolower(explode('/', ltrim($path, '/'), 2)[0]);
 
-        foreach (self::SENSITIVE_PREFIXES as $prefix) {
+        foreach ($this->neverSharedPrefixes as $prefix) {
             if ($segment === $prefix || str_starts_with($segment, $prefix.'-') || str_starts_with($segment, $prefix.'_')) {
                 return true;
             }
