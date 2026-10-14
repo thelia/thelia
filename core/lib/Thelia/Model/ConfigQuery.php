@@ -166,9 +166,13 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('url_site', '');
     }
 
-    public static function getDefaultLangWhenNoTranslationAvailable()
+    /**
+     * The stored value is a string ('0' or '1'), cast so that it compares strictly with
+     * Lang::STRICTLY_USE_REQUESTED_LANGUAGE and Lang::REPLACE_BY_DEFAULT_LANGUAGE.
+     */
+    public static function getDefaultLangWhenNoTranslationAvailable(): int
     {
-        return self::read('default_lang_without_translation', 1);
+        return (int) self::read('default_lang_without_translation', Lang::REPLACE_BY_DEFAULT_LANGUAGE);
     }
 
     public static function isRewritingEnable(): bool
