@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Core\SharedCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -257,6 +258,33 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         yield 'api' => ['/api/front/products', 'product'];
         yield 'admin' => ['/admin/products', 'product'];
         yield 'no view at all' => ['/horatio.html', ''];
+    }
+
+    public function testAProjectAddsAnAddressThatIsNeverShared(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $before = $this->snapshot($response);
+
+        $this->handle($this->request('/wishlist/mine', 'product'), $response, neverSharedPrefixes: [...SharedCachePolicy::SENSITIVE_PREFIXES, 'wishlist']);
+
+        self::assertSame($before, $this->snapshot($response));
+
+        $shared = $this->sessionResponse();
+        $this->handle($this->request('/wishlist/mine', 'product'), $shared);
+
+        self::assertTrue($shared->headers->hasCacheControlDirective('public'), 'The same address is shared with the list of the core.');
+    }
+
+    public function testTheAddressesThatAreNeverSharedAreAParameterAProjectOverrides(): void
+    {
+        $container = static::getContainer();
+
+        self::assertSame(SharedCachePolicy::SENSITIVE_PREFIXES, $container->getParameter('thelia.shared_cache.never_shared_prefixes'));
+
+        $attributes = (new \ReflectionParameter([SharedCachePolicy::class, '__construct'], 'neverSharedPrefixes'))->getAttributes(Autowire::class);
+        self::assertCount(1, $attributes, 'The policy reads the list from the parameter, so a project value replaces the list of the core.');
+        self::assertSame('%thelia.shared_cache.never_shared_prefixes%', $attributes[0]->newInstance()->value);
     }
 
     public function testAPostRequestIsNeverShared(): void
@@ -614,6 +642,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         int $requestType = HttpKernelInterface::MAIN_REQUEST,
         ?SharedCacheKeyCollector $collector = null,
         string $driver = '',
+        array $neverSharedPrefixes = SharedCachePolicy::SENSITIVE_PREFIXES,
     ): void {
         if (null === $checker) {
             $checker = $this->createStub(PricingActivityChecker::class);
@@ -622,7 +651,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
 
         $collector ??= new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
 
-        (new SharedCacheListener(new SharedCachePolicy($checker, $collector), $collector, $driver))
+        (new SharedCacheListener(new SharedCachePolicy($checker, $collector, $neverSharedPrefixes), $collector, $driver))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, $requestType, $response));
     }
 
