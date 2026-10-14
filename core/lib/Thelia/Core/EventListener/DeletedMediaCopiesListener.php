@@ -20,6 +20,7 @@ use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\File\LocalizedFileModelInterface;
+use Thelia\Core\File\SvgSanitizer;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -53,7 +54,7 @@ final readonly class DeletedMediaCopiesListener
         $model = $event->getFileToDelete();
         $files = self::storedFilesOf($model);
 
-        $this->removeCopies(ConfigQuery::read('image_cache_dir_from_web_root', 'cache'.DS.'images'), $model, $files);
+        $this->removeCopies(ConfigQuery::read('image_cache_dir_from_web_root', 'cache'.DS.'images'), $model, $files, true);
 
         $paths = [];
 
@@ -74,7 +75,7 @@ final readonly class DeletedMediaCopiesListener
     {
         $model = $event->getFileToDelete();
 
-        $this->removeCopies(ConfigQuery::read('document_cache_dir_from_web_root', 'cache'.DS.'documents'), $model, self::storedFilesOf($model));
+        $this->removeCopies(ConfigQuery::read('document_cache_dir_from_web_root', 'cache'.DS.'documents'), $model, self::storedFilesOf($model), false);
     }
 
     /**
@@ -92,8 +93,9 @@ final readonly class DeletedMediaCopiesListener
      * the one of its item, and any other a caller asked for.
      *
      * @param list<string> $files
+     * @param bool         $sanitizesSvg whether an SVG is published as a sanitized copy
      */
-    private function removeCopies(string $cacheDirFromWebRoot, FileModelInterface $model, array $files): void
+    private function removeCopies(string $cacheDirFromWebRoot, FileModelInterface $model, array $files, bool $sanitizesSvg): void
     {
         $cacheDirectory = rtrim(THELIA_WEB_DIR, '/').'/'.$cacheDirFromWebRoot;
         $subdirectories = is_dir($cacheDirectory) ? glob($cacheDirectory.'/*', \GLOB_ONLYDIR) : [];
@@ -103,15 +105,18 @@ final readonly class DeletedMediaCopiesListener
             $stem = pathinfo($name, \PATHINFO_FILENAME);
             $resizedCopy = \sprintf(self::RESIZED_COPY_PATTERN, preg_quote($stem, '/'));
             $storedPath = basename($model->getUploadDir()).'/'.$file;
+            $storedFile = $model->getUploadDir().'/'.$file;
 
             foreach ($subdirectories ?: [] as $subdirectory) {
                 $published = $subdirectory.'/'.$name;
 
-                // A link is removed when it points at this very file: another item may
-                // store a file of the same name.
-                if (is_link($published) && str_ends_with((string) readlink($published), '/'.$storedPath)) {
-                    unlink($published);
-                } elseif (is_file($published) && !is_link($published)) {
+                // A link or a copy is removed when it serves this very file: another item
+                // may store a file of the same name.
+                if (is_link($published)) {
+                    if (str_ends_with((string) readlink($published), '/'.$storedPath)) {
+                        unlink($published);
+                    }
+                } elseif (is_file($published) && self::isCopyOf($published, $storedFile, $sanitizesSvg)) {
                     unlink($published);
                 }
 
@@ -122,5 +127,31 @@ final readonly class DeletedMediaCopiesListener
                 }
             }
         }
+    }
+
+    /**
+     * A published copy only carries the name of the file: it is the copy of the stored
+     * file when it holds the same content, or the sanitized content of an SVG.
+     */
+    private static function isCopyOf(string $published, string $storedFile, bool $sanitizesSvg): bool
+    {
+        if (!is_file($storedFile)) {
+            return false;
+        }
+
+        $publishedSize = filesize($published);
+
+        if ($publishedSize === filesize($storedFile) && hash_file('sha256', $published) === hash_file('sha256', $storedFile)) {
+            return true;
+        }
+
+        if (!$sanitizesSvg || 'svg' !== strtolower(pathinfo($storedFile, \PATHINFO_EXTENSION))) {
+            return false;
+        }
+
+        $content = file_get_contents($storedFile);
+        $sanitized = false === $content ? null : (new SvgSanitizer())->sanitize($content);
+
+        return null !== $sanitized && $publishedSize === \strlen($sanitized) && hash_file('sha256', $published) === hash('sha256', $sanitized);
     }
 }
