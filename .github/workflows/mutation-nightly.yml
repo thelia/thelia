@@ -138,3 +138,29 @@ jobs:
           path: var/infection-integration/
           if-no-files-found: ignore
           retention-days: 30
+
+  alert:
+    name: Report a broken nightly run
+    needs: [ domains, mutate ]
+    # A run that fails is a broken run (the initial tests are red, or the job could not
+    # start): an escaped mutant only warns. Nobody watches a scheduled run, so it opens an
+    # issue, or comments on the one still open.
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the issue of the broken nightly run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='The nightly mutation run is broken'
+          number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          body="The run of $(date -u +%F) failed before it could report its mutants: $RUN_URL"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
