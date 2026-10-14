@@ -18,7 +18,6 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
-use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
@@ -234,8 +233,8 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Area|Lang|Config|Hook|Module|MetaData|RewritingUrl)#';
 
     public function __construct(
+        private readonly SharedCacheInvalidator $invalidator,
         private readonly SharedCachePurgeQueue $queue,
-        private readonly ResourceCache $resourceCache,
     ) {
     }
 
@@ -268,14 +267,12 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $family = self::FAMILIES[$eventName] ?? null;
         $id = null === $family ? null : $this->idOf($event, $family);
 
-        $this->clearTheResourceCache();
-        $this->queue->add(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, $id));
+        $this->purge($family, $id);
     }
 
     public function onWholeShopChange(): void
     {
-        $this->clearTheResourceCache();
-        $this->queue->add([SharedCacheKey::ALL]);
+        $this->invalidator->purge([SharedCacheKey::ALL]);
     }
 
     /**
@@ -286,8 +283,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     {
         $categoryId = $event->getModel()->getCategoryId();
 
-        $this->clearTheResourceCache();
-        $this->queue->add(null === $categoryId ? ['tfilters'] : ['tfilters', SharedCacheKey::item('categories', $categoryId)]);
+        $this->invalidator->purge(null === $categoryId ? ['tfilters'] : ['tfilters', SharedCacheKey::item('categories', $categoryId)]);
     }
 
     public function onResourceChange(ResourcePersistedEvent $event): void
@@ -298,12 +294,10 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             return;
         }
 
-        $this->clearTheResourceCache();
-
         $family = self::MODEL_FAMILIES[substr(strrchr($model::class, '\\') ?: '', 1)] ?? null;
         $id = null !== $family && method_exists($model, 'getId') ? $model->getId() : null;
 
-        $this->queue->add(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, (int) $id));
+        $this->purge($family, null === $id ? null : (int) $id);
     }
 
     public function flush(): void
@@ -311,13 +305,9 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $this->queue->flush();
     }
 
-    private function clearTheResourceCache(): void
+    private function purge(?string $family, ?int $id): void
     {
-        if (SharedCacheMode::DISABLED === SharedCacheMode::fromShopConfiguration()) {
-            return;
-        }
-
-        $this->resourceCache->clear();
+        $this->invalidator->purge(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, $id));
     }
 
     private function idOf(object $event, string $family): ?int

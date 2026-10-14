@@ -33,6 +33,7 @@ use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\SharedCache\NullSharedCachePurger;
 use Thelia\Core\SharedCache\SharedCacheInvalidationListener;
+use Thelia\Core\SharedCache\SharedCacheInvalidator;
 use Thelia\Core\SharedCache\SharedCacheKey;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePurgeQueue;
@@ -74,7 +75,8 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
 
         $this->purger = new RecordingSharedCachePurger();
         $this->resourceCache = $this->createMock(ResourceCache::class);
-        $this->listener = new SharedCacheInvalidationListener(new SharedCachePurgeQueue($this->purger), $this->resourceCache);
+        $queue = new SharedCachePurgeQueue($this->purger);
+        $this->listener = new SharedCacheInvalidationListener(new SharedCacheInvalidator($queue, $this->resourceCache), $queue);
     }
 
     public function testAProductChangePurgesThatProductAndWhatListsProducts(): void
