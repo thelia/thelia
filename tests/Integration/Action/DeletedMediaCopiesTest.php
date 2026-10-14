@@ -23,6 +23,8 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Product;
@@ -59,6 +61,8 @@ final class DeletedMediaCopiesTest extends ActionIntegrationTestCase
     protected function tearDown(): void
     {
         $this->cleanUpTestFiles();
+        // The database changes are rolled back, the static config cache is not.
+        ConfigQuery::resetCache();
 
         $filterDirectory = THELIA_WEB_DIR.'media/cache/'.self::FILTER;
         @rmdir($filterDirectory.'/product');
@@ -128,6 +132,53 @@ final class DeletedMediaCopiesTest extends ActionIntegrationTestCase
         self::assertFileExists($keptCopy);
     }
 
+    public function testDeletingAnImageKeepsTheCopyOfAnotherItemFileOfTheSameName(): void
+    {
+        ConfigQuery::write('original_image_delivery_mode', 'copy');
+
+        $deleted = $this->createImage(Lang::getDefaultLanguage()->getLocale(), 'shared.png');
+        $file = (string) $deleted->getOwnFile();
+
+        // A stored name ends with the id of its row, and each table counts its own ids:
+        // a category image may store another picture under the same name.
+        $categoryDirectory = (new CategoryImage())->getUploadDir();
+        if (!is_dir($categoryDirectory)) {
+            mkdir($categoryDirectory, 0o777, true);
+        }
+        $otherFile = $categoryDirectory.DS.$file;
+        imagepng(imagecreatetruecolor(2, 2), $otherFile);
+        $this->trackFileForCleanup($otherFile);
+
+        $deletedCopy = $this->publishOriginal($deleted->getUploadDir().DS.$file, 'product');
+        $keptCopy = $this->publishOriginal($otherFile, 'category');
+        $this->trackFileForCleanup($deletedCopy);
+        $this->trackFileForCleanup($keptCopy);
+
+        self::assertFalse(is_link($deletedCopy) || is_link($keptCopy), 'The originals are published as links.');
+        self::assertSame(basename($deletedCopy), basename($keptCopy));
+
+        $this->dispatch(new FileDeleteEvent($deleted), TheliaEvents::IMAGE_DELETE);
+
+        self::assertFileDoesNotExist($deletedCopy);
+        self::assertFileExists($keptCopy, 'The copy of the category image went with the product image of the same name.');
+    }
+
+    public function testDeletingAnSvgImageRemovesItsSanitizedCopy(): void
+    {
+        $image = $this->createImage(Lang::getDefaultLanguage()->getLocale(), 'deleted.svg', $this->createTestSvg(), 'image/svg+xml');
+        $file = (string) $image->getOwnFile();
+
+        $published = $this->publishOriginal($image->getUploadDir().DS.$file, 'product');
+        $this->trackFileForCleanup($published);
+
+        self::assertFalse(is_link($published), 'An SVG is published as a sanitized copy.');
+        self::assertFileExists($published);
+
+        $this->dispatch(new FileDeleteEvent($image), TheliaEvents::IMAGE_DELETE);
+
+        self::assertFileDoesNotExist($published);
+    }
+
     public function testDeletingADocumentRemovesItsPublishedLink(): void
     {
         $document = new ProductDocument();
@@ -155,7 +206,7 @@ final class DeletedMediaCopiesTest extends ActionIntegrationTestCase
         self::assertFalse(is_link($published) || file_exists($published), 'The published document stays served.');
     }
 
-    private function createImage(string $locale, string $name): ProductImage
+    private function createImage(string $locale, string $name, ?string $source = null, string $mimeType = 'image/png'): ProductImage
     {
         $model = new ProductImage();
         $model->setProductId($this->createProduct()->getId())->setVisible(1)->setLocale($locale)->setTitle('Image');
@@ -163,7 +214,7 @@ final class DeletedMediaCopiesTest extends ActionIntegrationTestCase
         $event = new FileCreateOrUpdateEvent($model->getProductId());
         $event
             ->setModel($model)
-            ->setUploadedFile($this->createUploadedFile($this->createTestPng(), $name, 'image/png'))
+            ->setUploadedFile($this->createUploadedFile($source ?? $this->createTestPng(), $name, $mimeType))
             ->setParentName('Product');
 
         $this->dispatch($event, TheliaEvents::IMAGE_SAVE);
@@ -203,6 +254,22 @@ final class DeletedMediaCopiesTest extends ActionIntegrationTestCase
         if (null !== $width) {
             $event->setWidth($width)->setHeight($width)->setResizeMode((string) Image::KEEP_IMAGE_RATIO);
         }
+
+        $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+
+        return (string) $event->getCacheFilepath();
+    }
+
+    /**
+     * Publishes a stored image at its original size and returns the path of the
+     * published link or copy.
+     */
+    private function publishOriginal(string $sourceFile, string $subdirectory): string
+    {
+        $event = new ImageEvent();
+        $event
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory($subdirectory);
 
         $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
