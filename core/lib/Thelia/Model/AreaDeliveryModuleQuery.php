@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
 
 /**
@@ -29,11 +30,20 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     /**
      * Check if a delivery module is suitable for the given country.
      *
+     * With a postal code, a zone whose postal code rules refuse it is skipped: the module
+     * is suitable when another of its zones covering the country accepts the code. Without
+     * one, the rules are not read, as before they existed.
+     *
      * @throws PropelException
      */
-    public function findByCountryAndModule(Country $country, Module $module, ?State $state = null): ?AreaDeliveryModule
+    public function findByCountryAndModule(Country $country, Module $module, ?State $state = null, ?string $zipCode = null): ?AreaDeliveryModule
     {
         $response = null;
+
+        // A blank code is an unknown one: every zone takes it, no rule is read.
+        if (null !== $zipCode && '' === ZipCodePattern::normalize($zipCode)) {
+            $zipCode = null;
+        }
 
         $countryInAreaList = CountryAreaQuery::findByCountryAndState($country, $state);
 
@@ -42,6 +52,14 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
             $response = self::create()->filterByAreaId($countryInArea->getAreaId())
                 ->filterByModule($module)
                 ->findOne();
+
+            if (null !== $response && null !== $zipCode
+                && !AreaZipCodeRuleQuery::ruleSetFor((int) $countryInArea->getAreaId(), (int) $country->getId())->accepts($zipCode)
+            ) {
+                $response = null;
+
+                continue;
+            }
 
             if (null !== $response) {
                 break;

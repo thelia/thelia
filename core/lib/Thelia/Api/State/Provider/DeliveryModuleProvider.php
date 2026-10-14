@@ -61,6 +61,12 @@ readonly class DeliveryModuleProvider implements ProviderInterface
         $deliveryAddress = $request instanceof Request
             ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
             : null;
+        // A guest's cart address points to no customer address: its own copy carries the
+        // country and the postal code the carriers are judged on.
+        if (!$deliveryAddress instanceof Address && null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+            return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
+        }
+
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
             : CountryQuery::create()->filterByByDefault(1)->findOne();

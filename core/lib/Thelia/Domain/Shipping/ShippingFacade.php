@@ -65,13 +65,13 @@ final readonly class ShippingFacade
     ): PostageEstimateView {
         $country = $this->handleCountry($cart, $country);
 
-        [$address, $country, $state] = $this->resolveAddressContext($cart, $country, $state, $addressId);
+        [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
 
         if (null === $country) {
             return new PostageEstimateView(null, null, null);
         }
 
-        $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state);
+        $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state, $zipCode);
 
         $totalTtc = $estimate->getBestPostageAmount();
         $tax = $estimate->getBestPostageTax();
@@ -184,13 +184,14 @@ final readonly class ShippingFacade
         ?State $state = null,
         ?int $addressId = null,
     ): array {
-        [$address, $country, $state] = $this->resolveAddressContext($cart, $country, $state, $addressId);
+        [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
+        $country = $this->handleCountry($cart, $country);
 
         $modules = $this->getActiveDeliveryModules();
 
         $result = [];
         foreach ($modules as $module) {
-            $resource = $this->resourceBuilder->build($module, $cart, $address, $country, $state, true);
+            $resource = $this->resourceBuilder->build($module, $cart, $address, $country, $state, true, $zipCode);
             if (null !== $resource) {
                 $result[] = $resource;
             }
@@ -208,13 +209,13 @@ final readonly class ShippingFacade
         ?State $state = null,
         ?int $addressId = null,
     ): array {
-        [$address, $country, $state] = $this->resolveAddressContext($cart, $country, $state, $addressId);
+        [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
         $country = $this->handleCountry($cart, $country);
         $validModules = [];
         $modules = $this->getActiveDeliveryModules();
 
         foreach ($modules as $module) {
-            if (!$this->eligibilityChecker->isEligible($module, $cart, $country, $state)) {
+            if (!$this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
                 continue;
             }
             $resourceDeliveryModule = $this->deliveryModuleResourceBuilder->build(
@@ -223,7 +224,8 @@ final readonly class ShippingFacade
                 $address,
                 $country,
                 $state,
-                true
+                true,
+                $zipCode,
             );
             if (null === $resourceDeliveryModule) {
                 continue;
@@ -244,17 +246,51 @@ final readonly class ShippingFacade
     }
 
     /**
+     * The postal code of the cart's delivery address when it is the reason no carrier is
+     * offered: some active carrier serves the country, and the postal code rules of its
+     * zones refuse that code. Null otherwise, including when carriers are offered.
+     *
+     * A front office reads it to explain an empty list of carriers instead of only
+     * showing one.
+     */
+    public function postalCodeWithoutCarrier(Cart $cart): ?string
+    {
+        [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
+        $country = $this->handleCountry($cart, $country);
+
+        if (null === $zipCode || '' === trim($zipCode)) {
+            return null;
+        }
+
+        $servesTheCountry = false;
+
+        foreach ($this->getActiveDeliveryModules() as $module) {
+            if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
+                return null;
+            }
+
+            $servesTheCountry = $servesTheCountry || $this->eligibilityChecker->isEligible($module, $cart, $country, $state);
+        }
+
+        return $servesTheCountry ? $zipCode : null;
+    }
+
+    /**
      * Resolve the trio (Address?, Country?, State?) from arguments and/or the cart.
      *
      * Rules:
      * - If country is provided, use the provided (country, state) over address.
      * - Else, if addressId is provided, resolve through that customer address.
      * - Else, resolve through the cart's own copy of its delivery address.
-     * - Else, return (null, null, null).
+     * - Else, return (null, null, null, null).
+     *
+     * The postal code comes with the address it belongs to: none for an explicit country,
+     * the cart's own copy for the cart's address, so that a guest, whose cart address
+     * points to no customer address, is judged on the code typed.
      *
      * @param int|null $addressId id of a customer `address`
      *
-     * @return array{0: ?\Thelia\Model\Address, 1: ?Country, 2: ?State}
+     * @return array{0: ?\Thelia\Model\Address, 1: ?Country, 2: ?State, 3: ?string}
      */
     private function resolveAddressContext(
         Cart $cart,
@@ -263,21 +299,48 @@ final readonly class ShippingFacade
         ?int $addressId,
     ): array {
         if (null !== $country) {
-            // Explicit (country/state) context over address
-            $address = null;
+            // Explicit (country/state) context over address; the address still gives its
+            // postal code when it is in that country, as the API passes both.
+            if (null === $addressId) {
+                return [null, $country, $state, $this->cartZipCodeIn($cart, $country)];
+            }
 
-            return [$address, $country, $state];
+            $address = AddressQuery::create()->findPk($addressId);
+            $zipCode = null !== $address && $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
+
+            return [null, $country, $state, $zipCode];
         }
 
-        $address = null === $addressId
-            ? $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress()
-            : AddressQuery::create()->findPk($addressId);
+        if (null !== $addressId) {
+            $address = AddressQuery::create()->findPk($addressId);
+
+            return null === $address
+                ? [null, null, null, null]
+                : [$address, $address->getCountry(), $address->getState(), $address->getZipcode()];
+        }
+
+        $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $address = $cartAddress?->getAddress();
 
         if (null === $address) {
-            return [null, null, null];
+            // A guest: no customer address behind the cart's copy, whose country
+            // handleCountry() reads, and whose postal code goes with it.
+            return [null, null, $cartAddress?->getState(), $cartAddress?->getZipcode()];
         }
 
-        return [$address, $address->getCountry(), $address->getState()];
+        return [$address, $address->getCountry(), $address->getState(), $cartAddress->getZipcode()];
+    }
+
+    /**
+     * The postal code of the cart's delivery address when that address is in the given
+     * country, as the postage estimate reads it: a list and an estimate for one cart and
+     * one country never judge two different codes.
+     */
+    private function cartZipCodeIn(Cart $cart, Country $country): ?string
+    {
+        $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+        return null !== $cartAddress && $cartAddress->getCountryId() === $country->getId() ? $cartAddress->getZipcode() : null;
     }
 
     /**

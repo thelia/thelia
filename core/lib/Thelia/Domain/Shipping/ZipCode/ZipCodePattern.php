@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\Shipping\ZipCode;
+
+/**
+ * One postal code pattern of a delivery zone, in the syntax merchants already know from
+ * other shops: an exact code ("75001"), a pattern where * stands for any characters
+ * ("20*", "75*"), or a range of numeric codes ("75001...75020", bounds included). A
+ * range matches the codes of the length of its bounds only, so "01000...01999" takes
+ * "01500" and neither "1500" nor "001500".
+ *
+ * Codes are compared in their normal form: upper case, without spaces or hyphens, so
+ * "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001".
+ */
+final readonly class ZipCodePattern
+{
+    private const RANGE_SEPARATOR = '...';
+
+    /** The length of the `pattern` column of `area_zip_code_rule`. */
+    public const MAX_LENGTH = 50;
+
+    private function __construct(
+        private string $pattern,
+    ) {
+    }
+
+    /**
+     * @throws \InvalidArgumentException when the pattern can match nothing
+     */
+    public static function fromString(string $pattern): self
+    {
+        $normalized = self::normalizePattern($pattern);
+
+        if ('' === str_replace(['*', self::RANGE_SEPARATOR], '', $normalized)) {
+            throw new \InvalidArgumentException('A postal code pattern needs at least one character other than *.');
+        }
+
+        if (\strlen($normalized) > self::MAX_LENGTH) {
+            throw new \InvalidArgumentException('A postal code pattern is 50 characters long at most.');
+        }
+
+        if (str_contains($normalized, self::RANGE_SEPARATOR)) {
+            [$from, $to] = explode(self::RANGE_SEPARATOR, $normalized, 2);
+
+            if (!ctype_digit($from) || !ctype_digit($to) || \strlen($from) !== \strlen($to) || strcmp($from, $to) > 0) {
+                throw new \InvalidArgumentException('A postal code range goes from a number to a greater or equal number of the same length, as in 75001...75020.');
+            }
+        }
+
+        return new self($normalized);
+    }
+
+    public static function normalize(string $zipCode): string
+    {
+        return strtoupper((string) preg_replace('/[\s\-]+/u', '', $zipCode));
+    }
+
+    public function matches(string $zipCode): bool
+    {
+        $zipCode = self::normalize($zipCode);
+
+        if ('' === $zipCode) {
+            return false;
+        }
+
+        if (str_contains($this->pattern, self::RANGE_SEPARATOR)) {
+            [$from, $to] = explode(self::RANGE_SEPARATOR, $this->pattern, 2);
+
+            // Digits of one length compare as strings: no integer overflow, and the leading
+            // zeros count.
+            return ctype_digit($zipCode)
+                && \strlen($zipCode) === \strlen($from)
+                && strcmp($zipCode, $from) >= 0
+                && strcmp($zipCode, $to) <= 0;
+        }
+
+        if (str_contains($this->pattern, '*')) {
+            $expression = '/^'.str_replace('\\*', '.*', preg_quote($this->pattern, '/')).'$/';
+
+            return 1 === preg_match($expression, $zipCode);
+        }
+
+        return $this->pattern === $zipCode;
+    }
+
+    public function __toString(): string
+    {
+        return $this->pattern;
+    }
+
+    private static function normalizePattern(string $pattern): string
+    {
+        // The range separator survives the normal form, the hyphens and spaces do not.
+        $normalized = implode(self::RANGE_SEPARATOR, array_map(self::normalize(...), explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
+
+        // "**" means "*": one star per gap keeps the expression linear.
+        return (string) preg_replace('/\*+/', '*', $normalized);
+    }
+}
