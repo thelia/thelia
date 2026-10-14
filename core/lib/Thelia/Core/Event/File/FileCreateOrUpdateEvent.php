@@ -115,11 +115,13 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get parent name.
+     * Get parent name, an empty string when none was given.
+     *
+     * FileProcessorService::processFile() takes it from an empty instance of the parent model, so it is often null.
      */
     public function getParentName(): string
     {
-        return $this->parentName;
+        return $this->parentName ?? '';
     }
 
     /**
