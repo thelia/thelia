@@ -48,27 +48,54 @@ final class CommandExitCodeRecorderTest extends TestCase
     }
 
     /**
-     * The listeners of a compiled container are lazy: `[closure, method]`, resolved when the
-     * event is dispatched. The one that dies on the deleted container file stays unresolved,
-     * and anything that resolves it again (removing a listener does) dies again: the exit
-     * code the command returned is kept all the same.
+     * The listeners of a compiled container are lazy: `[closure, method]`, the closure loading
+     * the service from the container cache. Depending on the console, the listener is resolved
+     * when console.terminate is dispatched, after the command cleared the cache (the closure
+     * dies), or before the command runs, as symfony/console 7.4.21 does when pcntl is loaded
+     * (the listener then dies on a service it loads when it is called). Either way it dies
+     * after the command returned, and anything that resolves it again (removing a listener
+     * does) dies again: the exit code the command returned is kept all the same.
      */
     public function testTheExitCodeIsKeptWhenALazyTerminateListenerDiesOnTheClearedCache(): void
     {
         foreach ([Command::FAILURE, Command::SUCCESS] as $returned) {
+            $cacheCleared = false;
+            $loadFromCache = static function (string $file) use (&$cacheCleared): void {
+                if ($cacheCleared) {
+                    throw new \Error(\sprintf('Failed opening required \'var/cache/dev/ContainerAbc/%s\'', $file));
+                }
+            };
             $dispatcher = new EventDispatcher();
-            $dispatcher->addListener(ConsoleEvents::TERMINATE, [static function (): never {
-                throw new \Error('Failed opening required \'var/cache/dev/ContainerAbc/getSomeListenerService.php\'');
+            $dispatcher->addListener(ConsoleEvents::TERMINATE, [static function () use ($loadFromCache): object {
+                $loadFromCache('getSomeListenerService.php');
+
+                return new class($loadFromCache) {
+                    public function __construct(private readonly \Closure $loadFromCache)
+                    {
+                    }
+
+                    public function onConsoleTerminate(): void
+                    {
+                        ($this->loadFromCache)('getSomeDependencyService.php');
+                    }
+                };
             }, 'onConsoleTerminate']);
 
-            self::assertSame($returned, $this->runCommand(static fn (): int => $returned, $dispatcher));
+            $command = static function () use (&$cacheCleared, $returned): int {
+                $cacheCleared = true;
+
+                return $returned;
+            };
+
+            self::assertSame($returned, $this->runCommand($command, $dispatcher));
         }
     }
 
     /**
      * The traceable dispatcher of a debug kernel resolves every listener before calling the
-     * first: the lazy listener dies before the exit code is recorded, and a command whose
-     * result cannot be read is a failure. The installers boot their kernels without debug.
+     * first: a lazy listener that dies when it is resolved dies before the exit code is
+     * recorded (before the command runs, with symfony/console 7.4.21 and pcntl), and a
+     * command whose result cannot be read is a failure. The installers boot their kernels without debug.
      */
     public function testATraceableDispatcherThatDiesBeforeTheRecorderReadsAFailure(): void
     {
