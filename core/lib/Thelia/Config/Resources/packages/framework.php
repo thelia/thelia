@@ -17,6 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Domain\Webhook\Message\DeliverWebhook;
 use Thelia\Messenger\Middleware\ReplayedJobMiddleware;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
 
@@ -281,6 +282,7 @@ return static function (ContainerConfigurator $container): void {
                 // tells how it went while the page is free.
                 RunExportJob::class => 'async_heavy',
                 RunImportJob::class => 'async_heavy',
+                DeliverWebhook::class => 'async',
             ],
         ],
     ], prepend: true);
