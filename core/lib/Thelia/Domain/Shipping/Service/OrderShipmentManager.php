@@ -74,7 +74,7 @@ final readonly class OrderShipmentManager
         $connection->beginTransaction();
 
         try {
-            $this->lockOrder($order, $connection);
+            $this->assertOrderShips($order, $this->lockOrder($order, $connection));
             $this->assertWithinRemaining($order, $wanted, $connection);
 
             $moduleId = $deliveryModuleId ?? $order->getDeliveryModuleId();
@@ -128,7 +128,7 @@ final readonly class OrderShipmentManager
         $connection->beginTransaction();
 
         try {
-            $this->lockOrder($order, $connection);
+            $orderStatusId = $this->lockOrder($order, $connection);
 
             // Reloaded under the lock: the draft may have been shipped or cancelled by
             // the request that held the lock before this one.
@@ -137,6 +137,9 @@ final readonly class OrderShipmentManager
             if (!$shipment->isDraft()) {
                 throw new ShipmentNotAllowedException(\sprintf('Shipment %s already left or was cancelled.', $shipment->getRef()));
             }
+
+            // A draft opened before the order was cancelled or refunded stays a draft.
+            $this->assertOrderShips($order, $orderStatusId);
 
             if (null !== $deliveryRef) {
                 $shipment->setDeliveryRef(self::cleanRef($deliveryRef));
@@ -334,12 +337,33 @@ final readonly class OrderShipmentManager
     /**
      * The order row is the lock every shipment gesture takes: a gesture holding it
      * is the only one reading and writing what is left to ship.
+     *
+     * @return int|null the status of the order as the lock reads it
      */
-    private function lockOrder(Order $order, ConnectionInterface $connection): void
+    private function lockOrder(Order $order, ConnectionInterface $connection): ?int
     {
-        $statement = $connection->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE');
+        $statement = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :id FOR UPDATE');
         $statement->bindValue(':id', (int) $order->getId(), \PDO::PARAM_INT);
         $statement->execute();
+
+        $statusId = $statement->fetchColumn();
+
+        return false === $statusId || null === $statusId ? null : (int) $statusId;
+    }
+
+    /**
+     * Nothing of a cancelled or refunded order leaves: a parcel shipped on it would
+     * move it back to a paid-equivalent status.
+     *
+     * @throws ShipmentNotAllowedException
+     */
+    private function assertOrderShips(Order $order, ?int $statusId): void
+    {
+        $code = null === $statusId ? null : $this->statusCatalog->get($statusId)?->getEffectiveCode();
+
+        if (\in_array($code, [OrderStatus::CODE_CANCELED, OrderStatus::CODE_REFUNDED], true)) {
+            throw new ShipmentNotAllowedException(\sprintf('Order %s is %s: nothing of it ships.', $order->getRef(), $code));
+        }
     }
 
     /**

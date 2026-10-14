@@ -166,6 +166,39 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
         self::assertSame([(int) $first->getId() => 0.0, (int) $second->getId() => 0.0], $this->quantities->remainingByOrderProduct($order), 'The draft still holds its line against what is left to ship.');
     }
 
+    public function testNoParcelOfACancelledOrderIsOpened(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_CANCELED]);
+        $line = $this->factory->orderProduct($order, ['quantity' => 2.0]);
+
+        try {
+            $this->manager->open($order, [new ShipmentLine((int) $line->getId(), 1.0)]);
+            self::fail('A parcel was opened on a cancelled order.');
+        } catch (ShipmentNotAllowedException) {
+        }
+
+        self::assertSame(0, OrderShipmentQuery::create()->filterByOrderId($order->getId())->count());
+        self::assertSame(OrderStatus::CODE_CANCELED, $this->statusCodeOf($order));
+    }
+
+    public function testADraftOpenedBeforeTheOrderWasRefundedDoesNotLeave(): void
+    {
+        [$order, $first] = $this->paidOrderOfTwoLines(2.0, 1.0);
+
+        $draft = $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 2.0)]);
+
+        $order->setStatusId((int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_REFUNDED)?->getId())->save();
+
+        try {
+            $this->manager->ship($draft);
+            self::fail('A draft of a refunded order left.');
+        } catch (ShipmentNotAllowedException) {
+        }
+
+        self::assertTrue($this->reloadedShipment($draft)->isDraft());
+        self::assertSame(OrderStatus::CODE_REFUNDED, $this->statusCodeOf($order));
+    }
+
     public function testAnOrderMarkedSentByHandGetsOneShipmentCarryingEverythingLeft(): void
     {
         [$order, $first, $second] = $this->paidOrderOfTwoLines(3.0, 2.0);
@@ -255,6 +288,13 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
         $order->reload();
 
         return $order;
+    }
+
+    private function reloadedShipment(OrderShipment $shipment): OrderShipment
+    {
+        $shipment->reload();
+
+        return $shipment;
     }
 
     /**
