@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Service\API\ResourceCache;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -255,6 +256,8 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
         $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
         $subscribed[ConfigEvent::POST_DELETE] = ['onWholeShopChange', -255];
+        $subscribed[ChoiceFilterEvent::POST_SAVE] = ['onChoiceFilterChange', -255];
+        $subscribed[ChoiceFilterEvent::POST_DELETE] = ['onChoiceFilterChange', -255];
         $subscribed[ResourcePersistedEvent::class] = ['onResourceChange', -255];
 
         return $subscribed;
@@ -273,6 +276,18 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     {
         $this->clearTheResourceCache();
         $this->queue->add([SharedCacheKey::ALL]);
+    }
+
+    /**
+     * The filters a category or a template offers are written straight to the table by the
+     * back office, with no catalogue event: the pages that read them carry the `tfilters` key.
+     */
+    public function onChoiceFilterChange(ChoiceFilterEvent $event): void
+    {
+        $categoryId = $event->getModel()->getCategoryId();
+
+        $this->clearTheResourceCache();
+        $this->queue->add(null === $categoryId ? ['tfilters'] : ['tfilters', SharedCacheKey::item('categories', $categoryId)]);
     }
 
     public function onResourceChange(ResourcePersistedEvent $event): void
