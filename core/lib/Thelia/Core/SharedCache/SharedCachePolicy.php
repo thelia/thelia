@@ -65,7 +65,8 @@ final readonly class SharedCachePolicy
 
     /**
      * @param string[] $neverSharedPrefixes the first segments of the addresses that are never
-     *                                      shared, the parameter `thelia.shared_cache.never_shared_prefixes`
+     *                                      shared, the parameter `thelia.shared_cache.never_shared_prefixes`,
+     *                                      read without their slashes and case
      */
     public function __construct(
         private PricingActivityChecker $pricingActivityChecker,
@@ -130,6 +131,12 @@ final readonly class SharedCachePolicy
         $segment = strtolower(explode('/', ltrim($path, '/'), 2)[0]);
 
         foreach ($this->neverSharedPrefixes as $prefix) {
+            $prefix = strtolower(trim($prefix, '/'));
+
+            if ('' === $prefix) {
+                continue;
+            }
+
             if ($segment === $prefix || str_starts_with($segment, $prefix.'-') || str_starts_with($segment, $prefix.'_')) {
                 return true;
             }

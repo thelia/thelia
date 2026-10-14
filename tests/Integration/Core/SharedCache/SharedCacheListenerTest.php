@@ -276,6 +276,28 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertTrue($shared->headers->hasCacheControlDirective('public'), 'The same address is shared with the list of the core.');
     }
 
+    #[DataProvider('neverSharedPrefixesWrittenLikeAPath')]
+    public function testAnAddressAProjectKeepsPersonalIsNeverSharedWhateverHowItIsWritten(string $prefix): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $before = $this->snapshot($response);
+
+        $this->handle($this->request('/wishlist/mine', 'product'), $response, neverSharedPrefixes: [...SharedCachePolicy::SENSITIVE_PREFIXES, $prefix]);
+
+        self::assertSame($before, $this->snapshot($response), \sprintf('The project listed "%s" as never shared, yet /wishlist/mine is shared.', $prefix));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function neverSharedPrefixesWrittenLikeAPath(): iterable
+    {
+        yield 'leading slash, like readable_prefixes' => ['/wishlist'];
+        yield 'leading and trailing slash' => ['/wishlist/'];
+        yield 'capitals' => ['Wishlist'];
+    }
+
     public function testTheAddressesThatAreNeverSharedAreAParameterAProjectOverrides(): void
     {
         $container = static::getContainer();
