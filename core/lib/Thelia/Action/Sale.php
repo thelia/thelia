@@ -115,7 +115,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * The selection can be narrowed by a module listening to TheliaEvents::SALE_PRODUCTS_QUERY. The promo status
      * is still reset on every product of the sale, so a product a listener excludes does not keep a promo status
-     * written when it was selected.
+     * written when it was selected, unless the listener asks to keep the promo status of the products it excludes
+     * (SaleProductsQueryEvent::keepExcludedProductsPromoStatus()): only the selected products are reset then.
      *
      * @throws \RuntimeException
      * @throws \Exception
@@ -149,14 +150,23 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $selectionQuery = SaleProductQuery::create()->filterBySale($sale)->orderByProductId();
 
         // Everything the sale selects, whatever a module keeps out of it below: the promo status of these
-        // products is reset, the excluded ones included.
+        // products is reset, the excluded ones included, unless the module keeps it.
         $selectedProductIds = SaleProductQuery::create()
             ->filterBySale($sale)
             ->select('ProductId')
             ->distinct()
             ->find();
 
-        $dispatcher?->dispatch(new SaleProductsQueryEvent($sale, $selectionQuery), TheliaEvents::SALE_PRODUCTS_QUERY);
+        $productsQueryEvent = new SaleProductsQueryEvent($sale, $selectionQuery);
+        $dispatcher?->dispatch($productsQueryEvent, TheliaEvents::SALE_PRODUCTS_QUERY);
+
+        if ($productsQueryEvent->isExcludedProductsPromoStatusKept()) {
+            $selectedProductIds = (clone $selectionQuery)
+                ->clearOrderByColumns()
+                ->select('ProductId')
+                ->distinct()
+                ->find();
+        }
 
         // Get all selected product sale elements for this sale
         if (null === $saleProducts = $selectionQuery->find()) {
