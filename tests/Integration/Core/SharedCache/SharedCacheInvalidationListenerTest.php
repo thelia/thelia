@@ -24,13 +24,19 @@ use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ToggleVisibilityEvent;
+use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\File\FileModelInterface;
 use Thelia\Core\SharedCache\NullSharedCachePurger;
 use Thelia\Core\SharedCache\SharedCacheInvalidationListener;
 use Thelia\Core\SharedCache\SharedCacheInvalidator;
@@ -40,16 +46,29 @@ use Thelia\Core\SharedCache\SharedCachePurgeQueue;
 use Thelia\Core\SharedCache\SharedCachePurgerInterface;
 use Thelia\Model\Area;
 use Thelia\Model\Brand;
+use Thelia\Model\BrandDocument;
+use Thelia\Model\BrandImage;
 use Thelia\Model\Cart;
+use Thelia\Model\CategoryDocument;
+use Thelia\Model\CategoryImage;
 use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
+use Thelia\Model\ContentDocument;
+use Thelia\Model\ContentImage;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
 use Thelia\Model\Folder;
+use Thelia\Model\FolderDocument;
+use Thelia\Model\FolderImage;
 use Thelia\Model\MetaData;
 use Thelia\Model\Product;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductImage;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductVideo;
 use Thelia\Model\RewritingUrl;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Unit\Core\SharedCache\RecordingSharedCachePurger;
@@ -336,23 +355,12 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         yield 'tax' => [TheliaEvents::TAX_UPDATE];
         yield 'currency rates' => [TheliaEvents::CURRENCY_UPDATE_RATES];
         yield 'default currency' => [TheliaEvents::CURRENCY_SET_DEFAULT];
-        yield 'product video' => [TheliaEvents::PRODUCT_VIDEO_UPDATE];
         yield 'template feature' => [TheliaEvents::TEMPLATE_ADD_FEATURE];
         yield 'configuration' => [TheliaEvents::CONFIG_SETVALUE];
         yield 'language' => [TheliaEvents::LANG_TOGGLEACTIVE];
         yield 'import' => [TheliaEvents::IMPORT_SUCCESS];
         yield 'module activation' => [TheliaEvents::MODULE_TOGGLE_ACTIVATION];
         yield 'translation file written' => [TheliaEvents::TRANSLATION_WRITE_FILE];
-        yield 'image saved' => [TheliaEvents::IMAGE_SAVE];
-        yield 'image updated' => [TheliaEvents::IMAGE_UPDATE];
-        yield 'image position' => [TheliaEvents::IMAGE_UPDATE_POSITION];
-        yield 'image visibility' => [TheliaEvents::IMAGE_TOGGLE_VISIBILITY];
-        yield 'image deleted' => [TheliaEvents::IMAGE_DELETE];
-        yield 'document saved' => [TheliaEvents::DOCUMENT_SAVE];
-        yield 'document updated' => [TheliaEvents::DOCUMENT_UPDATE];
-        yield 'document position' => [TheliaEvents::DOCUMENT_UPDATE_POSITION];
-        yield 'document visibility' => [TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY];
-        yield 'document deleted' => [TheliaEvents::DOCUMENT_DELETE];
         yield 'country created' => [TheliaEvents::COUNTRY_CREATE];
         yield 'country updated' => [TheliaEvents::COUNTRY_UPDATE];
         yield 'country deleted' => [TheliaEvents::COUNTRY_DELETE];
@@ -457,5 +465,125 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
     public function testTheListenerHearsTheWritesOfTheApi(): void
     {
         self::assertArrayHasKey(ResourcePersistedEvent::class, SharedCacheInvalidationListener::getSubscribedEvents());
+    }
+
+    /**
+     * @param \Closure(): object $event
+     */
+    #[DataProvider('mediumActions')]
+    public function testAMediumActionPurgesTheObjectTheMediumBelongsTo(\Closure $event, string $eventName, string $family): void
+    {
+        $this->listener->onMediumChange($event());
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange($family, 42)], $this->purger->calls, $eventName);
+    }
+
+    /**
+     * @return iterable<string, array{\Closure(): object, string, string}>
+     */
+    public static function mediumActions(): iterable
+    {
+        yield 'image of a product saved' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new ProductImage())->setProductId(42)), TheliaEvents::IMAGE_SAVE, 'product'];
+        yield 'image of a category updated' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new CategoryImage())->setCategoryId(42)), TheliaEvents::IMAGE_UPDATE, 'category'];
+        yield 'image of a content deleted' => [static fn (): object => new FileDeleteEvent((new ContentImage())->setContentId(42)), TheliaEvents::IMAGE_DELETE, 'content'];
+        yield 'image of a folder saved' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new FolderImage())->setFolderId(42)), TheliaEvents::IMAGE_SAVE, 'folder'];
+        yield 'image of a brand saved' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new BrandImage())->setBrandId(42)), TheliaEvents::IMAGE_SAVE, 'brand'];
+        yield 'document of a product deleted' => [static fn (): object => new FileDeleteEvent((new ProductDocument())->setProductId(42)), TheliaEvents::DOCUMENT_DELETE, 'product'];
+        yield 'document of a category saved' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new CategoryDocument())->setCategoryId(42)), TheliaEvents::DOCUMENT_SAVE, 'category'];
+        yield 'document of a content updated' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new ContentDocument())->setContentId(42)), TheliaEvents::DOCUMENT_UPDATE, 'content'];
+        yield 'document of a folder deleted' => [static fn (): object => new FileDeleteEvent((new FolderDocument())->setFolderId(42)), TheliaEvents::DOCUMENT_DELETE, 'folder'];
+        yield 'document of a brand updated' => [static fn (): object => (new FileCreateOrUpdateEvent(42))->setModel((new BrandDocument())->setBrandId(42)), TheliaEvents::DOCUMENT_UPDATE, 'brand'];
+        yield 'video of a product deleted' => [static fn (): object => new FileDeleteEvent((new ProductVideo())->setProductId(42)), TheliaEvents::PRODUCT_VIDEO_DELETE, 'product'];
+    }
+
+    public function testAMediumMovedOrHiddenIsFoundByItsId(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $document = (new ProductDocument())->setProductId((int) $product->getId())->setFile('shared-cache-probe.pdf');
+        $document->save($this->getPropelConnection());
+
+        $this->listener->onMediumChange(new UpdateFilePositionEvent(ProductDocumentQuery::create(), (int) $document->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1));
+        $this->listener->onMediumChange(new FileToggleVisibilityEvent(ProductDocumentQuery::create(), (int) $document->getId()));
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $this->purger->calls);
+    }
+
+    /**
+     * The medium of a module is never asked for its parent: HeaderHighlights answers with
+     * the medium itself, which breaks the return type of the interface.
+     */
+    public function testAMediumOfAModuleStillPurgesTheWholeShop(): void
+    {
+        $medium = $this->createMock(FileModelInterface::class);
+        $medium->method('getParentFileModel')->willThrowException(new \TypeError('Return value must be of type FileModelParentInterface'));
+        $medium->method('getParentId')->willReturn(42);
+
+        $this->listener->onMediumChange((new FileCreateOrUpdateEvent(42))->setModel($medium));
+        $this->listener->onMediumChange(new FileCreateOrUpdateEvent(42));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
+    #[DataProvider('mediumEventNames')]
+    public function testEveryMediumActionIsSubscribedAsAMediumChange(string $eventName): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        self::assertArrayHasKey($eventName, $subscribed);
+        self::assertSame('onMediumChange', $subscribed[$eventName][0]);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function mediumEventNames(): iterable
+    {
+        foreach ([
+            TheliaEvents::IMAGE_SAVE, TheliaEvents::IMAGE_UPDATE, TheliaEvents::IMAGE_UPDATE_POSITION, TheliaEvents::IMAGE_TOGGLE_VISIBILITY, TheliaEvents::IMAGE_DELETE,
+            TheliaEvents::DOCUMENT_SAVE, TheliaEvents::DOCUMENT_UPDATE, TheliaEvents::DOCUMENT_UPDATE_POSITION, TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY, TheliaEvents::DOCUMENT_DELETE,
+            TheliaEvents::PRODUCT_VIDEO_CREATE, TheliaEvents::PRODUCT_VIDEO_UPDATE, TheliaEvents::PRODUCT_VIDEO_DELETE, TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION, TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY,
+        ] as $eventName) {
+            yield $eventName => [$eventName];
+        }
+    }
+
+    public function testTheDeletionOfACombinationPurgesItsProductOnly(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $factory = $this->createFixtureFactory();
+        $currency = $factory->currency();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $currency);
+        $combination = $factory->productSaleElement($product);
+        $this->flushTheContainerListener($purger);
+
+        static::getContainer()->get('event_dispatcher')->dispatch(
+            new ProductSaleElementDeleteEvent((int) $combination->getId(), (int) $currency->getId()),
+            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,
+        );
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertNull(ProductSaleElementsQuery::create()->findPk($combination->getId()));
+        self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $purger->calls);
+    }
+
+    private function recordThroughTheContainer(): RecordingSharedCachePurger
+    {
+        $purger = new RecordingSharedCachePurger();
+        static::getContainer()->set(SharedCachePurgerInterface::class, $purger);
+
+        return $purger;
+    }
+
+    /**
+     * Sends what the fixtures purged, so the test only sees what its own write purges.
+     */
+    private function flushTheContainerListener(RecordingSharedCachePurger $purger): void
+    {
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+        $purger->calls = [];
     }
 }

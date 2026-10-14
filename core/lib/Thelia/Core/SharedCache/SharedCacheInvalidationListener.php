@@ -18,10 +18,25 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Model\BrandDocument;
+use Thelia\Model\BrandImage;
+use Thelia\Model\CategoryDocument;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ContentDocument;
+use Thelia\Model\ContentImage;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
+use Thelia\Model\FolderDocument;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductImage;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductVideo;
 
 final class SharedCacheInvalidationListener implements EventSubscriberInterface
 {
@@ -128,11 +143,6 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION,
         TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION,
         TheliaEvents::PRODUCT_UPDATE_ASSOCIATION_POSITION,
-        TheliaEvents::PRODUCT_VIDEO_CREATE,
-        TheliaEvents::PRODUCT_VIDEO_UPDATE,
-        TheliaEvents::PRODUCT_VIDEO_DELETE,
-        TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION,
-        TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY,
         TheliaEvents::TAX_CREATE,
         TheliaEvents::TAX_UPDATE,
         TheliaEvents::TAX_DELETE,
@@ -186,16 +196,6 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::META_DATA_DELETE,
         TheliaEvents::IMPORT_SUCCESS,
         TheliaEvents::TRANSLATION_WRITE_FILE,
-        TheliaEvents::IMAGE_SAVE,
-        TheliaEvents::IMAGE_UPDATE,
-        TheliaEvents::IMAGE_UPDATE_POSITION,
-        TheliaEvents::IMAGE_TOGGLE_VISIBILITY,
-        TheliaEvents::IMAGE_DELETE,
-        TheliaEvents::DOCUMENT_SAVE,
-        TheliaEvents::DOCUMENT_UPDATE,
-        TheliaEvents::DOCUMENT_UPDATE_POSITION,
-        TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY,
-        TheliaEvents::DOCUMENT_DELETE,
         TheliaEvents::COUNTRY_CREATE,
         TheliaEvents::COUNTRY_UPDATE,
         TheliaEvents::COUNTRY_DELETE,
@@ -222,6 +222,54 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES,
     ];
 
+    /**
+     * The actions on an image, a document or a video: the page of the object the medium
+     * belongs to is purged, the whole shop only when that object is not one of the five
+     * families (the medium of a module).
+     */
+    private const MEDIA = [
+        TheliaEvents::IMAGE_SAVE,
+        TheliaEvents::IMAGE_UPDATE,
+        TheliaEvents::IMAGE_UPDATE_POSITION,
+        TheliaEvents::IMAGE_TOGGLE_VISIBILITY,
+        TheliaEvents::IMAGE_DELETE,
+        TheliaEvents::DOCUMENT_SAVE,
+        TheliaEvents::DOCUMENT_UPDATE,
+        TheliaEvents::DOCUMENT_UPDATE_POSITION,
+        TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY,
+        TheliaEvents::DOCUMENT_DELETE,
+        TheliaEvents::PRODUCT_VIDEO_CREATE,
+        TheliaEvents::PRODUCT_VIDEO_UPDATE,
+        TheliaEvents::PRODUCT_VIDEO_DELETE,
+        TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION,
+        TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY,
+    ];
+
+    /**
+     * Above the core action (128): the combination is still there to name its product.
+     */
+    private const BEFORE_THE_ACTION = [
+        TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => 255,
+    ];
+
+    /**
+     * The media of the core, by the family of the object they belong to. The medium of a
+     * module is not asked for its parent: nothing says the module answers it.
+     */
+    private const MEDIUM_FAMILIES = [
+        ProductImage::class => self::PRODUCT,
+        ProductDocument::class => self::PRODUCT,
+        ProductVideo::class => self::PRODUCT,
+        CategoryImage::class => self::CATEGORY,
+        CategoryDocument::class => self::CATEGORY,
+        ContentImage::class => self::CONTENT,
+        ContentDocument::class => self::CONTENT,
+        FolderImage::class => self::FOLDER,
+        FolderDocument::class => self::FOLDER,
+        BrandImage::class => self::BRAND,
+        BrandDocument::class => self::BRAND,
+    ];
+
     private const MODEL_FAMILIES = [
         'Product' => self::PRODUCT,
         'Category' => self::CATEGORY,
@@ -246,11 +294,15 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         ];
 
         foreach (array_keys(self::FAMILIES) as $eventName) {
-            $subscribed[$eventName] = ['onCatalogueChange', -255];
+            $subscribed[$eventName] = ['onCatalogueChange', self::BEFORE_THE_ACTION[$eventName] ?? -255];
         }
 
         foreach (self::WHOLE_SHOP as $eventName) {
             $subscribed[$eventName] = ['onWholeShopChange', -255];
+        }
+
+        foreach (self::MEDIA as $eventName) {
+            $subscribed[$eventName] = ['onMediumChange', -255];
         }
 
         $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
@@ -273,6 +325,18 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     public function onWholeShopChange(): void
     {
         $this->invalidator->purge([SharedCacheKey::ALL]);
+    }
+
+    public function onMediumChange(object $event): void
+    {
+        $medium = match (true) {
+            $event instanceof FileCreateOrUpdateEvent => $event->getModel(),
+            $event instanceof FileDeleteEvent => $event->getFileToDelete(),
+            $event instanceof UpdateFilePositionEvent, $event instanceof FileToggleVisibilityEvent => $event->getQuery()?->findPk($event->getObjectId()),
+            default => null,
+        };
+
+        $this->purgeTheParentOf($medium);
     }
 
     /**
@@ -308,6 +372,19 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     private function purge(?string $family, ?int $id): void
     {
         $this->invalidator->purge(null === $family || null === $id ? [SharedCacheKey::ALL] : SharedCacheKey::forChange($family, $id));
+    }
+
+    private function purgeTheParentOf(mixed $medium): void
+    {
+        foreach (self::MEDIUM_FAMILIES as $class => $family) {
+            if ($medium instanceof $class) {
+                $this->purge($family, (int) $medium->getParentId());
+
+                return;
+            }
+        }
+
+        $this->purge(null, null);
     }
 
     private function idOf(object $event, string $family): ?int
