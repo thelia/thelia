@@ -44,6 +44,7 @@ use Thelia\Core\SharedCache\SharedCacheKey;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePurgeQueue;
 use Thelia\Core\SharedCache\SharedCachePurgerInterface;
+use Thelia\Domain\Media\ProductMediaOrder;
 use Thelia\Model\Area;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandDocument;
@@ -67,6 +68,7 @@ use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductVideo;
 use Thelia\Model\RewritingUrl;
@@ -359,6 +361,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         yield 'configuration' => [TheliaEvents::CONFIG_SETVALUE];
         yield 'language' => [TheliaEvents::LANG_TOGGLEACTIVE];
         yield 'import' => [TheliaEvents::IMPORT_SUCCESS];
+        yield 'import begun, even if it never succeeds' => [TheliaEvents::IMPORT_BEGIN];
         yield 'module activation' => [TheliaEvents::MODULE_TOGGLE_ACTIVATION];
         yield 'translation file written' => [TheliaEvents::TRANSLATION_WRITE_FILE];
         yield 'country created' => [TheliaEvents::COUNTRY_CREATE];
@@ -568,6 +571,76 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
 
         self::assertNull(ProductSaleElementsQuery::create()->findPk($combination->getId()));
         self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $purger->calls);
+    }
+
+    public function testMovingACategoryInTheTreePurgesThatCategory(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $newParent = $factory->category();
+        $this->flushTheContainerListener($purger);
+
+        $category->setParent((int) $newParent->getId())->save($this->getPropelConnection());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('category', (int) $category->getId())], $purger->calls);
+    }
+
+    public function testAttachingAnImageToACombinationPurgesItsProduct(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $combination = $factory->productSaleElement($product);
+        $image = (new ProductImage())->setProductId((int) $product->getId())->setFile('shared-cache-probe.png');
+        $image->save($this->getPropelConnection());
+        $this->flushTheContainerListener($purger);
+
+        $association = (new ProductSaleElementsProductImage())
+            ->setProductSaleElementsId((int) $combination->getId())
+            ->setProductImageId((int) $image->getId());
+        $association->save($this->getPropelConnection());
+        $association->delete($this->getPropelConnection());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $purger->calls);
+    }
+
+    public function testReorderingTheMediaOfAProductPurgesThatProduct(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $first = (new ProductImage())->setProductId((int) $product->getId())->setFile('shared-cache-probe-1.png');
+        $first->save($this->getPropelConnection());
+        $second = (new ProductImage())->setProductId((int) $product->getId())->setFile('shared-cache-probe-2.png');
+        $second->save($this->getPropelConnection());
+        $this->flushTheContainerListener($purger);
+
+        (new ProductMediaOrder())->reorder((int) $product->getId(), [
+            ['type' => ProductMediaOrder::TYPE_IMAGE, 'id' => (int) $second->getId()],
+            ['type' => ProductMediaOrder::TYPE_IMAGE, 'id' => (int) $first->getId()],
+        ]);
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $product->getId())], $purger->calls);
+    }
+
+    public function testTheQuickEditOfTheTitleOfADocumentPurgesItsObject(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $factory = $this->createFixtureFactory();
+        $folder = $factory->folder();
+        $document = (new FolderDocument())->setFolderId((int) $folder->getId())->setFile('shared-cache-probe.pdf');
+        $document->save($this->getPropelConnection());
+        $this->flushTheContainerListener($purger);
+
+        $document->setLocale('en_US')->setTitle('Renamed');
+        $document->save($this->getPropelConnection());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('folder', (int) $folder->getId())], $purger->calls);
     }
 
     private function recordThroughTheContainer(): RecordingSharedCachePurger

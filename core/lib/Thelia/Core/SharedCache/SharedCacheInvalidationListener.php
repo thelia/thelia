@@ -25,16 +25,35 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Model\BrandDocument;
 use Thelia\Model\BrandImage;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
+use Thelia\Model\Event\BrandDocumentEvent;
+use Thelia\Model\Event\BrandImageEvent;
+use Thelia\Model\Event\CategoryDocumentEvent;
+use Thelia\Model\Event\CategoryEvent;
+use Thelia\Model\Event\CategoryImageEvent;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
+use Thelia\Model\Event\ContentDocumentEvent;
+use Thelia\Model\Event\ContentImageEvent;
+use Thelia\Model\Event\FolderDocumentEvent;
+use Thelia\Model\Event\FolderImageEvent;
+use Thelia\Model\Event\ProductDocumentEvent;
+use Thelia\Model\Event\ProductImageEvent;
+use Thelia\Model\Event\ProductSaleElementsProductDocumentEvent;
+use Thelia\Model\Event\ProductSaleElementsProductImageEvent;
+use Thelia\Model\Event\ProductSaleElementsProductVideoEvent;
+use Thelia\Model\Event\ProductVideoEvent;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductSaleElementsProductDocument;
+use Thelia\Model\ProductSaleElementsProductImage;
+use Thelia\Model\ProductSaleElementsProductVideo;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductVideo;
 
@@ -194,6 +213,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::META_DATA_CREATE,
         TheliaEvents::META_DATA_UPDATE,
         TheliaEvents::META_DATA_DELETE,
+        TheliaEvents::IMPORT_BEGIN,
         TheliaEvents::IMPORT_SUCCESS,
         TheliaEvents::TRANSLATION_WRITE_FILE,
         TheliaEvents::COUNTRY_CREATE,
@@ -243,6 +263,44 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::PRODUCT_VIDEO_DELETE,
         TheliaEvents::PRODUCT_VIDEO_UPDATE_POSITION,
         TheliaEvents::PRODUCT_VIDEO_TOGGLE_VISIBILITY,
+    ];
+
+    /**
+     * Writes the back office makes straight to a table, with no catalogue event: the move of
+     * a category in the tree, the reorder of the media of a product, the quick edit of the
+     * title of a medium and the association of a medium with a combination. Propel still
+     * dispatches them.
+     */
+    private const WRITES = [
+        CategoryEvent::POST_UPDATE,
+        ProductImageEvent::POST_SAVE,
+        ProductImageEvent::POST_DELETE,
+        ProductDocumentEvent::POST_SAVE,
+        ProductDocumentEvent::POST_DELETE,
+        ProductVideoEvent::POST_SAVE,
+        ProductVideoEvent::POST_DELETE,
+        CategoryImageEvent::POST_SAVE,
+        CategoryImageEvent::POST_DELETE,
+        CategoryDocumentEvent::POST_SAVE,
+        CategoryDocumentEvent::POST_DELETE,
+        ContentImageEvent::POST_SAVE,
+        ContentImageEvent::POST_DELETE,
+        ContentDocumentEvent::POST_SAVE,
+        ContentDocumentEvent::POST_DELETE,
+        FolderImageEvent::POST_SAVE,
+        FolderImageEvent::POST_DELETE,
+        FolderDocumentEvent::POST_SAVE,
+        FolderDocumentEvent::POST_DELETE,
+        BrandImageEvent::POST_SAVE,
+        BrandImageEvent::POST_DELETE,
+        BrandDocumentEvent::POST_SAVE,
+        BrandDocumentEvent::POST_DELETE,
+        ProductSaleElementsProductImageEvent::POST_SAVE,
+        ProductSaleElementsProductImageEvent::POST_DELETE,
+        ProductSaleElementsProductDocumentEvent::POST_SAVE,
+        ProductSaleElementsProductDocumentEvent::POST_DELETE,
+        ProductSaleElementsProductVideoEvent::POST_SAVE,
+        ProductSaleElementsProductVideoEvent::POST_DELETE,
     ];
 
     /**
@@ -305,6 +363,10 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             $subscribed[$eventName] = ['onMediumChange', -255];
         }
 
+        foreach (self::WRITES as $eventName) {
+            $subscribed[$eventName] = ['onWrite', -255];
+        }
+
         $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
         $subscribed[ConfigEvent::POST_DELETE] = ['onWholeShopChange', -255];
         $subscribed[ChoiceFilterEvent::POST_SAVE] = ['onChoiceFilterChange', -255];
@@ -337,6 +399,19 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         };
 
         $this->purgeTheParentOf($medium);
+    }
+
+    public function onWrite(object $event): void
+    {
+        $model = method_exists($event, 'getModel') ? $event->getModel() : null;
+
+        match (true) {
+            $model instanceof Category => $this->purge(self::CATEGORY, null === $model->getId() ? null : (int) $model->getId()),
+            $model instanceof ProductSaleElementsProductImage,
+            $model instanceof ProductSaleElementsProductDocument,
+            $model instanceof ProductSaleElementsProductVideo => $this->purge(self::PRODUCT, ProductSaleElementsQuery::create()->findPk($model->getProductSaleElementsId())?->getProductId()),
+            default => $this->purgeTheParentOf($model),
+        };
     }
 
     /**
