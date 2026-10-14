@@ -118,6 +118,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'ref',
         'position',
         'productCategories.position',
+        'productCategories.createdAt',
         'createdAt',
         'updatedAt',
     ],
