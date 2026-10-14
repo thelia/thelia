@@ -136,9 +136,12 @@ class Cart implements PropelResourceInterface
     public ?array $cartItems = [];
 
     // Not writable from the front either: the discount is subtracted from the
-    // cart total, and it is derived from the customer's own rate.
+    // cart total, and it is derived from the customer's own rate. A cart created
+    // over the API starts without discount: a body that does not name it must not
+    // write NULL, which the `cart`.`discount` column of a shop updated from
+    // Thelia 2 (NOT NULL) refuses with a 500.
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
-    public ?float $discount = null;
+    public ?float $discount = 0.0;
 
     // What the carrier chosen at checkout actually quoted, as opposed to `delivery`,
     // which is an estimate over every carrier that could serve the cart. Read-only for
