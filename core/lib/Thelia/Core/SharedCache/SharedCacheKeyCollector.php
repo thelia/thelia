@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\SharedCache;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SharedCacheKeyCollector implements ResetInterface
@@ -53,27 +54,60 @@ final class SharedCacheKeyCollector implements ResetInterface
 
     private bool $overflowed = false;
 
+    /** @var array<string, list<string>> */
+    private readonly array $contributedResources;
+
     /**
-     * @param string[] $readablePrefixes
+     * @param string[]                                  $readablePrefixes
+     * @param iterable<SharedCacheContributorInterface> $contributors
      */
     public function __construct(
         #[Autowire(param: 'thelia.shared_cache.readable_prefixes')]
         private readonly array $readablePrefixes,
+        #[AutowireIterator(SharedCacheContributorInterface::TAG)]
+        iterable $contributors = [],
     ) {
+        $contributedResources = [];
+
+        foreach ($contributors as $contributor) {
+            foreach ($contributor->readableResources() as $prefix => $keys) {
+                $prefix = rtrim($prefix, '/');
+                $contributedResources[$prefix] = array_values(array_unique([...$contributedResources[$prefix] ?? [], ...$keys]));
+            }
+        }
+
+        $this->contributedResources = $contributedResources;
     }
 
     public function record(string $path): void
     {
         $path = (string) parse_url($path, \PHP_URL_PATH);
 
-        if (!$this->isReadable($path)) {
+        if ($this->isReadable($path)) {
+            $this->tag(...SharedCacheKey::forPath($path));
+
+            return;
+        }
+
+        $contributedKeys = $this->contributedKeys($path);
+
+        if (null === $contributedKeys) {
             $this->readUnlistedResource = true;
 
             return;
         }
 
-        foreach (SharedCacheKey::forPath($path) as $key) {
-            if (isset($this->keys[$key])) {
+        $this->tag(...$contributedKeys);
+    }
+
+    /**
+     * Tags the page with keys of its own, for what it shows without reading it through
+     * `resources()`: a module that renders a view of its own names what the view read.
+     */
+    public function tag(string ...$keys): void
+    {
+        foreach ($keys as $key) {
+            if ('' === $key || isset($this->keys[$key])) {
                 continue;
             }
 
@@ -116,5 +150,20 @@ final class SharedCacheKeyCollector implements ResetInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return list<string>|null the keys a contributor gave the resource, null when no
+     *                           contributor declared it
+     */
+    private function contributedKeys(string $path): ?array
+    {
+        foreach ($this->contributedResources as $prefix => $keys) {
+            if ($path === $prefix || str_starts_with($path, $prefix.'/')) {
+                return $keys;
+            }
+        }
+
+        return null;
     }
 }

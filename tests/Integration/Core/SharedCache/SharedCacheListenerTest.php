@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Core\SharedCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +28,7 @@ use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\SharedCache\SharedCacheContributorInterface;
 use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheListener;
 use Thelia\Core\SharedCache\SharedCacheMode;
@@ -584,6 +587,115 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         );
 
         self::assertSame($before, $this->snapshot($response));
+    }
+
+    public function testAViewAModuleDeclaresIsSharedWithTheKeysTheModuleTagsItWith(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $contributor = $this->contributor(views: ['cmspage']);
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES, [$contributor]);
+        $collector->tag('cms-page-3', 'cms');
+        $response = $this->sessionResponse();
+
+        $this->handleWith($this->request('/', 'cmspage'), $response, $collector, [$contributor]);
+
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertSame('300', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertSame('thelia, cms-page-3, cms', $response->headers->get('Surrogate-Key'));
+    }
+
+    public function testAViewNoModuleDeclaresStaysPersonal(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
+        $response = $this->sessionResponse();
+
+        $this->handleWith($this->request('/', 'cmspage'), $response, $collector, []);
+
+        self::assertFalse($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->has('Surrogate-Key'));
+    }
+
+    public function testAResourceAModuleDeclaresKeepsThePageSharedAndTagsItWithTheKeysOfTheModule(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $contributor = $this->contributor(resources: ['/api/header-highlights' => ['header_highlights', 'categories']]);
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES, [$contributor]);
+        $collector->record('/api/front/products/1');
+        $collector->record('/api/header-highlights');
+        $response = $this->sessionResponse();
+
+        $this->handleWith($this->request('/', 'index'), $response, $collector, [$contributor]);
+
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertSame('thelia, product-1, header_highlights, categories', $response->headers->get('Surrogate-Key'));
+    }
+
+    public function testTheSameResourceUndeclaredKeepsThePagePersonal(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $collector = $this->collector('/api/front/products/1', '/api/header-highlights');
+        $response = $this->sessionResponse();
+
+        $this->handleWith($this->request('/', 'index'), $response, $collector, []);
+
+        self::assertFalse($response->headers->hasCacheControlDirective('public'));
+    }
+
+    public function testTheContributorsOfTheModulesReachThePolicyAndTheCollectorThroughOneTag(): void
+    {
+        $tag = (new \ReflectionClass(SharedCacheContributorInterface::class))->getAttributes(AutoconfigureTag::class)[0]->getArguments()[0];
+
+        self::assertSame(SharedCacheContributorInterface::TAG, $tag);
+
+        foreach ([SharedCachePolicy::class, SharedCacheKeyCollector::class] as $class) {
+            $parameters = array_filter(
+                (new \ReflectionMethod($class, '__construct'))->getParameters(),
+                static fn (\ReflectionParameter $parameter): bool => 'contributors' === $parameter->getName(),
+            );
+
+            self::assertCount(1, $parameters, $class);
+            self::assertSame($tag, array_values($parameters)[0]->getAttributes(AutowireIterator::class)[0]->getArguments()[0], $class);
+        }
+    }
+
+    /**
+     * @param array<string, list<string>> $resources
+     * @param list<string>                $views
+     */
+    private function contributor(array $resources = [], array $views = []): SharedCacheContributorInterface
+    {
+        return new class($resources, $views) implements SharedCacheContributorInterface {
+            /**
+             * @param array<string, list<string>> $resources
+             * @param list<string>                $views
+             */
+            public function __construct(private readonly array $resources, private readonly array $views)
+            {
+            }
+
+            public function readableResources(): array
+            {
+                return $this->resources;
+            }
+
+            public function shareableViews(): array
+            {
+                return $this->views;
+            }
+        };
+    }
+
+    /**
+     * @param list<SharedCacheContributorInterface> $contributors
+     */
+    private function handleWith(Request $request, Response $response, SharedCacheKeyCollector $collector, array $contributors): void
+    {
+        $checker = $this->createStub(PricingActivityChecker::class);
+        $checker->method('hasVisitorDependentPricing')->willReturn(false);
+
+        (new SharedCacheListener(new SharedCachePolicy($checker, $collector, SharedCachePolicy::SENSITIVE_PREFIXES, $contributors), $collector, 'souin'))
+            ->onKernelResponse(new ResponseEvent(self::$kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
     }
 
     private function collector(string ...$paths): SharedCacheKeyCollector

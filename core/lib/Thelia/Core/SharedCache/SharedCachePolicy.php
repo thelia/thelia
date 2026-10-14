@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\SharedCache;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -63,17 +64,30 @@ final readonly class SharedCachePolicy
 
     public const MAX_TTL = 86400;
 
+    /** @var list<string> */
+    private array $shareableViews;
+
     /**
-     * @param string[] $neverSharedPrefixes the first segments of the addresses that are never
-     *                                      shared, the parameter `thelia.shared_cache.never_shared_prefixes`,
-     *                                      read without their slashes and case
+     * @param string[]                                  $neverSharedPrefixes the first segments of the addresses that are never
+     *                                                                       shared, the parameter `thelia.shared_cache.never_shared_prefixes`,
+     *                                                                       read without their slashes and case
+     * @param iterable<SharedCacheContributorInterface> $contributors        the modules that add views of their own to {@see self::SHAREABLE_VIEWS}
      */
     public function __construct(
         private PricingActivityChecker $pricingActivityChecker,
         private SharedCacheKeyCollector $keyCollector,
         #[Autowire(param: 'thelia.shared_cache.never_shared_prefixes')]
         private array $neverSharedPrefixes = self::SENSITIVE_PREFIXES,
+        #[AutowireIterator(SharedCacheContributorInterface::TAG)]
+        iterable $contributors = [],
     ) {
+        $views = self::SHAREABLE_VIEWS;
+
+        foreach ($contributors as $contributor) {
+            $views = [...$views, ...$contributor->shareableViews()];
+        }
+
+        $this->shareableViews = array_values(array_unique($views));
     }
 
     public function isTaggable(Request $request, Response $response): bool
@@ -86,7 +100,7 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        if (!\in_array((string) $request->attributes->get('_view', ''), self::SHAREABLE_VIEWS, true)
+        if (!\in_array((string) $request->attributes->get('_view', ''), $this->shareableViews, true)
             && !isset(self::SHAREABLE_ROUTES[(string) $request->attributes->get('_route', '')])) {
             return false;
         }

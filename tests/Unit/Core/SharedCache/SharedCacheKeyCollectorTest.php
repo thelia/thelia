@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Core\SharedCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Core\SharedCache\SharedCacheContributorInterface;
 use Thelia\Core\SharedCache\SharedCacheKey;
 use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 
@@ -134,5 +135,76 @@ final class SharedCacheKeyCollectorTest extends TestCase
 
         self::assertSame([], $collector->keys());
         self::assertTrue($collector->isComplete());
+    }
+
+    public function testAResourceAModuleDeclaresTagsThePageWithTheKeysOfTheModule(): void
+    {
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES, [$this->contributor(['/api/header-highlights/' => ['header_highlights']])]);
+
+        $collector->record('/api/header-highlights?width=1280');
+        $collector->record('/api/header-highlights/3');
+
+        self::assertSame(['header_highlights'], $collector->keys());
+        self::assertTrue($collector->isComplete());
+    }
+
+    public function testAPathThatOnlyStartsLikeADeclaredResourceIsNotReadable(): void
+    {
+        $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES, [$this->contributor(['/api/header-highlights' => ['header_highlights']])]);
+
+        $collector->record('/api/header-highlights-admin');
+
+        self::assertFalse($collector->isComplete());
+    }
+
+    public function testTwoModulesDeclaringTheSameResourceAddTheirKeys(): void
+    {
+        $collector = new SharedCacheKeyCollector([], [
+            $this->contributor(['/api/shared' => ['one']]),
+            $this->contributor(['/api/shared' => ['two', 'one']]),
+        ]);
+
+        $collector->record('/api/shared');
+
+        self::assertSame(['one', 'two'], $collector->keys());
+    }
+
+    public function testAPageTaggedByItsViewKeepsItsKeysWithinTheLimit(): void
+    {
+        $collector = new SharedCacheKeyCollector([]);
+
+        $collector->tag('cms-page-3', 'cms', '', 'cms-page-3');
+        self::assertSame(['cms-page-3', 'cms'], $collector->keys());
+        self::assertTrue($collector->isComplete());
+
+        $collector->tag(...array_map(static fn (int $id): string => 'key-'.$id, range(1, SharedCacheKeyCollector::MAX_KEYS)));
+
+        self::assertFalse($collector->isComplete());
+        self::assertCount(SharedCacheKeyCollector::MAX_KEYS, $collector->keys());
+    }
+
+    /**
+     * @param array<string, list<string>> $resources
+     */
+    private function contributor(array $resources): SharedCacheContributorInterface
+    {
+        return new class($resources) implements SharedCacheContributorInterface {
+            /**
+             * @param array<string, list<string>> $resources
+             */
+            public function __construct(private readonly array $resources)
+            {
+            }
+
+            public function readableResources(): array
+            {
+                return $this->resources;
+            }
+
+            public function shareableViews(): array
+            {
+                return [];
+            }
+        };
     }
 }
