@@ -78,7 +78,7 @@ final readonly class SharedCacheListener
             return;
         }
 
-        $keys = [SharedCacheKey::ALL, ...$this->keyCollector->keys()];
+        $keys = array_values(array_unique([SharedCacheKey::ALL, ...$this->keyCollector->keys(), ...$this->policy->routeKeys($request)]));
         $driver = strtolower(trim($this->purgerDriver));
 
         if ('varnish' === $driver || !\in_array($driver, SharedCachePurgerFactory::DRIVERS, true)) {

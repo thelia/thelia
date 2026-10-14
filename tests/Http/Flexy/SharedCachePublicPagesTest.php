@@ -101,6 +101,42 @@ final class SharedCachePublicPagesTest extends WebIntegrationTestCase
         yield 'a cart' => ['thelia_cart'];
     }
 
+    /**
+     * The sitemap reads the catalogue without going through `resources()`: it is shared all
+     * the same, and tagged with the list keys a change of a catalogue object purges.
+     */
+    #[DataProvider('answersOfTheSitemap')]
+    public function testTheSitemapIsServedAsAnAnswerAProxyMayKeep(string $method, string $url): void
+    {
+        $this->shareThePublicPages();
+
+        $this->client->getCookieJar()->clear();
+        $this->client->request($method, $url);
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue($response->headers->hasCacheControlDirective('public'), 'Cache-Control: '.$response->headers->get('Cache-Control'));
+        self::assertSame('300', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertSame([], $response->headers->getCookies());
+
+        $keys = explode(' ', (string) $response->headers->get('xkey'));
+        foreach (['products', 'categories', 'contents', 'folders'] as $key) {
+            self::assertContains($key, $keys);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function answersOfTheSitemap(): iterable
+    {
+        yield 'the index' => ['GET', '/sitemap.xml'];
+        yield 'the index, HEAD' => ['HEAD', '/sitemap.xml'];
+        yield 'a section' => ['GET', '/sitemap-products.xml'];
+    }
+
     public function testAShopThatDoesNotShareKeepsItsPagesPersonal(): void
     {
         $this->aProductPage();
