@@ -2242,7 +2242,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (60, 'admin.sale-unit', NOW(), NOW()),
 (61, 'admin.configuration.destination-restriction', NOW(), NOW()),
 (62, 'admin.configuration.background-jobs', NOW(), NOW()),
-(63, 'admin.customer.payment-method', NOW(), NOW())
+(63, 'admin.customer.payment-method', NOW(), NOW()),
+(64, 'admin.configuration.webhook', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -4060,7 +4061,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (60, '{{ locale }}', {{ intl('Sale units', locale) }}, NULL, NULL, NULL),
     (61, '{{ locale }}', {{ intl('Configuration destination restrictions', locale) }}, NULL, NULL, NULL),
     (62, '{{ locale }}', {{ intl('Configuration background jobs', locale) }}, NULL, NULL, NULL),
-    (63, '{{ locale }}', {{ intl('Saved payment methods', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (63, '{{ locale }}', {{ intl('Saved payment methods', locale) }}, NULL, NULL, NULL),
+    (64, '{{ locale }}', {{ intl('Configuration webhooks', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

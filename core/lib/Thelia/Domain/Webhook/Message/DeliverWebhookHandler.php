@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\Webhook\Message;
+
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Thelia\Domain\Webhook\WebhookDeliverer;
+use Thelia\Domain\Webhook\WebhookRetryPolicy;
+use Thelia\Domain\Webhook\WebhookStatus;
+use Thelia\Model\WebhookDeliveryQuery;
+
+#[AsMessageHandler]
+final readonly class DeliverWebhookHandler
+{
+    private bool $runsInline;
+
+    public function __construct(
+        private WebhookDeliverer $deliverer,
+        private WebhookRetryPolicy $retryPolicy,
+        private MessageBusInterface $bus,
+        #[Autowire('%env(default:thelia.messenger.inline_transport_dsn:MESSENGER_TRANSPORT_DSN)%')]
+        #[\SensitiveParameter]
+        string $jobDsn,
+    ) {
+        $this->runsInline = str_starts_with($jobDsn, 'sync://');
+    }
+
+    public function __invoke(DeliverWebhook $message): void
+    {
+        $delivery = WebhookDeliveryQuery::create()->findPk($message->deliveryId);
+
+        if (null === $delivery || WebhookStatus::DELIVERY_PENDING !== $delivery->getStatus()) {
+            return;
+        }
+
+        $subscription = $delivery->getWebhookSubscription();
+
+        if (null === $subscription || WebhookStatus::SUBSCRIPTION_ACTIVE !== $subscription->getStatus()) {
+            $delivery->setStatus(WebhookStatus::DELIVERY_FAILED)->setResponseBody('The subscription is not active.')->save();
+
+            return;
+        }
+
+        if ($this->deliverer->deliver($delivery, $subscription)) {
+            return;
+        }
+
+        $attempt = $delivery->getAttempts();
+
+        if (!$this->runsInline && $this->retryPolicy->shouldRetry($attempt)) {
+            $this->bus->dispatch(new DeliverWebhook($message->deliveryId), [new DelayStamp(($this->retryPolicy->delayAfter($attempt) ?? 0) * 1000)]);
+
+            return;
+        }
+
+        $delivery->setStatus(WebhookStatus::DELIVERY_FAILED)->save();
+
+        if (!$this->runsInline) {
+            $subscription
+                ->setStatus(WebhookStatus::SUBSCRIPTION_ERROR)
+                ->setFailureReason(\sprintf('Delivery %s failed after %d attempts.', $delivery->getDeliveryUuid(), $attempt))
+                ->setFailedAt(new \DateTimeImmutable())
+                ->save();
+        }
+    }
+}

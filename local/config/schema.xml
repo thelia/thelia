@@ -3324,4 +3324,46 @@
 
     <behavior name="timestampable" />
   </table>
+  <table name="webhook_subscription" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="what the administrator calls this subscription" name="title" required="true" size="255" type="VARCHAR" />
+    <column description="the address that receives the signed requests" name="url" required="true" size="2048" type="VARCHAR" />
+    <column description="the shared secret that signs every request, shown once at creation" name="secret" required="true" size="128" type="VARCHAR" />
+    <column description="JSON list of the published event names this subscription asks for" name="events" required="true" type="LONGVARCHAR" />
+    <column defaultValue="full" description="full: the object as the admin API shows it; identifiers: its identifiers only" name="payload_mode" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="active" description="active, inactive, or error once the retries of a delivery ran out" name="status" required="true" size="16" type="VARCHAR" />
+    <column description="why the subscription fell into error, never a secret" name="failure_reason" size="255" type="VARCHAR" />
+    <column name="failed_at" type="TIMESTAMP" />
+    <index name="idx_webhook_subscription_status">
+      <index-column name="status" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="webhook_delivery" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="subscription_id" required="true" type="INTEGER" />
+    <column description="the published event name" name="event" required="true" size="64" type="VARCHAR" />
+    <column description="the unique identifier sent in the headers, so a receiver can drop a duplicate" name="delivery_uuid" required="true" size="36" type="VARCHAR" />
+    <column defaultValue="pending" description="pending, succeeded or failed" name="status" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="0" name="attempts" required="true" type="INTEGER" />
+    <column description="the HTTP code the receiver answered, empty when it never answered" name="response_code" type="INTEGER" />
+    <column description="how long the last attempt took, in milliseconds" name="duration_ms" type="INTEGER" />
+    <column description="the beginning of the answer, truncated" name="response_body" type="LONGVARCHAR" />
+    <column description="the body that was signed, kept so that a delivery can be replayed and purged with the log" name="payload" required="true" type="CLOB" />
+    <column name="delivered_at" type="TIMESTAMP" />
+    <foreign-key foreignTable="webhook_subscription" name="fk_webhook_delivery_subscription_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_id" />
+    </foreign-key>
+    <index name="idx_webhook_delivery_subscription_created">
+      <index-column name="subscription_id" />
+      <index-column name="created_at" />
+    </index>
+    <index name="idx_webhook_delivery_created_at">
+      <index-column name="created_at" />
+    </index>
+    <unique name="webhook_delivery_uuid_UNIQUE">
+      <unique-column name="delivery_uuid" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
 </database>

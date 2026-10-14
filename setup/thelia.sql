@@ -1503,6 +1503,61 @@ CREATE TABLE `admin_two_factor_backup_code`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- webhook_subscription
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `webhook_subscription`;
+
+CREATE TABLE `webhook_subscription`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(255) NOT NULL COMMENT 'what the administrator calls this subscription',
+    `url` VARCHAR(2048) NOT NULL COMMENT 'the address that receives the signed requests',
+    `secret` VARCHAR(128) NOT NULL COMMENT 'the shared secret that signs every request, shown once at creation',
+    `events` TEXT NOT NULL COMMENT 'JSON list of the published event names this subscription asks for',
+    `payload_mode` VARCHAR(16) DEFAULT 'full' NOT NULL COMMENT 'full: the object as the admin API shows it; identifiers: its identifiers only',
+    `status` VARCHAR(16) DEFAULT 'active' NOT NULL COMMENT 'active, inactive, or error once the retries of a delivery ran out',
+    `failure_reason` VARCHAR(255) COMMENT 'why the subscription fell into error, never a secret',
+    `failed_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_webhook_subscription_status` (`status`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- webhook_delivery
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `webhook_delivery`;
+
+CREATE TABLE `webhook_delivery`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `subscription_id` INTEGER NOT NULL,
+    `event` VARCHAR(64) NOT NULL COMMENT 'the published event name',
+    `delivery_uuid` VARCHAR(36) NOT NULL COMMENT 'the unique identifier sent in the headers, so a receiver can drop a duplicate',
+    `status` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'pending, succeeded or failed',
+    `attempts` INTEGER DEFAULT 0 NOT NULL,
+    `response_code` INTEGER COMMENT 'the HTTP code the receiver answered, empty when it never answered',
+    `duration_ms` INTEGER COMMENT 'how long the last attempt took, in milliseconds',
+    `response_body` TEXT COMMENT 'the beginning of the answer, truncated',
+    `payload` LONGTEXT NOT NULL COMMENT 'the body that was signed, kept so that a delivery can be replayed and purged with the log',
+    `delivered_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `webhook_delivery_uuid_UNIQUE` (`delivery_uuid`),
+    INDEX `idx_webhook_delivery_subscription_created` (`subscription_id`, `created_at`),
+    INDEX `idx_webhook_delivery_created_at` (`created_at`),
+    CONSTRAINT `fk_webhook_delivery_subscription_id`
+        FOREIGN KEY (`subscription_id`)
+        REFERENCES `webhook_subscription` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile_resource
 -- ---------------------------------------------------------------------
 

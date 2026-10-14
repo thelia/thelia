@@ -80,6 +80,7 @@ class AdminResources
     public const GIFT_WRAPPING = 'admin.configuration.gift-wrapping';
     public const DESTINATION_RESTRICTION = 'admin.configuration.destination-restriction';
     public const BACKGROUND_JOBS = 'admin.configuration.background-jobs';
+    public const WEBHOOK = 'admin.configuration.webhook';
     public const HOME = 'admin.home';
     public const LANGUAGE = 'admin.configuration.language';
     public const MAILING_SYSTEM = 'admin.configuration.mailing-system';

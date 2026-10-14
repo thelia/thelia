@@ -1769,5 +1769,74 @@ SET @statement := IF(@folder_publication_added, 'UPDATE `folder` SET `unpublish_
 PREPARE migrate_statement FROM @statement;
 EXECUTE migrate_statement;
 DEALLOCATE PREPARE migrate_statement;
+-- Webhook subscriptions send data to a third-party address: they answer to a
+-- resource of their own, granted to a profile and to no existing one.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.webhook', NOW(), NOW());
+
+SET @webhook_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.webhook');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@webhook_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@webhook_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@webhook_resource_id, 'en_US', 'Configuration webhooks', NULL, NULL, NULL),
+    (@webhook_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@webhook_resource_id, 'fr_FR', 'Configuration des webhooks', NULL, NULL, NULL),
+    (@webhook_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@webhook_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@webhook_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
+
+-- ---------------------------------------------------------------------
+-- Webhook subscriptions and their delivery log
+--
+-- `webhook_subscription` is an address, the published events it asks for, a
+-- secret and a state; `webhook_delivery` is one row per request sent, with
+-- the answer and the body that was signed so that a delivery can be replayed.
+-- A shop that updates has no subscription, so nothing is sent until an
+-- administrator declares one.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `webhook_subscription`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(255) NOT NULL COMMENT 'what the administrator calls this subscription',
+    `url` VARCHAR(2048) NOT NULL COMMENT 'the address that receives the signed requests',
+    `secret` VARCHAR(128) NOT NULL COMMENT 'the shared secret that signs every request, shown once at creation',
+    `events` TEXT NOT NULL COMMENT 'JSON list of the published event names this subscription asks for',
+    `payload_mode` VARCHAR(16) DEFAULT 'full' NOT NULL COMMENT 'full: the object as the admin API shows it; identifiers: its identifiers only',
+    `status` VARCHAR(16) DEFAULT 'active' NOT NULL COMMENT 'active, inactive, or error once the retries of a delivery ran out',
+    `failure_reason` VARCHAR(255) COMMENT 'why the subscription fell into error, never a secret',
+    `failed_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_webhook_subscription_status` (`status`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `webhook_delivery`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `subscription_id` INTEGER NOT NULL,
+    `event` VARCHAR(64) NOT NULL COMMENT 'the published event name',
+    `delivery_uuid` VARCHAR(36) NOT NULL COMMENT 'the unique identifier sent in the headers, so a receiver can drop a duplicate',
+    `status` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'pending, succeeded or failed',
+    `attempts` INTEGER DEFAULT 0 NOT NULL,
+    `response_code` INTEGER COMMENT 'the HTTP code the receiver answered, empty when it never answered',
+    `duration_ms` INTEGER COMMENT 'how long the last attempt took, in milliseconds',
+    `response_body` TEXT COMMENT 'the beginning of the answer, truncated',
+    `payload` LONGTEXT NOT NULL COMMENT 'the body that was signed, kept so that a delivery can be replayed and purged with the log',
+    `delivered_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `webhook_delivery_uuid_UNIQUE` (`delivery_uuid`),
+    INDEX `idx_webhook_delivery_subscription_created` (`subscription_id`, `created_at`),
+    INDEX `idx_webhook_delivery_created_at` (`created_at`),
+    CONSTRAINT `fk_webhook_delivery_subscription_id`
+        FOREIGN KEY (`subscription_id`)
+        REFERENCES `webhook_subscription` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;
