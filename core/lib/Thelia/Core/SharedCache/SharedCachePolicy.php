@@ -23,6 +23,19 @@ final readonly class SharedCachePolicy
 {
     public const SHAREABLE_VIEWS = ['index', 'category', 'product', 'content', 'folder', 'brand'];
 
+    /**
+     * The routes shared like the views, with the keys their answer is tagged with. The
+     * sitemap of the theme reads the catalogue without going through `resources()`, so it
+     * carries the list keys a change of a product, a category, a content, a folder or a
+     * brand purges.
+     */
+    public const SHAREABLE_ROUTES = [
+        'front_sitemap_index' => self::SITEMAP_KEYS,
+        'front_sitemap_section' => self::SITEMAP_KEYS,
+    ];
+
+    private const SITEMAP_KEYS = ['products', 'product_images', 'categories', 'contents', 'folders', 'brands'];
+
     public const SENSITIVE_PREFIXES = [
         'admin',
         'api',
@@ -65,11 +78,20 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        if (!\in_array((string) $request->attributes->get('_view', ''), self::SHAREABLE_VIEWS, true)) {
+        if (!\in_array((string) $request->attributes->get('_view', ''), self::SHAREABLE_VIEWS, true)
+            && !isset(self::SHAREABLE_ROUTES[(string) $request->attributes->get('_route', '')])) {
             return false;
         }
 
         return !$this->isSensitivePath($request->getPathInfo());
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function routeKeys(Request $request): array
+    {
+        return self::SHAREABLE_ROUTES[(string) $request->attributes->get('_route', '')] ?? [];
     }
 
     public function isShareable(Request $request, Response $response): bool
