@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleProductsQueryEvent;
+use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Currency;
@@ -25,6 +26,7 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 /**
@@ -97,10 +99,48 @@ final class SaleProductsQueryEventTest extends ActionIntegrationTestCase
         self::assertSame(1, (int) $this->defaultPseFor($kept)->getPromo());
     }
 
-    private function withExclusion(Product $excluded, callable $action): void
+    public function testAProductKeptOutWithItsOwnPromotionKeepsItWhenTheListenerAsks(): void
     {
-        $listener = static function (SaleProductsQueryEvent $event) use ($excluded): void {
+        $kept = $this->catalogProduct();
+        $clearance = $this->catalogProduct();
+        $this->putOnPromotion($clearance, 80.0);
+        $sale = $this->createSale();
+
+        $this->withExclusion($clearance, fn () => $this->updateSale($sale, [$kept, $clearance]), keepPromoStatus: true);
+
+        self::assertSame(1, (int) $this->defaultPseFor($kept)->getPromo());
+        self::assertSame(90.0, $this->promoPriceOf($this->defaultPseFor($kept)));
+        self::assertSame(1, (int) $this->defaultPseFor($clearance)->getPromo(), 'the excluded product keeps its own promotion');
+        self::assertSame(80.0, $this->promoPriceOf($this->defaultPseFor($clearance)), 'and its own promo price');
+
+        $activeSale = SaleQuery::create()->findPk($sale->getId());
+        self::assertTrue((bool) $activeSale?->getActive());
+        $this->withExclusion($clearance, fn () => $this->dispatch(new SaleToggleActivityEvent($activeSale), TheliaEvents::SALE_TOGGLE_ACTIVITY), keepPromoStatus: true);
+
+        self::assertSame(0, (int) $this->defaultPseFor($kept)->getPromo(), 'the sale is over for the product it selects');
+        self::assertSame(1, (int) $this->defaultPseFor($clearance)->getPromo(), 'not for the product it never selected');
+    }
+
+    private function putOnPromotion(Product $product, float $promoPrice): void
+    {
+        $pse = $this->defaultPseFor($product);
+        $pse->setPromo(1)->save();
+        ProductPriceQuery::create()
+            ->filterByProductSaleElementsId($pse->getId())
+            ->filterByCurrencyId($this->currency->getId())
+            ->findOne()
+            ->setPromoPrice((string) $promoPrice)
+            ->save();
+    }
+
+    private function withExclusion(Product $excluded, callable $action, bool $keepPromoStatus = false): void
+    {
+        $listener = static function (SaleProductsQueryEvent $event) use ($excluded, $keepPromoStatus): void {
             $event->getQuery()->filterByProductId($excluded->getId(), Criteria::NOT_EQUAL);
+
+            if ($keepPromoStatus) {
+                $event->keepExcludedProductsPromoStatus();
+            }
         };
 
         $this->dispatcher->addListener(TheliaEvents::SALE_PRODUCTS_QUERY, $listener);
