@@ -49,26 +49,18 @@ final readonly class ShippedQuantityCalculator
      */
     public function heldByOrderProduct(Order $order, ?ConnectionInterface $connection = null): array
     {
-        $connection ??= Propel::getConnection(OrderShipmentTableMap::DATABASE_NAME);
+        return $this->sumByOrderProduct($order, false, $connection);
+    }
 
-        $statement = $connection->prepare(
-            'SELECT `item`.`order_product_id`, SUM(`item`.`quantity`) AS `held`'
-            .' FROM `order_shipment_item` AS `item`'
-            .' INNER JOIN `order_shipment` AS `shipment` ON `shipment`.`id` = `item`.`order_shipment_id`'
-            .' WHERE `shipment`.`order_id` = :order_id AND `shipment`.`status` <> :cancelled'
-            .' GROUP BY `item`.`order_product_id`',
-        );
-        $statement->bindValue(':order_id', (int) $order->getId(), \PDO::PARAM_INT);
-        $statement->bindValue(':cancelled', OrderShipment::STATUS_CANCELLED, \PDO::PARAM_STR);
-        $statement->execute();
-
-        $held = [];
-
-        foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            $held[(int) $row['order_product_id']] = (float) $row['held'];
-        }
-
-        return $held;
+    /**
+     * The quantity that already left in a shipped parcel, by order line id. A draft
+     * holds its lines but has not left.
+     *
+     * @return array<int, float>
+     */
+    public function shippedByOrderProduct(Order $order, ?ConnectionInterface $connection = null): array
+    {
+        return $this->sumByOrderProduct($order, true, $connection);
     }
 
     /**
@@ -93,23 +85,57 @@ final readonly class ShippedQuantityCalculator
     }
 
     /**
-     * Whether every shippable line of the order left, and at least one did.
+     * Whether every shippable line of the order left in a shipped parcel, and at least
+     * one did. A draft still open holds its lines without having left: an order whose
+     * last lines wait in a draft is not fully shipped.
      */
     public function isFullyShipped(Order $order, ?ConnectionInterface $connection = null): bool
     {
-        $remaining = $this->remainingByOrderProduct($order, $connection);
+        $lines = $this->shippableLines($order, $connection);
 
-        if ([] === $remaining) {
+        if ([] === $lines) {
             return false;
         }
 
-        foreach ($remaining as $left) {
-            if ($left > 0.0) {
+        $shipped = $this->shippedByOrderProduct($order, $connection);
+
+        foreach ($lines as $line) {
+            if ((float) $line->getQuantity() - ($shipped[(int) $line->getId()] ?? 0.0) > self::TOLERANCE) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Sums the items of the order's shipments by order line id: every shipment but the
+     * cancelled ones, or only the shipped ones.
+     *
+     * @return array<int, float>
+     */
+    private function sumByOrderProduct(Order $order, bool $shippedOnly, ?ConnectionInterface $connection): array
+    {
+        $connection ??= Propel::getConnection(OrderShipmentTableMap::DATABASE_NAME);
+
+        $statement = $connection->prepare(
+            'SELECT `item`.`order_product_id`, SUM(`item`.`quantity`) AS `held`'
+            .' FROM `order_shipment_item` AS `item`'
+            .' INNER JOIN `order_shipment` AS `shipment` ON `shipment`.`id` = `item`.`order_shipment_id`'
+            .' WHERE `shipment`.`order_id` = :order_id AND `shipment`.`status` '.($shippedOnly ? '=' : '<>').' :status'
+            .' GROUP BY `item`.`order_product_id`',
+        );
+        $statement->bindValue(':order_id', (int) $order->getId(), \PDO::PARAM_INT);
+        $statement->bindValue(':status', $shippedOnly ? OrderShipment::STATUS_SHIPPED : OrderShipment::STATUS_CANCELLED, \PDO::PARAM_STR);
+        $statement->execute();
+
+        $sums = [];
+
+        foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $sums[(int) $row['order_product_id']] = (float) $row['held'];
+        }
+
+        return $sums;
     }
 
     /**
