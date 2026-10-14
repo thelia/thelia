@@ -18,6 +18,7 @@
 
 ## Fixed
 
+- `ComposerHelper::dumpAutoload()` runs Composer with the PHP binary of the current process. It started `vendor/bin/composer` as a command, so its `#!/usr/bin/env php` shebang took the first `php` of the `PATH`: on a host whose default CLI is older than the one running Thelia, `template:set` printed `Composer dump-autoload failed: ... You are running 8.2.33` and the autoloader was not regenerated.
 - The `lang` argument of the loops that extend `BaseI18nLoop` (`country`, `title`, `module`, `product`, and so on) now chooses the language their texts are read in, as it did in Thelia 2. It was declared but ignored: the texts always came in the language of the session, so a document printed for a customer in another language than the administrator's, or rendered by a command, named countries and civilities in the wrong language. The argument takes a language id or a locale; without it, the language of the session applies, then the default one.
 - A stored cart discount shared over several promotions no longer lists a negative amount when every share rounds up: two cents over four promotions listed 0.01, 0.01, 0.01 and -0.01, and the untaxed amounts had the same flaw. Each share is now capped by what is left, so the listed amounts still add up to the stored discount.
 - The pro rata split of a postage over the tax rates of a cart no longer gives a negative share: two cents over four equal rates gave the largest one -0.01.
