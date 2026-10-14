@@ -740,4 +740,30 @@ INNER JOIN (
     UNION ALL SELECT 'shared_cache_ttl', 'fr_FR', 'Secondes pendant lesquelles un cache partagé peut garder une page publique (entre 1 et 86400, 300 si invalide)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+-- ---------------------------------------------------------------------
+-- The promotional price of an order line, a number again
+--
+-- `order_product`.`promo_price` is a VARCHAR(45) on a shop created by Thelia 2 and a
+-- DECIMAL(16,6) on a fresh install, and no earlier script puts the first in the shape of
+-- the second. The total of an order is computed by SQL, and ROUND() of a text reads it as
+-- a floating point number: 63.325 rounds to 63.32, where the same price in the DECIMAL
+-- column, and in the cart the buyer paid from, rounds to 63.33. An order whose promotional
+-- line ends in a half cent was one cent short on its confirmation, its invoice and the
+-- order list.
+--
+-- The values are numbers already, an empty text is read as no price. Nothing runs on a shop
+-- whose column is a DECIMAL, so the script can be replayed.
+-- ---------------------------------------------------------------------
+
+SET @convert_column := (SELECT COUNT(*) > 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'promo_price' AND `DATA_TYPE` = 'varchar');
+SET @statement := IF(@convert_column, 'UPDATE `order_product` SET `promo_price` = NULL WHERE `promo_price` = \'\'', 'DO 0');
+PREPARE convert_column_statement FROM @statement;
+EXECUTE convert_column_statement;
+DEALLOCATE PREPARE convert_column_statement;
+
+SET @statement := IF(@convert_column, 'ALTER TABLE `order_product` MODIFY `promo_price` DECIMAL(16,6) DEFAULT 0.000000', 'DO 0');
+PREPARE convert_column_statement FROM @statement;
+EXECUTE convert_column_statement;
+DEALLOCATE PREPARE convert_column_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;
