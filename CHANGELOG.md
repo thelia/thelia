@@ -1,3 +1,23 @@
+# 3.1.4
+
+Security release of the 3.1 line. It stops a customer from writing, through the front API, account fields the shop reserves to its administration. It ships `setup/update/sql/3.1.4.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.1.5 with this core, its 3.1.4 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
+
+## Security
+
+- [GHSA-q679-2j8v-rh79](https://github.com/thelia/thelia/security/advisories/GHSA-q679-2j8v-rh79) — the API wrote the fields a module adds to a native resource (its addons) straight from the request body, without the write groups of the operation. A signed-in customer updating their account with `PUT /api/front/account/customers/{id}` could set any addon field the shop reserves to its administration, such as the customer family of CustomerFamily, and with it the prices and payment conditions of another family. The same request replaced the whole customer, so the fields the customer cannot write came back empty, the e-mail among them, and the customer could no longer sign in. An addon field is now written only when it is in one of the write groups of the operation, and the front account update changes the customer in place: what the customer cannot write keeps its value.
+
+## Upgrade notes
+
+Update the core and the setup package, then the database, from the root of the project, and warm the cache up. The project keeps the 3.1 line of the skeleton, so Composer keeps the core on 3.1:
+
+```bash
+composer update thelia/core thelia/setup --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+A module that adds fields to an API resource has them written only when they carry a `#[Groups]` attribute naming a write group of the operation, as the fields of the resource itself do. A field without such a group is no longer written by an operation that declares groups.
+
 # 3.1.3
 
 Maintenance release of the 3.1 line. It fixes coupons and automatic promotions, the refund of a return that carries the postage, and a reserved operation that showed to every visitor while it was not running. It ships `setup/update/sql/3.1.3.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.1.4 with this core, its 3.1.3 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
