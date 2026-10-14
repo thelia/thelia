@@ -40,8 +40,10 @@ use Thelia\Core\SharedCache\SharedCachePurgerInterface;
 use Thelia\Model\Area;
 use Thelia\Model\Brand;
 use Thelia\Model\Cart;
+use Thelia\Model\ChoiceFilter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
+use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
 use Thelia\Model\Folder;
 use Thelia\Model\MetaData;
@@ -143,6 +145,52 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         foreach ([ConfigEvent::POST_SAVE, ConfigEvent::POST_DELETE] as $eventName) {
             self::assertArrayHasKey($eventName, $subscribed);
             self::assertSame('onWholeShopChange', $subscribed[$eventName][0]);
+        }
+    }
+
+    /**
+     * The back office writes the filters of a category straight to their table, with no
+     * catalogue event: the save still reaches the listener through Propel.
+     */
+    public function testSavingTheFiltersOfACategoryPurgesThePagesThatReadThem(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $category = $factory->category();
+        $feature = $factory->feature();
+
+        $purger = new RecordingSharedCachePurger();
+        static::getContainer()->set(SharedCachePurgerInterface::class, $purger);
+
+        (new ChoiceFilter())
+            ->setCategoryId((int) $category->getId())
+            ->setFeatureId((int) $feature->getId())
+            ->setVisible(1)
+            ->setPosition(1)
+            ->setType('checkbox')
+            ->save($this->getPropelConnection());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertCount(1, $purger->calls);
+        self::assertContains('tfilters', $purger->calls[0]);
+        self::assertContains('category-'.$category->getId(), $purger->calls[0]);
+        self::assertNotContains(SharedCacheKey::ALL, $purger->calls[0]);
+    }
+
+    public function testTheFiltersOfATemplatePurgeEveryPageThatReadsFilters(): void
+    {
+        $this->listener->onChoiceFilterChange(new ChoiceFilterEvent((new ChoiceFilter())->setTemplateId(3)));
+        $this->listener->flush();
+
+        self::assertSame([['tfilters']], $this->purger->calls);
+    }
+
+    public function testADeletedFilterIsSubscribedLikeASavedOne(): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        foreach ([ChoiceFilterEvent::POST_SAVE, ChoiceFilterEvent::POST_DELETE] as $eventName) {
+            self::assertArrayHasKey($eventName, $subscribed);
+            self::assertSame('onChoiceFilterChange', $subscribed[$eventName][0]);
         }
     }
 
