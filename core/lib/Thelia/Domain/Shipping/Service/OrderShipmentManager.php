@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Shipping\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -161,7 +162,9 @@ final readonly class OrderShipmentManager
 
         $trackingNumber = trim((string) $shipment->getDeliveryRef());
 
-        if ('' !== $trackingNumber && '' === trim((string) $order->getDeliveryRef())) {
+        // Only the first parcel speaks for the order: the delivery reference event writes
+        // the number on the first parcel, so the number of another one would land there.
+        if ('' !== $trackingNumber && '' === trim((string) $order->getDeliveryRef()) && $this->isFirstParcel($shipment)) {
             $orderEvent = new OrderEvent($order);
             $orderEvent->setDeliveryRef($trackingNumber);
             $this->dispatcher->dispatch($orderEvent, TheliaEvents::ORDER_UPDATE_DELIVERY_REF);
@@ -271,6 +274,21 @@ final readonly class OrderShipmentManager
         }
 
         $this->moveOrderTo($order, $partiallyShipped);
+    }
+
+    /**
+     * Whether the shipment is the first of its order that was not cancelled: the one
+     * whose tracking number the order carries.
+     */
+    private function isFirstParcel(OrderShipment $shipment): bool
+    {
+        $first = OrderShipmentQuery::create()
+            ->filterByOrderId($shipment->getOrderId())
+            ->filterByStatus(OrderShipment::STATUS_CANCELLED, Criteria::NOT_EQUAL)
+            ->orderById()
+            ->findOne();
+
+        return null !== $first && $first->getId() === $shipment->getId();
     }
 
     private function moveOrderTo(Order $order, ?OrderStatus $status): void

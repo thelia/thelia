@@ -166,6 +166,22 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
         self::assertSame([(int) $first->getId() => 0.0, (int) $second->getId() => 0.0], $this->quantities->remainingByOrderProduct($order), 'The draft still holds its line against what is left to ship.');
     }
 
+    public function testTheNumberOfALaterParcelStaysOnThatParcel(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $first = $this->factory->orderProduct($order, ['quantity' => 1.0]);
+        $second = $this->factory->orderProduct($order, ['quantity' => 1.0]);
+        $third = $this->factory->orderProduct($order, ['quantity' => 1.0]);
+
+        $leftWithoutNumber = $this->manager->ship($this->manager->open($order, [new ShipmentLine((int) $first->getId(), 1.0)]));
+        $draft = $this->manager->open($order, [new ShipmentLine((int) $second->getId(), 1.0)], deliveryRef: 'DRAFT-2');
+        $parcel = $this->manager->ship($this->manager->open($order, [new ShipmentLine((int) $third->getId(), 1.0)], deliveryRef: 'PARCEL-3'));
+
+        self::assertNull($this->reloadedShipment($leftWithoutNumber)->getDeliveryRef(), 'The first parcel left without a number and keeps none.');
+        self::assertSame('DRAFT-2', $this->reloadedShipment($draft)->getDeliveryRef(), 'The number typed on a draft belongs to it.');
+        self::assertSame('PARCEL-3', $this->reloadedShipment($parcel)->getDeliveryRef());
+    }
+
     public function testNoParcelOfACancelledOrderIsOpened(): void
     {
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_CANCELED]);
