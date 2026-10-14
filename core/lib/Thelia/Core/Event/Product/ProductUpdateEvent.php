@@ -23,6 +23,10 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $virtual_document_id;
     protected ?bool $guestCheckoutForbidden = null;
 
+    protected ?int $availabilityDelayDays = null;
+
+    protected bool $carriesAvailabilityDelay = false;
+
     /**
      * @param int $product_id
      */
@@ -124,5 +128,29 @@ class ProductUpdateEvent extends ProductCreateEvent
         $this->guestCheckoutForbidden = $guestCheckoutForbidden;
 
         return $this;
+    }
+
+    public function getAvailabilityDelayDays(): ?int
+    {
+        return $this->availabilityDelayDays;
+    }
+
+    /**
+     * Working days the product needs before it is shipped; null takes the delay off. Only a
+     * caller that sets it changes the column.
+     *
+     * @return $this
+     */
+    public function setAvailabilityDelayDays(?int $availabilityDelayDays): static
+    {
+        $this->availabilityDelayDays = null === $availabilityDelayDays ? null : max(0, $availabilityDelayDays);
+        $this->carriesAvailabilityDelay = true;
+
+        return $this;
+    }
+
+    public function carriesAvailabilityDelay(): bool
+    {
+        return $this->carriesAvailabilityDelay;
     }
 }

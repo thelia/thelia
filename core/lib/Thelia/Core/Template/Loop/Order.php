@@ -361,6 +361,10 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('DELIVERY_DATE', $order->getDeliveryDate('Y-m-d'))
                 ->set('DELIVERY_SLOT_START', $order->getDeliverySlotStart('H:i'))
                 ->set('DELIVERY_SLOT_END', $order->getDeliverySlotEnd('H:i'))
+                // The interval announced when the order was placed, as Y-m-d, kept as it was said.
+                // Null when the carrier announced none or the buyer picked a day.
+                ->set('ESTIMATED_DELIVERY_FROM', $order->getEstimatedDeliveryFromDay())
+                ->set('ESTIMATED_DELIVERY_TO', $order->getEstimatedDeliveryToDay())
                 ->set('INVOICE_REF', $order->getInvoiceRef())
                 ->set('VIRTUAL', $hasVirtualDownload)
                 ->set('POSTAGE', $order->getPostage())
