@@ -24,6 +24,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Controller\Admin\PostItemFileController;
@@ -38,6 +39,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
     public function __construct(
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
         private RequestStack $requestStack,
+        private ?ClassMetadataFactoryInterface $classMetadataFactory = null,
     ) {
     }
 
@@ -71,7 +73,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             $propelModel->save();
 
             if (!$implementsItemFileResource) {
-                $resourceAddons = $this->manageResourceAddons($propelModel, $data);
+                $resourceAddons = $this->manageResourceAddons($propelModel, $data, $operation);
             }
 
             $connection->commit();
@@ -180,25 +182,72 @@ readonly class PropelPersistProcessor implements ProcessorInterface
     private function manageResourceAddons(
         ActiveRecordInterface $propelModel,
         PropelResourceInterface $data,
+        Operation $operation,
     ): array {
         $resourceAddons = [];
         $jsonData = $this->requestPayload();
         $resourceAddonDefinitions = $this->apiResourcePropelTransformerService->getResourceAddonDefinitions($data::class);
 
         foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
-            if (!isset($jsonData[$addonShortName])) {
+            $addonData = \is_array($jsonData[$addonShortName] ?? null)
+                ? $this->writableAddonData($addonClass, $jsonData[$addonShortName], $operation)
+                : [];
+
+            if ([] === $addonData) {
                 $resourceAddons[$addonShortName] = null;
                 continue;
             }
 
             if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
-                $addon = (new $addonClass())->buildFromArray($jsonData[$addonShortName], $data);
+                $addon = (new $addonClass())->buildFromArray($addonData, $data);
                 $addon->doSave($propelModel, $data);
                 $resourceAddons[$addonShortName] = $addon;
             }
         }
 
         return $resourceAddons;
+    }
+
+    /**
+     * The part of an addon payload the operation is allowed to write.
+     *
+     * The addon is read from the raw request body, past the serializer, so its
+     * fields have to be held to the denormalization groups of the operation the
+     * way the resource's own fields are: a field reserved to the administration
+     * is dropped from a front write, and so is a field the addon does not declare.
+     * An operation without groups writes every declared field.
+     *
+     * @param array<string, mixed> $addonData
+     *
+     * @return array<string, mixed>
+     */
+    private function writableAddonData(string $addonClass, array $addonData, Operation $operation): array
+    {
+        if (!$this->classMetadataFactory instanceof ClassMetadataFactoryInterface) {
+            return $addonData;
+        }
+
+        $attributes = $this->classMetadataFactory->getMetadataFor($addonClass)->getAttributesMetadata();
+        $operationGroups = $operation->getDenormalizationContext()['groups'] ?? null;
+        $operationGroups = null === $operationGroups ? null : (array) $operationGroups;
+
+        return array_filter(
+            $addonData,
+            static function (string|int $field) use ($attributes, $operationGroups): bool {
+                if (!isset($attributes[$field])) {
+                    return false;
+                }
+
+                if (null === $operationGroups || \in_array('*', $operationGroups, true)) {
+                    return true;
+                }
+
+                $fieldGroups = $attributes[$field]->getGroups();
+
+                return \in_array('*', $fieldGroups, true) || [] !== array_intersect($fieldGroups, $operationGroups);
+            },
+            \ARRAY_FILTER_USE_KEY,
+        );
     }
 
     /**

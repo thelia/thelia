@@ -74,9 +74,12 @@ use Thelia\Model\Map\CustomerTableMap;
             uriTemplate: '/front/account/customers/{id}',
             security: 'is_granted("ROLE_CUSTOMER") and object.getId() == user.getId()',
         ),
+        // The customer updates the account in place: what the front write group leaves
+        // out (e-mail, reference, discount) keeps its value instead of being emptied.
         new Put(
             uriTemplate: '/front/account/customers/{id}',
             security: 'is_granted("ROLE_CUSTOMER") and object.getId() == user.getId()',
+            extraProperties: ['standard_put' => false],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_FRONT_READ_SINGLE]],
