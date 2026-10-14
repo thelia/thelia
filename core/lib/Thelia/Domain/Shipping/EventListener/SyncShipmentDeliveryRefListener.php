@@ -14,11 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Shipping\EventListener;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\OrderShipment;
 use Thelia\Model\OrderShipmentQuery;
 
 /**
@@ -40,11 +38,7 @@ final readonly class SyncShipmentDeliveryRefListener
             return;
         }
 
-        $first = OrderShipmentQuery::create()
-            ->filterByOrderId($event->getOrder()->getId())
-            ->filterByStatus(OrderShipment::STATUS_CANCELLED, Criteria::NOT_EQUAL)
-            ->orderById()
-            ->findOne();
+        $first = OrderShipmentQuery::create()->findFirstParcelOfOrder($event->getOrder()->getId());
 
         if (null === $first || trim((string) $first->getDeliveryRef()) === $deliveryRef) {
             return;

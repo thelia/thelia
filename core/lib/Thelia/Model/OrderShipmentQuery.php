@@ -14,8 +14,21 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\OrderShipmentQuery as BaseOrderShipmentQuery;
 
 class OrderShipmentQuery extends BaseOrderShipmentQuery
 {
+    /**
+     * The first parcel of an order is its oldest shipment that was not cancelled: the one
+     * that stands for the order and carries the tracking number the order shows.
+     */
+    public function findFirstParcelOfOrder(int $orderId): ?OrderShipment
+    {
+        return $this
+            ->filterByOrderId($orderId)
+            ->filterByStatus(OrderShipment::STATUS_CANCELLED, Criteria::NOT_EQUAL)
+            ->orderById()
+            ->findOne();
+    }
 }

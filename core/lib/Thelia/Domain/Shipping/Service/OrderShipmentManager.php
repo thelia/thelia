@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Shipping\Service;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -282,11 +281,7 @@ final readonly class OrderShipmentManager
      */
     private function isFirstParcel(OrderShipment $shipment): bool
     {
-        $first = OrderShipmentQuery::create()
-            ->filterByOrderId($shipment->getOrderId())
-            ->filterByStatus(OrderShipment::STATUS_CANCELLED, Criteria::NOT_EQUAL)
-            ->orderById()
-            ->findOne();
+        $first = OrderShipmentQuery::create()->findFirstParcelOfOrder($shipment->getOrderId());
 
         return null !== $first && $first->getId() === $shipment->getId();
     }
