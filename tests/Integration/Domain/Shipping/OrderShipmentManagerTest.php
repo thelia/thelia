@@ -151,6 +151,21 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
         self::assertCount(2, OrderShipmentQuery::create()->filterByOrderId($order->getId())->filterByStatus(OrderShipment::STATUS_SHIPPED)->find());
     }
 
+    public function testADraftKeptForLaterNeitherSendsTheOrderNorLeavesWithTheOtherParcel(): void
+    {
+        [$order, $first, $second] = $this->paidOrderOfTwoLines(1.0, 1.0);
+
+        $parcel = $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 1.0)]);
+        $keptForLater = $this->manager->open($order, [new ShipmentLine((int) $second->getId(), 1.0)]);
+
+        $this->manager->ship($parcel);
+
+        self::assertSame(OrderShipment::STATUS_DRAFT, OrderShipmentQuery::create()->findPk($keptForLater->getId())?->getStatus(), 'The draft kept for later does not leave on its own.');
+        self::assertSame(OrderStatus::CODE_PARTIALLY_SHIPPED, $this->statusCodeOf($order), 'One parcel of two left: the order is partially shipped, not sent.');
+        self::assertFalse($this->quantities->isFullyShipped($order), 'A line waiting in a draft has not left.');
+        self::assertSame([(int) $first->getId() => 0.0, (int) $second->getId() => 0.0], $this->quantities->remainingByOrderProduct($order), 'The draft still holds its line against what is left to ship.');
+    }
+
     public function testAnOrderMarkedSentByHandGetsOneShipmentCarryingEverythingLeft(): void
     {
         [$order, $first, $second] = $this->paidOrderOfTwoLines(3.0, 2.0);
