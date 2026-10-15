@@ -121,6 +121,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
 
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Shown brand'],
                 'feature/Colour' => ['Blue'],
             ],
@@ -168,6 +169,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
 
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Shown brand'],
                 'feature/Colour' => ['Blue'],
             ],
