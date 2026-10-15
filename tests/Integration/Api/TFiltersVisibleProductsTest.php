@@ -55,6 +55,9 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
     {
         self::assertSame(
             [
+                // Every product of the catalogue below sits at a quantity of 0 and at the same
+                // price: availability offers one value, and the price no interval.
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Hidden brand', 'Shown brand'],
                 'feature/Colour' => ['Blue', 'Red'],
             ],
@@ -66,6 +69,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
     {
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Shown brand'],
                 'feature/Colour' => ['Blue'],
             ],
@@ -77,6 +81,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
     {
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Hidden brand'],
                 'feature/Colour' => ['Red'],
             ],
@@ -116,6 +121,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
 
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Shown brand'],
                 'feature/Colour' => ['Blue'],
             ],
@@ -163,6 +169,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
 
         self::assertSame(
             [
+                'availability/Availability' => ['On order or out of stock'],
                 'brand/Brand' => ['Shown brand'],
                 'feature/Colour' => ['Blue'],
             ],
