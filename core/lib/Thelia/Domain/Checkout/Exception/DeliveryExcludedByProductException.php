@@ -34,9 +34,11 @@ class DeliveryExcludedByProductException extends InvalidDeliveryException
         ?\Throwable $previous = null,
     ) {
         CheckoutException::__construct(
-            $noCarrierLeft
-                ? 'No carrier can ship %products. Remove it from your cart to complete your order.'
-                : 'The chosen carrier cannot ship %products. Choose another carrier.',
+            match (true) {
+                !$noCarrierLeft => 'The chosen carrier cannot ship %products. Choose another carrier.',
+                \count($products) > 1 => 'No carrier can ship %products. Remove them from your cart to complete your order.',
+                default => 'No carrier can ship %products. Remove it from your cart to complete your order.',
+            },
             $code,
             $previous,
             ['%products' => implode(', ', $products)],

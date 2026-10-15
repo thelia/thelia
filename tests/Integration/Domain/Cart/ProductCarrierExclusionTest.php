@@ -120,6 +120,15 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
         self::assertSame([$product->getId()], $checker->productsBlockingEveryCarrier($cart, $country, null));
     }
 
+    public function testTheRefusalAgreesWithTheNumberOfProductsItNames(): void
+    {
+        $one = new DeliveryExcludedByProductException([7 => 'Garden furnace'], true);
+        $two = new DeliveryExcludedByProductException([7 => 'Garden furnace', 8 => 'Gas cylinder'], true);
+
+        self::assertStringContainsString('Garden furnace. Remove it from your cart', $one->getMessage());
+        self::assertStringContainsString('Garden furnace, Gas cylinder. Remove them from your cart', $two->getMessage());
+    }
+
     public function testOnlyAnActiveDeliveryModuleCanBeExcluded(): void
     {
         $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());

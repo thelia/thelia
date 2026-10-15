@@ -869,6 +869,7 @@ return [
     'This order requires an account.' => 'Este pedido requiere una cuenta.',
     'This shop is not asking for the consent "%consent".' => 'Esta tienda no solicita el consentimiento "%consent".',
     'You must accept "%consent" to place this order.' => 'Debe aceptar "%consent" para realizar este pedido.',
+    'No carrier can ship %products. Remove them from your cart to complete your order.' => 'Ningún transportista puede enviar %products. Retírelos de su carrito para completar su pedido.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Ningún transportista puede enviar %products. Retírelo de su carrito para completar su pedido.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'El transportista elegido no puede enviar %products. Elija otro transportista.',
 ];
