@@ -70,6 +70,7 @@ use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
 use Thelia\Api\Resource\ProductCategory;
 use Thelia\Api\Resource\ProductDocument;
+use Thelia\Api\Resource\ProductExcludedDeliveryModule;
 use Thelia\Api\Resource\ProductImage;
 use Thelia\Api\Resource\ProductPrice;
 use Thelia\Api\Resource\ProductSaleElements;
@@ -157,6 +158,7 @@ final readonly class AdminApiResourcePermissions
         ProductAssociationType::class => AdminResources::CONFIG,
         ProductCategory::class => AdminResources::PRODUCT,
         ProductDocument::class => AdminResources::PRODUCT,
+        ProductExcludedDeliveryModule::class => AdminResources::PRODUCT,
         ProductImage::class => AdminResources::PRODUCT,
         ProductPrice::class => AdminResources::PRODUCT,
         ProductSaleElements::class => AdminResources::PRODUCT,
