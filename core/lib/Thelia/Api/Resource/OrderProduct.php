@@ -113,6 +113,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?int $id = null;
 
@@ -135,6 +137,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productRef;
@@ -150,6 +154,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public string $productSaleElementsRef;
@@ -174,6 +180,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?string $title = null;
 
@@ -205,6 +213,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     // order_product.quantity is a FLOAT: a line of goods sold by weight carries
@@ -222,6 +232,8 @@ class OrderProduct implements PropelResourceInterface
         OrderReturn::GROUP_FRONT_READ,
         OrderReturnLine::GROUP_ADMIN_READ,
         OrderReturnLine::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
     public float $price;

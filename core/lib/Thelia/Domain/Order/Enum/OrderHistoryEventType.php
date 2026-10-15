@@ -34,4 +34,7 @@ enum OrderHistoryEventType: string
     case RETURN_OPENED = 'return_opened';
     case RETURN_STATUS_CHANGED = 'return_status_changed';
     case RETURN_RECEIVED = 'return_received';
+    case SHIPMENT_OPENED = 'shipment_opened';
+    case SHIPMENT_SHIPPED = 'shipment_shipped';
+    case SHIPMENT_CANCELLED = 'shipment_cancelled';
 }

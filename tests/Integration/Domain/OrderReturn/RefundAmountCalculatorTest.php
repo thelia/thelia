@@ -123,6 +123,121 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
         self::assertSame(0.0, round($this->calculator->lineRefundForProduct($orderProduct, 1.0), 2));
     }
 
+    public function testALineBoughtInPromoIsRefundedAtItsPromoPriceAndPromoTax(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '30.000000', quantity: 1.0, unitTax: '6.000000', promoPrice: '20.000000', promoTax: '4.000000');
+
+        self::assertSame(24.0, $this->calculator->unitTaxedPrice($orderProduct));
+    }
+
+    public function testEveryTaxOfALineIsRefunded(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '30.000000', quantity: 1.0, unitTax: '6.000000', otherTax: '1.500000');
+
+        self::assertSame(37.5, $this->calculator->unitTaxedPrice($orderProduct));
+    }
+
+    /**
+     * With the sum of roundings, the shop charged each unit amount rounded to the
+     * cent - the price and the taxes apart - and the order total adds them up.
+     */
+    public function testWithTheSumOfRoundingsEachUnitAmountIsRoundedToTheCent(): void
+    {
+        ConfigQuery::write('order_rounding_mode', (string) ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '10.046000', quantity: 3.0, unitTax: '2.046000');
+
+        self::assertEqualsWithDelta(12.1, $this->calculator->unitTaxedPrice($orderProduct), 1e-9);
+        self::assertEqualsWithDelta(36.3, $this->calculator->lineRefundForProduct($orderProduct, 3.0), 1e-9);
+        self::assertEqualsWithDelta(
+            $order->getTotalAmount(),
+            $this->calculator->lineRefundForProduct($orderProduct, 3.0),
+            1e-9,
+            'The whole line refunds what the order charged for it.',
+        );
+    }
+
+    /**
+     * With the rounding of sums, a price kept per gram is multiplied at full
+     * precision and only the line total is rounded to the cent.
+     */
+    public function testWithTheRoundingOfSumsOnlyTheLineTotalIsRoundedToTheCent(): void
+    {
+        ConfigQuery::write('order_rounding_mode', (string) ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '10.004000', quantity: 3.0, unitTax: '0.000000');
+
+        self::assertEqualsWithDelta(10.004, $this->calculator->unitTaxedPrice($orderProduct), 1e-9);
+        self::assertEqualsWithDelta(30.01, $this->calculator->lineRefundForProduct($orderProduct, 3.0), 1e-9);
+        self::assertEqualsWithDelta(
+            $order->getTotalAmount(),
+            $this->calculator->lineRefundForProduct($orderProduct, 3.0),
+            1e-9,
+            'The whole line refunds what the order charged for it.',
+        );
+    }
+
+    /**
+     * The postage is stored tax included: carried back, it refunds what the
+     * customer paid for it, its tax already in it.
+     */
+    public function testTheReturnedPostageIsRefundedAsTheCustomerPaidForIt(): void
+    {
+        $order = $this->factory->order(null, [
+            'statusCode' => OrderStatus::CODE_PAID,
+            'postage' => '6.000000',
+            'postageTax' => '1.000000',
+        ]);
+        $orderProduct = $this->orderProduct($order, price: '30.000000', quantity: 1.0, unitTax: '6.000000');
+
+        $withPostage = $this->returnOf($order, [[$orderProduct, 1.0]]);
+        $withPostage->setIncludePostage(true)->save($this->getPropelConnection());
+        $withoutPostage = $this->returnOf($order, [[$orderProduct, 1.0]]);
+
+        self::assertSame(42.0, round($order->getTotalAmount(), 2));
+        self::assertSame(42.0, round($this->calculator->compute($withPostage), 2));
+        self::assertSame(36.0, round($this->calculator->compute($withoutPostage), 2));
+    }
+
+    /**
+     * The discount is granted on the lines, so the postage is no part of the base
+     * it is shared over.
+     */
+    public function testThePostageTakesNoShareOfTheDiscount(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID, 'postage' => '10.000000']);
+        $order->setDiscount('21.000000');
+        $order->save($this->getPropelConnection());
+        $first = $this->orderProduct($order, price: '30.000000', quantity: 2.0, unitTax: '6.000000');
+        $this->orderProduct($order, price: '10.000000', quantity: 1.0, unitTax: '2.000000');
+
+        self::assertSame(27.0, round($this->calculator->lineRefundForProduct($first, 1.0), 2));
+    }
+
+    /**
+     * At the reception the refund follows what came back, not what was asked
+     * for; a line nothing was received for - its received quantity cleared -
+     * refunds nothing.
+     */
+    public function testTheRefundAtTheReceptionCountsTheReceivedQuantities(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $received = $this->orderProduct($order, price: '30.000000', quantity: 2.0, unitTax: '6.000000');
+        $missing = $this->orderProduct($order, price: '10.000000', quantity: 1.0, unitTax: '2.000000');
+
+        $return = $this->returnOf($order, [[$received, 2.0], [$missing, 1.0]]);
+        foreach ($return->getOrderReturnLines() as $line) {
+            $line
+                ->setQuantityReceived($line->getOrderProductId() === $received->getId() ? 1.0 : null)
+                ->save($this->getPropelConnection());
+        }
+
+        self::assertSame(84.0, round($this->calculator->compute($return), 2));
+        self::assertSame(36.0, round($this->calculator->compute($return, useReceivedQuantity: true), 2));
+    }
+
     private function discountedOrder(): Order
     {
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
@@ -132,8 +247,18 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
         return $order;
     }
 
-    private function orderProduct(Order $order, string $price, float $quantity, string $unitTax, bool $offered = false): OrderProductModel
-    {
+    private function orderProduct(
+        Order $order,
+        string $price,
+        float $quantity,
+        string $unitTax,
+        bool $offered = false,
+        ?string $promoPrice = null,
+        ?string $promoTax = null,
+        ?string $otherTax = null,
+    ): OrderProductModel {
+        $wasInPromo = null !== $promoPrice;
+
         $orderProduct = (new OrderProductModel())
             ->setOrderId((int) $order->getId())
             ->setProductRef('REF-'.uniqid())
@@ -142,9 +267,9 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
             ->setTitle('A returnable product')
             ->setQuantity($quantity)
             ->setPrice($price)
-            ->setPromoPrice($price)
+            ->setPromoPrice($promoPrice ?? $price)
             ->setWasNew(1)
-            ->setWasInPromo(0)
+            ->setWasInPromo($wasInPromo ? 1 : 0)
             ->setVirtual(0)
             ->setIsOffered($offered ? 1 : 0);
         $orderProduct->save($this->getPropelConnection());
@@ -154,7 +279,16 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
                 ->setOrderProductId((int) $orderProduct->getId())
                 ->setTitle('VAT')
                 ->setAmount($unitTax)
-                ->setPromoAmount($unitTax)
+                ->setPromoAmount($promoTax ?? $unitTax)
+                ->save($this->getPropelConnection());
+        }
+
+        if (null !== $otherTax) {
+            (new OrderProductTax())
+                ->setOrderProductId((int) $orderProduct->getId())
+                ->setTitle('Eco-contribution')
+                ->setAmount($otherTax)
+                ->setPromoAmount($otherTax)
                 ->save($this->getPropelConnection());
         }
 

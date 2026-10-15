@@ -996,6 +996,55 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="order_shipment" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column description="the shipment number: the order reference followed by the rank of the shipment in the order" name="ref" required="true" size="55" type="VARCHAR" />
+    <column defaultValue="draft" description="draft while being composed, shipped once handed to the carrier, cancelled when given up before it left" name="status" required="true" size="20" type="VARCHAR" />
+    <column description="the carrier module the parcel left with, NULL once that module is gone" name="delivery_module_id" type="INTEGER" />
+    <column description="the carrier name snapshot, kept when the module is gone" name="delivery_module_title" size="255" type="VARCHAR" />
+    <column description="the tracking number the carrier gave for this parcel" name="delivery_ref" size="100" type="VARCHAR" />
+    <column description="when the parcel was handed to the carrier, NULL while it is a draft" name="shipped_at" type="TIMESTAMP" />
+    <foreign-key foreignTable="order" name="fk_order_shipment_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_order_shipment_delivery_module_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
+    <index name="idx_order_shipment_order_id">
+      <index-column name="order_id" />
+    </index>
+    <index name="idx_order_shipment_delivery_module_id">
+      <index-column name="delivery_module_id" />
+    </index>
+    <unique name="order_shipment_ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="order_shipment_item" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_shipment_id" required="true" type="INTEGER" />
+    <column name="order_product_id" required="true" type="INTEGER" />
+    <column description="how much of the order line this shipment carries" name="quantity" required="true" type="FLOAT" />
+    <foreign-key foreignTable="order_shipment" name="fk_order_shipment_item_order_shipment_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_shipment_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_product" name="fk_order_shipment_item_order_product_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_product_id" />
+    </foreign-key>
+    <index name="idx_order_shipment_item_order_shipment_id">
+      <index-column name="order_shipment_id" />
+    </index>
+    <index name="idx_order_shipment_item_order_product_id">
+      <index-column name="order_product_id" />
+    </index>
+    <unique name="order_shipment_item_line_UNIQUE">
+      <unique-column name="order_shipment_id" />
+      <unique-column name="order_product_id" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
 
   <table name="order_status_transition" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />

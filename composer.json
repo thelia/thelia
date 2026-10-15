@@ -88,7 +88,7 @@
         ],
         "test:prepare": [
             "@phpc bin/test-prepare",
-            "@phpc bin/console cache:warmup --env=test"
+            "@phpc bin/console cache:warmup --env=test --no-debug"
         ],
         "test:unit": [
             "@phpc ./vendor/bin/phpunit --testsuite unit"

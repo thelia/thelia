@@ -14,11 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing\Rule\Scope;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\DataFetcher\DataFetcherInterface;
+use Propel\Runtime\Propel;
 use Thelia\Domain\Pricing\Rule\Scope\ScopeMaterializer;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleProductSaleElementsQuery;
 use Thelia\Model\Category;
 use Thelia\Model\Currency;
+use Thelia\Model\Map\CatalogPriceRuleTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -71,6 +76,23 @@ final class ScopeMaterializerTest extends ActionIntegrationTestCase
         self::assertEqualsCanonicalizing([$this->pseOf($inWinter)->getId(), $this->pseOf($inCoats)->getId()], $change->after);
         self::assertNotContains($this->pseOf($inSummer)->getId(), $change->after);
         self::assertEqualsCanonicalizing($change->after, $this->storedScopeOf($rule));
+    }
+
+    public function testEveryCategoryBelowTheNamedOneIsCovered(): void
+    {
+        $boots = $this->factory->category(['parent' => $this->winter->getId()]);
+        $hikingBoots = $this->factory->category(['parent' => $boots->getId()]);
+        $inCoats = $this->product($this->coats);
+        $inBoots = $this->product($boots);
+        $inHikingBoots = $this->product($hikingBoots);
+
+        $rule = $this->factory->catalogPriceRule();
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_CATEGORY, $this->winter->getId());
+
+        self::assertEqualsCanonicalizing(
+            [$this->pseOf($inCoats)->getId(), $this->pseOf($inBoots)->getId(), $this->pseOf($inHikingBoots)->getId()],
+            $this->materializer->materializeRule($rule)->after,
+        );
     }
 
     public function testSubcategoriesStayOutWhenTheRuleSaysSo(): void
@@ -203,6 +225,49 @@ final class ScopeMaterializerTest extends ActionIntegrationTestCase
         self::assertSame(['some_module_type'], $change->unknownCriterionTypes);
     }
 
+    public function testEveryCriterionTypeNoResolverAnswersForIsReported(): void
+    {
+        $rule = $this->factory->catalogPriceRule();
+        $this->factory->catalogPriceRuleCriterion($rule, 'module_a_type', 1);
+        $this->factory->catalogPriceRuleCriterion($rule, 'module_b_type', 1);
+
+        self::assertSame(['module_a_type', 'module_b_type'], $this->materializer->materializeRule($rule)->unknownCriterionTypes);
+    }
+
+    public function testReEvaluatingOneProductReportsEveryRule(): void
+    {
+        $product = $this->product($this->winter);
+        $byCategory = $this->factory->catalogPriceRule();
+        $this->factory->catalogPriceRuleCriterion($byCategory, CatalogPriceRule::CRITERION_CATEGORY, $this->winter->getId());
+        $byProduct = $this->factory->catalogPriceRule();
+        $this->factory->catalogPriceRuleCriterion($byProduct, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+
+        $changes = $this->materializer->materializeProduct($product->getId());
+
+        $afterByRule = [];
+        foreach ($changes as $change) {
+            $afterByRule[$change->ruleId] = $change->after;
+        }
+        self::assertSame([$this->pseOf($product)->getId()], $afterByRule[$byCategory->getId()] ?? null);
+        self::assertSame([$this->pseOf($product)->getId()], $afterByRule[$byProduct->getId()] ?? null);
+    }
+
+    public function testTheConnectionTheCallerHandsInIsTheOneUsed(): void
+    {
+        $product = $this->product($this->winter);
+        $rule = $this->factory->catalogPriceRule();
+        $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+        $statements = new \ArrayObject();
+        $connection = $this->recordingConnection($statements);
+
+        $this->materializer->materializeRule($rule, $connection);
+        self::assertNotCount(0, $statements, 'materializing a rule');
+
+        $statements->exchangeArray([]);
+        $this->materializer->materializeProduct($product->getId(), $connection);
+        self::assertNotCount(0, $statements, 'materializing a product');
+    }
+
     /**
      * Recette 2 of the ticket: a product filed in the category on the 15th enters
      * the rule from that moment, and nothing else about the scope moves.
@@ -247,6 +312,44 @@ final class ScopeMaterializerTest extends ActionIntegrationTestCase
             $change->touchedProductSaleElementsIds(),
         );
         self::assertFalse($change->isUnchanged());
+    }
+
+    /**
+     * The shop connection under another wrapper, which writes down the statements
+     * run through it.
+     *
+     * @param \ArrayObject<int, string> $statements
+     */
+    private function recordingConnection(\ArrayObject $statements): ConnectionWrapper
+    {
+        $shopConnection = Propel::getWriteConnection(CatalogPriceRuleTableMap::DATABASE_NAME);
+        self::assertInstanceOf(ConnectionWrapper::class, $shopConnection);
+        $pdoConnection = $shopConnection->getWrappedConnection();
+        self::assertNotNull($pdoConnection);
+
+        return new class($pdoConnection, $statements) extends ConnectionWrapper {
+            /**
+             * @param \ArrayObject<int, string> $statements
+             */
+            public function __construct(ConnectionInterface $connection, private readonly \ArrayObject $statements)
+            {
+                parent::__construct($connection);
+            }
+
+            public function exec($statement): int
+            {
+                $this->statements->append($statement);
+
+                return parent::exec($statement);
+            }
+
+            public function query(string $statement, ...$args): DataFetcherInterface
+            {
+                $this->statements->append($statement);
+
+                return parent::query($statement, ...$args);
+            }
+        };
     }
 
     private function product(Category $category, ?\Thelia\Model\Brand $brand = null): Product

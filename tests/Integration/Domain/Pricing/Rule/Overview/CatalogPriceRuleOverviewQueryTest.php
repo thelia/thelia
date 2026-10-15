@@ -62,14 +62,92 @@ final class CatalogPriceRuleOverviewQueryTest extends ActionIntegrationTestCase
         self::assertSame(CatalogPriceRule::STATE_RUNNING, $overview[0]->state);
         self::assertSame(2, $overview[0]->productCount);
         self::assertSame(3, $overview[0]->saleElementCount);
+        self::assertSame(0, $overview[0]->customerCount);
 
         self::assertSame(CatalogPriceRule::STATE_SCHEDULED, $overview[1]->state);
         self::assertSame(1, $overview[1]->customerCount);
 
         self::assertSame(CatalogPriceRule::STATE_EXPIRED, $overview[2]->state);
+        self::assertSame(0, $overview[2]->productCount, 'never materialized, it covers nothing');
+        self::assertSame(0, $overview[2]->saleElementCount);
+        self::assertSame(0, $overview[2]->customerCount);
         self::assertSame(CatalogPriceRule::STATE_INACTIVE, $overview[3]->state);
         self::assertSame(['moon_phase'], $overview[3]->unknownCriterionTypes);
 
         self::assertLessThanOrEqual(4, \count(array_filter($statements, static fn (string $statement): bool => str_starts_with($statement, 'SELECT'))), 'a fixed number of statements, whatever the number of rules');
+    }
+
+    public function testEveryRuleGetsItsOwnCounts(): void
+    {
+        $currency = $this->factory->currency();
+        $category = $this->factory->category();
+        $taxRule = $this->factory->taxRule();
+        $title = $this->factory->customerTitle();
+        $repricer = $this->getService(RuleRepricer::class);
+
+        $rules = [];
+
+        // Each product a rule covers comes with a customer of its audience.
+        foreach ([1, 2] as $productCount) {
+            $rule = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS]);
+
+            for ($i = 0; $i < $productCount; ++$i) {
+                $product = $this->factory->product($category, $taxRule, $currency);
+                $this->factory->catalogPriceRuleCriterion($rule, CatalogPriceRule::CRITERION_PRODUCT, $product->getId());
+                $customer = $this->factory->customer($title);
+                $this->factory->catalogPriceRuleCustomer($rule, $customer);
+            }
+
+            $repricer->afterRuleChanged($rule);
+            $rules[] = $rule;
+        }
+
+        $unresolved = [];
+
+        foreach (['moon_phase', 'tide_level'] as $type) {
+            $rule = $this->factory->catalogPriceRule();
+            $this->factory->catalogPriceRuleCriterion($rule, $type, 1);
+            $unresolved[] = $rule;
+        }
+
+        $overview = $this->getService(CatalogPriceRuleOverviewQuery::class)->overview(array_map(
+            static fn (CatalogPriceRule $rule): int => (int) $rule->getId(),
+            [...$rules, ...$unresolved],
+        ));
+
+        self::assertSame([1, 2, 0, 0], array_map(static fn ($line): int => $line->productCount, $overview));
+        self::assertSame([1, 2, 0, 0], array_map(static fn ($line): int => $line->saleElementCount, $overview));
+        self::assertSame([1, 2, 0, 0], array_map(static fn ($line): int => $line->customerCount, $overview));
+        self::assertSame([[], [], ['moon_phase'], ['tide_level']], array_map(static fn ($line): array => $line->unknownCriterionTypes, $overview));
+    }
+
+    public function testTheStateIsReadAtTheGivenMoment(): void
+    {
+        $scheduled = $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0, 'startDate' => new \DateTime('+1 day')]);
+
+        $line = $this->getService(CatalogPriceRuleOverviewQuery::class)->forRule($scheduled->getId(), new \DateTimeImmutable('+2 days'));
+
+        self::assertNotNull($line);
+        self::assertSame(CatalogPriceRule::STATE_RUNNING, $line->state);
+    }
+
+    public function testOnlyTheAskedRulesAreListed(): void
+    {
+        $this->factory->catalogPriceRule(['priority' => 1]);
+        $asked = $this->factory->catalogPriceRule(['priority' => 2]);
+        $query = $this->getService(CatalogPriceRuleOverviewQuery::class);
+
+        self::assertSame($asked->getId(), $query->forRule($asked->getId())?->rule->getId());
+        self::assertSame([], $query->overview([]));
+    }
+
+    public function testWithoutIdsEveryRuleIsListed(): void
+    {
+        $first = $this->factory->catalogPriceRule(['priority' => 1]);
+        $second = $this->factory->catalogPriceRule(['priority' => 2]);
+
+        $everyRuleId = array_map(static fn ($line): int => (int) $line->rule->getId(), $this->getService(CatalogPriceRuleOverviewQuery::class)->overview());
+        self::assertContains($first->getId(), $everyRuleId);
+        self::assertContains($second->getId(), $everyRuleId);
     }
 }

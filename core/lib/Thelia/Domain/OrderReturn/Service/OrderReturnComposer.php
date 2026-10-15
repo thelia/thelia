@@ -98,7 +98,8 @@ final readonly class OrderReturnComposer
     {
         $this->eligibility->assertPostageNotAlreadyReturned($order);
 
-        return (float) $order->getPostage() + (float) $order->getPostageTax();
+        // Stored tax included, like the postage of a cart.
+        return (float) $order->getPostage();
     }
 
     /**

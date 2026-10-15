@@ -216,6 +216,28 @@ final class OrderReturnHistoryTest extends ActionIntegrationTestCase
     }
 
     /**
+     * A return holding no status in memory - the database never stores one
+     * without - has moved nowhere the timeline could name.
+     */
+    public function testAStatusChangeOntoNoStatusWritesNothing(): void
+    {
+        [$customer, $order, $orderProduct] = $this->paidOrder(quantity: 3.0);
+        $return = $this->openReturn($customer, $order, $orderProduct, quantity: 2.0);
+
+        $listener = $this->getService(RecordOrderReturnHistoryListener::class);
+        $event = new OrderReturnEvent($return);
+
+        $listener->rememberStatusBeforeChange($event);
+        $return->setOrderReturnStatus(null);
+        $listener->onReturnStatusChanged($event);
+
+        self::assertCount(
+            0,
+            $this->entriesOfType($order, OrderHistoryEventType::RETURN_STATUS_CHANGED),
+        );
+    }
+
+    /**
      * @return array{Customer, Order, OrderProductModel}
      */
     private function paidOrder(float $quantity): array

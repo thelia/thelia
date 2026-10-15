@@ -61,6 +61,8 @@ use Thelia\Api\Resource\OrderReturn;
 use Thelia\Api\Resource\OrderReturnLine;
 use Thelia\Api\Resource\OrderReturnReason;
 use Thelia\Api\Resource\OrderReturnStatus;
+use Thelia\Api\Resource\OrderShipment;
+use Thelia\Api\Resource\OrderShipmentItem;
 use Thelia\Api\Resource\OrderStatus;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
@@ -138,6 +140,8 @@ final readonly class AdminApiResourcePermissions
         OrderProduct::class => AdminResources::ORDER,
         OrderProductTax::class => AdminResources::ORDER,
         OrderStatus::class => AdminResources::ORDER_STATUS,
+        OrderShipment::class => AdminResources::ORDER,
+        OrderShipmentItem::class => AdminResources::ORDER,
         OrderReturn::class => AdminResources::ORDER_RETURN,
         OrderReturnLine::class => AdminResources::ORDER_RETURN,
         OrderReturnStatus::class => AdminResources::ORDER_RETURN,

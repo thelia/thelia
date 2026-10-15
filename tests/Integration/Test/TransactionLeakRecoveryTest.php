@@ -43,7 +43,7 @@ final class TransactionLeakRecoveryTest extends IntegrationTestCase
 
         self::assertInstanceOf(ConnectionWrapper::class, $connection);
         self::assertSame(
-            1,
+            self::TEST_TRANSACTION_LEVELS,
             $connection->getNestedTransactionCount(),
             'Only the per-test wrapper transaction must be open: the level leaked by the previous test was not rolled back.',
         );

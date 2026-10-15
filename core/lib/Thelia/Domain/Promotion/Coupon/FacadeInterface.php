@@ -41,7 +41,7 @@ interface FacadeInterface
     /**
      * Return an Address a CouponManager can process.
      */
-    public function getDeliveryAddress(): Address;
+    public function getDeliveryAddress(): ?Address;
 
     /**
      * @return Country the delivery country
@@ -90,8 +90,11 @@ interface FacadeInterface
 
     /**
      * Return the number of Products include quantity in the Cart.
+     *
+     * The exact sum of the line quantities: a product sold by weight is bought
+     * in a decimal quantity, so the sum may be a float.
      */
-    public function getNbArticlesInCartIncludeQuantity(): int;
+    public function getNbArticlesInCartIncludeQuantity(): int|float;
 
     /**
      * Find one Coupon in the database from its code.

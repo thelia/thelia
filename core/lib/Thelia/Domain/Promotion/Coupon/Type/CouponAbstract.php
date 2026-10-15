@@ -22,6 +22,7 @@ use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 
 /**
@@ -69,6 +70,8 @@ abstract class CouponAbstract implements CouponInterface
     protected bool $isRemovingPostage = false;
     protected int $maxUsage = -1;
     protected bool $isAvailableOnSpecialOffers = false;
+
+    /** @var CouponCountry[] */
     protected array $freeShippingForCountries = [];
 
     /** @var CouponModule[] */
@@ -138,10 +141,10 @@ abstract class CouponAbstract implements CouponInterface
             : .0;
 
         $this->freeShippingForCountries = $freeShippingForCountries instanceof ObjectCollection
-            ? $freeShippingForCountries->toArray()
+            ? $freeShippingForCountries->getData()
             : $freeShippingForCountries;
         $this->freeShippingForModules = $freeShippingForModules instanceof ObjectCollection
-            ? $freeShippingForModules->toArray()
+            ? $freeShippingForModules->getData()
             : $freeShippingForModules;
         $this->perCustomerUsageCount = $perCustomerUsageCount;
 
@@ -359,12 +362,11 @@ abstract class CouponAbstract implements CouponInterface
         $couponSpecificData = json_decode((string) $data[self::COUPON_DATASET_NAME], true);
 
         if (isset($couponSpecificData[$fieldName])) {
-            return $this->checkCouponFieldValue(
-                $fieldName,
-                \is_array($couponSpecificData[$fieldName])
-                    ? $couponSpecificData[$fieldName][0]
-                    : $couponSpecificData[$fieldName]
-            );
+            if (\is_array($couponSpecificData[$fieldName])) {
+                return $this->checkCouponFieldValueList($fieldName, $couponSpecificData[$fieldName]);
+            }
+
+            return $this->checkCouponFieldValue($fieldName, $couponSpecificData[$fieldName]);
         }
 
         if (null !== $defaultValue) {
@@ -372,6 +374,60 @@ abstract class CouponAbstract implements CouponInterface
         }
 
         throw new \InvalidArgumentException(\sprintf('The coupon field name %s was not found in the coupon form', $fieldName));
+    }
+
+    /**
+     * A field posted by a multiple select (products, categories, attribute values)
+     * holds a list: every entry is checked and the whole list is kept.
+     *
+     * @param array<mixed> $values
+     *
+     * @return list<string>
+     *
+     * @throws \InvalidArgumentException if an entry is not valid
+     */
+    protected function checkCouponFieldValueList(string $fieldName, array $values): array
+    {
+        if ([] === $values) {
+            // An empty selection gets the same answer as an empty field.
+            $this->checkCouponFieldValue($fieldName, '');
+
+            return [];
+        }
+
+        $checkedValues = [];
+
+        foreach ($values as $value) {
+            if (!\is_scalar($value)) {
+                throw new \InvalidArgumentException(\sprintf('The coupon field %s holds an invalid value', $fieldName));
+            }
+
+            $checkedValues[] = $this->checkCouponFieldValue($fieldName, (string) $value);
+        }
+
+        return $checkedValues;
+    }
+
+    /**
+     * The ids of a list effect, as integers. The back-office stores them as
+     * strings, the API as integers, and a coupon saved while only the first
+     * entry of a list was kept holds a single id.
+     *
+     * @return list<int>
+     */
+    protected function effectIdList(mixed $ids): array
+    {
+        if (\is_string($ids) || \is_int($ids)) {
+            $ids = explode(',', (string) $ids);
+        }
+
+        if (!\is_array($ids)) {
+            return [];
+        }
+
+        $ids = array_map('\intval', array_filter($ids, '\is_scalar'));
+
+        return array_values(array_filter($ids, static fn (int $id): bool => $id > 0));
     }
 
     /**

@@ -509,8 +509,6 @@ final class CheckoutGiftWrappingTest extends GuestCheckoutTestCase
             TheliaEvents::MODULE_PAYMENT_IS_VALID,
             static function (IsValidPaymentEvent $event): void {
                 $event->setValidModule(true);
-                $event->setMinimumAmount(0);
-                $event->setMaximumAmount(0);
                 $event->stopPropagation();
             },
             512,

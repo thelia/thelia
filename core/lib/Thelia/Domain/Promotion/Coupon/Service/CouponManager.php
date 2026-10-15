@@ -310,7 +310,7 @@ class CouponManager implements ResetInterface
                 // If the list is empty, the shipping is free for all countries.
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
-                if (!$couponCountries->isEmpty()) {
+                if ([] !== $couponCountries) {
                     if (null === $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId()) {
                         continue;
                     }
@@ -336,7 +336,7 @@ class CouponManager implements ResetInterface
                 // If the list is empty, the shipping is free for all methods.
                 $couponModules = $coupon->getFreeShippingForModules();
 
-                if (!$couponModules->isEmpty()) {
+                if ([] !== $couponModules) {
                     $moduleValid = false;
 
                     $shippingModuleId = $cart->getDeliveryModuleId();
@@ -544,7 +544,8 @@ class CouponManager implements ResetInterface
                         ->setCount($newCount)
                         ->save();
 
-                    return $usageLeft - $newCount;
+                    // getUsagesLeft() already took the previous usages off.
+                    return $usageLeft - 1;
                 }
 
                 $coupon->setMaxUsage(--$usageLeft);
@@ -591,7 +592,7 @@ class CouponManager implements ResetInterface
                         ->setCount($newCount)
                         ->save();
 
-                    return $usageLeft - $newCount;
+                    return $usageLeft + 1;
                 }
             } else {
                 // Ad one usage to coupon

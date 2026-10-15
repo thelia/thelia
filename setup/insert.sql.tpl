@@ -107,7 +107,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
 (97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW()),
 (98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
-(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW())
+(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
+(100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
+(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2139,6 +2141,11 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 (5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
+-- Where an order sits once some of its parcels left and some are still to go: a
+-- custom status, equivalent to paid, the merchant may rename, recolour or delete.
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(7, 'partially_shipped', 'paid', '#20c997', 7, 0, NOW(), NOW());
+
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
 (2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
@@ -2313,7 +2320,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (96, '{{ locale }}', {{ intl('Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)', locale) }}, NULL, NULL, NULL),
     (97, '{{ locale }}', {{ intl('Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL),
     (98, '{{ locale }}', {{ intl('Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)', locale) }}, NULL, NULL, NULL),
-    (99, '{{ locale }}', {{ intl('Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (99, '{{ locale }}', {{ intl('Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', locale) }}, NULL, NULL, NULL),
+    (100, '{{ locale }}', {{ intl('Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)', locale) }}, NULL, NULL, NULL),
+    (101, '{{ locale }}', {{ intl('Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -3945,7 +3954,8 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (3, '{{ locale }}', {{ intl('Processing', locale) }}, '', '', ''),
     (4, '{{ locale }}', {{ intl('Sent', locale) }}, '', '', ''),
     (5, '{{ locale }}', {{ intl('Canceled', locale) }}, '', '', ''),
-    (6, '{{ locale }}', {{ intl('Refunded', locale) }}, '', '', ''){% if not loop.last %},{% endif %}
+    (6, '{{ locale }}', {{ intl('Refunded', locale) }}, '', '', ''),
+    (7, '{{ locale }}', {{ intl('Partially shipped', locale) }}, '', '', ''){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

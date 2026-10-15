@@ -51,6 +51,7 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderShipmentQuery;
 use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 
@@ -240,11 +241,22 @@ abstract class BaseController implements ControllerInterface
         bool $checkOrderStatus = true,
         bool $checkAdminUser = true,
         bool $browser = false,
+        ?int $shipmentId = null,
     ): Response {
         $order = OrderQuery::create()->findPk($order_id);
 
+        if (null === $order) {
+            throw new NotFoundHttpException();
+        }
+
         // check if the order has the paid status
         if ($checkAdminUser && $checkOrderStatus && !$order->isPaid(false) && !$this->getSecurityContext()->hasAdminUser()) {
+            throw new NotFoundHttpException();
+        }
+
+        // A delivery note of one parcel: the shipment must be one of this order's, or the
+        // answer is the same as for an order that does not exist.
+        if (null !== $shipmentId && null === OrderShipmentQuery::create()->filterById($shipmentId)->filterByOrderId($order_id)->findOne()) {
             throw new NotFoundHttpException();
         }
 
@@ -256,7 +268,7 @@ abstract class BaseController implements ControllerInterface
         $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $fileName);
         $parser->setTemplateDefinition($pdfTemplate, true);
 
-        $html = $parser->render($fileName, ['order_id' => $order_id]);
+        $html = $parser->render($fileName, ['order_id' => $order_id, 'shipment_id' => $shipmentId]);
 
         try {
             $pdfEvent = new PdfEvent($html);

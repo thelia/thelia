@@ -107,7 +107,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (96, 'vat_verification_lifetime_days', '90', 0, 0, NOW(), NOW()),
 (97, 'order_shipped_email_enabled', '1', 0, 0, NOW(), NOW()),
 (98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
-(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW())
+(99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
+(100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
+(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2139,6 +2141,11 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 (5, 'canceled', '#6c757d', 5, 1, NOW(), NOW()),
 (6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
+-- Where an order sits once some of its parcels left and some are still to go: a
+-- custom status, equivalent to paid, the merchant may rename, recolour or delete.
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(7, 'partially_shipped', 'paid', '#20c997', 7, 0, NOW(), NOW());
+
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
 (2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
@@ -2313,6 +2320,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'cs_CZ', NULL, NULL, NULL, NULL),
     (98, 'cs_CZ', NULL, NULL, NULL, NULL),
     (99, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (100, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (101, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2377,6 +2386,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'de_DE', NULL, NULL, NULL, NULL),
     (98, 'de_DE', NULL, NULL, NULL, NULL),
     (99, 'de_DE', NULL, NULL, NULL, NULL),
+    (100, 'de_DE', NULL, NULL, NULL, NULL),
+    (101, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2441,6 +2452,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'en_US', 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)', NULL, NULL, NULL),
     (98, 'en_US', 'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)', NULL, NULL, NULL),
     (99, 'en_US', 'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', NULL, NULL, NULL),
+    (100, 'en_US', 'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)', NULL, NULL, NULL),
+    (101, 'en_US', 'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2505,6 +2518,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'es_ES', NULL, NULL, NULL, NULL),
     (98, 'es_ES', NULL, NULL, NULL, NULL),
     (99, 'es_ES', NULL, NULL, NULL, NULL),
+    (100, 'es_ES', NULL, NULL, NULL, NULL),
+    (101, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2569,6 +2584,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'fr_FR', 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)', NULL, NULL, NULL),
     (98, 'fr_FR', 'Les retours déjà ouverts sur une ligne de commande retiennent une part de sa quantité (1), ou chaque demande de retour n\'est bornée que par la quantité commandée (0)', NULL, NULL, NULL),
     (99, 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)', NULL, NULL, NULL),
+    (100, 'fr_FR', 'Cache partagé des pages publiques anonymes : disabled (désactivé), announce (la page annonce combien de temps un cache partagé peut la garder, cookies inchangés) ou enabled (retire aussi les cookies d\'une page anonyme pour qu\'un proxy puisse la garder)', NULL, NULL, NULL),
+    (101, 'fr_FR', 'Secondes pendant lesquelles un cache partagé peut garder une page publique (entre 1 et 86400, 300 si invalide)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2633,6 +2650,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'it_IT', NULL, NULL, NULL, NULL),
     (98, 'it_IT', NULL, NULL, NULL, NULL),
     (99, 'it_IT', NULL, NULL, NULL, NULL),
+    (100, 'it_IT', NULL, NULL, NULL, NULL),
+    (101, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2697,6 +2716,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (97, 'nl_NL', NULL, NULL, NULL, NULL),
     (98, 'nl_NL', NULL, NULL, NULL, NULL),
     (99, 'nl_NL', NULL, NULL, NULL, NULL),
+    (100, 'nl_NL', NULL, NULL, NULL, NULL),
+    (101, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2760,7 +2781,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (96, 'ru_RU', NULL, NULL, NULL, NULL),
     (97, 'ru_RU', NULL, NULL, NULL, NULL),
     (98, 'ru_RU', NULL, NULL, NULL, NULL),
-    (99, 'ru_RU', NULL, NULL, NULL, NULL)
+    (99, 'ru_RU', NULL, NULL, NULL, NULL),
+    (100, 'ru_RU', NULL, NULL, NULL, NULL),
+    (101, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
@@ -15245,48 +15268,56 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (4, 'cs_CZ', NULL, '', '', ''),
     (5, 'cs_CZ', NULL, '', '', ''),
     (6, 'cs_CZ', NULL, '', '', ''),
+    (7, 'cs_CZ', 'Částečně odesláno', '', '', ''),
     (1, 'de_DE', 'Nicht bezahlt', '', '', ''),
     (2, 'de_DE', 'Bezahlt', '', '', ''),
     (3, 'de_DE', 'Bearbeitung', '', '', ''),
     (4, 'de_DE', 'Gesendet', '', '', ''),
     (5, 'de_DE', 'Storniert', '', '', ''),
     (6, 'de_DE', 'Zrückerstattet', '', '', ''),
+    (7, 'de_DE', 'Teilweise versandt', '', '', ''),
     (1, 'en_US', 'Not paid', '', '', ''),
     (2, 'en_US', 'Paid', '', '', ''),
     (3, 'en_US', 'Processing', '', '', ''),
     (4, 'en_US', 'Sent', '', '', ''),
     (5, 'en_US', 'Canceled', '', '', ''),
     (6, 'en_US', 'Refunded', '', '', ''),
+    (7, 'en_US', 'Partially shipped', '', '', ''),
     (1, 'es_ES', 'No pagados', '', '', ''),
     (2, 'es_ES', 'Pagado', '', '', ''),
     (3, 'es_ES', 'Procesando', '', '', ''),
     (4, 'es_ES', 'Enviado', '', '', ''),
     (5, 'es_ES', 'Cancelado', '', '', ''),
     (6, 'es_ES', 'Reembolsado', '', '', ''),
+    (7, 'es_ES', 'Enviado parcialmente', '', '', ''),
     (1, 'fr_FR', 'Non payée', '', '', ''),
     (2, 'fr_FR', 'Payée', '', '', ''),
     (3, 'fr_FR', 'Traitement', '', '', ''),
     (4, 'fr_FR', 'Envoyée', '', '', ''),
     (5, 'fr_FR', 'Annulée', '', '', ''),
     (6, 'fr_FR', 'Remboursé', '', '', ''),
+    (7, 'fr_FR', 'Partiellement expédiée', '', '', ''),
     (1, 'it_IT', NULL, '', '', ''),
     (2, 'it_IT', NULL, '', '', ''),
     (3, 'it_IT', NULL, '', '', ''),
     (4, 'it_IT', NULL, '', '', ''),
     (5, 'it_IT', NULL, '', '', ''),
     (6, 'it_IT', NULL, '', '', ''),
+    (7, 'it_IT', 'Parzialmente spedito', '', '', ''),
     (1, 'nl_NL', 'Niet betaald', '', '', ''),
     (2, 'nl_NL', 'Betaald', '', '', ''),
     (3, 'nl_NL', 'In behandeling', '', '', ''),
     (4, 'nl_NL', 'Verzonden', '', '', ''),
     (5, 'nl_NL', 'Geannuleerd', '', '', ''),
     (6, 'nl_NL', 'Terugbetaald', '', '', ''),
+    (7, 'nl_NL', 'Gedeeltelijk verzonden', '', '', ''),
     (1, 'ru_RU', 'Не оплачен', '', '', ''),
     (2, 'ru_RU', 'Оплачен', '', '', ''),
     (3, 'ru_RU', 'В обработке', '', '', ''),
     (4, 'ru_RU', 'Выслан', '', '', ''),
     (5, 'ru_RU', 'Отменен', '', '', ''),
-    (6, 'ru_RU', 'Возвращен', '', '', '')
+    (6, 'ru_RU', 'Возвращен', '', '', ''),
+    (7, 'ru_RU', 'Частично отправлен', '', '', '')
 ;
 
 INSERT INTO `order_return_status_i18n`(`id`, `locale`, `title`) VALUES

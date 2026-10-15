@@ -207,7 +207,7 @@ foreach ($update->getMessages() as $message) {
 }
 
 if (null === $updateError) {
-    cliOutput(sprintf('Thelia as been successfully updated to version %s', $update->getCurrentVersion()), 'success');
+    cliOutput(sprintf('Thelia has been successfully updated to version %s', $update->getCurrentVersion()), 'success');
 
     if ($update->hasPostInstructions()) {
         cliOutput('===================================');

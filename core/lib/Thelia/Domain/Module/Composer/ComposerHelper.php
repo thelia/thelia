@@ -14,8 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Module\Composer;
 
+use Symfony\Component\Process\Process;
+
 class ComposerHelper
 {
+    /**
+     * @param string|null $composerBinary the Composer script to run, vendor/bin/composer of the project by default
+     */
+    public function __construct(private readonly ?string $composerBinary = null)
+    {
+    }
+
     /**
      * @throws \JsonException
      */
@@ -223,14 +232,19 @@ class ComposerHelper
      * Regenerate the Composer autoloader of the project, so that a theme bundle or a module
      * copied on disk is autoloadable.
      *
+     * Composer runs with the PHP binary of the current process: its shebang would otherwise
+     * pick the first php of the PATH, which can be an older version than the one running Thelia.
+     *
      * @throws \RuntimeException with the Composer output when the dump fails
      */
     public function dumpAutoload(): void
     {
-        exec(THELIA_VENDOR.'bin'.DS.'composer dump-autoload 2>&1', $composerOutput, $returnCode);
+        $process = new Process([\PHP_BINARY, $this->composerBinary ?? THELIA_VENDOR.'bin'.DS.'composer', 'dump-autoload']);
+        $process->setTimeout(null);
+        $process->run();
 
-        if (0 !== $returnCode) {
-            throw new \RuntimeException(implode("\n", $composerOutput));
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException(trim($process->getOutput()."\n".$process->getErrorOutput()));
         }
     }
 }

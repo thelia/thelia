@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Promotion;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
@@ -56,6 +58,32 @@ final class CouponAbstractTest extends TestCase
         self::assertEquals(new \DateTime('2030-01-01'), $this->couponSetWith([])->getExpirationDate());
     }
 
+    public function testChangingTheReturnedExpirationDateLeavesTheCouponUntouched(): void
+    {
+        $expirationDate = new \DateTime('+1 month');
+        $coupon = $this->couponSetWith([], expirationDate: clone $expirationDate);
+
+        $coupon->getExpirationDate()->modify('-1 year');
+
+        self::assertEquals($expirationDate, $coupon->getExpirationDate());
+        self::assertFalse($coupon->isExpired());
+    }
+
+    public function testACouponPastItsExpirationDateIsExpired(): void
+    {
+        self::assertTrue($this->couponSetWith([], expirationDate: new \DateTime('-1 day'))->isExpired());
+    }
+
+    public function testChangingTheReturnedConditionsLeavesTheCouponUntouched(): void
+    {
+        $coupon = $this->couponSetWith([])->setConditions(new ConditionCollection());
+
+        $conditions = $coupon->getConditions();
+        $conditions[] = $this->createStub(ConditionInterface::class);
+
+        self::assertCount(0, $coupon->getConditions());
+    }
+
     public function testTheIdOfTheCouponRowItWasBuiltFromIsExposed(): void
     {
         $coupon = $this->couponSetWith([])->setCouponModelId(12);
@@ -71,6 +99,7 @@ final class CouponAbstractTest extends TestCase
         ?string $title = null,
         ?string $shortDescription = null,
         ?string $description = null,
+        \DateTime $expirationDate = new \DateTime('2030-01-01'),
     ): CouponAbstract {
         $translator = $this->createStub(Translator::class);
 
@@ -102,7 +131,7 @@ final class CouponAbstractTest extends TestCase
             false,
             true,
             -1,
-            new \DateTime('2030-01-01'),
+            $expirationDate,
             [],
             [],
             false,

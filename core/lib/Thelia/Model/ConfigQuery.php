@@ -116,20 +116,21 @@ class ConfigQuery extends BaseConfigQuery
             self::initCache(self::findAllAsMap());
         }
 
-        if (!\array_key_exists($search, self::$cache)) {
-            // The snapshot above is exhaustive: a name missing from it has no
-            // row in the table, it is not a lookup that has not run yet.
-            return $default;
-        }
-
         // An environment variable wins over the stored value, but only for the process
         // that has it set. Applying it here rather than caching the result is what
         // keeps the cached snapshot readable by a process started with another
-        // environment, and this one readable by no one else.
+        // environment, and this one readable by no one else. It also overrides a
+        // variable that has no row in the table yet.
         $envName = self::$envNames[$search] ??= Config::getEnvNameFor($search);
 
         if (isset($_ENV[$envName])) {
             return (string) $_ENV[$envName];
+        }
+
+        if (!\array_key_exists($search, self::$cache)) {
+            // The snapshot above is exhaustive: a name missing from it has no
+            // row in the table, it is not a lookup that has not run yet.
+            return $default;
         }
 
         // The default only applies to a variable that does not exist yet: a stored
@@ -165,9 +166,13 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('url_site', '');
     }
 
-    public static function getDefaultLangWhenNoTranslationAvailable()
+    /**
+     * The stored value is a string ('0' or '1'), cast so that it compares strictly with
+     * Lang::STRICTLY_USE_REQUESTED_LANGUAGE and Lang::REPLACE_BY_DEFAULT_LANGUAGE.
+     */
+    public static function getDefaultLangWhenNoTranslationAvailable(): int
     {
-        return self::read('default_lang_without_translation', 1);
+        return (int) self::read('default_lang_without_translation', Lang::REPLACE_BY_DEFAULT_LANGUAGE);
     }
 
     public static function isRewritingEnable(): bool

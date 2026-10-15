@@ -4697,6 +4697,70 @@ CREATE TABLE `order_return_line`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_shipment
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_shipment`;
+
+CREATE TABLE `order_shipment`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `ref` VARCHAR(55) NOT NULL COMMENT 'the shipment number: the order reference followed by the rank of the shipment in the order',
+    `status` VARCHAR(20) DEFAULT 'draft' NOT NULL COMMENT 'draft while being composed, shipped once handed to the carrier, cancelled when given up before it left',
+    `delivery_module_id` INTEGER COMMENT 'the carrier module the parcel left with, NULL once that module is gone',
+    `delivery_module_title` VARCHAR(255) COMMENT 'the carrier name snapshot, kept when the module is gone',
+    `delivery_ref` VARCHAR(100) COMMENT 'the tracking number the carrier gave for this parcel',
+    `shipped_at` DATETIME COMMENT 'when the parcel was handed to the carrier, NULL while it is a draft',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_shipment_ref_UNIQUE` (`ref`),
+    INDEX `idx_order_shipment_order_id` (`order_id`),
+    INDEX `idx_order_shipment_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_order_shipment_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_shipment_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_shipment_item
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_shipment_item`;
+
+CREATE TABLE `order_shipment_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_shipment_id` INTEGER NOT NULL,
+    `order_product_id` INTEGER NOT NULL,
+    `quantity` FLOAT NOT NULL COMMENT 'how much of the order line this shipment carries',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `order_shipment_item_line_UNIQUE` (`order_shipment_id`, `order_product_id`),
+    INDEX `idx_order_shipment_item_order_shipment_id` (`order_shipment_id`),
+    INDEX `idx_order_shipment_item_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_order_shipment_item_order_shipment_id`
+        FOREIGN KEY (`order_shipment_id`)
+        REFERENCES `order_shipment` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_shipment_item_order_product_id`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- order_return_status_i18n
 -- ---------------------------------------------------------------------
 

@@ -270,6 +270,118 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('fr_FR', $session->getLang()->getLocale());
     }
 
+    public function testCreateEmailMessageHandsTheLanguageOfTheMessageToTheParserWhenThereIsNoSession(): void
+    {
+        $german = LangQuery::create()->findOneByLocale('de_DE');
+        self::assertNotNull($german);
+        $this->saveStoredBodyMessage('test_message_sent_from_a_command', 'de_DE');
+
+        $rendered = [];
+        $parser = $this->createRecordingParser(null, $rendered);
+
+        $this->createMailerFactoryWith($parser)->createEmailMessage(
+            'test_message_sent_from_a_command',
+            ['sender@example.com' => 'Sender'],
+            ['customer@example.com' => 'Customer'],
+            [],
+            'de_DE',
+        );
+
+        self::assertNotSame([], $rendered);
+        self::assertSame(['locale' => 'de_DE', 'lang_code' => 'de', 'lang_id' => $german->getId()], end($rendered));
+    }
+
+    public function testTheLanguageOfAMessageSentWithoutASessionDoesNotLeakIntoTheNextRender(): void
+    {
+        $this->saveStoredBodyMessage('test_message_sent_from_a_command', 'de_DE');
+        $this->saveStoredBodyMessage('test_message_of_an_unknown_locale', 'xx_XX');
+
+        $rendered = [];
+        $parser = $this->createRecordingParser(null, $rendered);
+        $mailerFactory = $this->createMailerFactoryWith($parser);
+
+        foreach (['test_message_sent_from_a_command' => 'de_DE', 'test_message_of_an_unknown_locale' => 'xx_XX'] as $name => $locale) {
+            $mailerFactory->createEmailMessage($name, ['sender@example.com' => 'Sender'], ['customer@example.com' => 'Customer'], [], $locale);
+        }
+
+        // The second mail has no language to hand over (unknown locale): it must not read the German one.
+        self::assertNotSame([], $rendered);
+        self::assertSame(['locale' => null, 'lang_code' => null, 'lang_id' => null], end($rendered));
+    }
+
+    public function testCreateEmailMessageAssignsNoLanguageToTheParserWhenThereIsASession(): void
+    {
+        $this->saveStoredBodyMessage('test_message_sent_from_a_request', 'de_DE');
+
+        $rendered = [];
+        $parser = $this->createRecordingParser($this->getService(RequestStack::class)->getMainRequest(), $rendered);
+
+        $this->createMailerFactoryWith($parser)->createEmailMessage(
+            'test_message_sent_from_a_request',
+            ['sender@example.com' => 'Sender'],
+            ['customer@example.com' => 'Customer'],
+            [],
+            'de_DE',
+        );
+
+        self::assertNotSame([], $rendered);
+        foreach ($rendered as $languageVariables) {
+            self::assertSame([], $languageVariables, 'The language of the session, swapped by the factory, is the one to use.');
+        }
+    }
+
+    private function saveStoredBodyMessage(string $name, string $locale): void
+    {
+        $message = new Message();
+        $message->setName($name);
+        $message->setLocale($locale);
+        $message->setSubject('Subject');
+        $message->setHtmlMessage('<p>Text</p>');
+        $message->setTextMessage('Text');
+        $message->save();
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rendered filled, at each render, with the language variables the parser holds
+     */
+    private function createRecordingParser(?\Symfony\Component\HttpFoundation\Request $request, array &$rendered): ParserInterface
+    {
+        $assigned = [];
+        $parser = $this->createMock(ParserInterface::class);
+        $parser->method('getRequest')->willReturn($request);
+        $parser->method('getTemplateHelper')->willReturn($this->getService(TemplateHelperInterface::class));
+        $parser->method('assign')->willReturnCallback(
+            static function (string|array $variable, mixed $value = null) use (&$assigned): mixed {
+                foreach (\is_array($variable) ? $variable : [$variable => $value] as $name => $assignedValue) {
+                    if (\in_array($name, ['locale', 'lang_code', 'lang_id'], true)) {
+                        $assigned[$name] = $assignedValue;
+                    }
+                }
+
+                return null;
+            },
+        );
+        $parser->method('renderString')->willReturnCallback(
+            static function (string $templateText) use (&$assigned, &$rendered): string {
+                $rendered[] = $assigned;
+
+                return $templateText;
+            },
+        );
+
+        return $parser;
+    }
+
+    private function createMailerFactoryWith(ParserInterface $parser): MailerFactory
+    {
+        return new MailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->createParserResolverReturning($parser),
+            $this->getService(MailerInterface::class),
+            $this->getService(OrderHistoryRecorder::class),
+        );
+    }
+
     public function testAMessageWithoutATemplateFileRendersItsStoredBody(): void
     {
         // No template file at all: the message renders from its database-stored body, so

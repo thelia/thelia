@@ -55,6 +55,9 @@ $host     = $_SERVER['DATABASE_HOST'] ?? '';
 $port     = $_SERVER['DATABASE_PORT'] ?? '3306';
 $user     = $_SERVER['DATABASE_USER'] ?? '';
 $password = $_SERVER['DATABASE_PASSWORD'] ?? '';
+// A process running next to others (TEST_TOKEN=2) prepares its own database,
+// test_2, as the test bootstrap expects it.
+Thelia\Test\TestToken::useOwnDatabase();
 $dbName   = $_SERVER['DATABASE_NAME'] ?? '';
 
 // Publish the resolved credentials so subprocesses (bin/console
@@ -102,7 +105,7 @@ try {
     // Purge Propel test cache so it regenerates with the correct DSN.
     // Without this, a stale cache pointing at a different database name
     // (e.g. "db" instead of "test") causes tests to hit the wrong DB.
-    $propelTestCache = $projectRoot.'var'.DS.'propel'.DS.($_SERVER['APP_ENV'] ?? 'test');
+    $propelTestCache = $projectRoot.'var'.DS.'propel'.DS.($_SERVER['APP_ENV'] ?? 'test').Thelia\Test\TestToken::suffix();
     if (is_dir($propelTestCache)) {
         echo "Purging Propel test cache...\n";
         (new \Symfony\Component\Filesystem\Filesystem())->remove($propelTestCache);

@@ -267,7 +267,7 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
      */
     public function testAPriceIsConvertedFromTheDefaultCurrency(): void
     {
-        $defaultCurrency = $this->factory->currency();
+        $defaultCurrency = Currency::getDefaultCurrency();
         $otherCurrency = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0, 'symbol' => 'X']);
         $product = $this->catalogProduct($defaultCurrency);
         $customer = $this->newCustomer();
@@ -303,6 +303,10 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
             $manyPses[] = $this->extraPseWithPrice($product, $currency)->getId();
         }
 
+        // The first resolution of a test warms what the core memoises for a request
+        // (configuration, tax rules): measured cold, it would count those reads too.
+        $this->resolver->resolve($onePse, $currency, $customer);
+
         $forOne = $this->recordSqlQueries(function () use ($onePse, $currency, $customer): void {
             self::assertCount(1, $this->resolver->resolve($onePse, $currency, $customer));
         });
@@ -333,6 +337,179 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
         });
 
         self::assertSame([], $statements);
+    }
+
+    public function testACustomerEntitledToNothingCostsNoProductRead(): void
+    {
+        [$currency, $pse] = $this->reservedOperationOnOneProduct($this->newCustomer());
+        $stranger = $this->newCustomer();
+
+        $statements = $this->recordSqlQueries(function () use ($pse, $currency, $stranger): void {
+            self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $stranger));
+        });
+
+        self::assertSame(0, self::countSqlQueriesSelectingFrom($statements, 'product'));
+    }
+
+    public function testTheDateWindowIsReadAtTheInstantAsked(): void
+    {
+        $customer = $this->newCustomer();
+        [$currency, $pse] = $this->reservedOperationOnOneProduct($customer);
+
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $customer, new \DateTime('+2 days')));
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $customer, new \DateTime('-2 days')));
+        self::assertArrayHasKey(
+            $pse->getId(),
+            $this->resolver->resolve([$pse->getId()], $currency, $customer, new \DateTime('+12 hours')),
+        );
+    }
+
+    /**
+     * Only a price that beats the public offer is a reserved price: the same
+     * price would credit the reserved operation with a discount it does not give.
+     */
+    public function testAReservedPriceEqualToTheCurrentPublicOfferIsNotApplied(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->catalogProduct($currency);
+        $customer = $this->newCustomer();
+
+        $this->publicPromoPriceWrittenFor($product, $currency, '10');
+
+        $sale = $this->runningReservedSale($currency, '10');
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $pse = $this->defaultPseFor($product);
+
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $customer));
+    }
+
+    public function testEveryProductOfTheBatchGetsItsReservedPrice(): void
+    {
+        $currency = $this->factory->currency();
+        $first = $this->catalogProduct($currency);
+        $second = $this->catalogProduct($currency);
+        $customer = $this->newCustomer();
+
+        $sale = $this->runningReservedSale($currency, '10');
+        $this->factory->saleProduct($sale, $first);
+        $this->factory->saleProduct($sale, $second);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $firstPse = $this->defaultPseFor($first);
+        $secondPse = $this->defaultPseFor($second);
+        $resolved = $this->resolver->resolve([$firstPse->getId(), $secondPse->getId()], $currency, $customer);
+
+        self::assertArrayHasKey($firstPse->getId(), $resolved);
+        self::assertArrayHasKey($secondPse->getId(), $resolved);
+        self::assertSame(90.0, $resolved[$firstPse->getId()]->untaxedPromoPrice);
+        self::assertSame(90.0, $resolved[$secondPse->getId()]->untaxedPromoPrice);
+    }
+
+    /**
+     * A price typed in for the currency is the price of that currency: it is not
+     * converted from the default one.
+     */
+    public function testAPriceTypedInForTheCurrencyIsUsedAsItIs(): void
+    {
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $otherCurrency = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0, 'symbol' => 'X']);
+        $product = $this->catalogProduct($defaultCurrency);
+        $customer = $this->newCustomer();
+        $pse = $this->defaultPseFor($product);
+
+        $this->factory->productPrice($pse, $otherCurrency, ['price' => '150.000000', 'promoPrice' => '150.000000']);
+
+        $sale = $this->runningReservedSale($otherCurrency, '10');
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $resolved = $this->resolver->resolve([$pse->getId()], $otherCurrency, $customer);
+
+        self::assertArrayHasKey($pse->getId(), $resolved);
+        self::assertSame(135.0, $resolved[$pse->getId()]->untaxedPromoPrice);
+    }
+
+    public function testAPriceFlaggedAsAConversionIsConvertedAgainFromTheDefaultCurrency(): void
+    {
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $otherCurrency = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0, 'symbol' => 'X']);
+        $product = $this->catalogProduct($defaultCurrency);
+        $customer = $this->newCustomer();
+        $pse = $this->defaultPseFor($product);
+
+        $this->factory->productPrice(
+            $pse,
+            $otherCurrency,
+            ['price' => '999.000000', 'promoPrice' => '999.000000', 'fromDefaultCurrency' => true],
+        );
+
+        $sale = $this->runningReservedSale($otherCurrency, '10');
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $resolved = $this->resolver->resolve([$pse->getId()], $otherCurrency, $customer);
+
+        // 100 in the default currency at a rate of 2 is 200, minus 10% is 180.
+        self::assertArrayHasKey($pse->getId(), $resolved);
+        self::assertSame(180.0, $resolved[$pse->getId()]->untaxedPromoPrice);
+    }
+
+    /**
+     * The rate of the asked currency is relative to the default one, which does not
+     * have to be 1: ProductSaleElements::getPricesByCurrency() divides by it too.
+     */
+    public function testTheConversionIsRelativeToTheRateOfTheDefaultCurrency(): void
+    {
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $defaultCurrency->setRate(0.5)->save();
+        $otherCurrency = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0, 'symbol' => 'X']);
+        $product = $this->catalogProduct($defaultCurrency);
+        $customer = $this->newCustomer();
+        $pse = $this->defaultPseFor($product);
+
+        $sale = $this->runningReservedSale($otherCurrency, '10');
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $resolved = $this->resolver->resolve([$pse->getId()], $otherCurrency, $customer);
+
+        // 100 at a rate of 2 against 0.5 is 400, minus 10% is 360.
+        self::assertSame(400.0, $pse->getPricesByCurrency($otherCurrency)->getPrice());
+        self::assertArrayHasKey($pse->getId(), $resolved);
+        self::assertSame(360.0, $resolved[$pse->getId()]->untaxedPromoPrice);
+    }
+
+    /**
+     * The public offer the reserved price has to beat is converted like the price:
+     * a reserved price below it in the asked currency applies.
+     */
+    public function testThePublicOfferToBeatIsConvertedFromTheDefaultCurrency(): void
+    {
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $otherCurrency = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0, 'symbol' => 'X']);
+        $product = $this->catalogProduct($defaultCurrency);
+        $customer = $this->newCustomer();
+        $pse = $this->defaultPseFor($product);
+
+        $pse->setPromo(1)->save();
+        ProductPriceQuery::create()
+            ->filterByProductSaleElementsId($pse->getId())
+            ->filterByCurrencyId($defaultCurrency->getId())
+            ->findOne()
+            ->setPromoPrice('90.000000')
+            ->save();
+
+        $sale = $this->runningReservedSale($otherCurrency, '20');
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $customer);
+
+        $resolved = $this->resolver->resolve([$pse->getId()], $otherCurrency, $customer);
+
+        // The public offer is 90 at a rate of 2, so 180; 20% off 200 is 160, which beats it.
+        self::assertArrayHasKey($pse->getId(), $resolved);
+        self::assertSame(160.0, $resolved[$pse->getId()]->untaxedPromoPrice);
     }
 
     /**

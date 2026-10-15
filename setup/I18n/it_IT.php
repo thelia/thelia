@@ -435,4 +435,5 @@ return [
     'Newness' => 'Novità',
     'Configuration background jobs' => 'Configurazione delle attività in background',
     'Your order {{ order_ref }} has been shipped' => 'Il tuo ordine {{ order_ref }} è stato spedito',
+    'Partially shipped' => 'Parzialmente spedito',
 ];

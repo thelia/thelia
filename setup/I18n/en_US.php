@@ -1680,4 +1680,7 @@ return [
     'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)',
     'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)' => 'Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)',
     'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)' => 'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)',
+    'Partially shipped' => 'Partially shipped',
+    'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)' => 'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)',
+    'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)' => 'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)',
 ];

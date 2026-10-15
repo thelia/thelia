@@ -69,7 +69,8 @@ class CartContainsProducts extends ConditionAbstract
         }
 
         $this->operators = [self::PRODUCTS_LIST => $operators[self::PRODUCTS_LIST]];
-        $this->values = [self::PRODUCTS_LIST => $values[self::PRODUCTS_LIST]];
+        // The back-office posts the ids as strings and the comparison is strict: store them as integers.
+        $this->values = [self::PRODUCTS_LIST => array_map('\intval', $values[self::PRODUCTS_LIST])];
 
         return $this;
     }

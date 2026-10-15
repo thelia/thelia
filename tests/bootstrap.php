@@ -14,14 +14,21 @@ declare(strict_types=1);
 
 use Composer\Autoload\ClassLoader;
 use Symfony\Component\Dotenv\Dotenv;
+use Thelia\Test\TestToken;
 
 /** @var ClassLoader $loader */
 $loader = require dirname(__DIR__).'/vendor/autoload.php';
 
-$propelCacheDir = dirname(__DIR__).'/var/propel/test/model';
-if (is_dir($propelCacheDir)) {
-    $loader->addPsr4('', $propelCacheDir);
-    $loader->addPsr4('TheliaMain\\', dirname(__DIR__).'/var/propel/test/database/TheliaMain');
+// A process running next to others (TEST_TOKEN) has its own models once its
+// database is prepared; the unit suite never prepares one and reads the shared
+// models, which phpstan_autoload.php builds without a database.
+foreach (array_unique(['test'.TestToken::suffix(), 'test']) as $propelDirectory) {
+    $propelCacheDir = dirname(__DIR__).'/var/propel/'.$propelDirectory.'/model';
+    if (is_dir($propelCacheDir)) {
+        $loader->addPsr4('', $propelCacheDir);
+        $loader->addPsr4('TheliaMain\\', dirname(__DIR__).'/var/propel/'.$propelDirectory.'/database/TheliaMain');
+        break;
+    }
 }
 
 if (method_exists(Dotenv::class, 'bootEnv')) {
@@ -51,6 +58,19 @@ if (empty($_SERVER['DATABASE_HOST'])) {
 foreach (['MESSENGER_TRANSPORT_DSN', 'MESSENGER_HEAVY_TRANSPORT_DSN'] as $queueVariable) {
     $_SERVER[$queueVariable] = $_ENV[$queueVariable] = '';
     putenv($queueVariable.'=');
+}
+
+// Each process next to others gets its own database and lock directory: the
+// suites lock on row ids, which are the same in every copy of the database.
+if (null !== TestToken::current()) {
+    TestToken::useOwnDatabase();
+
+    $lockDirectory = dirname(__DIR__).'/var/lock/test'.TestToken::suffix();
+    if (!is_dir($lockDirectory)) {
+        mkdir($lockDirectory, 0o777, true);
+    }
+    $_SERVER['LOCK_DSN'] = $_ENV['LOCK_DSN'] = 'flock://'.$lockDirectory;
+    putenv('LOCK_DSN=flock://'.$lockDirectory);
 }
 
 if ($_SERVER['APP_DEBUG']) {

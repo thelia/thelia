@@ -26,7 +26,8 @@ left reachable by its id is not hidden, it is only harder to find.
 | Images, documents, prices, features, attribute combinations, categories and associated contents read by the id of a product or of a combination | no |
 | Products listed by a sale (`/api/front/sales`) | no |
 | `image`, `document` and `feature_value` loops | no |
-| Adding to the cart | no: see [The cart](#the-cart) |
+| Adding to the cart through the front API (`POST /api/front/cart_items`) | yes, a hidden combination answers 422: see [The cart](#the-cart) |
+| Adding to the cart by id (`CartFacade::addItem()`, the theme) | no: see [The cart](#the-cart) |
 
 The back office and the admin API are never narrowed: the readers above only ask on a front operation, outside the
 back-office context.
@@ -98,9 +99,14 @@ while a reserved operation runs.
 
 ## The cart
 
-A rule narrows what is read, not what can be bought: adding a combination to the cart reads it by its id. A module that
-forbids buying a product also listens to `TheliaEvents::CART_ADDITEM` with a priority above 128, the one
-`Thelia\Action\Cart::addItem` adds the line at, and throws a `Thelia\Domain\Cart\Exception\InvalidCartException`.
+An addition through the front API (`POST /api/front/cart_items`, `FrontCartItemProcessor`) reads the combination the way
+the catalog shows it to the visitor: one that a rule hides answers 422, like one that does not exist.
+
+An addition by id through `CartFacade::addItem()`, the way a theme adds from the product page or a list, reads the
+combination by its id and is not narrowed. A module that forbids buying a product therefore also listens to
+`TheliaEvents::CART_ADDITEM` with a priority above 128, the one `Thelia\Action\Cart::addItem` adds the line at, and
+throws a `Thelia\Domain\Cart\Exception\InvalidCartException`: that refusal holds on every path, the front API
+included.
 
 ## Test map
 

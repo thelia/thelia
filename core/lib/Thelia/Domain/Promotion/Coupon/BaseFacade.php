@@ -70,7 +70,7 @@ class BaseFacade implements FacadeInterface
     /**
      * Return an Address a CouponManager can process.
      */
-    public function getDeliveryAddress(): Address
+    public function getDeliveryAddress(): ?Address
     {
         try {
             return AddressQuery::create()->findPk(
@@ -198,7 +198,7 @@ class BaseFacade implements FacadeInterface
         return $count;
     }
 
-    public function getNbArticlesInCartIncludeQuantity(): int
+    public function getNbArticlesInCartIncludeQuantity(): int|float
     {
         $cartItems = $this->getCart()?->getCartItems() ?? [];
         $quantity = 0;

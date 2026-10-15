@@ -346,8 +346,6 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         });
         $this->listen(TheliaEvents::MODULE_PAYMENT_IS_VALID, static function (IsValidPaymentEvent $event): void {
             $event->setValidModule(true);
-            $event->setMinimumAmount(0);
-            $event->setMaximumAmount(0);
             $event->stopPropagation();
         }, 512);
 

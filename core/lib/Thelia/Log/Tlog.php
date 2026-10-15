@@ -375,13 +375,9 @@ class Tlog implements LoggerInterface
             while (null !== $hop) {
                 if (isset($hop['class'])) {
                     $className = $hop['class'];
-                    $parentClassName = false === get_parent_class($className) ? '' : get_parent_class($className);
 
-                    if (
-                        !empty($className)
-                        && ($className === ltrim(self::class, '\\')
-                        || strtolower($parentClassName) === ltrim(self::class, '\\'))
-                    ) {
+                    // The outermost frame of Tlog or of a subclass is where the caller logged.
+                    if (!empty($className) && is_a($className, self::class, true)) {
                         $origin['line'] = $hop['line'];
                         $origin['file'] = $hop['file'];
                         break;

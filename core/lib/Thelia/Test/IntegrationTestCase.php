@@ -19,11 +19,22 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
+use Thelia\Core\Hook\ModuleHookConfigurationStore;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Country;
+use Thelia\Model\Currency;
+use Thelia\Model\Lang;
+use Thelia\Model\ModuleConfigQuery;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderReturnStatusQuery;
+use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\TaxRuleQuery;
 
 /**
  * Base class for Thelia integration tests.
@@ -42,6 +53,18 @@ use Thelia\Core\Translation\Translator;
  */
 abstract class IntegrationTestCase extends KernelTestCase
 {
+    /**
+     * Each test opens its transaction under a hundred nested levels. Propel only
+     * counts a nested level, it sends nothing to the database: code under test
+     * that commits a transaction it did not open (a commit() left without its
+     * beginTransaction()) takes the counter down instead of committing the rows
+     * of the test, which would then stay in the database for every test after
+     * it. tearDown() still rolls everything back, and the test fails saying so.
+     * One level would not be enough: such code is often called more than once
+     * in a test.
+     */
+    protected const int TEST_TRANSACTION_LEVELS = 100;
+
     protected bool $useTransaction = true;
 
     private ?ConnectionInterface $connection = null;
@@ -87,7 +110,10 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         if ($this->useTransaction) {
             $this->connection = Propel::getConnection('TheliaMain');
-            $this->connection->beginTransaction();
+
+            for ($level = 0; $level < self::TEST_TRANSACTION_LEVELS; ++$level) {
+                $this->connection->beginTransaction();
+            }
         }
 
         // Propel caches ActiveRecord instances in a per-class in-memory
@@ -100,6 +126,10 @@ abstract class IntegrationTestCase extends KernelTestCase
 
     protected function tearDown(): void
     {
+        $closedByTheCodeUnderTest = $this->useTransaction
+            && $this->connection instanceof ConnectionWrapper
+            && $this->connection->getNestedTransactionCount() < self::TEST_TRANSACTION_LEVELS;
+
         if ($this->useTransaction && $this->connection instanceof ConnectionInterface && $this->connection->inTransaction()) {
             // A test that fails while application code is inside its own
             // Propel "nested transaction" leaves the nesting counter above 1.
@@ -114,7 +144,50 @@ abstract class IntegrationTestCase extends KernelTestCase
 
         $this->connection = null;
 
+        $this->forgetWhatTheTestLeftInMemory();
+
         parent::tearDown();
+
+        if ($closedByTheCodeUnderTest) {
+            self::fail('The code under test committed or rolled back a database transaction it did not open.');
+        }
+    }
+
+    /**
+     * The core memoises rows for the length of a request: the default country,
+     * currency and language, the tax rules of a product, the order statuses, the
+     * shop configuration. A test is one request, and its rows are rolled back
+     * with it, so the next test would read rows that no longer exist, or ids the
+     * database hands out again to other rows: the cart of a session without one
+     * was the cart a previous test had left there, with a currency rolled back since. The
+     * configuration is also kept in a cache shared between processes, which a
+     * test can fill with values it never committed.
+     */
+    private function forgetWhatTheTestLeftInMemory(): void
+    {
+        if (static::$booted && static::getContainer()->has(ConfigCacheService::class)) {
+            static::getContainer()->get(ConfigCacheService::class)->initCacheConfigs(true);
+        }
+
+        ConfigQuery::resetCache();
+        Country::resetDefaultCountryCache();
+        Lang::resetActiveLangsCache();
+        ModuleQuery::resetActivated();
+        ModuleConfigQuery::resetConfigCache();
+        OrderReturnStatusQuery::resetCache();
+
+        foreach ([
+            [Currency::class, 'defaultCurrency', null],
+            [Lang::class, 'defaultLanguage', null],
+            [TaxRuleQuery::class, 'caches', []],
+            [OrderStatusQuery::class, 'statusIdListsCache', []],
+            [OrderStatusQuery::class, 'statusModelCache', []],
+            [ModuleHookConfigurationStore::class, 'configuration', null],
+            [Session::class, 'transientCart', null],
+            [Request::class, 'isAdminEnv', false],
+        ] as [$class, $property, $emptyValue]) {
+            (new \ReflectionProperty($class, $property))->setValue(null, $emptyValue);
+        }
     }
 
     /**

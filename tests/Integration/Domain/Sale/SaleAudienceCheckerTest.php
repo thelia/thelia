@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Sale;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Customer;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
@@ -180,6 +181,19 @@ final class SaleAudienceCheckerTest extends IntegrationTestCase
         });
 
         self::assertSame(1, self::countSqlQueriesSelectingFrom($statements, 'sale'));
+    }
+
+    public function testTheRunningWindowIsReadAtTheInstantAsked(): void
+    {
+        $sale = $this->reservedSale(['startDate' => new \DateTime('-1 day'), 'endDate' => new \DateTime('+1 day')]);
+
+        $runningAt = fn (\DateTime $now): int => $this->checker
+            ->filterByRunningDates(SaleQuery::create()->filterById($sale->getId()), $now)
+            ->count();
+
+        self::assertSame(1, $runningAt(new \DateTime('+12 hours')));
+        self::assertSame(0, $runningAt(new \DateTime('+2 days')));
+        self::assertSame(0, $runningAt(new \DateTime('-2 days')));
     }
 
     private function newCustomer(): Customer

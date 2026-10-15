@@ -272,6 +272,19 @@ class Session extends BaseSession
         return $this->get('thelia.return_to_catalog_last_url', URL::getInstance()->getIndexPage());
     }
 
+    /**
+     * Drops the cart kept in memory for a visitor who has not saved one yet.
+     *
+     * Every Session object of a request shares that cart: the one the request
+     * carries and the autowired service. A process that serves several requests in
+     * a row empties it between two of them (TransientCartReset), so that a visitor
+     * never starts with the cart of the previous one.
+     */
+    public static function forgetTransientCart(): void
+    {
+        self::$transientCart = null;
+    }
+
     public function setSessionCart(?Cart $cart = null): self
     {
         if (!$cart instanceof Cart || $cart->isNew()) {
