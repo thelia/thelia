@@ -91,6 +91,15 @@ jobs:
         if: steps.changes.outputs.found
         run: composer update --no-progress --prefer-dist --optimize-autoloader
 
+      - name: Drop the files the official recipes write
+        # No symfony.lock is committed, so Flex runs the official recipes of the
+        # packages it installs: symfony/scheduler writes src/Schedule.php (which the
+        # coding standard rejects) and symfony/messenger writes
+        # config/packages/messenger.yaml, loaded before the core's own messenger
+        # configuration. This goes once thelia/thelia-recipes#14 is merged.
+        if: steps.changes.outputs.found
+        run: rm -f src/Schedule.php config/packages/messenger.yaml
+
       - name: Mutate the changed lines
         if: steps.changes.outputs.found
         # HEAD~1 is the tip of main the pull request is merged into.
