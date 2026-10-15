@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Catalog\Product\DTO;
 
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
+use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 
 readonly class ProductUpdateDTO implements DTOEventActionInterface
 {
@@ -36,6 +37,9 @@ readonly class ProductUpdateDTO implements DTOEventActionInterface
         public ?string $postscriptum = null,
         public ?int $brandId = null,
         public ?int $virtualDocumentId = null,
+        public ?float $shippingSurcharge = null,
+        public ?ShippingSurchargeMode $shippingSurchargeMode = null,
+        public ?bool $freeShipping = null,
     ) {
     }
 
@@ -59,6 +63,9 @@ readonly class ProductUpdateDTO implements DTOEventActionInterface
             'postscriptum' => $this->postscriptum,
             'brand_id' => $this->brandId,
             'virtual_document_id' => $this->virtualDocumentId,
+            'shipping_surcharge' => $this->shippingSurcharge,
+            'shipping_surcharge_mode' => $this->shippingSurchargeMode?->value,
+            'free_shipping' => $this->freeShipping,
         ];
     }
 }

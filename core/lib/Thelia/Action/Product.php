@@ -37,6 +37,7 @@ use Thelia\Core\Event\Product\ProductDeleteAssociationEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductDeliveryModuleExclusionEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -51,6 +52,7 @@ use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundExcept
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeTemplateQuery;
@@ -75,6 +77,8 @@ use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductExcludedDeliveryModule;
+use Thelia\Model\ProductExcludedDeliveryModuleQuery;
 use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImage;
@@ -178,6 +182,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->cloneFeatureCombination($event);
 
             $this->cloneAssociatedContent($event);
+            $this->cloneDeliveryModuleExclusions($event);
 
             $this->cloneAccessories($event);
 
@@ -244,6 +249,9 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
                 ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
                 ->setBrandId((int) $event->getOriginalProduct()->getBrandId())
+                ->setShippingSurcharge((float) $event->getOriginalProduct()->getShippingSurcharge())
+                ->setShippingSurchargeMode(ShippingSurchargeMode::tryFrom((int) $event->getOriginalProduct()->getShippingSurchargeMode()) ?? ShippingSurchargeMode::PerLine)
+                ->setFreeShipping((bool) $event->getOriginalProduct()->getFreeShipping())
                 ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId());
 
             $this->eventDispatcher->dispatch($clonedProductUpdateEvent, TheliaEvents::PRODUCT_UPDATE);
@@ -319,6 +327,16 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function cloneDeliveryModuleExclusions(ProductCloneEvent $event): void
+    {
+        foreach (ProductExcludedDeliveryModuleQuery::create()->findByProductId($event->getOriginalProduct()->getId()) as $exclusion) {
+            $this->eventDispatcher->dispatch(
+                new ProductDeliveryModuleExclusionEvent($event->getClonedProduct(), (int) $exclusion->getModuleId()),
+                TheliaEvents::PRODUCT_EXCLUDE_DELIVERY_MODULE,
+            );
+        }
+    }
+
     public function cloneAccessories(ProductCloneEvent $event): void
     {
         $this->resolvingAssociationTypesOnce(function () use ($event): void {
@@ -390,6 +408,18 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Null means the caller does not carry this field: leave the column untouched.
             if (null !== $event->getGuestCheckoutForbidden()) {
                 $product->setGuestCheckoutForbidden((int) $event->getGuestCheckoutForbidden());
+            }
+
+            if (null !== $event->getShippingSurcharge()) {
+                $product->setShippingSurcharge((string) max(0.0, $event->getShippingSurcharge()));
+            }
+
+            if (null !== $event->getShippingSurchargeMode()) {
+                $product->setShippingSurchargeMode($event->getShippingSurchargeMode()->value);
+            }
+
+            if (null !== $event->getFreeShipping()) {
+                $product->setFreeShipping((int) $event->getFreeShipping());
             }
 
             $product->save($con);
@@ -544,6 +574,34 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setContentId((int) $event->getContentId())
                 ->save();
         }
+    }
+
+    /**
+     * Safe to call twice: a carrier already excluded stays excluded once.
+     */
+    public function excludeDeliveryModule(ProductDeliveryModuleExclusionEvent $event): void
+    {
+        $alreadyExcluded = ProductExcludedDeliveryModuleQuery::create()
+            ->filterByProductId($event->getProduct()->getId())
+            ->filterByModuleId($event->getModuleId())
+            ->exists();
+
+        if ($alreadyExcluded) {
+            return;
+        }
+
+        (new ProductExcludedDeliveryModule())
+            ->setProductId($event->getProduct()->getId())
+            ->setModuleId($event->getModuleId())
+            ->save();
+    }
+
+    public function allowDeliveryModule(ProductDeliveryModuleExclusionEvent $event): void
+    {
+        ProductExcludedDeliveryModuleQuery::create()
+            ->filterByProductId($event->getProduct()->getId())
+            ->filterByModuleId($event->getModuleId())
+            ->delete();
     }
 
     public function removeContent(ProductDeleteContentEvent $event): void
@@ -1141,6 +1199,8 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_ADD_CONTENT => ['addContent', 128],
             TheliaEvents::PRODUCT_REMOVE_CONTENT => ['removeContent', 128],
+            TheliaEvents::PRODUCT_EXCLUDE_DELIVERY_MODULE => ['excludeDeliveryModule', 128],
+            TheliaEvents::PRODUCT_ALLOW_DELIVERY_MODULE => ['allowDeliveryModule', 128],
             TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION => ['updateContentPosition', 128],
 
             TheliaEvents::PRODUCT_ADD_ACCESSORY => ['addAccessory', 128],

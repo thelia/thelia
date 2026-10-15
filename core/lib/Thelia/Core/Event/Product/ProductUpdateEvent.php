@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Product;
 
+use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
+
 class ProductUpdateEvent extends ProductCreateEvent
 {
     protected $chapo;
@@ -22,6 +24,9 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $brand_id;
     protected $virtual_document_id;
     protected ?bool $guestCheckoutForbidden = null;
+    protected ?float $shippingSurcharge = null;
+    protected ?ShippingSurchargeMode $shippingSurchargeMode = null;
+    protected ?bool $freeShipping = null;
 
     /**
      * @param int $product_id
@@ -122,6 +127,51 @@ class ProductUpdateEvent extends ProductCreateEvent
     public function setGuestCheckoutForbidden(?bool $guestCheckoutForbidden): static
     {
         $this->guestCheckoutForbidden = $guestCheckoutForbidden;
+
+        return $this;
+    }
+
+    /**
+     * The untaxed surcharge, in the default currency. Null leaves the column untouched.
+     */
+    public function getShippingSurcharge(): ?float
+    {
+        return $this->shippingSurcharge;
+    }
+
+    public function setShippingSurcharge(?float $shippingSurcharge): static
+    {
+        $this->shippingSurcharge = $shippingSurcharge;
+
+        return $this;
+    }
+
+    /**
+     * Null leaves the column untouched.
+     */
+    public function getShippingSurchargeMode(): ?ShippingSurchargeMode
+    {
+        return $this->shippingSurchargeMode;
+    }
+
+    public function setShippingSurchargeMode(?ShippingSurchargeMode $shippingSurchargeMode): static
+    {
+        $this->shippingSurchargeMode = $shippingSurchargeMode;
+
+        return $this;
+    }
+
+    /**
+     * Null leaves the column untouched.
+     */
+    public function getFreeShipping(): ?bool
+    {
+        return $this->freeShipping;
+    }
+
+    public function setFreeShipping(?bool $freeShipping): static
+    {
+        $this->freeShipping = $freeShipping;
 
         return $this;
     }

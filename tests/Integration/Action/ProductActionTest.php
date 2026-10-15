@@ -15,16 +15,22 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Action;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductExcludedDeliveryModule;
+use Thelia\Model\ProductExcludedDeliveryModuleQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -303,6 +309,61 @@ final class ProductActionTest extends IntegrationTestCase
         $reloaded = ProductQuery::create()->findPk($product->getId());
         self::assertNotNull($reloaded);
         self::assertSame(1, $reloaded->getGuestCheckoutForbidden(), 'A caller that omits the field must not clear it.');
+    }
+
+    public function testUpdatePersistsTheShippingRulesOfTheProduct(): void
+    {
+        $product = $this->createVirtualProduct();
+
+        $event = $this->basicUpdateEvent($product, 'Shipping rules probe')
+            ->setShippingSurcharge(12.5)
+            ->setShippingSurchargeMode(ShippingSurchargeMode::PerUnit)
+            ->setFreeShipping(true);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertEqualsWithDelta(12.5, (float) $reloaded->getShippingSurcharge(), 0.000001);
+        self::assertSame(ShippingSurchargeMode::PerUnit->value, $reloaded->getShippingSurchargeMode());
+        self::assertSame(1, $reloaded->getFreeShipping());
+    }
+
+    public function testUpdateWithoutTheShippingRulesLeavesThemIntact(): void
+    {
+        $product = $this->createVirtualProduct();
+        $product->setShippingSurcharge('8')->setShippingSurchargeMode(ShippingSurchargeMode::PerUnit->value)->setFreeShipping(1)->save();
+
+        // A save from another tab of the sheet does not carry the rules.
+        $this->dispatcher->dispatch($this->basicUpdateEvent($product, 'Untouched rules probe'), TheliaEvents::PRODUCT_UPDATE);
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertEqualsWithDelta(8.0, (float) $reloaded->getShippingSurcharge(), 0.000001, 'A caller that omits the surcharge must not clear it.');
+        self::assertSame(ShippingSurchargeMode::PerUnit->value, $reloaded->getShippingSurchargeMode());
+        self::assertSame(1, $reloaded->getFreeShipping());
+    }
+
+    public function testACloneShipsUnderTheRulesOfItsSource(): void
+    {
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => 'Bulky parcel']);
+        $product->setShippingSurcharge('4')->setShippingSurchargeMode(ShippingSurchargeMode::PerUnit->value)->setFreeShipping(1)->save();
+        $carrier = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne();
+        self::assertNotNull($carrier, 'No delivery module installed - run bin/test-prepare.');
+        (new ProductExcludedDeliveryModule())->setProductId($product->getId())->setModuleId($carrier->getId())->save();
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $clone = ProductQuery::create()->findPk($event->getClonedProduct()->getId());
+        self::assertNotNull($clone);
+        self::assertEqualsWithDelta(4.0, (float) $clone->getShippingSurcharge(), 0.000001);
+        self::assertSame(ShippingSurchargeMode::PerUnit->value, $clone->getShippingSurchargeMode());
+        self::assertSame(1, $clone->getFreeShipping());
+        self::assertTrue(
+            ProductExcludedDeliveryModuleQuery::create()->filterByProductId($clone->getId())->filterByModuleId($carrier->getId())->exists(),
+            'The clone refuses the carriers its source refuses.',
+        );
     }
 
     public function testUpdateRollsBackGuestCheckoutForbiddenWhenTheSaveFails(): void
