@@ -26,6 +26,7 @@ use Thelia\Core\Event\Product\ProductDeleteAssociationEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductDeliveryModuleExclusionEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -37,11 +38,13 @@ use Thelia\Domain\Catalog\Product\DTO\ProductFeatureDTO;
 use Thelia\Domain\Catalog\Product\DTO\ProductSeoDTO;
 use Thelia\Domain\Catalog\Product\DTO\ProductUpdateDTO;
 use Thelia\Domain\Catalog\Product\DTO\ProductWithPSECreateDTO;
+use Thelia\Domain\Catalog\Product\Exception\NotAnActiveDeliveryModuleException;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\FeatureProduct;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductQuery;
@@ -99,7 +102,10 @@ final readonly class ProductFacade
             ->setDescription($dto->description)
             ->setPostscriptum($dto->postscriptum)
             ->setBrandId($dto->brandId)
-            ->setVirtualDocumentId($dto->virtualDocumentId);
+            ->setVirtualDocumentId($dto->virtualDocumentId)
+            ->setShippingSurcharge($dto->shippingSurcharge)
+            ->setShippingSurchargeMode($dto->shippingSurchargeMode)
+            ->setFreeShipping($dto->freeShipping);
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
 
@@ -214,6 +220,43 @@ final readonly class ProductFacade
         $event = new ProductAddContentEvent($product, $contentId);
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_CONTENT);
+    }
+
+    /**
+     * The product refuses this carrier: it is no longer offered for a cart holding it.
+     *
+     * @throws ProductNotFoundException
+     * @throws NotAnActiveDeliveryModuleException
+     */
+    public function excludeDeliveryModule(int $productId, int $moduleId): void
+    {
+        $product = $this->getById($productId);
+
+        if (null === $product) {
+            throw ProductNotFoundException::withId($productId);
+        }
+
+        $module = ModuleQuery::create()->findPk($moduleId);
+
+        if (null === $module || !$module->isDeliveryModule() || 1 !== (int) $module->getActivate()) {
+            throw NotAnActiveDeliveryModuleException::withId($moduleId);
+        }
+
+        $this->dispatcher->dispatch(new ProductDeliveryModuleExclusionEvent($product, $moduleId), TheliaEvents::PRODUCT_EXCLUDE_DELIVERY_MODULE);
+    }
+
+    /**
+     * @throws ProductNotFoundException
+     */
+    public function allowDeliveryModule(int $productId, int $moduleId): void
+    {
+        $product = $this->getById($productId);
+
+        if (null === $product) {
+            throw ProductNotFoundException::withId($productId);
+        }
+
+        $this->dispatcher->dispatch(new ProductDeliveryModuleExclusionEvent($product, $moduleId), TheliaEvents::PRODUCT_ALLOW_DELIVERY_MODULE);
     }
 
     public function removeContent(int $productId, int $contentId): void
