@@ -17,6 +17,7 @@ namespace Thelia\Domain\Shipping\Service;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\DeliveryModuleOptionEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -25,16 +26,26 @@ use Thelia\Model\State;
 
 final readonly class DeliveryOptionsProvider
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+    ) {
     }
 
     public function getOptions(Module $module, ?Address $address, Cart $cart, Country $country, ?State $state): array
     {
-        $event = new DeliveryModuleOptionEvent($module, $address, $cart, $country, $state);
+        $askCarrier = function (Cart $quotedCart) use ($module, $address, $country, $state): array {
+            $event = new DeliveryModuleOptionEvent($module, $address, $quotedCart, $country, $state);
 
-        $this->dispatcher->dispatch($event, TheliaEvents::MODULE_DELIVERY_GET_OPTIONS);
+            $this->dispatcher->dispatch($event, TheliaEvents::MODULE_DELIVERY_GET_OPTIONS);
 
-        return $event->getDeliveryModuleOptions();
+            return $event->getDeliveryModuleOptions();
+        };
+
+        // The prices listed to the buyer follow the shipping rules of the products,
+        // as the postage charged afterwards does.
+        return null !== $this->productShippingRuleQuoter
+            ? $this->productShippingRuleQuoter->quoteOptions($module, $cart, $country, $askCarrier)
+            : $askCarrier($cart);
     }
 }

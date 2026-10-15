@@ -44,6 +44,7 @@ use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -87,6 +88,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
         protected ?SaleUnitContext $saleUnitContext = null,
         protected ?SaleUnitStockResolver $saleUnitStockResolver = null,
+        protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
     ) {
     }
 
@@ -1082,20 +1084,30 @@ class Cart extends BaseAction implements EventSubscriberInterface
         // copied from one; country and state come from the cart address either way.
         $deliveryAddress = $cartAddress->getAddress();
 
-        $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress, $country, $state);
+        $askCarrier = static function (CartModel $quotedCart) use ($moduleInstance, $deliveryAddress, $country, $state, $dispatcher, $deliveryModule): OrderPostage {
+            $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $quotedCart, $deliveryAddress, $country, $state);
 
-        $dispatcher->dispatch(
-            $deliveryPostageEvent,
-            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
-        );
+            $dispatcher->dispatch(
+                $deliveryPostageEvent,
+                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
+            );
 
-        // A module that does not serve this cart quotes nothing, which is not the
-        // same as quoting a free delivery.
-        if (!$deliveryPostageEvent->isValidModule()) {
-            throw new DeliveryException(\sprintf('Delivery module %s is not available for this cart', $deliveryModule->getCode()));
-        }
+            // A module that does not serve this cart quotes nothing, which is not the
+            // same as quoting a free delivery.
+            if (!$deliveryPostageEvent->isValidModule()) {
+                throw new DeliveryException(\sprintf('Delivery module %s is not available for this cart', $deliveryModule->getCode()));
+            }
 
-        $postage = $deliveryPostageEvent->getPostage();
+            $postage = $deliveryPostageEvent->getPostage();
+
+            return $postage instanceof OrderPostage ? $postage : new OrderPostage();
+        };
+
+        // The shipping rules of the products: the carrier prices what it carries, the
+        // surcharges come on top.
+        $postage = null !== $this->productShippingRuleQuoter
+            ? $this->productShippingRuleQuoter->quote($deliveryModule, $cart, $country, $state, $askCarrier)
+            : $askCarrier($cart);
 
         if (!$postage instanceof OrderPostage) {
             return new OrderPostage();
