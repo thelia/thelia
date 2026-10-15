@@ -15,19 +15,64 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\State;
+use Thelia\Module\BaseModule;
 
 final readonly class DeliveryModuleEligibilityChecker
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+        private CartShippingRules $cartShippingRules,
+    ) {
     }
 
     public function isEligible(Module $module, Cart $cart, Country $country, ?State $state): bool
+    {
+        // A product of the cart the carrier cannot take rules it out, whatever it serves.
+        if ($this->cartShippingRules->for($cart)->excludes((int) $module->getId())) {
+            return false;
+        }
+
+        return $this->servesTheCart($module, $cart, $country, $state);
+    }
+
+    /**
+     * The products of the cart that leave it with no carrier at all: every active carrier
+     * that serves the address is excluded by one of them. Empty while one carrier is
+     * left, and when no carrier serves the address anyway, which is not their doing.
+     *
+     * @return list<int> product ids
+     */
+    public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state): array
+    {
+        $rules = $this->cartShippingRules->for($cart);
+        $blockingProductIds = [];
+        $servingCarrierCount = 0;
+
+        foreach (ModuleQuery::create()->filterByActivate(1)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find() as $module) {
+            if (!$this->servesTheCart($module, $cart, $country, $state)) {
+                continue;
+            }
+
+            ++$servingCarrierCount;
+
+            if (!$rules->excludes((int) $module->getId())) {
+                return [];
+            }
+
+            array_push($blockingProductIds, ...$rules->productsExcluding((int) $module->getId()));
+        }
+
+        return 0 === $servingCarrierCount ? [] : array_values(array_unique($blockingProductIds));
+    }
+
+    private function servesTheCart(Module $module, Cart $cart, Country $country, ?State $state): bool
     {
         $isCartVirtual = $cart->isVirtual();
 

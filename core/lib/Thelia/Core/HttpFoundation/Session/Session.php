@@ -25,6 +25,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Domain\Shipping\ProductRule\ShippingCartScope;
 use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
@@ -329,6 +330,11 @@ class Session extends BaseSession
      */
     public function getSessionCart(EventDispatcherInterface $dispatcher): Cart
     {
+        // A carrier pricing the cart without its offered lines reads that cart.
+        if (null !== $shippingCart = ShippingCartScope::cart()) {
+            return $shippingCart;
+        }
+
         $cartId = $this->get(self::SESSION_CART_ID_NAME);
         $cart = null !== $cartId
             ? CartQuery::create()->findPk($cartId)

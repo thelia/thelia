@@ -983,4 +983,6 @@ return [
     'A slot needs a start and an end hour, written HH:MM.' => 'Un créneau doit avoir une heure de début et une heure de fin, au format HH:MM.',
     'A slot must end after it starts.' => 'Un créneau doit se terminer après son début.',
     'The capacity of a slot is at least one order, or left empty for no limit.' => 'La capacité d\'un créneau est d\'au moins une commande, ou vide pour ne pas la limiter.',
+    'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Aucun transporteur ne peut acheminer %products. Retirez-le de votre panier pour terminer votre commande.',
+    'The chosen carrier cannot ship %products. Choose another carrier.' => 'Le transporteur choisi ne peut pas acheminer %products. Choisissez un autre transporteur.',
 ];

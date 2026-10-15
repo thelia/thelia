@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
@@ -26,10 +28,12 @@ use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -41,6 +45,7 @@ class CartGuard
         private readonly EventDispatcherInterface $dispatcher,
         private readonly ContainerInterface $container,
         private readonly DeliveryDateGuard $deliveryDateGuard,
+        private readonly CartShippingRules $cartShippingRules,
     ) {
     }
 
@@ -121,6 +126,8 @@ class CartGuard
         $this->checkDeliveryAddress($cart);
 
         if (!$cart?->getDeliveryModuleId()) {
+            $this->refuseProductsNoCarrierTakes($cart);
+
             throw new InvalidDeliveryException('Delivery module is required');
         }
 
@@ -143,6 +150,13 @@ class CartGuard
             throw new MissingAddressException('Delivery address has no country');
         }
 
+        // Named before the generic refusal: the buyer has to know which product is in the way.
+        $excludingProductIds = $this->cartShippingRules->for($cart)->productsExcluding((int) $module->getId());
+
+        if ([] !== $excludingProductIds) {
+            throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($excludingProductIds, $this->locale()), [] !== $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState()));
+        }
+
         if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState())) {
             throw new InvalidDeliveryException('Delivery module does not deliver to this address');
         }
@@ -156,6 +170,32 @@ class CartGuard
         // Last, once the carrier itself is settled: the day only means something for a
         // carrier that will ship this cart to this address.
         $this->deliveryDateGuard->check($cart, $module);
+    }
+
+    /**
+     * A cart no carrier can take, because of its products, is told which ones.
+     *
+     * @throws DeliveryExcludedByProductException
+     */
+    private function refuseProductsNoCarrierTakes(Cart $cart): void
+    {
+        $address = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId());
+        $country = $address?->getCountry();
+
+        if (null === $address || null === $country) {
+            return;
+        }
+
+        $blockingProductIds = $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState());
+
+        if ([] !== $blockingProductIds) {
+            throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($blockingProductIds, $this->locale()), true);
+        }
+    }
+
+    private function locale(): string
+    {
+        return Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale();
     }
 
     /**
