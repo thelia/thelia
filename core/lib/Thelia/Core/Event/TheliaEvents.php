@@ -176,6 +176,12 @@ final class TheliaEvents
     public const PRODUCT_UPDATE_SEO = 'action.updateProductSeo';
     public const PRODUCT_ADD_CONTENT = 'action.productAddContent';
     public const PRODUCT_REMOVE_CONTENT = 'action.productRemoveContent';
+
+    /**
+     * A carrier the product cannot travel with: the product refuses it, whatever the address.
+     */
+    public const PRODUCT_EXCLUDE_DELIVERY_MODULE = 'action.productExcludeDeliveryModule';
+    public const PRODUCT_ALLOW_DELIVERY_MODULE = 'action.productAllowDeliveryModule';
     public const PRODUCT_UPDATE_CONTENT_POSITION = 'action.updateProductContentPosition';
     public const PRODUCT_ADD_PRODUCT_SALE_ELEMENT = 'action.addProductSaleElement';
     public const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = 'action.deleteProductSaleElement';

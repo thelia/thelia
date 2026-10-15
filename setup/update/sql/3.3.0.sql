@@ -1092,4 +1092,71 @@ INSERT IGNORE INTO `choice_filter_other_i18n` (`id`, `locale`, `title`, `descrip
     (@price_filter_id, 'nl_NL', 'Prijs', NULL),
     (@price_filter_id, 'ru_RU', 'Цена', NULL);
 
+-- ---------------------------------------------------------------------
+-- Shipping rules of a product
+--
+-- A surcharge added to the carrier postage, the product left out of the postage,
+-- and the carriers that cannot take the product. Every column defaults to no
+-- rule, so the postage of an upgraded shop does not move. The versioned copy of
+-- the product follows the product table.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `COLUMN_NAME` = 'shipping_surcharge');
+SET @statement := IF(@add_column, 'ALTER TABLE `product` ADD `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT \'fixed amount added to the carrier postage, untaxed, in the default currency\' AFTER `guest_checkout_forbidden`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `COLUMN_NAME` = 'shipping_surcharge_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `product` ADD `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT \'0: the surcharge is charged once per cart line, 1: once per unit\' AFTER `shipping_surcharge`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `COLUMN_NAME` = 'free_shipping');
+SET @statement := IF(@add_column, 'ALTER TABLE `product` ADD `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT \'the product is left out of the postage the carrier quotes\' AFTER `shipping_surcharge_mode`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_version' AND `COLUMN_NAME` = 'shipping_surcharge');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_version` ADD `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT \'fixed amount added to the carrier postage, untaxed, in the default currency\' AFTER `guest_checkout_forbidden`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_version' AND `COLUMN_NAME` = 'shipping_surcharge_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_version` ADD `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT \'0: the surcharge is charged once per cart line, 1: once per unit\' AFTER `shipping_surcharge`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_version' AND `COLUMN_NAME` = 'free_shipping');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_version` ADD `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT \'the product is left out of the postage the carrier quotes\' AFTER `shipping_surcharge_mode`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+CREATE TABLE IF NOT EXISTS `product_excluded_delivery_module`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_excluded_delivery_module_UNIQUE` (`product_id`, `module_id`),
+    INDEX `idx_product_excluded_delivery_module_module_id` (`module_id`),
+    CONSTRAINT `fk_product_excluded_delivery_module_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_excluded_delivery_module_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;
