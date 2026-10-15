@@ -458,7 +458,7 @@ final class MailerFactoryTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->createParserResolverReturning($parser),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
     }
 
