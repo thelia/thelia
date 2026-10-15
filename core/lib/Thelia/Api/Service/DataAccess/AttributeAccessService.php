@@ -696,6 +696,15 @@ class AttributeAccessService
             );
 
             $data = $search->findOne();
+
+            // The texts come from the joined i18n columns, the getters that read a translation themselves
+            // (getUrl(), getMetaTitle()...) from the locale of the model: the language of the page too, not the
+            // default locale of the model class, which made attr('category', 'url') an unrewritten en_US address.
+            $locale = $this->getSession()->getLang()?->getLocale();
+            if (null !== $data && null !== $locale && method_exists($data, 'setLocale')) {
+                $data->setLocale($locale);
+            }
+
             self::$dataAccessCache[$cacheKey] = $data;
         }
 
