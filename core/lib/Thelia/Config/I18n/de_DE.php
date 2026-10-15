@@ -839,6 +839,7 @@ return [
     'This order requires an account.' => 'Für diese Bestellung ist ein Kundenkonto erforderlich.',
     'This shop is not asking for the consent "%consent".' => 'Dieser Shop fragt die Einwilligung "%consent" nicht ab.',
     'You must accept "%consent" to place this order.' => 'Sie müssen "%consent" akzeptieren, um diese Bestellung aufzugeben.',
+    'No carrier can ship %products. Remove them from your cart to complete your order.' => 'Kein Versanddienst kann %products versenden. Entfernen Sie sie aus Ihrem Warenkorb, um Ihre Bestellung abzuschließen.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Kein Versanddienst kann %products versenden. Entfernen Sie es aus Ihrem Warenkorb, um Ihre Bestellung abzuschließen.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Der gewählte Versanddienst kann %products nicht versenden. Wählen Sie einen anderen Versanddienst.',
 ];

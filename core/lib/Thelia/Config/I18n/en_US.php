@@ -964,6 +964,7 @@ return [
     'The GTIN "%code" of the combination %ref is refused: %reason.' => 'The GTIN "%code" of the combination %ref is refused: %reason.',
     'The manufacturer part number must be %max characters at most.' => 'The manufacturer part number must be %max characters at most.',
     'The manufacturer part number of the combination %ref must be %max characters at most.' => 'The manufacturer part number of the combination %ref must be %max characters at most.',
+    'No carrier can ship %products. Remove them from your cart to complete your order.' => 'No carrier can ship %products. Remove them from your cart to complete your order.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'No carrier can ship %products. Remove it from your cart to complete your order.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'The chosen carrier cannot ship %products. Choose another carrier.',
 ];
