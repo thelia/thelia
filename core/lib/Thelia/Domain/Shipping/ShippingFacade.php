@@ -21,6 +21,7 @@ use Thelia\Api\State\Collection\DeliveryModuleCollection;
 use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryModuleLookupService;
 use Thelia\Domain\Shipping\Service\DeliveryModuleResourceBuilder;
@@ -49,7 +50,26 @@ final readonly class ShippingFacade
         private DeliveryOptionsProvider $deliveryOptionsProvider,
         private DeliveryModuleResourceBuilder $deliveryModuleResourceBuilder,
         private CartAddressService $cartAddressService,
+        private ?CartShippingRules $cartShippingRules = null,
     ) {
+    }
+
+    /**
+     * The products of the cart no carrier can take, by title, for the delivery step to
+     * name them instead of saying that no carrier is available. Empty while a carrier
+     * is left.
+     *
+     * @return array<int, string> product id => title
+     */
+    public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state, string $locale): array
+    {
+        $productIds = $this->eligibilityChecker->productsBlockingEveryCarrier($cart, $country, $state);
+
+        if ([] === $productIds || null === $this->cartShippingRules) {
+            return [];
+        }
+
+        return $this->cartShippingRules->titlesOf($productIds, $locale);
     }
 
     /**

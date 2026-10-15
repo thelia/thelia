@@ -36,8 +36,10 @@ use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
@@ -47,9 +49,11 @@ use Thelia\Model\CouponModuleQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\OrderCouponTableMap;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponCountry;
 use Thelia\Model\OrderCouponModule;
+use Thelia\Model\OrderPostage;
 
 /**
  * Process Coupon Events.
@@ -69,7 +73,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected ConditionFactory $conditionFactory,
         protected EventDispatcherInterface $dispatcher,
         protected OfferedCartLineService $offeredCartLineService,
+        protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
     ) {
+    }
+
+    private function surchargeLeftByTheCoupon(Cart $cart): ?OrderPostage
+    {
+        if (null === $this->productShippingRuleQuoter || !$cart->getDeliveryModuleId() || !$cart->getAddressDeliveryId()) {
+            return null;
+        }
+
+        $module = ModuleQuery::create()->findPk($cart->getDeliveryModuleId());
+        $country = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId())?->getCountry();
+
+        if (null === $module || null === $country) {
+            return null;
+        }
+
+        return $this->productShippingRuleQuoter->surchargeLeftByAFreeShippingCoupon($module, $cart, $country);
     }
 
     /**
@@ -341,9 +362,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $cart = $this->getSession()?->getSessionCart($this->dispatcher);
 
         if ($cart instanceof Cart && $this->couponManager->isCouponRemovingPostage($cart)) {
-            $cart->setPostage(null)
-                ->setPostageTax(null)
-                ->setPostageTaxRuleTitle(null)
+            // The coupon offers the carrier; the surcharges of the products stay due.
+            $surcharge = $this->surchargeLeftByTheCoupon($cart);
+
+            $cart->setPostage(null !== $surcharge ? (string) $surcharge->getAmount() : null)
+                ->setPostageTax(null !== $surcharge ? (string) $surcharge->getAmountTax() : null)
+                ->setPostageTaxRuleTitle($surcharge?->getTaxRuleTitle())
                 ->save();
 
             $event->stopPropagation();
@@ -355,9 +379,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $cart = $this->getSession()?->getSessionCart($this->dispatcher);
 
         if ($cart instanceof Cart && $this->couponManager->isCouponRemovingPostage($cart)) {
-            $cart->setPostage(null)
-                ->setPostageTax(null)
-                ->setPostageTaxRuleTitle(null)
+            // The coupon offers the carrier; the surcharges of the products stay due.
+            $surcharge = $this->surchargeLeftByTheCoupon($cart);
+
+            $cart->setPostage(null !== $surcharge ? (string) $surcharge->getAmount() : null)
+                ->setPostageTax(null !== $surcharge ? (string) $surcharge->getAmountTax() : null)
+                ->setPostageTaxRuleTitle($surcharge?->getTaxRuleTitle())
                 ->save();
 
             $event->stopPropagation();
