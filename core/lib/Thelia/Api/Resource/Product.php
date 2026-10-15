@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -25,7 +26,9 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -218,6 +221,24 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
+    /**
+     * Shipping rules of the product, written by the back office and by a catalogue
+     * import. No default of their own: a PUT that leaves them out keeps what is stored.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[ApiProperty(description: 'Fixed amount added to the carrier postage, untaxed, in the default currency')]
+    #[PositiveOrZero]
+    public ?float $shippingSurcharge = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[ApiProperty(description: '0: the surcharge is charged once per cart line, 1: once per unit')]
+    #[Choice(choices: [0, 1])]
+    public ?int $shippingSurchargeMode = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[ApiProperty(description: 'The product is left out of the postage the carrier quotes')]
+    public ?bool $freeShipping = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
@@ -357,6 +378,42 @@ class Product extends AbstractTranslatableResource
     public function isVirtual(): bool
     {
         return $this->virtual;
+    }
+
+    public function getShippingSurcharge(): ?float
+    {
+        return $this->shippingSurcharge;
+    }
+
+    public function setShippingSurcharge(?float $shippingSurcharge): self
+    {
+        $this->shippingSurcharge = $shippingSurcharge;
+
+        return $this;
+    }
+
+    public function getShippingSurchargeMode(): ?int
+    {
+        return $this->shippingSurchargeMode;
+    }
+
+    public function setShippingSurchargeMode(?int $shippingSurchargeMode): self
+    {
+        $this->shippingSurchargeMode = $shippingSurchargeMode;
+
+        return $this;
+    }
+
+    public function isFreeShipping(): ?bool
+    {
+        return $this->freeShipping;
+    }
+
+    public function setFreeShipping(?bool $freeShipping): self
+    {
+        $this->freeShipping = $freeShipping;
+
+        return $this;
     }
 
     public function setVirtual(bool $virtual): self
