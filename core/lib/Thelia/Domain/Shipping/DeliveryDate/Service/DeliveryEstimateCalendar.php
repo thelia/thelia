@@ -134,6 +134,8 @@ final class DeliveryEstimateCalendar implements ResetInterface
         if (!isset($this->slowestDelays[$key])) {
             $slowest = ProductQuery::create()
                 ->filterById($productIds, Criteria::IN)
+                // A virtual product is not in the parcel.
+                ->filterByVirtual(0)
                 ->withColumn('MAX('.ProductTableMap::COL_AVAILABILITY_DELAY_DAYS.')', 'slowest')
                 ->select(['slowest'])
                 ->findOne();
