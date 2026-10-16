@@ -82,6 +82,10 @@ interface ExpressPaymentModuleInterface
      * Throw a refusal when the provider does not vouch for the payment. Nothing is placed
      * then, and the buyer is left with their cart.
      *
+     * The placement comes after this answer and can still fail. Authorize here rather than
+     * charge, capture in `pay()`, and release the authorization on
+     * {@see \Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent}.
+     *
      * @throws ExpressCheckoutRefusedException
      */
     public function readExpressPaymentConfirmation(Request $request, Cart $cart): ExpressWalletAnswer;

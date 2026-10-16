@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementResult;
@@ -45,6 +47,7 @@ final readonly class ExpressCheckoutConfirmationService
         private ExpressCheckoutPlacementService $placementService,
         private SecurityContext $securityContext,
         private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -62,14 +65,28 @@ final readonly class ExpressCheckoutConfirmationService
 
         $answer = $access->module->readExpressPaymentConfirmation($request, $access->cart);
 
-        $cart = $this->cartOfTheIdentifiedBuyer($session, $access->cart);
+        try {
+            $cart = $this->cartOfTheIdentifiedBuyer($session, $access->cart);
 
-        $result = $this->placementService->place(new ExpressCheckoutRequest(
-            $cart,
-            $access->paymentModuleId,
-            $answer->totalTaxIncludedShownToTheBuyer,
-            $answer->consentAnswers,
-        ));
+            $result = $this->placementService->place(new ExpressCheckoutRequest(
+                $cart,
+                $access->paymentModuleId,
+                $answer->totalTaxIncludedShownToTheBuyer,
+                $answer->consentAnswers,
+            ));
+        } catch (\Throwable $reason) {
+            // The module vouched for a payment the shop does not place: its provider may
+            // hold the buyer's money by now, and only the module can release it.
+            $this->tellTheModuleNothingWasPlaced(new ExpressPaymentNotPlacedEvent($moduleCode, $access->cart, $answer, $reason));
+
+            throw $reason;
+        }
+
+        // The cart was ordered by an earlier confirmation: no second order and no second
+        // call to `pay()`, so whatever the module just authorized is captured by nobody.
+        if ($result->alreadyPlaced) {
+            $this->tellTheModuleNothingWasPlaced(new ExpressPaymentNotPlacedEvent($moduleCode, $access->cart, $answer, null));
+        }
 
         // A paid order is settled on the next read of the session cart: the guest leaves
         // the session and an empty cart takes this one's place. It is read here rather
@@ -81,6 +98,23 @@ final readonly class ExpressCheckoutConfirmationService
         }
 
         return $result;
+    }
+
+    /**
+     * A listener that fails must not take the place of the answer: the script would get a
+     * 500 instead of the refusal that says what to do, and the other listeners nothing.
+     */
+    private function tellTheModuleNothingWasPlaced(ExpressPaymentNotPlacedEvent $event): void
+    {
+        try {
+            $this->dispatcher->dispatch($event);
+        } catch (\Throwable $failure) {
+            $this->logger->error('An express payment listener failed while the shop reported a payment it did not place: {message}', [
+                'message' => $failure->getMessage(),
+                'module' => $event->getPaymentModuleCode(),
+                'exception' => $failure,
+            ]);
+        }
     }
 
     /**
