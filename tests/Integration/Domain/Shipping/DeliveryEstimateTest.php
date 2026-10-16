@@ -59,6 +59,7 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
+use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Delivery\DeliveryDateTestCarrier;
@@ -573,7 +574,13 @@ final class DeliveryEstimateTest extends IntegrationTestCase
             new ProductVisibility($this->getService(ReservedSaleProductRule::class), $this->getService(CurrentCustomerProvider::class), [$broken]),
         );
 
-        self::assertNull($estimator->estimateById((int) $this->product()->getId()));
+        $productId = (int) $this->product()->getId();
+        $logged = $this->loggedWhile(static function () use ($estimator, $productId, &$estimate): void {
+            $estimate = $estimator->estimateById($productId);
+        }, static fn () => null);
+
+        self::assertNull($estimate);
+        self::assertStringContainsString(\sprintf('The product %d could not be read for a delivery estimate', $productId), $logged);
     }
 
     /**
@@ -588,6 +595,7 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
         $product = $this->product();
         $connection = $this->getPropelConnection();
+        self::assertGreaterThanOrEqual(2, ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->count($connection), 'Several carriers, or one entry per carrier and one per estimate cannot be told apart.');
 
         // Masks the carrier zones for this connection, without an implicit commit.
         $connection->exec('CREATE TEMPORARY TABLE `area_delivery_module` (id INT)');
@@ -600,9 +608,10 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertNull($byProduct);
         self::assertNull($byId);
         // Each carrier was left out on its own, the estimate was not abandoned as a whole.
-        self::assertStringContainsString('The zones of carrier(s) ', $logged);
+        self::assertMatchesRegularExpression('/The zones of carrier\\(s\\) [^,\\n]+, [^\\n]+ could not be read/', $logged, 'Every carrier is named in the one entry.');
         self::assertStringNotContainsString('The delivery of product', $logged);
-        self::assertSame(2, substr_count($logged, 'could not be read for a delivery estimate'), 'One entry per estimate, not one per carrier.');
+        self::assertStringNotContainsString('The product ', $logged);
+        self::assertSame(2, substr_count($logged, 'The zones of carrier(s) '), 'One entry per estimate, not one per carrier.');
     }
 
     public function testTheCutoffMustBeAnHour(): void
@@ -614,7 +623,9 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
     /**
      * What the shop log receives while the action runs: Tlog reads its configuration from the
-     * database, so a bare text logger stands in for it, then the shop's comes back.
+     * database, so a bare text logger stands in for it, then the shop's comes back. The bare
+     * logger is set the way Tlog::out() reads it (level, files, prefix, destinations): a field
+     * out() comes to need from init() has to be set here too.
      */
     private function loggedWhile(callable $action, callable $finally): string
     {

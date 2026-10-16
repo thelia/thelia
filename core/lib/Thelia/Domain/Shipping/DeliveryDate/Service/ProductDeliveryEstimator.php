@@ -115,7 +115,8 @@ final readonly class ProductDeliveryEstimator
             try {
                 $deliversThere = null !== AreaDeliveryModuleQuery::create()->findByCountryAndModule($country, $carrier, $state);
             } catch (\Throwable $throwable) {
-                $unread[] = TerminalText::singleLine((string) $carrier->getCode());
+                $code = TerminalText::singleLine((string) $carrier->getCode());
+                $unread[] = '' === $code ? '#'.$carrier->getId() : $code;
                 $firstFailure ??= $throwable;
 
                 continue;

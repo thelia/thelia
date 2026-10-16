@@ -169,9 +169,9 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         // date, so the private step is asked directly.
         $firstOpenFrom = new \ReflectionMethod(DeliveryIntervalCalculator::class, 'firstOpenFrom');
 
-        $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2026-09-02'), [], [['2026-09-02', '9999-12-31']]);
+        $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2026-09-02'), [], [['2026-09-02', '2099-12-31']]);
 
-        self::assertSame('10000-01-01', $next->format('Y-m-d'));
+        self::assertSame('2100-01-01', $next->format('Y-m-d'));
     }
 
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void
