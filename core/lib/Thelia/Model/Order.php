@@ -235,15 +235,16 @@ class Order extends BaseOrder
 
         // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
         // and may cache results for several orders, for example in the order list in the back-office.
-        // The rounding mode is part of the key: it decides what the query computes.
+        // The rounding mode and the reading of the promotional price are part of the key: they decide what the query computes.
         static $queryResult = [];
 
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
-        $id = $this->getId().'-'.$roundingMode;
+        $textPromoPrice = ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId());
+        $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice;
 
         if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
             $con = Propel::getConnection();
-            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode));
+            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice));
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
@@ -285,12 +286,18 @@ class Order extends BaseOrder
      * cent before being multiplied by the quantity. With
      * ROUNDING_MODE_ROUNDING_OF_SUMS the multiplication happens at the
      * precision the prices are stored with, and only the line total is rounded.
+     *
+     * With $textPromoPrice the promotional price is read as a text, the way it was
+     * read while order_product.promo_price was a VARCHAR. The type of IF() is the
+     * one of its operands, so a text promotional price makes the whole unit price a
+     * text, the price of a line that is not on promotion included, and ROUND() then
+     * reads it as a floating point number.
      */
-    private function buildTotalAmountQuery(int $roundingMode): string
+    private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice): string
     {
         $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode;
 
-        $unitPrice = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')';
+        $unitPrice = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.$this->promoPriceOperand($textPromoPrice).', '.OrderProductTableMap::COL_PRICE.')';
         $unitTax = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')';
 
         if (!$roundingOfSums) {
@@ -321,6 +328,13 @@ class Order extends BaseOrder
         ';
     }
 
+    private function promoPriceOperand(bool $textPromoPrice): string
+    {
+        return $textPromoPrice
+            ? 'COALESCE(CAST('.OrderProductTableMap::COL_PROMO_PRICE.' AS CHAR), \'\')'
+            : OrderProductTableMap::COL_PROMO_PRICE;
+    }
+
     /**
      * This is thge legacy way of computing this order amount with taxes. The tax amount is returned in the $tax parameter.
      *
@@ -339,7 +353,7 @@ class Order extends BaseOrder
             ->filterByOrderId($this->getId())
             ->withColumn('SUM(
                     '.OrderProductTableMap::COL_QUANTITY.'
-                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
+                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.$this->promoPriceOperand(ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId())).', '.OrderProductTableMap::COL_PRICE.')
                 )', 'total_amount')
             ->select(['total_amount'])
             ->findOne();
