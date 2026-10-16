@@ -22,14 +22,18 @@ use Thelia\Domain\Customer\Service\CustomerAnonymizer;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerVersionQuery;
 use Thelia\Model\Map\OrderAddressTableMap;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
@@ -42,8 +46,11 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\TagElement;
 use Thelia\Model\TagElementQuery;
 use Thelia\Model\TagQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Payment\RefusingStoredMethodsPaymentModule;
+use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 final class CustomerAnonymizerTest extends IntegrationTestCase
 {
@@ -53,6 +60,16 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
     {
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
+        StoredMethodsPaymentModule::reset();
+        RefusingStoredMethodsPaymentModule::reset();
+    }
+
+    protected function tearDown(): void
+    {
+        StoredMethodsPaymentModule::reset();
+        RefusingStoredMethodsPaymentModule::reset();
+
+        parent::tearDown();
     }
 
     public function testAnonymizeKeepsTheOrderAndItsAmounts(): void
@@ -317,7 +334,7 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             }
         };
 
-        (new CustomerAnonymizer([$provider]))->anonymize($customer);
+        $this->anonymizerWithProviders([$provider])->anonymize($customer);
 
         self::assertSame([$customer->getId()], $provider->anonymizedCustomerIds);
     }
@@ -353,7 +370,15 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('module failure');
 
-        (new CustomerAnonymizer([$failingProvider]))->anonymize($customer);
+        $this->anonymizerWithProviders([$failingProvider])->anonymize($customer);
+    }
+
+    /**
+     * @param iterable<CustomerPersonalDataProviderInterface> $providers
+     */
+    private function anonymizerWithProviders(iterable $providers): CustomerAnonymizer
+    {
+        return new CustomerAnonymizer($this->getService(CustomerPaymentMethodService::class), $providers);
     }
 
     private function adminLog(string $resource, int $resourceId, string $action, string $message, string $request): AdminLog
@@ -440,6 +465,87 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         self::assertNull($invoiceAddress->getVatVerifiedName());
         self::assertSame(1, $invoiceAddress->getVatExempted());
         self::assertSame('20.000000', $invoiceAddress->getVatExemptedAmount());
+    }
+
+    /**
+     * The row goes with the rest of the identity, and the provider is told only
+     * once the erasure has committed: forgetAllOf() hands the anonymizer a
+     * callback for exactly this, run after the transaction closes.
+     */
+    public function testAnonymizeDropsStoredPaymentMethodsAndTellsTheProviderAfterCommit(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $module = $this->paymentModuleRow(StoredMethodsPaymentModule::class);
+        $method = $this->getService(CustomerPaymentMethodService::class)
+            ->register($customer, $module, 'pm_anonymizer', 'Visa ending 4242', null);
+        $methodId = $method->getId();
+
+        $this->anonymize($customer);
+
+        self::assertSame(
+            0,
+            CustomerPaymentMethodQuery::create()->filterById($methodId)->count(),
+            'Stored payment methods must be dropped by the anonymization.',
+        );
+        self::assertSame(
+            [$methodId],
+            StoredMethodsPaymentModule::$forgottenMethodIds,
+            'The provider is told once the erasure transaction has committed.',
+        );
+    }
+
+    /**
+     * The erasure of personal data does not wait on a third party: a provider
+     * that refuses is only logged, never allowed to keep the row or to hold
+     * the other callbacks back.
+     */
+    public function testAnonymizeDropsAStoredPaymentMethodEvenWhenItsProviderRefuses(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $refusingModule = $this->paymentModuleRow(RefusingStoredMethodsPaymentModule::class);
+        $acceptingModule = $this->paymentModuleRow(StoredMethodsPaymentModule::class);
+        $service = $this->getService(CustomerPaymentMethodService::class);
+
+        $refused = $service->register($customer, $refusingModule, 'pm_refused', 'Visa ending 1111', null);
+        $accepted = $service->register($customer, $acceptingModule, 'pm_accepted', 'Visa ending 2222', null);
+
+        $this->anonymize($customer);
+
+        self::assertSame(
+            0,
+            CustomerPaymentMethodQuery::create()->filterById([$refused->getId(), $accepted->getId()])->count(),
+            'Both rows are dropped in the anonymization transaction, whatever a provider later answers.',
+        );
+        self::assertSame([$refused->getId()], RefusingStoredMethodsPaymentModule::$askedToForgetMethodIds);
+        self::assertSame(
+            [$accepted->getId()],
+            StoredMethodsPaymentModule::$forgottenMethodIds,
+            'The other provider is still told, even though the first one refused.',
+        );
+    }
+
+    /**
+     * @param class-string<BaseModule> $moduleClass
+     */
+    private function paymentModuleRow(string $moduleClass): Module
+    {
+        $code = $moduleClass::getModuleCode();
+        $existing = ModuleQuery::create()->findOneByCode($code);
+
+        if (null !== $existing) {
+            return $existing;
+        }
+
+        $module = (new Module())
+            ->setCode($code)
+            ->setFullNamespace($moduleClass)
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->setCategory('payment')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $module->save($this->getPropelConnection());
+
+        return $module;
     }
 
     private function anonymize(Customer $customer): void

@@ -29,6 +29,10 @@ use Thelia\Model\Lang;
  * The currency and the language stay optional: the tunnel of a theme leaves them out and
  * the listener reads them off the session, as it always has. A caller with no session
  * states them, and they are what the order is frozen with.
+ *
+ * The stored payment method is the one the cart names, null for a new one. It enters the
+ * fingerprint of the order; the payment module is handed the method read again off the
+ * cart, and checked again, when the order is paid.
  */
 final readonly class OrderPaymentRequest
 {
@@ -40,6 +44,7 @@ final readonly class OrderPaymentRequest
         public int $paymentModuleId,
         public ?Currency $currency = null,
         public ?Lang $lang = null,
+        public ?int $customerPaymentMethodId = null,
     ) {
     }
 
@@ -59,6 +64,7 @@ final readonly class OrderPaymentRequest
             (int) $cart->getPaymentModuleId(),
             $placement->currency,
             $placement->lang,
+            $cart->getCustomerPaymentMethodId(),
         );
     }
 }

@@ -29,6 +29,10 @@ class CheckoutDTO implements DTOEventActionInterface, CartDTOInterface
         protected ?int $paymentModuleId = null,
         protected ?OrderPostage $postage = null,
         protected array $extendedData = [],
+        // The stored payment method to pay with, chosen with the payment module. Unlike
+        // the other choices it is never read off the cart: leaving it out when choosing
+        // the payment module is choosing a new method.
+        protected ?int $customerPaymentMethodId = null,
     ) {
         // deliveryAddressId and invoiceAddressId are customer `address` ids.
         // The cart stores `cart_address` ids — its own copies — so they are read
@@ -57,6 +61,7 @@ class CheckoutDTO implements DTOEventActionInterface, CartDTOInterface
             'payment_module_id' => $this->paymentModuleId,
             'postage' => $this->postage,
             'extended_data' => $this->extendedData,
+            'customer_payment_method_id' => $this->customerPaymentMethodId,
         ];
     }
 
@@ -88,6 +93,11 @@ class CheckoutDTO implements DTOEventActionInterface, CartDTOInterface
     public function getPostage(): ?OrderPostage
     {
         return $this->postage;
+    }
+
+    public function getCustomerPaymentMethodId(): ?int
+    {
+        return $this->customerPaymentMethodId;
     }
 
     public function getExtendedData(): array

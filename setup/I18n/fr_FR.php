@@ -320,6 +320,7 @@ return [
     'Configuration delivery dates' => 'Configuration des dates de livraison',
     'Configuration checkout steps' => 'Configuration des étapes du tunnel de commande',
     'Catalog price rules' => 'Règles de prix catalogue',
+    'Saved payment methods' => 'Moyens de paiement enregistrés',
     'Configuration variables' => 'Variables de configuration',
     'Confirm your %store account' => 'Confirmez la création de votre compte {{ config("store_name") }}',
     'Congo' => 'Congo',

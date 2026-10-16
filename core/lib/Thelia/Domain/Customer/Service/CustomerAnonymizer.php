@@ -19,6 +19,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
@@ -45,10 +46,11 @@ use Thelia\Model\TagElementQuery;
  * reference, their invoice number and date, their amounts, their taxes, their
  * coupons and their status history. What disappears is who placed them: the
  * account identity, the address book, the identity frozen on the invoice and
- * delivery order addresses, the carts, the newsletter subscription, the address
- * the consents of the checkout were accepted from, the label naming them as the
- * author of an entry in the history of their own orders, and the identity the
- * administrator audit trail recorded about that customer.
+ * delivery order addresses, the carts, the newsletter subscription, the stored
+ * payment methods, the address the consents of the checkout were accepted from,
+ * the label naming them as the author of an entry in the history of their own
+ * orders, and the identity the administrator audit trail recorded about that
+ * customer.
  *
  * The country and state of an order address are kept, because they justify
  * the tax rate applied on the order.
@@ -66,6 +68,7 @@ final readonly class CustomerAnonymizer
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
      */
     public function __construct(
+        private CustomerPaymentMethodService $customerPaymentMethodService,
         #[AutowireIterator('thelia.customer.personal_data_provider')]
         private iterable $personalDataProviders = [],
     ) {
@@ -89,6 +92,9 @@ final readonly class CustomerAnonymizer
             $this->deleteCustomerLists($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
             $this->deleteTagAttachments($customer, $connection);
+            // Dropped in this transaction, told to the providers once it commits: the
+            // erasure of personal data does not wait on a third party. See forgetAllOf().
+            $tellProvidersToForget = $this->customerPaymentMethodService->forgetAllOf($customer, $connection);
             $this->anonymizeAccount($customer, $connection);
             $this->anonymizeAdminLogs($customer, $connection);
 
@@ -101,6 +107,10 @@ final readonly class CustomerAnonymizer
             $connection->rollBack();
 
             throw $throwable;
+        }
+
+        foreach ($tellProvidersToForget as $tellProviderToForget) {
+            $tellProviderToForget();
         }
     }
 
