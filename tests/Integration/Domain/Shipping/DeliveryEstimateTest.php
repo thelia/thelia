@@ -47,6 +47,8 @@ use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Domain\Shipping\DeliveryDate\Service\ProductDeliveryEstimator;
 use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\ShippingFacade;
+use Thelia\Log\Destination\TlogDestinationText;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ConsentQuery;
@@ -590,15 +592,17 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         // Masks the carrier zones for this connection, without an implicit commit.
         $connection->exec('CREATE TEMPORARY TABLE `area_delivery_module` (id INT)');
 
-        try {
+        $logged = $this->loggedWhile(function () use (&$byProduct, &$byId, $product): void {
             $byProduct = $this->getService(ShippingFacade::class)->estimateProductDelivery($product);
             $byId = $this->getService(ShippingFacade::class)->estimateProductDeliveryById((int) $product->getId());
-        } finally {
-            $connection->exec('DROP TEMPORARY TABLE `area_delivery_module`');
-        }
+        }, static fn () => $connection->exec('DROP TEMPORARY TABLE `area_delivery_module`'));
 
         self::assertNull($byProduct);
         self::assertNull($byId);
+        // Each carrier was left out on its own, the estimate was not abandoned as a whole.
+        self::assertStringContainsString('The zones of carrier(s) ', $logged);
+        self::assertStringNotContainsString('The delivery of product', $logged);
+        self::assertSame(2, substr_count($logged, 'could not be read for a delivery estimate'), 'One entry per estimate, not one per carrier.');
     }
 
     public function testTheCutoffMustBeAnHour(): void
@@ -606,6 +610,32 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         $this->expectException(InvalidDeliveryDateSettingsException::class);
 
         $this->settings()->saveShopCutoffTime('2pm');
+    }
+
+    /**
+     * What the shop log receives while the action runs: Tlog reads its configuration from the
+     * database, so a bare text logger stands in for it, then the shop's comes back.
+     */
+    private function loggedWhile(callable $action, callable $finally): string
+    {
+        $instance = new \ReflectionProperty(Tlog::class, 'instance');
+        $shopLogger = $instance->getValue();
+        $instance->setValue(null, (new \ReflectionClass(Tlog::class))->newInstanceWithoutConstructor()
+            ->setLevel(Tlog::DEBUG)
+            ->setFiles('*')
+            ->setPrefix('#LEVEL: ')
+            ->setDestinations(TlogDestinationText::class));
+        ob_start();
+
+        try {
+            $action();
+        } finally {
+            $logged = (string) ob_get_clean();
+            $instance->setValue(null, $shopLogger);
+            $finally();
+        }
+
+        return $logged;
     }
 
     /**

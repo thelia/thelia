@@ -66,7 +66,7 @@ final readonly class ProductDeliveryEstimator
 
             return null === $product ? null : $this->estimate($product, $cart, $now);
         } catch (\Throwable $throwable) {
-            Tlog::getInstance()->addError(\sprintf('The delivery of product %d could not be estimated', $productId)."\n".ThrowableTrace::describe($throwable));
+            Tlog::getInstance()->addError(\sprintf('The product %d could not be read for a delivery estimate', $productId)."\n".ThrowableTrace::describe($throwable));
 
             return null;
         }
@@ -105,13 +105,18 @@ final readonly class ProductDeliveryEstimator
             ->find();
 
         $soonest = null;
+        $unread = [];
+        $firstFailure = null;
 
         foreach ($carriers as $carrier) {
-            // A carrier whose zones cannot be read is left out, the others still announce.
+            // A carrier whose zones cannot be read is left out and the others still announce:
+            // the page may then show the date of a slower carrier, a later promise rather than
+            // an earlier one it could not keep.
             try {
                 $deliversThere = null !== AreaDeliveryModuleQuery::create()->findByCountryAndModule($country, $carrier, $state);
             } catch (\Throwable $throwable) {
-                Tlog::getInstance()->addError(\sprintf('The zones of carrier %s could not be read for a delivery estimate', TerminalText::singleLine((string) $carrier->getCode()))."\n".ThrowableTrace::describe($throwable));
+                $unread[] = TerminalText::singleLine((string) $carrier->getCode());
+                $firstFailure ??= $throwable;
 
                 continue;
             }
@@ -125,6 +130,11 @@ final readonly class ProductDeliveryEstimator
             if (null !== $estimate && (null === $soonest || $estimate->isSoonerThan($soonest->estimate))) {
                 $soonest = new ProductDeliveryEstimate($estimate, $country, $carrier);
             }
+        }
+
+        // One entry for the whole page, however many carriers a database failure reaches.
+        if (null !== $firstFailure) {
+            Tlog::getInstance()->addError(\sprintf('The zones of carrier(s) %s could not be read for a delivery estimate', implode(', ', $unread))."\n".ThrowableTrace::describe($firstFailure));
         }
 
         return $soonest;
