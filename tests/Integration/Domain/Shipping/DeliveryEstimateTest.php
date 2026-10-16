@@ -631,6 +631,9 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertStringNotContainsString('The delivery of product', $logged);
         self::assertStringNotContainsString('The product ', $logged);
         self::assertSame(2, substr_count($logged, 'The zones of carrier(s) '), 'One entry per estimate, not one per carrier.');
+        // A carrier with a code is named by it, not by its id.
+        self::assertMatchesRegularExpression('/The zones of carrier\\(s\\) [^\\n]*\\b'.preg_quote(DeliveryDateTestCarrier::getModuleCode(), '/').'\\b/', $logged);
+        self::assertStringNotContainsString('#'.$this->carrier->getId(), $logged);
     }
 
     public function testTheCutoffMustBeAnHour(): void
