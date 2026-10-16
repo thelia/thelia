@@ -237,6 +237,18 @@ final class TheliaEvents
     /** Sent when a cart item is duplicated. */
     public const CART_ITEM_DUPLICATE = 'cart.item.duplicate';
 
+    /**
+     * Sent each time the session hands its cart out (CartEvent): the cart follows the
+     * sale unit the visitor buys from, and is checked again when that unit changed.
+     */
+    public const CART_FOLLOW_SALE_UNIT = 'cart.follow.saleUnit';
+
+    /**
+     * Sent once a cart has been checked against a new sale unit (CartSaleUnitSwitchedEvent):
+     * the lines removed, the quantities reduced and the prices changed.
+     */
+    public const CART_SALE_UNIT_SWITCHED = 'cart.saleUnit.switched';
+
     /** sent when a new item is added to current cart. */
     public const AFTER_CARTADDITEM = 'cart.after.addItem';
 
@@ -489,6 +501,11 @@ final class TheliaEvents
     public const ADMINISTRATOR_DELETE = 'action.deleteAdministrator';
     public const ADMINISTRATOR_UPDATEPASSWORD = 'action.generatePassword';
     public const ADMINISTRATOR_CREATEPASSWORD = 'action.createPassword';
+
+    /**
+     * Replaces the sale units an administrator is restricted to (AdministratorSaleUnitsEvent).
+     */
+    public const ADMINISTRATOR_UPDATE_SALE_UNITS = 'action.updateAdministratorSaleUnits';
 
     // -- Mailing System management ---------------------------------------------
 

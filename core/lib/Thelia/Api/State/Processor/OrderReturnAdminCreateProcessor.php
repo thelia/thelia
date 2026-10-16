@@ -26,6 +26,7 @@ use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\Customer;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturn as OrderReturnModel;
@@ -41,6 +42,7 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
         private PropelPersistProcessor $persistProcessor,
         private OrderReturnHydrator $hydrator,
         private EventDispatcherInterface $eventDispatcher,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -53,7 +55,7 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
         }
 
         $order = OrderQuery::create()->findPk($data->getOrder()->getId());
-        $customer = $order?->getCustomer();
+        $customer = null !== $order && $this->adminSaleUnitScope->allows($order->getSaleUnitId()) ? $order->getCustomer() : null;
 
         if (!$customer instanceof Customer) {
             throw new UnprocessableEntityHttpException('The order does not exist or has no customer.');

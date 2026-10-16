@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Form\Exception\StockNotFoundException;
 use Thelia\Model\ConfigQuery;
@@ -35,6 +36,11 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class CartAdd extends BaseForm
 {
+    public function __construct(
+        protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+    ) {
+    }
+
     /**
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :.
@@ -126,7 +132,12 @@ class CartAdd extends BaseForm
 
             $product = $productSaleElements->getProduct();
 
-            if ($productSaleElements->getQuantity() < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
+            // The stock of the sale unit the visitor buys from, when it keeps one, is the
+            // one the cart and the checkout judge on.
+            $availableQuantity = $this->saleUnitAvailableStock?->availableQuantity($productSaleElements)
+                ?? (float) $productSaleElements->getQuantity();
+
+            if ($availableQuantity < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
                 $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
             }
         }

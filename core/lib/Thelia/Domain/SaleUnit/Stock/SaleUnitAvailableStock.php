@@ -49,6 +49,26 @@ readonly class SaleUnitAvailableStock
         return $this->saleUnitStockResolver->ownQuantity((int) $saleUnit->getId(), $productSaleElementsId);
     }
 
+    /**
+     * The quantities the current sale unit keeps of its own for a batch of sale
+     * elements, in one query; empty, without a query, when no unit is resolved. A
+     * sale element absent from the answer sells from the national counter.
+     *
+     * @param list<int> $productSaleElementsIds
+     *
+     * @return array<int, float> keyed by sale element id
+     */
+    public function ownQuantities(array $productSaleElementsIds): array
+    {
+        $saleUnit = $this->saleUnitContext->getSaleUnit();
+
+        if (null === $saleUnit) {
+            return [];
+        }
+
+        return $this->saleUnitStockResolver->ownQuantities((int) $saleUnit->getId(), $productSaleElementsIds);
+    }
+
     public function availableQuantity(ProductSaleElements $productSaleElements): float
     {
         return $this->ownQuantity((int) $productSaleElements->getId()) ?? (float) $productSaleElements->getQuantity();

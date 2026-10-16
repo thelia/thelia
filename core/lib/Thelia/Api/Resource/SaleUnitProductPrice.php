@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\SaleUnitScopeVoter;
 use Thelia\Model\Map\SaleUnitProductPriceTableMap;
 use Thelia\Model\SaleUnitProductPriceQuery;
 
@@ -44,6 +45,7 @@ use Thelia\Model\SaleUnitProductPriceQuery;
     operations: [
         new Post(
             uriTemplate: '/admin/sale_unit_product_prices',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new GetCollection(
             uriTemplate: '/admin/sale_unit_product_prices',
@@ -54,9 +56,11 @@ use Thelia\Model\SaleUnitProductPriceQuery;
         ),
         new Put(
             uriTemplate: '/admin/sale_unit_product_prices/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new Patch(
             uriTemplate: '/admin/sale_unit_product_prices/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new Delete(
             uriTemplate: '/admin/sale_unit_product_prices/{id}',

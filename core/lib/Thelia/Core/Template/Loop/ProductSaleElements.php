@@ -27,6 +27,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Currency as CurrencyModel;
@@ -68,6 +69,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         protected readonly TaxEngine $taxEngine,
         protected readonly ReservedSaleVisibility $reservedSaleVisibility,
         protected readonly EffectivePriceCatalog $effectivePriceCatalog,
+        protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
     ) {
     }
 
@@ -280,6 +282,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         $effectivePrices = $this->effectivePricesOf($loopResult);
+        $saleUnitQuantities = $this->saleUnitQuantitiesOf($loopResult);
 
         /** @var \Thelia\Model\ProductSaleElements $PSEValue */
         foreach ($loopResult->getResultDataCollection() as $PSEValue) {
@@ -326,7 +329,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
             $loopResultRow
                 ->set('ID', $PSEValue->getId())
-                ->set('QUANTITY', $PSEValue->getQuantity())
+                ->set('QUANTITY', $saleUnitQuantities[(int) $PSEValue->getId()] ?? $PSEValue->getQuantity())
                 ->set('IS_PROMO', $isPromo)
                 ->set('VISIBLE', $PSEValue->getVisible())
                 ->set('POSITION', $PSEValue->getPosition())
@@ -379,6 +382,29 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $this->currency,
             $this->reservedSaleVisibility->currentCustomer(),
         );
+    }
+
+    /**
+     * The stock the sale unit the visitor buys from keeps of the sale elements of the
+     * page, in one query; empty, without a query, when no unit is resolved, and in the
+     * back office, which edits the national counter.
+     *
+     * @return array<int, float> keyed by sale element id
+     */
+    private function saleUnitQuantitiesOf(LoopResult $loopResult): array
+    {
+        if (null === $this->saleUnitAvailableStock || $this->getBackendContext()) {
+            return [];
+        }
+
+        $productSaleElementsIds = [];
+
+        /** @var \Thelia\Model\ProductSaleElements $PSEValue */
+        foreach ($loopResult->getResultDataCollection() as $PSEValue) {
+            $productSaleElementsIds[] = (int) $PSEValue->getId();
+        }
+
+        return $this->saleUnitAvailableStock->ownQuantities($productSaleElementsIds);
     }
 
     /**

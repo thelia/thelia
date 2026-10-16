@@ -21,6 +21,7 @@ use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
 use Thelia\Model\Accessory;
 use Thelia\Model\Address;
 use Thelia\Model\Admin;
+use Thelia\Model\AdminSaleUnit;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeCombination;
@@ -997,6 +998,19 @@ final class FixtureFactory
         $saleUnit->save($this->connection);
 
         return $saleUnit;
+    }
+
+    /**
+     * Restricts the administrator to this sale unit (one more of them, when it already has some).
+     */
+    public function adminSaleUnit(Admin $admin, SaleUnit $saleUnit): AdminSaleUnit
+    {
+        $adminSaleUnit = new AdminSaleUnit();
+        $adminSaleUnit->setAdminId($admin->getId());
+        $adminSaleUnit->setSaleUnitId($saleUnit->getId());
+        $adminSaleUnit->save($this->connection);
+
+        return $adminSaleUnit;
     }
 
     public function saleUnitProductPrice(

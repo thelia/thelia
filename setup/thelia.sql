@@ -1704,6 +1704,7 @@ CREATE TABLE `cart`
     `gift_message` TEXT COMMENT 'the note the buyer wrote for whoever receives the parcel, distinct from any comment addressed to the merchant',
     `delivery_date` DATE COMMENT 'the delivery day the buyer picked for the selected carrier, NULL while they picked none',
     `delivery_slot_id` INTEGER COMMENT 'the slot of that day the buyer picked, when the carrier offers slots',
+    `sale_unit_id` INTEGER COMMENT 'the sale unit the cart was last priced and stocked for, NULL for a national cart',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1714,6 +1715,7 @@ CREATE TABLE `cart`
     INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
     INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
+    INDEX `idx_cart_sale_unit_id` (`sale_unit_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -1752,6 +1754,11 @@ CREATE TABLE `cart`
     CONSTRAINT `fk_cart_delivery_slot_id`
         FOREIGN KEY (`delivery_slot_id`)
         REFERENCES `delivery_slot` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_cart_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -5040,6 +5047,32 @@ CREATE TABLE `sale_unit_product_sale_elements`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
         ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- admin_sale_unit
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `admin_sale_unit`;
+
+CREATE TABLE `admin_sale_unit`
+(
+    `admin_id` INTEGER NOT NULL,
+    `sale_unit_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`admin_id`,`sale_unit_id`),
+    INDEX `idx_admin_sale_unit_sale_unit_id` (`sale_unit_id`),
+    CONSTRAINT `fk_admin_sale_unit_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_admin_sale_unit_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 # This restores the fkey checks, after having unset them earlier

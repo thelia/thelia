@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,9 +27,11 @@ use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
+use Thelia\Core\Event\Cart\CartSaleUnitSwitchedEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
@@ -35,8 +39,11 @@ use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\SaleUnit\Cart\CartLineChange;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -50,6 +57,7 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
+use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\ProductSaleElements;
@@ -77,6 +85,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected PricingActivityChecker $pricingActivityChecker,
         protected ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
         protected ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        protected ?SaleUnitContext $saleUnitContext = null,
+        protected ?SaleUnitStockResolver $saleUnitStockResolver = null,
     ) {
     }
 
@@ -720,6 +730,179 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Keeps the cart in step with the sale unit the visitor buys from.
+     *
+     * A cart remembers the unit it was last priced and stocked for. When the visitor
+     * reaches another one (another domain, a store picker, a unit turned off), the
+     * lines that unit cannot sell are removed, the quantities beyond its stock are
+     * reduced, and every line takes the unit's price, before anything else reads the
+     * cart. What changed is told by CART_SALE_UNIT_SWITCHED.
+     *
+     * A single shop, and a cart already on the current unit, compare two ids in
+     * memory and stop there: no query.
+     */
+    public function followSaleUnit(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        if (null === $this->saleUnitContext || true === TheliaRequest::$isAdminEnv) {
+            return;
+        }
+
+        $cart = $event->getCart();
+        $saleUnitId = $this->currentSaleUnitId();
+        $previousSaleUnitId = null === $cart->getSaleUnitId() ? null : (int) $cart->getSaleUnitId();
+
+        if ($previousSaleUnitId === $saleUnitId) {
+            return;
+        }
+
+        if ($cart->isNew()) {
+            // Nothing priced or stocked yet: it is saved with the unit it is filled on.
+            $cart->setSaleUnitId($saleUnitId);
+
+            return;
+        }
+
+        $con = Propel::getWriteConnection(CartTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            // Settled first, and only if the cart is still where this request read it:
+            // two requests of the same visitor may both find it on the old unit, and
+            // the move belongs to the one that makes it. A listener reading the session
+            // cart while the lines move then finds it on its unit and does not start over.
+            $moved = CartQuery::create()
+                ->filterById($cart->getId())
+                ->filterBySaleUnitId($previousSaleUnitId, null === $previousSaleUnitId ? Criteria::ISNULL : Criteria::EQUAL)
+                ->update(['SaleUnitId' => $saleUnitId], $con);
+
+            if (1 !== $moved) {
+                $con->commit();
+                $cart->reload(false, $con);
+
+                return;
+            }
+
+            $cart->setSaleUnitId($saleUnitId);
+            $cart->resetModified(CartTableMap::COL_SALE_UNIT_ID);
+            $changes = $this->switchLinesTo($cart, $saleUnitId);
+            $con->commit();
+        } catch (\Throwable $exception) {
+            $con->rollBack();
+
+            throw $exception;
+        }
+
+        $dispatcher->dispatch(
+            new CartSaleUnitSwitchedEvent($cart, $previousSaleUnitId, $saleUnitId, $changes),
+            TheliaEvents::CART_SALE_UNIT_SWITCHED,
+        );
+    }
+
+    /**
+     * @return list<CartLineChange> the lines that were removed, reduced or repriced
+     */
+    private function switchLinesTo(CartModel $cart, ?int $saleUnitId): array
+    {
+        $checkStock = ConfigQuery::checkAvailableStock();
+        /** @var array<int, array{0: CartItem, 1: float, 2: float}> $before line, quantity and price before, by line id */
+        $before = [];
+        $changes = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            // An offered line belongs to the promotion that placed it: the discount
+            // reconciliation that follows the switch settles it.
+            if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
+            $productSaleElements = $cartItem->getProductSaleElements();
+
+            if (null === $productSaleElements) {
+                continue;
+            }
+
+            $quantity = (float) $cartItem->getQuantity();
+            $price = $cartItem->getRealPrice();
+
+            if ($checkStock && 0 === (int) $productSaleElements->getProduct()->getVirtual()) {
+                $available = $this->saleUnitStockResolver?->availableQuantity(
+                    $saleUnitId,
+                    (int) $productSaleElements->getId(),
+                    (float) $productSaleElements->getQuantity(),
+                ) ?? (float) $productSaleElements->getQuantity();
+
+                if ($available <= 0) {
+                    $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
+                    $cartItem->delete();
+
+                    continue;
+                }
+
+                if ($quantity > $available) {
+                    $cartItem->setQuantity($available)->save();
+                }
+            }
+
+            $before[(int) $cartItem->getId()] = [$cartItem, $quantity, $price];
+        }
+
+        $cart->clearCartItems();
+        $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (!isset($before[(int) $cartItem->getId()])) {
+                continue;
+            }
+
+            [, $previousQuantity, $previousPrice] = $before[(int) $cartItem->getId()];
+            $change = $this->lineChange(
+                $cartItem,
+                $previousQuantity,
+                (float) $cartItem->getQuantity(),
+                $previousPrice,
+                $cartItem->getRealPrice(),
+            );
+
+            if ($change->hasChanged()) {
+                $changes[] = $change;
+            }
+        }
+
+        return $changes;
+    }
+
+    private function lineChange(CartItem $cartItem, float $previousQuantity, float $quantity, float $previousPrice, float $price): CartLineChange
+    {
+        return new CartLineChange(
+            (int) $cartItem->getProductSaleElementsId(),
+            (int) $cartItem->getProductId(),
+            (string) $cartItem->getProduct()->getRef(),
+            $previousQuantity,
+            $quantity,
+            $previousPrice,
+            $price,
+        );
+    }
+
+    private function isOnTheCurrentSaleUnit(CartModel $cart): bool
+    {
+        if (null === $this->saleUnitContext || true === TheliaRequest::$isAdminEnv) {
+            return true;
+        }
+
+        $saleUnitId = $cart->getSaleUnitId();
+
+        return (null === $saleUnitId ? null : (int) $saleUnitId) === $this->currentSaleUnitId();
+    }
+
+    private function currentSaleUnitId(): ?int
+    {
+        $saleUnitId = $this->saleUnitContext?->getSaleUnit()?->getId();
+
+        return null === $saleUnitId ? null : (int) $saleUnitId;
+    }
+
+    /**
      * Search if cart already exists in session. If not try to restore it from the cart cookie,
      * or duplicate an old one.
      */
@@ -747,8 +930,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         // A restored cart may have been created a long time ago: bring the price and the special offer
-        // status of its items back in line with the current catalog.
-        if (!$cart->isNew()) {
+        // status of its items back in line with the current catalog. A cart of another sale unit is
+        // left to followSaleUnit(), which reprices it and tells what changed.
+        if (!$cart->isNew() && $this->isOnTheCurrentSaleUnit($cart)) {
             $this->refreshCartItemPrices($cart, $cart->getCurrency() ?: $this->getSession()->getCurrency(true));
         }
 
@@ -943,6 +1127,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart = new CartModel();
 
         $cart->setCurrency($this->getSession()->getCurrency(true));
+        $cart->setSaleUnitId($this->currentSaleUnitId());
 
         /** @var CustomerModel $customer */
         if (null !== $customer = $this->getSession()->getCustomerUser()) {
@@ -970,6 +1155,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $customer,
             $this->getSession()->getCurrency(),
             $dispatcher,
+            $this->saleUnitStockResolver,
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
@@ -1006,6 +1192,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::CART_PERSIST => ['persistCart', 128],
             TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
+            TheliaEvents::CART_FOLLOW_SALE_UNIT => ['followSaleUnit', 128],
             TheliaEvents::CART_CREATE_NEW => ['createEmptyCart', 128],
             TheliaEvents::CART_ADDITEM => ['addItem', 128],
             TheliaEvents::CART_FINDITEM => ['findCartItem', 128],

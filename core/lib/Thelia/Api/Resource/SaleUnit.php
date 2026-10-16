@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\SaleUnitScopeVoter;
+use Thelia\Domain\SaleUnit\Exception\SaleUnitStillAssignedException;
 use Thelia\Model\Map\SaleUnitTableMap;
 
 /**
@@ -39,6 +41,7 @@ use Thelia\Model\Map\SaleUnitTableMap;
     operations: [
         new Post(
             uriTemplate: '/admin/sale_units',
+            security: 'is_granted("'.SaleUnitScopeVoter::UNRESTRICTED.'")',
         ),
         new GetCollection(
             uriTemplate: '/admin/sale_units',
@@ -49,12 +52,16 @@ use Thelia\Model\Map\SaleUnitTableMap;
         ),
         new Put(
             uriTemplate: '/admin/sale_units/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new Patch(
             uriTemplate: '/admin/sale_units/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new Delete(
             uriTemplate: '/admin/sale_units/{id}',
+            security: 'is_granted("'.SaleUnitScopeVoter::UNRESTRICTED.'")',
+            exceptionToStatus: [SaleUnitStillAssignedException::class => 409],
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],

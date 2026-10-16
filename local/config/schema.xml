@@ -1590,6 +1590,7 @@
 
     <column description="the delivery day the buyer picked for the selected carrier, NULL while they picked none" name="delivery_date" type="DATE" />
     <column description="the slot of that day the buyer picked, when the carrier offers slots" name="delivery_slot_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the sale unit the cart was last priced and stocked for, NULL for a national cart" name="sale_unit_id" type="INTEGER" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -1614,6 +1615,9 @@
     <foreign-key foreignTable="delivery_slot" name="fk_cart_delivery_slot_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="delivery_slot_id" />
     </foreign-key>
+    <foreign-key foreignTable="sale_unit" name="fk_cart_sale_unit_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
 
     <index name="idx_cart_customer_id">
       <index-column name="customer_id" />
@@ -1632,6 +1636,9 @@
     </index>
     <index name="idx_cart_currency_id">
       <index-column name="currency_id" />
+    </index>
+    <index name="idx_cart_sale_unit_id">
+      <index-column name="sale_unit_id" />
     </index>
     <unique name="token_UNIQUE">
       <unique-column name="token" />
@@ -3002,6 +3009,21 @@
     </unique>
     <index name="idx_sale_unit_pse_product_sale_elements_id">
       <index-column name="product_sale_elements_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="admin_sale_unit" namespace="Thelia\Model">
+    <column name="admin_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="admin" name="fk_admin_sale_unit_admin_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="admin_id" />
+    </foreign-key>
+    <foreign-key foreignTable="sale_unit" name="fk_admin_sale_unit_sale_unit_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <index name="idx_admin_sale_unit_sale_unit_id">
+      <index-column name="sale_unit_id" />
     </index>
     <behavior name="timestampable" />
   </table>

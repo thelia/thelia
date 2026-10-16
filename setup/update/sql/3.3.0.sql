@@ -913,4 +913,49 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@sale_unit_resource_id, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
     (@sale_unit_resource_id, 'ru_RU', 'Точки продаж', NULL, NULL, NULL);
 
+-- The sale unit a cart was last priced and stocked for. When the visitor moves
+-- to another unit, the cart is checked again against that unit's prices and
+-- stock. NULL for a national cart, so an existing shop is untouched.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'sale_unit_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit the cart was last priced and stocked for, NULL for a national cart'' AFTER `delivery_slot_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_sale_unit_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_sale_unit_id` (`sale_unit_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_fk := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_sale_unit_id');
+SET @statement := IF(@add_fk, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_sale_unit_id` FOREIGN KEY (`sale_unit_id`) REFERENCES `sale_unit` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_fk_statement FROM @statement;
+EXECUTE add_fk_statement;
+DEALLOCATE PREPARE add_fk_statement;
+
+-- The sale units an administrator is restricted to. An administrator with no
+-- row reaches every unit, as before; a superadministrator is never restricted.
+-- A unit some administrator is restricted to cannot be deleted (RESTRICT):
+-- the administrator would be left with no row, which reads as every unit.
+CREATE TABLE IF NOT EXISTS `admin_sale_unit`
+(
+    `admin_id` INTEGER NOT NULL,
+    `sale_unit_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`admin_id`,`sale_unit_id`),
+    INDEX `idx_admin_sale_unit_sale_unit_id` (`sale_unit_id`),
+    CONSTRAINT `fk_admin_sale_unit_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_admin_sale_unit_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

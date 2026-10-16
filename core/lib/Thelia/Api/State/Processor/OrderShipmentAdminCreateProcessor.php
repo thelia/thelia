@@ -19,6 +19,7 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\OrderShipment as OrderShipmentResource;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Domain\Shipping\DTO\ShipmentLine;
 use Thelia\Domain\Shipping\Exception\ShipmentNotAllowedException;
 use Thelia\Domain\Shipping\Service\OrderShipmentManager;
@@ -34,6 +35,7 @@ final readonly class OrderShipmentAdminCreateProcessor implements ProcessorInter
     public function __construct(
         private OrderShipmentManager $shipmentManager,
         private ApiResourcePropelTransformerService $transformer,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -45,7 +47,7 @@ final readonly class OrderShipmentAdminCreateProcessor implements ProcessorInter
 
         $order = OrderQuery::create()->findPk((int) $data->getOrder()?->getId());
 
-        if (null === $order) {
+        if (null === $order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
             throw new UnprocessableEntityHttpException('The order does not exist.');
         }
 

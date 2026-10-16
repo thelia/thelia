@@ -25,6 +25,7 @@ use Thelia\Api\Resource\OrderReturnTransitionInput;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatusQuery;
 
@@ -39,6 +40,7 @@ final readonly class OrderReturnTransitionProcessor implements ProcessorInterfac
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private ApiResourcePropelTransformerService $transformer,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -46,7 +48,9 @@ final readonly class OrderReturnTransitionProcessor implements ProcessorInterfac
     {
         $return = OrderReturnQuery::create()->findPk((int) ($uriVariables['id'] ?? 0));
 
-        if (null === $return) {
+        // A return of an order of a sale unit the administrator is restricted away
+        // from answers as the order itself does.
+        if (null === $return || !$this->adminSaleUnitScope->allows($return->getOrder()?->getSaleUnitId())) {
             throw new NotFoundHttpException('Return not found.');
         }
 

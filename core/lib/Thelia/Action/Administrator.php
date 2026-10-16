@@ -14,21 +14,31 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
+use Thelia\Core\Event\Administrator\AdministratorSaleUnitsEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\AdminSaleUnit;
+use Thelia\Model\AdminSaleUnitQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\AdminSaleUnitTableMap;
+use Thelia\Model\SaleUnitQuery;
 use Thelia\Tools\TokenProvider;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected MailerFactory $mailer, protected TokenProvider $tokenProvider)
-    {
+    public function __construct(
+        protected MailerFactory $mailer,
+        protected TokenProvider $tokenProvider,
+        protected ?AdminSaleUnitScope $adminSaleUnitScope = null,
+    ) {
     }
 
     public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -82,6 +92,58 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         $event->setAdministrator($administrator);
     }
 
+    /**
+     * Replaces the sale units the administrator is restricted to; an empty list lifts
+     * the restriction. An id naming no sale unit is ignored, and a list naming none
+     * that exists is refused.
+     */
+    public function updateSaleUnits(AdministratorSaleUnitsEvent $event): void
+    {
+        if (null === AdminQuery::create()->findPk($event->getAdminId())) {
+            return;
+        }
+
+        $saleUnitIds = [] === $event->getSaleUnitIds()
+            ? []
+            : array_map('intval', SaleUnitQuery::create()
+                ->filterById($event->getSaleUnitIds())
+                ->select(['Id'])
+                ->find()
+                ->getData());
+
+        // Only an empty list lifts the restriction: a list naming no unit that
+        // exists is a mistake, and taking it as empty would open every unit.
+        if ([] === $saleUnitIds && [] !== $event->getSaleUnitIds()) {
+            throw new \InvalidArgumentException('None of the sale units the administrator was to be restricted to exists: the restriction is left as it was.');
+        }
+
+        $con = Propel::getWriteConnection(AdminSaleUnitTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            AdminSaleUnitQuery::create()
+                ->filterByAdminId($event->getAdminId())
+                ->delete($con);
+
+            foreach ($saleUnitIds as $saleUnitId) {
+                (new AdminSaleUnit())
+                    ->setAdminId($event->getAdminId())
+                    ->setSaleUnitId($saleUnitId)
+                    ->save($con);
+            }
+
+            $con->commit();
+        } catch (\Throwable $exception) {
+            $con->rollBack();
+
+            throw $exception;
+        }
+
+        sort($saleUnitIds);
+        $event->setSaleUnitIds($saleUnitIds);
+        $this->adminSaleUnitScope?->forget($event->getAdminId());
+    }
+
     public function updatePassword(AdministratorUpdatePasswordEvent $event): void
     {
         $admin = $event->getAdmin();
@@ -128,6 +190,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ADMINISTRATOR_DELETE => ['delete', 128],
             TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD => ['updatePassword', 128],
             TheliaEvents::ADMINISTRATOR_CREATEPASSWORD => ['createPassword', 128],
+            TheliaEvents::ADMINISTRATOR_UPDATE_SALE_UNITS => ['updateSaleUnits', 128],
         ];
     }
 }

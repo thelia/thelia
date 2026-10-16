@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -81,6 +82,7 @@ class Cart extends BaseCart
         ?Customer $customer = null,
         ?Currency $currency = null,
         ?EventDispatcherInterface $dispatcher = null,
+        ?SaleUnitStockResolver $saleUnitStockResolver = null,
     ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
@@ -92,6 +94,9 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
+        // The copy belongs to the sale unit of the cart it copies: moving to another
+        // unit is the job of the session, which checks the copy again if needed.
+        $cart->setSaleUnitId($this->getSaleUnitId());
 
         $discount = 0.0;
 
@@ -113,6 +118,8 @@ class Cart extends BaseCart
 
         $cart->save();
 
+        $saleUnitQuantities = $this->saleUnitQuantitiesOf($cartItems, $saleUnitStockResolver);
+
         foreach ($cartItems as $cartItem) {
             if (1 === (int) $cartItem->getIsOffered()) {
                 // An offered line belongs to the promotion that placed it, not to the
@@ -127,7 +134,7 @@ class Cart extends BaseCart
             if ($product
                 && $productSaleElements
                 && 1 === (int) $product->getVisible()
-                && ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
+                && (($saleUnitQuantities[(int) $productSaleElements->getId()] ?? (float) $productSaleElements->getQuantity()) >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
             ) {
                 $item = new CartItem();
                 $item->setCart($cart);
@@ -155,6 +162,30 @@ class Cart extends BaseCart
         }
 
         return $cart;
+    }
+
+    /**
+     * The stock the cart's sale unit keeps of its own for the lines, in one query;
+     * empty for a national cart, without a query. A line absent from the answer is
+     * copied against the national counter.
+     *
+     * @param iterable<CartItem> $cartItems
+     *
+     * @return array<int, float> keyed by sale element id
+     */
+    private function saleUnitQuantitiesOf(iterable $cartItems, ?SaleUnitStockResolver $saleUnitStockResolver): array
+    {
+        if (null === $saleUnitStockResolver || null === $this->getSaleUnitId()) {
+            return [];
+        }
+
+        $productSaleElementsIds = [];
+
+        foreach ($cartItems as $cartItem) {
+            $productSaleElementsIds[] = (int) $cartItem->getProductSaleElementsId();
+        }
+
+        return $saleUnitStockResolver->ownQuantities((int) $this->getSaleUnitId(), $productSaleElementsIds);
     }
 
     /**
