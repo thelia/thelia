@@ -119,6 +119,28 @@ The token is an HMAC of the cart id and the module id under `kernel.secret`. It 
 rather than stored, and it dies with the cart: a cart replaced at sign-in or after a payment
 has another id.
 
+### A payment the shop did not place
+
+The module reads its provider's answer before anything is placed, and the placement can
+still fail after it: stock ran out, a placement already running, a total that differs, a
+buyer nobody identified. The shop then dispatches
+`Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent`, by its class name, with the
+module code, the cart the module was handed, its answer and the exception, before answering
+the script. It does the same, with no exception, when the cart was already ordered by an
+earlier confirmation (`alreadyPlaced`): `pay()` is not called again. A refusal the module
+made itself is not reported, and a listener that fails is logged without changing the answer.
+
+A module whose provider takes the money in two steps authorizes in
+`readExpressPaymentConfirmation()`, captures in `pay()`, and releases on this event the
+authorization it still holds. The failure can come after the order was written, from `pay()`
+itself or a listener of the payment: never release what `pay()` already captured. Charging in
+`readExpressPaymentConfirmation()` leaves the buyer charged for an order that does not exist
+whenever the placement fails.
+
+A `pay()` whose capture fails cancels the order and throws `ExpressCheckoutRefusedException`:
+the script gets a 422 with the reason, and the buyer can try again, since a cancelled order
+does not count as the cart's order.
+
 ### The ordinary placement refuses an express-only module
 
 `CheckoutPaymentOffer::canBePaidAtCheckout()` holds the rule: a module that implements the
@@ -154,12 +176,15 @@ hand, with the shop's routes and token, for a decoupled front.
   provider's data to the confirmation route with the token. Follow `nextUrl`.
 - In `readExpressPaymentConfirmation()`, verify the payment with the provider and return the
   total the sheet showed. Throw a refusal when the provider does not vouch for it.
+- Prefer an authorization to a charge there, capture it in `pay()`, and listen for
+  `ExpressPaymentNotPlacedEvent` to release it, filtering on your module code.
 
 ## Where things live
 
 | Piece | Place |
 |---|---|
 | Module contract | `core/lib/Thelia/Module/ExpressPaymentModuleInterface.php` |
+| Event when nothing is placed | `core/lib/Thelia/Core/Event/Checkout/ExpressPaymentNotPlacedEvent.php` |
 | Zone, button, answer | `core/lib/Thelia/Domain/Checkout/Enum/ExpressPaymentZone.php`, `DTO/ExpressPaymentButton.php`, `DTO/ExpressWalletAnswer.php` |
 | Collector, gate, token, amount, confirmation, placement | `core/lib/Thelia/Domain/Checkout/Service/Express*` |
 | Ordinary placement guard | `core/lib/Thelia/Domain/Checkout/Service/CheckoutPaymentOffer.php`, `ExpressPaymentCheckoutGuard.php` |
