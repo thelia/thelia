@@ -631,9 +631,13 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertStringNotContainsString('The delivery of product', $logged);
         self::assertStringNotContainsString('The product ', $logged);
         self::assertSame(2, substr_count($logged, 'The zones of carrier(s) '), 'One entry per estimate, not one per carrier.');
-        // Each entry names the carriers by their code, never by an id: only the line naming
+        // Each entry names every carrier by its code, never by an id: only the line naming
         // them is read, the trace below it numbers its frames with # too.
-        self::assertSame(2, preg_match_all('/^.*The zones of carrier\\(s\\) [^\\n]*\\b'.preg_quote(DeliveryDateTestCarrier::getModuleCode(), '/').'\\b[^\\n]* could not be read/m', $logged));
+        $codes = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->select('Code')->find($connection)->getData();
+        self::assertContains(DeliveryDateTestCarrier::getModuleCode(), $codes);
+        foreach ($codes as $code) {
+            self::assertSame(2, preg_match_all('/^.*The zones of carrier\\(s\\) [^\\n]*\\b'.preg_quote((string) $code, '/').'\\b[^\\n]* could not be read/m', $logged), \sprintf('Carrier %s is named in both entries.', $code));
+        }
         self::assertDoesNotMatchRegularExpression('/The zones of carrier\\(s\\) [^\\n]*#\\d/', $logged);
     }
 
