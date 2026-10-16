@@ -109,7 +109,9 @@ reads it, in one transaction:
 - a quantity beyond the unit's stock is reduced to what it holds;
 - every line takes the unit's price, or the national price back when the visitor
   leaves the units;
-- the cart is saved on the new unit.
+- the cart is saved on the new unit, by an update conditioned on the unit it was
+  read on: when two requests of the visitor find it on the old unit, the second
+  finds it moved and leaves it alone.
 
 Offered lines are left to the discount reconciliation, which runs again afterwards.
 `TheliaEvents::CART_SALE_UNIT_SWITCHED` then carries a `CartSaleUnitSwitchedEvent`:
@@ -132,8 +134,8 @@ request, and every cart of a single shop, compare two ids in memory and stop the
 no query. The back office never moves a cart.
 
 When a customer signs in and the cart is copied, the copy keeps the unit of the cart
-it copies and the lines that unit can sell; the session then moves it if needed, as
-above.
+it copies and the lines that unit can sell (its stock read in one query); the session
+then moves it if needed, as above.
 
 ## Orders
 
@@ -150,28 +152,42 @@ An administrator can be restricted to some sale units, by rows of
 `admin_sale_unit`. An administrator with no row reaches every unit and the national
 orders, which is every administrator of a shop that never restricts anyone: nothing
 changes for it. A superadministrator (no profile) is never restricted, whatever rows
-it carries.
+it carries. A shop with no active sale unit restricts nobody, and asks nothing about
+its administrators.
+
+For now the restriction applies to the admin API only. The back-office screens
+apply it through `AdminSaleUnitScope` (below) in the back-office theme, which
+follows on its own.
 
 A national order, placed on no sale unit, belongs to none of the units a restricted
-administrator works on: it is out of its reach. National orders are handled by the
-administrators who are not restricted.
+administrator works on: it is out of its reach, and a restricted administrator
+cannot create an order through `POST /api/admin/orders`, which would be national.
+National orders are handled by the administrators who are not restricted.
 
 Through the admin API, a restricted administrator reaches:
 
 | Resource | What it reaches |
 |---|---|
 | `/api/admin/orders` | the orders of its units |
-| `/api/admin/order_products`, `order_coupons`, `order_shipments`, `order_returns`, `/api/admin/orders/{id}/history` | those of the orders of its units |
+| `order_products`, `order_product_taxes`, `order_addresses`, `order_coupons`, `order_shipments`, `order_shipment_items`, `order_returns`, `order_return_lines`, `/api/admin/orders/{id}/history` | those of the orders of its units |
+| `/api/admin/carts`, `cart_items` | the carts of its units and their lines |
 | `/api/admin/sale_unit_product_prices`, `sale_unit_product_sale_elements` | the prices and stocks of its units |
-| `/api/admin/sale_units` | its units; it cannot create one |
+| `/api/admin/sale_units` | its units; it can neither create nor delete one |
 
 A collection leaves the other rows out and an item answers 404, so an item out of
-reach can be neither changed nor deleted. A write naming another unit is refused:
-its IRI resolves to nothing for this administrator (400), and the state about to be
-written is voted on (`SaleUnitScopeVoter`, 403) before it is persisted. The rights of
-the profile still apply first: the restriction narrows what a right reaches, it
-grants nothing. The order addresses, the line taxes, the shipment and return lines,
-reached by their own id rather than through their order, are not narrowed.
+reach can be neither changed nor deleted, and the transitions of a parcel or a
+return of another unit (`/order_shipments/{id}/transition`,
+`/order_returns/{id}/transition`) answer 404 too. A write naming another unit, or
+an order of another unit, is refused: the IRI resolves to nothing for this
+administrator (400), the processors that open a parcel or a return check the order
+again (422), and the state about to be written is voted on (`SaleUnitScopeVoter`,
+403) before it is persisted. The rights of the profile still apply first: the
+restriction narrows what a right reaches, it grants nothing.
+
+A unit some administrator is restricted to cannot be deleted
+(`SaleUnitStillAssignedException`, 409 on the API, a `RESTRICT` key in the
+database): the administrator would be left with no row, which reads as every unit.
+Detach the administrators first, or turn the unit off.
 
 `Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope` is what the back office uses:
 
@@ -189,8 +205,9 @@ $adminSaleUnitScope->restrictQuery($orderQuery, OrderTableMap::COL_SALE_UNIT_ID)
 $adminSaleUnitScope->assignedSaleUnitIds($adminId);
 ```
 
-The attachment is replaced by an event, an empty list lifting the restriction; an id
-naming no unit is ignored:
+The attachment is replaced by an event. An empty list lifts the restriction; an id
+naming no unit is ignored, and a list naming no unit that exists is refused
+(`InvalidArgumentException`) rather than taken for an empty one:
 
 ```php
 $dispatcher->dispatch(
