@@ -29,6 +29,7 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
+use Thelia\Tools\TerminalText;
 
 /**
  * The delivery a product page announces before anything is in the cart.
@@ -71,7 +72,21 @@ final readonly class ProductDeliveryEstimator
         }
     }
 
+    /**
+     * Anything that fails on the way is logged and announces nothing: the product page shows.
+     */
     public function estimate(Product $product, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
+    {
+        try {
+            return $this->soonestFor($product, $cart, $now);
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->addError(\sprintf('The delivery of product %d could not be estimated', (int) $product->getId())."\n".ThrowableTrace::describe($throwable));
+
+            return null;
+        }
+    }
+
+    private function soonestFor(Product $product, ?Cart $cart, ?\DateTimeImmutable $now): ?ProductDeliveryEstimate
     {
         if ($product->getVirtual()) {
             return null;
@@ -92,7 +107,16 @@ final readonly class ProductDeliveryEstimator
         $soonest = null;
 
         foreach ($carriers as $carrier) {
-            if (null === AreaDeliveryModuleQuery::create()->findByCountryAndModule($country, $carrier, $state)) {
+            // A carrier whose zones cannot be read is left out, the others still announce.
+            try {
+                $deliversThere = null !== AreaDeliveryModuleQuery::create()->findByCountryAndModule($country, $carrier, $state);
+            } catch (\Throwable $throwable) {
+                Tlog::getInstance()->addError(\sprintf('The zones of carrier %s could not be read for a delivery estimate', TerminalText::singleLine((string) $carrier->getCode()))."\n".ThrowableTrace::describe($throwable));
+
+                continue;
+            }
+
+            if (!$deliversThere) {
                 continue;
             }
 

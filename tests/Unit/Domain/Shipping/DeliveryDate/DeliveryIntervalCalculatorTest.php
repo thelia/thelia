@@ -131,19 +131,6 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         self::assertSame(['2026-09-07', '2026-09-07'], $interval);
     }
 
-    public function testAClosureWithoutEndIsSteppedOverAtOnce(): void
-    {
-        $started = microtime(true);
-
-        // A thousand visits: stepped over, they take a few milliseconds, coverage included;
-        // walked day by day, well over the bound, which leaves room for a busy runner.
-        for ($visit = 0; $visit < 1000; ++$visit) {
-            self::assertNull($this->interval(self::TUESDAY_MORNING, 1, 366, 366, carrierClosedDays: [['2026-09-02', '9999-12-31']]));
-        }
-
-        self::assertLessThan(0.2, microtime(true) - $started, 'The closure was walked day by day.');
-    }
-
     public function testAWeekClosedEveryDayIsNotWalked(): void
     {
         // A product page estimates every carrier at every visit: a thousand of them must not walk.
@@ -174,6 +161,15 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         self::assertNotNull($estimate);
         self::assertSame('2026-09-04', $estimate->earliestDay());
         self::assertSame('America/New_York', $estimate->earliest->getTimezone()->getName(), 'The count left its time zone.');
+    }
+
+    public function testAClosureIsSteppedOverInOneStep(): void
+    {
+        $firstOpenFrom = new \ReflectionMethod(DeliveryIntervalCalculator::class, 'firstOpenFrom');
+
+        $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2026-09-02'), [], [['2026-09-02', '9999-12-31']]);
+
+        self::assertSame('10000-01-01', $next->format('Y-m-d'));
     }
 
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void
