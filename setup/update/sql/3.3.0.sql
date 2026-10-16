@@ -913,4 +913,10 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@sale_unit_resource_id, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
     (@sale_unit_resource_id, 'ru_RU', 'Точки продаж', NULL, NULL, NULL);
 
+-- Whether a shop shows express payment buttons in its checkout. Empty means nowhere, which
+-- is the shop every existing boutique already is: no wallet appears until the merchant turns
+-- the zone on and installs a module that fills it.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('express_payment_zones', '', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
