@@ -98,7 +98,8 @@ final readonly class DeliveryTimeEstimator
     }
 
     /**
-     * The availability delay of the slowest product of the cart, in working days.
+     * The availability delay of the slowest product of the cart that is shipped, in working
+     * days: a virtual product is not in the parcel.
      */
     public function availabilityDelayOf(Cart $cart): int
     {

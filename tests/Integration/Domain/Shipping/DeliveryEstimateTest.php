@@ -184,6 +184,21 @@ final class DeliveryEstimateTest extends IntegrationTestCase
     }
 
     /**
+     * A virtual product is not in the parcel: its availability delay holds nothing back.
+     */
+    public function testAVirtualProductOfTheCartDoesNotStretchThePreparation(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        [$cart] = $this->cartReadyToPay();
+        $virtual = $this->product(['availabilityDelayDays' => 5]);
+        $virtual->setVirtual(1)->save($this->getPropelConnection());
+        $this->factory->cartItem($cart, $virtual);
+        $this->factory->cartItem($cart, $this->product(['availabilityDelayDays' => 2]));
+
+        self::assertSame([$this->day(4), $this->day(5)], $this->announcedFor($cart));
+    }
+
+    /**
      * Zero days of preparation ship like one: the days the goods need count from there, they
      * are not swallowed by it.
      */
