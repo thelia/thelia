@@ -302,6 +302,11 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertSame($defaultCountry->getId(), $estimate->country->getId());
         self::assertSame($this->carrier->getId(), $estimate->carrier->getId());
         self::assertSame([$this->day(3), $this->day(4)], [$estimate->estimate->earliestDay(), $estimate->estimate->latestDay()]);
+
+        $byId = $this->getService(ShippingFacade::class)->estimateProductDeliveryById((int) $product->getId());
+        self::assertNotNull($byId);
+        self::assertSame($this->day(3), $byId->estimate->earliestDay());
+        self::assertNull($this->getService(ShippingFacade::class)->estimateProductDeliveryById(0));
     }
 
     public function testAVirtualProductAnnouncesNoDelivery(): void
