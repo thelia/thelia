@@ -108,6 +108,26 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
     }
 
     /**
+     * A day with no end, written by anything else than the core, is said as a day rather
+     * than as an interval that stops nowhere.
+     */
+    public function testAnIntervalWithoutItsEndIsSaidAsItsFirstDay(): void
+    {
+        $this->skipUnlessTheInstalledTemplateCarries('ESTIMATED_DELIVERY_FROM', 'the estimated delivery interval');
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order($factory->customer($factory->customerTitle()));
+        $parameters = $this->parametersTheCoreSendsFor($order);
+        $order->setEstimatedDeliveryFrom('2026-09-03')->setEstimatedDeliveryTo(null)->save($this->getPropelConnection());
+        $mail = $this->renderConfirmation($parameters);
+
+        foreach ([(string) $mail->getHtmlBody(), (string) $mail->getTextBody()] as $body) {
+            self::assertMatchesRegularExpression('/Estimated delivery:\s+\S*.*3/', $body);
+            self::assertStringNotContainsString('between', $body);
+        }
+    }
+
+    /**
      * The confirmation exactly as Thelia\Action\Order sends it, parameters included.
      *
      * @return array<string, mixed>
