@@ -216,6 +216,103 @@ $dispatcher->dispatch(
 );
 ```
 
+## Configuration
+
+A unit sets some of the store settings for itself and gives its own values to the
+settings of a module. Like a price, each is an override: a setting the unit does not
+set keeps the national value.
+
+**Which unit.** The configuration read is the one of the unit in scope,
+`SaleUnitConfigScope`. `SaleUnitContext` keeps it on the unit of the request, and the
+back office, a command and a single shop have none: they read the national values.
+What is about an order reads the configuration of the unit the order was placed on,
+whatever the request resolved, from a command as well: the e-mails `MailerFactory`
+sends with an `order_id` or an `order_ref` among their parameters (sender, store
+name, shop notification recipients, and the template that reads them) and the PDF
+documents of an order (`pdf:render`, the order PDFs of `BaseController`, the return
+document). A theme or a module that renders an order document of its own wraps the
+render in `SaleUnitConfigService::runForOrder()`.
+
+**Store settings.** `ConfigQuery::read()` answers with the unit's value for the names
+of `ConfigQuery::SALE_UNIT_SCOPED_NAMES`: the name and description of the store, its
+e-mail and notification recipients, its address, phone and fax, and the identity
+printed on its invoices (`store_siret`, `store_vat_intracom`, `store_ape_code`,
+`store_eori`, `store_business_id`, `store_registration_exempt`,
+`store_legal_mentions`). Every other setting stays national, the country and the VAT
+exemption of the store first among them: the taxes, and therefore the prices, depend
+on them. The values live in `sale_unit_config`, and `config('store_name')` in a
+template reads them like any other caller.
+
+**Module settings.** `BaseModule::getConfigValue()` keeps its signature and answers
+for the unit in scope; a module that does nothing gets the unit's values for free.
+The values live in `sale_unit_module_config`, one per unit, module and name, the same
+in every locale. Code that works for a given unit, whatever is in scope, names it:
+
+| Call | Does |
+|---|---|
+| `MyModule::getConfigValueForSaleUnit(?int $saleUnitId, string $name, mixed $default = null, ?string $locale = null): ?string` | the unit's value, or else the national one; a null unit reads the national value |
+| `MyModule::setConfigValueForSaleUnit(int $saleUnitId, string $name, mixed $value, ?bool $secret = null): void` | writes the unit's value; `$secret` keeps the flag when null |
+| `MyModule::deleteConfigValueForSaleUnit(int $saleUnitId, string $name): void` | drops it, the national value applies again |
+| `SaleUnitConfigService::runForOrder(Order $order, callable $callback): mixed` | runs code that reads `getConfigValue()` or `ConfigQuery::read()` deep inside (an SDK wrapper, a mail) with the configuration of the order's unit |
+| `SaleUnitConfigService::runFor(?int $saleUnitId, callable $callback): mixed` | the same for a unit, null for the national configuration |
+| `SaleUnitConfigService::getStoreValue()`, `setStoreValue()`, `removeStoreValue()`, `getModuleValue()`, `setModuleValue()`, `removeModuleValue()` | the same reads and writes as a service to inject |
+
+`setConfigValue()` still writes the national value. The notification a payment
+provider sends about an order comes from its server, with no visitor and no unit
+resolved; the module reads its keys for the unit of the order:
+
+```php
+use MyPayment\MyPayment;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Thelia\Model\OrderQuery;
+
+final class NotificationController
+{
+    #[Route('/my-payment/notify', name: 'my_payment.notify', methods: ['POST'], defaults: ['ignore_thelia_view' => true])]
+    public function notify(Request $request): Response
+    {
+        $order = OrderQuery::create()->findOneByRef((string) $request->request->get('order_ref'));
+
+        if (null === $order) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        // The keys of the unit the order was placed on, the national ones for a national order.
+        $secretKey = (string) MyPayment::getConfigValueForSaleUnit($order->getSaleUnitId(), 'secret_key');
+        $expected = hash_hmac('sha256', $request->getContent(), $secretKey);
+
+        if (!hash_equals($expected, (string) $request->headers->get('X-Signature'))) {
+            return new Response('', Response::HTTP_FORBIDDEN);
+        }
+
+        // ... mark the order paid: the confirmation mail leaves with the unit's sender.
+
+        return new Response('OK');
+    }
+}
+```
+
+**Admin API.** Both are written through the admin API:
+
+| Resource | Holds | Filters | Right |
+|---|---|---|---|
+| `/api/admin/sale_unit_configs` | one value per unit and store setting, of the names above only | `saleUnit.id`, `name` | `admin.sale-unit` |
+| `/api/admin/sale_unit_module_configs` | one value per unit, module and setting | `saleUnit.id`, `module.id`, `name` | `admin.module`, like the national module settings |
+
+A module value written with `"secret": true` (a key, a password) is never read back:
+the API leaves its `value` out, a write that sends no value keeps the stored one, and
+turning a secret back into a readable value is refused (422) unless a new value comes
+with it. Deleting the row removes it. A second row for the same key is refused with a
+422.
+
+**Cost.** Nothing is read for a single shop, nor for a setting no unit can set. A
+request of a unit reads that unit's store settings once, at the first scoped setting
+asked for, and the settings of a module once per module. A write through the model
+(service, API, module) drops what the request had read; a row changed in SQL is seen
+by the next request.
+
 ## Isolation of the API
 
 The sale units are managed through the admin API (`/api/admin/sale_units`) and read
@@ -269,14 +366,14 @@ admin API of their prices and stocks, per-unit prices with national fallback,
 per-unit stock with atomic decrement, symmetric restock and national fallback, the
 unit stock in the cart, in the front read of a sale element, in the template loops,
 the legacy add-to-cart form and the copy of a cart, the cart tag and its check when
-the visitor changes unit, the order tag, and administrators restricted to some
-units through the admin API. Backward compatibility is a condition of every part:
-with no active sale unit, nothing changes and no query is added.
+the visitor changes unit, the order tag, administrators restricted to some units
+through the admin API, and the configuration of a unit (store settings and module
+settings). Backward compatibility is a condition of every part: with no active sale
+unit, nothing changes and no query is added.
 
-Not yet, and deliberately out of this scope: scoped configuration (per-unit store
-name, sender, modules), per-unit product visibility, the sales channel axis, the
-back-office selector and the back-office screens of the restriction, per-unit emails
-and coupons. These are the next slices.
+Not yet, and deliberately out of this scope: per-unit product visibility, the sales
+channel axis, the back-office selector and the back-office screens of the restriction,
+per-unit emails and coupons. These are the next slices.
 
 The `product` loop (its `QUANTITY` and `min_stock`) and the `quantity` ordering of
 the `product_sale_elements` loop still read the national counter.
