@@ -913,4 +913,26 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@sale_unit_resource_id, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
     (@sale_unit_resource_id, 'ru_RU', 'Точки продаж', NULL, NULL, NULL);
 
+-- The sale units an administrator is restricted to. An administrator with no
+-- row reaches every unit, as before; a superadministrator is never restricted.
+CREATE TABLE IF NOT EXISTS `admin_sale_unit`
+(
+    `admin_id` INTEGER NOT NULL,
+    `sale_unit_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`admin_id`,`sale_unit_id`),
+    INDEX `idx_admin_sale_unit_sale_unit_id` (`sale_unit_id`),
+    CONSTRAINT `fk_admin_sale_unit_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_admin_sale_unit_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

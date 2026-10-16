@@ -35,6 +35,7 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\SaleUnitScopeVoter;
 use Thelia\Api\State\Processor\OrderProcessor;
 use Thelia\Api\State\Provider\GuestOrderProvider;
 use Thelia\Model\Map\OrderTableMap;
@@ -44,6 +45,7 @@ use Thelia\Model\OrderQuery;
     operations: [
         new Post(
             uriTemplate: '/admin/orders',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
         ),
         new GetCollection(
             uriTemplate: '/admin/orders',
@@ -54,10 +56,12 @@ use Thelia\Model\OrderQuery;
         ),
         new Put(
             uriTemplate: '/admin/orders/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
             processor: OrderProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/orders/{id}',
+            securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
             processor: OrderProcessor::class,
         ),
         new Delete(

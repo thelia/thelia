@@ -490,6 +490,11 @@ final class TheliaEvents
     public const ADMINISTRATOR_UPDATEPASSWORD = 'action.generatePassword';
     public const ADMINISTRATOR_CREATEPASSWORD = 'action.createPassword';
 
+    /**
+     * Replaces the sale units an administrator is restricted to (AdministratorSaleUnitsEvent).
+     */
+    public const ADMINISTRATOR_UPDATE_SALE_UNITS = 'action.updateAdministratorSaleUnits';
+
     // -- Mailing System management ---------------------------------------------
 
     public const MAILING_SYSTEM_UPDATE = 'action.updateMailingSystem';

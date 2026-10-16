@@ -5042,5 +5042,31 @@ CREATE TABLE `sale_unit_product_sale_elements`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- admin_sale_unit
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `admin_sale_unit`;
+
+CREATE TABLE `admin_sale_unit`
+(
+    `admin_id` INTEGER NOT NULL,
+    `sale_unit_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`admin_id`,`sale_unit_id`),
+    INDEX `idx_admin_sale_unit_sale_unit_id` (`sale_unit_id`),
+    CONSTRAINT `fk_admin_sale_unit_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_admin_sale_unit_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
