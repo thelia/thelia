@@ -52,6 +52,16 @@ final class ThrowableTrace
             $parts[] = ($cause === $throwable ? '' : 'Caused by ').TerminalText::singleLine($cause::class).': '.TerminalText::onOneLine($cause->getMessage())."\n".self::withoutArguments($cause);
         }
 
+        if (null !== $cause) {
+            $more = 0;
+
+            for (; null !== $cause; $cause = $cause->getPrevious()) {
+                ++$more;
+            }
+
+            $parts[] = \sprintf('... %d more causes', $more);
+        }
+
         return implode("\n", $parts);
     }
 }

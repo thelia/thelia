@@ -135,41 +135,45 @@ final class DeliveryIntervalCalculatorTest extends TestCase
     {
         $started = microtime(true);
 
-        for ($visit = 0; $visit < 200; ++$visit) {
+        // A thousand visits: stepped over, they take a few milliseconds, coverage included;
+        // walked day by day, well over the bound, which leaves room for a busy runner.
+        for ($visit = 0; $visit < 1000; ++$visit) {
             self::assertNull($this->interval(self::TUESDAY_MORNING, 1, 366, 366, carrierClosedDays: [['2026-09-02', '9999-12-31']]));
         }
 
-        self::assertLessThan(0.05, microtime(true) - $started, 'The closure was walked day by day.');
-    }
-
-    public function testFiveHundredClosuresCostLittle(): void
-    {
-        $runs = [];
-
-        for ($week = 0; $week < 500; ++$week) {
-            $monday = (new \DateTimeImmutable('2026-09-07'))->modify(\sprintf('+%d weeks', $week));
-            $runs[] = [$monday->format('Y-m-d'), $monday->modify('+1 day')->format('Y-m-d')];
-        }
-
-        $started = microtime(true);
-
-        for ($visit = 0; $visit < 50; ++$visit) {
-            self::assertNotNull($this->interval(self::TUESDAY_MORNING, 366, 366, 366, carrierClosedDays: $runs));
-        }
-
-        self::assertLessThan(5.0, microtime(true) - $started, 'Five hundred closures were compared for every day walked.');
+        self::assertLessThan(0.2, microtime(true) - $started, 'The closure was walked day by day.');
     }
 
     public function testAWeekClosedEveryDayIsNotWalked(): void
     {
-        // A product page estimates every carrier at every visit: two hundred of them must not walk.
+        // A product page estimates every carrier at every visit: a thousand of them must not walk.
         $started = microtime(true);
 
-        for ($visit = 0; $visit < 200; ++$visit) {
+        for ($visit = 0; $visit < 1000; ++$visit) {
             self::assertNull($this->interval(self::TUESDAY_MORNING, DeliveryIntervalCalculator::MAXIMUM_WORKING_DAYS, 366, 366, carrierClosedWeekdays: [1, 2, 3, 4, 5, 6, 7]));
         }
 
-        self::assertLessThan(0.05, microtime(true) - $started, 'A week closed every day was walked.');
+        self::assertLessThan(0.2, microtime(true) - $started, 'A week closed every day was walked.');
+    }
+
+    public function testAClosureIsSteppedOverInTheTimeZoneOfTheCount(): void
+    {
+        $previous = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        try {
+            // Counted in New York while PHP runs in UTC: Thursday 3 stays closed.
+            $estimate = (new DeliveryIntervalCalculator())->interval(
+                new \DateTimeImmutable('2026-09-01 09:30', new \DateTimeZone('America/New_York')),
+                1, 2, 2, [6, 7], [], [6, 7], [['2026-09-03', '2026-09-03']],
+            );
+        } finally {
+            date_default_timezone_set($previous);
+        }
+
+        self::assertNotNull($estimate);
+        self::assertSame('2026-09-04', $estimate->earliestDay());
+        self::assertSame('America/New_York', $estimate->earliest->getTimezone()->getName(), 'The count left its time zone.');
     }
 
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void

@@ -45,7 +45,10 @@ final class ThrowableTraceTest extends TestCase
             $throwable = new \RuntimeException('cause '.$level, 0, $throwable);
         }
 
-        self::assertSame(9, substr_count(ThrowableTrace::describe($throwable), 'Caused by '));
+        $described = ThrowableTrace::describe($throwable);
+
+        self::assertSame(9, substr_count($described, 'Caused by '));
+        self::assertStringEndsWith('... 15 more causes', $described);
     }
 
     public function testTheNameOfAnAnonymousClassStaysOnItsLine(): void
