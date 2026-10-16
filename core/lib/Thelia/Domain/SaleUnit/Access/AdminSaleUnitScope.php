@@ -19,6 +19,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminSaleUnitQuery;
 
@@ -33,6 +34,8 @@ use Thelia\Model\AdminSaleUnitQuery;
  *
  * A national order (placed on no sale unit) belongs to none of the units an
  * administrator is restricted to: a restricted administrator does not see it.
+ *
+ * A shop with no active sale unit restricts nobody, and asks nothing.
  */
 class AdminSaleUnitScope implements ResetInterface
 {
@@ -42,6 +45,7 @@ class AdminSaleUnitScope implements ResetInterface
     public function __construct(
         private readonly ?Security $security = null,
         private readonly ?SecurityContext $securityContext = null,
+        private readonly ?SaleUnitActivityChecker $activityChecker = null,
     ) {
     }
 
@@ -72,6 +76,12 @@ class AdminSaleUnitScope implements ResetInterface
         $admin ??= $this->currentAdmin();
 
         if (null === $admin || self::isSuperAdministrator($admin)) {
+            return null;
+        }
+
+        // A shop with no active sale unit sells from none: nothing to narrow, and
+        // nothing to ask the database about its administrators.
+        if (null !== $this->activityChecker && !$this->activityChecker->isMultiSaleUnitMode()) {
             return null;
         }
 

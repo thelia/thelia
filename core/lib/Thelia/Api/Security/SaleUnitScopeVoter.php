@@ -37,12 +37,22 @@ final class SaleUnitScopeVoter extends Voter
 {
     public const SCOPE = 'THELIA_SALE_UNIT_SCOPE';
 
+    /**
+     * Granted to an administrator restricted to no sale unit: creating or deleting a
+     * unit changes what every administrator reaches, so a restricted one may not.
+     */
+    public const UNRESTRICTED = 'THELIA_SALE_UNIT_UNRESTRICTED';
+
     public function __construct(private readonly AdminSaleUnitScope $scope)
     {
     }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
+        if (self::UNRESTRICTED === $attribute) {
+            return true;
+        }
+
         return self::SCOPE === $attribute
             && ($subject instanceof Order
                 || $subject instanceof SaleUnit
@@ -56,6 +66,10 @@ final class SaleUnitScopeVoter extends Voter
 
         if (!$admin instanceof Admin) {
             return false;
+        }
+
+        if (self::UNRESTRICTED === $attribute) {
+            return !$this->scope->isRestricted($admin);
         }
 
         return $this->scope->allows(self::saleUnitIdOf($subject), $admin);

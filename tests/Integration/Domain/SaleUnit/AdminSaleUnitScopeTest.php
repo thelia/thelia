@@ -19,11 +19,14 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
+use Thelia\Domain\SaleUnit\Exception\SaleUnitStillAssignedException;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Model\Admin;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\SaleUnit;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 /**
  * An administrator attached to no sale unit reaches them all, as before; one
@@ -33,6 +36,8 @@ use Thelia\Test\ActionIntegrationTestCase;
  */
 final class AdminSaleUnitScopeTest extends ActionIntegrationTestCase
 {
+    use RecordsSqlQueries;
+
     private AdminSaleUnitScope $scope;
 
     private SaleUnit $first;
@@ -121,13 +126,67 @@ final class AdminSaleUnitScopeTest extends ActionIntegrationTestCase
             TheliaEvents::ADMINISTRATOR_UPDATE_SALE_UNITS,
         );
 
-        self::assertSame([$this->second->getId()], $event->getSaleUnitIds(), 'An id naming no unit is ignored.');
+        self::assertSame([$this->second->getId()], $event->getSaleUnitIds(), 'An id naming no unit is ignored when another one is known.');
         self::assertSame([$this->second->getId()], $this->scope->allowedSaleUnitIds($admin), 'The scope reads the new attachment at once.');
 
         $this->dispatch(new AdministratorSaleUnitsEvent($admin->getId(), []), TheliaEvents::ADMINISTRATOR_UPDATE_SALE_UNITS);
 
         self::assertNull($this->scope->allowedSaleUnitIds($admin));
         self::assertSame([], $this->scope->assignedSaleUnitIds($admin->getId()));
+    }
+
+    /**
+     * A list naming no unit at all is a mistake, not the empty list that lifts the
+     * restriction: taking it as such would open every unit to the administrator.
+     */
+    public function testAListNamingNoKnownUnitIsRefused(): void
+    {
+        $admin = $this->profiledAdmin();
+        $this->factory->adminSaleUnit($admin, $this->first);
+
+        try {
+            $this->dispatch(new AdministratorSaleUnitsEvent($admin->getId(), [999999999]), TheliaEvents::ADMINISTRATOR_UPDATE_SALE_UNITS);
+            self::fail('A list naming no known unit must be refused.');
+        } catch (\InvalidArgumentException) {
+        }
+
+        $this->scope->forget();
+        self::assertSame([$this->first->getId()], $this->scope->allowedSaleUnitIds($admin));
+    }
+
+    public function testAUnitStillAttachedToAnAdministratorCannotBeDeleted(): void
+    {
+        $admin = $this->profiledAdmin();
+        $this->factory->adminSaleUnit($admin, $this->first);
+
+        try {
+            $this->first->delete($this->getPropelConnection());
+            self::fail('Deleting the unit an administrator is restricted to must be refused.');
+        } catch (SaleUnitStillAssignedException $exception) {
+            self::assertStringContainsString('administrator', $exception->getMessage());
+        }
+
+        $this->scope->forget();
+        self::assertSame([$this->first->getId()], $this->scope->allowedSaleUnitIds($admin), 'The administrator stays restricted.');
+    }
+
+    public function testAShopWithNoActiveUnitAsksNothingAboutAdministrators(): void
+    {
+        $admin = $this->profiledAdmin();
+        $this->factory->adminSaleUnit($admin, $this->first);
+        $this->first->setActive(false)->save($this->getPropelConnection());
+        $this->second->setActive(false)->save($this->getPropelConnection());
+        $checker = $this->getService(SaleUnitActivityChecker::class);
+        $checker->forgetAfterTheRequest();
+        $checker->isMultiSaleUnitMode();
+        $checker->reset();
+
+        $statements = $this->recordSqlQueries(fn () => self::assertNull($this->scope->allowedSaleUnitIds($admin)));
+
+        self::assertSame([], array_values(array_filter(
+            $statements,
+            static fn (string $statement): bool => str_contains($statement, 'admin_sale_unit'),
+        )));
     }
 
     private function profiledAdmin(): Admin

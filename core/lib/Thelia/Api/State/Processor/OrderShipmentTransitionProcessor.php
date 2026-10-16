@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\OrderShipment as OrderShipmentResource;
 use Thelia\Api\Resource\OrderShipmentTransitionInput;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Domain\Shipping\Exception\ShipmentNotAllowedException;
 use Thelia\Domain\Shipping\Service\OrderShipmentManager;
 use Thelia\Model\OrderShipmentQuery;
@@ -34,6 +35,7 @@ final readonly class OrderShipmentTransitionProcessor implements ProcessorInterf
     public function __construct(
         private OrderShipmentManager $shipmentManager,
         private ApiResourcePropelTransformerService $transformer,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -41,7 +43,9 @@ final readonly class OrderShipmentTransitionProcessor implements ProcessorInterf
     {
         $shipment = OrderShipmentQuery::create()->findPk((int) ($uriVariables['id'] ?? 0));
 
-        if (null === $shipment) {
+        // A parcel of an order of a sale unit the administrator is restricted away
+        // from answers as the order itself does.
+        if (null === $shipment || !$this->adminSaleUnitScope->allows($shipment->getOrder()?->getSaleUnitId())) {
             throw new NotFoundHttpException('Shipment not found.');
         }
 

@@ -94,7 +94,8 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
     /**
      * Replaces the sale units the administrator is restricted to; an empty list lifts
-     * the restriction. An id naming no sale unit is ignored.
+     * the restriction. An id naming no sale unit is ignored, and a list naming none
+     * that exists is refused.
      */
     public function updateSaleUnits(AdministratorSaleUnitsEvent $event): void
     {
@@ -109,6 +110,12 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->select(['Id'])
                 ->find()
                 ->getData());
+
+        // Only an empty list lifts the restriction: a list naming no unit that
+        // exists is a mistake, and taking it as empty would open every unit.
+        if ([] === $saleUnitIds && [] !== $event->getSaleUnitIds()) {
+            throw new \InvalidArgumentException('None of the sale units the administrator was to be restricted to exists: the restriction is left as it was.');
+        }
 
         $con = Propel::getWriteConnection(AdminSaleUnitTableMap::DATABASE_NAME);
         $con->beginTransaction();

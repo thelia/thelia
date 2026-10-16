@@ -3019,7 +3019,7 @@
     <foreign-key foreignTable="admin" name="fk_admin_sale_unit_admin_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="admin_id" />
     </foreign-key>
-    <foreign-key foreignTable="sale_unit" name="fk_admin_sale_unit_sale_unit_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="sale_unit" name="fk_admin_sale_unit_sale_unit_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="sale_unit_id" />
     </foreign-key>
     <index name="idx_admin_sale_unit_sale_unit_id">

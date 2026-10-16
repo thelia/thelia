@@ -5072,7 +5072,7 @@ CREATE TABLE `admin_sale_unit`
         FOREIGN KEY (`sale_unit_id`)
         REFERENCES `sale_unit` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 # This restores the fkey checks, after having unset them earlier

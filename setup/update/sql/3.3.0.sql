@@ -936,6 +936,8 @@ DEALLOCATE PREPARE add_fk_statement;
 
 -- The sale units an administrator is restricted to. An administrator with no
 -- row reaches every unit, as before; a superadministrator is never restricted.
+-- A unit some administrator is restricted to cannot be deleted (RESTRICT):
+-- the administrator would be left with no row, which reads as every unit.
 CREATE TABLE IF NOT EXISTS `admin_sale_unit`
 (
     `admin_id` INTEGER NOT NULL,
@@ -953,7 +955,7 @@ CREATE TABLE IF NOT EXISTS `admin_sale_unit`
         FOREIGN KEY (`sale_unit_id`)
         REFERENCES `sale_unit` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;
