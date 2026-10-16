@@ -17,6 +17,7 @@ namespace Thelia\Tests\Api\Admin;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Map\AddressTableMap;
 use Thelia\Model\StateQuery;
 use Thelia\Test\ApiTestCase;
 
@@ -150,6 +151,29 @@ final class AddressApiTest extends ApiTestCase
      * Asserted on the stored row rather than on the response body: the serializer leaves a
      * null property out of the payload, so an absent key would satisfy assertNull by accident.
      */
+    /**
+     * Another system reads the addresses of a customer changed since its last
+     * synchronisation.
+     */
+    public function testFilterByUpdatedAfterOnTheAddressesOfACustomer(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $customerId = (int) $customer->getId();
+        $recentId = (int) $factory->address($customer)->getId();
+        $oldId = (int) $factory->address($customer)->getId();
+        $this->stampAddress($recentId, '2099-06-01 10:00:00');
+        $this->stampAddress($oldId, '2001-06-01 10:00:00');
+
+        $ids = $this->addressIds('/api/admin/addresses?updatedAt[after]=2099-01-01T00:00:00&customer.id='.$customerId);
+
+        self::assertSame([$recentId], $ids);
+
+        $ids = $this->addressIds('/api/admin/addresses?createdAt[after]=2000-01-01T00:00:00&customer.id='.$customerId);
+
+        self::assertEqualsCanonicalizing([$recentId, $oldId], $ids);
+    }
+
     private function assertStoredIdentifiersAreNull(Response $response): void
     {
         $created = json_decode((string) $response->getContent(), true);
@@ -200,5 +224,26 @@ final class AddressApiTest extends ApiTestCase
             'customer' => '/api/admin/customers/'.$customer->getId(),
             'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
         ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function addressIds(string $uri): array
+    {
+        $response = $this->jsonRequest('GET', $uri, token: $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+
+        return array_map(
+            static fn (array $item): int => (int) $item['id'],
+            json_decode((string) $response->getContent(), true)['hydra:member'],
+        );
+    }
+
+    private function stampAddress(int $addressId, string $date): void
+    {
+        AddressQuery::create()->filterById($addressId)->update(['UpdatedAt' => $date], $this->getPropelConnection());
+        AddressTableMap::clearInstancePool();
     }
 }
