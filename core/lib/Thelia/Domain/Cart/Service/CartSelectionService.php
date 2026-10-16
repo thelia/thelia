@@ -16,9 +16,16 @@ namespace Thelia\Domain\Cart\Service;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
+use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\Destination;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\Service\PostageHandler;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\Lang;
 
 class CartSelectionService
 {
@@ -26,6 +33,7 @@ class CartSelectionService
         protected EventDispatcherInterface $eventDispatcher,
         protected CartCheckoutEventBuilder $cartCheckoutEventBuilder,
         protected PostageHandler $postageHandler,
+        protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
 
@@ -37,12 +45,48 @@ class CartSelectionService
         $this->postageHandler->handlePostageOnCart($checkoutDTO->getCart());
     }
 
+    /**
+     * @throws DestinationRestrictedException when products of the cart cannot ship there
+     */
     public function setDeliveryAddress(CheckoutDTO $checkoutDTO): void
     {
+        $this->refuseARestrictedDestination($checkoutDTO);
+
         $cartCheckoutEvent = $this->cartCheckoutEventBuilder->buildEvent($checkoutDTO);
         $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_DELIVERY_ADDRESS);
 
         $this->postageHandler->handlePostageOnCart($checkoutDTO->getCart());
+    }
+
+    /**
+     * The address is refused before it is written, naming the products of the cart that
+     * cannot ship there, so the buyer can pick another one or empty the cart.
+     */
+    private function refuseARestrictedDestination(CheckoutDTO $checkoutDTO): void
+    {
+        $addressId = $checkoutDTO->getDeliveryAddressId();
+
+        if (null === $this->destinationRestrictionChecker || null === $addressId || !$this->destinationRestrictionChecker->hasActiveGroup()) {
+            return;
+        }
+
+        $address = AddressQuery::create()->findPk($addressId);
+
+        if (null === $address) {
+            return;
+        }
+
+        $cart = $checkoutDTO->getCart();
+        $lines = $this->destinationRestrictionChecker->violationsFor(
+            $cart,
+            Destination::of($address),
+            CartDestinations::billing($cart, true),
+            Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
+        );
+
+        if ([] !== $lines) {
+            throw new DestinationRestrictedException($lines);
+        }
     }
 
     public function setInvoiceAddress(CheckoutDTO $checkoutDTO): void

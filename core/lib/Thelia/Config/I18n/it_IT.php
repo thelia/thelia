@@ -347,4 +347,7 @@ return [
     'No carrier can ship %products. Remove them from your cart to complete your order.' => 'Nessun corriere può spedire %products. Rimuovili dal carrello per completare l\'ordine.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Nessun corriere può spedire %products. Rimuovilo dal carrello per completare l\'ordine.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Il corriere scelto non può spedire %products. Scegli un altro corriere.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products non può essere spedito a questo indirizzo. Rimuovilo dal carrello o scegli un altro indirizzo.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products non possono essere spediti a questo indirizzo. Rimuovili dal carrello o scegli un altro indirizzo.',
+    '%product cannot be shipped to your address.' => '%product non può essere spedito al tuo indirizzo.',
 ];

@@ -37,6 +37,7 @@ use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
+use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
@@ -97,13 +98,15 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         } catch (GuestCheckoutNotAllowedException $refusal) {
             throw new AccessDeniedHttpException($refusal->getMessage(), $refusal);
         } catch (InvalidDeliveryException $refusal) {
-            if (!$data instanceof CheckoutDeliveryDateInput && !$refusal instanceof DeliveryExcludedByProductException) {
+            if (!$data instanceof CheckoutDeliveryDateInput
+                && !$refusal instanceof DeliveryExcludedByProductException
+                && !$refusal instanceof DestinationRestrictedException) {
                 throw $refusal;
             }
 
-            // A refused day, or a carrier a product of the cart refuses, is answered in
-            // the shape a refused placement is, so the client branches on the same codes
-            // either way.
+            // A refused day, a carrier a product of the cart refuses, or an address the
+            // products of the cart cannot ship to, is answered in the shape a refused
+            // placement is, so the client branches on the same codes either way.
             return new JsonResponse(
                 CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),
                 Response::HTTP_UNPROCESSABLE_ENTITY,

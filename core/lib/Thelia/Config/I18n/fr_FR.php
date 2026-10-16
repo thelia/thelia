@@ -987,4 +987,7 @@ return [
     'No carrier can ship %products. Remove them from your cart to complete your order.' => 'Aucun transporteur ne peut acheminer %products. Retirez-les de votre panier pour terminer votre commande.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Aucun transporteur ne peut acheminer %products. Retirez-le de votre panier pour terminer votre commande.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Le transporteur choisi ne peut pas acheminer %products. Choisissez un autre transporteur.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products ne peut pas être livré à cette adresse. Retirez-le de votre panier ou choisissez une autre adresse.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products ne peuvent pas être livrés à cette adresse. Retirez-les de votre panier ou choisissez une autre adresse.',
+    '%product cannot be shipped to your address.' => '%product ne peut pas être livré à votre adresse.',
 ];

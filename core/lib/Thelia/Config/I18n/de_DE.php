@@ -842,4 +842,7 @@ return [
     'No carrier can ship %products. Remove them from your cart to complete your order.' => 'Kein Versanddienst kann %products versenden. Entfernen Sie sie aus Ihrem Warenkorb, um Ihre Bestellung abzuschließen.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'Kein Versanddienst kann %products versenden. Entfernen Sie es aus Ihrem Warenkorb, um Ihre Bestellung abzuschließen.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Der gewählte Versanddienst kann %products nicht versenden. Wählen Sie einen anderen Versanddienst.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products kann nicht an diese Adresse geliefert werden. Entfernen Sie es aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products können nicht an diese Adresse geliefert werden. Entfernen Sie sie aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
+    '%product cannot be shipped to your address.' => '%product kann nicht an Ihre Adresse geliefert werden.',
 ];
