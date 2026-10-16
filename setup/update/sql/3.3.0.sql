@@ -753,9 +753,20 @@ INNER JOIN (
 --
 -- The values are numbers already, an empty text is read as no price. Nothing runs on a shop
 -- whose column is a DECIMAL, so the script can be replayed.
+--
+-- The orders already placed keep the total of their invoice: the highest order id is stored
+-- in last_text_promo_price_order_id before the conversion, and the orders up to it are
+-- totalled with the promotional price read as a text, as they always were. The orders
+-- placed afterwards read the DECIMAL. INSERT IGNORE keeps the first value when a
+-- conversion that stopped halfway is run again.
 -- ---------------------------------------------------------------------
 
 SET @convert_column := (SELECT COUNT(*) > 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'promo_price' AND `DATA_TYPE` = 'varchar');
+SET @statement := IF(@convert_column, 'INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) SELECT \'last_text_promo_price_order_id\', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`', 'DO 0');
+PREPARE convert_column_statement FROM @statement;
+EXECUTE convert_column_statement;
+DEALLOCATE PREPARE convert_column_statement;
+
 SET @statement := IF(@convert_column, 'UPDATE `order_product` SET `promo_price` = NULL WHERE `promo_price` = \'\'', 'DO 0');
 PREPARE convert_column_statement FROM @statement;
 EXECUTE convert_column_statement;

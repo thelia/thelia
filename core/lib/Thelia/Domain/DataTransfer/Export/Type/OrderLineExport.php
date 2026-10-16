@@ -17,6 +17,7 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
+use Thelia\Model\ConfigQuery;
 
 /**
  * One row per order line, with the codes of the item as they were when it was sold.
@@ -32,6 +33,12 @@ class OrderLineExport extends OrderExport
     public const USE_RANGE_DATE = true;
 
     private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
+
+    /**
+     * The unit price of a line placed while order_product.promo_price was a text, read as it
+     * was then. See OrderExport::UNIT_PRICE_AS_TEXT.
+     */
+    private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
 
     protected array $orderAndAliases = [
         'order_ref' => 'order_ref',
@@ -72,7 +79,10 @@ class OrderLineExport extends OrderExport
                 order_product.ean_code as "order_product_ean_code",
                 order_product.mpn as "order_product_mpn",
                 order_product.quantity as "order_product_quantity",
-                ROUND('.self::UNIT_PRICE.', 2) as "order_product_unit_price",
+                CASE
+                    WHEN `order`.id <= :text_promo_price_pivot THEN CAST(ROUND('.self::UNIT_PRICE_AS_TEXT.', 2) AS DECIMAL(16,2))
+                    ELSE ROUND('.self::UNIT_PRICE.', 2)
+                END as "order_product_unit_price",
                 currency.code as "currency_code"
             FROM order_product
             INNER JOIN `order` ON `order`.id = order_product.order_id
@@ -82,6 +92,7 @@ class OrderLineExport extends OrderExport
         ';
 
         $stmt = $con->prepare($query);
+        $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));

@@ -39,6 +39,13 @@ class OrderExport extends JsonFileAbstractExport
 
     private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
 
+    /**
+     * The same unit price with the promotional price read as a text, the way it was read
+     * while order_product.promo_price was a VARCHAR: the type of IF() is the one of its
+     * operands, so the price of a line that is not on promotion is read as text too.
+     */
+    private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
+
     private const UNIT_TAX = 'IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)';
 
     protected array $orderAndAliases = [
@@ -160,6 +167,7 @@ class OrderExport extends JsonFileAbstractExport
         $stmt->bindValue('locale', $locale);
         $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
         $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
+        $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
@@ -218,17 +226,35 @@ class OrderExport extends JsonFileAbstractExport
      * follow the shop. Thelia\Model\Order::getTotalAmount() is the reference the
      * three branches mirror — an export that disagrees with it states an amount
      * the customer was never charged.
+     *
+     * Whatever the branch, an order placed while order_product.promo_price was a
+     * text keeps the total it was invoiced with.
      */
     private function orderTotal(bool $taxed): string
     {
         return '
-                    SUM(
+                    CAST(SUM(
                         CASE
-                            WHEN `order`.id <= :legacy_rounding_pivot THEN '.$this->lineTotal(self::ROUNDING_MODE_LEGACY, $taxed).'
-                            WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotal(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
-                            ELSE '.$this->lineTotal(ConfigQuery::getOrderRoundingMode(), $taxed).'
+                            WHEN `order`.id <= :legacy_rounding_pivot THEN '.$this->lineTotalOfOrder(self::ROUNDING_MODE_LEGACY, $taxed).'
+                            WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotalOfOrder(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
+                            ELSE '.$this->lineTotalOfOrder(ConfigQuery::getOrderRoundingMode(), $taxed).'
                         END
-                    )';
+                    ) AS DECIMAL(16,6))';
+    }
+
+    /**
+     * Chooses, line by line, how the promotional price is read. The choice is made on the line and not on the
+     * price operand: an IF takes the type of its operands, so a text read for the frozen orders would make the
+     * unit price of every order a text. The frozen line is a floating point number once rounded, and so is the
+     * quantity (a FLOAT) times a decimal: the cast to a DECIMAL is made on the SUM of the order, not on the line,
+     * because a CASE takes the type of its widest branch and would turn the cast line back into a DOUBLE.
+     */
+    private function lineTotalOfOrder(int $roundingMode, bool $taxed): string
+    {
+        return 'CASE
+                                WHEN `order`.id <= :text_promo_price_pivot THEN '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE_AS_TEXT).'
+                                ELSE '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE).'
+                            END';
     }
 
     /**
@@ -236,11 +262,11 @@ class OrderExport extends JsonFileAbstractExport
      * amounts under sum of roundings, on the line total under rounding of sums,
      * nowhere at all for an order frozen by the 2.4 upgrade.
      */
-    private function lineTotal(int $roundingMode, bool $taxed): string
+    private function lineTotal(int $roundingMode, bool $taxed, string $unitPrice): string
     {
         $roundUnitAmounts = ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS === $roundingMode;
 
-        $unitAmount = $roundUnitAmounts ? 'ROUND('.self::UNIT_PRICE.', 2)' : self::UNIT_PRICE;
+        $unitAmount = $roundUnitAmounts ? 'ROUND('.$unitPrice.', 2)' : $unitPrice;
 
         if ($taxed) {
             $unitTax = $roundUnitAmounts ? 'ROUND('.self::UNIT_TAX.', 2)' : self::UNIT_TAX;
