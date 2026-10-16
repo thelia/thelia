@@ -42,6 +42,7 @@ use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -224,7 +225,7 @@ class Product extends AbstractTranslatableResource
      * competitor that the product is out of stock.
      */
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
-    #[Range(min: 0, max: 366)]
+    #[Range(min: 0, max: DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS, groups: [self::GROUP_ADMIN_WRITE])]
     public ?int $availabilityDelayDays = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
