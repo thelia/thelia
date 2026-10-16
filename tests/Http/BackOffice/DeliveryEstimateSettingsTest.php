@@ -126,6 +126,27 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         self::assertSame('14:30', ConfigQuery::read(DeliveryTimeEstimator::CUTOFF_CONFIG_NAME));
     }
 
+    public function testARefusedCutoffLeavesTheClosedDaysAsTheyWere(): void
+    {
+        $closedBefore = (string) ConfigQuery::read('delivery_closed_weekdays', '');
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates');
+        $token = (string) $page->filter('[data-testid="delivery-date-shop-form"] [name="_token"]')->attr('value');
+
+        try {
+            $this->client->request('POST', '/admin/configuration/delivery-dates/shop/save', [
+                '_token' => $token,
+                'closed_weekdays' => ['1', '2'],
+                'cutoff_time' => '2pm',
+            ]);
+
+            self::assertSame(302, $this->client->getResponse()->getStatusCode());
+            ConfigQuery::resetCache();
+            self::assertSame($closedBefore, (string) ConfigQuery::read('delivery_closed_weekdays', ''));
+        } finally {
+            ConfigQuery::write('delivery_closed_weekdays', $closedBefore);
+        }
+    }
+
     public function testTheAvailabilityDelayOfAProductIsSavedAndCleared(): void
     {
         $factory = new FixtureFactory($this->getPropelConnection());
