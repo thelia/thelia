@@ -26,6 +26,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Domain\Module\Composer\ComposerHelper;
+use Thelia\Log\ThrowableTrace;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
@@ -139,7 +140,7 @@ class SetTemplate extends ContainerAwareCommand
         // The message quotes a module directory, a namespace or a descriptor value, and the
         // schema reports each of its errors on a line of its own: it is printed on one.
         $message = TerminalText::onOneLine($exception->getMessage());
-        $trace = self::traceWithoutArguments($exception);
+        $trace = ThrowableTrace::withoutArguments($exception);
         // The trace goes to the log without its arguments: getTraceAsString() would print
         // them, and one of them may be a connection password. The message stays on one line
         // there, so that a value it quotes cannot forge a log entry of its own.
@@ -150,21 +151,6 @@ class SetTemplate extends ContainerAwareCommand
         }
 
         return self::FAILURE;
-    }
-
-    /**
-     * The frames of the trace without their arguments: getTraceAsString() prints them unless
-     * zend.exception_ignore_args is on, and one of them may be a connection password.
-     */
-    private static function traceWithoutArguments(\Throwable $throwable): string
-    {
-        $frames = [];
-        foreach ($throwable->getTrace() as $index => $frame) {
-            // One frame per line: a file or class name cannot start a line of its own.
-            $frames[] = \sprintf('#%d %s(%d): %s%s%s()', $index, TerminalText::singleLine($frame['file'] ?? '[internal function]'), $frame['line'] ?? 0, TerminalText::singleLine($frame['class'] ?? ''), $frame['type'] ?? '', TerminalText::singleLine($frame['function']));
-        }
-
-        return TerminalText::withoutControlCharacters(implode("\n", $frames));
     }
 
     private function dumpAutoload(OutputInterface $output): void
