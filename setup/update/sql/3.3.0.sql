@@ -2406,4 +2406,10 @@ WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
 
 DROP TEMPORARY TABLE `config_title_seed`;
 
+-- Whether a shop shows express payment buttons in its checkout. Empty means nowhere, which
+-- is the shop every existing boutique already is: no wallet appears until the merchant turns
+-- the zone on and installs a module that fills it.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('express_payment_zones', '', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
