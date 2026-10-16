@@ -20,7 +20,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Positive;
 
 /**
- * How the order is paid, named by the module id `GET /front/payment/modules` reports.
+ * How the order is paid, named by the module id `GET /front/payment/modules` reports,
+ * and, for a module that offers them, the stored payment method to pay with.
  */
 final class CheckoutPaymentModuleInput
 {
@@ -33,4 +34,13 @@ final class CheckoutPaymentModuleInput
     #[Positive]
     #[Groups([Checkout::GROUP_FRONT_WRITE])]
     public ?int $paymentModuleId = null;
+
+    #[ApiProperty(
+        description: 'Identifier of a stored payment method of the buyer, as listed in the "stored_methods" option group of the module. Left out, or null, to pay with a new method.',
+        required: false,
+        example: 12,
+    )]
+    #[Positive]
+    #[Groups([Checkout::GROUP_FRONT_WRITE])]
+    public ?int $customerPaymentMethodId = null;
 }

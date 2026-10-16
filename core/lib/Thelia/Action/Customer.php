@@ -16,6 +16,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,12 +39,14 @@ use Thelia\Domain\Customer\Service\CustomerGuestConversionService;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Domain\Customer\Service\PasswordResetService;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Map\CustomerTableMap;
 
 /**
  * customer class where all actions are managed.
@@ -66,6 +69,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected PasswordResetService $passwordResetService,
         protected CustomerCodeManager $customerCodeManager,
         protected CustomerGuestConversionService $customerGuestConversionService,
+        protected CustomerPaymentMethodService $customerPaymentMethodService,
     ) {
     }
 
@@ -320,16 +324,40 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws PropelException
+     * The stored payment methods go in the deletion's transaction, and their providers
+     * are told once it is committed, as the anonymization does: the foreign key cascade
+     * would drop the rows without a word to the provider nor to the listeners of
+     * CUSTOMER_PAYMENT_METHOD_DELETE.
+     *
+     * @throws \Throwable
      */
     public function delete(CustomerEvent $event): void
     {
-        if (null !== $customer = $event->getModel()) {
-            if (true === $customer->hasOrder()) {
-                throw new CustomerException(Translator::getInstance()->trans('Impossible to delete a customer who already have orders'));
-            }
+        $customer = $event->getModel();
 
-            $customer->delete();
+        if (!$customer instanceof CustomerModel) {
+            return;
+        }
+
+        if (true === $customer->hasOrder()) {
+            throw new CustomerException(Translator::getInstance()->trans('Impossible to delete a customer who already have orders'));
+        }
+
+        $connection = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $tellProvidersToForget = $this->customerPaymentMethodService->forgetAllOf($customer, $connection);
+            $customer->delete($connection);
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
+
+        foreach ($tellProvidersToForget as $tellProviderToForget) {
+            $tellProviderToForget();
         }
     }
 

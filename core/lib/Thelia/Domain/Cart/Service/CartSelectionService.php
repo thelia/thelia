@@ -21,6 +21,9 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
+use Thelia\Domain\Payment\Exception\PaymentMethodNotOwnedException;
+use Thelia\Domain\Payment\Exception\StoredMethodNotSelectableException;
+use Thelia\Domain\Payment\StoredPaymentMethodSelection;
 use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
@@ -34,6 +37,7 @@ class CartSelectionService
         protected EventDispatcherInterface $eventDispatcher,
         protected CartCheckoutEventBuilder $cartCheckoutEventBuilder,
         protected PostageHandler $postageHandler,
+        protected StoredPaymentMethodSelection $storedPaymentMethodSelection,
         protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         protected ?RequestStack $requestStack = null,
     ) {
@@ -133,8 +137,22 @@ class CartSelectionService
         $this->postageHandler->handlePostageOnCart($checkoutDTO->getCart());
     }
 
+    /**
+     * The payment module and the stored method to pay with are chosen together: a
+     * choice that names no stored method is the choice of a new one, and a stored method
+     * the cart cannot be paid with is refused before anything is written.
+     *
+     * @throws PaymentMethodNotOwnedException
+     * @throws StoredMethodNotSelectableException
+     */
     public function setPaymentModule(CheckoutDTO $checkoutDTO): void
     {
+        $this->storedPaymentMethodSelection->methodToChooseFor(
+            $checkoutDTO->getCart(),
+            $checkoutDTO->getPaymentModuleId(),
+            $checkoutDTO->getCustomerPaymentMethodId(),
+        );
+
         $cartCheckoutEvent = $this->cartCheckoutEventBuilder->buildEvent($checkoutDTO);
         $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_PAYMENT_MODULE);
 

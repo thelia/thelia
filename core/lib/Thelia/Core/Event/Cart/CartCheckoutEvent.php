@@ -29,6 +29,11 @@ class CartCheckoutEvent extends ActionEvent
 
     protected ?int $paymentModuleId = null;
 
+    /**
+     * Not read off the cart: an event that does not name a stored method chooses a new one.
+     */
+    protected ?int $customerPaymentMethodId = null;
+
     protected ?OrderPostage $postage = null;
     protected ?CartAddress $cartAddress = null;
 
@@ -108,6 +113,18 @@ class CartCheckoutEvent extends ActionEvent
     public function setPaymentModuleId(?int $paymentModuleId): self
     {
         $this->paymentModuleId = $paymentModuleId;
+
+        return $this;
+    }
+
+    public function getCustomerPaymentMethodId(): ?int
+    {
+        return $this->customerPaymentMethodId;
+    }
+
+    public function setCustomerPaymentMethodId(?int $customerPaymentMethodId): self
+    {
+        $this->customerPaymentMethodId = $customerPaymentMethodId;
 
         return $this;
     }

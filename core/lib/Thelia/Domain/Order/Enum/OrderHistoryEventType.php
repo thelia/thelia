@@ -37,4 +37,5 @@ enum OrderHistoryEventType: string
     case SHIPMENT_OPENED = 'shipment_opened';
     case SHIPMENT_SHIPPED = 'shipment_shipped';
     case SHIPMENT_CANCELLED = 'shipment_cancelled';
+    case PAYMENT_CONFIRMED_AFTER_RELEASE = 'payment_confirmed_after_release';
 }

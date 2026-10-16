@@ -22,15 +22,20 @@ use Thelia\Domain\Customer\Service\CustomerPersonalDataExporter;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\Customer;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Newsletter;
 use Thelia\Model\Order;
 use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\TagElement;
+use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 {
@@ -40,6 +45,14 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
     {
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
+        StoredMethodsPaymentModule::reset();
+    }
+
+    protected function tearDown(): void
+    {
+        StoredMethodsPaymentModule::reset();
+
+        parent::tearDown();
     }
 
     public function testExportCollectsTheWholeCustomerFile(): void
@@ -317,6 +330,66 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
             \array_slice(array_keys($personalData), 0, \count(CustomerPersonalDataExporter::CORE_SECTION_NAMES)),
             'The core sections must all be exported, in their order, before any module section.',
         );
+    }
+
+    /**
+     * The provider reference is a secret handed to the payment module, never to
+     * the person reading their own export.
+     */
+    public function testExportIncludesStoredPaymentMethodsWithoutTheToken(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $module = $this->paymentModuleRow(StoredMethodsPaymentModule::class);
+        $this->getService(CustomerPaymentMethodService::class)->register(
+            $customer,
+            $module,
+            'pm_export_secret_token',
+            'Visa ending 4242',
+            new \DateTimeImmutable('2030-12-31'),
+        );
+
+        $event = new CustomerPersonalDataExportEvent($customer);
+        $this->getService(EventDispatcherInterface::class)->dispatch(
+            $event,
+            TheliaEvents::CUSTOMER_PERSONAL_DATA_EXPORT,
+        );
+
+        $personalData = $event->getPersonalData();
+
+        self::assertCount(1, $personalData['payment_methods']);
+        $exportedMethod = $personalData['payment_methods'][0];
+        self::assertSame(StoredMethodsPaymentModule::getModuleCode(), $exportedMethod['module_code']);
+        self::assertSame('Visa ending 4242', $exportedMethod['label']);
+        self::assertTrue($exportedMethod['is_default']);
+        self::assertNotNull($exportedMethod['expires_at']);
+        self::assertNotNull($exportedMethod['created_at']);
+
+        self::assertStringNotContainsString(
+            'pm_export_secret_token',
+            json_encode($personalData, \JSON_THROW_ON_ERROR),
+            'The provider token must never appear in the customer export.',
+        );
+    }
+
+    private function paymentModuleRow(string $moduleClass): Module
+    {
+        $code = $moduleClass::getModuleCode();
+        $existing = ModuleQuery::create()->findOneByCode($code);
+
+        if (null !== $existing) {
+            return $existing;
+        }
+
+        $module = (new Module())
+            ->setCode($code)
+            ->setFullNamespace($moduleClass)
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->setCategory('payment')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $module->save($this->getPropelConnection());
+
+        return $module;
     }
 
     private function createCustomerWithHistory(): Customer

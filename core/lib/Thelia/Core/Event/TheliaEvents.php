@@ -143,6 +143,16 @@ final class TheliaEvents
     /** Sent to collect everything the shop knows about one customer. */
     public const CUSTOMER_PERSONAL_DATA_EXPORT = 'action.exportCustomerPersonalData';
 
+    /**
+     * Sent once a stored payment method is recorded, after the commit of the service's
+     * transaction, which is only a nested one when the caller holds its own. Not sent when
+     * a registration only refreshes the label or the expiry of a method already stored.
+     */
+    public const CUSTOMER_PAYMENT_METHOD_CREATE = 'action.customer.paymentMethod.create';
+
+    /** Sent once a stored payment method is dropped, on the same terms. */
+    public const CUSTOMER_PAYMENT_METHOD_DELETE = 'action.customer.paymentMethod.delete';
+
     /** Sent when a customer asks to be mailed a link to choose a new password. */
     public const LOST_PASSWORD = 'action.lostPassword';
 
@@ -306,6 +316,16 @@ final class TheliaEvents
     public const ORDER_SEND_CONFIRMATION_EMAIL = 'action.order.sendOrderConfirmationEmail';
     public const ORDER_SEND_NOTIFICATION_EMAIL = 'action.order.sendOrderNotificationEmail';
     public const ORDER_UPDATE_DELIVERY_REF = 'action.order.updateDeliveryRef';
+
+    /**
+     * Payment parts: a part of an order payment settled (or given back) by an instant
+     * payment module. Dispatched once the change is committed, to announce it, never to
+     * perform it. ORDER_PAYMENT_PART_RELEASE is dispatched only for a part its module gave
+     * back: a pending part released by a cancellation took nothing and is not announced.
+     * Inside a transaction the caller opened, "committed" means the nested level only.
+     */
+    public const ORDER_PAYMENT_PART_SETTLE = 'action.order.paymentPart.settle';
+    public const ORDER_PAYMENT_PART_RELEASE = 'action.order.paymentPart.release';
 
     /**
      * Shipments: a parcel, or a set of parcels leaving together, carrying part or all

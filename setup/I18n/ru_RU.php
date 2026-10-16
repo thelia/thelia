@@ -1536,4 +1536,5 @@ return [
     'Price' => 'Цена',
     'Configuration destination restrictions' => 'Настройка ограничений по направлениям доставки',
     'Configuration background jobs' => 'Настройка фоновых задач',
+    'Saved payment methods' => 'Сохранённые способы оплаты',
 ];

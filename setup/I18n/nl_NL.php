@@ -424,4 +424,5 @@ return [
     'Price' => 'Prijs',
     'Configuration destination restrictions' => 'Configuratie van de bestemmingsbeperkingen',
     'Configuration background jobs' => 'Configuratie van achtergrondtaken',
+    'Saved payment methods' => 'Opgeslagen betaalmethoden',
 ];
