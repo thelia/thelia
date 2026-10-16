@@ -36,6 +36,7 @@ use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
@@ -45,7 +46,6 @@ use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 
 /**
  * The front writes of a cart line go through the cart, the way the theme writes

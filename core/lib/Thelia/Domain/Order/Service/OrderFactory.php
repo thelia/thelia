@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
-use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
