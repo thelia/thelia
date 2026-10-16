@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
+<!-- executionOrder is PHPUnit's default, but stated: Infection shuffles its
+     initial test run whenever this file leaves it unset, which gives every
+     mutation job its own test order. -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="tests/bootstrap.php"
          cacheDirectory="var/cache-ci/.phpunit.cache"
+         executionOrder="default"
 >
     <php>
         <ini name="error_reporting" value="-1" />
