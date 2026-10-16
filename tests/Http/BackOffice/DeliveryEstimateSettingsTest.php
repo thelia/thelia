@@ -120,8 +120,9 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
 
         $this->saveDelays($token, '1', 'two', '3');
 
+        // Nothing of the form is written, the delays typed right included.
         $rule = DeliveryDateRuleQuery::create()->findOneByModuleId($this->carrier->getId());
-        self::assertTrue(null === $rule || null === $rule->getTransitMinDays());
+        self::assertTrue(null === $rule || [null, null, null] === [$rule->getPreparationDays(), $rule->getTransitMinDays(), $rule->getTransitMaxDays()]);
     }
 
     public function testTheCutoffOfTheShopIsSavedWithItsClosedDays(): void
