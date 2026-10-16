@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Address;
 use Thelia\Model\Area;
@@ -171,6 +172,36 @@ final class CheckoutApiTest extends ApiTestCase
         self::assertFalse($placed['paid']);
         self::assertSame(OrderStatus::CODE_NOT_PAID, $placed['orderStatusCode']);
         self::assertSame($checkout['paymentModule']->getId(), OrderQuery::create()->findPk($placed['orderId'])?->getPaymentModuleId());
+    }
+
+    public function testADeliveryAddressTheProductsCannotShipToIsRefusedWithTheirNames(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $this->restrictTheProductTo($checkout, served: false);
+
+        $selection = $this->jsonRequest('POST', $this->url($checkout['cart']->getId(), 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+
+        self::assertSame(422, $selection->getStatusCode(), (string) $selection->getContent());
+        $violation = $this->theViolation($this->decode($selection)['violations'], CheckoutViolationCode::DeliveryDestinationRestricted->value);
+        self::assertSame([$checkout['product']->getId()], $violation['details']['productIds']);
+    }
+
+    public function testAnOrderWhoseProductsCannotShipToItsAddressIsRefusedAndNotCreated(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        // The restriction arrives once the address is already chosen.
+        $this->restrictTheProductTo($checkout, served: false);
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(422, $placement->getStatusCode(), (string) $placement->getContent());
+        $this->theViolation($this->decode($placement)['violations'], CheckoutViolationCode::DeliveryDestinationRestricted->value);
+        self::assertSame(0, OrderQuery::create()->filterByCustomerId($checkout['customer']->getId())->count());
     }
 
     public function testTheAmountAPaymentModuleIsAskedToCollectIsTheTotalOfTheOrderItPays(): void
@@ -874,6 +905,17 @@ final class CheckoutApiTest extends ApiTestCase
             'paymentModule' => $paymentModule,
             'product' => $product,
         ];
+    }
+
+    /**
+     * @param array{product: Product, country: Country} $checkout
+     */
+    private function restrictTheProductTo(array $checkout, bool $served): void
+    {
+        $facade = $this->getService(DestinationRestrictionFacade::class);
+        $group = $facade->save(null, 'checkout-api-'.uniqid(), $served ? 1 : 0, true, ['en_US' => ['title' => 'Spirits', 'reason' => 'Licence']]);
+        $facade->addDestination((int) $group->getId(), (int) $checkout['country']->getId());
+        $facade->attachProduct((int) $group->getId(), (int) $checkout['product']->getId());
     }
 
     private function anIdNoCartHas(): int

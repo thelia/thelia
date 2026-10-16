@@ -968,4 +968,7 @@ return [
     'No carrier can ship %products. Remove them from your cart to complete your order.' => 'No carrier can ship %products. Remove them from your cart to complete your order.',
     'No carrier can ship %products. Remove it from your cart to complete your order.' => 'No carrier can ship %products. Remove it from your cart to complete your order.',
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'The chosen carrier cannot ship %products. Choose another carrier.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products cannot be shipped to this address. Remove it from your cart or choose another address.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products cannot be shipped to this address. Remove them from your cart or choose another address.',
+    '%product cannot be shipped to your address.' => '%product cannot be shipped to your address.',
 ];
