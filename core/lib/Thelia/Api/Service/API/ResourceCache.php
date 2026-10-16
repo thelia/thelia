@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockActivityChecker;
 
 /**
  * Cross-request cache for the data access layer.
@@ -58,6 +59,7 @@ readonly class ResourceCache
         private PricingActivityChecker $pricingActivityChecker,
         private ?ProductVisibility $productVisibility = null,
         private ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
+        private ?SaleUnitStockActivityChecker $saleUnitStockActivityChecker = null,
     ) {
     }
 
@@ -116,11 +118,13 @@ readonly class ResourceCache
         foreach ($this->visitorDependentPricePrefixes as $prefix) {
             if (str_starts_with($path, $prefix)) {
                 // The sale units share this bypass: the key carries no unit either,
-                // and a price cached while selling from one unit must not be served
-                // to a request selling from another, nor to one selling from none.
+                // and a price or a stock cached while selling from one unit must not
+                // be served to a request selling from another, nor to one selling
+                // from none.
                 return $this->pricingActivityChecker->hasVisitorDependentPricing()
                     || true === $this->productVisibility?->hasModuleRules()
-                    || true === $this->saleUnitPricingActivityChecker?->anySaleUnitPricesAnything();
+                    || true === $this->saleUnitPricingActivityChecker?->anySaleUnitPricesAnything()
+                    || true === $this->saleUnitStockActivityChecker?->anySaleUnitKeepsItsOwnStock();
             }
         }
 

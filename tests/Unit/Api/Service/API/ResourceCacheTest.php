@@ -23,6 +23,7 @@ use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockActivityChecker;
 
 /**
  * The cross-request cache of the data access layer keys on the path, the format
@@ -103,6 +104,36 @@ final class ResourceCacheTest extends TestCase
         self::assertSame(['second'], $cache->remember('key', '/api/front/carts/1', static fn (): array => ['second']));
     }
 
+    /**
+     * The key carries no sale unit: a price or a stock one unit owns, cached while
+     * selling from it, would be served to a request selling from another.
+     */
+    public function testTheCatalogIsBypassedWhileASaleUnitPricesAnythingOfItsOwn(): void
+    {
+        $cache = $this->saleUnitCache(unitPrices: true, unitStocks: false);
+
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['first']));
+        self::assertSame(['second'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['second']));
+        self::assertSame(['first'], $cache->remember('key', self::NEUTRAL_PATH, static fn (): array => ['first']));
+        self::assertSame(['first'], $cache->remember('key', self::NEUTRAL_PATH, static fn (): array => ['second']), 'The paths no unit changes keep their cache.');
+    }
+
+    public function testTheCatalogIsBypassedWhileASaleUnitKeepsAStockOfItsOwn(): void
+    {
+        $cache = $this->saleUnitCache(unitPrices: false, unitStocks: true);
+
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['first']));
+        self::assertSame(['second'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['second']));
+    }
+
+    public function testTheCatalogIsCachedWhenNoSaleUnitOwnsAPriceOrAStock(): void
+    {
+        $cache = $this->saleUnitCache(unitPrices: false, unitStocks: false);
+
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['first']));
+        self::assertSame(['first'], $cache->remember('key', self::CATALOG_PATH, static fn (): array => ['second']));
+    }
+
     public function testTheCatalogIsCachedWhenNoProductVisibilityIsWired(): void
     {
         $pricingActivityChecker = $this->createStub(PricingActivityChecker::class);
@@ -169,6 +200,29 @@ final class ResourceCacheTest extends TestCase
                 $productVisibilityRules,
             ),
             saleUnitPricingActivityChecker: $saleUnitPricingActivityChecker,
+        );
+    }
+
+    private function saleUnitCache(bool $unitPrices, bool $unitStocks): ResourceCache
+    {
+        $pricingActivityChecker = $this->createStub(PricingActivityChecker::class);
+        $pricingActivityChecker->method('hasVisitorDependentPricing')->willReturn(false);
+
+        $saleUnitPricingActivityChecker = $this->createStub(SaleUnitPricingActivityChecker::class);
+        $saleUnitPricingActivityChecker->method('anySaleUnitPricesAnything')->willReturn($unitPrices);
+
+        $saleUnitStockActivityChecker = $this->createStub(SaleUnitStockActivityChecker::class);
+        $saleUnitStockActivityChecker->method('anySaleUnitKeepsItsOwnStock')->willReturn($unitStocks);
+
+        return new ResourceCache(
+            new ArrayAdapter(),
+            enabled: true,
+            ttl: 60,
+            allowedPrefixes: ['/api/front/products', '/api/front/countries'],
+            visitorDependentPricePrefixes: ['/api/front/products'],
+            pricingActivityChecker: $pricingActivityChecker,
+            saleUnitPricingActivityChecker: $saleUnitPricingActivityChecker,
+            saleUnitStockActivityChecker: $saleUnitStockActivityChecker,
         );
     }
 }

@@ -52,11 +52,20 @@ readonly class SaleUnitStockResolver
             return $nationalQuantity;
         }
 
+        return $this->ownQuantity($saleUnitId, $productSaleElementsId) ?? $nationalQuantity;
+    }
+
+    /**
+     * The quantity the sale unit keeps of its own, or null when it keeps no row for
+     * the sale element and sells from the national counter.
+     */
+    public function ownQuantity(int $saleUnitId, int $productSaleElementsId): ?float
+    {
         $row = SaleUnitProductSaleElementsQuery::create()
             ->filterBySaleUnitId($saleUnitId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
 
-        return null === $row ? $nationalQuantity : (float) $row->getQuantity();
+        return null === $row ? null : (float) $row->getQuantity();
     }
 }
