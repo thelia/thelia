@@ -24,6 +24,10 @@ use Thelia\Model\SaleUnitQuery;
  * from by its code, in the X-Sale-Unit header. An unknown or inactive code
  * resolves nothing rather than throwing here: what an unresolved sale unit
  * means is the calling context's decision, not a transport concern.
+ *
+ * Any caller can send the header, so it only ever names a unit the shop sells from
+ * publicly: an inactive unit is never served, and the domain and the session, which
+ * rank higher, are never overridden by it.
  */
 #[AsTaggedItem(priority: 32)]
 readonly class ApiHeaderSaleUnitResolver implements SaleUnitResolverInterface

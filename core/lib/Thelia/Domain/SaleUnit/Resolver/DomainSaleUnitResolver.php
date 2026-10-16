@@ -27,6 +27,12 @@ use Thelia\Model\SaleUnitQuery;
  *
  * `sale_unit.url` holds the bare host (no scheme, no port), compared to the
  * request host the way the per-language domains are matched on `lang.url`.
+ *
+ * The host is what the client sent, in the Host header or, behind a proxy Symfony
+ * trusts, in X-Forwarded-Host. A deployment serving several units must declare its
+ * hosts (`framework.trusted_hosts`) and only the proxies it runs behind
+ * (`framework.trusted_proxies`): otherwise a visitor picks the unit, and so its
+ * prices and its stock, by forging the header.
  */
 #[AsTaggedItem(priority: 128)]
 readonly class DomainSaleUnitResolver implements SaleUnitResolverInterface
