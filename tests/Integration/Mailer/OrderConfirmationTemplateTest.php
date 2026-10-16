@@ -118,13 +118,21 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
         $factory = $this->createFixtureFactory();
         $order = $factory->order($factory->customer($factory->customerTitle()));
         $parameters = $this->parametersTheCoreSendsFor($order);
-        $order->setEstimatedDeliveryFrom('2026-09-03')->setEstimatedDeliveryTo(null)->save($this->getPropelConnection());
-        $mail = $this->renderConfirmation($parameters);
+        $order->setEstimatedDeliveryFrom('2026-09-03')->setEstimatedDeliveryTo('2026-09-03')->save($this->getPropelConnection());
+        $oneDay = $this->renderConfirmation($parameters);
+        $order->setEstimatedDeliveryTo(null)->save($this->getPropelConnection());
+        $withoutEnd = $this->renderConfirmation($parameters);
 
-        foreach ([(string) $mail->getHtmlBody(), (string) $mail->getTextBody()] as $body) {
-            self::assertMatchesRegularExpression('/Estimated delivery:\s+\S*.*3/', $body);
-            self::assertStringNotContainsString('between', $body);
-        }
+        // Said word for word as an interval of one day is.
+        self::assertSame($this->estimateLineOf((string) $oneDay->getHtmlBody()), $this->estimateLineOf((string) $withoutEnd->getHtmlBody()));
+        self::assertSame($this->estimateLineOf((string) $oneDay->getTextBody()), $this->estimateLineOf((string) $withoutEnd->getTextBody()));
+    }
+
+    private function estimateLineOf(string $body): string
+    {
+        self::assertSame(1, preg_match('/Estimated delivery:[^\n]*/', $body, $line), 'The mail states an estimated delivery.');
+
+        return $line[0];
     }
 
     /**
