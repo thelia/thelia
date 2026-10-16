@@ -1561,4 +1561,5 @@ return [
     'Availability' => 'Disponibilité',
     'Customer rating' => 'Note client',
     'Price' => 'Prix',
+    'Configuration destination restrictions' => 'Configuration des restrictions de destination',
 ];

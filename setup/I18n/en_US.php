@@ -1687,4 +1687,5 @@ return [
     'Availability' => 'Availability',
     'Customer rating' => 'Customer rating',
     'Price' => 'Price',
+    'Configuration destination restrictions' => 'Configuration destination restrictions',
 ];

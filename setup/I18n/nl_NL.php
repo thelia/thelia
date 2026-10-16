@@ -422,4 +422,5 @@ return [
     'Availability' => 'Beschikbaarheid',
     'Customer rating' => 'Klantbeoordeling',
     'Price' => 'Prijs',
+    'Configuration destination restrictions' => 'Configuratie van de bestemmingsbeperkingen',
 ];
