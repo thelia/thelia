@@ -54,6 +54,9 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
     /** @var callable|null */
     private $optionListener;
 
+    /** What the test carrier writes in the dates of its option, before the core fills them. */
+    private ?string $moduleDate = null;
+
     protected function setUp(): void
     {
         if (!property_exists(self::CARRIER_CARD, 'earliestDelivery')) {
@@ -69,9 +72,16 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
         ConfigQuery::write(DeliveryTimeEstimator::CUTOFF_CONFIG_NAME, '');
 
         $carrierId = $this->carrier->getId();
-        $this->optionListener = static function (DeliveryModuleOptionEvent $event) use ($carrierId): void {
+        $this->optionListener = function (DeliveryModuleOptionEvent $event) use ($carrierId): void {
             if ($event->getModule()->getId() === $carrierId) {
-                $event->appendDeliveryModuleOptions((new DeliveryModuleOption())->setCode('estimate-step-test')->setValid(true)->setPostage(4.9));
+                $event->appendDeliveryModuleOptions(
+                    (new DeliveryModuleOption())
+                        ->setCode('estimate-step-test')
+                        ->setValid(true)
+                        ->setPostage(4.9)
+                        ->setMinimumDeliveryDate($this->moduleDate)
+                        ->setMaximumDeliveryDate($this->moduleDate),
+                );
             }
         };
         $this->getService(EventDispatcherInterface::class)->addListener(TheliaEvents::MODULE_DELIVERY_GET_OPTIONS, $this->optionListener);
@@ -103,6 +113,21 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
     public function testTheCardOfACarrierWithoutDelaysShowsNoInterval(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
+
+        $crawler = $this->deliveryStepOfAGuest();
+
+        self::assertStringContainsString('estimate-step-test', (string) $this->client->getResponse()->getContent(), 'The step lists the test carrier.');
+        self::assertCount(0, $crawler->filter('[data-testid="delivery-estimate"]'));
+    }
+
+    /**
+     * A module may write anything in the dates of its option: the step shows no interval for
+     * what is not a day, and is drawn all the same.
+     */
+    public function testADateTheModuleWroteAsFreeTextShowsNoIntervalAndBreaksNothing(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->moduleDate = '2 to 3 days';
 
         $crawler = $this->deliveryStepOfAGuest();
 

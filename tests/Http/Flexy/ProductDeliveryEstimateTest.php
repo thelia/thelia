@@ -109,10 +109,31 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
         self::assertCount(0, $crawler->filter('[data-testid="product-delivery-estimate"]'));
     }
 
-    private function productUnderTest(): void
+    /**
+     * Nothing is promised for a product the shop cannot sell from its stock.
+     */
+    public function testAProductOutOfAManagedStockAnnouncesNothing(): void
+    {
+        $this->serveCountryWithCarrier($this->carrier, $this->defaultCountry(), $this->getPropelConnection());
+        $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $checkStockBefore = (string) ConfigQuery::read('check-available-stock', '1');
+        ConfigQuery::write('check-available-stock', '1');
+
+        try {
+            $this->productUnderTest(quantity: 0);
+            $crawler = $this->client->request('GET', '/'.self::PRODUCT_URL);
+        } finally {
+            ConfigQuery::write('check-available-stock', $checkStockBefore);
+        }
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertCount(0, $crawler->filter('[data-testid="product-delivery-estimate"]'));
+    }
+
+    private function productUnderTest(int $quantity = 100): void
     {
         $factory = new FixtureFactory($this->getPropelConnection());
-        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => $quantity]);
         $product->setLocale('en_US')->setTitle('Product whose delivery is estimated')->save($this->getPropelConnection());
         $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
     }
