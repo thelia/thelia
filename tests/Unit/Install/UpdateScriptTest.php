@@ -166,6 +166,7 @@ final class UpdateScriptTest extends TestCase
         yield 'Return reasons' => ['Return reasons'];
         yield 'Order status transition override' => ['Order status transition override'];
         yield 'Catalog price rules' => ['Catalog price rules'];
+        yield 'Destination restrictions' => ['Configuration destination restrictions'];
     }
 
     /**
