@@ -59,6 +59,7 @@ readonly class PropelPersistProcessor implements ProcessorInterface
         }
 
         $resourceAddons = [];
+        $created = false;
 
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
@@ -72,6 +73,9 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             if ($implementsItemFileResource) {
                 $propelModel->setNew(false);
             }
+
+            // Read before save(), which marks the model as no longer new.
+            $created = $propelModel->isNew();
 
             $propelModel->save();
 
@@ -90,9 +94,14 @@ readonly class PropelPersistProcessor implements ProcessorInterface
             throw $exception;
         }
 
-        // Written and committed: whatever keeps itself in step with the catalog can
-        // now hear of it, the way it hears of a back-office edit through its action.
-        $this->eventDispatcher?->dispatch(new ResourcePersistedEvent($data::class, $propelModel, ResourcePersistedEvent::OPERATION_WRITE));
+        // Written and committed, addons included: whatever keeps itself in step with
+        // the catalog can now hear of it, the way it hears of a back-office edit
+        // through its action.
+        $this->eventDispatcher?->dispatch(new ResourcePersistedEvent(
+            $data::class,
+            $propelModel,
+            $created ? ResourcePersistedEvent::OPERATION_CREATE : ResourcePersistedEvent::OPERATION_WRITE,
+        ));
 
         /** @var ?Post $postOperation */
         $postOperation = $context['operation'] ?? $operation;
