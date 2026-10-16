@@ -163,8 +163,10 @@ final class DeliveryEstimateCalendar implements ResetInterface
             return;
         }
 
-        // Every closure not over yet, kept as a run: however long, it costs one comparison.
+        // Every closure not over yet that an estimate can reach, kept as a run: however long,
+        // it is stepped over at once.
         $closures = DeliveryClosureQuery::create()
+            ->filterByStartDate($day->setTime(0, 0)->modify(\sprintf('+%d days', DeliveryIntervalCalculator::MAXIMUM_REACH_DAYS))->format('Y-m-d'), Criteria::LESS_EQUAL)
             ->filterByEndDate($first, Criteria::GREATER_EQUAL)
             ->find();
 

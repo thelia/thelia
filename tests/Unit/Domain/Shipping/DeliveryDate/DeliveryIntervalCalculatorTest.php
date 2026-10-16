@@ -131,6 +131,35 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         self::assertSame(['2026-09-07', '2026-09-07'], $interval);
     }
 
+    public function testAClosureWithoutEndIsSteppedOverAtOnce(): void
+    {
+        $started = microtime(true);
+
+        for ($visit = 0; $visit < 200; ++$visit) {
+            self::assertNull($this->interval(self::TUESDAY_MORNING, 1, 366, 366, carrierClosedDays: [['2026-09-02', '9999-12-31']]));
+        }
+
+        self::assertLessThan(0.05, microtime(true) - $started, 'The closure was walked day by day.');
+    }
+
+    public function testFiveHundredClosuresCostLittle(): void
+    {
+        $runs = [];
+
+        for ($week = 0; $week < 500; ++$week) {
+            $monday = (new \DateTimeImmutable('2026-09-07'))->modify(\sprintf('+%d weeks', $week));
+            $runs[] = [$monday->format('Y-m-d'), $monday->modify('+1 day')->format('Y-m-d')];
+        }
+
+        $started = microtime(true);
+
+        for ($visit = 0; $visit < 50; ++$visit) {
+            self::assertNotNull($this->interval(self::TUESDAY_MORNING, 366, 366, 366, carrierClosedDays: $runs));
+        }
+
+        self::assertLessThan(5.0, microtime(true) - $started, 'Five hundred closures were compared for every day walked.');
+    }
+
     public function testAWeekClosedEveryDayIsNotWalked(): void
     {
         // A product page estimates every carrier at every visit: two hundred of them must not walk.

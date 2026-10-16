@@ -37,6 +37,24 @@ final class ThrowableTraceTest extends TestCase
         self::assertStringNotContainsString("\nforged line", $described);
     }
 
+    public function testAtMostTenCausesAreWritten(): void
+    {
+        $throwable = new \RuntimeException('cause 0');
+
+        for ($level = 1; $level < 25; ++$level) {
+            $throwable = new \RuntimeException('cause '.$level, 0, $throwable);
+        }
+
+        self::assertSame(9, substr_count(ThrowableTrace::describe($throwable), 'Caused by '));
+    }
+
+    public function testTheNameOfAnAnonymousClassStaysOnItsLine(): void
+    {
+        $described = ThrowableTrace::describe(new class('anonymous') extends \RuntimeException {});
+
+        self::assertStringNotContainsString("\0", $described);
+    }
+
     private function thrownWith(string $password): \Throwable
     {
         // The arguments are captured, as on a server where zend.exception_ignore_args is off.

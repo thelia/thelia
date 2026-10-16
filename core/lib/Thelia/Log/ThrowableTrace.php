@@ -40,14 +40,16 @@ final class ThrowableTrace
 
     /**
      * The class, the message on one line and the trace without arguments, then the same for
-     * each exception it was caused by: a database error usually hides its reason there.
+     * the exceptions it was caused by, at most ten: a database error usually hides its reason
+     * there. That reason goes to the log as the database wrote it, a value of the row it
+     * refused included: not for a write of personal data without a review.
      */
     public static function describe(\Throwable $throwable): string
     {
         $parts = [];
 
-        for ($cause = $throwable; null !== $cause; $cause = $cause->getPrevious()) {
-            $parts[] = ($cause === $throwable ? '' : 'Caused by ').$cause::class.': '.TerminalText::onOneLine($cause->getMessage())."\n".self::withoutArguments($cause);
+        for ($cause = $throwable; null !== $cause && \count($parts) < 10; $cause = $cause->getPrevious()) {
+            $parts[] = ($cause === $throwable ? '' : 'Caused by ').TerminalText::singleLine($cause::class).': '.TerminalText::onOneLine($cause->getMessage())."\n".self::withoutArguments($cause);
         }
 
         return implode("\n", $parts);

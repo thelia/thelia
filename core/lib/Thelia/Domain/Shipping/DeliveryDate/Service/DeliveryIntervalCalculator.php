@@ -45,6 +45,13 @@ final readonly class DeliveryIntervalCalculator
     public const int MAXIMUM_WORKING_DAYS = 2 * self::SEARCH_LIMIT_DAYS;
 
     /**
+     * How far from today an estimate can reach: the cutoff day, then two counts of the
+     * longest kind (preparation, then transit), each walking a week per working day and a
+     * year more of closures. Closures starting later cannot matter.
+     */
+    public const int MAXIMUM_REACH_DAYS = 2 * (7 * self::MAXIMUM_WORKING_DAYS + self::SEARCH_LIMIT_DAYS) + 2;
+
+    /**
      * Closures are runs of days, both bounds included, as Y-m-d: a closure of years is one run
      * to compare with, not years of days.
      *
@@ -76,8 +83,8 @@ final readonly class DeliveryIntervalCalculator
             $start = $start->modify('+1 day');
         }
 
-        $shopOpen = static fn (\DateTimeImmutable $day): bool => self::isOpen($day, $shopClosedWeekdays, $shopClosedDays);
-        $carrierOpen = static fn (\DateTimeImmutable $day): bool => self::isOpen($day, $carrierClosedWeekdays, $carrierClosedDays);
+        $shopOpen = static fn (\DateTimeImmutable $day): \DateTimeImmutable => self::firstOpenFrom($day, $shopClosedWeekdays, $shopClosedDays);
+        $carrierOpen = static fn (\DateTimeImmutable $day): \DateTimeImmutable => self::firstOpenFrom($day, $carrierClosedWeekdays, $carrierClosedDays);
 
         $shipped = self::nthOpenDay($start, max(1, $preparationDays), $shopOpen);
 
@@ -104,41 +111,55 @@ final readonly class DeliveryIntervalCalculator
     }
 
     /**
+     * The day itself when it is open; otherwise a later day to look at next: the day after,
+     * or the day after the whole closure that covers it, so that a closure of years is
+     * stepped over at once.
+     *
      * @param list<int>                   $closedWeekdays
      * @param list<array{string, string}> $closedRuns
      */
-    private static function isOpen(\DateTimeImmutable $day, array $closedWeekdays, array $closedRuns): bool
+    private static function firstOpenFrom(\DateTimeImmutable $day, array $closedWeekdays, array $closedRuns): \DateTimeImmutable
     {
-        if (\in_array((int) $day->format('N'), $closedWeekdays, true)) {
-            return false;
-        }
-
         $key = $day->format('Y-m-d');
 
         foreach ($closedRuns as [$first, $last]) {
             // Y-m-d days compare as strings.
             if ($first <= $key && $key <= $last) {
-                return false;
+                $lastDay = \DateTimeImmutable::createFromFormat('!Y-m-d', $last);
+
+                return false === $lastDay ? $day->modify('+1 day') : $lastDay->modify('+1 day');
             }
         }
 
-        return true;
+        return \in_array((int) $day->format('N'), $closedWeekdays, true) ? $day->modify('+1 day') : $day;
     }
 
     /**
-     * The nth open day counting from $from itself.
+     * The nth open day counting from $from itself, looked for until a week per working day
+     * and a year more of closures have gone by.
      *
-     * @param callable(\DateTimeImmutable): bool $open
+     * @param callable(\DateTimeImmutable): \DateTimeImmutable $firstOpenFrom
      */
-    private static function nthOpenDay(\DateTimeImmutable $from, int $nth, callable $open): ?\DateTimeImmutable
+    private static function nthOpenDay(\DateTimeImmutable $from, int $nth, callable $firstOpenFrom): ?\DateTimeImmutable
     {
         $nth = min($nth, self::MAXIMUM_WORKING_DAYS);
+        $limit = $from->modify(\sprintf('+%d days', 7 * $nth + self::SEARCH_LIMIT_DAYS));
         $counted = 0;
 
-        for ($walked = 0, $day = $from; $walked <= 7 * $nth + self::SEARCH_LIMIT_DAYS; ++$walked, $day = $day->modify('+1 day')) {
-            if ($open($day) && ++$counted === $nth) {
+        for ($day = $from; $day <= $limit;) {
+            $open = $firstOpenFrom($day);
+
+            if ($open != $day) {
+                $day = $open;
+
+                continue;
+            }
+
+            if (++$counted === $nth) {
                 return $day;
             }
+
+            $day = $day->modify('+1 day');
         }
 
         return null;
@@ -148,7 +169,7 @@ final readonly class DeliveryIntervalCalculator
      * The day reached after $days open days following $from; with none, the first open day
      * from $from itself.
      *
-     * @param callable(\DateTimeImmutable): bool $open
+     * @param callable(\DateTimeImmutable): \DateTimeImmutable $open
      */
     private static function afterOpenDays(\DateTimeImmutable $from, int $days, callable $open): ?\DateTimeImmutable
     {

@@ -73,8 +73,8 @@ final readonly class DeliveryTimeEstimator
             // Zero and one day of preparation both ship the day the order comes in: the extra
             // days of the goods count from there, whichever of the two the carrier says.
             max(1, self::boundedDays((int) $rule->getPreparationDays())) + self::boundedDays($extraPreparationDays),
-            (int) $rule->getTransitMinDays(),
-            (int) $rule->getTransitMaxDays(),
+            self::boundedDays((int) $rule->getTransitMinDays()),
+            self::boundedDays((int) $rule->getTransitMaxDays()),
             $shopClosedWeekdays,
             $this->calendar->shopClosedDaysFrom($now),
             null === $rule->getClosedWeekdays() ? $shopClosedWeekdays : ClosedWeekdays::parse($rule->getClosedWeekdays()),

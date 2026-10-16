@@ -17,6 +17,8 @@ namespace Thelia\Domain\Shipping\DeliveryDate\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Shipping\DeliveryDate\DTO\ProductDeliveryEstimate;
+use Thelia\Log\ThrowableTrace;
+use Thelia\Log\Tlog;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -46,15 +48,25 @@ final readonly class ProductDeliveryEstimator
     }
 
     /**
-     * The same for a product known by its id only, provided the visitor may see it: online,
-     * and kept in their catalogue by the visibility rules (private sales, reserved ranges).
-     * An id kept from an earlier page tells nothing about a product since taken away.
+     * The same for a product known by its id only, provided the front visitor of the request
+     * may see it: online, and kept in their catalogue by the visibility rules (private sales,
+     * reserved ranges). An id kept from an earlier page tells nothing about a product since
+     * taken away. Without a request, as in a command, the rules see an anonymous visitor.
+     *
+     * A product that cannot be read, a visibility rule of a module that fails among them, is
+     * logged and announces nothing, like an estimate that cannot be counted.
      */
     public function estimateById(int $productId, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
     {
-        $query = ProductQuery::create()->filterById($productId)->filterByVisible(1);
-        $this->productVisibility->applyTo($query, ProductTableMap::COL_ID);
-        $product = $query->findOne();
+        try {
+            $query = ProductQuery::create()->filterById($productId)->filterByVisible(1);
+            $this->productVisibility->applyTo($query, ProductTableMap::COL_ID);
+            $product = $query->findOne();
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->addError(\sprintf('The product %d could not be read for a delivery estimate', $productId)."\n".ThrowableTrace::describe($throwable));
+
+            return null;
+        }
 
         return null === $product ? null : $this->estimate($product, $cart, $now);
     }
