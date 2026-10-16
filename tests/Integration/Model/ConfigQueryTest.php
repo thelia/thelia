@@ -91,6 +91,25 @@ final class ConfigQueryTest extends IntegrationTestCase
         self::assertSame('fallback', ConfigQuery::read('test_read_unknown_name', 'fallback'));
     }
 
+    /**
+     * The conversion of order_product.promo_price writes the highest order id it found. An order up to it keeps the
+     * total it was invoiced with, one above it reads the decimal.
+     */
+    public function testAnOrderIsFrozenUpToTheLastTextPromoPriceOrderIncluded(): void
+    {
+        ConfigQuery::resetCache();
+
+        self::assertFalse(ConfigQuery::isOrderWithTextPromoPrice(1), 'A shop without the variable has nothing to protect.');
+
+        ConfigQuery::write('last_text_promo_price_order_id', '0');
+        self::assertFalse(ConfigQuery::isOrderWithTextPromoPrice(1));
+
+        ConfigQuery::write('last_text_promo_price_order_id', '50');
+        self::assertTrue(ConfigQuery::isOrderWithTextPromoPrice(1));
+        self::assertTrue(ConfigQuery::isOrderWithTextPromoPrice(50));
+        self::assertFalse(ConfigQuery::isOrderWithTextPromoPrice(51));
+    }
+
     public function testCheckAvailableStockHonoursAZeroWrittenFromTheBackOffice(): void
     {
         ConfigQuery::write('check-available-stock', '0');
