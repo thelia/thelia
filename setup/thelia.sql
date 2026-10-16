@@ -4415,7 +4415,7 @@ CREATE TABLE `order_version`
     `delivery_slot_id` INTEGER COMMENT 'the slot the buyer picked, NULL once that slot is deleted from the carrier settings',
     `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
     `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
-    `sale_unit_id` INTEGER,
+    `sale_unit_id` INTEGER COMMENT 'the sale unit this order was placed on, NULL for a national (single-shop) order',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

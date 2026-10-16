@@ -772,10 +772,9 @@ DEALLOCATE PREPARE convert_column_statement;
 -- A sale unit is a place the shop sells from: a storefront on its own
 -- domain, a pick-up store behind a shared one, a logical outlet an API
 -- consumer addresses by header. The catalog stays national and shared;
--- what a unit owns comes in later scripts (prices, stocks, carts and
--- orders tagged by unit).
+-- a unit owns its prices, its stock and the orders placed on it.
 --
--- The table alone changes nothing: with no active row, every code path
+-- The tables alone change nothing: with no active row, every code path
 -- behaves exactly as before. The multi-sale-unit mode is on as soon as
 -- one row is active.
 -- ---------------------------------------------------------------------
@@ -864,12 +863,12 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
--- The sale unit an order was placed on, so a drive of 130 shops can tell whose
--- order is whose. NULL for a national (single-shop) order, so an existing shop is
+-- The sale unit an order was placed on, so a shop selling from many units can
+-- tell whose order is whose. NULL for a national (single-shop) order, so an existing shop is
 -- untouched. `order` is versionable: the column is mirrored on `order_version`.
 -- Added with the information_schema guard MySQL 8 needs to replay the script.
 SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'sale_unit_id');
-SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `cart_fingerprint`', 'DO 0');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `delivery_slot_end`', 'DO 0');
 PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
@@ -887,7 +886,7 @@ EXECUTE add_fk_statement;
 DEALLOCATE PREPARE add_fk_statement;
 
 SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'sale_unit_id');
-SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL AFTER `cart_fingerprint`', 'DO 0');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `delivery_slot_end`', 'DO 0');
 PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
