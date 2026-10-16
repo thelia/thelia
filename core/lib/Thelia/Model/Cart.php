@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -92,6 +93,10 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
+        // The copy belongs to the sale unit of the cart it copies: moving to another
+        // unit is the job of the session, which checks the copy again if needed.
+        $cart->setSaleUnitId($this->getSaleUnitId());
+        $saleUnitStock = null === $this->getSaleUnitId() ? null : new SaleUnitStockResolver();
 
         $discount = 0.0;
 
@@ -127,7 +132,7 @@ class Cart extends BaseCart
             if ($product
                 && $productSaleElements
                 && 1 === (int) $product->getVisible()
-                && ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
+                && ($this->availableQuantityOf($productSaleElements, $saleUnitStock) >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
             ) {
                 $item = new CartItem();
                 $item->setCart($cart);
@@ -155,6 +160,25 @@ class Cart extends BaseCart
         }
 
         return $cart;
+    }
+
+    /**
+     * The stock the line is copied against: the cart's sale unit's own when it keeps
+     * one, the national counter otherwise (and always for a national cart, without a query).
+     */
+    private function availableQuantityOf(ProductSaleElements $productSaleElements, ?SaleUnitStockResolver $saleUnitStock): float
+    {
+        $nationalQuantity = (float) $productSaleElements->getQuantity();
+
+        if (null === $saleUnitStock) {
+            return $nationalQuantity;
+        }
+
+        return $saleUnitStock->availableQuantity(
+            (int) $this->getSaleUnitId(),
+            (int) $productSaleElements->getId(),
+            $nationalQuantity,
+        );
     }
 
     /**

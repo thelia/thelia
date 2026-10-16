@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\SaleUnit\Stock;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\SaleUnitProductSaleElementsQuery;
 
 /**
@@ -67,5 +68,33 @@ readonly class SaleUnitStockResolver
             ->findOne();
 
         return null === $row ? null : (float) $row->getQuantity();
+    }
+
+    /**
+     * The quantities the sale unit keeps of its own for a batch of sale elements, in
+     * one query. A sale element it keeps no row for is absent: the national counter
+     * stands for it.
+     *
+     * @param list<int> $productSaleElementsIds
+     *
+     * @return array<int, float> keyed by sale element id
+     */
+    public function ownQuantities(int $saleUnitId, array $productSaleElementsIds): array
+    {
+        if ([] === $productSaleElementsIds) {
+            return [];
+        }
+
+        $quantities = [];
+
+        foreach (SaleUnitProductSaleElementsQuery::create()
+            ->filterBySaleUnitId($saleUnitId)
+            ->filterByProductSaleElementsId(array_values(array_unique($productSaleElementsIds)), Criteria::IN)
+            ->select(['ProductSaleElementsId', 'Quantity'])
+            ->find() as $row) {
+            $quantities[(int) $row['ProductSaleElementsId']] = (float) $row['Quantity'];
+        }
+
+        return $quantities;
     }
 }

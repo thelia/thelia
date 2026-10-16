@@ -22,6 +22,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\ConfigQuery;
@@ -37,6 +38,11 @@ use Thelia\Type\TypeCollection;
  */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
+    public function __construct(
+        protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
@@ -84,6 +90,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $locale = $this->getMainRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
+        $saleUnitQuantities = $checkAvailability ? $this->saleUnitQuantitiesOf($loopResult) : [];
 
         /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
@@ -102,7 +109,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             if (!$checkAvailability || 1 === $product->getVirtual()) {
                 $loopResultRow->set('STOCK', $defaultAvailability);
             } else {
-                $loopResultRow->set('STOCK', $productSaleElement->getQuantity());
+                $loopResultRow->set('STOCK', $saleUnitQuantities[(int) $productSaleElement->getId()] ?? $productSaleElement->getQuantity());
             }
 
             $loopResultRow
@@ -139,5 +146,27 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function getDispatcher(): EventDispatcher
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * The stock the sale unit the visitor buys from keeps of the sale elements in the
+     * cart, in one query; empty, without a query, when no unit is resolved.
+     *
+     * @return array<int, float> keyed by sale element id
+     */
+    private function saleUnitQuantitiesOf(LoopResult $loopResult): array
+    {
+        if (null === $this->saleUnitAvailableStock) {
+            return [];
+        }
+
+        $productSaleElementsIds = [];
+
+        /** @var CartItemModel $cartItem */
+        foreach ($loopResult->getResultDataCollection() as $cartItem) {
+            $productSaleElementsIds[] = (int) $cartItem->getProductSaleElementsId();
+        }
+
+        return $this->saleUnitAvailableStock->ownQuantities($productSaleElementsIds);
     }
 }
