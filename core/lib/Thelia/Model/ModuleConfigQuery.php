@@ -75,8 +75,9 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
         if (null !== $saleUnitId) {
             $saleUnitValues = self::$saleUnitValues[$saleUnitId][$moduleId] ??= SaleUnitModuleConfigQuery::findValuesOfModule($saleUnitId, $moduleId);
 
-            if (\array_key_exists($variableName, $saleUnitValues)) {
-                return $saleUnitValues[$variableName] ?? (null === $defaultValue ? null : (string) $defaultValue);
+            // A row with no value leaves the setting to the national one, like a missing row.
+            if (null !== ($saleUnitValues[$variableName] ?? null)) {
+                return $saleUnitValues[$variableName];
             }
         }
 

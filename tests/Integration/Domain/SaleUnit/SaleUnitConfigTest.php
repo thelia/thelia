@@ -14,12 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\SaleUnit;
 
+use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\EventListener\ModuleConfigCacheListener;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
@@ -140,6 +148,81 @@ final class SaleUnitConfigTest extends IntegrationTestCase
 
         $this->saleUnitContext->setSaleUnit(null);
         self::assertSame('national-site', SaleUnitConfigProbe::getConfigValue('site_id'));
+    }
+
+    public function testTheSaleUnitValuesReadAreDroppedAtTheStartOfARequestAndOfACommand(): void
+    {
+        $lyon = $this->createFixtureFactory()->saleUnit();
+        $this->probeModule();
+        ConfigQuery::write('store_name', 'National shop');
+        SaleUnitConfigProbe::setConfigValue('site_id', 'national-site');
+        $this->saleUnitConfig->setStoreValue($lyon->getId(), 'store_name', 'Lyon shop');
+        SaleUnitConfigProbe::setConfigValueForSaleUnit($lyon->getId(), 'site_id', 'lyon-site');
+        $this->saleUnitContext->setSaleUnit($lyon);
+
+        $listener = $this->getService(ModuleConfigCacheListener::class);
+        $kernel = $this->getService('kernel');
+
+        $storeName = 'Lyon shop';
+        $siteId = 'lyon-site';
+
+        foreach ([
+            'request' => static fn () => $listener->onKernelRequest(new RequestEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST)),
+            'command' => static fn () => $listener->onConsoleCommand(new ConsoleCommandEvent(null, new ArrayInput([]), new NullOutput())),
+        ] as $start => $startOf) {
+            self::assertSame($storeName, ConfigQuery::getStoreName());
+            self::assertSame($siteId, SaleUnitConfigProbe::getConfigValue('site_id'));
+
+            // Written by another process, behind the model: only the start of the next
+            // request or command can see it.
+            $connection = Propel::getConnection();
+            $connection->exec("UPDATE sale_unit_config SET value = 'Lyon shop ({$start})' WHERE sale_unit_id = ".$lyon->getId());
+            $connection->exec("UPDATE sale_unit_module_config SET value = 'lyon-site-{$start}' WHERE sale_unit_id = ".$lyon->getId());
+
+            self::assertSame($storeName, ConfigQuery::getStoreName(), 'the read is kept for the request');
+
+            $startOf();
+
+            $storeName = "Lyon shop ({$start})";
+            $siteId = "lyon-site-{$start}";
+
+            self::assertSame($storeName, ConfigQuery::getStoreName(), "a new {$start} reads the database again");
+            self::assertSame($siteId, SaleUnitConfigProbe::getConfigValue('site_id'), "a new {$start} reads the database again");
+        }
+    }
+
+    public function testDeletingASaleUnitDropsTheValuesReadForIt(): void
+    {
+        $lyon = $this->createFixtureFactory()->saleUnit();
+        $module = $this->probeModule();
+        ConfigQuery::write('store_name', 'National shop');
+        SaleUnitConfigProbe::setConfigValue('site_id', 'national-site');
+        $this->saleUnitConfig->setStoreValue($lyon->getId(), 'store_name', 'Lyon shop');
+        SaleUnitConfigProbe::setConfigValueForSaleUnit($lyon->getId(), 'site_id', 'lyon-site');
+
+        self::assertSame('Lyon shop', $this->saleUnitConfig->getStoreValue($lyon->getId(), 'store_name'));
+        self::assertSame('lyon-site', SaleUnitConfigProbe::getConfigValueForSaleUnit($lyon->getId(), 'site_id'));
+
+        $lyonId = $lyon->getId();
+        $lyon->delete();
+
+        // The rows went with the unit through the foreign key, without a model event.
+        self::assertSame('National shop', $this->saleUnitConfig->getStoreValue($lyonId, 'store_name'));
+        self::assertSame('national-site', SaleUnitConfigProbe::getConfigValueForSaleUnit($lyonId, 'site_id'));
+        self::assertSame('national-site', $this->saleUnitConfig->getModuleValue($lyonId, $module->getId(), 'site_id'));
+    }
+
+    public function testAModuleValueTheSaleUnitLeavesNullFallsBackOnTheNationalOne(): void
+    {
+        $lyon = $this->createFixtureFactory()->saleUnit();
+        $this->probeModule();
+        SaleUnitConfigProbe::setConfigValue('site_id', 'national-site');
+        SaleUnitConfigProbe::setConfigValueForSaleUnit($lyon->getId(), 'site_id', 'lyon-site');
+        Propel::getConnection()->exec('UPDATE sale_unit_module_config SET value = NULL WHERE sale_unit_id = '.$lyon->getId());
+        ModuleConfigQuery::resetConfigCache();
+
+        self::assertSame('national-site', SaleUnitConfigProbe::getConfigValueForSaleUnit($lyon->getId(), 'site_id', 'a-default'));
+        self::assertSame('a-default', SaleUnitConfigProbe::getConfigValueForSaleUnit($lyon->getId(), 'never_set', 'a-default'));
     }
 
     /**

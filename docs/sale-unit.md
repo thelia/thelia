@@ -246,7 +246,10 @@ template reads them like any other caller.
 **Module settings.** `BaseModule::getConfigValue()` keeps its signature and answers
 for the unit in scope; a module that does nothing gets the unit's values for free.
 The values live in `sale_unit_module_config`, one per unit, module and name, the same
-in every locale. Code that works for a given unit, whatever is in scope, names it:
+in every locale. A row whose value is null sets nothing: the setting reads the
+national value, as it does without a row, and the default the caller passes only
+applies when the national value is null as well. Code that works for a given unit,
+whatever is in scope, names it:
 
 | Call | Does |
 |---|---|
