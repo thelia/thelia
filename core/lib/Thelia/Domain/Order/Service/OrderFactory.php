@@ -19,6 +19,8 @@ use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryEstimate;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
+use Thelia\Log\ThrowableTrace;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
@@ -83,7 +85,21 @@ readonly class OrderFactory
      */
     public function estimateDeliveryOf(ModelOrder $sessionOrder, CartModel $cart): ?DeliveryEstimate
     {
-        $module = null === $sessionOrder->getDeliveryModuleId() ? null : ModuleQuery::create()->findPk($sessionOrder->getDeliveryModuleId());
+        $moduleId = $sessionOrder->getDeliveryModuleId();
+
+        if (null === $moduleId) {
+            return null;
+        }
+
+        // Read here, outside the guard of the estimator: a failure still leaves the order
+        // placed without an estimate.
+        try {
+            $module = ModuleQuery::create()->findPk($moduleId);
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->addError(\sprintf('The carrier #%d of the order could not be read for a delivery estimate', $moduleId)."\n".ThrowableTrace::describe($throwable));
+
+            return null;
+        }
 
         return null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);
     }

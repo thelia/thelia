@@ -37,6 +37,7 @@ use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
@@ -55,8 +56,10 @@ use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
 use Thelia\Module\BaseModule;
@@ -530,6 +533,29 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         self::assertNotNull($order);
         self::assertNull($order->getEstimatedDeliveryFromDay());
+    }
+
+    /**
+     * The carrier of the order is read before the estimator guards anything: a failure there
+     * leaves the order without an estimate all the same, and says so.
+     */
+    public function testACarrierThatCannotBeReadLeavesTheOrderWithoutAnEstimate(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        [$cart] = $this->cartReadyToPay();
+        $sessionOrder = (new Order())->setDeliveryModuleId($this->carrier->getId());
+        $connection = $this->getPropelConnection();
+        ModuleTableMap::clearInstancePool();
+
+        // Masks the modules table for this connection, without an implicit commit.
+        $connection->exec('CREATE TEMPORARY TABLE `module` (id INT)');
+
+        $logged = $this->loggedWhile(function () use (&$estimate, $sessionOrder, $cart): void {
+            $estimate = $this->getService(OrderFactory::class)->estimateDeliveryOf($sessionOrder, $cart);
+        }, static fn () => $connection->exec('DROP TEMPORARY TABLE `module`'));
+
+        self::assertNull($estimate);
+        self::assertStringContainsString('The carrier #'.$this->carrier->getId().' of the order could not be read for a delivery estimate', $logged);
     }
 
     public function testAnOfflineProductHasNoEstimateById(): void
