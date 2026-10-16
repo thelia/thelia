@@ -288,9 +288,6 @@ final class DeliveryEstimateTest extends IntegrationTestCase
     }
 
     /**
-     * Recette 6: the product page names the soonest delivery and the country it holds for.
-     */
-    /**
      * A day left on the cart by a carrier the merchant has since stopped offering days for is
      * dropped from the order: the order then gets the estimate, not nothing.
      */
@@ -309,6 +306,9 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertSame([$this->day(2), $this->day(3)], [$order->getEstimatedDeliveryFromDay(), $order->getEstimatedDeliveryToDay()]);
     }
 
+    /**
+     * Recette 6: the product page names the soonest delivery and the country it holds for.
+     */
     public function testAProductPageAnnouncesTheSoonestCarrierForTheDefaultCountry(): void
     {
         $defaultCountry = CountryQuery::create()->findOneByByDefault(1);

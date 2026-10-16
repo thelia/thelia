@@ -47,9 +47,10 @@ final readonly class DeliveryIntervalCalculator
     /**
      * How far from today an estimate can reach: the cutoff day, then two counts of the
      * longest kind (preparation, then transit), each walking a week per working day and a
-     * year more of closures. Closures starting later cannot matter.
+     * year more of closures, and a week of margin for a change of the walk that forgets this
+     * sum. Closures starting later cannot matter.
      */
-    public const int MAXIMUM_REACH_DAYS = 2 * (7 * self::MAXIMUM_WORKING_DAYS + self::SEARCH_LIMIT_DAYS) + 2;
+    public const int MAXIMUM_REACH_DAYS = 2 * (7 * self::MAXIMUM_WORKING_DAYS + self::SEARCH_LIMIT_DAYS) + 2 + 7;
 
     /**
      * Closures are runs of days, both bounds included, as Y-m-d: a closure of years is one run
@@ -125,7 +126,8 @@ final readonly class DeliveryIntervalCalculator
         foreach ($closedRuns as [$first, $last]) {
             // Y-m-d days compare as strings.
             if ($first <= $key && $key <= $last) {
-                $lastDay = \DateTimeImmutable::createFromFormat('!Y-m-d', $last);
+                // In the time zone of the count, whatever the one PHP runs in.
+                $lastDay = \DateTimeImmutable::createFromFormat('!Y-m-d', $last, $day->getTimezone());
 
                 return false === $lastDay ? $day->modify('+1 day') : $lastDay->modify('+1 day');
             }

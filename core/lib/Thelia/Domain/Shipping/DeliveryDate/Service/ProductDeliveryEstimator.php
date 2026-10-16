@@ -53,8 +53,8 @@ final readonly class ProductDeliveryEstimator
      * reserved ranges). An id kept from an earlier page tells nothing about a product since
      * taken away. Without a request, as in a command, the rules see an anonymous visitor.
      *
-     * A product that cannot be read, a visibility rule of a module that fails among them, is
-     * logged and announces nothing, like an estimate that cannot be counted.
+     * Anything that fails on the way, a product that cannot be read or a visibility rule of a
+     * module that breaks among them, is logged and announces nothing: the product page shows.
      */
     public function estimateById(int $productId, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
     {
@@ -62,13 +62,13 @@ final readonly class ProductDeliveryEstimator
             $query = ProductQuery::create()->filterById($productId)->filterByVisible(1);
             $this->productVisibility->applyTo($query, ProductTableMap::COL_ID);
             $product = $query->findOne();
+
+            return null === $product ? null : $this->estimate($product, $cart, $now);
         } catch (\Throwable $throwable) {
-            Tlog::getInstance()->addError(\sprintf('The product %d could not be read for a delivery estimate', $productId)."\n".ThrowableTrace::describe($throwable));
+            Tlog::getInstance()->addError(\sprintf('The delivery of product %d could not be estimated', $productId)."\n".ThrowableTrace::describe($throwable));
 
             return null;
         }
-
-        return null === $product ? null : $this->estimate($product, $cart, $now);
     }
 
     public function estimate(Product $product, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
