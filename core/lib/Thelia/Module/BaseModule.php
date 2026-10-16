@@ -263,6 +263,37 @@ class BaseModule implements BaseModuleInterface
             ->setConfigValue(self::getModuleId(), $variableName, (string) $variableValue, $valueLocale, $createIfNotExists);
     }
 
+    /**
+     * The value of a setting for the given sale unit, whatever sale unit the request
+     * resolved, or without a request at all: the value the unit gives it, or else the
+     * national one. A null sale unit reads the national value.
+     *
+     * getConfigValue() already answers for the current sale unit; this is for the code
+     * that works for another one, such as the notification of a payment provider about
+     * an order: `getConfigValueForSaleUnit($order->getSaleUnitId(), 'secret_key')`.
+     */
+    public static function getConfigValueForSaleUnit(?int $saleUnitId, string $variableName, mixed $defaultValue = null, ?string $valueLocale = null): ?string
+    {
+        return ModuleConfigQuery::create()
+            ->getConfigValueForSaleUnit($saleUnitId, self::getModuleId(), $variableName, $defaultValue, $valueLocale);
+    }
+
+    /**
+     * @param bool|null $secret a secret value is never read back by the admin API; null keeps
+     *                          the flag of a stored value, and leaves a new one readable
+     */
+    public static function setConfigValueForSaleUnit(int $saleUnitId, string $variableName, mixed $variableValue, ?bool $secret = null): void
+    {
+        ModuleConfigQuery::create()
+            ->setConfigValueForSaleUnit($saleUnitId, self::getModuleId(), $variableName, null === $variableValue ? null : (string) $variableValue, $secret);
+    }
+
+    public static function deleteConfigValueForSaleUnit(int $saleUnitId, string $variableName): void
+    {
+        ModuleConfigQuery::create()
+            ->deleteConfigValueForSaleUnit($saleUnitId, self::getModuleId(), $variableName);
+    }
+
     public function deployImageFolder(Module $module, $folderPath, ?ConnectionInterface $con = null): void
     {
         $directoryBrowser = new \DirectoryIterator($folderPath);

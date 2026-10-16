@@ -46,6 +46,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -268,7 +269,12 @@ abstract class BaseController implements ControllerInterface
         $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $fileName);
         $parser->setTemplateDefinition($pdfTemplate, true);
 
-        $html = $parser->render($fileName, ['order_id' => $order_id, 'shipment_id' => $shipmentId]);
+        // The store identity printed on the document is the one of the sale unit the
+        // order was placed on, whatever unit the request resolved.
+        $html = SaleUnitConfigScope::runFor(
+            $order->getSaleUnitId(),
+            static fn (): string => $parser->render($fileName, ['order_id' => $order_id, 'shipment_id' => $shipmentId]),
+        );
 
         try {
             $pdfEvent = new PdfEvent($html);

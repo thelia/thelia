@@ -23,6 +23,7 @@ use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigService;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\Exception\EmailNotSentException;
 use Thelia\Model\ConfigQuery;
@@ -60,6 +61,7 @@ class MailerFactory
         private readonly ParserResolver $parserResolver,
         private readonly MailerInterface $mailer,
         private readonly OrderHistoryRecorder $orderHistoryRecorder,
+        private readonly ?SaleUnitConfigService $saleUnitConfig = null,
     ) {
     }
 
@@ -98,13 +100,15 @@ class MailerFactory
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
 
-        $this->sendEmailMessageOrFail(
-            $messageCode,
-            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-            [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
-            $messageParameters,
-            $customer->getCustomerLang()->getLocale(),
-        );
+        $this->inTheSaleUnitOfTheOrder($messageParameters, function () use ($messageCode, $customer, $messageParameters): void {
+            $this->sendEmailMessageOrFail(
+                $messageCode,
+                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
+                $messageParameters,
+                $customer->getCustomerLang()->getLocale(),
+            );
+        });
     }
 
     /**
@@ -131,6 +135,16 @@ class MailerFactory
      * @throws EmailNotSentException
      */
     public function sendEmailToShopManagersOrFail(string $messageCode, array $messageParameters = [], array $replyTo = []): void
+    {
+        $this->inTheSaleUnitOfTheOrder($messageParameters, function () use ($messageCode, $messageParameters, $replyTo): void {
+            $this->sendEmailToTheShopManagersOrFail($messageCode, $messageParameters, $replyTo);
+        });
+    }
+
+    /**
+     * @throws EmailNotSentException
+     */
+    private function sendEmailToTheShopManagersOrFail(string $messageCode, array $messageParameters, array $replyTo): void
     {
         $storeName = ConfigQuery::getStoreName();
 
@@ -217,6 +231,25 @@ class MailerFactory
         array $bcc = [],
         array $replyTo = [],
     ): void {
+        $this->inTheSaleUnitOfTheOrder(
+            $messageParameters,
+            fn () => $this->sendTheEmailMessageOrFail($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo),
+        );
+    }
+
+    /**
+     * @throws EmailNotSentException
+     */
+    private function sendTheEmailMessageOrFail(
+        string $messageCode,
+        array $from,
+        array $to,
+        array $messageParameters,
+        ?string $locale,
+        array $cc,
+        array $bcc,
+        array $replyTo,
+    ): void {
         $storeEmail = ConfigQuery::getStoreEmail();
 
         if (empty($storeEmail)) {
@@ -252,6 +285,25 @@ class MailerFactory
         // try on purpose, so that a failure to record is never reported as a mail
         // that did not leave.
         $this->recordEmailSentOnOrder($messageCode, $messageParameters);
+    }
+
+    /**
+     * Runs a send with the configuration of the sale unit the order of the message was
+     * placed on, so that its sender, its name and its notification recipients are the
+     * unit's, from a command as well as from a request. A message about no order, or
+     * sent by a shop that sells from no sale unit, runs with the configuration in scope.
+     *
+     * @param array<string, mixed> $messageParameters
+     */
+    private function inTheSaleUnitOfTheOrder(array $messageParameters, callable $send): void
+    {
+        if (null === $this->saleUnitConfig || !$this->saleUnitConfig->isActive()) {
+            $send();
+
+            return;
+        }
+
+        $this->saleUnitConfig->runForOrderId($this->orderIdFromMessageParameters($messageParameters), $send);
     }
 
     /**

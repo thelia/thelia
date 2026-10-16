@@ -3027,4 +3027,43 @@
     </index>
     <behavior name="timestampable" />
   </table>
+
+  <table name="sale_unit_config" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column description="one of the store settings a sale unit may set for itself (ConfigQuery::SALE_UNIT_SCOPED_NAMES)" name="name" required="true" size="255" type="VARCHAR" />
+    <column name="value" required="true" type="LONGVARCHAR" />
+    <foreign-key foreignTable="sale_unit" name="fk_sale_unit_config_sale_unit_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <unique name="sale_unit_config_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="name" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="sale_unit_module_config" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="name" required="true" size="255" type="VARCHAR" />
+    <column name="value" type="LONGVARCHAR" />
+    <column defaultValue="0" description="a secret value (a key, a password) is written and never read back by the API" name="secret" required="true" type="BOOLEAN" />
+    <foreign-key foreignTable="sale_unit" name="fk_sale_unit_module_config_sale_unit_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_sale_unit_module_config_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <unique name="sale_unit_module_config_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="module_id" />
+      <unique-column name="name" />
+    </unique>
+    <index name="idx_sale_unit_module_config_module_id">
+      <index-column name="module_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
 </database>

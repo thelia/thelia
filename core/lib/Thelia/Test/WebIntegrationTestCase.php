@@ -23,7 +23,10 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\ModuleConfigQuery;
 use Thelia\Tools\URL;
 use Twig\Environment;
 
@@ -111,6 +114,12 @@ abstract class WebIntegrationTestCase extends WebTestCase
 
         $this->forgetTheVisitorSession();
         $this->forgetTheSaleUnitActivity();
+
+        // The configuration of the sale unit a request of the test resolved is static,
+        // so it outlives the kernel the next test boots.
+        SaleUnitConfigScope::reset();
+        ConfigQuery::forgetSaleUnitValues();
+        ModuleConfigQuery::resetConfigCache();
 
         parent::tearDown();
     }

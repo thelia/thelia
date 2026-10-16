@@ -25,6 +25,7 @@ use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\LangQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderShipmentQuery;
@@ -100,7 +101,12 @@ class PdfRender extends ContainerAwareCommand
         $this->initRequest($lang);
 
         try {
-            $html = $this->renderDocumentHtml($document, (int) $order->getId(), $shipment?->getId());
+            // The store identity printed on the document is the one of the sale unit
+            // the order was placed on.
+            $html = SaleUnitConfigScope::runFor(
+                $order->getSaleUnitId(),
+                fn (): string => $this->renderDocumentHtml($document, (int) $order->getId(), $shipment?->getId()),
+            );
 
             $pdfEvent = new PdfEvent($html);
             $pdfEvent->setTemplateName($document);
