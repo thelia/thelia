@@ -43,8 +43,31 @@ final class DashboardOrderStatisticsTest extends IntegrationTestCase
             self::markTestSkipped('The installed back-office theme predates these dashboard figures.');
         }
 
-        $this->orders = new OrderRepository();
+        $this->orders = $this->orderRepository();
         $this->range = DateRange::fromPreset(DateRange::PRESET_THIRTY_DAYS);
+    }
+
+    /**
+     * The theme owns the constructor of its repository and changes it on its own release
+     * cycle: the dependencies are taken from the container, whatever the installed
+     * version asks for.
+     */
+    private function orderRepository(): OrderRepository
+    {
+        $constructor = (new \ReflectionClass(OrderRepository::class))->getConstructor();
+        $dependencies = [];
+
+        foreach ($constructor?->getParameters() ?? [] as $parameter) {
+            $type = $parameter->getType();
+
+            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+                self::fail(\sprintf('Cannot build the back-office OrderRepository: the parameter "%s" of its constructor is not a service.', $parameter->getName()));
+            }
+
+            $dependencies[] = $this->getService($type->getName());
+        }
+
+        return new OrderRepository(...$dependencies);
     }
 
     public function testRevenueLeavesOutTheOrdersTheShopWasNotPaidFor(): void
