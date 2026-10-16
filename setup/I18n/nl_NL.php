@@ -415,6 +415,7 @@ return [
     'Catalog price rules' => 'Catalogusprijsregels',
     'Promotion' => 'Promotie',
     'Newness' => 'Nieuw',
+    'Configuration background jobs' => 'Configuratie van achtergrondtaken',
     'Shipping notice sent to the customer' => 'Verzendbericht naar de klant verzonden',
     'Your order {{ order_ref }} has been shipped' => 'Je bestelling {{ order_ref }} is verzonden',
     'Partially shipped' => 'Gedeeltelijk verzonden',

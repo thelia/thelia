@@ -1117,6 +1117,7 @@ return [
     'Catalog price rules' => 'Katalogpreisregeln',
     'Promotion' => 'Aktion',
     'Newness' => 'Neuheit',
+    'Configuration background jobs' => 'Konfiguration der Hintergrundaufgaben',
     'Shipping notice sent to the customer' => 'Versandbestätigung an den Kunden gesendet',
     'Your order {{ order_ref }} has been shipped' => 'Ihre Bestellung {{ order_ref }} wurde versandt',
     'Partially shipped' => 'Teilweise versandt',

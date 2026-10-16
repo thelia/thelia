@@ -63,4 +63,5 @@ return [
     'This order requires an account.' => 'Voor deze bestelling is een account vereist.',
     'This shop is not asking for the consent "%consent".' => 'Deze winkel vraagt niet om de toestemming "%consent".',
     'You must accept "%consent" to place this order.' => 'U moet "%consent" accepteren om deze bestelling te plaatsen.',
+    'The value "%value" of the column %column is not a number (product sale element id %id)' => 'De waarde "%value" van de kolom %column is geen getal (id van productvariant %id)',
 ];

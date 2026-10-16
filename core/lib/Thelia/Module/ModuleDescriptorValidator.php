@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Module;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\File\XmlDescriptor;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
+use Thelia\Tools\TerminalText;
 
 /**
  * Class ModuleDescriptorValidator.
@@ -47,30 +49,47 @@ class ModuleDescriptorValidator
 
     public function validate($xml_file, $version = null): bool
     {
+        $this->moduleVersion = null;
         $dom = new \DOMDocument();
-        $errors = [];
+        $notLoaded = XmlDescriptor::loadingErrors($dom, (string) $xml_file);
 
-        // No network access for an entity or a DTD a descriptor would point at.
-        if ($dom->load($xml_file, \LIBXML_NONET)) {
-            /** @var \SplFileInfo $xsdFile */
-            foreach ($this->xsdFinder as $xsdFile) {
-                $xsdVersion = array_search($xsdFile->getBasename(), self::$versions, true);
+        if ([] !== $notLoaded) {
+            $reason = implode(', ', $notLoaded);
+        } else {
+            ['version' => $this->moduleVersion, 'errors' => $errors] = XmlDescriptor::matchingSchemaVersion($dom, $this->xsdFinder, self::$versions, null === $version ? null : (string) $version, $this->schemaValidate(...));
 
-                if (false === $xsdVersion || (null !== $version && $version !== $xsdVersion)) {
-                    continue;
-                }
-
-                $errors = $this->schemaValidate($dom, $xsdFile);
-
-                if ([] === $errors) {
-                    $this->moduleVersion = $xsdVersion;
-
-                    return true;
-                }
+            if (null !== $this->moduleVersion) {
+                return true;
             }
+
+            $reason = implode(', ', $errors);
         }
 
-        throw new InvalidXmlDocumentException(\sprintf('%s file is not a valid file : %s', $xml_file, implode(', ', $errors)));
+        // Shown to the administrator who uploads the module: the module it is about, never
+        // where the server unpacked it, and nothing a value of the descriptor would make a
+        // log or a page obey.
+        throw new InvalidXmlDocumentException(TerminalText::onOneLine(\sprintf('The %s is not a valid file: %s', self::describe((string) $xml_file), $reason)));
+    }
+
+    /**
+     * The descriptor as the administrator knows it: "module.xml of <module>" for one at its
+     * place in a module (<module>/Config/module.xml), the file name alone anywhere else.
+     */
+    private static function describe(string $xmlFile): string
+    {
+        $file = trim(basename($xmlFile));
+
+        if ('' === $file) {
+            return 'descriptor';
+        }
+
+        $configFolder = \dirname($xmlFile);
+
+        if ('Config' !== basename($configFolder) || \in_array(basename(\dirname($configFolder)), ['', '.', '..'], true)) {
+            return $file;
+        }
+
+        return \sprintf('%s of %s', $file, basename(\dirname($configFolder)));
     }
 
     /**
@@ -83,41 +102,16 @@ class ModuleDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile): array
     {
-        $errorMessages = [];
-
-        try {
-            libxml_use_internal_errors(true);
-
-            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-                $errors = libxml_get_errors();
-
-                foreach ($errors as $error) {
-                    $errorMessages[] = \sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
-                        $error->message,
-                        $error->level,
-                        $error->code,
-                        $error->file,
-                        $error->line,
-                        $error->column,
-                    );
-                }
-
-                libxml_clear_errors();
-            }
-
-            libxml_use_internal_errors(false);
-        } catch (\ErrorException) {
-            libxml_use_internal_errors(false);
-        }
-
-        return $errorMessages;
+        return array_map(
+            static fn (string $error): string => 'XML error "'.$error.'"',
+            XmlDescriptor::schemaErrors($dom, (string) $xsdFile->getRealPath()),
+        );
     }
 
     public function getDescriptor($xml_file): \SimpleXMLElement|false
     {
         $this->validate($xml_file);
 
-        return @simplexml_load_file($xml_file, \SimpleXMLElement::class, \LIBXML_NONET);
+        return XmlDescriptor::read((string) $xml_file);
     }
 }

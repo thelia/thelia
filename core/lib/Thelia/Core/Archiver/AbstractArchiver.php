@@ -21,10 +21,10 @@ use Thelia\Core\Translation\Translator;
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-abstract class AbstractArchiver implements ArchiverInterface
+abstract class AbstractArchiver implements ArchiverInterface, ClosableArchiverInterface
 {
     /** @var mixed The archive resource */
-    protected mixed $archive;
+    protected mixed $archive = null;
 
     /** @var string Path to archive */
     protected string $archivePath;
@@ -50,11 +50,13 @@ abstract class AbstractArchiver implements ArchiverInterface
 
     public function add(string $path, ?string $pathInArchive = null): self
     {
-        $path = realpath($path);
+        $resolved = realpath($path);
 
-        if (!file_exists($path)) {
+        if (false === $resolved || !file_exists($resolved)) {
             throw new \RuntimeException('File '.$path." doesn't exists");
         }
+
+        $path = $resolved;
 
         if (null === $pathInArchive) {
             $pathInArchive = basename($path);
@@ -78,5 +80,21 @@ abstract class AbstractArchiver implements ArchiverInterface
     public function extract($toPath = null): void
     {
         $this->archive->extractTo($toPath);
+    }
+
+    /**
+     * Lets go of the archive once it is read or written: a worker that opened it keeps
+     * no file open between two jobs.
+     */
+    public function close(): bool
+    {
+        $this->archive = null;
+
+        return true;
+    }
+
+    public function discard(): void
+    {
+        $this->archive = null;
     }
 }

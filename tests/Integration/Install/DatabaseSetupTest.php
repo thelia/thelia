@@ -514,6 +514,35 @@ final class DatabaseSetupTest extends IntegrationTestCase
         self::assertSame([self::SHIPPED_ACTIVE_CODE => 1, self::SHIPPED_INACTIVE_CODE => 0, self::UNDECLARED_CODE => 1], $activation);
     }
 
+    /**
+     * A module folder whose name reads as a URI ("Mod%41ule") is a folder: libxml, given
+     * the path, decoded it and the install skipped the module as unreadable.
+     */
+    public function testAModuleInAFolderThatReadsAsAUriIsRead(): void
+    {
+        $moduleDir = $this->newModuleDir();
+        (new Filesystem())->dumpFile($moduleDir.'Mod%41ule/Config/module.xml', <<<'XML'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <module xmlns="http://thelia.net/schema/dic/module">
+                <fullnamespace>Sample\Sample</fullnamespace>
+                <descriptive locale="en_US">
+                    <title>Sample</title>
+                </descriptive>
+                <languages>
+                    <language>en_US</language>
+                </languages>
+                <version>1.0.0</version>
+                <type>classic</type>
+                <stability>prod</stability>
+            </module>
+            XML);
+
+        $records = (new ModuleDescriptorReader())->read([$moduleDir]);
+
+        self::assertCount(1, $records);
+        self::assertSame('Mod%41ule', $records[0]->code);
+    }
+
     public function testAnInvalidActivationValueStopsTheRegistration(): void
     {
         $setup = $this->createDatabaseSetup();

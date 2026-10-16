@@ -321,4 +321,5 @@ return [
     'Zaire' => 'زئیر',
     'Zambia' => 'زامبیا',
     'Zimbabwe' => 'زیمباوه',
+    'Configuration background jobs' => 'پیکربندی کارهای پس‌زمینه',
 ];

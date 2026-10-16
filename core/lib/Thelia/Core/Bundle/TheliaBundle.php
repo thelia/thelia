@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
+use Thelia\Core\DependencyInjection\Compiler\HandledMessageClassesPass;
 use Thelia\Core\DependencyInjection\Compiler\LoopCompilerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceAddonPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
@@ -74,7 +75,9 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new CurrencyConverterProviderPass())
             ->addCompilerPass(new RegisterCommandPass())
             ->addCompilerPass(new RegisterFormPass())
-            ->addCompilerPass(new RegisterApiResourceAddonPass());
+            ->addCompilerPass(new RegisterApiResourceAddonPass())
+            // After MessengerPass, which registers the handlers it reads.
+            ->addCompilerPass(new HandledMessageClassesPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(new TestPublicServicesPass(), PassConfig::TYPE_BEFORE_REMOVING);

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Exception;
 
-class DataTransferNoDataFoundException extends \Exception
+use Thelia\Exception\UserFacingFailure;
+
+class DataTransferNoDataFoundException extends \Exception implements UserFacingFailure
 {
 }

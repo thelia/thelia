@@ -18,4 +18,5 @@ return [
     'Folder' => 'Каталог',
     'Hooks' => 'Хуки',
     'Order status transition override' => 'Примусова зміна статусу замовлення',
+    'Configuration background jobs' => 'Налаштування фонових завдань',
 ];

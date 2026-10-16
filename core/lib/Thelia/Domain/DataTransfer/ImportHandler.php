@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Archiver\AbstractArchiver;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -26,13 +29,18 @@ use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
+use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
+use Thelia\Domain\DataTransfer\Exception\UploadRefusedException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
-use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
+use Thelia\Messenger\JobFailureMessage;
 use Thelia\Model\Import;
 use Thelia\Model\ImportCategory;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\Map\ImportTableMap;
 
 /**
  * Class ImportHandler.
@@ -41,10 +49,14 @@ use Thelia\Model\Lang;
  */
 class ImportHandler
 {
+    /** Told the rows read while import() runs: processImport() keeps its signature. */
+    private ?\Closure $onProgress = null;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected SerializerManager $serializerManager,
         protected ArchiverManager $archiverManager,
+        protected ArchiveInspector $archiveInspector,
     ) {
     }
 
@@ -90,22 +102,45 @@ class ImportHandler
         return $category;
     }
 
-    public function import(Import $import, File $file, ?Lang $language = null): ImportEvent
+    /**
+     * @param (\Closure(int): void)|null $onProgress told the number of rows read, every
+     *                                               DataTransferProgress::STEP rows and once at the end
+     */
+    public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
+        $extractedDirectory = null;
 
         if ($archiver instanceof AbstractArchiver) {
-            $file = $this->extractArchive($file, $archiver);
+            $this->archiveInspector->assertExtractable($file->getPathname(), $archiver->getExtension());
+            $extractedDirectory = $file->getPath().DS.uniqid('', true);
         }
 
+        // The extracted copy is only read here: it goes once the import is over,
+        // whatever came of it, rather than piling up next to the uploads.
+        try {
+            if (null !== $extractedDirectory && $archiver instanceof AbstractArchiver) {
+                $file = $this->extractInto($file, $archiver, $extractedDirectory);
+            }
+
+            return $this->importFile($import, $file, $language, $onProgress);
+        } finally {
+            if (null !== $extractedDirectory) {
+                (new Filesystem())->remove($extractedDirectory);
+            }
+        }
+    }
+
+    private function importFile(Import $import, File $file, ?Lang $language, ?\Closure $onProgress): ImportEvent
+    {
         $serializer = $this->matchSerializerByExtension($file->getFilename());
 
         if (!$serializer instanceof AbstractSerializer) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION)]));
         }
 
         if (!$import->isHandlerAvailable()) {
-            throw new \ErrorException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
+            throw new HandlerUnavailableException(Translator::getInstance()->trans('The import "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $import->getRef(), '%class' => $import->getHandleClass()]));
         }
 
         $importHandleClass = $import->getHandleClass();
@@ -122,7 +157,13 @@ class ImportHandler
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_BEGIN);
 
-        $errors = $this->processImport($event->getImport(), $event->getSerializer());
+        $this->onProgress = $onProgress;
+
+        try {
+            $errors = $this->processImport($event->getImport(), $event->getSerializer());
+        } finally {
+            $this->onProgress = null;
+        }
 
         $event->setErrors($errors);
 
@@ -179,22 +220,67 @@ class ImportHandler
      * before anything is written to disk. Callers get the same policy the back office
      * displays, so the promise made by the interface is the one that is enforced.
      *
-     * @throws FormValidationException when the file may not be imported
+     * Given the file, its content is checked too: the name is chosen by whoever
+     * uploads it, the content is what gets stored and read.
+     *
+     * @throws UploadRefusedException when the file may not be imported (a FormValidationException)
      */
-    public function validateUpload(string $fileName): void
+    public function validateUpload(string $fileName, ?File $file = null): void
     {
         $dangerousExtension = FileConfiguration::findExecutableExtension($fileName);
 
         if (null !== $dangerousExtension) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed', ['%extension' => $dangerousExtension]));
         }
 
         $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
         $acceptedExtensions = $this->getAcceptedExtensions();
 
         if (!\in_array($extension, $acceptedExtensions, true)) {
-            throw new FormValidationException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
+            throw new UploadRefusedException(Translator::getInstance()->trans('The extension "%extension" is not allowed. Accepted formats: %formats', ['%extension' => $extension, '%formats' => implode(', ', $acceptedExtensions)]));
         }
+
+        if (null === $file) {
+            return;
+        }
+
+        if (!$this->contentMatchesExtension($file, $fileName)) {
+            throw new UploadRefusedException(Translator::getInstance()->trans('The content of the file is not a "%extension" file.', ['%extension' => $extension]));
+        }
+
+        if ($this->matchArchiverByExtension($fileName) instanceof AbstractArchiver) {
+            $this->archiveInspector->assertExtractable($file->getPathname(), $extension);
+        }
+    }
+
+    /**
+     * An archive must be an archive of its kind; anything else must be text, the only
+     * thing a serializer reads.
+     */
+    private function contentMatchesExtension(File $file, string $fileName): bool
+    {
+        $detected = (new \finfo(\FILEINFO_MIME_TYPE))->file($file->getPathname());
+
+        if (false === $detected) {
+            return false;
+        }
+
+        $archiver = $this->matchArchiverByExtension($fileName);
+
+        if ($archiver instanceof AbstractArchiver) {
+            return self::withoutVendorPrefix($detected) === self::withoutVendorPrefix($archiver->getMimeType());
+        }
+
+        return str_starts_with($detected, 'text/')
+            || \in_array($detected, ['application/json', 'application/xml', 'application/csv', 'application/x-empty', 'inode/x-empty'], true);
+    }
+
+    /**
+     * application/x-gzip and application/gzip name the same format.
+     */
+    private static function withoutVendorPrefix(string $mimeType): string
+    {
+        return str_replace('/x-', '/', strtolower($mimeType));
     }
 
     public function matchArchiverByExtension(string $fileName): ?AbstractArchiver
@@ -227,11 +313,36 @@ class ImportHandler
 
     public function extractArchive(File $file, ArchiverInterface $archiver): File
     {
+        return $this->extractInto($file, $archiver, \dirname($file->getPathname()).DS.uniqid('', true));
+    }
+
+    /**
+     * Extracts the archive into $extractPath and gives its first file at the root, or
+     * the archive itself when there is none.
+     */
+    private function extractInto(File $file, ArchiverInterface $archiver, string $extractPath): File
+    {
         $archiver->open($file->getPathname());
 
-        $extractPath = \dirname($archiver->getArchivePath()).DS.uniqid('', true);
+        try {
+            $archiver->extract($extractPath);
+        } finally {
+            // The archiver is a shared service: the archive is let go here, not held
+            // open until the next import of a worker.
+            if ($archiver instanceof AbstractArchiver) {
+                $archiver->close();
+            }
+        }
 
-        $archiver->extract($extractPath);
+        // An archive with nothing in it creates no folder.
+        if (!is_dir($extractPath)) {
+            return $file;
+        }
+
+        // The sizes an archive declares are written by whoever made it: what was
+        // really written is measured, and too much is refused (the folder is then
+        // removed with the rest of the extraction).
+        $this->archiveInspector->assertExtractedSize($extractPath);
 
         /** @var \DirectoryIterator $item */
         foreach (new \DirectoryIterator($extractPath) as $item) {
@@ -245,20 +356,55 @@ class ImportHandler
         return $file;
     }
 
+    /**
+     * Tells the progress callback given to import(), if any, the number of rows read
+     * every DataTransferProgress::STEP rows and once at the end.
+     */
     protected function processImport(AbstractImport $import, SerializerInterface $serializer): array
     {
+        $onProgress = $this->onProgress;
         $errors = [];
+        $read = 0;
 
-        $import->setData($serializer->unserialize($import->getFile()->openFile('r')));
+        // A file that does not parse (broken JSON, XML or YAML) is the administrator's to
+        // fix: said as such, not as a server error.
+        try {
+            $data = $serializer->unserialize($import->getFile()->openFile('r'));
+        } catch (\Throwable $unreadable) {
+            Tlog::getInstance()->addWarning(\sprintf('An imported %s file could not be read: %s', $serializer->getExtension(), JobFailureMessage::forLog($unreadable)));
+
+            throw new UploadRefusedException(Translator::getInstance()->trans('The file cannot be read as a "%format" file: check its content.', ['%format' => $serializer->getExtension()]), 0, $unreadable);
+        }
+
+        $import->setData($data);
+
+        $connection = Propel::getWriteConnection(ImportTableMap::DATABASE_NAME);
+        $row = 0;
 
         foreach ($import as $data) {
+            ++$row;
             $import->checkMandatoryColumns($data);
 
             $error = $import->importData($data);
 
+            // A row whose save failed inside the import's transaction leaves it unable to
+            // commit, whatever the import did with the exception: said at that row, with
+            // nothing imported, rather than as a server error at the end.
+            if ($connection instanceof ConnectionWrapper && $connection->isInTransaction() && !$connection->isCommitable()) {
+                throw new JobRefusedException(Translator::getInstance()->trans('Row %row could not be saved: nothing was imported.', ['%row' => $row]));
+            }
+
             if (null !== $error) {
                 $errors[] = $error;
             }
+
+            if (null !== $onProgress && 0 === ++$read % DataTransferProgress::STEP) {
+                $onProgress($read);
+            }
+        }
+
+        if (null !== $onProgress) {
+            $onProgress($read);
         }
 
         return $errors;

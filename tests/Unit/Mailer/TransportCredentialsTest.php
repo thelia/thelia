@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Mailer;
 
 use PHPUnit\Framework\TestCase;
-use Thelia\Mailer\MailerFactory;
+use Thelia\Mailer\TransportCredentials;
 
 /**
  * What the mailer writes to the log when the transport refuses a message.
@@ -24,7 +24,7 @@ use Thelia\Mailer\MailerFactory;
  * in the reason it gives. That reason goes to the server log, which is read,
  * shipped and archived far more widely than the configuration it comes from.
  */
-final class MailerFactoryTransportCredentialsTest extends TestCase
+final class TransportCredentialsTest extends TestCase
 {
     public function testThePasswordOfTheTransportIsHiddenBeforeTheReasonIsLogged(): void
     {
@@ -43,6 +43,14 @@ final class MailerFactoryTransportCredentialsTest extends TestCase
         self::assertStringNotContainsString('pass2', $logged);
     }
 
+    public function testAPasswordHoldingAnAtSignIsHiddenWhole(): void
+    {
+        $logged = $this->sanitize('Connection to smtp://postmaster:p@ss@mail.example.com:587 refused');
+
+        self::assertStringNotContainsString('ss@', $logged);
+        self::assertStringContainsString('smtp://***@mail.example.com:587', $logged);
+    }
+
     public function testAReasonWithNoCredentialsIsLeftAsItIs(): void
     {
         $reason = 'Unable to write body to stream, mailbox unavailable for contact@example.com';
@@ -52,8 +60,6 @@ final class MailerFactoryTransportCredentialsTest extends TestCase
 
     private function sanitize(string $message): string
     {
-        $method = new \ReflectionMethod(MailerFactory::class, 'withoutTransportCredentials');
-
-        return $method->invoke(null, $message);
+        return TransportCredentials::hide($message);
     }
 }

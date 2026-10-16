@@ -50,7 +50,16 @@ class ProductStockImport extends AbstractImport
             );
         }
 
-        $pse->setQuantity($data['stock']);
+        // A spreadsheet gives every cell as text: the stock is read as a number, and
+        // a cell that is not one refuses this row only.
+        if (!self::isStorableNumber($data['stock'])) {
+            return Translator::getInstance()->trans(
+                'The value "%value" of the column %column is not a number (product sale element id %id)',
+                ['%value' => self::cellText($data['stock']), '%column' => 'stock', '%id' => self::cellText($data['id'])],
+            );
+        }
+
+        $pse->setQuantity((float) $data['stock']);
 
         if (isset($data['ean']) && !empty($data['ean'])) {
             $pse->setEanCode((string) $data['ean']);
@@ -61,9 +70,11 @@ class ProductStockImport extends AbstractImport
         }
 
         // A code that is not a GTIN refuses this row only, with the reason, and the
-        // import carries on with the next one.
+        // import carries on with the next one. Checked before saving: refused by
+        // save(), it would roll back a transaction nested in the import's, which
+        // could then not be committed.
         try {
-            $pse->save();
+            $pse->assertIdentifiersAreValid();
         } catch (InvalidGtinException|InvalidMpnException $refusal) {
             // The refused values would otherwise stay on the pooled instance and come
             // back with a later row of the same combination.
@@ -71,6 +82,8 @@ class ProductStockImport extends AbstractImport
 
             return $refusal->getMessage();
         }
+
+        $pse->save();
 
         ++$this->importedRows;
 

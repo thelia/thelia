@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Mailer;
 
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\EventListener\SendShippingEmailListener;
-use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -83,7 +83,7 @@ final class OrderShippedTemplateTest extends IntegrationTestCase
             $this->getService(TemplateHelperInterface::class),
             $this->getService(ParserResolver::class),
             $this->getService(MailerInterface::class),
-            $this->getService(OrderHistoryRecorder::class),
+            new NullTransport(),
         );
 
         return $mailerFactory->createEmailMessage(

@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Tests\Unit\Core\Archiver;
+
+use PHPUnit\Framework\TestCase;
+use Thelia\Core\Archiver\Archiver\ZipArchiver;
+
+final class ZipArchiverTest extends TestCase
+{
+    /**
+     * An export that fails before its archive is created still closes the archiver.
+     */
+    public function testAnArchiverNeverOpenedClosesAtOnce(): void
+    {
+        self::assertTrue((new ZipArchiver())->close());
+    }
+
+    /**
+     * An export that fails while it fills its archive: what was added is dropped, and
+     * no file is written only to be removed.
+     */
+    public function testADiscardedArchiveWritesNoFile(): void
+    {
+        $base = sys_get_temp_dir().'/thelia_zip_archiver_'.uniqid();
+        $added = $base.'.csv';
+        file_put_contents($added, 'id');
+
+        try {
+            $archiver = (new ZipArchiver())->create($base);
+            $archiver->add($added);
+            $archivePath = $archiver->getArchivePath();
+            $archiver->discard();
+            // A zip still open is written when it is let go: gone, it must write nothing.
+            unset($archiver);
+
+            self::assertFileDoesNotExist($archivePath);
+        } finally {
+            @unlink($added);
+            @unlink($base.'.zip');
+        }
+    }
+
+    /**
+     * A file that is not a zip is refused when it is opened, not later, by an extraction
+     * that finds nothing to extract.
+     */
+    public function testAFileThatIsNotAZipIsRefusedWhenOpened(): void
+    {
+        $path = sys_get_temp_dir().'/thelia_zip_archiver_'.uniqid().'.zip';
+        file_put_contents($path, 'not a zip');
+
+        try {
+            $this->expectException(\RuntimeException::class);
+
+            (new ZipArchiver())->open($path);
+        } finally {
+            @unlink($path);
+        }
+    }
+}

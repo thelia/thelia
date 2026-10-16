@@ -1,0 +1,14 @@
+# A worker for the background jobs, so a developer who names a queue in
+# MESSENGER_TRANSPORT_DSN (in .env.local) sees the jobs run as they would in
+# production. Without a queue it waits and does nothing: every job already runs in
+# the request that dispatched it. It stops after an hour and DDEV starts it again,
+# so it never runs on code older than an hour. It takes the mails (async) before
+# the exports and imports (async_heavy).
+#
+# The recurring tasks (scheduler_thelia) are left out on purpose: they would purge
+# the carts and the logs of the development database at night. Run them by hand
+# with `ddev exec php bin/console messenger:consume scheduler_thelia`.
+web_extra_daemons:
+  - name: messenger-worker
+    command: "php bin/console messenger:consume async async_heavy --time-limit=3600 --memory-limit=256M"
+    directory: /var/www/html

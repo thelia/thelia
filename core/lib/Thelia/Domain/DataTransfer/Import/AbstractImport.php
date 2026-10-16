@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Import;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Exception\MissingColumnsException;
 use Thelia\Model\Lang;
 
 /**
@@ -25,6 +26,8 @@ use Thelia\Model\Lang;
  */
 abstract class AbstractImport implements \Iterator
 {
+    private const LARGEST_STORABLE_NUMBER = 1e10;
+
     private ?array $data = null;
     protected File $file;
     protected Lang $language;
@@ -116,13 +119,13 @@ abstract class AbstractImport implements \Iterator
     /**
      * Set language.
      *
-     * @param Lang|null $language A language model
+     * @param Lang|null $language A language model, the default language of the shop when null
      *
      * @return $this Return $this, allow chaining
      */
     public function setLang(?Lang $language = null)
     {
-        $this->language = $language;
+        $this->language = $language ?? Lang::getDefaultLanguage();
 
         return $this;
     }
@@ -170,7 +173,7 @@ abstract class AbstractImport implements \Iterator
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
         if ([] !== $diff) {
-            throw new \UnexpectedValueException(Translator::getInstance()->trans('The following columns are missing: %columns', ['%columns' => implode(', ', $diff)]));
+            throw new MissingColumnsException(Translator::getInstance()->trans('The following columns are missing: %columns', ['%columns' => implode(', ', $diff)]));
         }
     }
 
@@ -206,4 +209,24 @@ abstract class AbstractImport implements \Iterator
      * @return string|null String with error, null otherwise
      */
     abstract public function importData(array $data): ?string;
+
+    /**
+     * A cell an import may write as a number: text or a number, within what the columns
+     * of the catalog hold (a price is a DECIMAL(16,6)). Anything else refuses its row
+     * rather than failing the whole import at the database.
+     */
+    protected static function isStorableNumber(mixed $value): bool
+    {
+        return (\is_int($value) || \is_float($value) || \is_string($value))
+            && is_numeric($value)
+            && abs((float) $value) < self::LARGEST_STORABLE_NUMBER;
+    }
+
+    /**
+     * The cell as the reason of a refused row quotes it.
+     */
+    protected static function cellText(mixed $value): string
+    {
+        return \is_scalar($value) ? (string) $value : '';
+    }
 }

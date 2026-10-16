@@ -28,6 +28,9 @@ abstract class JsonFileAbstractExport extends AbstractExport
     /** @var \SplFileObject Data to export */
     private ?\SplFileObject $data = null;
 
+    /** The rows file getDataJsonCache() wrote: the only file this export ever removes. */
+    private ?string $rowsFile = null;
+
     public function current(): mixed
     {
         $dataCurrent = $this->data->current();
@@ -61,8 +64,13 @@ abstract class JsonFileAbstractExport extends AbstractExport
             ) {
                 $this->data = new \SplFileObject($data, 'r');
                 $this->data->setFlags(\SplFileObject::READ_AHEAD);
-
                 $this->data->rewind();
+
+                // Gone once open: the open file is read to its end all the same, and the
+                // customer data it holds outlives no export, even one whose worker dies.
+                if ($data === $this->rowsFile) {
+                    ExportStorage::discard($data);
+                }
 
                 return;
             }
@@ -110,18 +118,27 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     protected function getDataJsonCache(StatementInterface $statement, string $exportName): string
     {
-        $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
-
         if (0 === $statement->rowCount()) {
             throw new DataTransferNoDataFoundException(Translator::getInstance()->trans('No data found for your export.'));
         }
 
-        if (file_exists($filename)) {
-            unlink($filename);
+        // Written again: the rows file before is never read, and goes.
+        if (null !== $this->rowsFile) {
+            ExportStorage::discard($this->rowsFile);
         }
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
+        $filename = ExportStorage::newRowsFile($exportName);
+        $this->rowsFile = $filename;
+
+        // Rows read half way hold customer data all the same: they go with the failure.
+        try {
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                file_put_contents($filename, json_encode($row, \JSON_THROW_ON_ERROR)."\r\n", \FILE_APPEND);
+            }
+        } catch (\Throwable $exception) {
+            ExportStorage::discard($filename);
+
+            throw $exception;
         }
 
         return $filename;

@@ -1026,4 +1026,5 @@ return [
     'tax rule - create form' => 'Kdv kural - oluşturma formu',
     'tax rule - delete form' => 'Kdv kural - silme formu',
     'tinymce wysiwyg editor' => 'TinyMCE WYSIWYG editörü',
+    'Configuration background jobs' => 'Arka plan görevleri yapılandırması',
 ];

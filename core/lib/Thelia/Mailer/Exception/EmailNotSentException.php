@@ -23,11 +23,11 @@ namespace Thelia\Mailer\Exception;
  * message code and the kind of failure and nothing else — the recipient address
  * and the transport detail stay in the server log.
  */
-final class EmailNotSentException extends \RuntimeException
+class EmailNotSentException extends \RuntimeException
 {
-    public static function storeEmailMissing(string $messageCode): self
+    public static function storeEmailMissing(string $messageCode): StoreEmailMissingException
     {
-        return new self(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
+        return new StoreEmailMissingException(\sprintf("Can't send email message %s: store email address is not defined.", $messageCode));
     }
 
     public static function emptyRecipientList(string $messageCode): self
