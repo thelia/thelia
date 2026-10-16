@@ -1243,4 +1243,104 @@ CREATE TABLE IF NOT EXISTS `area_zip_code_rule`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- Destination restrictions
+--
+-- A group of products that cannot ship to some countries or regions, or only to
+-- some. A shop that upgrades has no group, so nothing it sells is refused.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `destination_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the import and the API refer this group by',
+    `mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the listed destinations are refused, 1: only the listed destinations are served',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a group turned off refuses nothing, and is kept with its products',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `destination_restriction_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `destination_restriction_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `reason` TEXT COMMENT 'why the products of the group do not ship there, shown to the buyer',
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `destination_restriction_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `destination_restriction_country`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `destination_restriction_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER COMMENT 'null: the whole country, its regions included',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_destination_restriction_country_restriction_id` (`destination_restriction_id`),
+    INDEX `idx_destination_restriction_country_country_id` (`country_id`),
+    INDEX `idx_destination_restriction_country_state_id` (`state_id`),
+    CONSTRAINT `fk_destination_restriction_country_restriction_id`
+        FOREIGN KEY (`destination_restriction_id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_destination_restriction_country_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_destination_restriction_country_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `product_destination_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `destination_restriction_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_destination_restriction_UNIQUE` (`product_id`, `destination_restriction_id`),
+    INDEX `idx_product_destination_restriction_restriction_id` (`destination_restriction_id`),
+    CONSTRAINT `fk_product_destination_restriction_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_destination_restriction_restriction_id`
+        FOREIGN KEY (`destination_restriction_id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.configuration.destination-restriction', NOW(), NOW());
+
+SET @destination_restriction_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.configuration.destination-restriction');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@destination_restriction_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'de_DE', 'Konfiguration der Lieferbeschränkungen', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'en_US', 'Configuration destination restrictions', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'es_ES', 'Configuración de las restricciones de destino', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'fr_FR', 'Configuration des restrictions de destination', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'it_IT', 'Configurazione delle restrizioni di destinazione', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'nl_NL', 'Configuratie van de bestemmingsbeperkingen', NULL, NULL, NULL),
+    (@destination_restriction_resource_id, 'ru_RU', 'Настройка ограничений по направлениям доставки', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

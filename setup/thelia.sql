@@ -2128,6 +2128,107 @@ CREATE TABLE `product_excluded_delivery_module`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- destination_restriction
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `destination_restriction`;
+
+CREATE TABLE `destination_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the name the import and the API refer this group by',
+    `mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the listed destinations are refused, 1: only the listed destinations are served',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a group turned off refuses nothing, and is kept with its products',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `destination_restriction_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- destination_restriction_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `destination_restriction_i18n`;
+
+CREATE TABLE `destination_restriction_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `reason` TEXT COMMENT 'why the products of the group do not ship there, shown to the buyer',
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `destination_restriction_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- destination_restriction_country
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `destination_restriction_country`;
+
+CREATE TABLE `destination_restriction_country`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `destination_restriction_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER COMMENT 'null: the whole country, its regions included',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_destination_restriction_country_restriction_id` (`destination_restriction_id`),
+    INDEX `idx_destination_restriction_country_country_id` (`country_id`),
+    INDEX `idx_destination_restriction_country_state_id` (`state_id`),
+    CONSTRAINT `fk_destination_restriction_country_restriction_id`
+        FOREIGN KEY (`destination_restriction_id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_destination_restriction_country_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_destination_restriction_country_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_destination_restriction
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_destination_restriction`;
+
+CREATE TABLE `product_destination_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `destination_restriction_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_destination_restriction_UNIQUE` (`product_id`, `destination_restriction_id`),
+    INDEX `idx_product_destination_restriction_restriction_id` (`destination_restriction_id`),
+    CONSTRAINT `fk_product_destination_restriction_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_destination_restriction_restriction_id`
+        FOREIGN KEY (`destination_restriction_id`)
+        REFERENCES `destination_restriction` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- category_associated_content
 -- ---------------------------------------------------------------------
 

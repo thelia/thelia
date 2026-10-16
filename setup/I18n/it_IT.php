@@ -439,4 +439,5 @@ return [
     'Availability' => 'Disponibilità',
     'Customer rating' => 'Valutazione dei clienti',
     'Price' => 'Prezzo',
+    'Configuration destination restrictions' => 'Configurazione delle restrizioni di destinazione',
 ];
