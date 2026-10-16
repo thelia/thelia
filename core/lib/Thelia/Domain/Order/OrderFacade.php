@@ -194,7 +194,9 @@ readonly class OrderFacade
                             guardAvailability: $checkStock,
                             allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
                             connection: $connection,
-                            saleUnitId: $this->saleUnitContext->getSaleUnit()?->getId(),
+                            // The unit the order was stamped with: what a cancellation or a
+                            // return gives back to, so the two movements always meet.
+                            saleUnitId: $placedOrder->getSaleUnitId(),
                         );
                     } catch (TheliaProcessException $shortage) {
                         // The decrementer knows a row id and a quantity; only here is
@@ -209,7 +211,11 @@ readonly class OrderFacade
                     // advisory availability check on order creation.
                     $this->stockPolicy->assertStockIsAvailable(
                         $cartItem->getQuantity(),
-                        $productSaleElements->getQuantity(),
+                        $this->saleUnitStockResolver->availableQuantity(
+                            $placedOrder->getSaleUnitId(),
+                            $productSaleElements->getId(),
+                            (float) $productSaleElements->getQuantity(),
+                        ),
                         $product->getRef(),
                     );
                 }

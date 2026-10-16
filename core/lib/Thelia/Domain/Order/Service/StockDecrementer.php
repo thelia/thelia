@@ -32,6 +32,8 @@ use Thelia\Exception\TheliaProcessException;
  */
 readonly class StockDecrementer
 {
+    private const SALE_UNIT_TABLE = 'sale_unit_product_sale_elements';
+
     public function __construct(private SaleUnitStockResolver $saleUnitStockResolver)
     {
     }
@@ -73,7 +75,7 @@ readonly class StockDecrementer
         $statement->bindValue(':quantity', $quantity);
         $statement->bindValue(':id', $productSaleElementsId, \PDO::PARAM_INT);
 
-        if (null !== $saleUnitId && '`product_sale_elements`' !== $table) {
+        if (self::SALE_UNIT_TABLE === $table) {
             $statement->bindValue(':saleUnitId', $saleUnitId, \PDO::PARAM_INT);
         }
 
@@ -100,11 +102,20 @@ readonly class StockDecrementer
         $statement->bindValue(':quantity', $quantity);
         $statement->bindValue(':id', $productSaleElementsId, \PDO::PARAM_INT);
 
-        if (null !== $saleUnitId && '`product_sale_elements`' !== $table) {
+        if (self::SALE_UNIT_TABLE === $table) {
             $statement->bindValue(':saleUnitId', $saleUnitId, \PDO::PARAM_INT);
         }
 
         $statement->execute();
+    }
+
+    /**
+     * Whether a movement for this sale unit lands on the unit's own stock row rather
+     * than on the shared national counter.
+     */
+    public function movesSaleUnitStock(?int $saleUnitId, int $productSaleElementsId): bool
+    {
+        return null !== $saleUnitId && $this->saleUnitStockResolver->hasOwnStock($saleUnitId, $productSaleElementsId);
     }
 
     /**
@@ -116,8 +127,8 @@ readonly class StockDecrementer
      */
     private function target(?int $saleUnitId, int $productSaleElementsId): array
     {
-        if (null !== $saleUnitId && $this->saleUnitStockResolver->hasOwnStock($saleUnitId, $productSaleElementsId)) {
-            return ['sale_unit_product_sale_elements', '`sale_unit_id` = :saleUnitId AND `product_sale_elements_id` = :id'];
+        if ($this->movesSaleUnitStock($saleUnitId, $productSaleElementsId)) {
+            return [self::SALE_UNIT_TABLE, '`sale_unit_id` = :saleUnitId AND `product_sale_elements_id` = :id'];
         }
 
         return ['product_sale_elements', '`id` = :id'];

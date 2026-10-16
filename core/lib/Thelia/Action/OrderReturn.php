@@ -360,6 +360,8 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             return;
         }
 
+        $saleUnitId = $return->getOrder()?->getSaleUnitId();
+
         foreach ($return->getOrderReturnLines() as $line) {
             $productSaleElementsId = $line->getProductSaleElementsId();
             $quantity = (float) $line->getQuantityReceived();
@@ -372,7 +374,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stockIncrementer->increment((int) $productSaleElementsId, $quantity, $connection);
+            $this->stockIncrementer->increment((int) $productSaleElementsId, $quantity, $connection, $saleUnitId);
         }
     }
 
