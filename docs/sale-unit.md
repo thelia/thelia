@@ -85,12 +85,55 @@ adding to the cart and changing a quantity (`CART_ADDITEM`, `CART_UPDATEITEM`, a
 it has one: a quantity beyond it is refused even when the national counter would
 cover it, and a quantity it holds is accepted even when the national counter is
 short. The front read of a sale element serves the unit's quantity in `quantity`.
-`SaleUnitAvailableStock` is the one place that answers; it queries nothing when no
-unit is resolved.
+The template readers follow the same rule: the `product_sale_elements` loop serves
+the unit's quantity in `QUANTITY` (its price already came from the unit), the `cart`
+loop in `STOCK`, and the legacy `thelia_cart_add` form judges the quantity against
+it. In the back office the loops keep the national counter, which is what it edits.
+`SaleUnitAvailableStock` is the one place that answers, one query for a page of sale
+elements; it queries nothing when no unit is resolved.
 
 That shared fallback is a mode of **compatibility**, not a target for a unit with a
 stock of its own: it is right for a dematerialised product or a centralised stock,
 wrong for a physical store, whose sale elements are each expected to carry a row.
+
+## The cart
+
+A cart carries `cart.sale_unit_id`, the unit it was last priced and stocked for: a
+new cart is born on the unit of the request, NULL for a national cart. Each time the
+session hands the cart out, it dispatches `TheliaEvents::CART_FOLLOW_SALE_UNIT`, and
+when the unit of the request is not the cart's (another domain, a store picker, a
+unit turned off), `Action\Cart` checks the cart against the new unit before anyone
+reads it, in one transaction:
+
+- a line the unit cannot sell any more (no stock left) is removed;
+- a quantity beyond the unit's stock is reduced to what it holds;
+- every line takes the unit's price, or the national price back when the visitor
+  leaves the units;
+- the cart is saved on the new unit.
+
+Offered lines are left to the discount reconciliation, which runs again afterwards.
+`TheliaEvents::CART_SALE_UNIT_SWITCHED` then carries a `CartSaleUnitSwitchedEvent`:
+the previous and the new unit and the lines that changed (`getRemovedLines()`,
+`getReducedLines()`, `getRepricedLines()`, each a `CartLineChange` with the
+reference, the quantities and the untaxed unit prices before and after). When
+something changed, the core leaves its summary in the session flash bag, for the
+theme to tell the visitor on the next page:
+
+```twig
+{% for switch in app.session.flashBag.get('thelia.cart.sale_unit_switch') %}
+    {% for line in switch.removed %}{{ line.ref }} is no longer available here.{% endfor %}
+    {% for line in switch.reduced %}{{ line.ref }}: {{ line.quantity }} left.{% endfor %}
+    {% for line in switch.repriced %}{{ line.ref }} now costs {{ line.price }} (excl. tax).{% endfor %}
+{% endfor %}
+```
+
+The key is `CartSaleUnitSwitchedEvent::FLASH_KEY`. A cart already on the unit of the
+request, and every cart of a single shop, compare two ids in memory and stop there:
+no query. The back office never moves a cart.
+
+When a customer signs in and the cart is copied, the copy keeps the unit of the cart
+it copies and the lines that unit can sell; the session then moves it if needed, as
+above.
 
 ## Orders
 
@@ -100,6 +143,61 @@ client: `OrderFactory` overwrites whatever the incoming order carries, and the A
 property belongs to no write group. The stock decremented at checkout, and given
 back later, is the one of that unit; the tag is what lets a shop selling from many
 units tell whose order is whose.
+
+## Administrators restricted to sale units
+
+An administrator can be restricted to some sale units, by rows of
+`admin_sale_unit`. An administrator with no row reaches every unit and the national
+orders, which is every administrator of a shop that never restricts anyone: nothing
+changes for it. A superadministrator (no profile) is never restricted, whatever rows
+it carries.
+
+A national order, placed on no sale unit, belongs to none of the units a restricted
+administrator works on: it is out of its reach. National orders are handled by the
+administrators who are not restricted.
+
+Through the admin API, a restricted administrator reaches:
+
+| Resource | What it reaches |
+|---|---|
+| `/api/admin/orders` | the orders of its units |
+| `/api/admin/order_products`, `order_coupons`, `order_shipments`, `order_returns`, `/api/admin/orders/{id}/history` | those of the orders of its units |
+| `/api/admin/sale_unit_product_prices`, `sale_unit_product_sale_elements` | the prices and stocks of its units |
+| `/api/admin/sale_units` | its units; it cannot create one |
+
+A collection leaves the other rows out and an item answers 404, so an item out of
+reach can be neither changed nor deleted. A write naming another unit is refused:
+its IRI resolves to nothing for this administrator (400), and the state about to be
+written is voted on (`SaleUnitScopeVoter`, 403) before it is persisted. The rights of
+the profile still apply first: the restriction narrows what a right reaches, it
+grants nothing. The order addresses, the line taxes, the shipment and return lines,
+reached by their own id rather than through their order, are not narrowed.
+
+`Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope` is what the back office uses:
+
+```php
+// null: not restricted; otherwise the ids of the units the current administrator reaches
+$saleUnitIds = $adminSaleUnitScope->allowedSaleUnitIds();
+
+// whether the current administrator reaches what belongs to a unit (null = national)
+$adminSaleUnitScope->allows($order->getSaleUnitId());
+
+// narrows any query by the column holding the unit
+$adminSaleUnitScope->restrictQuery($orderQuery, OrderTableMap::COL_SALE_UNIT_ID);
+
+// the rows as stored, for the form that edits them
+$adminSaleUnitScope->assignedSaleUnitIds($adminId);
+```
+
+The attachment is replaced by an event, an empty list lifting the restriction; an id
+naming no unit is ignored:
+
+```php
+$dispatcher->dispatch(
+    new AdministratorSaleUnitsEvent($adminId, [3, 7]),
+    TheliaEvents::ADMINISTRATOR_UPDATE_SALE_UNITS,
+);
+```
 
 ## Isolation of the API
 
@@ -152,16 +250,16 @@ clear after one.
 Shipped: the entity and its resolution, the admin and front API of the units and the
 admin API of their prices and stocks, per-unit prices with national fallback,
 per-unit stock with atomic decrement, symmetric restock and national fallback, the
-unit stock in the cart and in the front read of a sale element, and the order tag.
-Backward compatibility is a condition of every part: with no active sale unit,
-nothing changes and no query is added.
+unit stock in the cart, in the front read of a sale element, in the template loops,
+the legacy add-to-cart form and the copy of a cart, the cart tag and its check when
+the visitor changes unit, the order tag, and administrators restricted to some
+units through the admin API. Backward compatibility is a condition of every part:
+with no active sale unit, nothing changes and no query is added.
 
 Not yet, and deliberately out of this scope: scoped configuration (per-unit store
 name, sender, modules), per-unit product visibility, the sales channel axis, the
-back-office selector and per-admin restriction, per-unit emails and coupons, and the
-cart tag (the durable tag is on the order). These are the next slices.
+back-office selector and the back-office screens of the restriction, per-unit emails
+and coupons. These are the next slices.
 
-The stock of a unit is not read yet by the template loops (`product_sale_elements`,
-`cart`), by the legacy `thelia_cart_add` form, nor when a cart is copied to a
-customer at login: they judge on the national counter, and the checkout still
-refuses what the unit cannot sell.
+The `product` loop (its `QUANTITY` and `min_stock`) and the `quantity` ordering of
+the `product_sale_elements` loop still read the national counter.
