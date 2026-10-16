@@ -16,10 +16,13 @@ namespace Thelia\Domain\Shipping\DeliveryDate\Service;
 
 use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryEstimate;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
+use Thelia\Log\ThrowableTrace;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\DeliveryDateRule;
 use Thelia\Model\Module;
 use Thelia\Model\Product;
+use Thelia\Tools\TerminalText;
 
 /**
  * When a parcel sent by a carrier is expected, from the delays the merchant set.
@@ -49,6 +52,11 @@ final readonly class DeliveryTimeEstimator
      * @param int $extraPreparationDays working days the goods need on top of the carrier preparation
      */
     public function estimateFor(Module $module, int $extraPreparationDays = 0, ?\DateTimeImmutable $now = null): ?DeliveryEstimate
+    {
+        return $this->guarded($module, fn (): ?DeliveryEstimate => $this->count($module, $extraPreparationDays, $now));
+    }
+
+    private function count(Module $module, int $extraPreparationDays, ?\DateTimeImmutable $now): ?DeliveryEstimate
     {
         $moduleId = (int) $module->getId();
         $rule = $this->calendar->ruleOf($moduleId);
@@ -81,7 +89,7 @@ final readonly class DeliveryTimeEstimator
      */
     public function estimateForCart(Module $module, Cart $cart, ?\DateTimeImmutable $now = null): ?DeliveryEstimate
     {
-        return $this->estimateFor($module, $this->availabilityDelayOf($cart), $now);
+        return $this->guarded($module, fn (): ?DeliveryEstimate => $this->count($module, $this->availabilityDelayOf($cart), $now));
     }
 
     public function estimateForProduct(Module $module, Product $product, ?\DateTimeImmutable $now = null): ?DeliveryEstimate
@@ -104,15 +112,30 @@ final readonly class DeliveryTimeEstimator
     }
 
     /**
+     * The estimate is information: a failure to count it, a database that does not answer
+     * or a carrier whose settings cannot be read, leaves the page or the order without one,
+     * it never takes them down.
+     *
+     * @param callable(): ?DeliveryEstimate $estimate
+     */
+    private function guarded(Module $module, callable $estimate): ?DeliveryEstimate
+    {
+        try {
+            return $estimate();
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->addError(\sprintf('The delivery of carrier %s could not be estimated', TerminalText::singleLine((string) $module->getCode())), ThrowableTrace::describe($throwable));
+
+            return null;
+        }
+    }
+
+    /**
      * A carrier the buyer picks a day from shows that calendar, not an estimate: two dates
      * counted by two different rules would be two promises.
      */
     private function letsTheBuyerPickADay(Module $module, DeliveryDateRule $rule): bool
     {
-        $stored = DeliveryDateChoiceMode::tryFrom((string) $rule->getChoiceMode()) ?? DeliveryDateChoiceMode::None;
-
-        return DeliveryDateChoiceMode::None !== $stored
-            && \in_array($stored, $this->deliveryDateCalendar->acceptedChoiceModesOf($module), true);
+        return DeliveryDateChoiceMode::None !== $this->deliveryDateCalendar->choiceModeUnder($module, $rule);
     }
 
     /**

@@ -85,7 +85,7 @@ final readonly class DeliveryDateCalendar
      */
     public function choiceModeOf(Module $module): DeliveryDateChoiceMode
     {
-        return $this->resolveChoiceMode($module, DeliveryDateRuleQuery::create()->findOneByModuleId($module->getId()));
+        return $this->choiceModeUnder($module, DeliveryDateRuleQuery::create()->findOneByModuleId($module->getId()));
     }
 
     /**
@@ -98,7 +98,7 @@ final readonly class DeliveryDateCalendar
     public function offerFor(Module $module, ?\DateTimeImmutable $now = null, ?string $locale = null): ?DeliveryDateOffer
     {
         $rule = DeliveryDateRuleQuery::create()->findOneByModuleId($module->getId());
-        $choiceMode = $this->resolveChoiceMode($module, $rule);
+        $choiceMode = $this->choiceModeUnder($module, $rule);
 
         if (null === $rule || DeliveryDateChoiceMode::None === $choiceMode) {
             return null;
@@ -153,7 +153,11 @@ final readonly class DeliveryDateCalendar
         return new DeliveryDateOffer((int) $module->getId(), $choiceMode, $days);
     }
 
-    private function resolveChoiceMode(Module $module, ?DeliveryDateRule $rule): DeliveryDateChoiceMode
+    /**
+     * What the buyer picks for this carrier under this rule: the shape the merchant set, as
+     * long as the module accepts it. For a caller that already holds the rule.
+     */
+    public function choiceModeUnder(Module $module, ?DeliveryDateRule $rule): DeliveryDateChoiceMode
     {
         $stored = DeliveryDateChoiceMode::tryFrom((string) $rule?->getChoiceMode()) ?? DeliveryDateChoiceMode::None;
 

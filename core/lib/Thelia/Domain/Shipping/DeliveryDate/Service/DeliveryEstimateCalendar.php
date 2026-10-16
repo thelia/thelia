@@ -56,11 +56,13 @@ final class DeliveryEstimateCalendar implements ResetInterface
     public function ruleOf(int $moduleId): ?DeliveryDateRule
     {
         if (null === $this->rules) {
-            $this->rules = [];
+            $rules = [];
 
             foreach (DeliveryDateRuleQuery::create()->find() as $rule) {
-                $this->rules[(int) $rule->getModuleId()] = $rule;
+                $rules[(int) $rule->getModuleId()] = $rule;
             }
+
+            $this->rules = $rules;
         }
 
         return $this->rules[$moduleId] ?? null;
@@ -161,15 +163,16 @@ final class DeliveryEstimateCalendar implements ResetInterface
             return;
         }
 
-        $last = $first->modify(\sprintf('+%d days', 2 * DeliveryIntervalCalculator::SEARCH_LIMIT_DAYS));
-        $this->closuresFrom = $first->format('Y-m-d');
-        $this->shopClosedDays = [];
-        $this->carrierClosedDays = [];
-
+        $last = $first->modify(\sprintf('+%d days', 2 * DeliveryIntervalCalculator::MAXIMUM_WALK_DAYS));
         $closures = DeliveryClosureQuery::create()
             ->filterByStartDate($last->format('Y-m-d'), Criteria::LESS_EQUAL)
             ->filterByEndDate($first->format('Y-m-d'), Criteria::GREATER_EQUAL)
             ->find();
+
+        // Noted as loaded once the query answered: a query that fails leaves the next estimate
+        // to ask again, not to count without the closures.
+        $shop = [];
+        $carriers = [];
 
         foreach ($closures as $closure) {
             $start = DeliveryDateGuard::parseDay((string) $closure->getStartDate('Y-m-d'));
@@ -181,11 +184,15 @@ final class DeliveryEstimateCalendar implements ResetInterface
 
             for ($date = max($first, $start), $to = min($last, $end); $date <= $to; $date = $date->modify('+1 day')) {
                 if (null === $closure->getModuleId()) {
-                    $this->shopClosedDays[$date->format('Y-m-d')] = true;
+                    $shop[$date->format('Y-m-d')] = true;
                 } else {
-                    $this->carrierClosedDays[(int) $closure->getModuleId()][$date->format('Y-m-d')] = true;
+                    $carriers[(int) $closure->getModuleId()][$date->format('Y-m-d')] = true;
                 }
             }
         }
+
+        $this->shopClosedDays = $shop;
+        $this->carrierClosedDays = $carriers;
+        $this->closuresFrom = $first->format('Y-m-d');
     }
 }

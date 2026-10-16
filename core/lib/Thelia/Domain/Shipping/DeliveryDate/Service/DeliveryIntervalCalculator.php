@@ -39,6 +39,18 @@ final readonly class DeliveryIntervalCalculator
     public const int SEARCH_LIMIT_DAYS = 366;
 
     /**
+     * The most working days a count goes to: a year of preparation and a year of the goods.
+     * Beyond, a delay is read as this one.
+     */
+    public const int MAXIMUM_WORKING_DAYS = 2 * self::SEARCH_LIMIT_DAYS;
+
+    /**
+     * The most calendar days a count walks: a week per working day, for a calendar open one
+     * day a week, and a year more of closures.
+     */
+    public const int MAXIMUM_WALK_DAYS = 7 * self::MAXIMUM_WORKING_DAYS + self::SEARCH_LIMIT_DAYS;
+
+    /**
      * @param list<int>           $shopClosedWeekdays    ISO numbers, 1 (Monday) to 7 (Sunday)
      * @param array<string, true> $shopClosedDays        days the shop is closed, keyed Y-m-d
      * @param list<int>           $carrierClosedWeekdays ISO numbers the carrier does not deliver on
@@ -97,10 +109,10 @@ final readonly class DeliveryIntervalCalculator
      */
     private static function nthOpenDay(\DateTimeImmutable $from, int $nth, callable $open): ?\DateTimeImmutable
     {
+        $nth = min($nth, self::MAXIMUM_WORKING_DAYS);
         $counted = 0;
 
-        // Bounded whatever $nth says: a delay of millions of days must not walk millions of days.
-        for ($walked = 0, $day = $from; $walked <= 2 * self::SEARCH_LIMIT_DAYS; ++$walked, $day = $day->modify('+1 day')) {
+        for ($walked = 0, $day = $from; $walked <= 7 * $nth + self::SEARCH_LIMIT_DAYS; ++$walked, $day = $day->modify('+1 day')) {
             if ($open($day) && ++$counted === $nth) {
                 return $day;
             }

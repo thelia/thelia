@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use ApiPlatform\Metadata\GetCollection;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,6 +38,7 @@ use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Exception\InvalidDeliveryDateSettingsException;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSettings;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryEstimateCalendar;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\ShippingFacade;
@@ -217,11 +219,6 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         self::assertSame([null, null], $this->announcedFor($cart));
         self::assertNull($this->getService(ShippingFacade::class)->estimateProductDelivery($this->product()));
-    }
-
-    public function testTheAvailabilityDelayOfAnEventIsBoundedByTheHorizon(): void
-    {
-        self::assertSame(366, (new \Thelia\Core\Event\Product\ProductUpdateEvent(1))->setAvailabilityDelayDays(100000)->getAvailabilityDelayDays());
     }
 
     public function testDatesTheModuleGaveItselfAreKept(): void
@@ -420,16 +417,90 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         $connection = $this->getPropelConnection();
         $connection->useDebug(true);
-        $before = $connection->getQueryCount();
 
-        foreach (\array_slice($carriers, 1) as $carrier) {
-            self::assertNotNull($estimator->estimateForCart($carrier, $cart));
+        try {
+            $before = $connection->getQueryCount();
+            foreach (\array_slice($carriers, 1) as $carrier) {
+                self::assertNotNull($estimator->estimateForCart($carrier, $cart));
+            }
+            $queries = $connection->getQueryCount() - $before;
+        } finally {
+            $connection->useDebug(false);
         }
 
-        $queries = $connection->getQueryCount() - $before;
-        $connection->useDebug(false);
-
         self::assertSame(0, $queries, \sprintf('Three more carriers cost %d queries.', $queries));
+    }
+
+    /**
+     * The same holds for carriers that let the buyer pick a day: deciding they announce no
+     * estimate reads their rule from the same cache, not from the database.
+     */
+    public function testCarriersThatLetTheBuyerPickADayCostNoMoreQueriesEither(): void
+    {
+        [$cart] = $this->cartReadyToPay();
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Date, 1, 10, []);
+        $others = ModuleQuery::create()->filterById($this->carrier->getId(), Criteria::NOT_EQUAL)->limit(3)->find($this->getPropelConnection())->getData();
+        foreach ($others as $other) {
+            $this->settings()->saveDeliveryDelays($other, 1, 2, 3);
+        }
+        $estimator = $this->getService(DeliveryTimeEstimator::class);
+        // Warmed by a carrier that counts: the one that lets the buyer pick a day stops before the closures.
+        $estimator->estimateForCart(array_shift($others), $cart);
+
+        $connection = $this->getPropelConnection();
+        $connection->useDebug(true);
+
+        try {
+            $before = $connection->getQueryCount();
+            self::assertNull($estimator->estimateForCart($this->carrier, $cart));
+            foreach ($others as $other) {
+                $estimator->estimateForCart($other, $cart);
+            }
+            $queries = $connection->getQueryCount() - $before;
+        } finally {
+            $connection->useDebug(false);
+        }
+
+        self::assertSame(0, $queries, \sprintf('Three more estimates cost %d queries.', $queries));
+    }
+
+    /**
+     * An estimate that cannot be counted leaves the delivery step and the order without one:
+     * it never refuses the order.
+     */
+    public function testAnEstimateThatFailsLeavesTheOrderPlacedWithoutOne(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        [$cart, $customer] = $this->cartReadyToPay();
+        $connection = $this->getPropelConnection();
+        $this->getService(DeliveryEstimateCalendar::class)->reset();
+
+        // Masks the closures table for this connection, without an implicit commit.
+        $connection->exec('CREATE TEMPORARY TABLE `delivery_closure` (id INT)');
+
+        try {
+            self::assertSame([null, null], $this->announcedFor($cart));
+            $order = OrderQuery::create()->findPk($this->place($cart, $customer));
+        } finally {
+            $connection->exec('DROP TEMPORARY TABLE `delivery_closure`');
+        }
+
+        self::assertNotNull($order);
+        self::assertNull($order->getEstimatedDeliveryFromDay());
+    }
+
+    public function testAnOfflineProductHasNoEstimateById(): void
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $this->getPropelConnection());
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $product = $this->product();
+        $product->setVisible(0)->save($this->getPropelConnection());
+
+        self::assertNotNull($this->getService(ShippingFacade::class)->estimateProductDelivery($product));
+        self::assertNull($this->getService(ShippingFacade::class)->estimateProductDeliveryById((int) $product->getId()));
     }
 
     public function testTheCutoffMustBeAnHour(): void

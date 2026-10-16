@@ -113,12 +113,15 @@ readonly class OrderFacade
         // StockDecrementer inside the transaction.
         $this->assertCartStockIsAvailable($cart);
 
+        // Counted before the transaction: it only reads settings.
+        $deliveryEstimate = $this->orderFactory->estimateDeliveryOf($sessionOrder, $cart);
+
         $connection = $this->orderTransactionManager->begin();
 
         try {
             $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection);
 
-            $placedOrder = $this->orderFactory->createFromSessionOrder($sessionOrder, $currency, $lang, $cart, $customer);
+            $placedOrder = $this->orderFactory->createFromSessionOrder($sessionOrder, $currency, $lang, $cart, $customer, $deliveryEstimate);
 
             // Decided once, here, on the cart that is being turned into an order,
             // and never asked again afterwards: from now on the answer is the
