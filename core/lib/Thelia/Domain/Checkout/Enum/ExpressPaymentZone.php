@@ -44,12 +44,10 @@ enum ExpressPaymentZone: string
      */
     public static function listFromStoredValue(?string $value): array
     {
-        $named = array_filter(array_map(
+        return self::inDeclarationOrder(array_map(
             static fn (string $entry): ?self => self::tryFrom(strtolower(trim($entry))),
             explode(',', (string) $value)
         ));
-
-        return array_values(array_filter(self::cases(), static fn (self $zone): bool => \in_array($zone, $named, true)));
     }
 
     /**
@@ -61,7 +59,27 @@ enum ExpressPaymentZone: string
     {
         return implode(',', array_map(
             static fn (self $zone): string => $zone->value,
-            array_values(array_filter(self::cases(), static fn (self $zone): bool => \in_array($zone, $zones, true)))
+            self::inDeclarationOrder($zones)
         ));
+    }
+
+    /**
+     * Each zone named once, in the order the cases are declared, whatever else the list holds.
+     *
+     * @param array<?self> $named
+     *
+     * @return list<self>
+     */
+    private static function inDeclarationOrder(array $named): array
+    {
+        $zones = [];
+
+        foreach (self::cases() as $zone) {
+            if (\in_array($zone, $named, true)) {
+                $zones[] = $zone;
+            }
+        }
+
+        return $zones;
     }
 }
