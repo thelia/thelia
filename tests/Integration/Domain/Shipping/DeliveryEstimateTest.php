@@ -636,7 +636,8 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         $codes = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->select('Code')->find($connection)->getData();
         self::assertContains(DeliveryDateTestCarrier::getModuleCode(), $codes);
         foreach ($codes as $code) {
-            self::assertSame(2, preg_match_all('/^.*The zones of carrier\\(s\\) [^\\n]*\\b'.preg_quote((string) $code, '/').'\\b[^\\n]* could not be read/m', $logged), \sprintf('Carrier %s is named in both entries.', $code));
+            self::assertNotSame('', (string) $code, 'Every active carrier has a code to be named by.');
+            self::assertSame(2, preg_match_all('/The zones of carrier\\(s\\) (?:[^\\n]*, )?'.preg_quote((string) $code, '/').'(?:, [^\\n]*)? could not be read/', $logged), \sprintf('Carrier %s is named in both entries.', $code));
         }
         self::assertDoesNotMatchRegularExpression('/The zones of carrier\\(s\\) [^\\n]*#\\d/', $logged);
     }
