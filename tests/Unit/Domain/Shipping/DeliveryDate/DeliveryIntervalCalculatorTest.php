@@ -172,6 +172,11 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2026-09-02'), [], [['2026-09-02', '2099-12-31']]);
 
         self::assertSame('2100-01-01', $next->format('Y-m-d'));
+
+        // A closure ending on the last day of a leap year steps into the next year.
+        $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2028-02-29'), [], [['2028-02-01', '2028-12-31']]);
+
+        self::assertSame('2029-01-01', $next->format('Y-m-d'));
     }
 
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void

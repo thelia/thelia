@@ -561,6 +561,23 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertNotNull($estimator->estimateById((int) $this->product()->getId()));
     }
 
+    public function testACarrierWithoutCodeIsNamedByItsIdInTheLog(): void
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $connection = $this->getPropelConnection();
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $connection);
+        $product = $this->product();
+        $this->carrier->setCode('')->save($connection);
+        $connection->exec('CREATE TEMPORARY TABLE `area_delivery_module` (id INT)');
+
+        $logged = $this->loggedWhile(function () use ($product): void {
+            $this->getService(ShippingFacade::class)->estimateProductDelivery($product);
+        }, static fn () => $connection->exec('DROP TEMPORARY TABLE `area_delivery_module`'));
+
+        self::assertMatchesRegularExpression('/The zones of carrier\\(s\\) [^\\n]*#'.$this->carrier->getId().'\\b/', $logged);
+    }
+
     public function testAVisibilityRuleThatFailsAnnouncesNothingAndBreaksNothing(): void
     {
         $broken = new class implements ProductVisibilityRuleInterface {
@@ -581,6 +598,8 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         self::assertNull($estimate);
         self::assertStringContainsString(\sprintf('The product %d could not be read for a delivery estimate', $productId), $logged);
+        self::assertStringNotContainsString('The zones of carrier(s)', $logged);
+        self::assertStringNotContainsString('The delivery of product', $logged);
     }
 
     /**
