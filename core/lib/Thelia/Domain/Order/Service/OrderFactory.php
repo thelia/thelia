@@ -18,6 +18,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
@@ -74,16 +75,27 @@ readonly class OrderFactory
     }
 
     /**
-     * The interval the delivery step announced, kept on the order so that the e-mails and
-     * the order pages repeat what the buyer was told, whatever the carrier delays become.
-     * An order with a picked day has no use for an estimate.
+     * The interval the carrier delays give when the order is taken, kept on the order so that
+     * the e-mails and the order pages repeat it whatever the delays become. It is counted
+     * again here rather than copied from the delivery step: an order paid after the cutoff
+     * hour is prepared the next day, and the order says so. An order with a picked day has
+     * no use for an estimate.
+     *
+     * The estimate is information: a failure to count it leaves the order without one, it
+     * never refuses the order.
      */
     private function freezeDeliveryEstimate(CartModel $cart, ModelOrder $order): void
     {
         $module = null === $order->getDeliveryDate() && null !== $order->getDeliveryModuleId()
             ? ModuleQuery::create()->findPk($order->getDeliveryModuleId())
             : null;
-        $estimate = null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);
+
+        try {
+            $estimate = null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->error('The delivery of cart {cart} could not be estimated: {error}', ['cart' => $cart->getId(), 'error' => $throwable->getMessage()]);
+            $estimate = null;
+        }
 
         $order
             ->setEstimatedDeliveryFrom($estimate?->earliestDay())
