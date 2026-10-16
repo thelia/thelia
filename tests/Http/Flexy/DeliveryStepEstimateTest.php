@@ -55,7 +55,9 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
     private $optionListener;
 
     /** What the test carrier writes in the dates of its option, before the core fills them. */
-    private ?string $moduleDate = null;
+    private ?string $moduleEarliest = null;
+
+    private ?string $moduleLatest = null;
 
     protected function setUp(): void
     {
@@ -79,8 +81,8 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
                         ->setCode('estimate-step-test')
                         ->setValid(true)
                         ->setPostage(4.9)
-                        ->setMinimumDeliveryDate($this->moduleDate)
-                        ->setMaximumDeliveryDate($this->moduleDate),
+                        ->setMinimumDeliveryDate($this->moduleEarliest)
+                        ->setMaximumDeliveryDate($this->moduleLatest),
                 );
             }
         };
@@ -127,12 +129,40 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
     public function testADateTheModuleWroteAsFreeTextShowsNoIntervalAndBreaksNothing(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
-        $this->moduleDate = '2 to 3 days';
+        $this->moduleEarliest = $this->moduleLatest = '2 to 3 days';
 
         $crawler = $this->deliveryStepOfAGuest();
 
         self::assertStringContainsString('estimate-step-test', (string) $this->client->getResponse()->getContent(), 'The step lists the test carrier.');
         self::assertCount(0, $crawler->filter('[data-testid="delivery-estimate"]'));
+    }
+
+    public function testASingleDayIsAnnouncedAsThatDay(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->moduleEarliest = $this->moduleLatest = $this->day(4);
+
+        $estimate = $this->deliveryStepOfAGuest()->filter('[data-testid="delivery-estimate"]');
+
+        self::assertCount(1, $estimate);
+        self::assertSame('Estimated delivery on '.$this->spelled(4), trim((string) preg_replace('/\s+/', ' ', $estimate->text())));
+    }
+
+    /**
+     * A module that writes its two dates the wrong way round still announces the earlier one
+     * first.
+     */
+    public function testDatesWrittenTheWrongWayRoundOpenWithTheEarlierOne(): void
+    {
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->moduleEarliest = $this->day(5);
+        $this->moduleLatest = $this->day(2);
+
+        $text = $this->deliveryStepOfAGuest()->filter('[data-testid="delivery-estimate"]')->text();
+
+        self::assertStringContainsString($this->spelled(2), $text);
+        self::assertStringContainsString($this->spelled(5), $text);
+        self::assertLessThan(strpos($text, $this->spelled(5)), strpos($text, $this->spelled(2)), $text);
     }
 
     private function deliveryStepOfAGuest(): Crawler
@@ -153,6 +183,11 @@ final class DeliveryStepEstimateTest extends GuestCheckoutTestCase
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
         return $crawler;
+    }
+
+    private function day(int $daysFromToday): string
+    {
+        return (new \DateTimeImmutable('today'))->modify(\sprintf('+%d days', $daysFromToday))->format('Y-m-d');
     }
 
     /** The day as the theme writes it in English: "Thursday 3 September". */
