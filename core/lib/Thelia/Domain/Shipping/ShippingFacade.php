@@ -37,7 +37,6 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 
@@ -67,14 +66,12 @@ final readonly class ShippingFacade
     }
 
     /**
-     * The same, for a theme that holds the id of the product only; null for a product that is
-     * unknown or offline, so that an id kept from an earlier page tells nothing about it.
+     * The same, for a theme that holds the id of the product only; null for a product the
+     * visitor cannot see: unknown, offline or out of their catalogue.
      */
     public function estimateProductDeliveryById(int $productId, ?Cart $cart = null): ?ProductDeliveryEstimate
     {
-        $product = ProductQuery::create()->filterByVisible(1)->findPk($productId);
-
-        return null === $product ? null : $this->productDeliveryEstimator->estimate($product, $cart);
+        return $this->productDeliveryEstimator->estimateById($productId, $cart);
     }
 
     /**

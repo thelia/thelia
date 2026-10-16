@@ -32,14 +32,19 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Cart\CartFacade;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Exception\InvalidDeliveryDateSettingsException;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSettings;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryEstimateCalendar;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
+use Thelia\Domain\Shipping\DeliveryDate\Service\ProductDeliveryEstimator;
 use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Cart;
@@ -501,6 +506,37 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         self::assertNotNull($this->getService(ShippingFacade::class)->estimateProductDelivery($product));
         self::assertNull($this->getService(ShippingFacade::class)->estimateProductDeliveryById((int) $product->getId()));
+    }
+
+    /**
+     * A product a visibility rule keeps out of the visitor's catalogue (a private sale, a
+     * reserved range) has no estimate by id either.
+     */
+    public function testAProductOutOfTheVisitorsCatalogueHasNoEstimateById(): void
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $this->getPropelConnection());
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $hidden = (int) $this->product()->getId();
+
+        $rule = new class($hidden) implements ProductVisibilityRuleInterface {
+            public function __construct(private int $hiddenProductId)
+            {
+            }
+
+            public function visibleProductClause(string $productIdColumn, ?Customer $customer): ?string
+            {
+                return \sprintf('%s <> %d', $productIdColumn, $this->hiddenProductId);
+            }
+        };
+        $estimator = new ProductDeliveryEstimator(
+            $this->getService(DeliveryTimeEstimator::class),
+            new ProductVisibility($this->getService(ReservedSaleProductRule::class), $this->getService(CurrentCustomerProvider::class), [$rule]),
+        );
+
+        self::assertNull($estimator->estimateById($hidden));
+        self::assertNotNull($estimator->estimateById((int) $this->product()->getId()));
     }
 
     public function testTheCutoffMustBeAnHour(): void

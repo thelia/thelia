@@ -39,10 +39,17 @@ final class ThrowableTrace
     }
 
     /**
-     * The class, the message on one line, then the trace without arguments.
+     * The class, the message on one line and the trace without arguments, then the same for
+     * each exception it was caused by: a database error usually hides its reason there.
      */
     public static function describe(\Throwable $throwable): string
     {
-        return $throwable::class.': '.TerminalText::onOneLine($throwable->getMessage())."\n".self::withoutArguments($throwable);
+        $parts = [];
+
+        for ($cause = $throwable; null !== $cause; $cause = $cause->getPrevious()) {
+            $parts[] = ($cause === $throwable ? '' : 'Caused by ').$cause::class.': '.TerminalText::onOneLine($cause->getMessage())."\n".self::withoutArguments($cause);
+        }
+
+        return implode("\n", $parts);
     }
 }

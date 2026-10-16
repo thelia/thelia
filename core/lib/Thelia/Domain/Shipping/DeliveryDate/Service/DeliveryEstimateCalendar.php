@@ -44,13 +44,13 @@ final class DeliveryEstimateCalendar implements ResetInterface
 
     private ?string $closuresFrom = null;
 
-    /** @var array<string, true> */
+    /** @var list<array{string, string}> */
     private array $shopClosedDays = [];
 
     /** @var array<string, int> */
     private array $slowestDelays = [];
 
-    /** @var array<int, array<string, true>> */
+    /** @var array<int, list<array{string, string}>> */
     private array $carrierClosedDays = [];
 
     public function ruleOf(int $moduleId): ?DeliveryDateRule
@@ -90,10 +90,10 @@ final class DeliveryEstimateCalendar implements ResetInterface
     }
 
     /**
-     * The days the whole shop is closed from this day on, keyed Y-m-d: they stop the
-     * preparation and the delivery alike.
+     * The runs of days the whole shop is closed from this day on, both bounds included: they
+     * stop the preparation and the delivery alike.
      *
-     * @return array<string, true>
+     * @return list<array{string, string}>
      */
     public function shopClosedDaysFrom(\DateTimeImmutable $day): array
     {
@@ -103,15 +103,15 @@ final class DeliveryEstimateCalendar implements ResetInterface
     }
 
     /**
-     * The days this carrier does not deliver from this day on, the shop closures included.
+     * The runs of days this carrier does not deliver from this day on, the shop closures included.
      *
-     * @return array<string, true>
+     * @return list<array{string, string}>
      */
     public function carrierClosedDaysFrom(int $moduleId, \DateTimeImmutable $day): array
     {
         $this->loadClosuresFrom($day);
 
-        return ($this->carrierClosedDays[$moduleId] ?? []) + $this->shopClosedDays;
+        return [...($this->carrierClosedDays[$moduleId] ?? []), ...$this->shopClosedDays];
     }
 
     /**
@@ -157,16 +157,15 @@ final class DeliveryEstimateCalendar implements ResetInterface
 
     private function loadClosuresFrom(\DateTimeImmutable $day): void
     {
-        $first = $day->setTime(0, 0);
+        $first = $day->setTime(0, 0)->format('Y-m-d');
 
-        if ($first->format('Y-m-d') === $this->closuresFrom) {
+        if ($first === $this->closuresFrom) {
             return;
         }
 
-        $last = $first->modify(\sprintf('+%d days', 2 * DeliveryIntervalCalculator::MAXIMUM_WALK_DAYS));
+        // Every closure not over yet, kept as a run: however long, it costs one comparison.
         $closures = DeliveryClosureQuery::create()
-            ->filterByStartDate($last->format('Y-m-d'), Criteria::LESS_EQUAL)
-            ->filterByEndDate($first->format('Y-m-d'), Criteria::GREATER_EQUAL)
+            ->filterByEndDate($first, Criteria::GREATER_EQUAL)
             ->find();
 
         // Noted as loaded once the query answered: a query that fails leaves the next estimate
@@ -182,17 +181,17 @@ final class DeliveryEstimateCalendar implements ResetInterface
                 continue;
             }
 
-            for ($date = max($first, $start), $to = min($last, $end); $date <= $to; $date = $date->modify('+1 day')) {
-                if (null === $closure->getModuleId()) {
-                    $shop[$date->format('Y-m-d')] = true;
-                } else {
-                    $carriers[(int) $closure->getModuleId()][$date->format('Y-m-d')] = true;
-                }
+            $run = [$start->format('Y-m-d'), $end->format('Y-m-d')];
+
+            if (null === $closure->getModuleId()) {
+                $shop[] = $run;
+            } else {
+                $carriers[(int) $closure->getModuleId()][] = $run;
             }
         }
 
         $this->shopClosedDays = $shop;
         $this->carrierClosedDays = $carriers;
-        $this->closuresFrom = $first->format('Y-m-d');
+        $this->closuresFrom = $first;
     }
 }
