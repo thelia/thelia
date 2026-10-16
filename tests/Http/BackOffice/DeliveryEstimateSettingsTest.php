@@ -110,6 +110,20 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         self::assertTrue(null === $rule || null === $rule->getTransitMinDays());
     }
 
+    /**
+     * A delay typed by hand that is not a number of days is refused, not read as zero.
+     */
+    public function testADelayThatIsNotANumberOfDaysIsRefused(): void
+    {
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
+        $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
+
+        $this->saveDelays($token, '1', 'two', '3');
+
+        $rule = DeliveryDateRuleQuery::create()->findOneByModuleId($this->carrier->getId());
+        self::assertTrue(null === $rule || null === $rule->getTransitMinDays());
+    }
+
     public function testTheCutoffOfTheShopIsSavedWithItsClosedDays(): void
     {
         $page = $this->client->request('GET', '/admin/configuration/delivery-dates');
