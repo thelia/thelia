@@ -45,8 +45,8 @@ class EffectivePriceCatalog implements ResetInterface
         private readonly EffectivePriceResolver $resolver,
         private readonly PricingActivityChecker $activityChecker,
         private readonly SaleAudienceChecker $saleAudienceChecker,
-        private readonly SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker,
-        private readonly SaleUnitContext $saleUnitContext,
+        private readonly ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
+        private readonly ?SaleUnitContext $saleUnitContext = null,
     ) {
     }
 
@@ -148,7 +148,7 @@ class EffectivePriceCatalog implements ResetInterface
     public function pricesAnythingFor(?Customer $customer): bool
     {
         return $this->activityChecker->hasActivePublicRule()
-            || $this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()
+            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
             || (null !== $customer && ($this->activityChecker->hasActiveNamedRule() || $this->saleAudienceChecker->hasActiveReservedSale()));
     }
 
@@ -156,6 +156,6 @@ class EffectivePriceCatalog implements ResetInterface
     {
         // The sale unit is part of the key: within one process (a command iterating
         // over units, a test) the same sale element may owe two units two prices.
-        return ($customer?->getId() ?? 0).'|'.$currency->getId().'|'.($this->saleUnitContext->getSaleUnit()?->getId() ?? 0);
+        return ($customer?->getId() ?? 0).'|'.$currency->getId().'|'.($this->saleUnitContext?->getSaleUnit()?->getId() ?? 0);
     }
 }

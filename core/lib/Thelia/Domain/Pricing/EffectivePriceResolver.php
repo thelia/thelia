@@ -40,8 +40,8 @@ class EffectivePriceResolver
         private readonly CatalogPriceResolverInterface $catalogPriceResolver,
         private readonly ReservedSalePriceResolver $reservedSalePriceResolver,
         private readonly SaleAudienceChecker $saleAudienceChecker,
-        private readonly SaleUnitPriceResolver $saleUnitPriceResolver,
-        private readonly SaleUnitContext $saleUnitContext,
+        private readonly ?SaleUnitPriceResolver $saleUnitPriceResolver = null,
+        private readonly ?SaleUnitContext $saleUnitContext = null,
     ) {
     }
 
@@ -63,7 +63,7 @@ class EffectivePriceResolver
         }
 
         $now ??= new \DateTimeImmutable();
-        $saleUnitPrices = $this->saleUnitPriceResolver->resolve($productSaleElementsIds, $currency);
+        $saleUnitPrices = $this->saleUnitPriceResolver?->resolve($productSaleElementsIds, $currency) ?? [];
         $remaining = array_values(array_diff($productSaleElementsIds, array_keys($saleUnitPrices)));
 
         $rulePrices = [] !== $remaining
@@ -74,7 +74,7 @@ class EffectivePriceResolver
             : [];
 
         $effective = [];
-        $saleUnitId = $this->saleUnitContext->getSaleUnit()?->getId();
+        $saleUnitId = $this->saleUnitContext?->getSaleUnit()?->getId();
 
         foreach ($productSaleElementsIds as $pseId) {
             if (isset($saleUnitPrices[$pseId])) {
