@@ -99,7 +99,8 @@ final readonly class DeliveryIntervalCalculator
     {
         $counted = 0;
 
-        for ($walked = 0, $day = $from; $walked <= self::SEARCH_LIMIT_DAYS + $nth; ++$walked, $day = $day->modify('+1 day')) {
+        // Bounded whatever $nth says: a delay of millions of days must not walk millions of days.
+        for ($walked = 0, $day = $from; $walked <= 2 * self::SEARCH_LIMIT_DAYS; ++$walked, $day = $day->modify('+1 day')) {
             if ($open($day) && ++$counted === $nth) {
                 return $day;
             }

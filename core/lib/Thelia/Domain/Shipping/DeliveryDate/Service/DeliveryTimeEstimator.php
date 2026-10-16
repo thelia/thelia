@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\DeliveryDate\Service;
 
 use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryEstimate;
+use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Model\Cart;
 use Thelia\Model\DeliveryDateRule;
 use Thelia\Model\Module;
@@ -40,6 +41,7 @@ final readonly class DeliveryTimeEstimator
     public function __construct(
         private DeliveryIntervalCalculator $calculator,
         private DeliveryEstimateCalendar $calendar,
+        private DeliveryDateCalendar $deliveryDateCalendar,
     ) {
     }
 
@@ -51,7 +53,7 @@ final readonly class DeliveryTimeEstimator
         $moduleId = (int) $module->getId();
         $rule = $this->calendar->ruleOf($moduleId);
 
-        if (!self::announcesAnEstimate($rule)) {
+        if (!self::announcesAnEstimate($rule) || $this->letsTheBuyerPickADay($module, $rule)) {
             return null;
         }
 
@@ -60,7 +62,9 @@ final readonly class DeliveryTimeEstimator
 
         return $this->calculator->interval(
             $now,
-            max(0, (int) $rule->getPreparationDays()) + max(0, $extraPreparationDays),
+            // Zero and one day of preparation both ship the day the order comes in: the extra
+            // days of the goods count from there, whichever of the two the carrier says.
+            max(1, self::boundedDays((int) $rule->getPreparationDays())) + self::boundedDays($extraPreparationDays),
             (int) $rule->getTransitMinDays(),
             (int) $rule->getTransitMaxDays(),
             $shopClosedWeekdays,
@@ -97,6 +101,27 @@ final readonly class DeliveryTimeEstimator
         }
 
         return $this->calendar->slowestAvailabilityDelayOf($productIds);
+    }
+
+    /**
+     * A carrier the buyer picks a day from shows that calendar, not an estimate: two dates
+     * counted by two different rules would be two promises.
+     */
+    private function letsTheBuyerPickADay(Module $module, DeliveryDateRule $rule): bool
+    {
+        $stored = DeliveryDateChoiceMode::tryFrom((string) $rule->getChoiceMode()) ?? DeliveryDateChoiceMode::None;
+
+        return DeliveryDateChoiceMode::None !== $stored
+            && \in_array($stored, $this->deliveryDateCalendar->acceptedChoiceModesOf($module), true);
+    }
+
+    /**
+     * A delay longer than the horizon of the calendar is a typing mistake: it would be walked
+     * day by day.
+     */
+    private static function boundedDays(int $days): int
+    {
+        return max(0, min(DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS, $days));
     }
 
     /**
