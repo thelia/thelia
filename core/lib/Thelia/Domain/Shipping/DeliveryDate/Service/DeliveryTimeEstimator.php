@@ -123,7 +123,8 @@ final readonly class DeliveryTimeEstimator
         try {
             return $estimate();
         } catch (\Throwable $throwable) {
-            Tlog::getInstance()->addError(\sprintf('The delivery of carrier %s could not be estimated', TerminalText::singleLine((string) $module->getCode())), ThrowableTrace::describe($throwable));
+            // One entry: Tlog writes each argument of addError() as an entry of its own.
+            Tlog::getInstance()->addError(\sprintf('The delivery of carrier %s could not be estimated', TerminalText::singleLine((string) $module->getCode()))."\n".ThrowableTrace::describe($throwable));
 
             return null;
         }

@@ -56,7 +56,7 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         // Thursday 3 is a holiday of the carrier: the parcel lands on Friday.
         self::assertSame(
             ['2026-09-04', '2026-09-04'],
-            $this->interval(self::TUESDAY_MORNING, 1, 2, 2, carrierClosedDays: ['2026-09-03' => true]),
+            $this->interval(self::TUESDAY_MORNING, 1, 2, 2, carrierClosedDays: [['2026-09-03', '2026-09-03']]),
         );
     }
 
@@ -119,6 +119,30 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         self::assertNotNull($this->interval(self::TUESDAY_MORNING, DeliveryIntervalCalculator::MAXIMUM_WORKING_DAYS, 0, 0, shopClosedWeekdays: [2, 3, 4, 5, 6, 7], carrierClosedWeekdays: [2, 3, 4, 5, 6, 7]));
     }
 
+    public function testAClosureOfDecadesIsOneRun(): void
+    {
+        // Closed from Wednesday 2 to Friday 4 September, then for seventy years from 2030.
+        $closed = [['2026-09-02', '2026-09-04'], ['2030-01-01', '2099-12-31']];
+
+        $started = microtime(true);
+        $interval = $this->interval(self::TUESDAY_MORNING, 1, 1, 1, carrierClosedDays: $closed);
+
+        self::assertLessThan(0.1, microtime(true) - $started);
+        self::assertSame(['2026-09-07', '2026-09-07'], $interval);
+    }
+
+    public function testAWeekClosedEveryDayIsNotWalked(): void
+    {
+        // A product page estimates every carrier at every visit: two hundred of them must not walk.
+        $started = microtime(true);
+
+        for ($visit = 0; $visit < 200; ++$visit) {
+            self::assertNull($this->interval(self::TUESDAY_MORNING, DeliveryIntervalCalculator::MAXIMUM_WORKING_DAYS, 366, 366, carrierClosedWeekdays: [1, 2, 3, 4, 5, 6, 7]));
+        }
+
+        self::assertLessThan(0.05, microtime(true) - $started, 'A week closed every day was walked.');
+    }
+
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void
     {
         self::assertNull($this->interval(self::TUESDAY_MORNING, 1, 1, 1, shopClosedWeekdays: [1, 2, 3, 4, 5, 6, 7]));
@@ -126,9 +150,9 @@ final class DeliveryIntervalCalculatorTest extends TestCase
     }
 
     /**
-     * @param list<int>           $shopClosedWeekdays
-     * @param array<string, true> $carrierClosedDays
-     * @param list<int>           $carrierClosedWeekdays
+     * @param list<int>                   $shopClosedWeekdays
+     * @param list<array{string, string}> $carrierClosedDays
+     * @param list<int>                   $carrierClosedWeekdays
      *
      * @return array{string, string}|null
      */

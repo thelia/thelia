@@ -45,17 +45,14 @@ final readonly class DeliveryIntervalCalculator
     public const int MAXIMUM_WORKING_DAYS = 2 * self::SEARCH_LIMIT_DAYS;
 
     /**
-     * The most calendar days a count walks: a week per working day, for a calendar open one
-     * day a week, and a year more of closures.
-     */
-    public const int MAXIMUM_WALK_DAYS = 7 * self::MAXIMUM_WORKING_DAYS + self::SEARCH_LIMIT_DAYS;
-
-    /**
-     * @param list<int>           $shopClosedWeekdays    ISO numbers, 1 (Monday) to 7 (Sunday)
-     * @param array<string, true> $shopClosedDays        days the shop is closed, keyed Y-m-d
-     * @param list<int>           $carrierClosedWeekdays ISO numbers the carrier does not deliver on
-     * @param array<string, true> $carrierClosedDays     days the carrier does not deliver, keyed Y-m-d
-     * @param string|null         $cutoff                the local hour, H:i, from which an order is prepared the next day
+     * Closures are runs of days, both bounds included, as Y-m-d: a closure of years is one run
+     * to compare with, not years of days.
+     *
+     * @param list<int>                   $shopClosedWeekdays    ISO numbers, 1 (Monday) to 7 (Sunday)
+     * @param list<array{string, string}> $shopClosedDays        runs of days the shop is closed
+     * @param list<int>                   $carrierClosedWeekdays ISO numbers the carrier does not deliver on
+     * @param list<array{string, string}> $carrierClosedDays     runs of days the carrier does not deliver
+     * @param string|null                 $cutoff                the local hour, H:i, from which an order is prepared the next day
      */
     public function interval(
         \DateTimeImmutable $now,
@@ -68,6 +65,11 @@ final readonly class DeliveryIntervalCalculator
         array $carrierClosedDays,
         ?string $cutoff = null,
     ): ?DeliveryEstimate {
+        // A week closed every day has no working day to find: nothing to walk.
+        if (self::closedAllWeek($shopClosedWeekdays) || self::closedAllWeek($carrierClosedWeekdays)) {
+            return null;
+        }
+
         $start = $now->setTime(0, 0);
 
         if (null !== $cutoff && $now->format('H:i') >= $cutoff) {
@@ -94,12 +96,33 @@ final readonly class DeliveryIntervalCalculator
     }
 
     /**
-     * @param list<int>           $closedWeekdays
-     * @param array<string, true> $closedDays
+     * @param list<int> $closedWeekdays
      */
-    private static function isOpen(\DateTimeImmutable $day, array $closedWeekdays, array $closedDays): bool
+    private static function closedAllWeek(array $closedWeekdays): bool
     {
-        return !\in_array((int) $day->format('N'), $closedWeekdays, true) && !isset($closedDays[$day->format('Y-m-d')]);
+        return 7 === \count(array_intersect([1, 2, 3, 4, 5, 6, 7], $closedWeekdays));
+    }
+
+    /**
+     * @param list<int>                   $closedWeekdays
+     * @param list<array{string, string}> $closedRuns
+     */
+    private static function isOpen(\DateTimeImmutable $day, array $closedWeekdays, array $closedRuns): bool
+    {
+        if (\in_array((int) $day->format('N'), $closedWeekdays, true)) {
+            return false;
+        }
+
+        $key = $day->format('Y-m-d');
+
+        foreach ($closedRuns as [$first, $last]) {
+            // Y-m-d days compare as strings.
+            if ($first <= $key && $key <= $last) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

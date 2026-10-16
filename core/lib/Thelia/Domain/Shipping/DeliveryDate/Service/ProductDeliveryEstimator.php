@@ -15,13 +15,16 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\DeliveryDate\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Shipping\DeliveryDate\DTO\ProductDeliveryEstimate;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 
@@ -38,7 +41,22 @@ final readonly class ProductDeliveryEstimator
 {
     public function __construct(
         private DeliveryTimeEstimator $deliveryTimeEstimator,
+        private ProductVisibility $productVisibility,
     ) {
+    }
+
+    /**
+     * The same for a product known by its id only, provided the visitor may see it: online,
+     * and kept in their catalogue by the visibility rules (private sales, reserved ranges).
+     * An id kept from an earlier page tells nothing about a product since taken away.
+     */
+    public function estimateById(int $productId, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
+    {
+        $query = ProductQuery::create()->filterById($productId)->filterByVisible(1);
+        $this->productVisibility->applyTo($query, ProductTableMap::COL_ID);
+        $product = $query->findOne();
+
+        return null === $product ? null : $this->estimate($product, $cart, $now);
     }
 
     public function estimate(Product $product, ?Cart $cart = null, ?\DateTimeImmutable $now = null): ?ProductDeliveryEstimate
