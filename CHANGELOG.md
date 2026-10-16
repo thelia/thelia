@@ -34,6 +34,9 @@
 ## Modules
 
 - `BaseModule::postUpdate($currentVersion, $newVersion)` is called after `update()`, once the core has committed the transaction of the update. A module puts there what cannot run inside that transaction: an `ALTER TABLE`, which MySQL commits implicitly and which, on MySQL 8, waits for the locks the transaction holds on every table linked to `module` by a foreign key. It is not called on install. The new version is already recorded when it runs and a failure is not retried, so it is meant to be idempotent and to catch up on its own.
+## API
+
+- An administration client can set the reference of a customer: `ref` is writable on `POST`, `PUT` and `PATCH /api/admin/customers`, and the model still generates it when it is left out. A reference another customer already holds is a validation error on `ref` (422) instead of the failed write of the unique index. The customer cannot write it through the front API.
 
 ## Tests
 

@@ -56,4 +56,30 @@ final class AccountCustomerUpdateApiTest extends ApiTestCase
         self::assertEquals(5.0, (float) $saved->getDiscount());
         self::assertNotEmpty($this->authenticateAsCustomer($saved), 'The customer must still be able to sign in.');
     }
+
+    /**
+     * The reference is written by the administration only.
+     */
+    public function testTheCustomerCannotWriteTheReference(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $customer->setRef('CUST-OWN')->save($this->getPropelConnection());
+        $customerId = (int) $customer->getId();
+
+        $token = $this->authenticateAsCustomer($customer);
+        $current = json_decode($this->jsonRequest('GET', '/api/front/account/customers/'.$customerId, token: $token)->getContent(), true);
+
+        $response = $this->jsonRequest('PUT', '/api/front/account/customers/'.$customerId, [
+            'customerTitle' => $current['customerTitle']['@id'] ?? $current['customerTitle'],
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'ref' => 'CUST-CHOSEN',
+        ], token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('CUST-OWN', CustomerQuery::create()->findPk($customerId)?->getRef());
+    }
 }
