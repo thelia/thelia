@@ -2955,9 +2955,10 @@
   </table>
 
   <table name="sale_unit_product_price" namespace="Thelia\Model">
-    <column name="sale_unit_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
     <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
@@ -2970,6 +2971,11 @@
     <foreign-key foreignTable="currency" name="fk_sale_unit_product_price_currency_id" onDelete="CASCADE">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
+    <unique name="sale_unit_product_price_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="product_sale_elements_id" />
+      <unique-column name="currency_id" />
+    </unique>
     <index name="idx_sale_unit_product_price_product_sale_elements_id">
       <index-column name="product_sale_elements_id" />
     </index>
@@ -2980,8 +2986,9 @@
   </table>
 
   <table name="sale_unit_product_sale_elements" namespace="Thelia\Model">
-    <column name="sale_unit_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column defaultValue="0.000000" name="quantity" required="true" scale="6" size="16" type="DECIMAL" />
     <foreign-key foreignTable="sale_unit" name="fk_sale_unit_pse_sale_unit_id" onDelete="CASCADE">
       <reference foreign="id" local="sale_unit_id" />
@@ -2989,6 +2996,10 @@
     <foreign-key foreignTable="product_sale_elements" name="fk_sale_unit_pse_product_sale_elements_id" onDelete="CASCADE">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
+    <unique name="sale_unit_pse_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="product_sale_elements_id" />
+    </unique>
     <index name="idx_sale_unit_pse_product_sale_elements_id">
       <index-column name="product_sale_elements_id" />
     </index>

@@ -78,6 +78,8 @@ use Thelia\Api\Resource\ProductSaleElementsProductVideo;
 use Thelia\Api\Resource\ProductVideo;
 use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\SaleUnit;
+use Thelia\Api\Resource\SaleUnitProductPrice;
+use Thelia\Api\Resource\SaleUnitProductSaleElements;
 use Thelia\Api\Resource\State;
 use Thelia\Api\Resource\Tag;
 use Thelia\Api\Resource\TagElement;
@@ -162,6 +164,8 @@ final readonly class AdminApiResourcePermissions
         Sale::class => AdminResources::SALES,
         CatalogPriceRule::class => AdminResources::CATALOG_PRICE_RULE,
         SaleUnit::class => AdminResources::SALE_UNIT,
+        SaleUnitProductPrice::class => AdminResources::SALE_UNIT,
+        SaleUnitProductSaleElements::class => AdminResources::SALE_UNIT,
         State::class => AdminResources::STATE,
         Tag::class => AdminResources::TAG,
         // Attaching a tag to a customer is editing that customer, so the

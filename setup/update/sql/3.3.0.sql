@@ -814,6 +814,7 @@ CREATE TABLE IF NOT EXISTS `sale_unit_i18n`
 -- the national price: the fallback is the mode of compatibility, not an error.
 CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `sale_unit_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
@@ -822,7 +823,8 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
     `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
-    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`,`currency_id`),
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_product_price_unique` (`sale_unit_id`, `product_sale_elements_id`, `currency_id`),
     INDEX `idx_sale_unit_product_price_product_sale_elements_id` (`product_sale_elements_id`),
     INDEX `idx_sale_unit_product_price_currency_id` (`currency_id`),
     CONSTRAINT `fk_sale_unit_product_price_sale_unit_id`
@@ -846,12 +848,14 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
 -- their own, whose sale elements are expected to each carry a row.
 CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `sale_unit_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
     `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
-    PRIMARY KEY (`sale_unit_id`,`product_sale_elements_id`),
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_pse_unique` (`sale_unit_id`, `product_sale_elements_id`),
     INDEX `idx_sale_unit_pse_product_sale_elements_id` (`product_sale_elements_id`),
     CONSTRAINT `fk_sale_unit_pse_sale_unit_id`
         FOREIGN KEY (`sale_unit_id`)
