@@ -338,4 +338,7 @@ return [
     'This order requires an account.' => 'Questo ordine richiede un account.',
     'This shop is not asking for the consent "%consent".' => 'Questo negozio non richiede il consenso "%consent".',
     'You must accept "%consent" to place this order.' => 'Per effettuare questo ordine è necessario accettare "%consent".',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products non può essere spedito a questo indirizzo. Rimuovilo dal carrello o scegli un altro indirizzo.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products non possono essere spediti a questo indirizzo. Rimuovili dal carrello o scegli un altro indirizzo.',
+    '%product cannot be shipped to your address.' => '%product non può essere spedito al tuo indirizzo.',
 ];
