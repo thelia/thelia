@@ -50,7 +50,9 @@ final readonly class ExpressCheckoutGate
      */
     public function open(Request $request, string $moduleCode, string $token): ExpressCheckoutAccess
     {
-        $session = $request->getSession();
+        // getSession() throws on a request that has none: asked first, so that a call without a
+        // session gets the refusal the script can read.
+        $session = $request->hasSession() ? $request->getSession() : null;
 
         if (!$session instanceof Session) {
             throw ExpressCheckoutRefusedException::becauseThereIsNoCartToPayFor();
