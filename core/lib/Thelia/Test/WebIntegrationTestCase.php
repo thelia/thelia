@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Tools\URL;
 use Twig\Environment;
 
@@ -109,8 +110,25 @@ abstract class WebIntegrationTestCase extends WebTestCase
         $this->connection = null;
 
         $this->forgetTheVisitorSession();
+        $this->forgetTheSaleUnitActivity();
 
         parent::tearDown();
+    }
+
+    /**
+     * Whether the shop sells from sale units is kept in a pool shared beyond the
+     * transaction: a request of the test that read a unit the test created would
+     * otherwise leave the next test in the multi-sale-unit mode, with no unit.
+     */
+    private function forgetTheSaleUnitActivity(): void
+    {
+        if (!static::$booted || !static::getContainer()->has(SaleUnitActivityChecker::class)) {
+            return;
+        }
+
+        $saleUnitActivityChecker = static::getContainer()->get(SaleUnitActivityChecker::class);
+        $saleUnitActivityChecker->forget();
+        $saleUnitActivityChecker->forgetAfterTheRequest();
     }
 
     /**

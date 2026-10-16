@@ -326,6 +326,7 @@ return [
     'Saint Lucia' => 'Saint Lucia',
     'Saint Martin (French part)' => 'Saint-Martin (Frans deel)',
     'Saint Vincent and the Grenadines' => 'Saint Vincent en de Grenadines',
+    'Sale units' => 'Verkoopeenheden',
     'Sales management' => 'Verkoopbeheer',
     'San Marino' => 'San Marino',
     'Sao Tome and Principe' => 'Sao Tomé en Principe',

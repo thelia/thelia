@@ -789,6 +789,7 @@ CREATE TABLE `order`
     `delivery_slot_id` INTEGER COMMENT 'the slot the buyer picked, NULL once that slot is deleted from the carrier settings',
     `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
     `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
+    `sale_unit_id` INTEGER COMMENT 'the sale unit this order was placed on, NULL for a national (single-shop) order',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -807,9 +808,15 @@ CREATE TABLE `order`
     INDEX `fk_order_lang_id_idx` (`lang_id`),
     INDEX `idx_order_cart_fk` (`cart_id`),
     INDEX `idx_order_delivery_slot_id` (`delivery_slot_id`),
+    INDEX `fi_order_sale_unit_id` (`sale_unit_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
     CONSTRAINT `fk_order_customer_id`
@@ -4408,6 +4415,7 @@ CREATE TABLE `order_version`
     `delivery_slot_id` INTEGER COMMENT 'the slot the buyer picked, NULL once that slot is deleted from the carrier settings',
     `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
     `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
+    `sale_unit_id` INTEGER COMMENT 'the sale unit this order was placed on, NULL for a national (single-shop) order',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -4930,6 +4938,108 @@ CREATE TABLE `customer_list_item`
             REFERENCES `product_sale_elements` (`id`)
             ON UPDATE RESTRICT
             ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_unit
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit`;
+
+CREATE TABLE `sale_unit`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a sale unit by; never shown to a customer',
+    `url` VARCHAR(255) COMMENT 'the domain that resolves to this sale unit, scheme-less (shop-a.example.com); null for a unit resolved by session or API header only',
+    `active` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'an inactive unit is never resolved; the multi-sale-unit mode is on as soon as one unit is active',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_code_unique` (`code`),
+    UNIQUE INDEX `sale_unit_url_unique` (`url`),
+    INDEX `idx_sale_unit_active` (`active`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_unit_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_i18n`;
+
+CREATE TABLE `sale_unit_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_unit_i18n_fk_e2d6ae`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_unit_product_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_product_price`;
+
+CREATE TABLE `sale_unit_product_price`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_product_price_unique` (`sale_unit_id`, `product_sale_elements_id`, `currency_id`),
+    INDEX `idx_sale_unit_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_sale_unit_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_sale_unit_product_price_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_unit_product_sale_elements
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_product_sale_elements`;
+
+CREATE TABLE `sale_unit_product_sale_elements`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_pse_unique` (`sale_unit_id`, `product_sale_elements_id`),
+    INDEX `idx_sale_unit_pse_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_sale_unit_pse_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_pse_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 # This restores the fkey checks, after having unset them earlier

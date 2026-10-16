@@ -1353,6 +1353,7 @@ return [
     'Sale edit - top' => 'Sale edit - top',
     'Sale edit page - javascript last call block' => 'Sale edit page - javascript last call block',
     'Salerno' => 'Salerno',
+    'Sale units' => 'Sale units',
     'Sales - JavaScript' => 'Sales - JavaScript',
     'Sales - at the bottom' => 'Sales - at the bottom',
     'Sales - at the top' => 'Sales - at the top',

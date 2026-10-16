@@ -2233,7 +2233,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (56, 'admin.configuration.tag', NOW(), NOW()),
 (57, 'admin.catalog-price-rule', NOW(), NOW()),
 (58, 'admin.configuration.gift-wrapping', NOW(), NOW()),
-(59, 'admin.configuration.delivery-date', NOW(), NOW())
+(59, 'admin.configuration.delivery-date', NOW(), NOW()),
+(60, 'admin.sale-unit', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15480,6 +15481,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'cs_CZ', NULL, NULL, NULL, NULL),
     (58, 'cs_CZ', NULL, NULL, NULL, NULL),
     (59, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (60, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15538,6 +15540,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'de_DE', 'Katalogpreisregeln', NULL, NULL, NULL),
     (58, 'de_DE', NULL, NULL, NULL, NULL),
     (59, 'de_DE', NULL, NULL, NULL, NULL),
+    (60, 'de_DE', 'Verkaufseinheiten', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15596,6 +15599,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'en_US', 'Catalog price rules', NULL, NULL, NULL),
     (58, 'en_US', 'Configuration gift wrappings', NULL, NULL, NULL),
     (59, 'en_US', 'Configuration delivery dates', NULL, NULL, NULL),
+    (60, 'en_US', 'Sale units', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15654,6 +15658,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'es_ES', 'Reglas de precios del catálogo', NULL, NULL, NULL),
     (58, 'es_ES', NULL, NULL, NULL, NULL),
     (59, 'es_ES', NULL, NULL, NULL, NULL),
+    (60, 'es_ES', 'Unidades de venta', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15712,6 +15717,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'fr_FR', 'Règles de prix catalogue', NULL, NULL, NULL),
     (58, 'fr_FR', 'Configuration des emballages cadeaux', NULL, NULL, NULL),
     (59, 'fr_FR', 'Configuration des dates de livraison', NULL, NULL, NULL),
+    (60, 'fr_FR', 'Unités de vente', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15770,6 +15776,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'it_IT', 'Regole di prezzo del catalogo', NULL, NULL, NULL),
     (58, 'it_IT', NULL, NULL, NULL, NULL),
     (59, 'it_IT', NULL, NULL, NULL, NULL),
+    (60, 'it_IT', 'Unità di vendita', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15828,6 +15835,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (57, 'nl_NL', 'Catalogusprijsregels', NULL, NULL, NULL),
     (58, 'nl_NL', NULL, NULL, NULL, NULL),
     (59, 'nl_NL', NULL, NULL, NULL, NULL),
+    (60, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15885,7 +15893,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (56, 'ru_RU', NULL, NULL, NULL, NULL),
     (57, 'ru_RU', 'Правила цен каталога', NULL, NULL, NULL),
     (58, 'ru_RU', NULL, NULL, NULL, NULL),
-    (59, 'ru_RU', NULL, NULL, NULL, NULL)
+    (59, 'ru_RU', NULL, NULL, NULL, NULL),
+    (60, 'ru_RU', 'Точки продаж', NULL, NULL, NULL)
 ;
 
 

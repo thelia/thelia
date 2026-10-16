@@ -1227,6 +1227,7 @@ return [
     'Sale edit - top' => 'Édition d\'une promotion - en haut',
     'Sale edit page - javascript last call block' => 'Page sale edit - appel javascript',
     'Salerno' => 'Salerno',
+    'Sale units' => 'Unités de vente',
     'Sales - JavaScript' => 'Promotions - JavaScript',
     'Sales - at the bottom' => 'Promotions - en bas',
     'Sales - at the top' => 'Promotions - en haut',

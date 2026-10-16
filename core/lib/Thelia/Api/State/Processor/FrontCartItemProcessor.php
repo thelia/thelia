@@ -36,6 +36,7 @@ use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
@@ -70,6 +71,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         private ReservedSaleVisibility $reservedSaleVisibility,
         private ApiResourcePropelTransformerService $transformer,
         private EventDispatcherInterface $dispatcher,
+        private ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
     ) {
     }
 
@@ -180,7 +182,11 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
             return;
         }
 
-        if ((float) $saleElements->getQuantity() < $quantity) {
+        // The stock of the sale unit the visitor buys from when it keeps one, the
+        // national counter otherwise: what the checkout will decrement.
+        $available = $this->saleUnitAvailableStock?->availableQuantity($saleElements) ?? (float) $saleElements->getQuantity();
+
+        if ($available < $quantity) {
             throw self::notEnoughStockFor($saleElements);
         }
     }

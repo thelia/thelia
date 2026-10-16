@@ -927,6 +927,7 @@ return [
     'Sale edit - bottom' => 'Editar Venta - parte inferior',
     'Sale edit - top' => 'Editar Venta - parte superior',
     'Sale edit page - javascript last call block' => 'Página de edición de Venta - última bloque de llamada JavaScript',
+    'Sale units' => 'Unidades de venta',
     'Sales - JavaScript' => 'Ventas - JavaScript',
     'Sales - at the bottom' => 'Ventas - en la parte inferior',
     'Sales - at the top' => 'Ventas - en la parte superior',

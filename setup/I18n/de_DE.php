@@ -906,6 +906,7 @@ return [
     'Sale edit - bottom' => 'Sonderangebot Bearbeitung - unten',
     'Sale edit - top' => 'Sonderangebot Bearbeitung - oben',
     'Sale edit page - javascript last call block' => 'Sonderangebot Änderungsseite - javascript last call block',
+    'Sale units' => 'Verkaufseinheiten',
     'Sales - JavaScript' => 'Sonderangebote - JavaScript',
     'Sales - at the bottom' => 'Sonderangebote - unten',
     'Sales - at the top' => 'Sonderangebote - oben',

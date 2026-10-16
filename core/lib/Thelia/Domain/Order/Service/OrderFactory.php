@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Model\Cart as CartModel;
@@ -30,6 +31,7 @@ readonly class OrderFactory
 {
     public function __construct(
         private DeliveryDateCalendar $deliveryDateCalendar,
+        private SaleUnitContext $saleUnitContext,
     ) {
     }
 
@@ -59,6 +61,10 @@ readonly class OrderFactory
         $order->setCartId($cart->getId());
         $order->setDiscount($cart->getDiscount());
         $order->setCustomerDiscountRate($this->resolveCustomerDiscountRate($customer));
+        // Stamped by the server from the resolved context, never by the client: the
+        // order carries the sale unit it was placed on for good, whatever the session
+        // does afterwards. NULL is a national (single-shop) order.
+        $order->setSaleUnitId($this->saleUnitContext->getSaleUnit()?->getId());
 
         // The note for whoever receives the parcel, copied off the cart the way every other
         // wording the order needs to keep is. The wrapping itself is not copied here: it

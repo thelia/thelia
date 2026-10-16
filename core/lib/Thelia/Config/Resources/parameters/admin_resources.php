@@ -59,6 +59,7 @@ return static function (ContainerConfigurator $container): void {
                 'TOOLS' => 'admin.tools',
                 'SALES' => 'admin.sales',
                 'CATALOG_PRICE_RULE' => 'admin.catalog-price-rule',
+                'SALE_UNIT' => 'admin.sale-unit',
                 'TITLE' => 'admin.customer.title',
             ],
         ]);

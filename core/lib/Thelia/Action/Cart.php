@@ -35,6 +35,8 @@ use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -73,6 +75,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
         protected EffectivePriceResolver $effectivePriceResolver,
         protected PricingActivityChecker $pricingActivityChecker,
+        protected ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
+        protected ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
     ) {
     }
 
@@ -276,9 +280,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $dispatcher->dispatch($findItemEvent, TheliaEvents::CART_FINDITEM);
 
         $cartItem = $findItemEvent->getCartItem();
+        $appends = $cartItem instanceof CartItem && $append;
 
-        if ($cartItem instanceof CartItem && $append) {
-            $cartItem->addQuantity($quantity)->save();
+        // The stock of the sale unit the visitor buys from, when it keeps one: the
+        // national counter may well cover a quantity the unit itself cannot sell.
+        $saleUnitQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
+
+        if (null !== $saleUnitQuantity) {
+            $this->assertSaleUnitStock(
+                $productSaleElements,
+                ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity,
+                $saleUnitQuantity,
+            );
+        }
+
+        if ($appends) {
+            $cartItem->addQuantity($quantity, $saleUnitQuantity)->save();
         } else {
             $productPrices = $productSaleElements->getPricesByCurrency(
                 $this->currencyOf($cart),
@@ -478,6 +495,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         if (!$this->pricingActivityChecker->hasActivePublicRule()
             && !$this->pricingActivityChecker->hasVisitorDependentPricing()
+            && true !== $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
             && !$this->holdsSpecialOffer($cart)) {
             return;
         }
@@ -583,10 +601,34 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, float $quantity): CartItem
     {
         $cartItem->setDispatcher($dispatcher);
-        $cartItem->updateQuantity($quantity)
+        $cartItem->updateQuantity(
+            $quantity,
+            $this->saleUnitAvailableStock?->ownQuantity((int) $cartItem->getProductSaleElementsId()),
+        )
             ->save();
 
         return $cartItem;
+    }
+
+    /**
+     * A line of a sale unit that keeps its own stock is refused beyond that stock, the
+     * way the checkout would refuse it, rather than accepted on the national counter.
+     *
+     * @throws NotEnoughStockException
+     */
+    private function assertSaleUnitStock(ProductSaleElements $productSaleElements, float $requestedQuantity, float $saleUnitQuantity): void
+    {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return;
+        }
+
+        $product = $productSaleElements->getProduct();
+
+        if (0 !== (int) $product->getVirtual() || $requestedQuantity <= $saleUnitQuantity) {
+            return;
+        }
+
+        throw new NotEnoughStockException(\sprintf('Not enough stock for product %s', $product->getRef()));
     }
 
     /**

@@ -707,8 +707,12 @@
     <column description="the slot the buyer picked, NULL once that slot is deleted from the carrier settings" name="delivery_slot_id" type="INTEGER" />
     <column description="the local hour the picked slot started at, copied off the slot" name="delivery_slot_start" type="TIME" />
     <column description="the local hour the picked slot ended at, copied off the slot" name="delivery_slot_end" type="TIME" />
+    <column defaultValue="NULL" description="the sale unit this order was placed on, NULL for a national (single-shop) order" name="sale_unit_id" type="INTEGER" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <foreign-key foreignTable="sale_unit" name="fk_order_sale_unit_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_unit_id" />
     </foreign-key>
     <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
@@ -2922,6 +2926,83 @@
       <index-column name="product_sale_elements_id" />
     </index>
 
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="sale_unit" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="stable machine name a deployment references a sale unit by; never shown to a customer" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="NULL" description="the domain that resolves to this sale unit, scheme-less (shop-a.example.com); null for a unit resolved by session or API header only" name="url" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <column defaultValue="0" description="an inactive unit is never resolved; the multi-sale-unit mode is on as soon as one unit is active" name="active" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+
+    <unique name="sale_unit_code_unique">
+      <unique-column name="code" />
+    </unique>
+    <unique name="sale_unit_url_unique">
+      <unique-column name="url" />
+    </unique>
+    <index name="idx_sale_unit_active">
+      <index-column name="active" />
+    </index>
+
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="sale_unit_product_price" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="promo_price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
+    <foreign-key foreignTable="sale_unit" name="fk_sale_unit_product_price_sale_unit_id" onDelete="CASCADE">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_sale_unit_product_price_product_sale_elements_id" onDelete="CASCADE">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_sale_unit_product_price_currency_id" onDelete="CASCADE">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <unique name="sale_unit_product_price_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="product_sale_elements_id" />
+      <unique-column name="currency_id" />
+    </unique>
+    <index name="idx_sale_unit_product_price_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
+    <index name="idx_sale_unit_product_price_currency_id">
+      <index-column name="currency_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+
+  <table name="sale_unit_product_sale_elements" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_unit_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column defaultValue="0.000000" name="quantity" required="true" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="sale_unit" name="fk_sale_unit_pse_sale_unit_id" onDelete="CASCADE">
+      <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_sale_unit_pse_product_sale_elements_id" onDelete="CASCADE">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <unique name="sale_unit_pse_unique">
+      <unique-column name="sale_unit_id" />
+      <unique-column name="product_sale_elements_id" />
+    </unique>
+    <index name="idx_sale_unit_pse_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
 </database>

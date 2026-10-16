@@ -17,6 +17,8 @@ namespace Thelia\Domain\Pricing;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Domain\Sale\SaleAudienceChecker;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -43,6 +45,8 @@ class EffectivePriceCatalog implements ResetInterface
         private readonly EffectivePriceResolver $resolver,
         private readonly PricingActivityChecker $activityChecker,
         private readonly SaleAudienceChecker $saleAudienceChecker,
+        private readonly ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
+        private readonly ?SaleUnitContext $saleUnitContext = null,
     ) {
     }
 
@@ -144,11 +148,14 @@ class EffectivePriceCatalog implements ResetInterface
     public function pricesAnythingFor(?Customer $customer): bool
     {
         return $this->activityChecker->hasActivePublicRule()
+            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
             || (null !== $customer && ($this->activityChecker->hasActiveNamedRule() || $this->saleAudienceChecker->hasActiveReservedSale()));
     }
 
     private function keyOf(Currency $currency, ?Customer $customer): string
     {
-        return ($customer?->getId() ?? 0).'|'.$currency->getId();
+        // The sale unit is part of the key: within one process (a command iterating
+        // over units, a test) the same sale element may owe two units two prices.
+        return ($customer?->getId() ?? 0).'|'.$currency->getId().'|'.($this->saleUnitContext?->getSaleUnit()?->getId() ?? 0);
     }
 }

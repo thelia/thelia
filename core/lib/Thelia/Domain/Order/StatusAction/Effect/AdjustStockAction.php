@@ -92,6 +92,10 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             $connection->exec('SAVEPOINT '.self::SAVEPOINT);
         }
 
+        // The stock of the sale unit the order was placed on, when the unit keeps a row
+        // for the sale element: the same rule the checkout decremented by.
+        $saleUnitId = $context->order->getSaleUnitId();
+
         try {
             foreach ($context->order->getOrderProducts() as $orderProduct) {
                 $productSaleElementsId = $orderProduct->getProductSaleElementsId();
@@ -102,7 +106,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
                 }
 
                 if ($increase) {
-                    $this->stockDecrementer->increment($productSaleElementsId, $quantity, $connection);
+                    $this->stockDecrementer->increment($productSaleElementsId, $quantity, $connection, $saleUnitId);
 
                     continue;
                 }
@@ -113,6 +117,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
                     guardAvailability: $checkAvailableStock,
                     allowNegativeStock: !$checkAvailableStock,
                     connection: $connection,
+                    saleUnitId: $saleUnitId,
                 );
             }
 

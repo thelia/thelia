@@ -34,6 +34,7 @@ use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
+use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
@@ -44,6 +45,7 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderProduct;
@@ -76,6 +78,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         protected URL $urlManager,
         protected OrderStatusTransitionGuard $transitionGuard,
         protected PaymentCartContext $paymentCartContext,
+        protected ?StockDecrementer $stockDecrementer = null,
     ) {
     }
 
@@ -467,6 +470,12 @@ class Order extends BaseAction implements EventSubscriberInterface
         foreach ($orderProductList as $orderProduct) {
             $productSaleElementsId = $orderProduct->getProductSaleElementsId();
 
+            if ($this->movesSaleUnitStock($order, $productSaleElementsId)) {
+                $this->updateSaleUnitQuantity($order, $orderProduct, $operationEvent);
+
+                continue;
+            }
+
             /** @var ProductSaleElements $productSaleElements */
             if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
                 $offset = 0;
@@ -488,6 +497,56 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->setQuantity($productSaleElements->getQuantity() + $offset)
                     ->save();
             }
+        }
+    }
+
+    /**
+     * An order placed on a sale unit that keeps its own stock of the sale element gives
+     * back, or takes again, from that stock: the same rule the checkout decremented by.
+     * Any other order moves the shared national counter, as it always has.
+     */
+    private function movesSaleUnitStock(ModelOrder $order, ?int $productSaleElementsId): bool
+    {
+        return null !== $productSaleElementsId
+            && null !== $this->stockDecrementer
+            && $this->stockDecrementer->movesSaleUnitStock($order->getSaleUnitId(), $productSaleElementsId);
+    }
+
+    /**
+     * @throws TheliaProcessException when the sale unit has not enough stock left to take the order again
+     */
+    private function updateSaleUnitQuantity(
+        ModelOrder $order,
+        OrderProduct $orderProduct,
+        GetStockUpdateOperationOnOrderStatusChangeEvent $operationEvent,
+    ): void {
+        $productSaleElementsId = (int) $orderProduct->getProductSaleElementsId();
+        $quantity = (float) $orderProduct->getQuantity();
+        $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+
+        if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
+            $this->stockDecrementer?->increment($productSaleElementsId, $quantity, $connection, $order->getSaleUnitId());
+
+            return;
+        }
+
+        if ($operationEvent->getOperation() !== $operationEvent::DECREASE_STOCK) {
+            return;
+        }
+
+        $checkAvailableStock = ConfigQuery::checkAvailableStock();
+
+        try {
+            $this->stockDecrementer?->decrement(
+                $productSaleElementsId,
+                $quantity,
+                guardAvailability: $checkAvailableStock,
+                allowNegativeStock: !$checkAvailableStock,
+                connection: $connection,
+                saleUnitId: $order->getSaleUnitId(),
+            );
+        } catch (TheliaProcessException $shortage) {
+            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
         }
     }
 

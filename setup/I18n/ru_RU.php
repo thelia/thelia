@@ -1223,6 +1223,7 @@ return [
     'Sale edit - top' => 'Редактирование распродажи - вверху',
     'Sale edit page - javascript last call block' => 'Страница редактирования распродажи - блок последнего вызова javascript',
     'Salerno' => 'Салерно',
+    'Sale units' => 'Точки продаж',
     'Sales - JavaScript' => 'Распродажи - JavaScript',
     'Sales - at the bottom' => 'Распродажи - внизу',
     'Sales - at the top' => 'Распродажи - вверху',

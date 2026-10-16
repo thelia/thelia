@@ -71,6 +71,9 @@ use Thelia\Model\Sale;
 use Thelia\Model\SaleCustomer;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleProduct;
+use Thelia\Model\SaleUnit;
+use Thelia\Model\SaleUnitProductPrice;
+use Thelia\Model\SaleUnitProductSaleElements;
 use Thelia\Model\Tag;
 use Thelia\Model\TagElement;
 use Thelia\Model\Tax;
@@ -976,6 +979,57 @@ final class FixtureFactory
         $line->save($this->connection);
 
         return $line;
+    }
+
+    public function saleUnit(array $overrides = []): SaleUnit
+    {
+        $n = $this->next();
+
+        $saleUnit = new SaleUnit();
+        $saleUnit->setCode($overrides['code'] ?? 'sale-unit-'.$n);
+        // array_key_exists, not ??: a caller passing an explicit null wants a unit
+        // with no domain (session or API header resolution only).
+        $saleUnit->setUrl(\array_key_exists('url', $overrides) ? $overrides['url'] : 'sale-unit-'.$n.'.example.com');
+        $saleUnit->setActive($overrides['active'] ?? true);
+        $saleUnit->setPosition($overrides['position'] ?? 0);
+        $saleUnit->setLocale($overrides['locale'] ?? 'en_US');
+        $saleUnit->setTitle($overrides['title'] ?? 'Sale unit '.$n);
+        $saleUnit->save($this->connection);
+
+        return $saleUnit;
+    }
+
+    public function saleUnitProductPrice(
+        SaleUnit $saleUnit,
+        ProductSaleElements $productSaleElements,
+        Currency $currency,
+        float $price,
+        ?float $promoPrice = null,
+    ): SaleUnitProductPrice {
+        $saleUnitProductPrice = new SaleUnitProductPrice();
+        $saleUnitProductPrice->setSaleUnitId($saleUnit->getId());
+        $saleUnitProductPrice->setProductSaleElementsId($productSaleElements->getId());
+        $saleUnitProductPrice->setCurrencyId($currency->getId());
+        $saleUnitProductPrice->setPrice((string) $price);
+        $saleUnitProductPrice->setPromoPrice((string) ($promoPrice ?? $price));
+        $saleUnitProductPrice->setFromDefaultCurrency(false);
+        $saleUnitProductPrice->save($this->connection);
+
+        return $saleUnitProductPrice;
+    }
+
+    public function saleUnitProductSaleElements(
+        SaleUnit $saleUnit,
+        ProductSaleElements $productSaleElements,
+        float $quantity,
+    ): SaleUnitProductSaleElements {
+        $stock = new SaleUnitProductSaleElements();
+        $stock->setSaleUnitId($saleUnit->getId());
+        $stock->setProductSaleElementsId($productSaleElements->getId());
+        $stock->setQuantity((string) $quantity);
+        $stock->save($this->connection);
+
+        return $stock;
     }
 
     public function tag(array $overrides = []): Tag

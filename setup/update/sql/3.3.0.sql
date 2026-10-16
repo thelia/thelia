@@ -766,4 +766,151 @@ PREPARE convert_column_statement FROM @statement;
 EXECUTE convert_column_statement;
 DEALLOCATE PREPARE convert_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Sale units
+--
+-- A sale unit is a place the shop sells from: a storefront on its own
+-- domain, a pick-up store behind a shared one, a logical outlet an API
+-- consumer addresses by header. The catalog stays national and shared;
+-- a unit owns its prices, its stock and the orders placed on it.
+--
+-- The tables alone change nothing: with no active row, every code path
+-- behaves exactly as before. The multi-sale-unit mode is on as soon as
+-- one row is active.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `sale_unit`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a sale unit by; never shown to a customer',
+    `url` VARCHAR(255) COMMENT 'the domain that resolves to this sale unit, scheme-less (shop-a.example.com); null for a unit resolved by session or API header only',
+    `active` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'an inactive unit is never resolved; the multi-sale-unit mode is on as soon as one unit is active',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_code_unique` (`code`),
+    UNIQUE INDEX `sale_unit_url_unique` (`url`),
+    INDEX `idx_sale_unit_active` (`active`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `sale_unit_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_unit_i18n_fk_e2d6ae`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- What a sale unit sells at when it does not sell at the national price: one row
+-- per (unit, sale element, currency), read with the exact semantics of
+-- `product_price` — same columns, same from_default_currency conversion, same
+-- obedience to `product_sale_elements.promo`. A sale element without a row keeps
+-- the national price: the fallback is the mode of compatibility, not an error.
+CREATE TABLE IF NOT EXISTS `sale_unit_product_price`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_product_price_unique` (`sale_unit_id`, `product_sale_elements_id`, `currency_id`),
+    INDEX `idx_sale_unit_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_sale_unit_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_sale_unit_product_price_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The stock a sale unit keeps of its own: one row per (unit, sale element). A
+-- sale element without a row for the unit decrements the shared national counter
+-- `product_sale_elements.quantity` — right for a dematerialised or centralised
+-- stock, a compatibility mode rather than the target for units with a stock of
+-- their own, whose sale elements are expected to each carry a row.
+CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_pse_unique` (`sale_unit_id`, `product_sale_elements_id`),
+    INDEX `idx_sale_unit_pse_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_sale_unit_pse_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_pse_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The sale unit an order was placed on, so a shop selling from many units can
+-- tell whose order is whose. NULL for a national (single-shop) order, so an existing shop is
+-- untouched. `order` is versionable: the column is mirrored on `order_version`.
+-- Added with the information_schema guard MySQL 8 needs to replay the script.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'sale_unit_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `delivery_slot_end`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'fi_order_sale_unit_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `fi_order_sale_unit_id` (`sale_unit_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_fk := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `CONSTRAINT_NAME` = 'fk_order_sale_unit_id');
+SET @statement := IF(@add_fk, 'ALTER TABLE `order` ADD CONSTRAINT `fk_order_sale_unit_id` FOREIGN KEY (`sale_unit_id`) REFERENCES `sale_unit` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT', 'DO 0');
+PREPARE add_fk_statement FROM @statement;
+EXECUTE add_fk_statement;
+DEALLOCATE PREPARE add_fk_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'sale_unit_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `sale_unit_id` INTEGER NULL DEFAULT NULL COMMENT ''the sale unit this order was placed on, NULL for a national (single-shop) order'' AFTER `delivery_slot_end`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.sale-unit', NOW(), NOW());
+
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @sale_unit_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.sale-unit');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@sale_unit_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'de_DE', 'Verkaufseinheiten', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'en_US', 'Sale units', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'es_ES', 'Unidades de venta', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'fr_FR', 'Unités de vente', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'it_IT', 'Unità di vendita', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'nl_NL', 'Verkoopeenheden', NULL, NULL, NULL),
+    (@sale_unit_resource_id, 'ru_RU', 'Точки продаж', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

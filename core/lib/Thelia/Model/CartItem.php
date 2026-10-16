@@ -90,12 +90,16 @@ class CartItem extends BaseCartItem
     }
 
     /**
+     * @param float|null $availableQuantity the stock to check against when it is not the
+     *                                      national counter of the sale element (the stock
+     *                                      of the sale unit the visitor buys from)
+     *
      * @return $this
      *
      * @throws PropelException
      * @throws NotEnoughStockException
      */
-    public function updateQuantity($value)
+    public function updateQuantity($value, ?float $availableQuantity = null)
     {
         $currentQuantity = $this->getQuantity();
 
@@ -107,7 +111,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $value) {
+            if (0 === $product->getVirtual() && ($availableQuantity ?? $productSaleElements->getQuantity()) < $value) {
                 $this->setQuantity($currentQuantity);
                 throw new NotEnoughStockException(Translator::getInstance()->trans('Not enough stock for product '.$product->getRef()));
             }
@@ -119,11 +123,15 @@ class CartItem extends BaseCartItem
     }
 
     /**
+     * @param float|null $availableQuantity the stock to check against when it is not the
+     *                                      national counter of the sale element (the stock
+     *                                      of the sale unit the visitor buys from)
+     *
      * @return $this
      *
      * @throws PropelException
      */
-    public function addQuantity($value)
+    public function addQuantity($value, ?float $availableQuantity = null)
     {
         if ($value <= 0) {
             return $this;
@@ -136,7 +144,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
-            if (0 === $product->getVirtual() && $productSaleElements->getQuantity() < $newQuantity) {
+            if (0 === $product->getVirtual() && ($availableQuantity ?? $productSaleElements->getQuantity()) < $newQuantity) {
                 $newQuantity = $currentQuantity;
             }
         }

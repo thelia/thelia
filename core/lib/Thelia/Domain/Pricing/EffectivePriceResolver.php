@@ -17,6 +17,8 @@ namespace Thelia\Domain\Pricing;
 use Thelia\Domain\Sale\ReservedPrice;
 use Thelia\Domain\Sale\ReservedSalePriceResolver;
 use Thelia\Domain\Sale\SaleAudienceChecker;
+use Thelia\Domain\SaleUnit\Pricing\SaleUnitPriceResolver;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 
@@ -24,10 +26,13 @@ use Thelia\Model\Customer;
  * Combines everything that prices a sale element outside the catalog columns,
  * for a batch and a visitor.
  *
- * The rules come first: a rule replaces the promo price, whatever it was. A
- * reserved operation the customer is named on then applies only when it beats
- * what the customer would otherwise pay - the frozen decision of the reserved
- * sales, kept as is.
+ * The sale unit speaks first: where the request sells from a unit that priced
+ * a sale element itself, that price is the price — the national rules and
+ * operations are computed against the national catalog and have nothing to say
+ * about it. Everywhere else the rules come next: a rule replaces the promo
+ * price, whatever it was. A reserved operation the customer is named on then
+ * applies only when it beats what the customer would otherwise pay - the
+ * frozen decision of the reserved sales, kept as is.
  */
 class EffectivePriceResolver
 {
@@ -35,6 +40,8 @@ class EffectivePriceResolver
         private readonly CatalogPriceResolverInterface $catalogPriceResolver,
         private readonly ReservedSalePriceResolver $reservedSalePriceResolver,
         private readonly SaleAudienceChecker $saleAudienceChecker,
+        private readonly ?SaleUnitPriceResolver $saleUnitPriceResolver = null,
+        private readonly ?SaleUnitContext $saleUnitContext = null,
     ) {
     }
 
@@ -56,14 +63,32 @@ class EffectivePriceResolver
         }
 
         $now ??= new \DateTimeImmutable();
-        $rulePrices = $this->catalogPriceResolver->resolve($productSaleElementsIds, $currency, $customer, $now);
-        $reservedPrices = null !== $customer && $this->saleAudienceChecker->hasActiveReservedSale()
-            ? $this->reservedSalePriceResolver->resolve($productSaleElementsIds, $currency, $customer, $now)
+        $saleUnitPrices = $this->saleUnitPriceResolver?->resolve($productSaleElementsIds, $currency) ?? [];
+        $remaining = array_values(array_diff($productSaleElementsIds, array_keys($saleUnitPrices)));
+
+        $rulePrices = [] !== $remaining
+            ? $this->catalogPriceResolver->resolve($remaining, $currency, $customer, $now)
+            : [];
+        $reservedPrices = [] !== $remaining && null !== $customer && $this->saleAudienceChecker->hasActiveReservedSale()
+            ? $this->reservedSalePriceResolver->resolve($remaining, $currency, $customer, $now)
             : [];
 
         $effective = [];
+        $saleUnitId = $this->saleUnitContext?->getSaleUnit()?->getId();
 
         foreach ($productSaleElementsIds as $pseId) {
+            if (isset($saleUnitPrices[$pseId])) {
+                $effective[$pseId] = new EffectivePrice(
+                    $pseId,
+                    $saleUnitPrices[$pseId],
+                    false,
+                    EffectivePrice::SOURCE_SALE_UNIT,
+                    saleUnitId: $saleUnitId,
+                );
+
+                continue;
+            }
+
             $rulePrice = $rulePrices[$pseId] ?? null;
             $reservedPrice = $reservedPrices[$pseId] ?? null;
 
