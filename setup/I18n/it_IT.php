@@ -441,4 +441,5 @@ return [
     'Price' => 'Prezzo',
     'Configuration destination restrictions' => 'Configurazione delle restrizioni di destinazione',
     'Configuration background jobs' => 'Configurazione delle attività in background',
+    'Saved payment methods' => 'Metodi di pagamento salvati',
 ];

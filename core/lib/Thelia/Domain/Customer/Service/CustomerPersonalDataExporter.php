@@ -20,6 +20,8 @@ use Thelia\Model\Cart;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerListItemQuery;
 use Thelia\Model\CustomerListQuery;
+use Thelia\Model\CustomerPaymentMethod;
+use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Order;
@@ -39,7 +41,7 @@ use Thelia\Model\OrderReturnQuery;
  */
 final readonly class CustomerPersonalDataExporter
 {
-    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter', 'customer_lists'];
+    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter', 'customer_lists', 'payment_methods'];
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
@@ -63,6 +65,7 @@ final readonly class CustomerPersonalDataExporter
             'carts' => $this->exportCarts($customer),
             'newsletter' => $this->exportNewsletterSubscription($customer),
             'customer_lists' => $this->exportCustomerLists($customer),
+            'payment_methods' => $this->exportPaymentMethods($customer),
         ];
 
         foreach ($this->personalDataProviders as $provider) {
@@ -469,6 +472,43 @@ final readonly class CustomerPersonalDataExporter
             'locale' => $newsletter->getLocale(),
             'unsubscribed' => $newsletter->getUnsubscribed(),
             'created_at' => $this->formatDate($newsletter->getCreatedAt()),
+        ];
+    }
+
+    /**
+     * The provider token never appears here: the module that stored the method is
+     * named by its code, never by the opaque reference it handed back.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportPaymentMethods(Customer $customer): array
+    {
+        // Same reasoning as exportAccount(): the account's own language, not the
+        // shop default it falls back to when the account carries none.
+        $locale = $customer->getLangModel()?->getLocale();
+        $methods = [];
+
+        foreach (CustomerPaymentMethodQuery::create()->filterByCustomerId($customer->getId())->find() as $method) {
+            $methods[] = $this->exportPaymentMethod($method, $locale);
+        }
+
+        return $methods;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function exportPaymentMethod(CustomerPaymentMethod $method, ?string $locale): array
+    {
+        $module = $method->getPaymentModule();
+
+        return [
+            'module_code' => $module->getCode(),
+            'module_title' => null === $locale ? null : $module->setLocale($locale)->getTitle(),
+            'label' => $method->getLabel(),
+            'expires_at' => $this->formatDate($method->getExpiresAt()),
+            'is_default' => (bool) $method->getIsDefault(),
+            'created_at' => $this->formatDate($method->getCreatedAt()),
         ];
     }
 

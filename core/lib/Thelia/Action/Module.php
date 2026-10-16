@@ -34,14 +34,23 @@ use Thelia\Core\File\Exception\FileNotFoundException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Service\HandlerCleaner;
 use Thelia\Domain\Module\Exception\ModuleException;
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
+use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
+use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
+use Thelia\Domain\Payment\StoredPaymentMethodPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Map\ModuleTableMap;
+use Thelia\Model\Map\OrderPaymentPartTableMap;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\InstantPaymentModuleInterface;
 use Thelia\Module\ModuleManagement;
 use Thelia\Module\ModuleTransactionGuard;
+use Thelia\Module\PaymentModuleInterface;
+use Thelia\Module\PaymentModuleWithStoredMethodsInterface;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
@@ -54,6 +63,9 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function __construct(
         protected ContainerInterface $container,
         protected HandlerCleaner $handlerCleaner,
+        protected CustomerPaymentMethodService $customerPaymentMethods,
+        protected StoredPaymentMethodPayment $storedPaymentMethodPayment,
+        protected OrderPaymentPartSettlement $orderPaymentPartSettlement,
     ) {
     }
 
@@ -284,6 +296,11 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $instance->setContainer($this->container);
 
+                // The stored payment methods name the module under a foreign key that forbids
+                // the deletion. The provider is told to forget them first, while the module's
+                // classes are still on disk.
+                $this->customerPaymentMethods->forgetAllOfModule($module, $con);
+
                 $path = $module->getAbsoluteBaseDir();
 
                 ModuleTransactionGuard::run($con, (string) $module->getCode(), 'destroy', static function () use ($instance, $con, $event): void {
@@ -311,6 +328,12 @@ class Module extends BaseAction implements EventSubscriberInterface
                     ),
                 );
             }
+
+            // Again, for the paths above that stopped before the first call: a class gone
+            // from disk, a module missing its descriptor. The provider is told when the class
+            // still loads, the methods are dropped either way; after the first call there is
+            // nothing left to drop.
+            $this->customerPaymentMethods->forgetAllOfModule($module, $con);
 
             // The export and import tables carry no module id, so the entries the module
             // declared are matched on the namespace of their handler class.
@@ -341,6 +364,8 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         $moduleId = $module->getId();
 
+        $this->freezeModuleOnPaymentParts($module, $con);
+
         foreach (LangQuery::create()->find($con) as $lang) {
             $title = $module->setLocale($lang->getLocale())->getTitle() ?: $module->getCode();
 
@@ -353,6 +378,58 @@ class Module extends BaseAction implements EventSubscriberInterface
                 ->filterByLangId($lang->getId())
                 ->filterByDeliveryModuleId($moduleId)
                 ->update(['DeliveryModuleTitle' => $title, 'DeliveryModuleId' => null], $con);
+        }
+    }
+
+    /**
+     * The payment parts of an order name the module too, and the foreign key would
+     * release them without a trace: write the title first, in the language of their order.
+     */
+    private function freezeModuleOnPaymentParts(\Thelia\Model\Module $module, ConnectionInterface $con): void
+    {
+        $moduleId = $module->getId();
+
+        $this->lockTheOrdersOfThePartsOfModule($moduleId, $con);
+
+        // The code first, for the parts whose order has no language the title could be
+        // read in; then the title of each language, on the parts of the orders written in it.
+        $statement = $con->prepare(
+            'UPDATE `order_payment_part` SET `payment_module_title` = :title WHERE `payment_module_id` = :module',
+        );
+        $statement->execute(['title' => $module->getCode(), 'module' => $moduleId]);
+
+        $statement = $con->prepare(
+            'UPDATE `order_payment_part` AS `part` INNER JOIN `order` ON `order`.`id` = `part`.`order_id`
+             SET `part`.`payment_module_title` = :title
+             WHERE `part`.`payment_module_id` = :module AND `order`.`lang_id` = :lang',
+        );
+
+        foreach (LangQuery::create()->find($con) as $lang) {
+            $title = $module->setLocale($lang->getLocale())->getTitle() ?: $module->getCode();
+
+            $statement->execute(['title' => $title, 'module' => $moduleId, 'lang' => $lang->getId()]);
+        }
+
+        OrderPaymentPartTableMap::clearInstancePool();
+    }
+
+    /**
+     * The settlement and the release of a part lock the order by its primary key, then its
+     * parts: the same order here, orders first and by increasing id, or the two meet in a
+     * deadlock. The orders are found by a read that locks nothing, because a locking read
+     * joining the parts would lock them through the index on the module, before the orders.
+     */
+    private function lockTheOrdersOfThePartsOfModule(int $moduleId, ConnectionInterface $con): void
+    {
+        $statement = $con->prepare(
+            'SELECT DISTINCT `order_id` FROM `order_payment_part` WHERE `payment_module_id` = :module ORDER BY `order_id`',
+        );
+        $statement->execute(['module' => $moduleId]);
+
+        foreach (array_chunk(array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN)), 500) as $orderIds) {
+            $con
+                ->query('SELECT `id` FROM `order` WHERE `id` IN ('.implode(',', $orderIds).') ORDER BY `id` FOR UPDATE')
+                ->close();
         }
     }
 
@@ -491,7 +568,11 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Call the payment method of the payment module of the given order.
      *
-     * @throws \RuntimeException if no payment module can be found
+     * A module that keeps payment methods is asked to pay with the one chosen on the cart
+     * of the order, when there is one and it can still pay; with a new one otherwise.
+     *
+     * @throws \RuntimeException                       if no payment module can be found
+     * @throws StoredMethodPaymentRateLimitedException when the customer paid with a stored method too often
      */
     public function pay(OrderPaymentEvent $event): void
     {
@@ -504,11 +585,36 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $paymentModuleInstance = $paymentModule->getPaymentModuleInstance($this->container);
 
-        $response = $paymentModuleInstance->pay($order);
+        // The instant parts have settled the whole order (and the core has turned it paid,
+        // before this listener): the module that holds them has nothing left to charge,
+        // and asked to pay it would turn the order paid a second time.
+        if ($paymentModuleInstance instanceof InstantPaymentModuleInterface && $this->orderPaymentPartSettlement->isPaidByInstantPartsOnly($order)) {
+            return;
+        }
+
+        $response = $this->askTheModuleToPay($paymentModuleInstance, $order);
 
         if (null !== $response && $response instanceof Response) {
             $event->setResponse($response);
         }
+    }
+
+    /**
+     * @throws StoredMethodPaymentRateLimitedException
+     */
+    private function askTheModuleToPay(PaymentModuleInterface $paymentModule, OrderModel $order): ?Response
+    {
+        if (!$paymentModule instanceof PaymentModuleWithStoredMethodsInterface) {
+            return $paymentModule->pay($order);
+        }
+
+        $storedMethod = $this->storedPaymentMethodPayment->methodChosenFor($order, $paymentModule);
+
+        if (null === $storedMethod) {
+            return $paymentModule->pay($order);
+        }
+
+        return $this->storedPaymentMethodPayment->pay($paymentModule, $order, $storedMethod);
     }
 
     /**

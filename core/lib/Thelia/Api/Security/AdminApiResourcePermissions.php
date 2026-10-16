@@ -38,6 +38,7 @@ use Thelia\Api\Resource\ContentImage;
 use Thelia\Api\Resource\Country;
 use Thelia\Api\Resource\Currency;
 use Thelia\Api\Resource\Customer;
+use Thelia\Api\Resource\CustomerPaymentMethod;
 use Thelia\Api\Resource\CustomerTitle;
 use Thelia\Api\Resource\DestinationRestriction;
 use Thelia\Api\Resource\DestinationRestrictionCountry;
@@ -57,6 +58,7 @@ use Thelia\Api\Resource\Order;
 use Thelia\Api\Resource\OrderAddress;
 use Thelia\Api\Resource\OrderCoupon;
 use Thelia\Api\Resource\OrderHistory;
+use Thelia\Api\Resource\OrderPaymentPart;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
 use Thelia\Api\Resource\OrderReturn;
@@ -129,6 +131,7 @@ final readonly class AdminApiResourcePermissions
         Country::class => AdminResources::COUNTRY,
         Currency::class => AdminResources::CURRENCY,
         Customer::class => AdminResources::CUSTOMER,
+        CustomerPaymentMethod::class => AdminResources::CUSTOMER_PAYMENT_METHOD,
         CustomerTitle::class => AdminResources::TITLE,
         Feature::class => AdminResources::FEATURE,
         FeatureAv::class => AdminResources::FEATURE,
@@ -151,6 +154,7 @@ final readonly class AdminApiResourcePermissions
         OrderStatus::class => AdminResources::ORDER_STATUS,
         OrderShipment::class => AdminResources::ORDER,
         OrderShipmentItem::class => AdminResources::ORDER,
+        OrderPaymentPart::class => AdminResources::ORDER,
         OrderReturn::class => AdminResources::ORDER_RETURN,
         OrderReturnLine::class => AdminResources::ORDER_RETURN,
         OrderReturnStatus::class => AdminResources::ORDER_RETURN,

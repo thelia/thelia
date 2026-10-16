@@ -1597,6 +1597,10 @@
 
     <column name="payment_module_id" type="INTEGER" />
     <column name="delivery_module_id" type="INTEGER" />
+    <!-- The stored payment method the buyer chose to pay this cart with, NULL for a new one.
+         Chosen with the payment module and reset with it; read again, and checked again, when
+         the order is paid. -->
+    <column name="customer_payment_method_id" type="INTEGER" />
 
     <column defaultValue="0.000000" name="postage" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
@@ -1626,6 +1630,9 @@
     </foreign-key>
     <foreign-key foreignTable="module" name="fk_cart_delivery_module_id" onDelete="SET NULL">
       <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_payment_method" name="fk_cart_customer_payment_method_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_payment_method_id" />
     </foreign-key>
     <foreign-key foreignTable="currency" name="fk_cart_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
@@ -1660,6 +1667,9 @@
     </index>
     <index name="idx_cart_sale_unit_id">
       <index-column name="sale_unit_id" />
+    </index>
+    <index name="idx_cart_customer_payment_method_id">
+      <index-column name="customer_payment_method_id" />
     </index>
     <unique name="token_UNIQUE">
       <unique-column name="token" />
@@ -3190,6 +3200,7 @@
     <index name="idx_admin_sale_unit_sale_unit_id">
       <index-column name="sale_unit_id" />
     </index>
+
     <behavior name="timestampable" />
   </table>
 
@@ -3229,6 +3240,72 @@
     <index name="idx_sale_unit_module_config_module_id">
       <index-column name="module_id" />
     </index>
+    <behavior name="timestampable" />
+  </table>
+
+  <!-- A payment method a customer asked the shop to keep, so the next order can be
+       paid without typing it again. The provider keeps the card or the mandate; the
+       shop keeps only the opaque reference the provider handed back, and a label the
+       payment module wrote for the customer to recognize it by ("Visa ending 4242").
+       The token is stored in clear until it is encrypted at rest, and is never
+       logged nor serialized. A module cannot be removed while a row names it: the
+       deletion asks the module to forget its methods, then drops them. -->
+  <table name="customer_payment_method" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="customer_id" required="true" type="INTEGER" />
+    <column name="payment_module_id" required="true" type="INTEGER" />
+    <column description="opaque provider reference, never a card number" name="token" required="true" type="LONGVARCHAR" />
+    <column description="what the customer sees, written by the payment module, never a full card number" name="label" required="true" size="255" type="VARCHAR" />
+    <column description="the last day the provider accepts the method, NULL when it does not expire" name="expires_at" type="DATE" />
+    <column defaultValue="0" description="the method offered first; at most one per customer" name="is_default" required="true" type="BOOLEAN" />
+
+    <foreign-key foreignTable="customer" name="fk_customer_payment_method_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_customer_payment_method_payment_module_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="PaymentModule">
+      <reference foreign="id" local="payment_module_id" />
+    </foreign-key>
+
+    <index name="idx_customer_payment_method_customer_id">
+      <index-column name="customer_id" />
+    </index>
+    <index name="fk_customer_payment_method_payment_module_id_idx">
+      <index-column name="payment_module_id" />
+    </index>
+
+    <behavior name="timestampable" />
+  </table>
+
+  <!-- One share of what an order is paid with. An order paid with several means has one
+       row per means, in settlement order; the primary part is the one that carries the
+       order's payment module. The module is released with SET NULL when it is deleted,
+       and the module deletion first writes its title on the parts that name it, the way
+       it does on the order. -->
+  <table name="order_payment_part" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="order_id" required="true" type="INTEGER" />
+    <column name="payment_module_id" type="INTEGER" />
+    <column description="the name the payment module had when it was deleted, NULL while the module is still installed" name="payment_module_title" size="255" type="VARCHAR" />
+    <column name="amount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="pending" description="one of OrderPaymentPartState" name="state" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="0" description="the part that carries the order's payment module; one per order" name="is_primary" required="true" type="BOOLEAN" />
+    <column defaultValue="0" description="settlement order, ascending" name="position" required="true" type="INTEGER" />
+
+    <foreign-key foreignTable="order" name="fk_order_payment_part_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_order_payment_part_payment_module_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="PaymentModule">
+      <reference foreign="id" local="payment_module_id" />
+    </foreign-key>
+
+    <index name="idx_order_payment_part_order_id_position">
+      <index-column name="order_id" />
+      <index-column name="position" />
+    </index>
+    <index name="fk_order_payment_part_payment_module_id_idx">
+      <index-column name="payment_module_id" />
+    </index>
+
     <behavior name="timestampable" />
   </table>
 </database>

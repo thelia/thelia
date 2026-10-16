@@ -1126,4 +1126,5 @@ return [
     'Price' => 'Preis',
     'Configuration destination restrictions' => 'Konfiguration der Lieferbeschränkungen',
     'Configuration background jobs' => 'Konfiguration der Hintergrundaufgaben',
+    'Saved payment methods' => 'Gespeicherte Zahlungsmethoden',
 ];

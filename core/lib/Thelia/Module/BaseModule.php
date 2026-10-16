@@ -520,6 +520,17 @@ class BaseModule implements BaseModuleInterface
      */
     private function taxationPlaceOf(Cart $cart): array
     {
+        return self::resolveTaxationPlace($cart, $this->getContainer());
+    }
+
+    /**
+     * The country and state a cart is taxed at: its delivery address, then the default
+     * address of its customer, then what the tax engine resolves for the request.
+     *
+     * @return array{0: Country, 1: State|null}
+     */
+    public static function resolveTaxationPlace(Cart $cart, ContainerInterface $container): array
+    {
         $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
         $country = $deliveryAddress?->getCountry();
 
@@ -535,7 +546,7 @@ class BaseModule implements BaseModuleInterface
         }
 
         /** @var TaxEngine $taxEngine */
-        $taxEngine = $this->getContainer()->get('thelia.taxEngine');
+        $taxEngine = $container->get('thelia.taxEngine');
 
         return [$taxEngine->getDeliveryCountry(), $taxEngine->getDeliveryState()];
     }

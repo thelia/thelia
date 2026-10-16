@@ -31,6 +31,12 @@ use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessLimiter;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderFingerprint;
+use Thelia\Domain\Payment\DTO\PaymentComposition;
+use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
+use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
+use Thelia\Domain\Payment\OrderPaymentComposer;
+use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
+use Thelia\Domain\Payment\StoredPaymentMethodPayment;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -38,7 +44,6 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
-use Thelia\Module\PaymentModuleInterface;
 
 readonly class CheckoutPaymentService
 {
@@ -51,11 +56,15 @@ readonly class CheckoutPaymentService
         private OrderFacade $orderFacade,
         private OrderFingerprint $orderFingerprint,
         private PaymentCartContext $paymentCartContext,
+        private StoredPaymentMethodPayment $storedPaymentMethodPayment,
+        private OrderPaymentComposer $orderPaymentComposer,
+        private OrderPaymentPartSettlement $orderPaymentPartSettlement,
     ) {
     }
 
     /**
-     * @throws GuestCheckoutNotAllowedException when the shop stopped allowing this cart to be ordered without an account
+     * @throws GuestCheckoutNotAllowedException        when the shop stopped allowing this cart to be ordered without an account
+     * @throws StoredMethodPaymentRateLimitedException when the customer already paid with a stored method too often this hour
      * @throws \Exception
      */
     public function pay(
@@ -71,6 +80,7 @@ readonly class CheckoutPaymentService
             $invoiceAddressId,
             $deliveryModuleId,
             $paymentModuleId,
+            customerPaymentMethodId: $cart->getCustomerPaymentMethodId(),
         ))->paymentResponse;
     }
 
@@ -83,9 +93,11 @@ readonly class CheckoutPaymentService
      * to read it from, so it comes back here — and the two go down the same path, ORDER_PAY,
      * so there is no second way to place an order to keep in step with the first.
      *
-     * @throws GuestCheckoutNotAllowedException when the shop stopped allowing this cart to be ordered without an account
-     * @throws CartAlreadyOrderedException      when this very cart was turned into an order by another request
-     * @throws TheliaProcessException           when nothing answered ORDER_PAY with an order
+     * @throws GuestCheckoutNotAllowedException        when the shop stopped allowing this cart to be ordered without an account
+     * @throws StoredMethodPaymentRateLimitedException when the customer already paid with a stored method too often this hour
+     * @throws PaymentCompositionRefusedException      when the instant payment means of the cart and the payment module chosen cannot make up one payment
+     * @throws CartAlreadyOrderedException             when this very cart was turned into an order by another request
+     * @throws TheliaProcessException                  when nothing answered ORDER_PAY with an order
      * @throws \Exception
      */
     public function payAndReturnOutcome(OrderPaymentRequest $request): OrderPaymentOutcome
@@ -94,13 +106,20 @@ readonly class CheckoutPaymentService
 
         $this->refuseAGuestTheShopNoLongerAllows($cart);
 
+        // Read once, here, because the fingerprint says what the order is paid with, and
+        // refused here, before the unpaid order of the cart is looked at, let alone cancelled:
+        // a composition the core refuses leaves the buyer with the order they had.
+        $composition = $this->orderPaymentComposer->composeForCart($cart, $request->paymentModuleId);
+
         $unpaidOrder = $this->orderFacade->findUnpaidOrderOf($cart);
 
-        if ($unpaidOrder instanceof Order) {
-            if ($this->mayBePresentedAgain($unpaidOrder, $cart, $request)) {
-                return $this->payAgain($unpaidOrder, $cart);
-            }
+        if ($unpaidOrder instanceof Order && $this->mayBePresentedAgain($unpaidOrder, $cart, $request, $composition)) {
+            return $this->payAgain($unpaidOrder, $cart);
+        }
 
+        $this->refuseAStoredMethodPaymentOverTheAllowance($cart);
+
+        if ($unpaidOrder instanceof Order) {
             // Through the status flow, not written to the row: the stock the previous
             // order took is given back and the status listeners run. Done before the new
             // placement, which then finds a cart with no order standing on it.
@@ -125,6 +144,8 @@ readonly class CheckoutPaymentService
                 $request->deliveryModuleId,
                 $request->paymentModuleId,
                 $request->currency?->getId(),
+                $request->customerPaymentMethodId,
+                $composition,
             ));
 
         if ($request->currency instanceof Currency) {
@@ -159,8 +180,13 @@ readonly class CheckoutPaymentService
      * is paying for — the fingerprint. And the payment module must have said it can be
      * presented the same order twice: a module whose provider reference is one key on
      * the order, overwritten at each attempt, cannot, and gets a new order instead.
+     *
+     * A third one for an order with payment parts: it must not have been refunded while it
+     * holds an instant part still marked settled. The module gave that part back with the
+     * refund, and presenting the order again would charge the provider the balance alone and
+     * pay the order with the part missing; the order is taken back and another is placed.
      */
-    private function mayBePresentedAgain(Order $unpaidOrder, Cart $cart, OrderPaymentRequest $request): bool
+    private function mayBePresentedAgain(Order $unpaidOrder, Cart $cart, OrderPaymentRequest $request, PaymentComposition $composition): bool
     {
         if (!$this->orderFingerprint->matches(
             $unpaidOrder,
@@ -168,13 +194,17 @@ readonly class CheckoutPaymentService
             $request->deliveryModuleId,
             $request->paymentModuleId,
             $request->currency?->getId(),
+            $request->customerPaymentMethodId,
+            $composition,
         )) {
             return false;
         }
 
-        $paymentModule = $unpaidOrder->getPaymentModuleInstance();
+        if (!$unpaidOrder->getPaymentModuleInstance()->supportsPaymentRetry()) {
+            return false;
+        }
 
-        return $paymentModule instanceof PaymentModuleInterface && $paymentModule->supportsPaymentRetry();
+        return !$this->orderPaymentPartSettlement->wasRefundedWhileHoldingInstantParts($unpaidOrder);
     }
 
     /**
@@ -182,6 +212,8 @@ readonly class CheckoutPaymentService
      *
      * ORDER_PAY is not raised, so nothing is written and ORDER_BEFORE_PAYMENT — the
      * confirmation e-mail and the shop notification — does not go out a second time.
+     * MODULE_PAY is the same event the placement raises, so a stored payment method
+     * chosen on the cart pays this attempt the way it paid the first.
      */
     private function payAgain(Order $unpaidOrder, Cart $cart): OrderPaymentOutcome
     {
@@ -226,6 +258,34 @@ readonly class CheckoutPaymentService
         }
 
         throw new GuestCheckoutNotAllowedException('This order can no longer be placed without an account. Please sign in or create one.');
+    }
+
+    /**
+     * The hourly allowance of payments with a stored method, asked before anything is
+     * written: MODULE_PAY only spends it once the order it pays exists, and a customer
+     * over the limit refused there would be left with an unpaid order, and the previous
+     * one cancelled, for nothing. Nothing is spent here — StoredPaymentMethodPayment::pay()
+     * still spends the slot when the provider is actually asked.
+     *
+     * Asked here, when the buyer pays, and nowhere earlier: the steps of the tunnel are
+     * read by every page that shows the progression and by the validation of the API,
+     * and a limit on paying is not something the cart is missing. An attempt that
+     * presents the unpaid order again is not asked either: it writes nothing, and pay()
+     * refuses it before the provider is called.
+     *
+     * The method is read off the cart, not off the request: MODULE_PAY pays with the one
+     * the cart names, and a caller that left it out of the request would otherwise get
+     * its order written before being refused.
+     *
+     * @throws StoredMethodPaymentRateLimitedException
+     */
+    private function refuseAStoredMethodPaymentOverTheAllowance(Cart $cart): void
+    {
+        if (null !== $cart->getCustomerPaymentMethodId()
+            && $this->storedPaymentMethodPayment->customerHasExhaustedTheirAllowance((int) $cart->getCustomerId())
+        ) {
+            throw new StoredMethodPaymentRateLimitedException();
+        }
     }
 
     /**

@@ -147,6 +147,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $cart->setPaymentModuleId((int) $event->getPaymentModuleId());
+        // Chosen with the module, so reset with it: a method stored through another
+        // module cannot pay through this one.
+        $cart->setCustomerPaymentMethodId($event->getCustomerPaymentMethodId());
         $cart->save();
     }
 

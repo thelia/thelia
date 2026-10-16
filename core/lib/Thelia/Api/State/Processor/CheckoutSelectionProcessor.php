@@ -40,6 +40,7 @@ use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
+use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -111,6 +112,10 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
                 CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
             );
+        } catch (CustomerPaymentMethodException $refusal) {
+            // A stored method of another customer reads like a missing one, and none of
+            // these messages carries the provider reference.
+            throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
         }
 
         // The selection wrote through events and services that hold their own instances
@@ -174,16 +179,24 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
+     * @throws CustomerPaymentMethodException
      */
     private function selectPaymentModule(Cart $cart, CheckoutPaymentModuleInput $input): void
     {
         $module = $this->activatedModule($input->paymentModuleId, BaseModule::PAYMENT_MODULE_TYPE, 'payment');
 
-        if ($cart->getPaymentModuleId() === $module->getId()) {
+        if (
+            $cart->getPaymentModuleId() === $module->getId()
+            && $cart->getCustomerPaymentMethodId() === $input->customerPaymentMethodId
+        ) {
             return;
         }
 
-        $this->checkoutFacade->selectPaymentModule(new CheckoutDTO($cart, paymentModuleId: $module->getId()));
+        $this->checkoutFacade->selectPaymentModule(new CheckoutDTO(
+            $cart,
+            paymentModuleId: $module->getId(),
+            customerPaymentMethodId: $input->customerPaymentMethodId,
+        ));
     }
 
     /**

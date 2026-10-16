@@ -205,6 +205,15 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 30,
                 'interval' => '1 minute',
             ],
+            // Paying with a stored payment method asks for no card number, so a stolen
+            // session, or a client caught in a loop, could charge the customer's card
+            // again and again. Counted per customer. A real customer pays a handful of
+            // orders an hour at most, a retry after a declined payment included.
+            'stored_method_payment' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '1 hour',
+            ],
         ],
         'messenger' => [
             // Read and written as JSON through an allow list, never PHP

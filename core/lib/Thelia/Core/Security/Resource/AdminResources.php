@@ -110,6 +110,7 @@ class AdminResources
     public const API = 'admin.configuration.api';
     public const TITLE = 'admin.customer.title';
     public const TAG = 'admin.configuration.tag';
+    public const CUSTOMER_PAYMENT_METHOD = 'admin.customer.payment-method';
 
     /**
      * Create a new AdminRessources instance.

@@ -1476,4 +1476,123 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@background_jobs_resource_id, 'nl_NL', 'Configuratie van achtergrondtaken', NULL, NULL, NULL),
     (@background_jobs_resource_id, 'ru_RU', 'Настройка фоновых задач', NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- Stored payment methods
+--
+-- A customer can ask the shop to keep a payment method for the next order.
+-- The provider keeps the card or the mandate; the shop keeps the opaque
+-- reference the provider handed back and a label the payment module wrote
+-- ("Visa ending 4242"), never a card number nor a security code. A module
+-- cannot be removed while a method names it: removing the module asks it to
+-- forget its methods at the provider, then drops them.
+--
+-- Replayable: the table is created only when missing.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `customer_payment_method`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_id` INTEGER NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `token` TEXT NOT NULL COMMENT 'opaque provider reference, never a card number',
+    `label` VARCHAR(255) NOT NULL COMMENT 'what the customer sees, written by the payment module, never a full card number',
+    `expires_at` DATE COMMENT 'the last day the provider accepts the method, NULL when it does not expire',
+    `is_default` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the method offered first; at most one per customer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_customer_payment_method_customer_id` (`customer_id`),
+    INDEX `fk_customer_payment_method_payment_module_id_idx` (`payment_module_id`),
+    CONSTRAINT `fk_customer_payment_method_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_payment_method_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The stored method a buyer chose to pay a cart with, NULL for a new one. Chosen with
+-- the payment module, and reset with it; a method that goes away leaves the cart
+-- paying with a new one.
+--
+-- Replayable: the column, its index and its foreign key are each added only when missing.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'customer_payment_method_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD `customer_payment_method_id` INTEGER NULL AFTER `payment_module_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_customer_payment_method_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_customer_payment_method_id` (`customer_payment_method_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_customer_payment_method_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_customer_payment_method_id` FOREIGN KEY (`customer_payment_method_id`) REFERENCES `customer_payment_method` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.customer.payment-method', NOW(), NOW());
+
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @customer_payment_method_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.customer.payment-method');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@customer_payment_method_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'de_DE', 'Gespeicherte Zahlungsmethoden', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'en_US', 'Saved payment methods', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'es_ES', 'Métodos de pago guardados', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'fr_FR', 'Moyens de paiement enregistrés', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'it_IT', 'Metodi di pagamento salvati', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'nl_NL', 'Opgeslagen betaalmethoden', NULL, NULL, NULL),
+    (@customer_payment_method_resource_id, 'ru_RU', 'Сохранённые способы оплаты', NULL, NULL, NULL);
+
+-- ---------------------------------------------------------------------
+-- order_payment_part
+--
+-- One share of what an order is paid with, one row per payment means in
+-- settlement order, so a gift card or a credit note can settle part of an
+-- order before the payment module charges the balance. Removing a module
+-- keeps the part and releases the module reference; the module deletion
+-- first writes the module title on the parts that name it.
+--
+-- Replayable: the table is created only when missing.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `order_payment_part`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `payment_module_id` INTEGER,
+    `payment_module_title` VARCHAR(255) COMMENT 'the name the payment module had when it was deleted, NULL while the module is still installed',
+    `amount` DECIMAL(16,6) NOT NULL,
+    `state` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'one of OrderPaymentPartState',
+    `is_primary` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the part that carries the order''s payment module; one per order',
+    `position` INTEGER DEFAULT 0 NOT NULL COMMENT 'settlement order, ascending',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_payment_part_order_id_position` (`order_id`, `position`),
+    INDEX `fk_order_payment_part_payment_module_id_idx` (`payment_module_id`),
+    CONSTRAINT `fk_order_payment_part_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_payment_part_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 SET FOREIGN_KEY_CHECKS = 1;

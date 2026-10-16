@@ -29,6 +29,8 @@ use Thelia\Domain\Checkout\Exception\DeliveryDateUnavailableException;
 use Thelia\Domain\Checkout\Exception\DeliverySlotFullException;
 use Thelia\Domain\Checkout\Exception\GiftMessageTooLongException;
 use Thelia\Domain\Checkout\Exception\UnknownGiftWrappingException;
+use Thelia\Domain\Payment\Exception\PaymentMethodNotOwnedException;
+use Thelia\Domain\Payment\Exception\StoredMethodNotSelectableException;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSelection;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
@@ -161,7 +163,12 @@ final readonly class CartFacade
 
     /**
      * Select payment module on cart and refresh shipping.
-     * Use CheckoutDTO with cart + paymentModuleId filled.
+     * Use CheckoutDTO with cart + paymentModuleId filled, and customerPaymentMethodId to
+     * pay with one of the buyer's stored methods of that module; left out, the buyer pays
+     * with a new one.
+     *
+     * @throws PaymentMethodNotOwnedException
+     * @throws StoredMethodNotSelectableException
      */
     public function setPaymentModule(CheckoutDTO $dto): void
     {

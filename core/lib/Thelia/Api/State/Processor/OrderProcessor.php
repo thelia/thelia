@@ -16,8 +16,10 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
@@ -51,26 +53,35 @@ final readonly class OrderProcessor implements ProcessorInterface
         }
 
         $order = OrderQuery::create()->findPk((int) $uriVariables['id']);
-        $requestedStatusId = $this->requestedStatusId($data);
 
-        if (null === $order || null === $requestedStatusId || $requestedStatusId === $order->getStatusId()) {
+        if (null === $order) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
 
-        // Persist everything but the status, then move the status through the event.
-        // One transaction around both: a refused transition must not leave the other
-        // fields of the request written while the client is told the write failed.
-        $data->setOrderStatus((new OrderStatusResource())->setId($order->getStatusId()));
-
+        // Every write of an order goes down the locked road, whatever the request says of the
+        // status: the resource carries the status the provider read, which may be older than
+        // the row, and the persistence writes it back. One transaction around the write and
+        // the event: a refused transition must not leave the other fields of the request
+        // written while the client is told the write failed.
         $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
         $connection->beginTransaction();
+        $event = null;
 
         try {
-            $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+            $lockedStatusId = $this->lockTheOrder($connection, (int) $uriVariables['id']) ?? throw new NotFoundHttpException('No such order.');
+            $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
 
-            $order->reload();
-            $event = (new OrderEvent($order))->setStatus($requestedStatusId);
-            $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+            // The status written back is always the one read under the lock: the column itself is
+            // moved through the event only, and a status another request committed since the
+            // provider read the order is not undone by a request that never spoke of the status.
+            $data->setOrderStatus((new OrderStatusResource())->setId($lockedStatusId));
+            $resource = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+
+            if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
+                $order->reload();
+                $event = (new OrderEvent($order))->setStatus($requestedStatusId);
+                $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+            }
 
             $connection->commit();
         } catch (OrderStatusTransitionRefusedException $exception) {
@@ -83,6 +94,10 @@ final readonly class OrderProcessor implements ProcessorInterface
             throw $throwable;
         }
 
+        if (null === $event) {
+            return $resource;
+        }
+
         return $this->transformer->modelToResource(
             resourceClass: OrderResource::class,
             propelModel: $event->getOrder(),
@@ -90,12 +105,45 @@ final readonly class OrderProcessor implements ProcessorInterface
         );
     }
 
-    private function requestedStatusId(OrderResource $data): ?int
+    /**
+     * Locks the order row by its primary key: the first statement of the transaction, before
+     * any plain read, since the read view of InnoDB freezes at the first one. The listeners
+     * of the status event (the release of the payment parts asks the modules to give back
+     * what they hold) then read what another request committed before this lock was granted,
+     * not what a view frozen earlier shows.
+     *
+     * @return int|null the status stored, as read under the lock; null when the order is gone
+     */
+    private function lockTheOrder(ConnectionInterface $connection, int $orderId): ?int
+    {
+        $statement = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :orderId FOR UPDATE');
+        $statement->bindValue(':orderId', $orderId, \PDO::PARAM_INT);
+        $statement->execute();
+        $statusId = $statement->fetchColumn();
+        $statement->closeCursor();
+
+        // The statement wrapper of Propel answers an empty string for no row at all.
+        return null === $statusId || '' === $statusId ? null : (int) $statusId;
+    }
+
+    /**
+     * The status the client asked for, null when the request leaves it as it was: the status
+     * of the resource is compared with the one the provider read before the request was
+     * applied to it (API Platform's previous data). Called without it, a status that differs
+     * from the one of the order read just before is taken as asked for.
+     */
+    private function requestedStatusId(OrderResource $data, mixed $previousData, ?int $statusIdRead): ?int
     {
         if (!(new \ReflectionProperty($data, 'orderStatus'))->isInitialized($data)) {
             return null;
         }
 
-        return $data->getOrderStatus()->getId();
+        $statusId = $data->getOrderStatus()->getId();
+
+        if ($previousData instanceof OrderResource && (new \ReflectionProperty($previousData, 'orderStatus'))->isInitialized($previousData)) {
+            $statusIdRead = $previousData->getOrderStatus()->getId();
+        }
+
+        return $statusId === $statusIdRead ? null : $statusId;
     }
 }

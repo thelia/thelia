@@ -1728,6 +1728,7 @@ CREATE TABLE `cart`
     `address_invoice_id` INTEGER,
     `delivery_module_id` INTEGER,
     `payment_module_id` INTEGER,
+    `customer_payment_method_id` INTEGER,
     `postage` DECIMAL(10, 2),
     `postage_tax` DECIMAL(10, 2),
     `postage_tax_rule_title` VARCHAR(255),
@@ -1749,6 +1750,7 @@ CREATE TABLE `cart`
     INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
     INDEX `idx_cart_currency_id` (`currency_id`),
     INDEX `idx_cart_sale_unit_id` (`sale_unit_id`),
+    INDEX `idx_cart_customer_payment_method_id` (`customer_payment_method_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -1792,6 +1794,11 @@ CREATE TABLE `cart`
     CONSTRAINT `fk_cart_sale_unit_id`
         FOREIGN KEY (`sale_unit_id`)
         REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_cart_customer_payment_method_id`
+        FOREIGN KEY (`customer_payment_method_id`)
+        REFERENCES `customer_payment_method` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -5412,6 +5419,71 @@ CREATE TABLE `messenger_messages`
     `delivered_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_messenger_messages_queue_name_available_at` (`queue_name`, `available_at`, `delivered_at`, `id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_payment_method
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_payment_method`;
+
+CREATE TABLE `customer_payment_method`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_id` INTEGER NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `token` TEXT NOT NULL COMMENT 'opaque provider reference, never a card number',
+    `label` VARCHAR(255) NOT NULL COMMENT 'what the customer sees, written by the payment module, never a full card number',
+    `expires_at` DATE COMMENT 'the last day the provider accepts the method, NULL when it does not expire',
+    `is_default` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the method offered first; at most one per customer',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_customer_payment_method_customer_id` (`customer_id`),
+    INDEX `fk_customer_payment_method_payment_module_id_idx` (`payment_module_id`),
+    CONSTRAINT `fk_customer_payment_method_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_payment_method_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- order_payment_part
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_payment_part`;
+
+CREATE TABLE `order_payment_part`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `payment_module_id` INTEGER,
+    `payment_module_title` VARCHAR(255) COMMENT 'the name the payment module had when it was deleted, NULL while the module is still installed',
+    `amount` DECIMAL(16,6) NOT NULL,
+    `state` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'one of OrderPaymentPartState',
+    `is_primary` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'the part that carries the order''s payment module; one per order',
+    `position` INTEGER DEFAULT 0 NOT NULL COMMENT 'settlement order, ascending',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_payment_part_order_id_position` (`order_id`, `position`),
+    INDEX `fk_order_payment_part_payment_module_id_idx` (`payment_module_id`),
+    CONSTRAINT `fk_order_payment_part_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_payment_part_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 # This restores the fkey checks, after having unset them earlier

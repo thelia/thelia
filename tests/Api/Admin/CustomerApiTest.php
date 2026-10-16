@@ -14,13 +14,33 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
+use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 final class CustomerApiTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        StoredMethodsPaymentModule::reset();
+    }
+
+    protected function tearDown(): void
+    {
+        StoredMethodsPaymentModule::reset();
+
+        parent::tearDown();
+    }
+
     /**
      * firstname and lastname are NOT NULL columns with no default. A payload
      * that misspells them - an ERP sending firstName rather than firstname -
@@ -135,6 +155,51 @@ final class CustomerApiTest extends ApiTestCase
 
         self::assertSame(204, $response->getStatusCode());
         self::assertNull(CustomerQuery::create()->findPk($id));
+    }
+
+    /**
+     * The admin API deletes a customer through the same action as the back office,
+     * so the provider is told to forget the stored methods the cascade drops.
+     */
+    public function testDeleteCustomerTellsTheProviderToForgetTheirStoredMethods(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $method = $this->getService(CustomerPaymentMethodService::class)
+            ->register($customer, $this->paymentModuleRow(), 'pm_1', 'Visa ending 1111', null);
+        $methodId = (int) $method->getId();
+
+        $response = $this->jsonRequest('DELETE', '/api/admin/customers/'.$customer->getId(), token: $token);
+
+        self::assertSame(204, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNull(CustomerQuery::create()->findPk($customer->getId()));
+        self::assertNull(CustomerPaymentMethodQuery::create()->findPk($methodId));
+        self::assertSame([$methodId], StoredMethodsPaymentModule::$forgottenMethodIds, 'The provider was asked to forget it.');
+    }
+
+    public function testDeleteCustomerWithOrdersIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->order($customer);
+
+        $response = $this->jsonRequest('DELETE', '/api/admin/customers/'.$customer->getId(), token: $token);
+
+        self::assertSame(409, $response->getStatusCode(), (string) $response->getContent());
+        self::assertNotNull(CustomerQuery::create()->findPk($customer->getId()));
+    }
+
+    public function testDeleteCustomerReturns404ForNonExistent(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('DELETE', '/api/admin/customers/999999', token: $token);
+
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testGetCustomerReturns404ForNonExistent(): void
@@ -339,5 +404,26 @@ final class CustomerApiTest extends ApiTestCase
     {
         CustomerQuery::create()->filterById($customerId)->update(['UpdatedAt' => $date], $this->getPropelConnection());
         CustomerTableMap::clearInstancePool();
+    }
+
+    private function paymentModuleRow(): Module
+    {
+        $code = StoredMethodsPaymentModule::getModuleCode();
+        $existing = ModuleQuery::create()->findOneByCode($code);
+
+        if (null !== $existing) {
+            return $existing;
+        }
+
+        $module = (new Module())
+            ->setCode($code)
+            ->setFullNamespace(StoredMethodsPaymentModule::class)
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->setCategory('payment')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $module->save($this->getPropelConnection());
+
+        return $module;
     }
 }

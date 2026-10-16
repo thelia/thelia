@@ -24,19 +24,25 @@ use Thelia\Model\Customer;
  * by CustomerPersonalDataExporter when the data of a customer is exported,
  * and by CustomerAnonymizer when that customer is anonymized.
  *
- * Core covers the customer account, its addresses, orders and their frozen
- * order addresses, carts and newsletter subscriptions. Everything else — a
- * loyalty balance, a support ticket, a stored payment token — belongs to the
- * module that stores it, hence this interface.
+ * Core covers the sections listed in
+ * CustomerPersonalDataExporter::CORE_SECTION_NAMES. Everything else — a
+ * loyalty balance, a support ticket — belongs to the module that stores it,
+ * hence this interface.
+ *
+ * A stored payment method is not one of them: the core keeps it, in
+ * `customer_payment_method`, and a payment module records it through
+ * Thelia\Domain\Payment\CustomerPaymentMethodService rather than in a table
+ * of its own.
  */
 interface CustomerPersonalDataProviderInterface
 {
     /**
      * Key under which this provider appears in the exported data.
      *
-     * It must not collide with a core section (customer, addresses, orders,
-     * carts, newsletter) nor with another provider: prefer the module code,
-     * for instance `loyalty` or `virtual_product_delivery`.
+     * It must not collide with a core section, listed in
+     * CustomerPersonalDataExporter::CORE_SECTION_NAMES, nor with another
+     * provider: prefer the module code, for instance `loyalty` or
+     * `virtual_product_delivery`.
      */
     public function getPersonalDataSectionName(): string;
 
