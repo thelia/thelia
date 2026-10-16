@@ -16,10 +16,12 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent;
 use Thelia\Domain\Checkout\DTO\ExpressWalletAnswer;
 use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutConfirmationToken;
+use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
@@ -281,6 +283,93 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
     }
 
     /**
+     * The module vouched for the payment, then the shop placed nothing: the module is told,
+     * since its provider may hold the buyer's money by then.
+     */
+    public function testAPlacementThatFailsAfterTheWalletPaidIsReportedToTheModule(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+        $reported = $this->recordTheExpressPaymentsNotPlaced();
+
+        foreach (CartQuery::create()->findPk($cart->getId())?->getCartItems() ?? [] as $item) {
+            $item->getProductSaleElements()?->setQuantity(0)->save($this->getPropelConnection());
+        }
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(409);
+        self::assertCount(1, $reported);
+        self::assertSame(ExpressPaymentTestModule::MODULE_CODE, $reported[0]->getPaymentModuleCode());
+        self::assertSame($cart->getId(), $reported[0]->getCart()->getId());
+        self::assertSame(ExpressPaymentTestModule::$answer, $reported[0]->getAnswer());
+        self::assertInstanceOf(StockShortageException::class, $reported[0]->getReason());
+    }
+
+    /**
+     * A second confirmation of a cart already ordered places nothing and does not call
+     * `pay()` again: whatever the module authorized for it is captured by nobody.
+     */
+    public function testAConfirmationOfACartAlreadyOrderedIsReportedToTheModule(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+
+        $this->confirm($this->tokenFor($cart));
+        self::assertFalse($this->jsonAnswer(200)['alreadyPlaced']);
+
+        $reported = $this->recordTheExpressPaymentsNotPlaced();
+        $this->confirm($this->tokenFor($cart));
+
+        self::assertTrue($this->jsonAnswer(200)['alreadyPlaced']);
+        self::assertCount(1, $reported);
+        self::assertTrue($reported[0]->wasAlreadyPlaced());
+    }
+
+    /** A listener that fails while it is told must not turn the refusal into a crash. */
+    public function testAListenerThatFailsLeavesTheRefusalAsItWas(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+        $this->getService('event_dispatcher')->addListener(
+            ExpressPaymentNotPlacedEvent::class,
+            static fn () => throw new \RuntimeException('The provider is down.'),
+        );
+
+        foreach (CartQuery::create()->findPk($cart->getId())?->getCartItems() ?? [] as $item) {
+            $item->getProductSaleElements()?->setQuantity(0)->save($this->getPropelConnection());
+        }
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(409);
+    }
+
+    public function testARefusalTheModuleMadeItselfIsNotReportedBack(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = null;
+        $reported = $this->recordTheExpressPaymentsNotPlaced();
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(422);
+        self::assertCount(0, $reported, 'Nothing was taken, so there is nothing to release.');
+    }
+
+    public function testAPlacedPaymentIsNotReportedAsNotPlaced(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+        $reported = $this->recordTheExpressPaymentsNotPlaced();
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(200);
+        self::assertCount(0, $reported);
+    }
+
+    /**
      * The module asks what the sheet will charge every time the carrier or the cart
      * changes. Nothing until a carrier is chosen, then the goods for the chosen address plus
      * its postage, the sum the placement checks the wallet's total against.
@@ -471,6 +560,20 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
                 ->setDeliveryModuleId($module->getId())
                 ->save($this->getPropelConnection());
         }
+    }
+
+    /** @return \ArrayObject<int, ExpressPaymentNotPlacedEvent> filled as the requests run */
+    private function recordTheExpressPaymentsNotPlaced(): \ArrayObject
+    {
+        $reported = new \ArrayObject();
+        $this->getService('event_dispatcher')->addListener(
+            ExpressPaymentNotPlacedEvent::class,
+            static function (ExpressPaymentNotPlacedEvent $event) use ($reported): void {
+                $reported[] = $event;
+            },
+        );
+
+        return $reported;
     }
 
     private function registerWallet(): int
