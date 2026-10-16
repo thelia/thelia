@@ -26,6 +26,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -172,6 +173,15 @@ abstract class IntegrationTestCase extends KernelTestCase
     {
         if (static::$booted && static::getContainer()->has(ConfigCacheService::class)) {
             static::getContainer()->get(ConfigCacheService::class)->initCacheConfigs(true);
+        }
+
+        // Whether the shop sells from sale units is kept in the same shared pool: a
+        // unit the test created and rolled back must not leave the next test in the
+        // multi-sale-unit mode.
+        if (static::$booted && static::getContainer()->has(SaleUnitActivityChecker::class)) {
+            $saleUnitActivityChecker = static::getContainer()->get(SaleUnitActivityChecker::class);
+            $saleUnitActivityChecker->forget();
+            $saleUnitActivityChecker->forgetAfterTheRequest();
         }
 
         ConfigQuery::resetCache();
