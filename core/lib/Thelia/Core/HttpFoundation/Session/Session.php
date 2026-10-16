@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -343,7 +344,7 @@ class Session extends BaseSession
         }
 
         if (null !== $cart && $this->isValidCart($cart)) {
-            return $this->hasBeenPaidFor($cart) ? $this->consume($cart, $dispatcher) : $cart;
+            return $this->hasBeenPaidFor($cart) ? $this->consume($cart, $dispatcher) : $this->followSaleUnit($cart, $dispatcher);
         }
         $cartEvent = new CartRestoreEvent();
 
@@ -363,6 +364,19 @@ class Session extends BaseSession
         }
 
         $this->setSessionCart($cart);
+
+        return $this->followSaleUnit($cart, $dispatcher);
+    }
+
+    /**
+     * The cart is handed out for the sale unit the visitor buys from: a cart last
+     * priced and stocked for another one is checked again first (Action\Cart). A
+     * cart already on the current unit, and every cart of a single shop, costs a
+     * comparison of two ids and no query.
+     */
+    private function followSaleUnit(Cart $cart, EventDispatcherInterface $dispatcher): Cart
+    {
+        $dispatcher->dispatch(new CartEvent($cart), TheliaEvents::CART_FOLLOW_SALE_UNIT);
 
         return $cart;
     }

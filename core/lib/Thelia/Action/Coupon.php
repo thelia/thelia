@@ -503,6 +503,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_ADDITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_SALE_UNIT_SWITCHED => ['updateOrderDiscount', 10],
             TheliaEvents::CUSTOMER_LOGIN => ['updateOrderDiscount', 10],
             AddressEvent::POST_UPDATE => ['updateOrderDiscount', 10],
             // The promotions conditioned on the shipping choice (MatchDeliveryModules,
