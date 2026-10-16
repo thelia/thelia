@@ -67,11 +67,12 @@ final readonly class ShippingFacade
     }
 
     /**
-     * The same, for a theme that holds the id of the product only; null for an unknown product.
+     * The same, for a theme that holds the id of the product only; null for a product that is
+     * unknown or offline, so that an id kept from an earlier page tells nothing about it.
      */
     public function estimateProductDeliveryById(int $productId, ?Cart $cart = null): ?ProductDeliveryEstimate
     {
-        $product = ProductQuery::create()->findPk($productId);
+        $product = ProductQuery::create()->filterByVisible(1)->findPk($productId);
 
         return null === $product ? null : $this->productDeliveryEstimator->estimate($product, $cart);
     }

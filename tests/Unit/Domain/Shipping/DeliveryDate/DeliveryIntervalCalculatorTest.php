@@ -102,12 +102,21 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         }
     }
 
-    public function testADelayOfMillionsOfDaysIsNotWalkedDayByDay(): void
+    public function testADelayOfMillionsOfDaysIsCountedAsTheLongestCount(): void
     {
         $started = microtime(true);
 
-        self::assertNull($this->interval(self::TUESDAY_MORNING, 1000000000, 0, 0));
-        self::assertLessThan(1.0, microtime(true) - $started);
+        $millions = $this->interval(self::TUESDAY_MORNING, 1000000000, 0, 0);
+
+        self::assertLessThan(1.0, microtime(true) - $started, 'The delay was walked day by day.');
+        self::assertSame($this->interval(self::TUESDAY_MORNING, DeliveryIntervalCalculator::MAXIMUM_WORKING_DAYS, 0, 0), $millions);
+        self::assertNotNull($millions);
+    }
+
+    public function testACalendarOpenOneDayAWeekStillReachesTheLongestCount(): void
+    {
+        // Open on Mondays only: 732 working days are about fourteen years away.
+        self::assertNotNull($this->interval(self::TUESDAY_MORNING, DeliveryIntervalCalculator::MAXIMUM_WORKING_DAYS, 0, 0, shopClosedWeekdays: [2, 3, 4, 5, 6, 7], carrierClosedWeekdays: [2, 3, 4, 5, 6, 7]));
     }
 
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void
