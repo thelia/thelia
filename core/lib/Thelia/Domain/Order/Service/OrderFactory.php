@@ -83,11 +83,6 @@ readonly class OrderFactory
      */
     public function estimateDeliveryOf(ModelOrder $sessionOrder, CartModel $cart): ?DeliveryEstimate
     {
-        // A picked day is the promise: the order has no use for an estimate beside it.
-        if (null !== $cart->getDeliveryDate()) {
-            return null;
-        }
-
         $module = null === $sessionOrder->getDeliveryModuleId() ? null : ModuleQuery::create()->findPk($sessionOrder->getDeliveryModuleId());
 
         return null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);

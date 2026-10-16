@@ -290,6 +290,25 @@ final class DeliveryEstimateTest extends IntegrationTestCase
     /**
      * Recette 6: the product page names the soonest delivery and the country it holds for.
      */
+    /**
+     * A day left on the cart by a carrier the merchant has since stopped offering days for is
+     * dropped from the order: the order then gets the estimate, not nothing.
+     */
+    public function testAnOrderWhoseDayWasDroppedGetsTheEstimate(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Date, 1, 10, []);
+        [$cart, $customer] = $this->cartReadyToPay();
+        $this->getService(CartFacade::class)->chooseDeliveryDate($cart, $this->day(4));
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::None, 1, 10, []);
+
+        $order = OrderQuery::create()->findPk($this->place($cart, $customer));
+
+        self::assertNotNull($order);
+        self::assertNull($order->getDeliveryDay());
+        self::assertSame([$this->day(2), $this->day(3)], [$order->getEstimatedDeliveryFromDay(), $order->getEstimatedDeliveryToDay()]);
+    }
+
     public function testAProductPageAnnouncesTheSoonestCarrierForTheDefaultCountry(): void
     {
         $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
@@ -537,6 +556,22 @@ final class DeliveryEstimateTest extends IntegrationTestCase
 
         self::assertNull($estimator->estimateById($hidden));
         self::assertNotNull($estimator->estimateById((int) $this->product()->getId()));
+    }
+
+    public function testAVisibilityRuleThatFailsAnnouncesNothingAndBreaksNothing(): void
+    {
+        $broken = new class implements ProductVisibilityRuleInterface {
+            public function visibleProductClause(string $productIdColumn, ?Customer $customer): ?string
+            {
+                return '';
+            }
+        };
+        $estimator = new ProductDeliveryEstimator(
+            $this->getService(DeliveryTimeEstimator::class),
+            new ProductVisibility($this->getService(ReservedSaleProductRule::class), $this->getService(CurrentCustomerProvider::class), [$broken]),
+        );
+
+        self::assertNull($estimator->estimateById((int) $this->product()->getId()));
     }
 
     public function testTheCutoffMustBeAnHour(): void
