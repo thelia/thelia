@@ -18,7 +18,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * A model was written or deleted through the API.
+ * A model was created, written or deleted through the API.
  *
  * The API processors save and delete the Propel model directly, without going
  * through the Thelia\Action\* listeners the back office dispatches: whatever
@@ -28,6 +28,16 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ResourcePersistedEvent extends Event
 {
+    /**
+     * The model did not exist before the write: a POST. A listener that only
+     * cares that the model changed tells it from a deletion with isDelete(),
+     * which reads a creation and an update alike.
+     */
+    public const OPERATION_CREATE = 'create';
+
+    /**
+     * An existing model was updated.
+     */
     public const OPERATION_WRITE = 'write';
 
     public const OPERATION_DELETE = 'delete';
@@ -53,6 +63,11 @@ class ResourcePersistedEvent extends Event
     public function getModel(): ActiveRecordInterface
     {
         return $this->model;
+    }
+
+    public function isCreate(): bool
+    {
+        return self::OPERATION_CREATE === $this->operation;
     }
 
     public function isDelete(): bool
