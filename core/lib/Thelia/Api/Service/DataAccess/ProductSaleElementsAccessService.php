@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Localization\Service\LangService;
+use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
@@ -107,13 +108,21 @@ class ProductSaleElementsAccessService
             // below read: the customer discount and the tax are then applied to it
             // exactly the way they are applied to a public promo price.
             $effectivePrice = $effectivePrices[(int) $pse->getId()] ?? null;
+            $displayInitialPrice = null;
 
             if (null !== $effectivePrice) {
-                $pse->setVirtualColumn(
-                    'price_PROMO_PRICE',
-                    $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100)),
-                );
-                $isPromo = true;
+                $chargedPrice = $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100));
+                $pse->setVirtualColumn('price_PROMO_PRICE', $chargedPrice);
+                $displayInitialPrice = $effectivePrice->displayInitialPrice;
+
+                if (EffectivePrice::SOURCE_SALE_UNIT === $effectivePrice->source) {
+                    // A sale unit's own price is the price of the sale element there, not a
+                    // promotion of the national one: nothing is struck through.
+                    $pse->setVirtualColumn('price_PRICE', $chargedPrice);
+                    $isPromo = false;
+                } else {
+                    $isPromo = true;
+                }
             }
 
             foreach ($pse->getAttributeCombinations() as $attribute) {
@@ -126,6 +135,7 @@ class ProductSaleElementsAccessService
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
                 'isPromo' => $isPromo,
+                'displayInitialPrice' => $displayInitialPrice,
                 'isNew' => $pse->getNewness() ? true : false,
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
