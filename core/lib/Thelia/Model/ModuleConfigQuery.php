@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Base\ModuleConfigQuery as BaseModuleConfigQuery;
 
 /**
@@ -44,11 +45,42 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
      */
     private static array $values = [];
 
+    /**
+     * The values each sale unit gives the settings of a module, by sale unit id, module
+     * id then name, read once per unit and module.
+     *
+     * @var array<int, array<int, array<string, string|null>>>
+     */
+    private static array $saleUnitValues = [];
+
     /** The locale a row answers in when the caller names none. */
     private static ?string $rowDefaultLocale = null;
 
+    /**
+     * The value of a module setting for the sale unit whose configuration is in scope
+     * (SaleUnitConfigScope): the one the unit gives it, or else the national one.
+     */
     public function getConfigValue(int $moduleId, string $variableName, mixed $defaultValue = null, $valueLocale = null): ?string
     {
+        return $this->getConfigValueForSaleUnit(SaleUnitConfigScope::current(), $moduleId, $variableName, $defaultValue, $valueLocale);
+    }
+
+    /**
+     * The value of a module setting for the given sale unit, whatever is in scope:
+     * the one the unit gives it, or else the national one. A null sale unit reads the
+     * national value. A value set for a sale unit is the same in every locale.
+     */
+    public function getConfigValueForSaleUnit(?int $saleUnitId, int $moduleId, string $variableName, mixed $defaultValue = null, ?string $valueLocale = null): ?string
+    {
+        if (null !== $saleUnitId) {
+            $saleUnitValues = self::$saleUnitValues[$saleUnitId][$moduleId] ??= SaleUnitModuleConfigQuery::findValuesOfModule($saleUnitId, $moduleId);
+
+            // A row with no value leaves the setting to the national one, like a missing row.
+            if (null !== ($saleUnitValues[$variableName] ?? null)) {
+                return $saleUnitValues[$variableName];
+            }
+        }
+
         $valueKey = $moduleId.'|'.$variableName.'|'.($valueLocale ?? '');
 
         if (!\array_key_exists($valueKey, self::$values)) {
@@ -67,6 +99,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
     {
         self::$configsByModuleId = [];
         self::$values = [];
+        self::$saleUnitValues = [];
     }
 
     private static function readConfigValue(int $moduleId, string $variableName, ?string $valueLocale): ?string
@@ -150,6 +183,49 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
             ->save();
 
         self::resetConfigCache();
+
+        return $this;
+    }
+
+    /**
+     * Set the value a sale unit gives a module setting, read instead of the national one
+     * while the configuration of that unit is in scope.
+     *
+     * @param bool|null $secret a secret value is never read back by the admin API; null keeps
+     *                          the flag of a stored value, and leaves a new one readable
+     */
+    public function setConfigValueForSaleUnit(int $saleUnitId, int $moduleId, string $variableName, ?string $variableValue, ?bool $secret = null): static
+    {
+        $configValue = SaleUnitModuleConfigQuery::create()
+            ->filterBySaleUnitId($saleUnitId)
+            ->filterByModuleId($moduleId)
+            ->filterByName($variableName)
+            ->findOne()
+            ?? (new SaleUnitModuleConfig())
+                ->setSaleUnitId($saleUnitId)
+                ->setModuleId($moduleId)
+                ->setName($variableName);
+
+        if (null !== $secret) {
+            $configValue->setSecret($secret);
+        }
+
+        $configValue->setValue($variableValue)->save();
+
+        return $this;
+    }
+
+    /**
+     * Drop the value a sale unit gives a module setting: the national one applies again.
+     */
+    public function deleteConfigValueForSaleUnit(int $saleUnitId, int $moduleId, string $variableName): static
+    {
+        SaleUnitModuleConfigQuery::create()
+            ->filterBySaleUnitId($saleUnitId)
+            ->filterByModuleId($moduleId)
+            ->filterByName($variableName)
+            ->findOne()
+            ?->delete();
 
         return $this;
     }

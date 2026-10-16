@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\SaleUnit;
 
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\Exception\NoCurrentSaleUnitException;
 use Thelia\Model\SaleUnit;
 
@@ -28,6 +29,10 @@ use Thelia\Model\SaleUnit;
  * it is a multi-sale-unit request nothing resolved. A reader that can serve a
  * national answer reads getSaleUnit() and handles null; a writer that must not
  * guess (an order, a stock movement) calls requireSaleUnit() and lets it throw.
+ *
+ * The sale unit it holds is also the one whose configuration the static readers
+ * answer for (SaleUnitConfigScope): the store settings and the module settings it
+ * sets for itself.
  */
 class SaleUnitContext implements ResetInterface
 {
@@ -41,6 +46,7 @@ class SaleUnitContext implements ResetInterface
     public function setSaleUnit(?SaleUnit $saleUnit): void
     {
         $this->saleUnit = $saleUnit;
+        SaleUnitConfigScope::set($saleUnit?->getId());
     }
 
     public function requireSaleUnit(): SaleUnit
@@ -51,5 +57,6 @@ class SaleUnitContext implements ResetInterface
     public function reset(): void
     {
         $this->saleUnit = null;
+        SaleUnitConfigScope::reset();
     }
 }

@@ -19,6 +19,7 @@ use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderReturn;
 
@@ -48,7 +49,12 @@ final readonly class OrderReturnPdfService
         $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), self::TEMPLATE_NAME);
         $parser->setTemplateDefinition($pdfTemplate, true);
 
-        $html = $parser->render(self::TEMPLATE_NAME, $this->buildContext($return));
+        // The store identity printed on the document is the one of the sale unit the
+        // returned order was placed on.
+        $html = SaleUnitConfigScope::runFor(
+            $return->getOrder()?->getSaleUnitId(),
+            fn (): string => $parser->render(self::TEMPLATE_NAME, $this->buildContext($return)),
+        );
 
         $pdfEvent = new PdfEvent($html);
         $pdfEvent->setTemplateName(self::TEMPLATE_NAME);

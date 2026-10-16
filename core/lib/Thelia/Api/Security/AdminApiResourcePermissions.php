@@ -78,6 +78,8 @@ use Thelia\Api\Resource\ProductSaleElementsProductVideo;
 use Thelia\Api\Resource\ProductVideo;
 use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\SaleUnit;
+use Thelia\Api\Resource\SaleUnitConfig;
+use Thelia\Api\Resource\SaleUnitModuleConfig;
 use Thelia\Api\Resource\SaleUnitProductPrice;
 use Thelia\Api\Resource\SaleUnitProductSaleElements;
 use Thelia\Api\Resource\State;
@@ -164,6 +166,10 @@ final readonly class AdminApiResourcePermissions
         Sale::class => AdminResources::SALES,
         CatalogPriceRule::class => AdminResources::CATALOG_PRICE_RULE,
         SaleUnit::class => AdminResources::SALE_UNIT,
+        // The store settings of a unit (e-mails, legal identity): the national ones answer to CONFIG.
+        SaleUnitConfig::class => AdminResources::CONFIG,
+        // The settings of a module, a unit's own as the national ones.
+        SaleUnitModuleConfig::class => AdminResources::MODULE,
         SaleUnitProductPrice::class => AdminResources::SALE_UNIT,
         SaleUnitProductSaleElements::class => AdminResources::SALE_UNIT,
         State::class => AdminResources::STATE,

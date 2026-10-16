@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Thelia\Domain\Media\Service\ImageFormatPolicy;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 
 /**
@@ -42,6 +43,36 @@ class ConfigQuery extends BaseConfigQuery
      */
     public const ROUNDING_MODE_ROUNDING_OF_SUMS = 2;
 
+    /**
+     * The store settings a sale unit may set for itself, read for the sale unit whose
+     * configuration is in scope (SaleUnitConfigScope) before the national value: its
+     * name, its senders and the identity printed on its documents. Every other
+     * setting stays national, the country and the VAT exemption of the store first
+     * among them, since the taxes and therefore the prices depend on them.
+     *
+     * @var list<string>
+     */
+    public const SALE_UNIT_SCOPED_NAMES = [
+        'store_name',
+        'store_description',
+        'store_email',
+        'store_notification_emails',
+        'store_business_id',
+        'store_phone',
+        'store_fax',
+        'store_address1',
+        'store_address2',
+        'store_address3',
+        'store_zipcode',
+        'store_city',
+        'store_siret',
+        'store_vat_intracom',
+        'store_ape_code',
+        'store_eori',
+        'store_registration_exempt',
+        'store_legal_mentions',
+    ];
+
     protected static $booted = false;
 
     /**
@@ -55,6 +86,14 @@ class ConfigQuery extends BaseConfigQuery
 
     /** @var array<string, string> */
     private static array $envNames = [];
+
+    /**
+     * The store settings each sale unit sets for itself, by sale unit id then name,
+     * read once per unit the first time one of its scoped settings is asked for.
+     *
+     * @var array<int, array<string, string>>
+     */
+    private static array $saleUnitValues = [];
 
     /**
      * @internal
@@ -74,6 +113,15 @@ class ConfigQuery extends BaseConfigQuery
     {
         self::$booted = false;
         self::$cache = [];
+        self::$saleUnitValues = [];
+    }
+
+    /**
+     * @internal a store setting of a sale unit was written or deleted
+     */
+    public static function forgetSaleUnitValues(): void
+    {
+        self::$saleUnitValues = [];
     }
 
     /**
@@ -125,6 +173,22 @@ class ConfigQuery extends BaseConfigQuery
 
         if (isset($_ENV[$envName])) {
             return (string) $_ENV[$envName];
+        }
+
+        // A sale unit in scope answers for the store settings it sets itself. Nothing
+        // is read for a single shop, nor for a setting no sale unit can set.
+        $saleUnitId = SaleUnitConfigScope::current();
+
+        if (null !== $saleUnitId && \in_array($search, self::SALE_UNIT_SCOPED_NAMES, true)) {
+            if ($ignoreCache) {
+                unset(self::$saleUnitValues[$saleUnitId]);
+            }
+
+            $saleUnitValues = self::$saleUnitValues[$saleUnitId] ??= SaleUnitConfigQuery::findValuesOfSaleUnit($saleUnitId);
+
+            if (\array_key_exists($search, $saleUnitValues)) {
+                return $saleUnitValues[$search];
+            }
         }
 
         if (!\array_key_exists($search, self::$cache)) {

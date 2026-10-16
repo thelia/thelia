@@ -18,7 +18,9 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Event\SaleUnitEvent;
+use Thelia\Model\ModuleConfigQuery;
 
 /**
  * Keeps the shared answer to "does the shop sell from sale units" in step with the
@@ -39,6 +41,17 @@ readonly class SaleUnitCacheListener
     public function forgetTheActivity(): void
     {
         $this->activityChecker->forget();
+    }
+
+    /**
+     * The settings of a unit leave with it through a foreign key, without a model event
+     * of their own: what was read for it is dropped here.
+     */
+    #[AsEventListener(event: SaleUnitEvent::POST_DELETE)]
+    public function forgetTheConfigurationOfTheUnit(): void
+    {
+        ConfigQuery::forgetSaleUnitValues();
+        ModuleConfigQuery::resetConfigCache();
     }
 
     #[AsEventListener(event: KernelEvents::TERMINATE)]

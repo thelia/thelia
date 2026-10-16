@@ -5075,5 +5075,59 @@ CREATE TABLE `admin_sale_unit`
         ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- sale_unit_config
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_config`;
+
+CREATE TABLE `sale_unit_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL COMMENT 'one of the store settings a sale unit may set for itself (ConfigQuery::SALE_UNIT_SCOPED_NAMES)',
+    `value` TEXT NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_config_unique` (`sale_unit_id`, `name`),
+    CONSTRAINT `fk_sale_unit_config_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- sale_unit_module_config
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_unit_module_config`;
+
+CREATE TABLE `sale_unit_module_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `value` TEXT,
+    `secret` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'a secret value (a key, a password) is written and never read back by the API',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_module_config_unique` (`sale_unit_id`, `module_id`, `name`),
+    INDEX `idx_sale_unit_module_config_module_id` (`module_id`),
+    CONSTRAINT `fk_sale_unit_module_config_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_module_config_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

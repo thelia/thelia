@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Api\Resource\SaleUnitConfig;
 use Thelia\Api\Security\AdminApiResourcePermissions;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -153,6 +154,27 @@ final class AdminApiPermissionsApiTest extends ApiTestCase
         );
 
         self::assertSame(403, $response->getStatusCode());
+    }
+
+    public function testTheStoreSettingsOfASaleUnitNeedTheConfigurationRight(): void
+    {
+        self::assertSame(
+            AdminResources::CONFIG,
+            (new AdminApiResourcePermissions())->resolve(SaleUnitConfig::class),
+        );
+
+        $withSaleUnitRight = $this->createFixtureFactory()->restrictedAdmin([
+            AdminResources::SALE_UNIT => self::ALL_ACCESSES,
+        ]);
+        $withConfigRight = $this->createFixtureFactory()->restrictedAdmin([
+            AdminResources::CONFIG => self::ALL_ACCESSES,
+        ]);
+
+        $refused = $this->jsonRequest('GET', '/api/admin/sale_unit_configs', token: $this->authenticateAsAdmin($withSaleUnitRight));
+        $granted = $this->jsonRequest('GET', '/api/admin/sale_unit_configs', token: $this->authenticateAsAdmin($withConfigRight));
+
+        self::assertSame(403, $refused->getStatusCode());
+        self::assertJsonResponseSuccessful($granted);
     }
 
     public function testResourceWithoutADeclaredPermissionIsRefused(): void

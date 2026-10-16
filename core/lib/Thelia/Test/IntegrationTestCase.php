@@ -26,6 +26,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
@@ -184,6 +185,7 @@ abstract class IntegrationTestCase extends KernelTestCase
             $saleUnitActivityChecker->forgetAfterTheRequest();
         }
 
+        SaleUnitConfigScope::reset();
         ConfigQuery::resetCache();
         Country::resetDefaultCountryCache();
         Lang::resetActiveLangsCache();

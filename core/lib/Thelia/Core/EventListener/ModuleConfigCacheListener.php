@@ -19,6 +19,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Event\ModuleConfigEvent;
 use Thelia\Model\Event\ModuleConfigI18nEvent;
 use Thelia\Model\ModuleConfigQuery;
@@ -47,13 +48,24 @@ readonly class ModuleConfigCacheListener
     public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
-            ModuleConfigQuery::resetConfigCache();
+            $this->forgetWhatWasRead();
         }
     }
 
     #[AsEventListener(event: ConsoleEvents::COMMAND)]
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
+        $this->forgetWhatWasRead();
+    }
+
+    /**
+     * The values a sale unit gives the store settings are kept for a request in the same
+     * way, and dropped with those of the modules: a long-running worker must not keep
+     * reading what another process has changed since.
+     */
+    private function forgetWhatWasRead(): void
+    {
         ModuleConfigQuery::resetConfigCache();
+        ConfigQuery::forgetSaleUnitValues();
     }
 }

@@ -867,6 +867,54 @@ CREATE TABLE IF NOT EXISTS `sale_unit_product_sale_elements`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- The store settings a sale unit sets for itself (its name, its sender, the
+-- identity printed on its invoices), read instead of the national `config` row
+-- of the same name. A setting without a row keeps the national value.
+CREATE TABLE IF NOT EXISTS `sale_unit_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL COMMENT 'one of the store settings a sale unit may set for itself (ConfigQuery::SALE_UNIT_SCOPED_NAMES)',
+    `value` TEXT NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_config_unique` (`sale_unit_id`, `name`),
+    CONSTRAINT `fk_sale_unit_config_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The values a sale unit gives the settings of a module, read by the module
+-- instead of its national `module_config` row: the account of a payment
+-- provider, the sender of a carrier. A secret value is never read back by the API.
+CREATE TABLE IF NOT EXISTS `sale_unit_module_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_unit_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `value` TEXT,
+    `secret` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'a secret value (a key, a password) is written and never read back by the API',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `sale_unit_module_config_unique` (`sale_unit_id`, `module_id`, `name`),
+    INDEX `idx_sale_unit_module_config_module_id` (`module_id`),
+    CONSTRAINT `fk_sale_unit_module_config_sale_unit_id`
+        FOREIGN KEY (`sale_unit_id`)
+        REFERENCES `sale_unit` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_unit_module_config_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 -- The sale unit an order was placed on, so a shop selling from many units can
 -- tell whose order is whose. NULL for a national (single-shop) order, so an existing shop is
 -- untouched. `order` is versionable: the column is mirrored on `order_version`.
