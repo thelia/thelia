@@ -102,6 +102,14 @@ final class DeliveryIntervalCalculatorTest extends TestCase
         }
     }
 
+    public function testADelayOfMillionsOfDaysIsNotWalkedDayByDay(): void
+    {
+        $started = microtime(true);
+
+        self::assertNull($this->interval(self::TUESDAY_MORNING, 1000000000, 0, 0));
+        self::assertLessThan(1.0, microtime(true) - $started);
+    }
+
     public function testACalendarWithoutAnyWorkingDayGivesNoEstimate(): void
     {
         self::assertNull($this->interval(self::TUESDAY_MORNING, 1, 1, 1, shopClosedWeekdays: [1, 2, 3, 4, 5, 6, 7]));

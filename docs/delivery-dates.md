@@ -66,14 +66,15 @@ The buyer picks nothing here: each carrier announces the days a parcel is expect
 - The day the order comes in is the first day of preparation, unless the shop is closed that day or the order comes in at or after the cutoff: preparation starts on the next working day of the shop. The parcel leaves at the end of the last day of preparation; zero days of preparation leave the same day, like one.
 - The transit counts working days of the carrier from the day after the parcel leaves; zero days deliver that day, or on the next day the carrier works.
 - Preparation days follow the shop closed days of the week and the shop closures; transit days follow the carrier closed days of the week (or the shop's) and the closures of the carrier and of the shop.
-- The slowest product of the cart adds its `availability_delay_days` to the preparation.
+- The slowest product of the cart adds its `availability_delay_days` to the preparation, counted after the first day: zero or one day of preparation plus two days of the product ship on the third working day. A delay is read as at most 366 days.
+- A carrier that lets the buyer pick a day (`choice_mode` it accepts) shows its calendar and announces no estimate, on the delivery step, on the product page and on the order.
 
 So one day of preparation and two of transit deliver an order of Tuesday morning on Thursday, and on Friday once the cutoff is passed.
 
 | Where | What is shown |
 |---|---|
 | Delivery options (delivery step, `GET /api/front/delivery_modules`) | `minimumDeliveryDate` and `maximumDeliveryDate`, `Y-m-d`, filled by `DeliveryOptionsProvider` unless the module wrote its own (an empty string counts as none) |
-| Order | `order.estimated_delivery_from` / `estimated_delivery_to`, the interval announced when the order was placed (`OrderFactory`); it does not move when the delays change. Empty when the buyer picked a day. Order API: `estimatedDeliveryFrom`, `estimatedDeliveryTo` |
+| Order | `order.estimated_delivery_from` / `estimated_delivery_to`, counted again when the order is placed (`OrderFactory`): an order paid after the cutoff hour gets the next day, which is the day it will really be prepared. It then does not move when the delays change. Empty when the buyer picked a day, and when the count fails, which never refuses the order. Order API: `estimatedDeliveryFrom`, `estimatedDeliveryTo` |
 | Product page | `ShippingFacade::estimateProductDelivery($product, $cart)`: the soonest of the active carriers delivering to the delivery address of the cart, else the default address of its customer, else the default country of the shop, with that country, for the theme to name it. Null for a virtual product or when no carrier there announces delays |
 
 `DeliveryEstimateCalendar` loads the delays of every carrier, the closures and the shop settings once per request, so listing or comparing several carriers costs no query per carrier; `DeliveryDateSettings` empties it on every write. The estimate reads neither the session nor the request, and counts days in the time zone PHP runs in, so a command that writes an e-mail gets the same days as the delivery step. Thelia has no time zone setting of its own: set `date.timezone` to the shop's, for the web server and the command line alike. The estimate depends on the visitor's address and on today: Flexy serves the product page as `private`, and a theme or a proxy must not put it in a shared cache.

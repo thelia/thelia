@@ -173,6 +173,57 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertSame([$this->day(7), $this->day(8)], $this->announcedFor($cart));
     }
 
+    /**
+     * Zero days of preparation ship like one: the days the goods need count from there, they
+     * are not swallowed by it.
+     */
+    public function testTheDaysOfTheProductCountAfterAPreparationOfZeroDays(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 0, 2, 3);
+        [$cart] = $this->cartReadyToPay();
+        $this->factory->cartItem($cart, $this->product(['availabilityDelayDays' => 2]));
+
+        self::assertSame([$this->day(4), $this->day(5)], $this->announcedFor($cart));
+    }
+
+    public function testADelayBeyondTheHorizonIsCountedAsTheHorizon(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 0, 0);
+        [$cart] = $this->cartReadyToPay();
+        $product = $this->product();
+        $product->setAvailabilityDelayDays(2000000000)->save($this->getPropelConnection());
+        $this->factory->cartItem($cart, $product);
+
+        $started = microtime(true);
+        $estimate = $this->getService(DeliveryTimeEstimator::class)->estimateForCart($this->carrier, $cart);
+
+        self::assertLessThan(2.0, microtime(true) - $started, 'The estimate walked the whole delay.');
+        self::assertNotNull($estimate);
+        self::assertSame($this->day(1 + 366 - 1), $estimate->earliestDay());
+    }
+
+    /**
+     * A carrier the buyer picks a day from shows its calendar: no estimate beside it, on the
+     * delivery step nor on a product page.
+     */
+    public function testACarrierThatLetsTheBuyerPickADayAnnouncesNoEstimate(): void
+    {
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $this->settings()->saveRule($this->carrier, DeliveryDateChoiceMode::Date, 1, 10, []);
+        [$cart] = $this->cartReadyToPay();
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $this->getPropelConnection());
+
+        self::assertSame([null, null], $this->announcedFor($cart));
+        self::assertNull($this->getService(ShippingFacade::class)->estimateProductDelivery($this->product()));
+    }
+
+    public function testTheAvailabilityDelayOfAnEventIsBoundedByTheHorizon(): void
+    {
+        self::assertSame(366, (new \Thelia\Core\Event\Product\ProductUpdateEvent(1))->setAvailabilityDelayDays(100000)->getAvailabilityDelayDays());
+    }
+
     public function testDatesTheModuleGaveItselfAreKept(): void
     {
         $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);

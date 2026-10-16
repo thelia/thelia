@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Product;
 
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
+
 class ProductUpdateEvent extends ProductCreateEvent
 {
     protected $chapo;
@@ -143,7 +145,9 @@ class ProductUpdateEvent extends ProductCreateEvent
      */
     public function setAvailabilityDelayDays(?int $availabilityDelayDays): static
     {
-        $this->availabilityDelayDays = null === $availabilityDelayDays ? null : max(0, $availabilityDelayDays);
+        $this->availabilityDelayDays = null === $availabilityDelayDays
+            ? null
+            : max(0, min(DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS, $availabilityDelayDays));
         $this->carriesAvailabilityDelay = true;
 
         return $this;
