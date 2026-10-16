@@ -227,6 +227,43 @@ final class SaleUnitCartSwitchTest extends ActionIntegrationTestCase
         self::assertCount(1, $this->switches[0]->getReducedLines());
     }
 
+    /**
+     * Two requests of the same visitor may both find the cart on the old unit: the
+     * one that moves it second must not check it again against what the first one
+     * already settled.
+     */
+    public function testACartAnotherRequestAlreadyMovedIsLeftAlone(): void
+    {
+        $product = $this->product();
+        $cart = $this->cartOn($this->first);
+        $this->line($cart, $product, 3);
+        $this->factory->saleUnitProductSaleElements($this->second, $product->getDefaultSaleElements(), 1.0);
+        // Another request moved it meanwhile; this one still holds the cart as it read it.
+        CartQuery::create()->filterById($cart->getId())->update(['SaleUnitId' => $this->second->getId()], $this->getPropelConnection());
+        $this->buyFrom($this->second);
+
+        $this->follow($cart);
+
+        self::assertSame([], $this->switches, 'The move belongs to the request that made it.');
+        self::assertSame(3.0, (float) $this->lineOf($cart, $product)?->getQuantity());
+    }
+
+    public function testTheDiscountIsComputedAgainAfterAMove(): void
+    {
+        $cart = $this->cartOn($this->first);
+        $this->line($cart, $this->product(), 1);
+        $cart->setDiscount('5.000000')->save($this->getPropelConnection());
+        self::assertEqualsWithDelta(5.0, (float) $this->reloaded($cart)->getDiscount(), 0.000001);
+        $this->session()->start();
+        $this->session()->setSessionCart($cart);
+        $this->buyFrom($this->second);
+
+        $this->session()->getSessionCart($this->dispatcher);
+
+        self::assertCount(1, $this->switches);
+        self::assertEqualsWithDelta(0.0, (float) $this->reloaded($cart)->getDiscount(), 0.000001, 'No coupon applies: the stale discount is gone.');
+    }
+
     public function testTheBackOfficeLeavesTheCartAlone(): void
     {
         $cart = $this->cartOn($this->first);

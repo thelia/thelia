@@ -25,6 +25,7 @@ use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Form\CartAdd;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
@@ -237,7 +238,13 @@ final class SaleUnitStockReadersTest extends IntegrationTestCase
 
     private function copy(Cart $cart): Cart
     {
-        $copy = $cart->duplicate('copy-'.uniqid(), null, $this->currency, $this->getService(EventDispatcherInterface::class));
+        $copy = $cart->duplicate(
+            'copy-'.uniqid(),
+            null,
+            $this->currency,
+            $this->getService(EventDispatcherInterface::class),
+            $this->getService(SaleUnitStockResolver::class),
+        );
         self::assertInstanceOf(Cart::class, $copy);
 
         return $copy;

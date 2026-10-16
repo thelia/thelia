@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -765,9 +766,24 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            // Settled first, so a listener reading the session cart while the lines
-            // move finds it on its unit already and does not start over.
-            $cart->setSaleUnitId($saleUnitId)->save($con);
+            // Settled first, and only if the cart is still where this request read it:
+            // two requests of the same visitor may both find it on the old unit, and
+            // the move belongs to the one that makes it. A listener reading the session
+            // cart while the lines move then finds it on its unit and does not start over.
+            $moved = CartQuery::create()
+                ->filterById($cart->getId())
+                ->filterBySaleUnitId($previousSaleUnitId, null === $previousSaleUnitId ? Criteria::ISNULL : Criteria::EQUAL)
+                ->update(['SaleUnitId' => $saleUnitId], $con);
+
+            if (1 !== $moved) {
+                $con->commit();
+                $cart->reload(false, $con);
+
+                return;
+            }
+
+            $cart->setSaleUnitId($saleUnitId);
+            $cart->resetModified(CartTableMap::COL_SALE_UNIT_ID);
             $changes = $this->switchLinesTo($cart, $saleUnitId);
             $con->commit();
         } catch (\Throwable $exception) {
@@ -1139,6 +1155,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $customer,
             $this->getSession()->getCurrency(),
             $dispatcher,
+            $this->saleUnitStockResolver,
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
