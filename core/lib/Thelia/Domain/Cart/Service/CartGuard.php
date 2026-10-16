@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
@@ -26,18 +28,16 @@ use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\Destination;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Core\Translation\Translator;
-use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
-use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
-use Thelia\Domain\Shipping\DestinationRestriction\Destination;
-use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
-use Thelia\Model\Lang;
 
 class CartGuard
 {

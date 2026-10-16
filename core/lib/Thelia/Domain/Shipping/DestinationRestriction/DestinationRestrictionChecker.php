@@ -26,8 +26,8 @@ use Thelia\Model\Map\DestinationRestrictionTableMap;
 use Thelia\Model\Map\ProductDestinationRestrictionTableMap;
 use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductDestinationRestrictionQuery;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 
 /**
