@@ -51,6 +51,17 @@ final class ThrowableTraceTest extends TestCase
         self::assertStringEndsWith('... 15 more causes', $described);
     }
 
+    public function testASingleUnwrittenCauseIsNamedInTheSingular(): void
+    {
+        $throwable = new \RuntimeException('cause 0');
+
+        for ($level = 1; $level <= 10; ++$level) {
+            $throwable = new \RuntimeException('cause '.$level, 0, $throwable);
+        }
+
+        self::assertStringEndsWith('... 1 more cause', ThrowableTrace::describe($throwable));
+    }
+
     public function testTheNameOfAnAnonymousClassStaysOnItsLine(): void
     {
         $described = ThrowableTrace::describe(new class('anonymous') extends \RuntimeException {});

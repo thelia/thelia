@@ -574,6 +574,33 @@ final class DeliveryEstimateTest extends IntegrationTestCase
         self::assertNull($estimator->estimateById((int) $this->product()->getId()));
     }
 
+    /**
+     * A product page estimate whose carrier zones cannot be read announces nothing, whether
+     * the theme holds the product or its id: the page shows.
+     */
+    public function testAProductEstimateThatFailsAnnouncesNothingAndBreaksNothing(): void
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        self::assertInstanceOf(Country::class, $defaultCountry);
+        $this->serveCountryWithCarrier($this->carrier, $defaultCountry, $this->getPropelConnection());
+        $this->settings()->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $product = $this->product();
+        $connection = $this->getPropelConnection();
+
+        // Masks the carrier zones for this connection, without an implicit commit.
+        $connection->exec('CREATE TEMPORARY TABLE `area_delivery_module` (id INT)');
+
+        try {
+            $byProduct = $this->getService(ShippingFacade::class)->estimateProductDelivery($product);
+            $byId = $this->getService(ShippingFacade::class)->estimateProductDeliveryById((int) $product->getId());
+        } finally {
+            $connection->exec('DROP TEMPORARY TABLE `area_delivery_module`');
+        }
+
+        self::assertNull($byProduct);
+        self::assertNull($byId);
+    }
+
     public function testTheCutoffMustBeAnHour(): void
     {
         $this->expectException(InvalidDeliveryDateSettingsException::class);

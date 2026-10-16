@@ -47,19 +47,20 @@ final class ThrowableTrace
     public static function describe(\Throwable $throwable): string
     {
         $parts = [];
+        $unwritten = 0;
 
-        for ($cause = $throwable; null !== $cause && \count($parts) < 10; $cause = $cause->getPrevious()) {
+        for ($cause = $throwable; null !== $cause; $cause = $cause->getPrevious()) {
+            if (10 === \count($parts)) {
+                ++$unwritten;
+
+                continue;
+            }
+
             $parts[] = ($cause === $throwable ? '' : 'Caused by ').TerminalText::singleLine($cause::class).': '.TerminalText::onOneLine($cause->getMessage())."\n".self::withoutArguments($cause);
         }
 
-        if (null !== $cause) {
-            $more = 0;
-
-            for (; null !== $cause; $cause = $cause->getPrevious()) {
-                ++$more;
-            }
-
-            $parts[] = \sprintf('... %d more causes', $more);
+        if ($unwritten > 0) {
+            $parts[] = \sprintf('... %d more %s', $unwritten, 1 === $unwritten ? 'cause' : 'causes');
         }
 
         return implode("\n", $parts);
