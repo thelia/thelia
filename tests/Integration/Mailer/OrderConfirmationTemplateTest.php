@@ -126,6 +126,12 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
         // Said word for word as an interval of one day is.
         self::assertSame($this->estimateLineOf((string) $oneDay->getHtmlBody()), $this->estimateLineOf((string) $withoutEnd->getHtmlBody()));
         self::assertSame($this->estimateLineOf((string) $oneDay->getTextBody()), $this->estimateLineOf((string) $withoutEnd->getTextBody()));
+        // And that day is said: a date, not a blank and not an interval.
+        foreach ([(string) $oneDay->getHtmlBody(), (string) $oneDay->getTextBody()] as $body) {
+            $line = $this->estimateLineOf($body);
+            self::assertMatchesRegularExpression('/^Estimated delivery:\s+[^<\s][^<]*3/', $line);
+            self::assertStringNotContainsString('between', $line);
+        }
     }
 
     private function estimateLineOf(string $body): string
