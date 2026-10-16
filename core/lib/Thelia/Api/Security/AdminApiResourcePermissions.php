@@ -39,6 +39,8 @@ use Thelia\Api\Resource\Country;
 use Thelia\Api\Resource\Currency;
 use Thelia\Api\Resource\Customer;
 use Thelia\Api\Resource\CustomerTitle;
+use Thelia\Api\Resource\DestinationRestriction;
+use Thelia\Api\Resource\DestinationRestrictionCountry;
 use Thelia\Api\Resource\Feature;
 use Thelia\Api\Resource\FeatureAv;
 use Thelia\Api\Resource\FeatureProduct;
@@ -69,6 +71,7 @@ use Thelia\Api\Resource\ProductAssociatedContent;
 use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
 use Thelia\Api\Resource\ProductCategory;
+use Thelia\Api\Resource\ProductDestinationRestriction;
 use Thelia\Api\Resource\ProductDocument;
 use Thelia\Api\Resource\ProductExcludedDeliveryModule;
 use Thelia\Api\Resource\ProductImage;
@@ -158,6 +161,7 @@ final readonly class AdminApiResourcePermissions
         ProductAssociationType::class => AdminResources::CONFIG,
         ProductCategory::class => AdminResources::PRODUCT,
         ProductDocument::class => AdminResources::PRODUCT,
+        ProductDestinationRestriction::class => AdminResources::PRODUCT,
         ProductExcludedDeliveryModule::class => AdminResources::PRODUCT,
         ProductImage::class => AdminResources::PRODUCT,
         ProductPrice::class => AdminResources::PRODUCT,
@@ -174,6 +178,8 @@ final readonly class AdminApiResourcePermissions
         SaleUnitModuleConfig::class => AdminResources::MODULE,
         SaleUnitProductPrice::class => AdminResources::SALE_UNIT,
         SaleUnitProductSaleElements::class => AdminResources::SALE_UNIT,
+        DestinationRestriction::class => AdminResources::DESTINATION_RESTRICTION,
+        DestinationRestrictionCountry::class => AdminResources::DESTINATION_RESTRICTION,
         State::class => AdminResources::STATE,
         Tag::class => AdminResources::TAG,
         // Attaching a tag to a customer is editing that customer, so the
