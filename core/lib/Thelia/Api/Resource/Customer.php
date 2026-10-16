@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Core\Translation\Translator;
@@ -107,6 +108,13 @@ use Thelia\Model\Map\CustomerTableMap;
     filterClass: BooleanFilter::class,
     properties: [
         'reseller',
+    ],
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt' => DateFilter::EXCLUDE_NULL,
+        'updatedAt' => DateFilter::EXCLUDE_NULL,
     ],
 )]
 class Customer implements PropelResourceInterface

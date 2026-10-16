@@ -240,6 +240,31 @@ final class CustomerApiTest extends ApiTestCase
     }
 
     /**
+     * Another system reads the customers changed since its last synchronisation.
+     */
+    public function testFilterByUpdatedAfterReturnsTheCustomersChangedSince(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $recent = $factory->customer($title);
+        $old = $factory->customer($title);
+        $recentId = (int) $recent->getId();
+        $oldId = (int) $old->getId();
+        $this->stampCustomer($recentId, '2099-06-01 10:00:00');
+        $this->stampCustomer($oldId, '2001-06-01 10:00:00');
+
+        $ids = $this->customerIds('/api/admin/customers?updatedAt[after]=2099-01-01T00:00:00&itemsPerPage=100');
+
+        self::assertContains($recentId, $ids);
+        self::assertNotContains($oldId, $ids);
+
+        $ids = $this->customerIds('/api/admin/customers?updatedAt[before]=2002-01-01T00:00:00&itemsPerPage=100');
+
+        self::assertContains($oldId, $ids);
+        self::assertNotContains($recentId, $ids);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function customerPayload(string $email): array
@@ -251,5 +276,26 @@ final class CustomerApiTest extends ApiTestCase
             'email' => $email,
             'password' => 'Password1!',
         ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function customerIds(string $uri): array
+    {
+        $response = $this->jsonRequest('GET', $uri, token: $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+
+        return array_map(
+            static fn (array $item): int => (int) $item['id'],
+            json_decode((string) $response->getContent(), true)['hydra:member'],
+        );
+    }
+
+    private function stampCustomer(int $customerId, string $date): void
+    {
+        CustomerQuery::create()->filterById($customerId)->update(['UpdatedAt' => $date], $this->getPropelConnection());
+        CustomerTableMap::clearInstancePool();
     }
 }

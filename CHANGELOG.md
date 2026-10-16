@@ -37,6 +37,7 @@
 ## API
 
 - An administration client can set the reference of a customer: `ref` is writable on `POST`, `PUT` and `PATCH /api/admin/customers`, and the model still generates it when it is left out. A reference another customer already holds is a validation error on `ref` (422) instead of the failed write of the unique index. The customer cannot write it through the front API.
+- The customer and address collections filter on `createdAt` and `updatedAt` (`updatedAt[after]=2026-10-01T00:00:00`, and `before`, `strictly_before`, `strictly_after`), so a client can read what changed since its last synchronisation, for instance `/api/admin/addresses?updatedAt[after]=...&customer.id=42`.
 
 ## Tests
 

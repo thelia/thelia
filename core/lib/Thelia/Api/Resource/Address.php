@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\State\Processor\CustomerAddressProcessor;
@@ -124,6 +125,13 @@ use Thelia\Model\Map\AddressTableMap;
     filterClass: BooleanFilter::class,
     properties: [
         'isDefault',
+    ],
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt' => DateFilter::EXCLUDE_NULL,
+        'updatedAt' => DateFilter::EXCLUDE_NULL,
     ],
 )]
 class Address implements PropelResourceInterface
