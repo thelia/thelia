@@ -165,6 +165,8 @@ final class DeliveryIntervalCalculatorTest extends TestCase
 
     public function testAClosureIsSteppedOverInOneStep(): void
     {
+        // Measures the step, not the result: an interval reached day by day would be the same
+        // date, so the private step is asked directly.
         $firstOpenFrom = new \ReflectionMethod(DeliveryIntervalCalculator::class, 'firstOpenFrom');
 
         $next = $firstOpenFrom->invoke(null, new \DateTimeImmutable('2026-09-02'), [], [['2026-09-02', '9999-12-31']]);
