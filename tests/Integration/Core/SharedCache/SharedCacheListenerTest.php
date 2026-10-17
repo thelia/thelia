@@ -796,6 +796,8 @@ final class SharedCacheListenerTest extends IntegrationTestCase
     {
         $headers = $response->headers->all();
         unset($headers['surrogate-key'], $headers['xkey']);
+        // A cleared cookie is rendered with "now - 1 year": two snapshots taken across a second boundary would differ.
+        $headers['set-cookie'] = preg_replace('/expires=[^;]+/', 'expires=<now>', $headers['set-cookie'] ?? []);
         ksort($headers);
 
         return [(string) $response->getStatusCode(), $headers];
