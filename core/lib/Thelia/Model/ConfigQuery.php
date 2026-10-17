@@ -588,6 +588,19 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * The last order placed while order_product.promo_price was a text, as it is
+     * on a shop created by Thelia 2. The conversion of the column to a decimal
+     * (setup/update/sql/3.3.0.sql) writes the highest order id here, so that the
+     * orders already invoiced keep the total they were invoiced with: reading
+     * them back with the new type would restate an invoice the customer has
+     * already paid. Zero, the default, means the shop has nothing to protect.
+     */
+    public static function isOrderWithTextPromoPrice(int $orderId): bool
+    {
+        return $orderId <= (int) self::read('last_text_promo_price_order_id', 0);
+    }
+
+    /**
      * Tells how a line total has to be built from a unit price and a quantity.
      *
      * Pass the id of a persisted order to get the mode that order was invoiced

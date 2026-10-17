@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
+use Thelia\Domain\DataTransfer\Export\Type\OrderLineExport;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
@@ -193,6 +194,115 @@ final class OrderExportTest extends IntegrationTestCase
     }
 
     /**
+     * `order_product`.`promo_price` was a text before 3.3.0, and an order placed then was totalled with the promotional
+     * price read as a text: 63.325 is 63.32 and not 63.33. The pivot written by the conversion keeps that amount in the
+     * file, as it is on the invoice.
+     */
+    public function testAnOrderPlacedBeforeThePromotionalPriceBecameADecimalIsExportedWithItsInvoicedTotal(): void
+    {
+        $order = $this->promotionalOrder();
+
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        self::assertEqualsWithDelta(75.99, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+        self::assertSame(75.99, (float) $this->exportedRow($order->getRef())['order_total_taxed_price']);
+    }
+
+    public function testAnOrderPlacedAfterThePivotIsExportedWithTheDecimal(): void
+    {
+        $frozen = $this->promotionalOrder();
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $frozen->getId());
+
+        $order = $this->promotionalOrder();
+
+        self::assertEqualsWithDelta(76.0, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+        self::assertSame(76.0, (float) $this->exportedRow($order->getRef())['order_total_taxed_price']);
+    }
+
+    /**
+     * ROUND() of a text is a floating point number, and so is its product by the quantity: 3 x (63.32 + 12.67) gives
+     * 227.96999999999997. The total of the order is brought back to a decimal after the sum, to state 227.97.
+     */
+    public function testTheTotalOfAFrozenOrderIsStatedWithoutFloatingPointNoise(): void
+    {
+        $order = $this->promotionalOrder(3.0);
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        self::assertSame(227.97, (float) $this->exportedRow($order->getRef())['order_total_taxed_price']);
+    }
+
+    /** The cast is made on the sum of the order: a cast on each line leaves clean doubles whose SUM is noisy (75.99 + 151.98 gives 227.96999999999997). */
+    public function testTheTotalOfAFrozenOrderOfTwoLinesIsStatedWithoutFloatingPointNoise(): void
+    {
+        $order = $this->promotionalOrder(1.0, 2.0);
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        $row = $this->exportedRow($order->getRef());
+
+        self::assertSame(227.97, (float) $row['order_total_taxed_price']);
+    }
+
+    /** A promotional line whose text was empty is NULL once converted: it counts for 0, plus its tax, as before. */
+    public function testAFrozenPromotionalLineWithoutPriceIsCountedForZeroPlusItsTax(): void
+    {
+        $order = $this->promotionalOrder();
+        $this->getPropelConnection()->exec('UPDATE order_product SET promo_price = NULL WHERE order_id = '.(int) $order->getId());
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        $row = $this->exportedRow($order->getRef());
+
+        self::assertEqualsWithDelta(12.67, (float) $row['order_total_taxed_price'], 0.0001);
+        self::assertEqualsWithDelta(0.0, (float) $row['order_total_price'], 0.0001);
+        self::assertEqualsWithDelta(12.67, $this->invoicedTotal($order), 0.0001);
+    }
+
+    public function testAFrozenOrderIsExportedWithItsInvoicedTotalUnderRoundingOfSums(): void
+    {
+        $this->optIn();
+
+        $order = $this->promotionalOrder();
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    public function testAFrozenOrderIsExportedWithItsInvoicedTotalWhenTheUpgradeTo24FrozeIt(): void
+    {
+        $order = $this->promotionalOrder();
+        ConfigQuery::write('last_legacy_rounding_order_id', (string) $order->getId());
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    public function testTheOrderLineExportStatesTheUnitPriceOfAnOrderPlacedBeforeThePivot(): void
+    {
+        $frozen = $this->promotionalOrder();
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $frozen->getId());
+        $order = $this->promotionalOrder();
+
+        self::assertSame(63.32, (float) $this->exportedLineRow($frozen->getRef())['order_product_unit_price']);
+        self::assertSame(63.33, (float) $this->exportedLineRow($order->getRef())['order_product_unit_price']);
+    }
+
+    /** A line that is not on promotion was read as a text too: 63.325 gave 63.32. */
+    public function testTheOrderLineExportFreezesALineThatIsNotOnPromotionToo(): void
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+        $this->factory->orderProduct($order, ['price' => '63.325000']);
+
+        self::assertSame(63.33, (float) $this->exportedLineRow($order->getRef())['order_product_unit_price']);
+
+        ConfigQuery::write('last_text_promo_price_order_id', (string) $order->getId());
+
+        self::assertSame(63.32, (float) $this->exportedLineRow($order->getRef())['order_product_unit_price']);
+    }
+
+    /**
      * A line bearing two taxes is one line on the invoice. The export joined
      * order_product_tax at the top level, so the line reached the SUM() once
      * per tax row and the order came out doubled.
@@ -281,6 +391,32 @@ final class OrderExportTest extends IntegrationTestCase
             ->setDescription('')
             ->setAmount(self::TAX_PER_GRAM)
             ->save($this->getPropelConnection());
+
+        return $order;
+    }
+
+    /**
+     * One promotional line at 63.325 €, bearing a 12.665 € tax per unit: 63.32 + 12.67 when the promotional price is read
+     * as a text, 63.33 + 12.67 when it is read as a decimal.
+     */
+    private function promotionalOrder(float ...$quantities): Order
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        foreach ($quantities ?: [1.0] as $quantity) {
+            $line = $this->factory->orderProduct($order, ['price' => '66.658333', 'quantity' => $quantity]);
+            $line->setWasInPromo(1)->setPromoPrice('63.325000')->save($this->getPropelConnection());
+
+            (new OrderProductTax())
+                ->setOrderProductId($line->getId())
+                ->setTitle('VAT')
+                ->setDescription('')
+                ->setAmount('13.331667')
+                ->setPromoAmount('12.665000')
+                ->save($this->getPropelConnection());
+        }
 
         return $order;
     }
@@ -386,6 +522,24 @@ final class OrderExportTest extends IntegrationTestCase
         }
 
         return $refs;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function exportedLineRow(string $ref): array
+    {
+        $export = new OrderLineExport();
+        $export->setLang(Lang::getDefaultLanguage());
+        $export->setRangeDate(null);
+
+        foreach ($export as $row) {
+            if (($row['order_ref'] ?? null) === $ref) {
+                return $row;
+            }
+        }
+
+        self::fail("Order $ref is missing from the order line export.");
     }
 
     /**
