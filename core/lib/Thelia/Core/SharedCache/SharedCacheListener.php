@@ -69,7 +69,7 @@ final readonly class SharedCacheListener
             return;
         }
 
-        $this->makePublic($response, $ttl);
+        $this->makePublic($request, $response, $ttl);
     }
 
     private function tag(Request $request, Response $response): void
@@ -138,14 +138,18 @@ final readonly class SharedCacheListener
         return true;
     }
 
-    private function makePublic(Response $response, int $ttl): void
+    /**
+     * Only the session cookie and the cleared cart cookie are dropped: any other cookie is
+     * the visitor's, and the answer that sets it stays personal.
+     */
+    private function makePublic(Request $request, Response $response, int $ttl): void
     {
-        foreach ($response->headers->getCookies() as $cookie) {
-            $response->headers->removeCookie($cookie->getName(), $cookie->getPath(), $cookie->getDomain());
+        if (!$this->carriesOnlyTheCookiesAProxyMayStrip($request, $response)) {
+            return;
         }
 
-        if ([] !== $response->headers->getCookies()) {
-            return;
+        foreach ($response->headers->getCookies() as $cookie) {
+            $response->headers->removeCookie($cookie->getName(), $cookie->getPath(), $cookie->getDomain());
         }
 
         $response->headers->remove(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER);

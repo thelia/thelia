@@ -158,6 +158,22 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         yield 'a cart that is kept' => [Cookie::create('thelia_cart', 'token', time() + 3600, '/', null, false, true, false, 'lax')];
     }
 
+    #[DataProvider('cookiesThatAreNotTheSession')]
+    public function testAResponseThatSetsAnotherCookieIsNeverMadePublic(Cookie $cookie): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $response->headers->setCookie($cookie);
+
+        $this->handle($this->request('/horatio.html', 'product'), $response);
+
+        self::assertFalse($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
+        self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertContains($cookie->getName(), array_map(static fn (Cookie $kept): string => $kept->getName(), $response->headers->getCookies()));
+        self::assertContains('PHPSESSID', array_map(static fn (Cookie $kept): string => $kept->getName(), $response->headers->getCookies()));
+    }
+
     public function testTheSessionCookieIsTheOneTheSessionOfTheRequestIsNamed(): void
     {
         $this->mode(SharedCacheMode::ANNOUNCE);
