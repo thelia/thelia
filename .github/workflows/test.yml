@@ -176,14 +176,71 @@ jobs:
         if: matrix.group != 'static'
         # Every suite of the group runs even when an earlier one fails, so a single
         # run reports all of them.
+        #
+        # Each suite also writes a JUnit report: it is what the skipped-tests job
+        # below compares between a pull request and main.
         run: |
           status=0
+          mkdir -p "$RUNNER_TEMP/junit"
           for suite in ${{ matrix.suites }}; do
             echo "::group::$suite"
-            composer "test:$suite" || status=1
+            composer "test:$suite" -- --log-junit "$RUNNER_TEMP/junit/$suite.xml" || status=1
             echo "::endgroup::"
           done
           exit $status
+
+      - name: Keep the JUnit reports
+        if: ${{ !cancelled() && matrix.group != 'static' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-php${{ matrix.php }}-${{ matrix.group }}
+          path: ${{ runner.temp }}/junit/*.xml
+          retention-days: 30
+          if-no-files-found: warn
+
+  skipped-tests:
+    # Signal only, never a gate: a test that skips itself keeps its suite green
+    # while proving nothing. This compares the skipped tests of the pull request
+    # with those of the last green run of main and says what changed, in the job
+    # summary and in an annotation. It is a separate job so that the required
+    # checks do not wait for it, and it cannot fail.
+    name: Skipped tests against main (signal)
+    needs: checks
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # The branch whose last green run is the reference.
+      REFERENCE_BRANCH: main
+    steps:
+      - name: Checkout the comparison script
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
+      - name: Fetch the JUnit reports of this run
+        run: gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'junit-*' --dir "$RUNNER_TEMP/head" || echo "::warning title=Skipped tests::No JUnit report was uploaded by this run."
+
+      - name: Fetch the JUnit reports of the reference run
+        # The last green run that kept its reports: runs older than the upload
+        # step, or whose artifacts expired, are skipped over.
+        run: |
+          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow test.yml --branch "$REFERENCE_BRANCH" --status success --limit 10 --json databaseId --jq '.[].databaseId'); do
+            [ "$id" = "$GITHUB_RUN_ID" ] && continue
+            if gh run download "$id" --repo "$GITHUB_REPOSITORY" --pattern 'junit-*' --dir "$RUNNER_TEMP/base" 2>/dev/null; then
+              echo "REFERENCE_RUN_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$id" >> "$GITHUB_ENV"
+              break
+            fi
+          done
+
+      - name: Compare the skipped tests
+        run: python3 .github/scripts/skipped-tests-gate.py "$RUNNER_TEMP/base" "$RUNNER_TEMP/head" "$REFERENCE_BRANCH"
 
   ci:
     # The branch protection of main requires these three check names. Each one
