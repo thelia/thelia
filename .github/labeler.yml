@@ -1,24 +1,48 @@
 # Tier labels from the changed paths, applied by .github/workflows/labeler.yml.
-# The same tiers, with the same paths, are computed by
-# .github/scripts/evidence/classify.php, which also makes a change of more than
-# 500 lines T2: keep both lists in step.
+# The same path tiers are computed by .github/scripts/evidence/classify.php,
+# which also sees what a change does to the tests and its size;
+# .github/scripts/evidence/check-tier-parity.mjs checks that both lists agree.
+#
+# T2 wins over T0: every T2 glob is excluded from T0 below, so that a pull
+# request never carries both labels.
 
-# Only documentation, tests, translations or CI files change.
+# Only documentation, tests or translation catalogs change. The update
+# instructions are read by the updater, tests/bootstrap.php and tests/Support/
+# run under every test, the PHP translation arrays are loaded at runtime: none
+# of them is T0.
 'tier:T0':
   - all:
       - changed-files:
+          # any-glob-to-all-files asks one glob to match every file: the T0
+          # globs are one brace pattern, so that each file can match a
+          # different alternative.
+          - any-glob-to-all-files:
+              - '{**/*.md,**/*.xlf,**/translations/**/*.{yml,yaml},tests/{Api,Http,Integration,Unit,fixtures}/**,tests/Playwright/specs/**}'
           - all-globs-to-all-files:
-              - '**/*.md'
-              - '*.md'
-              - 'docs/**'
-              - 'tests/**'
-              - '.github/**'
-              - 'core/lib/Thelia/Config/I18n/**'
-              - 'core/lib/Thelia/Install/I18n/**'
-              - 'setup/I18n/**'
-              - 'local/I18n/**'
+              - '!setup/update/instruction/**'
+              # The T2 globs, negated.
+              - '!core/lib/Thelia/Api/**'
+              - '!core/lib/Thelia/Core/Security/**'
+              - '!core/lib/Thelia/Form/**'
+              - '!core/lib/Thelia/Controller/**'
+              - '!**/*Upload*'
+              - '!**/*Upload*/**'
+              - '!**/*Mailer*'
+              - '!**/*Mailer*/**'
+              - '!**/*Voter*'
+              - '!**/*Voter*/**'
+              - '!core/lib/Thelia/Model/**'
+              - '!core/lib/Thelia/Core/Template/Loop/**'
+              - '!local/config/schema.xml'
+              - '!core/lib/Thelia/Config/**/*.xml'
+              - '!core/lib/Thelia/Config/*.xml'
+              - '!core/lib/Thelia/Install/**'
+              - '!core/lib/Thelia/Core/Install/**'
+              - '!.github/workflows/**'
+              - '!.github/scripts/**'
+              - '!.github/labeler.yml'
 
-# Security, persistence or API surface paths.
+# Security, persistence, API surface, installer or CI paths.
 'tier:T2':
   - changed-files:
       - any-glob-to-any-file:
@@ -37,3 +61,8 @@
           - 'local/config/schema.xml'
           - 'core/lib/Thelia/Config/**/*.xml'
           - 'core/lib/Thelia/Config/*.xml'
+          - 'core/lib/Thelia/Install/**'
+          - 'core/lib/Thelia/Core/Install/**'
+          - '.github/workflows/**'
+          - '.github/scripts/**'
+          - '.github/labeler.yml'

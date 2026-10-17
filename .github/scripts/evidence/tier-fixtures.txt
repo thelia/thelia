@@ -1,0 +1,44 @@
+# Expected path tier of a change, then the paths it changes, separated by tabs.
+# Read by check-tier-parity.mjs. The tier from the paths only: classify.php can
+# raise a T0 change to T1 when the tests lose something, and a T1 change to T2
+# when it is large.
+T0	README.md
+T0	docs/delivery-dates.md
+T0	.github/pull_request_template.md
+T0	core/lib/Thelia/Command/Skeleton/Module/Readme.md
+T0	tests/Unit/Core/SomeTest.php
+T0	tests/Integration/Domain/OrderReturn/OrderReturnRefTest.php
+T0	tests/fixtures/images/sample.png
+T0	tests/Playwright/specs/checkout.spec.ts
+T0	templates/frontOffice/flexy/translations/messages.fr_FR.xlf
+T0	local/modules/Foo/translations/messages.en_US.yml
+T0	README.md	tests/Unit/Core/SomeTest.php	docs/delivery-dates.md
+T1	setup/update/instruction/3.2.0.md
+T1	tests/bootstrap.php
+T1	tests/Support/Trait/SomeTrait.php
+T1	tests/Playwright/package.json
+T1	tests/Playwright/playwright.config.ts
+T1	tests/Playwright/helpers/login.ts
+T1	core/lib/Thelia/Config/I18n/fr_FR.php
+T1	setup/I18n/fr_FR.php
+T1	local/I18n/fr_FR.php
+T1	core/lib/Thelia/Core/Translation/Translator.php
+T1	local/config/services.yaml
+T1	.github/dependabot.yml
+T1	README.md	core/lib/Thelia/Core/Translation/Translator.php
+T1	README.md	setup/update/instruction/3.2.0.md
+T2	.github/workflows/split.yml
+T2	.github/workflows/backport.yml
+T2	.github/scripts/evidence/classify.php
+T2	.github/scripts/evidence/README.md
+T2	.github/labeler.yml
+T2	core/lib/Thelia/Install/I18n/SeedI18nInstaller.php
+T2	core/lib/Thelia/Install/I18n/SeedTranslationCatalog.php
+T2	core/lib/Thelia/Core/Install/Update.php
+T2	core/lib/Thelia/Api/Resource/Product.php
+T2	core/lib/Thelia/Model/Product.php
+T2	local/config/schema.xml
+T2	core/lib/Thelia/Config/Resources/config.xml
+T2	tests/Unit/Core/FileUploadTest.php
+T2	docs/Upload.md
+T2	README.md	.github/workflows/test.yml
