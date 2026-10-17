@@ -35,7 +35,7 @@ jobs:
       || github.event.action == 'closed' && contains(toJSON(github.event.pull_request.labels.*.name), '"backport 3.'))
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Select the branches to backport to
         id: select
@@ -58,7 +58,7 @@ jobs:
 
       - name: Create the backport pull requests
         # Pinned to the commit of v4.7.0: this action holds a token that can write to the repository.
-        uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7
+        uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7 # v4.7.0
         with:
           label_pattern: ${{ steps.select.outputs.pattern }}
           experimental: '{"conflict_resolution": "draft_commit_conflicts"}'
