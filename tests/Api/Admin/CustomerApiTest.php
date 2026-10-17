@@ -16,6 +16,7 @@ namespace Thelia\Tests\Api\Admin;
 
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Test\ApiTestCase;
 
 final class CustomerApiTest extends ApiTestCase
@@ -156,5 +157,145 @@ final class CustomerApiTest extends ApiTestCase
 
         self::assertJsonResponseSuccessful($response);
         self::assertHydraTotalItems(1, $response);
+    }
+
+    /**
+     * Another system that already knows the customer by a code sets it as the
+     * reference instead of receiving a generated one.
+     */
+    public function testAnAdministrationClientSetsTheReference(): void
+    {
+        $response = $this->jsonRequest('POST', '/api/admin/customers', $this->customerPayload('ref-set@example.com') + ['ref' => 'C00123'], $this->authenticateAsAdmin());
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('C00123', json_decode((string) $response->getContent(), true)['ref']);
+
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('C00123', CustomerQuery::create()->findOneByEmail('ref-set@example.com')?->getRef());
+    }
+
+    public function testTheReferenceIsGeneratedWhenLeftOut(): void
+    {
+        $response = $this->jsonRequest('POST', '/api/admin/customers', $this->customerPayload('ref-generated@example.com'), $this->authenticateAsAdmin());
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+        $ref = json_decode((string) $response->getContent(), true)['ref'];
+        self::assertIsString($ref);
+        self::assertNotSame('', $ref);
+    }
+
+    /**
+     * The reference is unique in the database. A duplicate used to be the
+     * failed INSERT of the unique index; it is a violation on the field.
+     */
+    public function testADuplicateReferenceIsRefusedOnCreation(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $factory->customer($factory->customerTitle())->setRef('C00124')->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest('POST', '/api/admin/customers', $this->customerPayload('ref-duplicate@example.com') + ['ref' => 'C00124'], $this->authenticateAsAdmin());
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        $error = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame(['ref'], array_column($error['violations'], 'propertyPath'));
+        self::assertNull(CustomerQuery::create()->findOneByEmail('ref-duplicate@example.com'));
+    }
+
+    public function testThePatchSetsTheReferenceAndRefusesADuplicate(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $factory->customer($title)->setRef('C00125')->save($this->getPropelConnection());
+        $customerId = (int) $factory->customer($title)->getId();
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/customers/'.$customerId, ['ref' => 'C00126'], $token, 'merge-patch+json');
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('C00126', CustomerQuery::create()->findPk($customerId)?->getRef());
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/customers/'.$customerId, ['ref' => 'C00125'], $token, 'merge-patch+json');
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        $error = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame(['ref'], array_column($error['violations'], 'propertyPath'));
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('C00126', CustomerQuery::create()->findPk($customerId)?->getRef());
+    }
+
+    /**
+     * Saving its own reference again is not a duplicate.
+     */
+    public function testThePatchKeepsItsOwnReference(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $customer->setRef('C00127')->save($this->getPropelConnection());
+        $customerId = (int) $customer->getId();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/customers/'.$customerId, ['ref' => 'C00127', 'lastname' => 'Same-Ref'], $this->authenticateAsAdmin(), 'merge-patch+json');
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * Another system reads the customers changed since its last synchronisation.
+     */
+    public function testFilterByUpdatedAfterReturnsTheCustomersChangedSince(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $recent = $factory->customer($title);
+        $old = $factory->customer($title);
+        $recentId = (int) $recent->getId();
+        $oldId = (int) $old->getId();
+        $this->stampCustomer($recentId, '2099-06-01 10:00:00');
+        $this->stampCustomer($oldId, '2001-06-01 10:00:00');
+
+        $ids = $this->customerIds('/api/admin/customers?updatedAt[after]=2099-01-01T00:00:00&itemsPerPage=100');
+
+        self::assertContains($recentId, $ids);
+        self::assertNotContains($oldId, $ids);
+
+        $ids = $this->customerIds('/api/admin/customers?updatedAt[before]=2002-01-01T00:00:00&itemsPerPage=100');
+
+        self::assertContains($oldId, $ids);
+        self::assertNotContains($recentId, $ids);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function customerPayload(string $email): array
+    {
+        return [
+            'customerTitle' => '/api/admin/customer_titles/'.$this->createFixtureFactory()->customerTitle()->getId(),
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'email' => $email,
+            'password' => 'Password1!',
+        ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function customerIds(string $uri): array
+    {
+        $response = $this->jsonRequest('GET', $uri, token: $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($response);
+
+        return array_map(
+            static fn (array $item): int => (int) $item['id'],
+            json_decode((string) $response->getContent(), true)['hydra:member'],
+        );
+    }
+
+    private function stampCustomer(int $customerId, string $date): void
+    {
+        CustomerQuery::create()->filterById($customerId)->update(['UpdatedAt' => $date], $this->getPropelConnection());
+        CustomerTableMap::clearInstancePool();
     }
 }

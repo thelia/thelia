@@ -30,6 +30,12 @@
 
 - An order lines export, `thelia.export.order_lines`, writes one row per order line with the references of the product and of the combination, the GTIN and the manufacturer part number frozen on the line, the quantity and the unit price, bounded by the same optional dates as the full order export. The two product price exports gain an `mpn` column, and the stock import an optional `mpn` column; a row of the stock import whose `ean` is not a GTIN is refused with the reason and the import goes on. A GTIN or a part number a spreadsheet would run as a formula is exported behind a leading quote.
 
+## API
+
+- An administration client can set the reference of a customer: `ref` is writable on `POST`, `PUT` and `PATCH /api/admin/customers`, and the model still generates it when it is left out. A reference another customer already holds is a validation error on `ref` (422) instead of the failed write of the unique index. The customer cannot write it through the front API.
+- The customer and address collections filter on `createdAt` and `updatedAt` (`updatedAt[after]=2026-10-01T00:00:00`, and `before`, `strictly_before`, `strictly_after`), so a client can read what changed since its last synchronisation, for instance `/api/admin/addresses?updatedAt[after]=...&customer.id=42`.
+- `ResourcePersistedEvent` tells a creation from an update. The persist processor dispatches it with `OPERATION_CREATE` when the model did not exist before the write, which `isCreate()` answers, and with `OPERATION_WRITE` for an update, as before; `isDelete()` is unchanged, so a listener that only told a write from a deletion keeps working. The resource addons are saved, in the same transaction, before the event is dispatched.
+
 ## Tests
 
 - The test suites can run in several processes at once. With `TEST_TOKEN=2`, `composer test:prepare` creates the database `test_2` and the suites use it, with their own container cache, Propel models, cache pools and lock directory. A module's tests get the same suffix from `Thelia\Test\TestToken` for anything they write into a directory the processes share.

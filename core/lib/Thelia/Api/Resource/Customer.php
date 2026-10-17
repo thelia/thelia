@@ -26,11 +26,13 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Core\Translation\Translator;
@@ -108,6 +110,13 @@ use Thelia\Model\Map\CustomerTableMap;
         'reseller',
     ],
 )]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt' => DateFilter::EXCLUDE_NULL,
+        'updatedAt' => DateFilter::EXCLUDE_NULL,
+    ],
+)]
 class Customer implements PropelResourceInterface
 {
     use PropelResourceTrait;
@@ -143,7 +152,13 @@ class Customer implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_WRITE])]
     public ?Lang $lang = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    /**
+     * Left out of the payload, the model generates the reference on creation.
+     * An administration client may set it instead, to keep the code another
+     * system knows the customer by. The customer never writes it.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[Length(max: 50, groups: [self::GROUP_ADMIN_WRITE])]
     public ?string $ref = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
@@ -502,6 +517,29 @@ class Customer implements PropelResourceInterface
 
         if ($customer && $customer->getId() !== $this->getId()) {
             $context->addViolation(Translator::getInstance()->trans('This email already exists.', [], null, 'en_US'));
+        }
+    }
+
+    /**
+     * The reference is unique in the database: a duplicate is a validation
+     * error on the field, not the failed write of the unique index.
+     */
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE])]
+    public function verifyExistingRef(ExecutionContextInterface $context): void
+    {
+        if (null === $this->ref) {
+            return;
+        }
+
+        $customerId = CustomerQuery::create()
+            ->filterByRef($this->ref)
+            ->select('Id')
+            ->findOne();
+
+        if (null !== $customerId && (int) $customerId !== $this->getId()) {
+            $context->buildViolation(Translator::getInstance()->trans('This reference already exists.', [], null, 'en_US'))
+                ->atPath('ref')
+                ->addViolation();
         }
     }
 }
