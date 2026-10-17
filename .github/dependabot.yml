@@ -13,6 +13,13 @@ updates:
       day: monday
     allow:
       - dependency-type: development
+    # The core stays on the Symfony 7.4 LTS line and on PHPUnit 11.5: a new major
+    # of either is a decision, not a weekly pull request.
+    ignore:
+      - dependency-name: 'symfony/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'phpunit/phpunit'
+        update-types: ['version-update:semver-major']
     groups:
       dev-tools:
         patterns:
