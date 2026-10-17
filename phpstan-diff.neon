@@ -1,0 +1,14 @@
+includes:
+    - phpstan.neon
+parameters:
+    # Level 5 on the lines a pull request adds (see .github/workflows/phpstan-diff.yml).
+    # `composer phpstan` stays at level 1 against its baseline; this raises the bar
+    # for new code only, without touching the code that is already there.
+    #
+    # `ignoreErrors!` replaces the list the level-1 baseline contributes: a baselined
+    # error on a line a pull request touches is reported, not hidden. Unmatched
+    # entries are irrelevant here, there are none left to match.
+    level: 5
+    tmpDir: var/cache-ci/phpstan-diff
+    ignoreErrors!: []
+    reportUnmatchedIgnoredErrors: false
