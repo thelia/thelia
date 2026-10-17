@@ -41,6 +41,10 @@ ddev exec composer test       # PHPUnit suites: unit, integration, api, http-fle
 
 Write commit messages in English, in the imperative, with a type prefix, for example `fix: prevent double tax on free shipping`. Keep one concern per commit.
 
+Each pull request also gets an evidence report (tests seen failing without the change, public surface changes, new duplicated code) and a review tier label. Neither blocks the merge for now.
+
+Maintainers merge through the merge queue: it replays the checks on top of the latest `main`, so a pull request does not need to be rebased by hand before it is merged.
+
 ## Mutation testing
 
 Mutation testing checks that the unit tests would notice a bug. [Infection](https://infection.github.io) makes small changes to the core code, for example negating a condition or moving a boundary, and runs the unit tests again. When no test fails, the change is an escaped mutant: a test is missing, or it does not check the result closely enough.
