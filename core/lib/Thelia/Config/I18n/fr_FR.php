@@ -976,4 +976,7 @@ return [
     'A slot needs a start and an end hour, written HH:MM.' => 'Un créneau doit avoir une heure de début et une heure de fin, au format HH:MM.',
     'A slot must end after it starts.' => 'Un créneau doit se terminer après son début.',
     'The capacity of a slot is at least one order, or left empty for no limit.' => 'La capacité d\'un créneau est d\'au moins une commande, ou vide pour ne pas la limiter.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products ne peut pas être livré à cette adresse. Retirez-le de votre panier ou choisissez une autre adresse.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products ne peuvent pas être livrés à cette adresse. Retirez-les de votre panier ou choisissez une autre adresse.',
+    '%product cannot be shipped to your address.' => '%product ne peut pas être livré à votre adresse.',
 ];

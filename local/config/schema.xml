@@ -1909,6 +1909,66 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="destination_restriction" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the name the import and the API refer this group by" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="0" description="0: the listed destinations are refused, 1: only the listed destinations are served" name="mode" required="true" type="TINYINT" />
+    <column defaultValue="1" description="a group turned off refuses nothing, and is kept with its products" name="active" required="true" type="TINYINT" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column description="why the products of the group do not ship there, shown to the buyer" name="reason" type="LONGVARCHAR" />
+    <unique name="destination_restriction_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, reason" />
+    </behavior>
+  </table>
+  <table name="destination_restriction_country" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="destination_restriction_id" required="true" type="INTEGER" />
+    <column name="country_id" required="true" type="INTEGER" />
+    <column description="null: the whole country, its regions included" name="state_id" type="INTEGER" />
+    <foreign-key foreignTable="destination_restriction" name="fk_destination_restriction_country_restriction_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="destination_restriction_id" />
+    </foreign-key>
+    <foreign-key foreignTable="country" name="fk_destination_restriction_country_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <foreign-key foreignTable="state" name="fk_destination_restriction_country_state_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
+    </foreign-key>
+    <index name="idx_destination_restriction_country_restriction_id">
+      <index-column name="destination_restriction_id" />
+    </index>
+    <index name="idx_destination_restriction_country_country_id">
+      <index-column name="country_id" />
+    </index>
+    <index name="idx_destination_restriction_country_state_id">
+      <index-column name="state_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="product_destination_restriction" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
+    <column name="destination_restriction_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="product" name="fk_product_destination_restriction_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="destination_restriction" name="fk_product_destination_restriction_restriction_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="destination_restriction_id" />
+    </foreign-key>
+    <unique name="product_destination_restriction_UNIQUE">
+      <unique-column name="product_id" />
+      <unique-column name="destination_restriction_id" />
+    </unique>
+    <index name="idx_product_destination_restriction_restriction_id">
+      <index-column name="destination_restriction_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table name="category_associated_content" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />

@@ -44,6 +44,35 @@
             </import_descriptive>
         </import>
 
+        <import id="thelia.import.product_destination_restriction" class="Thelia\Domain\DataTransfer\Import\Type\ProductDestinationRestrictionImport" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les restrictions de destination des produits</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes :
+                    <ul>
+                        <li>ref : la référence du produit</li>
+                        <li>restriction_code : le code du groupe de restriction de destination</li>
+                    </ul>
+                    Chaque ligne ajoute le produit au groupe. Une ligne dont le produit ou le groupe est inconnu est refusée.
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import the destination restrictions of your products</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns to work:
+                    <ul>
+                        <li>ref: the reference of the product</li>
+                        <li>restriction_code: the code of the destination restriction group</li>
+                    </ul>
+                    Each row puts the product into the group. A row whose product or group is unknown is refused.
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+
         <import id="thelia.import.price" class="Thelia\Domain\DataTransfer\Import\Type\ProductPricesImport" category_id="thelia.import.products">
             <import_descriptive locale="fr_FR">
                 <title>Importer vos prix Hors-Taxes</title>

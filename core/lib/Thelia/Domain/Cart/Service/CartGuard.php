@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
@@ -26,10 +28,14 @@ use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\Destination;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -41,6 +47,7 @@ class CartGuard
         private readonly EventDispatcherInterface $dispatcher,
         private readonly ContainerInterface $container,
         private readonly DeliveryDateGuard $deliveryDateGuard,
+        private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
 
@@ -141,6 +148,19 @@ class CartGuard
 
         if (null === $address || null === $country) {
             throw new MissingAddressException('Delivery address has no country');
+        }
+
+        // The one refusal that holds whatever path placed the order, theme or API: the earlier
+        // ones, at the cart and at the address, only save the buyer some time.
+        $restrictedLines = $this->destinationRestrictionChecker?->violationsFor(
+            $cart,
+            Destination::of($address),
+            CartDestinations::billing($cart, true),
+            Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
+        ) ?? [];
+
+        if ([] !== $restrictedLines) {
+            throw new DestinationRestrictedException($restrictedLines);
         }
 
         if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState())) {

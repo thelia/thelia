@@ -37,6 +37,11 @@ enum CheckoutViolationCode: string
     case DeliveryInvalid = 'delivery-invalid';
 
     /**
+     * A product of the cart cannot be shipped to the chosen address.
+     */
+    case DeliveryDestinationRestricted = 'delivery-destination-restricted';
+
+    /**
      * The carrier offers delivery dates and none, or no slot, was picked.
      */
     case DeliveryDateMissing = 'delivery-date-missing';

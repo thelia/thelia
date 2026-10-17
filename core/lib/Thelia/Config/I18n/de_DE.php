@@ -833,4 +833,7 @@ return [
     'This order requires an account.' => 'Für diese Bestellung ist ein Kundenkonto erforderlich.',
     'This shop is not asking for the consent "%consent".' => 'Dieser Shop fragt die Einwilligung "%consent" nicht ab.',
     'You must accept "%consent" to place this order.' => 'Sie müssen "%consent" akzeptieren, um diese Bestellung aufzugeben.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products kann nicht an diese Adresse geliefert werden. Entfernen Sie es aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products können nicht an diese Adresse geliefert werden. Entfernen Sie sie aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
+    '%product cannot be shipped to your address.' => '%product kann nicht an Ihre Adresse geliefert werden.',
 ];

@@ -957,4 +957,7 @@ return [
     'The GTIN "%code" of the combination %ref is refused: %reason.' => 'The GTIN "%code" of the combination %ref is refused: %reason.',
     'The manufacturer part number must be %max characters at most.' => 'The manufacturer part number must be %max characters at most.',
     'The manufacturer part number of the combination %ref must be %max characters at most.' => 'The manufacturer part number of the combination %ref must be %max characters at most.',
+    '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products cannot be shipped to this address. Remove it from your cart or choose another address.',
+    '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products cannot be shipped to this address. Remove them from your cart or choose another address.',
+    '%product cannot be shipped to your address.' => '%product cannot be shipped to your address.',
 ];
