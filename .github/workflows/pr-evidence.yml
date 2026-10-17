@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # The merge commit of the pull request and its first parent, the tip of
           # main it is compared with.
@@ -44,7 +44,7 @@ jobs:
           php .github/scripts/evidence/classify.php HEAD~1 HEAD var/evidence/classify.json
 
       - name: Upload the result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence-part-classify
           path: var/evidence/classify.json
@@ -64,7 +64,7 @@ jobs:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -96,7 +96,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
       - name: Restore the Composer download cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
@@ -152,7 +152,7 @@ jobs:
 
       - name: Restore the Sass and Tailwind binaries
         if: steps.revert.outputs.http
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             var/dart-sass
@@ -175,7 +175,7 @@ jobs:
 
       - name: Upload the results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence-part-runtime
           path: |
@@ -186,7 +186,7 @@ jobs:
 
       - name: Upload the snapshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: surface-snapshots
           path: |
@@ -203,7 +203,7 @@ jobs:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -221,7 +221,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
       - name: Restore the Composer download cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-core-${{ runner.os }}-${{ hashFiles('core/composer.json') }}
@@ -234,7 +234,7 @@ jobs:
 
       - name: Upload the result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence-part-php-api
           path: var/evidence/roave.json
@@ -246,7 +246,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -280,7 +280,7 @@ jobs:
 
       - name: Upload the result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence-part-duplication
           path: var/evidence/jscpd.json
@@ -303,10 +303,10 @@ jobs:
       SAME_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download the results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: evidence-part-*
           path: var/evidence
@@ -328,7 +328,7 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence
           path: evidence.json
