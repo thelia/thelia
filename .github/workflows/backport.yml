@@ -1,0 +1,64 @@
+name: Backport
+
+# Labelling a merged pull request `backport 3.2` or `backport 3.1` opens a pull request that
+# cherry-picks it onto that maintenance branch. The label can be set before the merge (the
+# backport opens when the pull request is merged) or after it (it opens when the label is set).
+#
+# The commits are cherry-picked as they were merged. A conflict opens a draft pull request that
+# carries the conflict markers, with the commands to resolve them in a comment on the original
+# pull request. The branch protection of 3.1 and 3.2 applies to the pull request as to any other.
+#
+# pull_request_target gives the token write access when the merged pull request comes from a
+# fork. Nothing of the pull request is checked out or executed: the action only reads its commits
+# and replays them with git.
+on:
+  pull_request_target:
+    types: [ closed, labeled ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# One backport run per pull request at a time: two labels set in a row queue instead of racing
+# on the same cherry-pick branches.
+concurrency:
+  group: backport-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  backport:
+    name: Backport ${{ github.event.action == 'labeled' && github.event.label.name || 'the labelled branches' }}
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.merged == true &&
+      (github.event.action == 'labeled' && startsWith(github.event.label.name, 'backport 3.')
+      || github.event.action == 'closed' && contains(toJSON(github.event.pull_request.labels.*.name), '"backport 3.'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select the branches to backport to
+        id: select
+        # On `closed`, every `backport 3.x` label of the pull request counts. On `labeled`, only
+        # the label that was just set, so that a second label does not replay the first branch.
+        env:
+          ACTION: ${{ github.event.action }}
+          LABEL: ${{ github.event.label.name }}
+        run: |
+          pattern='^backport (3\.[0-9]+)$'
+          if [ "$ACTION" = labeled ]; then
+            if [[ ! "$LABEL" =~ ^backport\ (3\.[0-9]+)$ ]]; then
+              echo "::error::'$LABEL' is not a backport label (expected 'backport 3.<minor>')"
+              exit 1
+            fi
+            pattern="^backport (${BASH_REMATCH[1]//./\\.})\$"
+          fi
+          echo "Label pattern: $pattern"
+          echo "pattern=$pattern" >> "$GITHUB_OUTPUT"
+
+      - name: Create the backport pull requests
+        # Pinned to the commit of v4.7.0: this action holds a token that can write to the repository.
+        uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7
+        with:
+          label_pattern: ${{ steps.select.outputs.pattern }}
+          experimental: '{"conflict_resolution": "draft_commit_conflicts"}'
