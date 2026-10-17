@@ -120,6 +120,29 @@ if (null === $proveRed) {
     $sections[] = details('Tests seen red', $body);
 }
 
+// What the tests lose.
+$weakening = $classification['test_weakening'] ?? null;
+if (null === $weakening) {
+    $rows[] = ['Tests removed, skipped or emptied', $missing];
+} elseif (!$weakening['weakened']) {
+    $rows[] = ['Tests removed, skipped or emptied', 'none'];
+} else {
+    $rows[] = ['Tests removed, skipped or emptied', '**attention**: '.implode(', ', $weakening['reasons'])];
+    $body = "A pull request that takes something away from the tests is never T0.\n";
+    foreach ([
+        'deleted_test_files' => 'Test files deleted',
+        'removed_test_methods' => 'Test methods removed',
+        'added_skips' => 'markTestSkipped or markTestIncomplete added',
+    ] as $key => $title) {
+        if ([] !== $weakening[$key]) {
+            $body .= "\n**$title**\n\n".bullets($weakening[$key])."\n";
+        }
+    }
+    $calls = $weakening['assertion_calls'];
+    $body .= "\nAssertion calls in the test files the pull request changes: {$calls['before']} before, {$calls['after']} after.\n";
+    $sections[] = details('Tests removed, skipped or emptied', $body);
+}
+
 // Twig, routes, event listeners.
 $surface = $evidence['surface'];
 if (null === $surface) {

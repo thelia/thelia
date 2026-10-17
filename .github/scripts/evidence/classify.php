@@ -13,12 +13,14 @@ declare(strict_types=1);
  */
 
 // Classifies the changes of a pull request: the review tier, the risk areas it
-// touches, and whether a database schema change comes with its migration.
+// touches, whether a database schema change comes with its migration, and
+// whether the tests lose something.
 //
 // Tiers:
 //   T2  a security, persistence, API surface, installer or CI path changes, or
 //       more than 500 lines change outside the T0 paths;
-//   T0  only documentation, tests or translation catalogs change;
+//   T0  only documentation, tests or translation catalogs change, and no test
+//       is removed, emptied or skipped;
 //   T1  everything else.
 //
 // T2 wins over T0: a test named after an upload is T2. Nothing that runs in
@@ -139,6 +141,87 @@ function pathTier(array $paths): string
     return [] !== $paths && [] === array_filter($paths, static fn (string $path): bool => !isT0Path($path)) ? 'T0' : 'T1';
 }
 
+/** @return list<string> */
+function testMethods(string $code): array
+{
+    preg_match_all('/function\s+(test\w*)\s*\(/', $code, $named);
+    preg_match_all('/#\[\s*(?:\\\\?PHPUnit\\\\Framework\\\\Attributes\\\\)?Test\s*\][^{;]*?function\s+(\w+)\s*\(/s', $code, $attributed);
+
+    return array_values(array_unique([...$named[1], ...$attributed[1]]));
+}
+
+function countMatches(string $pattern, string $code): int
+{
+    return (int) preg_match_all($pattern, $code);
+}
+
+// What the change takes away from the tests: deleted test files, removed test
+// methods, new skips, fewer assertion calls. A test moved to another file counts
+// as removed from the first one: the reviewer checks where it went.
+function testWeakening(string $base, string $head): array
+{
+    $skip = '/\bmarkTest(?:Skipped|Incomplete)\s*\(/';
+    $assertion = '/\b(?:assert|expect)[A-Z]\w*\s*\(/';
+
+    $deleted = [];
+    $removedMethods = [];
+    $addedSkips = [];
+    $assertionsBefore = 0;
+    $assertionsAfter = 0;
+
+    $status = git('diff', '--name-status', '-M', $base, $head, '--', 'tests/');
+    foreach (array_filter(explode("\n", $status)) as $line) {
+        $fields = explode("\t", $line);
+        $kind = $fields[0][0];
+        $before = 'A' === $kind ? null : $fields[1];
+        $after = 'D' === $kind ? null : $fields[\count($fields) - 1];
+        if (!str_ends_with((string) ($after ?? $before), '.php')) {
+            continue;
+        }
+
+        $baseCode = null === $before ? '' : git('show', "$base:$before");
+        $headCode = null === $after ? '' : git('show', "$head:$after");
+
+        if ('D' === $kind && str_ends_with($before, 'Test.php')) {
+            $deleted[] = $before;
+        }
+        foreach (array_diff(testMethods($baseCode), testMethods($headCode)) as $method) {
+            if ('D' !== $kind) {
+                $removedMethods[] = "$after::$method";
+            }
+        }
+        $newSkips = countMatches($skip, $headCode) - countMatches($skip, $baseCode);
+        if ($newSkips > 0) {
+            $addedSkips[] = "$after (+$newSkips)";
+        }
+        $assertionsBefore += countMatches($assertion, $baseCode);
+        $assertionsAfter += countMatches($assertion, $headCode);
+    }
+
+    $reasons = [];
+    if ([] !== $deleted) {
+        $reasons[] = \count($deleted).' test file(s) deleted';
+    }
+    if ([] !== $removedMethods) {
+        $reasons[] = \count($removedMethods).' test method(s) removed';
+    }
+    if ([] !== $addedSkips) {
+        $reasons[] = 'markTestSkipped or markTestIncomplete added';
+    }
+    if ($assertionsAfter < $assertionsBefore) {
+        $reasons[] = "assertion calls in the changed tests go from $assertionsBefore to $assertionsAfter";
+    }
+
+    return [
+        'weakened' => [] !== $reasons,
+        'reasons' => $reasons,
+        'deleted_test_files' => $deleted,
+        'removed_test_methods' => $removedMethods,
+        'added_skips' => $addedSkips,
+        'assertion_calls' => ['before' => $assertionsBefore, 'after' => $assertionsAfter],
+    ];
+}
+
 if (3 === $argc && '--paths' === $argv[1]) {
     // One change per line, its paths separated by tabs.
     foreach (file($argv[2], \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES) as $line) {
@@ -171,6 +254,7 @@ $paths = array_column($files, 'path');
 $changedLines = array_sum(array_column($files, 'lines'));
 
 $risks = risksOf($paths);
+$weakening = testWeakening($base, $head);
 
 $reasons = [];
 if ([] !== $risks) {
@@ -178,7 +262,7 @@ if ([] !== $risks) {
     foreach (array_keys($risks) as $risk) {
         $reasons[] = "touches the $risk paths";
     }
-} elseif ('T0' === pathTier($paths)) {
+} elseif ('T0' === pathTier($paths) && !$weakening['weakened']) {
     $tier = 'T0';
     $reasons[] = 'only documentation, tests or translation catalogs change';
 } elseif ($changedLines > LARGE_CHANGE_LINES) {
@@ -187,6 +271,9 @@ if ([] !== $risks) {
 } else {
     $tier = 'T1';
     $reasons[] = 'no risk path, '.$changedLines.' changed lines';
+}
+if ($weakening['weakened']) {
+    $reasons[] = 'the tests lose something: '.implode(', ', $weakening['reasons']);
 }
 
 // A schema change needs the upgrade script of existing shops and the DDL of a
@@ -206,6 +293,7 @@ $result = [
     'changed_lines' => $changedLines,
     'risks' => (object) $risks,
     'schema' => $schema,
+    'test_weakening' => $weakening,
 ];
 
 file_put_contents($output, json_encode($result, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES)."\n");
