@@ -6,7 +6,9 @@ name: Backport
 #
 # The commits are cherry-picked as they were merged. A conflict opens a draft pull request that
 # carries the conflict markers, with the commands to resolve them in a comment on the original
-# pull request. The branch protection of 3.1 and 3.2 applies to the pull request as to any other.
+# pull request. The "maintenance branches" ruleset makes the four checks of test.yml and
+# phpstan-botwig.yml required on 3.*. A pull request opened with the workflow token starts no
+# workflow: close and reopen it, or push to its branch, so that the CI runs and it can merge.
 #
 # pull_request_target gives the token write access when the merged pull request comes from a
 # fork. Nothing of the pull request is checked out or executed: the action only reads its commits
