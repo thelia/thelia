@@ -77,3 +77,4 @@ The place in a slot is taken in the transaction of `OrderFacade::createOrder()`,
 | `GET /api/front/account/orders[/{id}]` | `deliveryDate` (Y-m-d), `deliverySlotStart`, `deliverySlotEnd` (H:i) |
 
 `Cart` carries `deliveryDate` and `deliverySlotId`, read only. The day is published as written, Y-m-d: a client must not turn it into an instant of its own time zone. The availability endpoint takes no address and needs no account; an anonymous caller counts against the per-address limiter of the API (`limiter.api_anonymous`).
+
