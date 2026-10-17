@@ -4,6 +4,11 @@ name: labeler
 # (.github/labeler.yml). pull_request_target gives the token the right to label
 # a pull request from a fork; the job reads the configuration of the base branch
 # and never checks out the code of the pull request.
+#
+# sync-labels removes a tier label that no longer applies after a push. The
+# second step keeps out of T0 a pull request that deletes a test file, removes a
+# test method or adds a skip: it reads the patches from the API as data, the
+# full check is in the evidence report.
 
 on:
   pull_request_target:
@@ -21,3 +26,22 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/labeler@v7
+        with:
+          sync-labels: true
+
+      - name: Keep a pull request that weakens the tests out of T0
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          weakened=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --paginate --jq '
+            .[] | select(.filename | startswith("tests/"))
+            | select(
+                (.status == "removed" and (.filename | endswith("Test.php")))
+                or ((.patch // "") | test("(?m)^-[^\\n]*function\\s+test|^\\+[^\\n]*markTest(Skipped|Incomplete)\\s*\\("))
+              )
+            | .filename' | wc -l)
+          echo "Test files losing a test or gaining a skip: $weakened"
+          if [ "$weakened" -gt 0 ]; then
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels/tier%3AT0" > /dev/null 2>&1 || true
+          fi
