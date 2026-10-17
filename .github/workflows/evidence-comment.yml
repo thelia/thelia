@@ -1,0 +1,77 @@
+name: evidence comment
+
+# Posts the evidence report on a pull request from a fork, whose evidence run
+# has a read-only token. It runs from main once the evidence run is over.
+#
+# The report was written by code of the pull request: it is data. Nothing of
+# the pull request is checked out or executed, the report never reaches a
+# command line, and it is only sent to the API as the file of a comment, under a
+# line that says where it comes from. The pull request number is not read from
+# the artifact: it is the open pull request of the head branch of the run, and
+# its head commit must be the one the run tested. No label is set from it: the
+# tier labels of a fork come from labeler.yml.
+
+on:
+  workflow_run:
+    workflows: [ evidence ]
+    types: [ completed ]
+
+permissions: {}
+
+jobs:
+  comment:
+    name: Post the report
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+    steps:
+      - name: Find the pull request
+        id: pr
+        run: |
+          number=$(gh api -X GET "repos/$GITHUB_REPOSITORY/pulls" -f state=open -f head="$HEAD_OWNER:$HEAD_BRANCH" \
+            --jq '[.[] | select(.head.sha == env.HEAD_SHA) | .number][0] // empty')
+          if [ -z "$number" ]; then
+            echo "::notice::no open pull request has $HEAD_SHA as its head: nothing to post"
+            exit 0
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      - name: Download the report
+        if: steps.pr.outputs.number
+        run: gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name evidence --dir "$RUNNER_TEMP/evidence"
+
+      - name: Post the report on the pull request
+        if: steps.pr.outputs.number
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          report="$RUNNER_TEMP/evidence/report.md"
+          body="$RUNNER_TEMP/body.md"
+          if [ ! -f "$report" ] || [ -L "$report" ]; then
+            echo "::notice::the evidence artifact holds no report"
+            exit 0
+          fi
+          {
+            echo '<!-- pr-evidence -->'
+            echo "_Report written by the evidence run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$RUN_ID, which runs the code of this pull request._"
+            echo
+            grep -v -F '<!-- pr-evidence -->' "$report" | head -c 60000
+          } > "$body"
+          comment=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- pr-evidence -->"))) | .id' | head -n 1)
+          if [ -n "$comment" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment" -F body=@"$body" > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F body=@"$body" > /dev/null
+          fi
