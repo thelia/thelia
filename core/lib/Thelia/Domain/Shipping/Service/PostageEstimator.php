@@ -23,6 +23,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\Service\CouponFreeShippingEvaluator;
 use Thelia\Domain\Shipping\DTO\EstimatedPostageDTO;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Log\Tlog;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
@@ -42,6 +44,8 @@ class PostageEstimator
         protected Session $session,
         protected CouponFreeShippingEvaluator $couponFreeShippingEvaluator,
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
+        protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+        protected ?CartShippingRules $cartShippingRules = null,
     ) {
     }
 
@@ -66,10 +70,16 @@ class PostageEstimator
         $bestPostageAmount = null;
         $bestPostageTax = null;
         $bestModuleId = null;
+        $bestModule = null;
 
         /** @var Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
             if (!$this->isModuleEligibleForCountryAndCart($deliveryModule, $country, $state, $virtual)) {
+                continue;
+            }
+
+            // A carrier a product of the cart refuses is not a carrier the buyer can pick.
+            if ($this->cartShippingRules?->for($cart)->excludes((int) $deliveryModule->getId())) {
                 continue;
             }
 
@@ -83,13 +93,19 @@ class PostageEstimator
                     $bestPostageAmount = $amountTtc;
                     $bestPostageTax = $tax;
                     $bestModuleId = $deliveryModule->getId();
+                    $bestModule = $deliveryModule;
                 }
             }
         }
 
         if (null !== $bestModuleId && $this->couponFreeShippingEvaluator->isCouponRemovingPostage($country->getId(), $bestModuleId)) {
-            $bestPostageAmount = 0.0;
-            $bestPostageTax = 0.0;
+            // The coupon offers the carrier, not the surcharges of the products.
+            $surcharge = $bestModule instanceof Module
+                ? $this->productShippingRuleQuoter?->surchargeLeftByAFreeShippingCoupon($bestModule, $cart, $country)
+                : null;
+
+            $bestPostageAmount = $surcharge?->getAmount() ?? 0.0;
+            $bestPostageTax = $surcharge?->getAmountTax() ?? 0.0;
         }
 
         return new EstimatedPostageDTO($bestPostageAmount, $bestPostageTax);
@@ -151,22 +167,28 @@ class PostageEstimator
         try {
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-            $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, null, $country, $state);
-            $this->eventDispatcher->dispatch(
-                $deliveryPostageEvent,
-                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-            );
+            $askCarrier = function (Cart $quotedCart) use ($moduleInstance, $country, $state): ?OrderPostage {
+                $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $quotedCart, null, $country, $state);
+                $this->eventDispatcher->dispatch(
+                    $deliveryPostageEvent,
+                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                );
 
-            if ($deliveryPostageEvent->isValidModule()) {
-                $postage = $deliveryPostageEvent->getPostage();
+                return $deliveryPostageEvent->isValidModule() && $deliveryPostageEvent->getPostage() instanceof OrderPostage
+                    ? $deliveryPostageEvent->getPostage()
+                    : null;
+            };
 
-                if ($postage instanceof OrderPostage) {
-                    // Same post-processing as the checkout, so an estimate and
-                    // the cart it turns into never announce two different taxes.
-                    $this->postageTaxBreakdownCalculator->applyToPostage($postage, $cart, $country, $state);
+            $postage = null !== $this->productShippingRuleQuoter
+                ? $this->productShippingRuleQuoter->quote($deliveryModule, $cart, $country, $state, $askCarrier)
+                : $askCarrier($cart);
 
-                    return $postage;
-                }
+            if ($postage instanceof OrderPostage) {
+                // Same post-processing as the checkout, so an estimate and
+                // the cart it turns into never announce two different taxes.
+                $this->postageTaxBreakdownCalculator->applyToPostage($postage, $cart, $country, $state);
+
+                return $postage;
             }
         } catch (DeliveryException) {
             Tlog::getInstance()->error(

@@ -340,6 +340,9 @@ class ProductFacadeTest extends TestCase
                 'postscriptum' => null,
                 'brand_id' => null,
                 'virtual_document_id' => null,
+                'shipping_surcharge' => null,
+                'shipping_surcharge_mode' => null,
+                'free_shipping' => null,
             ],
             $dto->toArray(),
         );

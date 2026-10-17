@@ -43,6 +43,9 @@ CREATE TABLE `product`
     `brand_id` INTEGER,
     `virtual` TINYINT DEFAULT 0 NOT NULL,
     `guest_checkout_forbidden` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product may only be bought from an account, so a cart holding it is refused the guest checkout',
+    `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'fixed amount added to the carrier postage, untaxed, in the default currency',
+    `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the surcharge is charged once per cart line, 1: once per unit',
+    `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is left out of the postage the carrier quotes',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -2062,6 +2065,34 @@ CREATE TABLE `product_associated_content`
     CONSTRAINT `fk_product_associated_content_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_excluded_delivery_module
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_excluded_delivery_module`;
+
+CREATE TABLE `product_excluded_delivery_module`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `product_excluded_delivery_module_UNIQUE` (`product_id`, `module_id`),
+    INDEX `idx_product_excluded_delivery_module_module_id` (`module_id`),
+    CONSTRAINT `fk_product_excluded_delivery_module_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_excluded_delivery_module_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -4283,6 +4314,9 @@ CREATE TABLE `product_version`
     `brand_id` INTEGER,
     `virtual` TINYINT DEFAULT 0 NOT NULL,
     `guest_checkout_forbidden` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product may only be bought from an account, so a cart holding it is refused the guest checkout',
+    `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'fixed amount added to the carrier postage, untaxed, in the default currency',
+    `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the surcharge is charged once per cart line, 1: once per unit',
+    `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is left out of the postage the carrier quotes',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

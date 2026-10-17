@@ -58,6 +58,9 @@
     <column name="meta_keywords" type="LONGVARCHAR" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column defaultValue="0" description="the product may only be bought from an account, so a cart holding it is refused the guest checkout" name="guest_checkout_forbidden" required="true" type="TINYINT" />
+    <column defaultValue="0" description="fixed amount added to the carrier postage, untaxed, in the default currency" name="shipping_surcharge" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" description="0: the surcharge is charged once per cart line, 1: once per unit" name="shipping_surcharge_mode" required="true" type="TINYINT" />
+    <column defaultValue="0" description="the product is left out of the postage the carrier quotes" name="free_shipping" required="true" type="TINYINT" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -1906,6 +1909,25 @@
     </index>
     <index name="idx_product_associated_content_content_id">
       <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="product_excluded_delivery_module" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="product" name="fk_product_excluded_delivery_module_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_product_excluded_delivery_module_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <unique name="product_excluded_delivery_module_UNIQUE">
+      <unique-column name="product_id" />
+      <unique-column name="module_id" />
+    </unique>
+    <index name="idx_product_excluded_delivery_module_module_id">
+      <index-column name="module_id" />
     </index>
     <behavior name="timestampable" />
   </table>

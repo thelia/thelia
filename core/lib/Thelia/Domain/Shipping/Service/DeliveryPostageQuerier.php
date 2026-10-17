@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Log\Tlog;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
@@ -32,6 +33,7 @@ final readonly class DeliveryPostageQuerier
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private ContainerInterface $container,
+        private ProductShippingRuleQuoter $productShippingRuleQuoter,
     ) {
     }
 
@@ -42,10 +44,23 @@ final readonly class DeliveryPostageQuerier
     {
         $moduleInstance = $module->getDeliveryModuleInstance($this->container);
 
-        $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
+        $deliveryPostageEvent = null;
 
         try {
-            $this->dispatcher->dispatch($deliveryPostageEvent, TheliaEvents::MODULE_DELIVERY_GET_POSTAGE);
+            $postage = $this->productShippingRuleQuoter->quote(
+                $module,
+                $cart,
+                $country,
+                $state,
+                function (Cart $quotedCart) use ($moduleInstance, $address, $country, $state, &$deliveryPostageEvent): ?OrderPostage {
+                    $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $quotedCart, $address, $country, $state);
+                    $this->dispatcher->dispatch($deliveryPostageEvent, TheliaEvents::MODULE_DELIVERY_GET_POSTAGE);
+
+                    return $deliveryPostageEvent->isValidModule() && $deliveryPostageEvent->getPostage() instanceof OrderPostage
+                        ? $deliveryPostageEvent->getPostage()
+                        : null;
+                },
+            );
         } catch (DeliveryException $e) {
             Tlog::getInstance()->error(\sprintf('Delivery module %s is not available: %s', $module->getCode(), $e->getMessage()));
 
@@ -55,9 +70,9 @@ final readonly class DeliveryPostageQuerier
                 'valid' => false,
             ];
         }
-        $valid = $deliveryPostageEvent->isValidModule();
-        $postage = $valid && $deliveryPostageEvent->getPostage() instanceof OrderPostage ? $deliveryPostageEvent->getPostage() : null;
-        $deliveryMode = $deliveryPostageEvent->getDeliveryMode()?->value;
+        $valid = $deliveryPostageEvent instanceof DeliveryPostageEvent && $deliveryPostageEvent->isValidModule();
+        $postage = $valid ? $postage : null;
+        $deliveryMode = $deliveryPostageEvent?->getDeliveryMode()?->value;
 
         return [
             'postage' => $postage,
