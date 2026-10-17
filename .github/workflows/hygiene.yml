@@ -2,20 +2,26 @@ name: hygiene
 
 # Two audits that report and never fail: the vulnerable dependencies and the
 # weaknesses of the workflows themselves. They are a signal for now; a finding is
-# written in the job summary and raised as one annotation.
+# written in the job summary and raised as one annotation. Neither job is a
+# required check, and continue-on-error keeps a broken tool from turning the run
+# red.
 #
-# Neither job is a required check, and continue-on-error keeps a broken tool from
-# turning the run red.
+# A third job fails when .github/labeler.yml and the evidence classifier give a
+# change different review tiers.
 on:
   pull_request:
     paths:
       - '.github/workflows/**'
+      - '.github/labeler.yml'
+      - '.github/scripts/evidence/**'
       - 'composer.json'
       - 'core/composer.json'
   push:
     branches: [ main ]
     paths:
       - '.github/workflows/**'
+      - '.github/labeler.yml'
+      - '.github/scripts/evidence/**'
       - 'composer.json'
       - 'core/composer.json'
   # An advisory is published without any push to this repository.
@@ -106,3 +112,20 @@ jobs:
             echo "::warning title=zizmor::$(tail -n 1 "$RUNNER_TEMP/zizmor.txt"), see the job summary."
           fi
           exit 0
+
+  tier-parity:
+    name: Tier rules agree
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install the glob library of actions/labeler
+        # The versions of the actions/labeler release in use.
+        run: npm install --no-save --no-audit --no-fund --prefix "$RUNNER_TEMP/parity" minimatch@10.2.5 js-yaml@5.1.0
+
+      - name: Compare labeler.yml and classify.php
+        run: node .github/scripts/evidence/check-tier-parity.mjs "$RUNNER_TEMP/parity/node_modules"
