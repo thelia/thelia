@@ -1,0 +1,361 @@
+name: evidence
+
+# Gathers the evidence a reviewer needs on a pull request, in one report: the
+# review tier, whether the new tests fail on the code before the change, what
+# the change removes or alters in the public surface (Twig callables, routes,
+# event listeners, API operations and fields, PHP API of core), new duplicated
+# code, and whether a schema change comes with its migration.
+#
+# BC-PROMISE.md says what the public surface is. The report flags, it blocks
+# nothing: no check of this workflow is required by the branch protection, and
+# every step reports instead of failing.
+#
+# The report is the summary of the `report` job and the evidence.json artifact.
+# On a pull request from a branch of this repository it is also posted as one
+# comment, updated on each push; the token of a fork pull request cannot write.
+
+on:
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  classify:
+    name: Tier and schema
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The merge commit of the pull request and its first parent, the tip of
+          # main it is compared with.
+          fetch-depth: 2
+
+      - name: Classify the changes
+        run: |
+          mkdir -p var/evidence
+          php .github/scripts/evidence/classify.php HEAD~1 HEAD var/evidence/classify.json
+
+      - name: Upload the result
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-part-classify
+          path: var/evidence/classify.json
+
+  runtime:
+    # One installed application, inspected twice: on the pull request, then with
+    # every non-test file put back to its base version. The second state also
+    # runs the new tests, which must fail on it.
+    name: Runtime surface and tests seen red
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
+      # Without a token, Flex silently skips the thelia/thelia-recipes endpoint
+      # and the GitHub archives the theme branches are downloaded from are rate
+      # limited per runner IP.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: post_max_size=20M
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+          coverage: none
+
+      - name: Prepare the test database credentials
+        run: printf 'DATABASE_HOST=127.0.0.1\nDATABASE_PORT=3306\nDATABASE_USER=root\nDATABASE_PASSWORD=root\nDATABASE_NAME=test\n' > .env.test.local
+
+      - name: Resolve the themes from their development branch
+        # Same resolution as test.yml, so that the Composer cache key matches.
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Locate the Composer download cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Composer download cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Build the test database
+        run: php bin/test-prepare
+
+      - name: Snapshot the surface of the pull request
+        run: .github/scripts/evidence/snapshot.sh var/evidence/pr
+
+      - name: Put the code back to its base version
+        id: revert
+        # composer.json comes back with the rest; its dependencies stay those of
+        # the pull request. A schema change needs the base Propel models and
+        # database, which bin/test-prepare builds again.
+        run: |
+          .github/scripts/evidence/revert-to-base.sh HEAD~1 | tee var/evidence/reverted.txt
+          git diff --quiet HEAD~1 HEAD -- local/config/schema.xml || php bin/test-prepare
+          composer dump-autoload --optimize --no-scripts
+          rm -rf var/cache/test
+          if git diff --name-only --diff-filter=AMR HEAD~1 HEAD -- tests/Http | grep -q 'Test\.php$'; then
+            echo "http=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Snapshot the surface of the base code
+        run: .github/scripts/evidence/snapshot.sh var/evidence/base
+
+      - name: Compare the Twig callables, routes and event listeners
+        run: php .github/scripts/evidence/surface-diff.php var/evidence/base var/evidence/pr var/evidence/surface.json
+
+      - name: Compare the API descriptions
+        # oasdiff ranks a field removed from a response as "info", since API
+        # Platform marks no response field as required; the report lists the
+        # removals on their own. The githubactions run annotates the breaking ones.
+        run: |
+          if [ -s var/evidence/base/openapi.json ] && [ -s var/evidence/pr/openapi.json ]; then
+            oasdiff="docker run --rm -v $PWD/var/evidence:/specs -w /specs tufin/oasdiff:v1.33.0"
+            $oasdiff breaking base/openapi.json pr/openapi.json --fail-on ERR -f githubactions || true
+            # Not oasdiff.json: oasdiff reads a file of that name in its working
+            # directory as its configuration.
+            if $oasdiff changelog base/openapi.json pr/openapi.json -f json > var/evidence/api-changes.json; then
+              jq '{ran: true, changes: .}' var/evidence/api-changes.json > var/evidence/openapi.json
+            else
+              jq -n '{ran: false, error: "oasdiff changelog failed"}' > var/evidence/openapi.json
+            fi
+          else
+            jq -n '{ran: false, error: "an OpenAPI export failed"}' > var/evidence/openapi.json
+          fi
+
+      - name: Restore the Sass and Tailwind binaries
+        if: steps.revert.outputs.http
+        uses: actions/cache@v4
+        with:
+          path: |
+            var/dart-sass
+            var/tailwind/v*
+          key: asset-binaries-${{ runner.os }}-${{ hashFiles('composer.lock', 'templates/frontOffice/*/config/**') }}
+          restore-keys: asset-binaries-${{ runner.os }}-
+
+      - name: Build the theme assets
+        # Without them, every HTTP test of a page is skipped, and a skipped test
+        # proves nothing either way.
+        if: steps.revert.outputs.http
+        run: |
+          php bin/console importmap:install --env=test --no-debug
+          php bin/console tailwind:build --env=test --no-debug
+          php bin/console sass:build --env=test --no-debug
+          php bin/console cache:warmup --env=test --no-debug
+
+      - name: Run the new tests against the base code
+        run: .github/scripts/evidence/prove-red.sh HEAD~1 var/evidence/reverted.txt var/evidence/prove-red.json
+
+      - name: Upload the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-part-runtime
+          path: |
+            var/evidence/surface.json
+            var/evidence/openapi.json
+            var/evidence/prove-red.json
+          if-no-files-found: ignore
+
+      - name: Upload the snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surface-snapshots
+          path: |
+            var/evidence/base/
+            var/evidence/pr/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  php-api:
+    name: PHP API of core
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        # roave/backward-compatibility-check 8.23 requires PHP 8.4.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, gd, zip
+          coverage: none
+          tools: roave/backward-compatibility-check:8.23.0
+
+      - name: Locate the Composer download cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Composer download cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-core-${{ runner.os }}-${{ hashFiles('core/composer.json') }}
+          restore-keys: composer-core-${{ runner.os }}-
+
+      - name: Compare the PHP API of core
+        run: |
+          mkdir -p var/evidence
+          .github/scripts/evidence/roave-core.sh HEAD~1 HEAD var/evidence/roave.json
+
+      - name: Upload the result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-part-php-api
+          path: var/evidence/roave.json
+          if-no-files-found: ignore
+
+  duplication:
+    name: New duplicated code
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Find the new clones
+        # The base is scanned with the same settings; jscpd marks the clones it
+        # did not have as new. A clone between two files the pull request does not
+        # touch can still come out as new when the base already had it under
+        # another pairing: only the new clones involving a changed file count.
+        # Two files that share nothing but the license header at the top (13
+        # lines) are not a clone.
+        run: |
+          mkdir -p var/evidence
+          npx --yes jscpd@5.4.1 . --format php,twig --ignore "tests/**,.github/**,**/vendor/**,**/node_modules/**" \
+            --baseline-from-ref HEAD~1 --reporters json,silent --output var/jscpd || true
+          git diff --name-only --diff-filter=AMR HEAD~1 HEAD | jq -R . | jq -s . > var/jscpd/changed.json
+          if [ -s var/jscpd/jscpd-report.json ]; then
+            jq --slurpfile changed var/jscpd/changed.json '{
+              ran: true,
+              new_clones_total: ([.duplicates[] | select(.isNew)] | length),
+              new_clones_in_changed_files: [
+                .duplicates[] | select(.isNew)
+                | select((.firstFile.start == 1 and .secondFile.start == 1 and .lines <= 15) | not)
+                | select((.firstFile.name as $f | $changed[0] | index($f)) or (.secondFile.name as $s | $changed[0] | index($s)))
+                | {format, lines,
+                   first: "\(.firstFile.name):\(.firstFile.start)-\(.firstFile.end)",
+                   second: "\(.secondFile.name):\(.secondFile.start)-\(.secondFile.end)"}
+              ]
+            }' var/jscpd/jscpd-report.json > var/evidence/jscpd.json
+            jq -r '.new_clones_in_changed_files[] | "::warning title=New duplicated code::\(.lines) lines: \(.first) and \(.second)"' var/evidence/jscpd.json | head -n 20
+          fi
+
+      - name: Upload the result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-part-duplication
+          path: var/evidence/jscpd.json
+          if-no-files-found: ignore
+
+  report:
+    name: Report
+    needs: [ classify, runtime, php-api, duplication ]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      SAME_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download the results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: evidence-part-*
+          path: var/evidence
+          merge-multiple: true
+
+      - name: Measure the duration
+        run: |
+          started=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .run_started_at)
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
+            --jq '[.jobs[] | select(.completed_at != null) | {name, conclusion, seconds: ((.completed_at | fromdate) - (.started_at | fromdate))}]' > var/evidence/jobs.json
+          jq -n --arg started "$started" --slurpfile jobs var/evidence/jobs.json \
+            '{run_started_at: $started, total_seconds: (now - ($started | fromdate) | floor), jobs: $jobs[0]}' > var/evidence/timing.json
+          cat var/evidence/timing.json
+
+      - name: Write the report
+        run: |
+          php .github/scripts/evidence/summary.php var/evidence evidence.json report.md \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence
+          path: evidence.json
+
+      - name: Post the report on the pull request
+        if: env.SAME_REPOSITORY == 'true'
+        run: |
+          comment=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- pr-evidence -->"))) | .id' | head -n 1)
+          if [ -n "$comment" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment" -F body=@report.md > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F body=@report.md > /dev/null
+          fi
+
+      - name: Label the tier
+        # .github/labeler.yml sets the tier labels from the paths; only this job
+        # sees the size of the change, which can make it T2. A tier label that no
+        # longer applies is removed.
+        if: env.SAME_REPOSITORY == 'true'
+        run: |
+          tier=$(jq -r '.classification.tier // empty' evidence.json)
+          [ -n "$tier" ] || exit 0
+          for label in tier:T0 tier:T2; do
+            if [ "$label" = "tier:$tier" ]; then
+              gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels" -f "labels[]=$label" > /dev/null
+            else
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels/$(jq -rn --arg l "$label" '$l|@uri')" > /dev/null 2>&1 || true
+            fi
+          done
