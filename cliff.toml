@@ -1,0 +1,60 @@
+# git-cliff configuration: a draft of the changelog section of a release, from the conventional
+# commit titles between two tags. CHANGELOG.md is written by hand; this prints the list a release
+# manager starts from, to complete with the upgrade notes.
+#
+#   git cliff 3.2.3..origin/3.2 --tag 3.2.4        section of the next 3.2 release
+#   git cliff 3.2.3..origin/main --unreleased --ignore-tags '.*'   what main holds since 3.2.3, as one section
+#   git cliff --latest                             the section of the last tag reachable from HEAD
+#
+# The range is explicit because the tags sit on the maintenance branches (3.1, 3.2), not on main.
+# Without --ignore-tags, a range ending on main is cut in one section per tag it contains (3.2.0 is on main).
+# Commit titles that are not conventional (merge commits, advisory merges) are left out.
+
+[changelog]
+header = ""
+# The sort prefixes (<!-- 1 -->) keep the groups in the order of commit_parsers; they are stripped here.
+body = """
+{% if version %}\
+# {{ version }}
+{% else %}\
+# Unreleased
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+## {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {% if commit.scope and commit.scope != "security" %}**{{ commit.scope }}**: {% endif %}{{ commit.message | upper_first }}\
+{% endfor %}
+{% endfor %}
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+# A breaking change is listed even when its type is one of the skipped ones.
+protect_breaking_commits = true
+filter_commits = false
+tag_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+sort_commits = "oldest"
+topo_order = false
+
+commit_preprocessors = [
+  # "(#4176)" at the end of a title becomes a link to the pull request.
+  { pattern = '\(#([0-9]+)\)', replace = "([#${1}](https://github.com/thelia/thelia/pull/${1}))" },
+]
+
+commit_parsers = [
+  { message = "^docs.*changelog", skip = true },
+  { message = "^(chore|ci|test|style|build)", skip = true },
+  { message = "^revert", skip = true },
+  { breaking = true, group = "<!-- 0 -->Breaking changes" },
+  { message = "^(fix|feat|perf|refactor)\\(security\\)", group = "<!-- 1 -->Security" },
+  { message = "^feat", group = "<!-- 2 -->Features" },
+  { message = "^fix", group = "<!-- 3 -->Fixes" },
+  { message = "^reworks", group = "<!-- 3 -->Fixes" },
+  { message = "^perf", group = "<!-- 4 -->Performance" },
+  { message = "^refactor", group = "<!-- 5 -->Refactoring" },
+  { message = "^docs", group = "<!-- 6 -->Documentation" },
+]
