@@ -35,6 +35,9 @@ use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
+use Thelia\Domain\Payment\Enum\OrderPaymentPartState;
+use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
+use Thelia\Domain\Payment\OrderPaymentComposer;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker;
@@ -49,6 +52,7 @@ use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsent;
+use Thelia\Model\OrderPaymentPart;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
@@ -76,6 +80,7 @@ readonly class OrderFacade
         private DeliverySlotBooker $deliverySlotBooker,
         private SaleUnitContext $saleUnitContext,
         private SaleUnitStockResolver $saleUnitStockResolver,
+        private OrderPaymentComposer $orderPaymentComposer,
     ) {
     }
 
@@ -287,6 +292,8 @@ readonly class OrderFacade
                 );
             }
 
+            $this->persistPaymentParts($placedOrder, $cart, $connection);
+
             // Allocate the ref from the gapless sequence as the very last
             // operation: the counter lock is only held for the commit window,
             // and any earlier failure rolls the increment back with the order.
@@ -307,6 +314,44 @@ readonly class OrderFacade
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
             throw $throwable;
+        }
+    }
+
+    /**
+     * What the order is paid with, written in the transaction of the order: the amounts the
+     * instant payment modules applied to the cart, then the payment module that charges the
+     * rest, all `pending`. Settling them is the payment's business, once the order exists.
+     *
+     * Composed here again, on the total of the order itself, although the checkout composed
+     * it before anything was written: that one is what refuses early and what the
+     * fingerprint is taken from, this one is what the parts are written from. When nothing
+     * is applied there is nothing to write, and the order is the one an order paid with a
+     * single payment module has always been — its payment module is left as it was chosen.
+     *
+     * The payment module of the order is then the one of the primary part: the provider
+     * that charges the balance, or, when the instant means cover the whole order, the last
+     * of them.
+     *
+     * @throws PaymentCompositionRefusedException
+     * @throws PropelException
+     */
+    private function persistPaymentParts(ModelOrder $placedOrder, CartModel $cart, ConnectionInterface $connection): void
+    {
+        $composition = $this->orderPaymentComposer->composeForOrder($cart, $placedOrder, $placedOrder->getPaymentModuleId());
+
+        foreach ($composition->parts as $plannedPart) {
+            (new OrderPaymentPart())
+                ->setOrderId($placedOrder->getId())
+                ->setPaymentModuleId($plannedPart->moduleId)
+                ->setAmount($plannedPart->amount)
+                ->setState(OrderPaymentPartState::PENDING->value)
+                ->setIsPrimary($plannedPart->isPrimary)
+                ->setPosition($plannedPart->position)
+                ->save($connection);
+
+            if ($plannedPart->isPrimary) {
+                $placedOrder->setPaymentModuleId($plannedPart->moduleId);
+            }
         }
     }
 

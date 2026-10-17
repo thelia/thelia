@@ -142,14 +142,14 @@ use Thelia\Api\State\Provider\CheckoutValidationProvider;
             status: 200,
             openapi: new OpenApiOperation(
                 summary: 'Choose how the order is paid',
-                description: 'Selects a payment module on the cart and returns the cart.',
+                description: 'Selects a payment module on the cart, and optionally one of the buyer\'s stored payment methods of that module, and returns the cart. Choosing a module without a stored method means paying with a new one.',
                 responses: [
                     '200' => new OpenApiResponse(
                         description: 'The choice was taken: the cart it is paid through, with the amounts the shop computed.',
                         content: new \ArrayObject(['application/json' => ['example' => self::CART_EXAMPLE]]),
                     ),
                     '404' => new OpenApiResponse(description: 'No such cart — the same answer for a cart of another account.'),
-                    '422' => new OpenApiResponse(description: 'The identifier names nothing the checkout can take: no such activated module, or none given.'),
+                    '422' => new OpenApiResponse(description: 'The identifier names nothing the checkout can take: no such activated module, or none given; or a stored payment method that is not the buyer\'s, belongs to another module or has expired.'),
                 ],
             ),
             normalizationContext: ['groups' => [Cart::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ_SINGLE]],

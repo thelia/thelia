@@ -431,6 +431,7 @@ return [
     'Configuration delivery dates' => 'Configuration delivery dates',
     'Configuration checkout steps' => 'Configuration checkout steps',
     'Catalog price rules' => 'Catalog price rules',
+    'Saved payment methods' => 'Saved payment methods',
     'Configuration order status' => 'Configuration order status',
     'Configuration variables' => 'Configuration variables',
     'Confirm your %store account' => 'Confirm your {{ config("store_name") }} account',

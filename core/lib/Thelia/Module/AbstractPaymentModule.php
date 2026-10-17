@@ -178,6 +178,21 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         return false;
     }
 
+    /**
+     * What this module charges for the order, as a decimal string of six decimals.
+     *
+     * The balance its own part holds when the order is paid with several means, the total
+     * of the order otherwise: the figure a module that implements
+     * BalanceChargingPaymentModuleInterface sends to its provider, never
+     * Order::getTotalAmount(). It is the answer of ORDER_PAY_GET_TOTAL, which is what lets
+     * a listener that adjusts the total of an order with no part (a discount module) keep
+     * doing so.
+     */
+    public function getAmountToCharge(Order $order): string
+    {
+        return number_format((float) $this->getOrderPayTotalAmount($order), 6, '.', '');
+    }
+
     public function getMinimumAmount(): int
     {
         return 0;

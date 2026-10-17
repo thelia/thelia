@@ -18,6 +18,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
+use Thelia\Domain\Payment\Exception\PaymentMethodNotOwnedException;
+use Thelia\Domain\Payment\Exception\StoredMethodNotSelectableException;
+use Thelia\Domain\Payment\StoredPaymentMethodSelection;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 
 class CartSelectionService
@@ -26,6 +29,7 @@ class CartSelectionService
         protected EventDispatcherInterface $eventDispatcher,
         protected CartCheckoutEventBuilder $cartCheckoutEventBuilder,
         protected PostageHandler $postageHandler,
+        protected StoredPaymentMethodSelection $storedPaymentMethodSelection,
     ) {
     }
 
@@ -53,8 +57,22 @@ class CartSelectionService
         $this->postageHandler->handlePostageOnCart($checkoutDTO->getCart());
     }
 
+    /**
+     * The payment module and the stored method to pay with are chosen together: a
+     * choice that names no stored method is the choice of a new one, and a stored method
+     * the cart cannot be paid with is refused before anything is written.
+     *
+     * @throws PaymentMethodNotOwnedException
+     * @throws StoredMethodNotSelectableException
+     */
     public function setPaymentModule(CheckoutDTO $checkoutDTO): void
     {
+        $this->storedPaymentMethodSelection->methodToChooseFor(
+            $checkoutDTO->getCart(),
+            $checkoutDTO->getPaymentModuleId(),
+            $checkoutDTO->getCustomerPaymentMethodId(),
+        );
+
         $cartCheckoutEvent = $this->cartCheckoutEventBuilder->buildEvent($checkoutDTO);
         $this->eventDispatcher->dispatch($cartCheckoutEvent, TheliaEvents::CART_SET_PAYMENT_MODULE);
 

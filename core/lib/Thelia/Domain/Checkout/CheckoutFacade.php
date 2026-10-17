@@ -22,6 +22,8 @@ use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
 use Thelia\Domain\Checkout\Service\CheckoutResetService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
+use Thelia\Domain\Payment\Exception\PaymentMethodNotOwnedException;
+use Thelia\Domain\Payment\Exception\StoredMethodNotSelectableException;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Cart;
 use Thelia\Model\Order;
@@ -63,7 +65,11 @@ final readonly class CheckoutFacade
     }
 
     /**
-     * Select the payment module on the cart and refresh shipping.
+     * Select the payment module on the cart, with the stored method to pay with when the
+     * DTO names one, and refresh shipping.
+     *
+     * @throws PaymentMethodNotOwnedException
+     * @throws StoredMethodNotSelectableException
      */
     public function selectPaymentModule(CheckoutDTO $dto): void
     {

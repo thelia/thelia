@@ -33,6 +33,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\State\Processor\CustomerDeleteProcessor;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
@@ -60,6 +61,7 @@ use Thelia\Model\Map\CustomerTableMap;
         ),
         new Delete(
             uriTemplate: '/admin/customers/{id}',
+            processor: CustomerDeleteProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],

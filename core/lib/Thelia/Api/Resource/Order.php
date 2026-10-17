@@ -256,6 +256,15 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public array $orderShipments = [];
 
+    /**
+     * What the order is paid with, in settlement order: one part per payment module,
+     * the amount each carries and where it stands. Read only, the checkout and the
+     * payment modules write the parts.
+     */
+    #[Relation(targetResource: OrderPaymentPart::class, relationAlias: 'OrderPaymentParts')]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public array $paymentParts = [];
+
     #[Relation(targetResource: OrderCoupon::class)]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public array $orderCoupons = [];
@@ -647,6 +656,27 @@ class Order implements PropelResourceInterface
     public function setOrderShipments(array $orderShipments): self
     {
         $this->orderShipments = $orderShipments;
+
+        return $this;
+    }
+
+    /**
+     * @return list<OrderPaymentPart>
+     */
+    public function getPaymentParts(): array
+    {
+        return $this->paymentParts;
+    }
+
+    /**
+     * @param list<OrderPaymentPart> $paymentParts
+     */
+    public function setPaymentParts(array $paymentParts): self
+    {
+        // The collection comes back in whatever order the index gave it; the
+        // settlement order is the position, then the id for equal positions.
+        usort($paymentParts, static fn (OrderPaymentPart $a, OrderPaymentPart $b): int => [$a->position, $a->id] <=> [$b->position, $b->id]);
+        $this->paymentParts = $paymentParts;
 
         return $this;
     }
