@@ -1,0 +1,23 @@
+name: labeler
+
+# Sets the review tier labels of a pull request from the paths it changes
+# (.github/labeler.yml). pull_request_target gives the token the right to label
+# a pull request from a fork; the job reads the configuration of the base branch
+# and never checks out the code of the pull request.
+
+on:
+  pull_request_target:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    name: Tier labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/labeler@v7

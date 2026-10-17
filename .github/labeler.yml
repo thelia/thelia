@@ -1,0 +1,39 @@
+# Tier labels from the changed paths, applied by .github/workflows/labeler.yml.
+# The same tiers, with the same paths, are computed by
+# .github/scripts/evidence/classify.php, which also makes a change of more than
+# 500 lines T2: keep both lists in step.
+
+# Only documentation, tests, translations or CI files change.
+'tier:T0':
+  - all:
+      - changed-files:
+          - all-globs-to-all-files:
+              - '**/*.md'
+              - '*.md'
+              - 'docs/**'
+              - 'tests/**'
+              - '.github/**'
+              - 'core/lib/Thelia/Config/I18n/**'
+              - 'core/lib/Thelia/Install/I18n/**'
+              - 'setup/I18n/**'
+              - 'local/I18n/**'
+
+# Security, persistence or API surface paths.
+'tier:T2':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'core/lib/Thelia/Api/**'
+          - 'core/lib/Thelia/Core/Security/**'
+          - 'core/lib/Thelia/Form/**'
+          - 'core/lib/Thelia/Controller/**'
+          - '**/*Upload*'
+          - '**/*Upload*/**'
+          - '**/*Mailer*'
+          - '**/*Mailer*/**'
+          - '**/*Voter*'
+          - '**/*Voter*/**'
+          - 'core/lib/Thelia/Model/**'
+          - 'core/lib/Thelia/Core/Template/Loop/**'
+          - 'local/config/schema.xml'
+          - 'core/lib/Thelia/Config/**/*.xml'
+          - 'core/lib/Thelia/Config/*.xml'
