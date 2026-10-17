@@ -62,7 +62,7 @@ jobs:
         --admin_email=admin@example.com
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Start MySQL
         run: sudo systemctl start mysql.service
@@ -133,7 +133,7 @@ jobs:
 
       - name: Keep the diffs and the update log
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: upgrade-diffs
           path: |

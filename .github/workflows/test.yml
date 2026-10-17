@@ -47,7 +47,7 @@ jobs:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Start MySQL
         # The runner ships MySQL pre-installed (root/root on 127.0.0.1:3306); using
@@ -94,7 +94,7 @@ jobs:
       - name: Restore the Composer download cache
         # Only the downloaded archives are cached: without a committed lock file
         # every run still resolves the dependencies afresh.
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
@@ -147,7 +147,7 @@ jobs:
         # when it is missing: a 500 from github.com failed a whole integration job
         # (30/09/2026). The versions come from the locked bundles and the theme config,
         # so the lock file keys the cache; a stale entry only costs a new download.
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             var/dart-sass
@@ -191,7 +191,7 @@ jobs:
 
       - name: Keep the JUnit reports
         if: ${{ !cancelled() && matrix.group != 'static' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: junit-php${{ matrix.php }}-${{ matrix.group }}
           path: ${{ runner.temp }}/junit/*.xml
@@ -219,7 +219,7 @@ jobs:
       REFERENCE_BRANCH: main
     steps:
       - name: Checkout the comparison script
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github/scripts
           persist-credentials: false

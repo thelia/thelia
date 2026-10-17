@@ -35,7 +35,7 @@ jobs:
       || github.event.action == 'closed' && contains(toJSON(github.event.pull_request.labels.*.name), '"backport 3.'))
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Select the branches to backport to
         id: select
