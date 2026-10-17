@@ -1,0 +1,36 @@
+version: 2
+
+updates:
+  # No composer.lock is committed, so only the development tools are pinned
+  # (phpstan/phpstan and friendsofphp/php-cs-fixer to an exact version): a new
+  # release reaches the CI through one pull request that shows its own result,
+  # instead of turning every open pull request red on the same morning.
+  # Runtime dependencies keep their ranges and are not touched here.
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    allow:
+      - dependency-type: development
+    groups:
+      dev-tools:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: build
+      include: scope
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: ci
+    open-pull-requests-limit: 3
