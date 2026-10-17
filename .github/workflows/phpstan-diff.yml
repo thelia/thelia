@@ -49,7 +49,7 @@ jobs:
         run: sudo systemctl start mysql.service
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           ini-values: post_max_size=20M
@@ -99,7 +99,7 @@ jobs:
           sed -i 's/severity="error"/severity="warning"/' "$RUNNER_TEMP/phpstan.xml"
 
       - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
+        uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
           reviewdog_version: v0.21.2
 

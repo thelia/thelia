@@ -72,7 +72,7 @@ jobs:
         run: sudo systemctl start mysql.service
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
           ini-values: post_max_size=20M
@@ -209,7 +209,7 @@ jobs:
 
       - name: Setup PHP
         # roave/backward-compatibility-check 8.23 requires PHP 8.4.
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.4'
           extensions: mbstring, xml, ctype, iconv, intl, gd, zip
