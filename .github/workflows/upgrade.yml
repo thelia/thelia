@@ -1,0 +1,143 @@
+name: Upgrade
+
+# Moves a shop from the latest published release to the code of this branch the way the
+# documentation tells a merchant to (composer update, then setup/update.php), and checks that
+# the database it ends up with has the structure of a fresh install of the same code.
+#
+# What it catches: a column, an index or a foreign key that schema.xml and thelia.sql carry and
+# the update script forgot, so that a fresh install works and every existing shop breaks; and
+# an update that crashes on a database of the previous release.
+#
+# It is a signal, not a required check: the job is not in the branch protection of main.
+on:
+  schedule:
+    - cron: '41 4 * * *'
+  workflow_dispatch:
+    inputs:
+      from:
+        description: 'Release to start from, as a thelia/thelia-project constraint (empty: the latest stable, what a new merchant gets)'
+        required: false
+        default: ''
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'local/config/schema.xml'
+      - 'setup/**'
+      - 'core/lib/Thelia/Install/**'
+      - 'core/lib/Thelia/Core/Install/**'
+      - 'core/lib/Thelia/Command/DiffDatabaseCommand.php'
+      - '.github/workflows/upgrade.yml'
+      - '.github/scripts/upgrade/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  upgrade:
+    name: Update from the latest release (PHP 8.3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SHOP_DIR: ${{ github.workspace }}/shop
+      DIFF_DIR: ${{ github.workspace }}/upgrade-diffs
+      # Without a token, Flex skips the thelia/thelia-recipes endpoint without a word.
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      COMPOSER_NO_INTERACTION: '1'
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '3306'
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      # The shop that is updated; the fresh install it is compared with gets its own database.
+      DATABASE_NAME: thelia
+      INSTALL_OPTIONS: >-
+        --frontoffice_theme=flexy --backoffice_theme=default-twig
+        --pdf_theme=default --email_theme=default
+        --with-demo --skip-demo-images --with-admin
+        --admin_login=thelia --admin_password=thelia
+        --admin_first_name=Admin --admin_last_name=User
+        --admin_email=admin@example.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          ini-values: post_max_size=20M
+          coverage: none
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+
+      - name: Create the shop from the published release
+        run: |
+          composer create-project "thelia/thelia-project${INPUT_FROM:+:$INPUT_FROM}" "$SHOP_DIR" --no-progress
+          composer --working-dir="$SHOP_DIR" show 'thelia/*'
+        env:
+          INPUT_FROM: ${{ inputs.from }}
+
+      - name: Install the published release
+        working-directory: ${{ env.SHOP_DIR }}
+        run: php bin/install $INSTALL_OPTIONS
+
+      - name: Take the code of this branch
+        # What a merchant's composer update does to the three packages this repository
+        # publishes: the core, the setup scripts and the schema. The path repositories copy
+        # the directories (no symlink), and `versions` gives them the version the packages
+        # will carry once published, so that the skeleton constraints still resolve.
+        working-directory: ${{ env.SHOP_DIR }}
+        run: |
+          version=$(sed -n "s/.*THELIA_VERSION = '\([^']*\)'.*/\1/p" "$GITHUB_WORKSPACE/core/lib/Thelia/Core/TheliaKernel.php")
+          test -n "$version"
+          echo "Code under test: $version"
+          for package in core:core setup:setup config:local/config; do
+            name=${package%%:*}; path=${package#*:}
+            composer config "repositories.branch-$name" "{\"type\":\"path\",\"url\":\"$GITHUB_WORKSPACE/$path\",\"options\":{\"symlink\":false,\"versions\":{\"thelia/$name\":\"$version\"}}}"
+          done
+          composer require "thelia/core:$version" "thelia/setup:$version" "thelia/config:$version" --with-all-dependencies --no-progress
+          composer show 'thelia/*'
+
+      - name: Run the update script
+        working-directory: ${{ env.SHOP_DIR }}
+        run: php local/setup/update.php --no-interaction 2>&1 | tee "$RUNNER_TEMP/update.log"; test "${PIPESTATUS[0]}" -eq 0
+
+      - name: Generate the schema diff of the updated database
+        working-directory: ${{ env.SHOP_DIR }}
+        # The compiled container and the Propel models are rebuilt before every diff: they
+        # carry the database name of the install that wrote them.
+        run: |
+          mkdir -p "$DIFF_DIR"
+          rm -rf var/cache var/propel
+          php bin/console thelia:dev:db:diff > "$DIFF_DIR/updated.sql"
+
+      - name: Install the same code on a new database
+        working-directory: ${{ env.SHOP_DIR }}
+        run: |
+          rm -rf var/cache var/propel
+          php bin/install $INSTALL_OPTIONS --database_name=thelia_fresh
+
+      - name: Generate the schema diff of the fresh install
+        working-directory: ${{ env.SHOP_DIR }}
+        run: |
+          rm -rf var/cache var/propel
+          DATABASE_NAME=thelia_fresh php bin/console thelia:dev:db:diff > "$DIFF_DIR/fresh.sql"
+
+      - name: Compare the updated database with the fresh install
+        run: .github/scripts/upgrade/compare-schema.sh "$DIFF_DIR/fresh.sql" "$DIFF_DIR/updated.sql"
+
+      - name: Keep the diffs and the update log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrade-diffs
+          path: |
+            ${{ env.DIFF_DIR }}
+            ${{ runner.temp }}/update.log
+          if-no-files-found: ignore
+          retention-days: 7
