@@ -34,7 +34,7 @@ jobs:
       domains: ${{ steps.list.outputs.domains }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: List the domains of the core
         id: list
@@ -63,7 +63,7 @@ jobs:
       DOMAIN_PATH: core/lib/Thelia/Domain/${{ matrix.domain }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Start MySQL
         run: sudo systemctl start mysql.service
@@ -95,7 +95,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
       - name: Restore the Composer download cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ hashFiles('composer.json') }}
@@ -132,7 +132,7 @@ jobs:
 
       - name: Keep the reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mutation-${{ matrix.domain }}
           path: var/infection-integration/
