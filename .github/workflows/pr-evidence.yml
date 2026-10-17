@@ -12,7 +12,8 @@ name: evidence
 #
 # The report is the summary of the `report` job and the evidence.json artifact.
 # On a pull request from a branch of this repository it is also posted as one
-# comment, updated on each push; the token of a fork pull request cannot write.
+# comment, updated on each push; the token of a fork pull request cannot write,
+# evidence-comment.yml posts it for those.
 
 on:
   pull_request:
@@ -328,10 +329,13 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the evidence
+        # evidence-comment.yml posts report.md on a pull request from a fork.
         uses: actions/upload-artifact@v7
         with:
           name: evidence
-          path: evidence.json
+          path: |
+            evidence.json
+            report.md
 
       - name: Post the report on the pull request
         if: env.SAME_REPOSITORY == 'true'
