@@ -42,6 +42,7 @@
 
 ## Fixed
 
+- A module whose `hook.event_listener` tag has no `type` attribute no longer stops the container from compiling with a `TypeError`: the listener goes to the front-office hook, the default the code meant.
 - The promotional price of an order line is a `DECIMAL(16,6)` on a shop updated from Thelia 2, as on a fresh install. It was a `VARCHAR(45)`, which the SQL that totals an order rounds as a floating point number: a promotional price ending in a half cent, 63.325 for instance, made an order total one cent lower than the cart the buyer paid from. The `3.3.0.sql` update script converts the column.
 - Deleting an image or a document, in the back office or with a DELETE on the API, removes what the shop published to serve it: the link or copy in the cache directory, the resized versions and the variants of the image filters. They used to stay served at the same address, and a deletion over the API also left the stored file on disk. A copy published in `copy` mode is removed only when it holds the content of the deleted file: a category image and a product image can both be stored as `logo-8.png`, and deleting one keeps the copy of the other.
 - `ComposerHelper::dumpAutoload()` runs Composer with the PHP binary of the current process. It started `vendor/bin/composer` as a command, so its `#!/usr/bin/env php` shebang took the first `php` of the `PATH`: on a host whose default CLI is older than the one running Thelia, `template:set` printed `Composer dump-autoload failed: ... You are running 8.2.33` and the autoloader was not regenerated.
