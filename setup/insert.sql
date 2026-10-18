@@ -109,7 +109,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
 (99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
 (100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
-(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW())
+(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW()),
+(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2322,6 +2323,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'cs_CZ', NULL, NULL, NULL, NULL),
     (100, 'cs_CZ', NULL, NULL, NULL, NULL),
     (101, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (102, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2388,6 +2390,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'de_DE', NULL, NULL, NULL, NULL),
     (100, 'de_DE', NULL, NULL, NULL, NULL),
     (101, 'de_DE', NULL, NULL, NULL, NULL),
+    (102, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2454,6 +2457,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'en_US', 'Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', NULL, NULL, NULL),
     (100, 'en_US', 'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)', NULL, NULL, NULL),
     (101, 'en_US', 'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', NULL, NULL, NULL),
+    (102, 'en_US', 'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2520,6 +2524,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'es_ES', NULL, NULL, NULL, NULL),
     (100, 'es_ES', NULL, NULL, NULL, NULL),
     (101, 'es_ES', NULL, NULL, NULL, NULL),
+    (102, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2586,6 +2591,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'fr_FR', 'Statuts de commande sur lesquels un client peut ouvrir un retour, codes séparés par des virgules (vide : tout statut payé)', NULL, NULL, NULL),
     (100, 'fr_FR', 'Cache partagé des pages publiques anonymes : disabled (désactivé), announce (la page annonce combien de temps un cache partagé peut la garder, cookies inchangés) ou enabled (retire aussi les cookies d\'une page anonyme pour qu\'un proxy puisse la garder)', NULL, NULL, NULL),
     (101, 'fr_FR', 'Secondes pendant lesquelles un cache partagé peut garder une page publique (entre 1 et 86400, 300 si invalide)', NULL, NULL, NULL),
+    (102, 'fr_FR', 'Nombre de jours pendant lesquels une commande impayée retient les usages de coupon avec lesquels elle a été passée (0 : une commande impayée n\'en retient aucun)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2652,6 +2658,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'it_IT', NULL, NULL, NULL, NULL),
     (100, 'it_IT', NULL, NULL, NULL, NULL),
     (101, 'it_IT', NULL, NULL, NULL, NULL),
+    (102, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2718,6 +2725,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, 'nl_NL', NULL, NULL, NULL, NULL),
     (100, 'nl_NL', NULL, NULL, NULL, NULL),
     (101, 'nl_NL', NULL, NULL, NULL, NULL),
+    (102, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2783,7 +2791,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (98, 'ru_RU', NULL, NULL, NULL, NULL),
     (99, 'ru_RU', NULL, NULL, NULL, NULL),
     (100, 'ru_RU', NULL, NULL, NULL, NULL),
-    (101, 'ru_RU', NULL, NULL, NULL, NULL)
+    (101, 'ru_RU', NULL, NULL, NULL, NULL),
+    (102, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks

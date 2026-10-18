@@ -109,7 +109,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (98, 'order_return_cumulative_quantity', '1', 0, 0, NOW(), NOW()),
 (99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
 (100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
-(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW())
+(101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW()),
+(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2322,7 +2323,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (98, '{{ locale }}', {{ intl('Whether the returns already opened on an order line hold part of its quantity (1), or each return request is bounded by the ordered quantity alone (0)', locale) }}, NULL, NULL, NULL),
     (99, '{{ locale }}', {{ intl('Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', locale) }}, NULL, NULL, NULL),
     (100, '{{ locale }}', {{ intl('Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)', locale) }}, NULL, NULL, NULL),
-    (101, '{{ locale }}', {{ intl('Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (101, '{{ locale }}', {{ intl('Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', locale) }}, NULL, NULL, NULL),
+    (102, '{{ locale }}', {{ intl('Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

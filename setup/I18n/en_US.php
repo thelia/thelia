@@ -1683,4 +1683,5 @@ return [
     'Partially shipped' => 'Partially shipped',
     'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)' => 'Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)',
     'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)' => 'Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)',
+    'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)' => 'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)',
 ];
