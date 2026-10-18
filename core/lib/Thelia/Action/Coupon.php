@@ -30,6 +30,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
+use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
@@ -376,7 +377,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
+        $order = $event->getOrder();
+        $refusedCoupon = null;
+
         try {
+            $couponsToRecord = [];
+
             foreach ($consumedCoupons as $consumedCoupon) {
                 $couponModel = $this->resolveCouponModel($consumedCoupon);
 
@@ -388,11 +394,34 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     continue;
                 }
 
+                // The checkout read the usages left before the order existed, and so
+                // did any other checkout placing an order at the same time. They are
+                // read again under a lock on the coupon row, held until the lines
+                // below are written: the next order to record this coupon waits, then
+                // sees the usage this one holds.
+                if (!$couponModel->isUsageUnlimited()) {
+                    CouponQuery::create()->lockForUsageCheck($couponModel, $con);
+
+                    if ($couponModel->getUsagesLeftForANewOrder($order->getCustomerId()) <= 0) {
+                        $refusedCoupon = $couponModel;
+
+                        break;
+                    }
+                }
+
+                $couponsToRecord[] = [$consumedCoupon, $couponModel];
+            }
+
+            if (null !== $refusedCoupon) {
+                $couponsToRecord = [];
+            }
+
+            foreach ($couponsToRecord as [$consumedCoupon, $couponModel]) {
                 $couponModel->setLocale($this->getSession()?->getLang()?->getLocale());
 
                 /* memorize coupon. Its usage is not counted yet: this is done when the order is paid. */
                 $orderCoupon = new OrderCoupon();
-                $orderCoupon->setOrder($event->getOrder())
+                $orderCoupon->setOrder($order)
                     ->setUsageCanceled(1)
                     ->setCouponId($couponModel->getId())
                     ->setCode($couponModel->getCode())
@@ -442,6 +471,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $con->rollBack();
 
             throw $ex;
+        }
+
+        if (null !== $refusedCoupon) {
+            // The order was priced with a coupon it can no longer have: it does not
+            // go to the payment.
+            $order->setCancelled($dispatcher);
+
+            throw new CouponNoUsageLeftException((string) ($refusedCoupon->getCode() ?: $refusedCoupon->getTitle()));
         }
 
         // Clear all coupons.
@@ -498,7 +535,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CONDITION_UPDATE => ['updateCondition', 128],
             TheliaEvents::ORDER_SET_POSTAGE => ['forceFreePostage', 132],
             TheliaEvents::CART_SET_POSTAGE => ['forceFreePostage', 132],
-            TheliaEvents::ORDER_BEFORE_PAYMENT => ['afterOrder', 128],
+            // Before Action\Order::orderBeforePayment (128): an order refused for a
+            // coupon it can no longer have sends no confirmation e-mail.
+            TheliaEvents::ORDER_BEFORE_PAYMENT => ['afterOrder', 130],
             TheliaEvents::ORDER_UPDATE_STATUS => ['orderStatusChange', 10],
             TheliaEvents::CART_ADDITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
