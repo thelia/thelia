@@ -1,0 +1,145 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Tests\Integration\Domain\Promotion\Coupon\Service;
+
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
+use Thelia\Model\Coupon;
+use Thelia\Model\CouponCustomerCountQuery;
+use Thelia\Model\Customer;
+use Thelia\Model\Order;
+use Thelia\Model\OrderCouponQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
+use Thelia\Test\ActionIntegrationTestCase;
+
+/**
+ * An order counts the usages of the coupons it was placed with, found back by
+ * id, or by code when the order kept no usable id.
+ */
+final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
+{
+    /**
+     * An automatic promotion has no code: once the row it came from is gone, the
+     * order line points at nothing, and no other promotion without a code may
+     * take the usage in its place.
+     */
+    public function testAnOrderLineWhosePromotionIsGoneCountsAgainstNoOtherPromotion(): void
+    {
+        $otherPromotion = $this->automaticPromotion();
+        $gonePromotion = $this->automaticPromotion();
+        $order = $this->factory->order();
+        $this->factory->orderCoupon($order, $gonePromotion);
+        $gonePromotion->delete();
+
+        self::assertSame(1, $this->getService(OrderCouponUsageManager::class)->consume($order));
+
+        $otherPromotion->reload();
+        self::assertSame(5, $otherPromotion->getMaxUsage());
+    }
+
+    /**
+     * The last usage goes to the first order paid. The second one is paid without
+     * it, and cancelling that second order gives back nothing it never took.
+     */
+    public function testTwoOrdersPaidOnTheLastUsageNeverRaiseTheLimit(): void
+    {
+        $coupon = $this->factory->coupon(['maxUsage' => 1]);
+        $first = $this->orderWith($coupon);
+        $second = $this->orderWith($coupon);
+
+        $this->changeStatus($first, OrderStatus::CODE_PAID);
+        $this->changeStatus($second, OrderStatus::CODE_PAID);
+        self::assertSame(0, $this->maxUsage($coupon));
+        self::assertFalse($this->isCounted($second), 'the second order took no usage');
+
+        $this->changeStatus($second, OrderStatus::CODE_CANCELED);
+        self::assertSame(0, $this->maxUsage($coupon), 'cancelling the second order gives nothing back');
+
+        $this->changeStatus($first, OrderStatus::CODE_CANCELED);
+        self::assertSame(1, $this->maxUsage($coupon));
+    }
+
+    public function testTwoOrdersOfOneCustomerPaidOnTheirLastUsageNeverGiveItBackTwice(): void
+    {
+        $coupon = $this->factory->coupon(['maxUsage' => 1, 'perCustomerUsageCount' => true]);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $first = $this->orderWith($coupon, $customer);
+        $second = $this->orderWith($coupon, $customer);
+
+        $this->changeStatus($first, OrderStatus::CODE_PAID);
+        $this->changeStatus($second, OrderStatus::CODE_PAID);
+        self::assertSame(1, $this->customerCount($coupon, $customer));
+        self::assertFalse($this->isCounted($second), 'the second order took no usage');
+
+        $this->changeStatus($second, OrderStatus::CODE_CANCELED);
+        self::assertSame(1, $this->customerCount($coupon, $customer), 'cancelling the second order gives nothing back');
+        self::assertSame(0, $this->reloaded($coupon)->getUsagesLeft($customer->getId()));
+
+        $this->changeStatus($first, OrderStatus::CODE_CANCELED);
+        self::assertSame(0, $this->customerCount($coupon, $customer));
+    }
+
+    private function automaticPromotion(): Coupon
+    {
+        return $this->factory->coupon([
+            'code' => null,
+            'triggerMode' => Coupon::TRIGGER_MODE_AUTOMATIC,
+            'maxUsage' => 5,
+        ]);
+    }
+
+    private function orderWith(Coupon $coupon, ?Customer $customer = null): Order
+    {
+        $order = $this->factory->order($customer);
+        $this->factory->orderCoupon($order, $coupon);
+
+        return $order;
+    }
+
+    private function changeStatus(Order $order, string $statusCode): void
+    {
+        $event = new OrderEvent($order);
+        $event->setStatus(OrderStatusQuery::create()->findOneByCode($statusCode)->getId());
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+    }
+
+    private function reloaded(Coupon $coupon): Coupon
+    {
+        $coupon->reload();
+
+        return $coupon;
+    }
+
+    private function maxUsage(Coupon $coupon): int
+    {
+        return $this->reloaded($coupon)->getMaxUsage();
+    }
+
+    private function customerCount(Coupon $coupon, Customer $customer): int
+    {
+        return (int) CouponCustomerCountQuery::create()
+            ->filterByCouponId($coupon->getId())
+            ->filterByCustomerId($customer->getId())
+            ->select(['Count'])
+            ->findOne();
+    }
+
+    private function isCounted(Order $order): bool
+    {
+        return !OrderCouponQuery::create()->findOneByOrderId($order->getId())->getUsageCanceled();
+    }
+}
