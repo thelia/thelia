@@ -24,6 +24,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\AbstractTlogDestination;
+use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -60,18 +62,27 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
 
     private Filesystem $filesystem;
 
+    /**
+     * Receives the lines Tlog writes during the test, warnings included.
+     */
+    private AbstractTlogDestination $logDestination;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->filesystem = new Filesystem();
         $this->removeSampleModule();
+        $this->captureTheLog();
     }
 
     protected function tearDown(): void
     {
         $this->rollBackWhatTheTestLeftOpen();
         $this->removeSampleModule();
+
+        // The next Tlog::getInstance() reads its configuration again.
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
 
         parent::tearDown();
     }
@@ -84,6 +95,51 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
 
         self::assertTheModuleEndedTheTransaction('update');
         $this->assertTheTransactionsOfTheProcessWork();
+        $this->assertTheWarningNames('update()', 'Run schema changes from postUpdate()');
+    }
+
+    public function testAnInstallThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $this->installSampleModule('1.0.0', ['install.sql' => self::ALTER_A_TABLE]);
+
+        self::assertTheModuleEndedTheTransaction('install');
+        $this->assertTheTransactionsOfTheProcessWork();
+        $this->assertTheWarningNames('install()');
+    }
+
+    public function testAnUpdateFailingWithoutSchemaChangeTakesItsWriteBack(): void
+    {
+        $this->installSampleModule('1.0.0');
+
+        try {
+            $this->installSampleModule('2.0.0', ['update.sql' => self::moduleWrite().self::FAILING_STATEMENT]);
+
+            self::fail('The update script fails on its last statement.');
+        } catch (\PDOException|\RuntimeException $failure) {
+            self::assertStringContainsString('schema_change_missing_table', $failure->getMessage());
+        }
+
+        self::assertNull(
+            $this->probeSeenByAnotherConnection(self::moduleProbeName()),
+            'The write of a module that failed is rolled back with the rest of its update.',
+        );
+        $this->assertTheTransactionsOfTheProcessWork();
+        self::assertSame([], $this->warnings(), 'A module that kept its transaction is not reported.');
+    }
+
+    public function testAnUpdateWithoutSchemaChangeCommitsItsWrite(): void
+    {
+        $this->installSampleModule('1.0.0');
+
+        $this->installSampleModule('2.0.0', ['update.sql' => self::moduleWrite()]);
+
+        self::assertSame(
+            'written by the module',
+            $this->probeSeenByAnotherConnection(self::moduleProbeName()),
+            'The write of a module that succeeded is committed with its update.',
+        );
+        $this->assertTheTransactionsOfTheProcessWork();
+        self::assertSame([], $this->warnings(), 'A module that kept its transaction is not reported.');
     }
 
     public function testAnUpdateThatAltersATableInATransactionOfItsOwnLeavesTheTransactionsOfTheProcessWorking(): void
@@ -167,6 +223,22 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
         $this->assertTheTransactionsOfTheProcessWork();
     }
 
+    public function testAPreDeactivationThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $module = $this->installSampleModule('1.0.0', ['preDeactivation.sql' => self::ALTER_A_TABLE]);
+        ModuleQuery::create()->filterById($module->getId())->update(['Activate' => BaseModule::IS_ACTIVATED]);
+
+        $this->dispatch(new ModuleToggleActivationEvent($module->getId()), TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+
+        self::assertSame(
+            BaseModule::IS_NOT_ACTIVATED,
+            ModuleQuery::create()->findPk($module->getId())?->getActivate(),
+            'The module is deactivated.',
+        );
+        self::assertTheModuleEndedTheTransaction('preDeactivation');
+        $this->assertTheTransactionsOfTheProcessWork();
+    }
+
     public function testADeletionThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
     {
         $module = $this->installSampleModule('1.0.0', ['destroy.sql' => self::ALTER_A_TABLE]);
@@ -176,6 +248,7 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
         self::assertNull(ModuleQuery::create()->findPk($module->getId()), 'The module is deleted.');
         self::assertTheModuleEndedTheTransaction('destroy');
         $this->assertTheTransactionsOfTheProcessWork();
+        $this->assertTheWarningNames('destroy()');
     }
 
     /**
@@ -216,6 +289,76 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
         );
     }
 
+    /**
+     * The warning names the module and the method that ended the transaction, and points an
+     * update to postUpdate() only.
+     */
+    private function assertTheWarningNames(string $method, ?string $advice = null): void
+    {
+        $warnings = $this->warnings();
+        self::assertCount(1, $warnings, 'The module that ended the transaction is reported once.');
+        self::assertStringContainsString('Module '.self::sampleCode().' ended the database transaction of its '.$method, $warnings[0]);
+
+        if (null === $advice) {
+            self::assertStringNotContainsString('postUpdate()', $warnings[0]);
+        } else {
+            self::assertStringContainsString($advice, $warnings[0]);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function warnings(): array
+    {
+        return array_values(array_filter(
+            $this->logDestination->lines,
+            static fn (string $line): bool => str_contains($line, 'ended the database transaction'),
+        ));
+    }
+
+    /**
+     * Tlog keeps its lines for the end of the request: a destination of the test reads them
+     * as they come, warnings included.
+     */
+    private function captureTheLog(): void
+    {
+        $this->logDestination = new class extends AbstractTlogDestination {
+            /**
+             * @var list<string>
+             */
+            public array $lines = [];
+
+            public function add($string): void
+            {
+                $this->lines[] = (string) $string;
+            }
+
+            public function write(&$res): void
+            {
+            }
+
+            public function getTitle(): string
+            {
+                return 'Test';
+            }
+
+            public function getDescription(): string
+            {
+                return 'Keeps the lines for the test.';
+            }
+        };
+
+        $log = Tlog::getInstance();
+        $log->setLevel(Tlog::WARNING);
+        (new \ReflectionProperty(Tlog::class, 'destinations'))->setValue($log, [$this->logDestination]);
+    }
+
+    private static function moduleWrite(): string
+    {
+        return "INSERT INTO config (name, value, secured, hidden) VALUES ('".self::moduleProbeName()."', 'written by the module', 1, 1);\n";
+    }
+
     private function writeProbe(ConnectionInterface $connection, string $value): void
     {
         $statement = $connection->prepare(
@@ -228,10 +371,10 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
     /**
      * What a second connection reads: a write shows there once committed only.
      */
-    private function probeSeenByAnotherConnection(): ?string
+    private function probeSeenByAnotherConnection(?string $name = null): ?string
     {
         $statement = $this->anotherConnection()->prepare('SELECT value FROM config WHERE name = :name');
-        $statement->execute([':name' => self::probeName()]);
+        $statement->execute([':name' => $name ?? self::probeName()]);
         $row = $statement->fetch(\PDO::FETCH_NUM);
 
         return \is_array($row) ? (string) $row[0] : null;
@@ -301,7 +444,8 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
     {
         $connection = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $connection->exec('DROP TEMPORARY TABLE IF EXISTS schema_change_sample');
-        $connection->prepare('DELETE FROM config WHERE name = :name')->execute([':name' => self::probeName()]);
+        $connection->prepare('DELETE FROM config WHERE name IN (:probe, :moduleProbe)')
+            ->execute([':probe' => self::probeName(), ':moduleProbe' => self::moduleProbeName()]);
 
         ModuleQuery::create()->filterByCode(self::sampleCode(), Criteria::EQUAL)->delete();
 
@@ -319,6 +463,11 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
     private static function probeName(): string
     {
         return 'schema_change_probe'.TestToken::suffix();
+    }
+
+    private static function moduleProbeName(): string
+    {
+        return 'schema_change_module_probe'.TestToken::suffix();
     }
 
     private static function callLog(): string
@@ -342,6 +491,11 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
 
             class {$code} extends BaseModule
             {
+                public function install(?ConnectionInterface \$con = null): void
+                {
+                    \$this->runScript('install', \$con);
+                }
+
                 public function update(\$currentVersion, \$newVersion, ?ConnectionInterface \$con = null): void
                 {
                     \$this->runScript('update', \$con);
@@ -357,6 +511,13 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
                 public function postActivation(?ConnectionInterface \$con = null): void
                 {
                     \$this->runScript('postActivation', \$con);
+                }
+
+                public function preDeactivation(?ConnectionInterface \$con = null): bool
+                {
+                    \$this->runScript('preDeactivation', \$con);
+
+                    return true;
                 }
 
                 public function postDeactivation(?ConnectionInterface \$con = null): void
