@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderCouponQuery as BaseOrderCouponQuery;
 use Thelia\Model\Map\OrderCouponTableMap;
 
@@ -27,6 +29,29 @@ use Thelia\Model\Map\OrderCouponTableMap;
  */
 class OrderCouponQuery extends BaseOrderCouponQuery
 {
+    /**
+     * Sets whether the usage of an order coupon line is canceled, unless the line
+     * already says so. A single statement: of two requests switching the same
+     * line at once, one changes it and the other waits for it, then finds it
+     * already switched.
+     *
+     * @return bool whether this call switched the line
+     */
+    public function switchUsageCanceled(int $orderCouponId, bool $usageCanceled, ?ConnectionInterface $connection = null): bool
+    {
+        $connection ??= Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
+        $statement = $connection->prepare(
+            'UPDATE order_coupon SET usage_canceled = :switched, updated_at = NOW() WHERE id = :id AND usage_canceled = :current',
+        );
+        $statement->execute([
+            ':switched' => (int) $usageCanceled,
+            ':current' => (int) !$usageCanceled,
+            ':id' => $orderCouponId,
+        ]);
+
+        return 1 === $statement->rowCount();
+    }
+
     /**
      * How many usages of a coupon the orders waiting for their payment hold.
      *

@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Promotion\Coupon\Service;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponQuery;
@@ -50,15 +53,9 @@ final readonly class OrderCouponUsageManager
         $counted = 0;
 
         foreach ($orderCoupons as $orderCoupon) {
-            // No usage left: the line stays uncounted, so cancelling the order
-            // later gives back nothing it never took.
-            if (null !== ($coupon = $this->resolveCoupon($orderCoupon))
-                && false === $this->couponManager->decrementQuantity($coupon, $order->getCustomerId())) {
-                continue;
+            if ($this->countUsageOf($orderCoupon, $order)) {
+                ++$counted;
             }
-
-            $orderCoupon->setUsageCanceled(false)->save();
-            ++$counted;
         }
 
         return $counted;
@@ -75,15 +72,98 @@ final readonly class OrderCouponUsageManager
             ->filterByUsageCanceled(false)
             ->findByOrderId($order->getId());
 
+        $released = 0;
+
         foreach ($orderCoupons as $orderCoupon) {
+            if ($this->releaseUsageOf($orderCoupon, $order)) {
+                ++$released;
+            }
+        }
+
+        return $released;
+    }
+
+    /**
+     * The line is claimed before its coupon is touched: another request counting
+     * the same order finds it taken. Without a usage left, the claim is undone and
+     * the line stays uncounted, so cancelling the order later gives back nothing
+     * it never took.
+     */
+    private function countUsageOf(OrderCoupon $orderCoupon, Order $order): bool
+    {
+        return $this->inTransaction(function (ConnectionInterface $connection) use ($orderCoupon, $order): bool {
+            if (!OrderCouponQuery::create()->switchUsageCanceled($orderCoupon->getId(), false, $connection)) {
+                return false;
+            }
+
+            if (null !== ($coupon = $this->resolveCoupon($orderCoupon))
+                && false === $this->couponManager->decrementQuantity($coupon, $order->getCustomerId())) {
+                OrderCouponQuery::create()->switchUsageCanceled($orderCoupon->getId(), true, $connection);
+                $this->syncLoadedLine($orderCoupon, true);
+
+                return false;
+            }
+
+            $this->syncLoadedLine($orderCoupon, false);
+
+            return true;
+        });
+    }
+
+    /**
+     * The line is claimed before its coupon is given the usage back: another
+     * request releasing the same order finds it already released.
+     */
+    private function releaseUsageOf(OrderCoupon $orderCoupon, Order $order): bool
+    {
+        return $this->inTransaction(function (ConnectionInterface $connection) use ($orderCoupon, $order): bool {
+            if (!OrderCouponQuery::create()->switchUsageCanceled($orderCoupon->getId(), true, $connection)) {
+                return false;
+            }
+
             if (null !== $coupon = $this->resolveCoupon($orderCoupon)) {
                 $this->couponManager->incrementQuantity($coupon, $order->getCustomerId());
             }
 
-            $orderCoupon->setUsageCanceled(true)->save();
+            $this->syncLoadedLine($orderCoupon, true);
+
+            return true;
+        });
+    }
+
+    /**
+     * The claim holds the line until the transaction ends, so a request switching
+     * it at the same time waits for the outcome. A transaction opened by the
+     * caller (the admin API wraps a status change in one) keeps it until its own
+     * commit.
+     *
+     * @param callable(ConnectionInterface): bool $work
+     */
+    private function inTransaction(callable $work): bool
+    {
+        $connection = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $done = $work($connection);
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            $connection->rollBack();
+
+            throw $exception;
         }
 
-        return \count($orderCoupons);
+        return $done;
+    }
+
+    /**
+     * The line was switched by a single statement, behind Propel's back: the
+     * loaded object takes the stored value, without marking it as a change to save.
+     */
+    private function syncLoadedLine(OrderCoupon $orderCoupon, bool $usageCanceled): void
+    {
+        $orderCoupon->setUsageCanceled($usageCanceled);
+        $orderCoupon->resetModified(OrderCouponTableMap::COL_USAGE_CANCELED);
     }
 
     /**
