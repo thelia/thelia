@@ -237,9 +237,11 @@ final class ProductMediaGalleryTest extends WebIntegrationTestCase
      */
     private static function slidePositions(string $content): array
     {
-        preg_match_all('#<li\s+class="splide__slide".*?</li>#s', $content, $matches);
+        // Found by Splide's class, not by tag: the theme renders a slide as an li or a div
+        // depending on its version. A slide runs up to the opening of the next one.
+        $parts = preg_split('#(?=<(?:li|div)\s+class="splide__slide")#', $content) ?: [];
 
-        return $matches[0];
+        return \array_slice($parts, 1);
     }
 
     private function productUnderTest(): Product
