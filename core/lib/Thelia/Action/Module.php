@@ -41,6 +41,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
+use Thelia\Module\ModuleTransactionGuard;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
@@ -285,7 +286,9 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $path = $module->getAbsoluteBaseDir();
 
-                $instance->destroy($con, $event->getDeleteData());
+                ModuleTransactionGuard::run($con, (string) $module->getCode(), 'destroy', static function () use ($instance, $con, $event): void {
+                    $instance->destroy($con, $event->getDeleteData());
+                });
 
                 $fs = new Filesystem();
                 $fs->remove($path);
