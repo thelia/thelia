@@ -14,12 +14,14 @@ updates:
     allow:
       - dependency-type: development
     # The core stays on the Symfony 7.4 LTS line and on PHPUnit 11.5: a new major
-    # of either is a decision, not a weekly pull request.
+    # of either is a decision, not a weekly pull request. The bound is a version
+    # range: an update-types rule on the `7.4.*` requirement did not stop a move
+    # of symfony/phpunit-bridge to 8.1.
     ignore:
       - dependency-name: 'symfony/*'
-        update-types: ['version-update:semver-major']
+        versions: ['>= 8']
       - dependency-name: 'phpunit/phpunit'
-        update-types: ['version-update:semver-major']
+        versions: ['>= 12']
     groups:
       dev-tools:
         patterns:
