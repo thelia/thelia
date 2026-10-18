@@ -1,3 +1,23 @@
+# 3.1.5
+
+Security release of the 3.1 line. It ships `setup/update/sql/3.1.5.sql`, which adds a configuration variable and records the new version, without any schema change. `thelia/setup` ships as 3.1.6 with this core, its 3.1.5 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
+
+## Security
+
+- Coupon usage limits are now enforced on paid and pending orders. A coupon limited to a number of usages, overall or per customer, could be used more times than allowed. Taking a usage, and checking the usages left when an order is placed or recorded, now happen in a single guarded step, and the orders waiting for their payment hold the usages they were placed with.
+
+## Upgrade notes
+
+Update the core and the setup package, then the database, from the root of the project, and warm the cache up. The project keeps the 3.1 line of the skeleton, so Composer keeps the core on 3.1:
+
+```bash
+composer update thelia/core thelia/setup --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+The update adds the `coupon_unpaid_order_hold_days` configuration variable (7 by default): the number of days an unpaid order holds the coupon usages it was placed with. Past that delay, or with 0, its usages are available to new orders again.
+
 # 3.1.4
 
 Security release of the 3.1 line. It stops a customer from writing, through the front API, account fields the shop reserves to its administration. It ships `setup/update/sql/3.1.4.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.1.5 with this core, its 3.1.4 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
