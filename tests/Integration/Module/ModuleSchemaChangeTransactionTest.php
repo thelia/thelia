@@ -34,9 +34,9 @@ use Thelia\Test\TestToken;
 
 /**
  * MySQL and MariaDB commit the open transaction before a schema change. A module that alters
- * a table from update(), postActivation() or destroy() ends the transaction the core opened
- * around the call, and Propel kept counting it: every later transaction of the process
- * committed each statement on its own and rolled nothing back.
+ * a table from update(), an activation method or destroy() ends the
+ * transaction the core opened around the call, and Propel kept counting it: every later
+ * transaction of the process committed each statement on its own and rolled nothing back.
  *
  * Each case runs the lifecycle of a sample module, then checks what the rest of the process
  * depends on: a transaction opened afterwards keeps its writes to itself, rollBack() takes
@@ -131,6 +131,21 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
             'The module is activated.',
         );
         self::assertTheModuleEndedTheTransaction('postActivation');
+        $this->assertTheTransactionsOfTheProcessWork();
+    }
+
+    public function testAPreActivationThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $module = $this->installSampleModule('1.0.0', ['preActivation.sql' => self::ALTER_A_TABLE]);
+
+        $this->dispatch(new ModuleToggleActivationEvent($module->getId()), TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+
+        self::assertSame(
+            BaseModule::IS_ACTIVATED,
+            ModuleQuery::create()->findPk($module->getId())?->getActivate(),
+            'The module is activated.',
+        );
+        self::assertTheModuleEndedTheTransaction('preActivation');
         $this->assertTheTransactionsOfTheProcessWork();
     }
 
@@ -312,6 +327,13 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
                 public function update(\$currentVersion, \$newVersion, ?ConnectionInterface \$con = null): void
                 {
                     \$this->runScript('update', \$con);
+                }
+
+                public function preActivation(?ConnectionInterface \$con = null): bool
+                {
+                    \$this->runScript('preActivation', \$con);
+
+                    return true;
                 }
 
                 public function postActivation(?ConnectionInterface \$con = null): void
