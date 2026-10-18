@@ -34,7 +34,7 @@ use Thelia\Test\TestToken;
 
 /**
  * MySQL and MariaDB commit the open transaction before a schema change. A module that alters
- * a table from update(), an activation method or destroy() ends the
+ * a table from update(), an activation or deactivation method or destroy() ends the
  * transaction the core opened around the call, and Propel kept counting it: every later
  * transaction of the process committed each statement on its own and rolled nothing back.
  *
@@ -146,6 +146,24 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
             'The module is activated.',
         );
         self::assertTheModuleEndedTheTransaction('preActivation');
+        $this->assertTheTransactionsOfTheProcessWork();
+    }
+
+    public function testADeactivationThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $module = $this->installSampleModule('1.0.0', ['postDeactivation.sql' => self::ALTER_A_TABLE]);
+        // Marked active in the database: the deactivation is the step under test, an
+        // activation would rebuild the Propel models for nothing.
+        ModuleQuery::create()->filterById($module->getId())->update(['Activate' => BaseModule::IS_ACTIVATED]);
+
+        $this->dispatch(new ModuleToggleActivationEvent($module->getId()), TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+
+        self::assertSame(
+            BaseModule::IS_NOT_ACTIVATED,
+            ModuleQuery::create()->findPk($module->getId())?->getActivate(),
+            'The module is deactivated.',
+        );
+        self::assertTheModuleEndedTheTransaction('postDeactivation');
         $this->assertTheTransactionsOfTheProcessWork();
     }
 
@@ -339,6 +357,11 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
                 public function postActivation(?ConnectionInterface \$con = null): void
                 {
                     \$this->runScript('postActivation', \$con);
+                }
+
+                public function postDeactivation(?ConnectionInterface \$con = null): void
+                {
+                    \$this->runScript('postDeactivation', \$con);
                 }
 
                 public function destroy(?ConnectionInterface \$con = null, \$deleteModuleData = false): void
