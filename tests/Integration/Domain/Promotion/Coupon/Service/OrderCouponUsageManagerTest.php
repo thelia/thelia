@@ -24,6 +24,8 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCustomerCountQuery;
@@ -99,6 +101,40 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
 
         $this->changeStatus($first, OrderStatus::CODE_CANCELED);
         self::assertSame(0, $this->customerCount($coupon, $customer));
+    }
+
+    /**
+     * Another request counts the same order while this one is counting it: the
+     * line is claimed before its coupon is touched, so only one of them takes
+     * the usage.
+     */
+    public function testAnOrderCountedByTwoRequestsAtOnceTakesOneUsage(): void
+    {
+        $coupon = $this->factory->coupon(['maxUsage' => 5]);
+        $order = $this->orderWith($coupon);
+        $usageManager = $this->usageManagerInterruptedBy(
+            static fn (OrderCouponUsageManager $otherRequest): int => $otherRequest->consume($order),
+            onDecrement: true,
+        );
+
+        $usageManager->consume($order);
+
+        self::assertSame(4, $this->maxUsage($coupon));
+    }
+
+    public function testAnOrderReleasedByTwoRequestsAtOnceGivesOneUsageBack(): void
+    {
+        $coupon = $this->factory->coupon(['maxUsage' => 4]);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $this->factory->orderCoupon($order, $coupon, ['usageCanceled' => 0]);
+        $usageManager = $this->usageManagerInterruptedBy(
+            static fn (OrderCouponUsageManager $otherRequest): int => $otherRequest->release($order),
+            onDecrement: false,
+        );
+
+        $usageManager->release($order);
+
+        self::assertSame(5, $this->maxUsage($coupon));
     }
 
     /**
@@ -193,6 +229,52 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
         $this->factory->orderCoupon($order, $coupon);
 
         return $order;
+    }
+
+    /**
+     * A usage manager whose coupon manager lets another request run once, right
+     * before it first takes (or gives back) a usage: the interleaving of two
+     * requests on the same order, staged on one connection.
+     *
+     * @param \Closure(OrderCouponUsageManager): int $otherRequest
+     */
+    private function usageManagerInterruptedBy(\Closure $otherRequest, bool $onDecrement): OrderCouponUsageManager
+    {
+        $couponManager = new class($this->getService(FacadeInterface::class), $this->getService(CouponFactory::class), $this->getService(RequestStack::class)) extends CouponManager {
+            public ?\Closure $meanwhile = null;
+
+            public bool $onDecrement = true;
+
+            public function decrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
+            {
+                $this->letTheOtherRequestRun(true);
+
+                return parent::decrementQuantity($coupon, $customerId);
+            }
+
+            public function incrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
+            {
+                $this->letTheOtherRequestRun(false);
+
+                return parent::incrementQuantity($coupon, $customerId);
+            }
+
+            private function letTheOtherRequestRun(bool $decrementing): void
+            {
+                if (null !== $this->meanwhile && $decrementing === $this->onDecrement) {
+                    $meanwhile = $this->meanwhile;
+                    $this->meanwhile = null;
+                    $meanwhile();
+                }
+            }
+        };
+
+        $usageManager = new OrderCouponUsageManager($couponManager);
+        $couponManager->onDecrement = $onDecrement;
+        $otherUsageManager = new OrderCouponUsageManager($this->getService(CouponManager::class));
+        $couponManager->meanwhile = static fn (): int => $otherRequest($otherUsageManager);
+
+        return $usageManager;
     }
 
     private function changeStatus(Order $order, string $statusCode): void
