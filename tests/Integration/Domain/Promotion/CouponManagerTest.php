@@ -180,6 +180,17 @@ final class CouponManagerTest extends ActionIntegrationTestCase
         self::assertSame([], $this->couponManager->getCurrentCoupons());
     }
 
+    public function testAPromotionWhoseLastUsageIsHeldByAnUnpaidOrderIsIgnored(): void
+    {
+        $coupon = $this->automaticPromotion(['maxUsage' => 1]);
+        $this->factory->orderCoupon($this->factory->order(), $coupon);
+
+        $this->getService(SecurityContext::class)->setCustomerUser($this->factory->customer($this->factory->customerTitle()));
+        $this->couponManager->invalidateCurrentCoupons();
+
+        self::assertSame([], $this->couponManager->getCurrentCoupons());
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Exception\InvalidConditionException;
 use Thelia\Condition\Exception\UnmatchableConditionException;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNotReleaseException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
@@ -82,7 +83,7 @@ class CouponFactory
                 throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
             }
 
-            if ($couponModel->getUsagesLeft($customer->getId()) <= 0) {
+            if ($couponModel->getUsagesLeftForANewOrder($customer->getId(), $this->cartBeingCheckedOut()) <= 0) {
                 throw new CouponNoUsageLeftException($couponCode);
             }
         }
@@ -94,6 +95,23 @@ class CouponFactory
         }
 
         return $couponInterface;
+    }
+
+    /**
+     * The cart of the session, read without loading nor creating one. None in a
+     * console command, or on a request without a session.
+     */
+    private function cartBeingCheckedOut(): ?int
+    {
+        $request = $this->container->get('request_stack')->getMainRequest();
+
+        if (null === $request || !$request->hasSession()) {
+            return null;
+        }
+
+        $cartId = $request->getSession()->get(Session::SESSION_CART_ID_NAME);
+
+        return is_numeric($cartId) ? (int) $cartId : null;
     }
 
     /**
