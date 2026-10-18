@@ -83,7 +83,7 @@ class CouponFactory
                 throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
             }
 
-            if ($couponModel->getUsagesLeftForANewOrder($customer->getId(), $this->cartBeingCheckedOut()) <= 0) {
+            if (!$this->hasAUsageLeftForANewOrder($couponModel, $customer)) {
                 throw new CouponNoUsageLeftException($couponCode);
             }
         }
@@ -95,6 +95,17 @@ class CouponFactory
         }
 
         return $couponInterface;
+    }
+
+    /**
+     * Whether a limited coupon has a usage left for the order this customer is
+     * about to place: neither counted yet nor held by an order waiting for its
+     * payment, except the one of the cart being checked out, which a new
+     * placement replaces.
+     */
+    public function hasAUsageLeftForANewOrder(Coupon $couponModel, Customer $customer): bool
+    {
+        return $couponModel->getUsagesLeftForANewOrder($customer->getId(), $this->cartBeingCheckedOut()) > 0;
     }
 
     /**
