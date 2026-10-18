@@ -576,6 +576,16 @@ class BaseModule implements BaseModuleInterface
         // Override this method to do something useful.
     }
 
+    /**
+     * Called after update(), once the core has committed the transaction of the update: the place
+     * for what cannot run inside it, like an ALTER TABLE, which MySQL commits implicitly and which
+     * waits for the locks that transaction holds.
+     */
+    public function postUpdate(string $currentVersion, string $newVersion): void
+    {
+        // Override this method to do something useful.
+    }
+
     public function preActivation(?ConnectionInterface $con = null): bool
     {
         // Override this method to do something useful.

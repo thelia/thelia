@@ -328,19 +328,24 @@ final class ModuleActionTest extends ActionIntegrationTestCase
         OrderQuery::create()->filterById($orderId)->delete();
     }
 
-    public function testUpgradeCallsUpdateAndNotInstall(): void
+    public function testUpgradeCallsUpdateThenPostUpdateOnceCommittedAndNotInstall(): void
     {
         $this->installSampleModule('1.0.0');
 
+        self::assertSame("install\n", file_get_contents(self::callLog()), 'An install does not call postUpdate().');
         file_put_contents(self::callLog(), '');
 
         $this->upgradeSampleModule('2.0.0');
 
-        self::assertSame(
-            "update 1.0.0 2.0.0\n",
-            file_get_contents(self::callLog()),
-            'An upgrade must call update() on the module, not install() again.',
+        // The calls log the nesting level of the Propel transaction: the test case may run
+        // inside a transaction of its own.
+        self::assertMatchesRegularExpression(
+            '/\Aupdate 1\.0\.0 2\.0\.0 (\d+)\npostUpdate 1\.0\.0 2\.0\.0 (\d+)\n\z/',
+            (string) file_get_contents(self::callLog()),
+            'An upgrade calls update(), then postUpdate(), never install().',
         );
+        preg_match_all('/ (\d+)$/m', (string) file_get_contents(self::callLog()), $levels);
+        self::assertSame((int) $levels[1][0] - 1, (int) $levels[1][1], 'postUpdate() runs once the transaction of the update is committed.');
     }
 
     public function testUpgradeRemovesTheFilesTheNewVersionDropped(): void
@@ -578,8 +583,10 @@ final class ModuleActionTest extends ActionIntegrationTestCase
             namespace {$moduleNamespace};
 
             use Propel\\Runtime\\Connection\\ConnectionInterface;
+            use Propel\\Runtime\\Propel;
             use Symfony\\Component\\HttpFoundation\\Response;
             use Thelia\\Core\\Template\\TemplateDefinition;
+            use Thelia\\Model\\Map\\ModuleTableMap;
             use Thelia\\Model\\Order;
             use Thelia\\Module\\BaseModule;
             use Thelia\\Module\\PaymentModuleInterface;
@@ -593,7 +600,14 @@ final class ModuleActionTest extends ActionIntegrationTestCase
 
                 public function update(\$currentVersion, \$newVersion, ?ConnectionInterface \$con = null): void
                 {
-                    file_put_contents({$callLog}, "update \$currentVersion \$newVersion\\n", \\FILE_APPEND);
+                    \$level = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME)->getNestedTransactionCount();
+                    file_put_contents({$callLog}, "update \$currentVersion \$newVersion \$level\\n", \\FILE_APPEND);
+                }
+
+                public function postUpdate(string \$currentVersion, string \$newVersion): void
+                {
+                    \$level = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME)->getNestedTransactionCount();
+                    file_put_contents({$callLog}, "postUpdate \$currentVersion \$newVersion \$level\\n", \\FILE_APPEND);
                 }
 
                 public function getHooks(): array
