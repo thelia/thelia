@@ -29,7 +29,8 @@ concurrency:
 
 jobs:
   backport:
-    name: Backport ${{ github.event.action == 'labeled' && github.event.label.name || 'the labelled branches' }}
+    # A fixed name: GitHub shows a skipped job under its unevaluated expression.
+    name: Backport
     runs-on: ubuntu-latest
     if: >-
       github.event.pull_request.merged == true &&
