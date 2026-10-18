@@ -190,6 +190,10 @@ class ModuleManagement
             throw $exception;
         }
 
+        if ('update' === $action) {
+            $instance->postUpdate($currentVersion, $version);
+        }
+
         return $module;
     }
 
