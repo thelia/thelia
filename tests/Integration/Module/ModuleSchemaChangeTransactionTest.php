@@ -21,6 +21,7 @@ use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\ModuleTableMap;
@@ -130,6 +131,17 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
             'The module is activated.',
         );
         self::assertTheModuleEndedTheTransaction('postActivation');
+        $this->assertTheTransactionsOfTheProcessWork();
+    }
+
+    public function testADeletionThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $module = $this->installSampleModule('1.0.0', ['destroy.sql' => self::ALTER_A_TABLE]);
+
+        $this->dispatch(new ModuleDeleteEvent($module->getId()), TheliaEvents::MODULE_DELETE);
+
+        self::assertNull(ModuleQuery::create()->findPk($module->getId()), 'The module is deleted.');
+        self::assertTheModuleEndedTheTransaction('destroy');
         $this->assertTheTransactionsOfTheProcessWork();
     }
 
