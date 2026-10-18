@@ -17,6 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\CouponQuery as BaseCouponQuery;
+use Thelia\Model\Map\CouponCustomerCountTableMap;
 use Thelia\Model\Map\CouponTableMap;
 
 /**
@@ -71,6 +72,25 @@ class CouponQuery extends BaseCouponQuery
         $maxUsage = $statement->fetchColumn();
 
         return false === $maxUsage ? null : (int) $maxUsage;
+    }
+
+    /**
+     * Locks the coupon row until the end of the transaction, and refreshes the
+     * usages left of the loaded coupon from it: what is read afterwards in the
+     * same transaction cannot be changed by another order meanwhile.
+     */
+    public function lockForUsageCheck(Coupon $coupon, ConnectionInterface $connection): void
+    {
+        $statement = $connection->prepare('SELECT max_usage FROM coupon WHERE id = :id FOR UPDATE');
+        $statement->execute([':id' => $coupon->getId()]);
+        $maxUsage = $statement->fetchColumn();
+
+        if (false !== $maxUsage) {
+            $coupon->setMaxUsage((int) $maxUsage);
+            $coupon->resetModified(CouponTableMap::COL_MAX_USAGE);
+        }
+
+        CouponCustomerCountTableMap::clearInstancePool();
     }
 
     private function executeUsageUpdate(string $sql, int $couponId, ?ConnectionInterface $connection): int
