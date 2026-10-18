@@ -580,6 +580,10 @@ class BaseModule implements BaseModuleInterface
      * Called after update(), once the core has committed the transaction of the update: the place
      * for what cannot run inside it, like an ALTER TABLE, which MySQL commits implicitly and which
      * waits for the locks that transaction holds.
+     *
+     * The new version is already recorded when it runs, and nothing calls it again if it fails:
+     * keep it idempotent, and let the module catch up on what it could not do (at its next update,
+     * for instance).
      */
     public function postUpdate(string $currentVersion, string $newVersion): void
     {

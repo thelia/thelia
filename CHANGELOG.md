@@ -32,7 +32,7 @@
 
 ## Modules
 
-- `BaseModule::postUpdate($currentVersion, $newVersion)` is called after `update()`, once the core has committed the transaction of the update. A module puts there what cannot run inside that transaction: an `ALTER TABLE`, which MySQL commits implicitly and which, on MySQL 8, waits for the locks the transaction holds on every table linked to `module` by a foreign key. It is not called on install.
+- `BaseModule::postUpdate($currentVersion, $newVersion)` is called after `update()`, once the core has committed the transaction of the update. A module puts there what cannot run inside that transaction: an `ALTER TABLE`, which MySQL commits implicitly and which, on MySQL 8, waits for the locks the transaction holds on every table linked to `module` by a foreign key. It is not called on install. The new version is already recorded when it runs and a failure is not retried, so it is meant to be idempotent and to catch up on its own.
 
 ## Tests
 
