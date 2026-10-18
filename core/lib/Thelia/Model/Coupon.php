@@ -297,4 +297,20 @@ class Coupon extends BaseCoupon
 
         return $usageLeft;
     }
+
+    /**
+     * The usages left for an order about to be placed: the usages left, less the
+     * ones the orders waiting for their payment already hold.
+     *
+     * @param int|null $customerId   the ID of the ordering customer
+     * @param int|null $exceptCartId the cart being checked out, whose own unpaid order a new placement replaces
+     */
+    public function getUsagesLeftForANewOrder(?int $customerId = null, ?int $exceptCartId = null): int
+    {
+        return $this->getUsagesLeft($customerId) - OrderCouponQuery::create()->countUsagesHeldByUnpaidOrders(
+            $this,
+            $this->getPerCustomerUsageCount() ? $customerId : null,
+            $exceptCartId,
+        );
+    }
 }

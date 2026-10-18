@@ -14,8 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Promotion\Coupon\Service;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Promotion\Coupon\CouponFactory;
+use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCustomerCountQuery;
@@ -93,6 +101,70 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
         self::assertSame(0, $this->customerCount($coupon, $customer));
     }
 
+    /**
+     * The usage is only counted when the order is paid: until then, an order
+     * waiting for its payment holds it, and nobody may place a second order on it.
+     */
+    public function testACodeHeldByAnOrderWaitingForItsPaymentIsRefused(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $this->orderWith($coupon);
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        $this->expectException(CouponNoUsageLeftException::class);
+
+        $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode());
+    }
+
+    public function testACodeIsAcceptedWhileSomeUsagesAreNotHeldByUnpaidOrders(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 2]);
+        $this->orderWith($coupon);
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+    }
+
+    public function testAPerCustomerCodeHeldByAnUnpaidOrderOfTheCustomerIsRefusedToThatCustomerOnly(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1, 'perCustomerUsageCount' => true]);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $this->orderWith($coupon, $customer);
+
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+
+        $this->logIn($customer);
+        $this->expectException(CouponNoUsageLeftException::class);
+        $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode());
+    }
+
+    public function testCancellingTheUnpaidOrderFreesTheCode(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $order = $this->orderWith($coupon);
+        $this->changeStatus($order, OrderStatus::CODE_CANCELED);
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+        self::assertSame(1, $this->maxUsage($coupon));
+    }
+
+    /**
+     * A new payment attempt on the same cart replaces its unpaid order: that order
+     * does not hold the code against the cart it was placed from.
+     */
+    public function testTheUnpaidOrderOfTheCurrentCartDoesNotHoldTheCodeAgainstIt(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $order = $this->orderWith($coupon, $customer);
+        $this->logIn($customer);
+        $this->getService(RequestStack::class)->getCurrentRequest()->getSession()->set(Session::SESSION_CART_ID_NAME, $order->getCartId());
+
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+    }
+
     private function automaticPromotion(): Coupon
     {
         return $this->factory->coupon([
@@ -100,6 +172,19 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
             'triggerMode' => Coupon::TRIGGER_MODE_AUTOMATIC,
             'maxUsage' => 5,
         ]);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    private function typedCoupon(array $overrides): Coupon
+    {
+        $conditions = new ConditionCollection();
+        $conditions[] = $this->getService(MatchForEveryone::class);
+
+        return $this->factory->coupon(array_merge([
+            'conditions' => $this->getService(ConditionFactory::class)->serializeConditionCollection($conditions),
+        ], $overrides));
     }
 
     private function orderWith(Coupon $coupon, ?Customer $customer = null): Order
@@ -115,6 +200,11 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
         $event = new OrderEvent($order);
         $event->setStatus(OrderStatusQuery::create()->findOneByCode($statusCode)->getId());
         $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+    }
+
+    private function logIn(Customer $customer): void
+    {
+        $this->getService(SecurityContext::class)->setCustomerUser($customer);
     }
 
     private function reloaded(Coupon $coupon): Coupon
