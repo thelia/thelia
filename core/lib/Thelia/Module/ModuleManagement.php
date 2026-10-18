@@ -168,9 +168,13 @@ class ModuleManagement
             $instance->setContainer($container);
 
             if ('install' === $action) {
-                $instance->install($con);
+                ModuleTransactionGuard::run($con, $code, 'install', static function () use ($instance, $con): void {
+                    $instance->install($con);
+                });
             } elseif ('update' === $action) {
-                $instance->update($currentVersion, $version, $con);
+                ModuleTransactionGuard::run($con, $code, 'update', static function () use ($instance, $currentVersion, $version, $con): void {
+                    $instance->update($currentVersion, $version, $con);
+                });
             }
 
             // $forceHookRegistration covers the module whose files were just replaced without a
