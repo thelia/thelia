@@ -144,10 +144,14 @@ class BaseModule implements BaseModuleInterface
             $con->beginTransaction();
 
             try {
-                if ($this->preDeactivation($con)) {
+                $moduleCode = (string) $moduleModel->getCode();
+
+                if (ModuleTransactionGuard::run($con, $moduleCode, 'preDeactivation', fn (): bool => $this->preDeactivation($con))) {
                     $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                     $moduleModel->save($con);
-                    $this->postDeactivation($con);
+                    ModuleTransactionGuard::run($con, $moduleCode, 'postDeactivation', function () use ($con): void {
+                        $this->postDeactivation($con);
+                    });
 
                     $con->commit();
                 } else {
