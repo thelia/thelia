@@ -25,7 +25,9 @@ use Thelia\Model\OrderCouponQuery;
  *
  * A coupon remembered on an order (order_coupon) starts with its usage canceled:
  * it counts once the order is paid, and stops counting when the order stops
- * being paid. Both moves are idempotent, so calling them twice changes nothing.
+ * being paid. A line only counts when its coupon had a usage left to take, and
+ * only a counted line gives one back. Both moves are idempotent, so calling them
+ * twice changes nothing.
  */
 final readonly class OrderCouponUsageManager
 {
@@ -45,15 +47,21 @@ final readonly class OrderCouponUsageManager
             ->filterByUsageCanceled(true)
             ->findByOrderId($order->getId());
 
+        $counted = 0;
+
         foreach ($orderCoupons as $orderCoupon) {
-            if (null !== $coupon = $this->resolveCoupon($orderCoupon)) {
-                $this->couponManager->decrementQuantity($coupon, $order->getCustomerId());
+            // No usage left: the line stays uncounted, so cancelling the order
+            // later gives back nothing it never took.
+            if (null !== ($coupon = $this->resolveCoupon($orderCoupon))
+                && false === $this->couponManager->decrementQuantity($coupon, $order->getCustomerId())) {
+                continue;
             }
 
             $orderCoupon->setUsageCanceled(false)->save();
+            ++$counted;
         }
 
-        return \count($orderCoupons);
+        return $counted;
     }
 
     /**
