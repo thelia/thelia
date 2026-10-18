@@ -108,12 +108,6 @@ class ModuleValidator
         if (false === file_exists($path)) {
             throw new FileNotFoundException($this->trans('Module %name should have a module.xml in the Config directory.', ['%name' => $this->moduleDirName]));
         }
-
-        $path = \sprintf('%s/Config/config.xml', $this->modulePath);
-
-        if (false === file_exists($path)) {
-            throw new FileNotFoundException($this->trans('Module %name should have a config.xml in the Config directory.', ['%name' => $this->moduleDirName]));
-        }
     }
 
     protected function loadModuleDescriptor(): void
