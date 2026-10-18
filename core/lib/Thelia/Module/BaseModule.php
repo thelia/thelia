@@ -91,7 +91,9 @@ class BaseModule implements BaseModuleInterface
             $con->beginTransaction();
 
             try {
-                if (!$this->preActivation($con)) {
+                $moduleCode = (string) $moduleModel->getCode();
+
+                if (!ModuleTransactionGuard::run($con, $moduleCode, 'preActivation', fn (): bool => $this->preActivation($con))) {
                     throw new \Exception('An error occured during the module pre activation.');
                 }
 
@@ -113,7 +115,9 @@ class BaseModule implements BaseModuleInterface
 
                 $this->getContainer()->get('kernel')->initializePropelService(true);
 
-                $this->postActivation($con);
+                ModuleTransactionGuard::run($con, $moduleCode, 'postActivation', function () use ($con): void {
+                    $this->postActivation($con);
+                });
                 $con->commit();
             } catch (\Throwable $e) {
                 if ($con->inTransaction()) {
