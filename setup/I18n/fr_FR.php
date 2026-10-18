@@ -1541,4 +1541,5 @@ return [
     'Wrong item received' => 'Mauvais article reçu',
     'No longer needed' => 'Plus nécessaire',
     'Other' => 'Autre',
+    'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)' => 'Nombre de jours pendant lesquels une commande impayée retient les usages de coupon avec lesquels elle a été passée (0 : une commande impayée n\'en retient aucun)',
 ];

@@ -1562,4 +1562,5 @@ return [
     'Wrong item received' => 'Wrong item received',
     'No longer needed' => 'No longer needed',
     'Other' => 'Other',
+    'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)' => 'Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)',
 ];

@@ -95,7 +95,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (84, 'order_return_enabled', '0', 0, 0, NOW(), NOW()),
 (85, 'order_return_window_days', '14', 0, 0, NOW(), NOW()),
 (86, 'order_return_restock_mode', 'resellable', 0, 0, NOW(), NOW()),
-(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW())
+(87, 'checkout_display_mode', 'steps', 0, 0, NOW(), NOW()),
+(88, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2186,7 +2187,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, '{{ locale }}', {{ intl('Default number of coupons per page on coupon list', locale) }}, NULL, NULL, NULL),
     (71, '{{ locale }}', {{ intl('The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).', locale) }}, NULL, NULL, NULL),
     (72, '{{ locale }}', {{ intl('The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).', locale) }}, NULL, NULL, NULL),
-    (73, '{{ locale }}', {{ intl('Allow module installation from ZIP files.', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (73, '{{ locale }}', {{ intl('Allow module installation from ZIP files.', locale) }}, NULL, NULL, NULL),
+    (88, '{{ locale }}', {{ intl('Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

@@ -27,6 +27,7 @@ use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\Customer;
@@ -187,6 +188,40 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
     }
 
     /**
+     * An order left unpaid holds the usage for the hold period of the shop only:
+     * an abandoned order does not keep the code out of reach for good.
+     */
+    public function testAnUnpaidOrderOlderThanTheHoldPeriodNoLongerHoldsTheCode(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $this->orderWith($coupon, null, '-8 days');
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+    }
+
+    public function testAnUnpaidOrderWithinTheHoldPeriodStillHoldsTheCode(): void
+    {
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $this->orderWith($coupon, null, '-6 days');
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        $this->expectException(CouponNoUsageLeftException::class);
+
+        $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode());
+    }
+
+    public function testAHoldPeriodOfZeroDaysLetsNoUnpaidOrderHoldTheCode(): void
+    {
+        ConfigQuery::write(OrderCouponQuery::UNPAID_ORDER_HOLD_DAYS_CONFIG_KEY, '0');
+        $coupon = $this->typedCoupon(['maxUsage' => 1]);
+        $this->orderWith($coupon);
+        $this->logIn($this->factory->customer($this->factory->customerTitle()));
+
+        self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+    }
+
+    /**
      * A new payment attempt on the same cart replaces its unpaid order: that order
      * does not hold the code against the cart it was placed from.
      */
@@ -199,6 +234,13 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
         $this->getService(RequestStack::class)->getCurrentRequest()->getSession()->set(Session::SESSION_CART_ID_NAME, $order->getCartId());
 
         self::assertSame($coupon->getCode(), $this->getService(CouponFactory::class)->buildCouponFromCode($coupon->getCode())->getCode());
+    }
+
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
     }
 
     private function automaticPromotion(): Coupon
@@ -223,9 +265,14 @@ final class OrderCouponUsageManagerTest extends ActionIntegrationTestCase
         ], $overrides));
     }
 
-    private function orderWith(Coupon $coupon, ?Customer $customer = null): Order
+    private function orderWith(Coupon $coupon, ?Customer $customer = null, ?string $placed = null): Order
     {
         $order = $this->factory->order($customer);
+
+        if (null !== $placed) {
+            $order->setCreatedAt(new \DateTime($placed))->save();
+        }
+
         $this->factory->orderCoupon($order, $coupon);
 
         return $order;
