@@ -220,7 +220,7 @@ class CouponManager implements ResetInterface
                     continue;
                 }
 
-                if ($model->getUsagesLeft($customer->getId()) <= 0) {
+                if ($model->getUsagesLeftForANewOrder($customer->getId(), $this->cartBeingCheckedOut()) <= 0) {
                     continue;
                 }
             }
@@ -267,6 +267,16 @@ class CouponManager implements ResetInterface
         }
 
         return $total;
+    }
+
+    /**
+     * The cart of the session, read without loading nor creating one.
+     */
+    private function cartBeingCheckedOut(): ?int
+    {
+        $cartId = $this->getSession()?->get(Session::SESSION_CART_ID_NAME);
+
+        return is_numeric($cartId) ? (int) $cartId : null;
     }
 
     private function getSession(): ?Session
