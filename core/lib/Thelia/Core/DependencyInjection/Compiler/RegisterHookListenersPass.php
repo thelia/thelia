@@ -147,7 +147,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
 
         $active = 1 === (int) ($attributes['active'] ?? 1);
-        $type = $this->getHookType($attributes['type'] ?? TemplateDefinition::FRONT_OFFICE);
+        // A tag without a type listens to the front office, like an unknown type.
+        $type = $this->getHookType((string) ($attributes['type'] ?? 'front'));
         $templates = (string) ($attributes['templates'] ?? '');
         $method = $this->getMethodName($attributes)['method'];
         $declaredPosition = $this->getDeclaredPosition($attributes, $class);

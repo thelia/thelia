@@ -58,6 +58,15 @@ final class RegisterHookListenersPassTest extends IntegrationTestCase
         self::assertSame(3, $moduleHook->getPosition());
     }
 
+    public function testATagWithoutTypeListensToTheFrontOfficeHook(): void
+    {
+        $hook = $this->createHook('test.hook.type.omitted');
+
+        $this->registerHook($this->getModule('Cheque'), self::FIRST_SERVICE_ID, $hook, type: null);
+
+        self::assertSame(1, ModuleHookQuery::create()->filterByHookId($hook->getId())->count());
+    }
+
     public function testHookWithoutDeclaredPositionIsAppendedAtTheEndOfTheQueue(): void
     {
         $hook = $this->createHook('test.hook.position.undeclared');
@@ -139,9 +148,13 @@ final class RegisterHookListenersPassTest extends IntegrationTestCase
         return $hook;
     }
 
-    private function registerHook(Module $module, string $serviceId, Hook $hook, ?int $position = null): void
+    private function registerHook(Module $module, string $serviceId, Hook $hook, ?int $position = null, ?string $type = 'front'): void
     {
-        $attributes = ['event' => $hook->getCode(), 'type' => 'front', 'method' => self::HOOK_METHOD];
+        $attributes = ['event' => $hook->getCode(), 'method' => self::HOOK_METHOD];
+
+        if (null !== $type) {
+            $attributes['type'] = $type;
+        }
 
         if (null !== $position) {
             $attributes['position'] = $position;
