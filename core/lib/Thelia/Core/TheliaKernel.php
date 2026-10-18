@@ -676,7 +676,7 @@ class TheliaKernel extends Kernel
     /**
      * @throws \Exception
      */
-    private function loadModulesConfiguration(ContainerBuilder $container, iterable $modules): void
+    protected function loadModulesConfiguration(ContainerBuilder $container, iterable $modules): void
     {
         if (\defined('THELIA_INSTALL_MODE')) {
             return;
@@ -712,7 +712,15 @@ class TheliaKernel extends Kernel
                 }
 
                 $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                $loader->load('config.xml', 'module.'.$module->getCode());
+
+                // config.xml is optional: hooks, loops, forms and services are discovered
+                // without it, it only declares what has no other home (exports, imports,
+                // parameters, loop aliases).
+                $configFile = \sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, 'config.xml');
+
+                if (is_file($configFile) && is_readable($configFile)) {
+                    $loader->load('config.xml', 'module.'.$module->getCode());
+                }
 
                 $envConfigFileName = \sprintf('config_%s.xml', $this->environment);
                 $envConfigFile = \sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
