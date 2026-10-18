@@ -21,9 +21,12 @@ use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\TestToken;
@@ -112,6 +115,21 @@ final class ModuleSchemaChangeTransactionTest extends ActionIntegrationTestCase
         }
 
         self::assertTheModuleEndedTheTransaction('update');
+        $this->assertTheTransactionsOfTheProcessWork();
+    }
+
+    public function testAnActivationThatAltersATableLeavesTheTransactionsOfTheProcessWorking(): void
+    {
+        $module = $this->installSampleModule('1.0.0', ['postActivation.sql' => self::ALTER_A_TABLE]);
+
+        $this->dispatch(new ModuleToggleActivationEvent($module->getId()), TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+
+        self::assertSame(
+            BaseModule::IS_ACTIVATED,
+            ModuleQuery::create()->findPk($module->getId())?->getActivate(),
+            'The module is activated.',
+        );
+        self::assertTheModuleEndedTheTransaction('postActivation');
         $this->assertTheTransactionsOfTheProcessWork();
     }
 
