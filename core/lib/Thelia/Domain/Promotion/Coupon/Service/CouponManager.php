@@ -30,7 +30,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
-use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
@@ -499,14 +498,17 @@ class CouponManager implements ResetInterface
     }
 
     /**
-     * Decrement this coupon quantity.
+     * Takes one usage off this coupon: off the coupon itself, or off what the
+     * customer has left when the coupon is limited per customer.
      *
-     * To call when a coupon is consumed
+     * Nothing is taken when no usage is left, and the check and the write are a
+     * single statement, so two orders paid at the same time never share the last
+     * usage.
      *
      * @param Coupon   $coupon     Coupon consumed
      * @param int|null $customerId the ID of the ordering customer
      *
-     * @return int Usage left after decremental
+     * @return int|bool the usages left once this one is taken, true for an unlimited coupon, false when no usage was taken
      */
     public function decrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
     {
@@ -515,44 +517,23 @@ class CouponManager implements ResetInterface
         }
 
         try {
-            $usageLeft = $coupon->getUsagesLeft($customerId);
-
-            if ($usageLeft > 0) {
-                // If the coupon usage is per user, add an entry to coupon customer usage count table
-                if ($coupon->getPerCustomerUsageCount()) {
-                    if (null === $customerId) {
-                        throw new \LogicException('Customer should not be null at this time.');
-                    }
-
-                    $ccc = CouponCustomerCountQuery::create()
-                        ->filterByCouponId($coupon->getId())
-                        ->filterByCustomerId($customerId)
-                        ->findOne();
-
-                    if (null === $ccc) {
-                        $ccc = new CouponCustomerCount();
-
-                        $ccc
-                            ->setCustomerId($customerId)
-                            ->setCouponId($coupon->getId())
-                            ->setCount(0);
-                    }
-
-                    $newCount = 1 + $ccc->getCount();
-
-                    $ccc
-                        ->setCount($newCount)
-                        ->save();
-
-                    return $usageLeft - $newCount;
+            if ($coupon->getPerCustomerUsageCount()) {
+                if (null === $customerId) {
+                    throw new \LogicException('Customer should not be null at this time.');
                 }
 
-                $coupon->setMaxUsage(--$usageLeft);
+                if (!CouponCustomerCountQuery::create()->takeOneUsage($coupon->getId(), $customerId)) {
+                    return false;
+                }
 
-                $coupon->save();
-
-                return $usageLeft;
+                return $coupon->getUsagesLeft($customerId);
             }
+
+            if (!CouponQuery::create()->takeOneUsage($coupon->getId())) {
+                return false;
+            }
+
+            return $this->refreshMaxUsage($coupon);
         } catch (\Exception $exception) {
             // Just log the problem.
             Tlog::getInstance()->addError(\sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
@@ -562,7 +543,9 @@ class CouponManager implements ResetInterface
     }
 
     /**
-     * Add a coupon usage, for the case the related order is canceled.
+     * Gives one usage back to this coupon, for the case the related order is canceled.
+     *
+     * @return int|bool the usages left once this one is given back, true for an unlimited coupon, false when nothing was given back
      */
     public function incrementQuantity(Coupon $coupon, ?int $customerId = null): int|float|bool
     {
@@ -571,41 +554,42 @@ class CouponManager implements ResetInterface
         }
 
         try {
-            $usageLeft = $coupon->getUsagesLeft($customerId);
-
-            // If the coupon usage is per user, remove an entry from coupon customer usage count table
             if ($coupon->getPerCustomerUsageCount()) {
                 if (null === $customerId) {
                     throw new \LogicException('Customer should not be null at this time.');
                 }
 
-                $ccc = CouponCustomerCountQuery::create()
-                    ->filterByCouponId($coupon->getId())
-                    ->filterByCustomerId($customerId)
-                    ->findOne();
-
-                if (null !== $ccc && $ccc->getCount() > 0) {
-                    $newCount = $ccc->getCount() - 1;
-
-                    $ccc
-                        ->setCount($newCount)
-                        ->save();
-
-                    return $usageLeft - $newCount;
+                if (!CouponCustomerCountQuery::create()->giveBackOneUsage($coupon->getId(), $customerId)) {
+                    return false;
                 }
-            } else {
-                // Ad one usage to coupon
-                $coupon->setMaxUsage(++$usageLeft);
 
-                $coupon->save();
-
-                return $usageLeft;
+                return $coupon->getUsagesLeft($customerId);
             }
+
+            if (!CouponQuery::create()->giveBackOneUsage($coupon->getId())) {
+                return false;
+            }
+
+            return $this->refreshMaxUsage($coupon);
         } catch (\Exception $exception) {
             // Just log the problem.
             Tlog::getInstance()->addError(\sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $exception->getMessage()));
         }
 
         return false;
+    }
+
+    /**
+     * The coupon row was written by a single statement, behind Propel's back:
+     * the object takes the stored value, without marking it as a change to save.
+     */
+    private function refreshMaxUsage(Coupon $coupon): int
+    {
+        $maxUsage = CouponQuery::create()->findMaxUsage($coupon->getId()) ?? $coupon->getMaxUsage();
+
+        $coupon->setMaxUsage($maxUsage);
+        $coupon->resetModified(CouponTableMap::COL_MAX_USAGE);
+
+        return $maxUsage;
     }
 }
