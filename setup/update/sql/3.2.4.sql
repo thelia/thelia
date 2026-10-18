@@ -15,4 +15,8 @@ INNER JOIN (
     UNION ALL SELECT 'coupon_unpaid_order_hold_days', 'fr_FR', 'Nombre de jours pendant lesquels une commande impayée retient les usages de coupon avec lesquels elle a été passée (0 : une commande impayée n''en retient aucun)'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
+UPDATE `config` SET `value`='3.2.4' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='4' WHERE `name`='thelia_release_version';
+UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
+
 SET FOREIGN_KEY_CHECKS = 1;
