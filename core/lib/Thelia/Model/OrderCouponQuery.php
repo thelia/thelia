@@ -29,6 +29,21 @@ use Thelia\Model\Map\OrderCouponTableMap;
  */
 class OrderCouponQuery extends BaseOrderCouponQuery
 {
+    public const string UNPAID_ORDER_HOLD_DAYS_CONFIG_KEY = 'coupon_unpaid_order_hold_days';
+
+    public const int DEFAULT_UNPAID_ORDER_HOLD_DAYS = 7;
+
+    /**
+     * How many days an unpaid order holds the coupon usages it was placed with.
+     * Zero: an unpaid order holds none.
+     */
+    public static function unpaidOrderHoldDays(): int
+    {
+        $holdDays = ConfigQuery::read(self::UNPAID_ORDER_HOLD_DAYS_CONFIG_KEY, (string) self::DEFAULT_UNPAID_ORDER_HOLD_DAYS);
+
+        return is_numeric($holdDays) ? max(0, (int) $holdDays) : self::DEFAULT_UNPAID_ORDER_HOLD_DAYS;
+    }
+
     /**
      * Sets whether the usage of an order coupon line is canceled, unless the line
      * already says so. A single statement: of two requests switching the same
@@ -56,22 +71,25 @@ class OrderCouponQuery extends BaseOrderCouponQuery
      * How many usages of a coupon the orders waiting for their payment hold.
      *
      * Such an order does not count its usage until it is paid, yet it was placed
-     * with the coupon: as long as it may still be paid, the usage is promised to it.
+     * with the coupon: for a while, the usage is promised to it. An order left
+     * unpaid longer than the hold period of the shop holds nothing any more.
      *
      * @param int|null $customerId   only the orders of this customer, for a coupon limited per customer
      * @param int|null $exceptCartId the cart being checked out: a new placement on it replaces its unpaid order
      */
     public function countUsagesHeldByUnpaidOrders(Coupon $coupon, ?int $customerId = null, ?int $exceptCartId = null): int
     {
-        $waitingStatusIds = [];
+        $holdDays = self::unpaidOrderHoldDays();
 
-        foreach (OrderStatusQuery::create()->find() as $status) {
-            if (!$status->isPaid(false) && !$status->isCancelled() && !$status->isRefunded()) {
-                $waitingStatusIds[] = $status->getId();
-            }
-        }
+        // Neither paid, cancelled nor refunded: from the status lists the shop
+        // already keeps for the request.
+        $waitingStatusIds = array_values(array_diff(
+            OrderStatusQuery::getNotPaidStatusIdList(),
+            OrderStatusQuery::getCanceledStatusIdList(),
+            OrderStatusQuery::getRefundedStatusIdList(),
+        ));
 
-        if ([] === $waitingStatusIds) {
+        if (0 === $holdDays || [] === $waitingStatusIds) {
             return 0;
         }
 
@@ -91,7 +109,9 @@ class OrderCouponQuery extends BaseOrderCouponQuery
             $query->where(['by_id']);
         }
 
-        $orderQuery = $query->useOrderQuery()->filterByStatusId($waitingStatusIds, Criteria::IN);
+        $orderQuery = $query->useOrderQuery()
+            ->filterByStatusId($waitingStatusIds, Criteria::IN)
+            ->filterByCreatedAt(new \DateTimeImmutable(\sprintf('-%d days', $holdDays)), Criteria::GREATER_EQUAL);
 
         if (null !== $customerId) {
             $orderQuery->filterByCustomerId($customerId);
