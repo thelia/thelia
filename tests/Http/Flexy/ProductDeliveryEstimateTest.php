@@ -110,6 +110,27 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
     }
 
     /**
+     * The theme promises shipping within 24 hours on every product page: where the shop
+     * announces its own dates, that promise gives way to them, and it stays where nothing is
+     * announced.
+     */
+    public function testTheShippingPromiseOfTheThemeGivesWayToTheAnnouncedDates(): void
+    {
+        $this->serveCountryWithCarrier($this->carrier, $this->defaultCountry(), $this->getPropelConnection());
+        $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $this->productUnderTest();
+
+        $announced = $this->client->request('GET', '/'.self::PRODUCT_URL);
+        self::assertCount(1, $announced->filter('[data-testid="product-delivery-estimate"]'));
+        self::assertStringNotContainsString('within 24 hours', $announced->filter('body')->text());
+
+        $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, null, null, null);
+        $silent = $this->client->request('GET', '/'.self::PRODUCT_URL);
+        self::assertCount(0, $silent->filter('[data-testid="product-delivery-estimate"]'));
+        self::assertStringContainsString('within 24 hours', $silent->filter('body')->text());
+    }
+
+    /**
      * Nothing is promised for a product the shop cannot sell from its stock.
      */
     public function testAProductOutOfAManagedStockAnnouncesNothing(): void
