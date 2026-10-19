@@ -16,16 +16,44 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\State\Processor\FeatureProductProcessor;
 use Thelia\Model\Map\FeatureProductTableMap;
 
+/**
+ * A value of a feature on a product: either one of the values the feature
+ * lists, or a free text of the product's own.
+ *
+ * The admin API writes one value at a time, through the same events as the
+ * back office. A free text is stored as a translation, in the `locale` the
+ * payload names or the shop's default language; writing it in another
+ * language adds that translation and keeps the others.
+ */
 #[ApiResource(
     operations: [
+        new Post(
+            uriTemplate: '/admin/feature_products',
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+            denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_CREATE]],
+            processor: FeatureProductProcessor::class,
+        ),
+        new Patch(
+            uriTemplate: '/admin/feature_products/{id}',
+            normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
+            processor: FeatureProductProcessor::class,
+        ),
+        new Delete(
+            uriTemplate: '/admin/feature_products/{id}',
+            processor: FeatureProductProcessor::class,
+        ),
         new Get(
             uriTemplate: '/admin/feature_products/{id}',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
@@ -71,6 +99,7 @@ class FeatureProduct implements PropelResourceInterface
     public const GROUP_ADMIN_READ = 'admin:feature_product:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:feature_product:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:feature_product:write';
+    public const GROUP_ADMIN_CREATE = 'admin:feature_product:create';
     public const GROUP_FRONT_READ = 'front:feature_product:read';
     public const GROUP_FRONT_READ_SINGLE = 'front:feature_product:read:single';
 
@@ -83,12 +112,13 @@ class FeatureProduct implements PropelResourceInterface
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_ADMIN_CREATE])]
     public Product $product;
 
     #[Relation(targetResource: Feature::class)]
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_CREATE,
         self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
@@ -98,6 +128,7 @@ class FeatureProduct implements PropelResourceInterface
     #[Relation(targetResource: FeatureAv::class)]
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_CREATE,
         self::GROUP_FRONT_READ,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
@@ -116,13 +147,20 @@ class FeatureProduct implements PropelResourceInterface
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
-        self::GROUP_ADMIN_WRITE,
+        self::GROUP_ADMIN_CREATE,
         Product::GROUP_ADMIN_READ_SINGLE,
         Product::GROUP_FRONT_READ_SINGLE,
     ])]
     public ?bool $is_free_text = false;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    /**
+     * The language a free text is written in, the shop's default language when
+     * left out. Write-only.
+     */
+    #[Groups([self::GROUP_ADMIN_WRITE])]
+    public ?string $locale = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?int $position = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -199,6 +237,18 @@ class FeatureProduct implements PropelResourceInterface
     public function setIsFreeText(?bool $is_free_text): self
     {
         $this->is_free_text = $is_free_text;
+
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(?string $locale): self
+    {
+        $this->locale = $locale;
 
         return $this;
     }
