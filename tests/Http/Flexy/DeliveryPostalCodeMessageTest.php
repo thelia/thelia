@@ -14,12 +14,18 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaZipCodeRule;
+use Thelia\Model\CartAddressQuery;
+use Thelia\Model\CartQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -89,6 +95,47 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
     }
 
     /**
+     * Recette 6: the delivery address edited on the step itself, its new postal code decides
+     * the carriers. The cart keeps its own copy of the address, which only a new choice of
+     * the address refreshes.
+     */
+    public function testEditingTheDeliveryAddressOnTheStepFollowsItsNewPostalCode(): void
+    {
+        if (!method_exists(self::DELIVERY_STEP_COMPONENT, 'addressSaved')) {
+            self::markTestSkipped('The installed front-office theme does not choose an edited delivery address again.');
+        }
+
+        $this->skipUnlessTheThemeHasTheIdentificationPage();
+        $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
+        $this->deliveryStepOfAGuest(excluding: '20*');
+        $guest = $this->guestCustomerOf(self::GUEST_EMAIL);
+        self::assertNotNull($guest);
+        $address = AddressQuery::create()->filterByCustomerId($guest->getId())->findOne();
+        self::assertNotNull($address);
+
+        // Driven outside of a page: the request of the guest's session is provided.
+        $requestStack = $this->getService(RequestStack::class);
+        $request = Request::create('/checkout/delivery');
+        $request->setSession($this->sessionOfTheClient());
+        $requestStack->push($request);
+
+        try {
+            $step = $this->getService(self::DELIVERY_STEP_COMPONENT);
+            $step->mount();
+            $step->setEditingAddress((int) $address->getId());
+            $address->setZipcode('20000')->setCity('Ajaccio')->save($this->getPropelConnection());
+            $step->addressSaved();
+            $blamed = $step->getPostalCodeWithoutCarrier();
+        } finally {
+            $requestStack->pop();
+        }
+
+        self::assertSame('20000', $blamed);
+        $cart = CartQuery::create()->filterByCustomerId($guest->getId())->orderById(Criteria::DESC)->findOne();
+        self::assertSame('20000', CartAddressQuery::create()->findPk($cart?->getAddressDeliveryId())?->getZipcode(), 'The order would leave for the address the buyer no longer reads.');
+    }
+
+    /**
      * The guest identifies, then a zone served by an active carrier takes their country
      * with one exclusion, before the delivery step is displayed.
      */
@@ -110,6 +157,17 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
         return $crawler;
+    }
+
+    private function sessionOfTheClient(): SessionInterface
+    {
+        $session = $this->getService('session.factory')->createSession();
+        $cookie = $this->client->getCookieJar()->get($session->getName());
+        self::assertNotNull($cookie, 'The guest holds a session.');
+        $session->setId($cookie->getValue());
+        $session->start();
+
+        return $session;
     }
 
     private function zoneServingTheCountryExcept(int $countryId, string $excluded): void
