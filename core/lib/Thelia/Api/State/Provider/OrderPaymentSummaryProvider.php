@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Resource\OrderPaymentSummary;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 
@@ -28,6 +29,7 @@ final readonly class OrderPaymentSummaryProvider implements ProviderInterface
     public function __construct(
         private PaymentTransactionTotalsReader $totalsReader,
         private PaymentCaptureService $captureService,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -57,7 +59,9 @@ final readonly class OrderPaymentSummaryProvider implements ProviderInterface
         $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
         $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
 
-        if (!$order instanceof Order) {
+        // An order of a sale unit the administrator is restricted away from is no
+        // order of theirs, the way the order itself answers 404 to them.
+        if (!$order instanceof Order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
             throw new NotFoundHttpException('No such order.');
         }
 
