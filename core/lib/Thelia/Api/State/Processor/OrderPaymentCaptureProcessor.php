@@ -31,6 +31,7 @@ use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
 use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 
@@ -45,6 +46,7 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -86,7 +88,9 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
         $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
         $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
 
-        if (!$order instanceof Order) {
+        // An order of a sale unit the administrator is restricted away from is no
+        // order of theirs, the way the order itself answers 404 to them.
+        if (!$order instanceof Order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
             throw new NotFoundHttpException('No such order.');
         }
 

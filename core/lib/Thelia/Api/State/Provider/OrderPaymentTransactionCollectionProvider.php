@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
 use Thelia\Api\Resource\OrderPaymentTransaction;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\OrderPaymentTransaction as OrderPaymentTransactionModel;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
@@ -35,6 +36,7 @@ final readonly class OrderPaymentTransactionCollectionProvider implements Provid
     public function __construct(
         private Pagination $pagination,
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
+        private AdminSaleUnitScope $adminSaleUnitScope,
     ) {
     }
 
@@ -59,7 +61,11 @@ final readonly class OrderPaymentTransactionCollectionProvider implements Provid
     {
         $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
 
-        if (false === $orderId || $orderId < 1 || null === OrderQuery::create()->findPk($orderId)) {
+        $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
+
+        // An order of a sale unit the administrator is restricted away from is no
+        // order of theirs, the way the order itself answers 404 to them.
+        if (null === $order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
             throw new NotFoundHttpException('No such order.');
         }
 
