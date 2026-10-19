@@ -14,18 +14,17 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\BackOffice;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\DeliveryDateRuleQuery;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
+use Thelia\Tests\Support\Delivery\DeliveryDateTestCarrier;
 use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
 
 /**
@@ -177,6 +176,26 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
     }
 
     /**
+     * A refusal never shown, then a save that goes through: the screen shows what is stored.
+     */
+    public function testASaveForgetsARefusalTypedBefore(): void
+    {
+        $this->skipUnlessTheThemeTypesBackARefusal();
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
+        $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
+
+        $this->saveDelays($token, '1', '5', '2');
+        $this->saveDelays($token, '1', '2', '4');
+
+        $form = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId())->filter('[data-testid="delivery-date-estimate-form"]');
+        self::assertSame(['1', '2', '4'], [
+            $form->filter('[name="preparation_days"]')->attr('value'),
+            $form->filter('[name="transit_min_days"]')->attr('value'),
+            $form->filter('[name="transit_max_days"]')->attr('value'),
+        ]);
+    }
+
+    /**
      * Typed for one carrier, never shown on the screen of another.
      */
     public function testDelaysTypedForACarrierAreNotShownForAnother(): void
@@ -186,11 +205,14 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
         $this->saveDelays($token, '1', '5', '2');
 
-        $other = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterById($this->carrier->getId(), Criteria::NOT_EQUAL)->findOne();
-        self::assertNotNull($other);
+        $other = $this->secondCarrier();
         $form = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$other->getId())->filter('[data-testid="delivery-date-estimate-form"]');
 
-        self::assertNotSame('5', (string) $form->filter('[name="transit_min_days"]')->attr('value'));
+        self::assertSame(['', '', ''], [
+            (string) $form->filter('[name="preparation_days"]')->attr('value'),
+            (string) $form->filter('[name="transit_min_days"]')->attr('value'),
+            (string) $form->filter('[name="transit_max_days"]')->attr('value'),
+        ]);
     }
 
     public function testTheCutoffOfTheShopIsSavedWithItsClosedDays(): void
@@ -274,6 +296,29 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         self::assertCount(1, $line);
         self::assertStringContainsString('September 3', $line->text());
         self::assertStringContainsString('September 7', $line->text());
+    }
+
+    /**
+     * A carrier of the test's own, without delays: the shop's carriers depend on the modules
+     * installed.
+     */
+    private function secondCarrier(): Module
+    {
+        $code = 'DeliveryEstimateSecondTestCarrier';
+        if (!static::getContainer()->has('module.'.$code)) {
+            static::getContainer()->set('module.'.$code, new DeliveryDateTestCarrier());
+        }
+
+        $module = (new Module())
+            ->setCode($code)
+            ->setFullNamespace(DeliveryDateTestCarrier::class)
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->setCategory('delivery')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $module->save($this->getPropelConnection());
+
+        return $module;
     }
 
     /**
