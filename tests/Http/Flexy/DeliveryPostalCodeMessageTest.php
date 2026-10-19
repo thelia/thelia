@@ -103,8 +103,8 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 
     /**
      * Recette 6: the delivery address edited on the step itself, its new postal code decides
-     * the carriers. The cart keeps its own copy of the address, which only a new choice of
-     * the address refreshes.
+     * the carriers. The cart keeps its own copy of the address, which the step refreshes once
+     * the address is saved.
      */
     public function testEditingTheDeliveryAddressOnTheStepFollowsItsNewPostalCode(): void
     {

@@ -72,7 +72,9 @@ step instead of the general message.
 - The carriers follow the cart's copy of its delivery address, which only choosing the
   address again refreshes: an address edited elsewhere (another checkout step, the
   customer account, the API) keeps its old postal code in the cart until it is chosen
-  again. Flexy's delivery step chooses an address edited on it again.
+  again. Flexy's delivery step refreshes the copy of an address edited on it, and chooses
+  the address again, asking the carriers and their postage again, when its country, state
+  or postal code changed; another edit keeps the carrier and its postage as they were.
 - The radius around a shop (GeolocatedDelivery in Thelia 2) is a separate feature.
 
 ## Back office
