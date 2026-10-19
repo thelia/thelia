@@ -240,6 +240,48 @@ final class CustomerApiTest extends ApiTestCase
     }
 
     /**
+     * Another system replaces the customer with its full record on every
+     * synchronisation, its own reference included.
+     */
+    public function testThePutKeepsItsOwnReference(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $customer->setRef('C00128')->save($this->getPropelConnection());
+        $customerId = (int) $customer->getId();
+
+        $response = $this->jsonRequest('PUT', '/api/admin/customers/'.$customerId, $this->customerPayload((string) $customer->getEmail()) + ['ref' => 'C00128'], $this->authenticateAsAdmin());
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('C00128', CustomerQuery::create()->findPk($customerId)?->getRef());
+    }
+
+    public function testThePutWithoutAReferenceKeepsTheStoredOne(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $customer->setRef('C00129')->save($this->getPropelConnection());
+        $customerId = (int) $customer->getId();
+
+        $response = $this->jsonRequest('PUT', '/api/admin/customers/'.$customerId, $this->customerPayload((string) $customer->getEmail()), $this->authenticateAsAdmin());
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        CustomerTableMap::clearInstancePool();
+        self::assertSame('C00129', CustomerQuery::create()->findPk($customerId)?->getRef());
+    }
+
+    public function testABlankReferenceIsRefused(): void
+    {
+        $response = $this->jsonRequest('POST', '/api/admin/customers', $this->customerPayload('ref-blank@example.com') + ['ref' => ' '], $this->authenticateAsAdmin());
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        $error = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame(['ref'], array_column($error['violations'], 'propertyPath'));
+        self::assertNull(CustomerQuery::create()->findOneByEmail('ref-blank@example.com'));
+    }
+
+    /**
      * Another system reads the customers changed since its last synchronisation.
      */
     public function testFilterByUpdatedAfterReturnsTheCustomersChangedSince(): void
