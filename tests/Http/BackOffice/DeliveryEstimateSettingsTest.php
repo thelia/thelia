@@ -125,6 +125,28 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         self::assertTrue(null === $rule || [null, null, null] === [$rule->getPreparationDays(), $rule->getTransitMinDays(), $rule->getTransitMaxDays()]);
     }
 
+    /**
+     * A refusal sends the merchant back to what they typed, not to what was stored before.
+     */
+    public function testRefusedDelaysAreTypedBackIntoTheForm(): void
+    {
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
+        $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
+
+        $this->saveDelays($token, '1', '5', '2');
+
+        $form = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId())->filter('[data-testid="delivery-date-estimate-form"]');
+        self::assertSame(['1', '5', '2'], [
+            $form->filter('[name="preparation_days"]')->attr('value'),
+            $form->filter('[name="transit_min_days"]')->attr('value'),
+            $form->filter('[name="transit_max_days"]')->attr('value'),
+        ]);
+
+        // Once shown, the typed values are gone: the next visit reads what is stored.
+        $again = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
+        self::assertSame('', (string) $again->filter('[data-testid="delivery-date-estimate-form"] [name="transit_min_days"]')->attr('value'));
+    }
+
     public function testTheCutoffOfTheShopIsSavedWithItsClosedDays(): void
     {
         $page = $this->client->request('GET', '/admin/configuration/delivery-dates');
@@ -157,6 +179,11 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
             self::assertSame(302, $this->client->getResponse()->getStatusCode());
             ConfigQuery::resetCache();
             self::assertSame($closedBefore, (string) ConfigQuery::read('delivery_closed_weekdays', ''));
+
+            // The form shows what the merchant typed, the refused hour and the days with it.
+            $form = $this->client->request('GET', '/admin/configuration/delivery-dates')->filter('[data-testid="delivery-date-shop-form"]');
+            self::assertSame('2pm', $form->filter('[name="cutoff_time"]')->attr('value'));
+            self::assertSame(['1', '2'], $form->filter('[name="closed_weekdays[]"]:checked')->each(static fn ($box): string => (string) $box->attr('value')));
         } finally {
             ConfigQuery::write('delivery_closed_weekdays', $closedBefore);
         }
