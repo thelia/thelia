@@ -69,6 +69,10 @@ step instead of the general message.
   country, without the postal code.
 - A module that decides eligibility on its own (`isValidDelivery()`, the postage event)
   is not affected by the rules of the zones it is not linked to.
+- The carriers follow the cart's copy of its delivery address, which only choosing the
+  address again refreshes: an address edited elsewhere (another checkout step, the
+  customer account, the API) keeps its old postal code in the cart until it is chosen
+  again. Flexy's delivery step chooses an address edited on it again.
 - The radius around a shop (GeolocatedDelivery in Thelia 2) is a separate feature.
 
 ## Back office
