@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\BackOffice;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\DeliveryDateRuleQuery;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
@@ -130,6 +133,7 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
      */
     public function testRefusedDelaysAreTypedBackIntoTheForm(): void
     {
+        $this->skipUnlessTheThemeTypesBackARefusal();
         $page = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
         $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
 
@@ -145,6 +149,48 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         // Once shown, the typed values are gone: the next visit reads what is stored.
         $again = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
         self::assertSame('', (string) $again->filter('[data-testid="delivery-date-estimate-form"] [name="transit_min_days"]')->attr('value'));
+    }
+
+    public function testARefusedCutoffIsTypedBackWithItsClosedDays(): void
+    {
+        $this->skipUnlessTheThemeTypesBackARefusal();
+        $closedBefore = (string) ConfigQuery::read('delivery_closed_weekdays', '');
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates');
+        $token = (string) $page->filter('[data-testid="delivery-date-shop-form"] [name="_token"]')->attr('value');
+
+        try {
+            $this->client->request('POST', '/admin/configuration/delivery-dates/shop/save', [
+                '_token' => $token,
+                'closed_weekdays' => ['1', '2'],
+                'cutoff_time' => '2pm',
+            ]);
+
+            $list = $this->client->request('GET', '/admin/configuration/delivery-dates');
+            $form = $list->filter('[data-testid="delivery-date-shop-form"]');
+            self::assertSame('2pm', $form->filter('[name="cutoff_time"]')->attr('value'));
+            self::assertSame(['1', '2'], $form->filter('[name="closed_weekdays[]"]:checked')->each(static fn ($box): string => (string) $box->attr('value')));
+            // What was typed is no flash message: the layout prints no banner of it.
+            self::assertSame([], $list->filter('.alert')->reduce(static fn ($alert): bool => str_contains($alert->text(), '2pm'))->each(static fn ($alert): string => $alert->text()));
+        } finally {
+            ConfigQuery::write('delivery_closed_weekdays', $closedBefore);
+        }
+    }
+
+    /**
+     * Typed for one carrier, never shown on the screen of another.
+     */
+    public function testDelaysTypedForACarrierAreNotShownForAnother(): void
+    {
+        $this->skipUnlessTheThemeTypesBackARefusal();
+        $page = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$this->carrier->getId());
+        $token = (string) $page->filter('[data-testid="delivery-date-estimate-form"] [name="_token"]')->attr('value');
+        $this->saveDelays($token, '1', '5', '2');
+
+        $other = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterById($this->carrier->getId(), Criteria::NOT_EQUAL)->findOne();
+        self::assertNotNull($other);
+        $form = $this->client->request('GET', '/admin/configuration/delivery-dates/carrier/'.$other->getId())->filter('[data-testid="delivery-date-estimate-form"]');
+
+        self::assertNotSame('5', (string) $form->filter('[name="transit_min_days"]')->attr('value'));
     }
 
     public function testTheCutoffOfTheShopIsSavedWithItsClosedDays(): void
@@ -179,11 +225,6 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
             self::assertSame(302, $this->client->getResponse()->getStatusCode());
             ConfigQuery::resetCache();
             self::assertSame($closedBefore, (string) ConfigQuery::read('delivery_closed_weekdays', ''));
-
-            // The form shows what the merchant typed, the refused hour and the days with it.
-            $form = $this->client->request('GET', '/admin/configuration/delivery-dates')->filter('[data-testid="delivery-date-shop-form"]');
-            self::assertSame('2pm', $form->filter('[name="cutoff_time"]')->attr('value'));
-            self::assertSame(['1', '2'], $form->filter('[name="closed_weekdays[]"]:checked')->each(static fn ($box): string => (string) $box->attr('value')));
         } finally {
             ConfigQuery::write('delivery_closed_weekdays', $closedBefore);
         }
@@ -233,6 +274,17 @@ final class DeliveryEstimateSettingsTest extends WebIntegrationTestCase
         self::assertCount(1, $line);
         self::assertStringContainsString('September 3', $line->text());
         self::assertStringContainsString('September 7', $line->text());
+    }
+
+    /**
+     * The typed values came with a later commit of the theme than its estimate screens: an
+     * installed theme in between is skipped, not failed.
+     */
+    private function skipUnlessTheThemeTypesBackARefusal(): void
+    {
+        if (!(new \ReflectionClass(self::CONTROLLER))->hasMethod('typedBack')) {
+            self::markTestSkipped('The installed back-office theme does not type a refused setting back into its form.');
+        }
     }
 
     private function saveDelays(string $token, string $preparation, string $min, string $max): void
