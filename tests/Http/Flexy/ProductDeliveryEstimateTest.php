@@ -14,12 +14,18 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSettings;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
+use Thelia\Model\Product;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
@@ -33,6 +39,7 @@ use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
  */
 final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
 {
+    use InteractsWithLiveComponents;
     use RegistersDeliveryDateTestCarrier;
 
     /**
@@ -40,6 +47,9 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
      * the current namespace, and the guard would then skip the whole file for ever.
      */
     private const COMPONENT = 'FlexyBundle\\Components\\Organisms\\DeliveryEstimate\\Base';
+
+    /** The product details count the estimate themselves since this service came with the theme. */
+    private const RESOLVER = 'FlexyBundle\\Service\\DeliveryEstimateResolver';
 
     private const PRODUCT_URL = 'flexy-delivery-estimate-test.html';
 
@@ -116,6 +126,7 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
      */
     public function testTheShippingPromiseOfTheThemeGivesWayToTheAnnouncedDates(): void
     {
+        $this->skipUnlessTheDetailsCountTheEstimate();
         $this->serveCountryWithCarrier($this->carrier, $this->defaultCountry(), $this->getPropelConnection());
         $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, 1, 2, 3);
         $this->productUnderTest();
@@ -128,6 +139,63 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
         $silent = $this->client->request('GET', '/'.self::PRODUCT_URL);
         self::assertCount(0, $silent->filter('[data-testid="product-delivery-estimate"]'));
         self::assertStringContainsString('within 24 hours', $silent->filter('body')->text());
+    }
+
+    /**
+     * Out of stock, the dates are not announced, and the theme's promise does not come back in
+     * their place either: it would contradict the shop as much.
+     */
+    public function testAProductOutOfStockDoesNotGetTheShippingPromiseBack(): void
+    {
+        $this->skipUnlessTheDetailsCountTheEstimate();
+        $this->serveCountryWithCarrier($this->carrier, $this->defaultCountry(), $this->getPropelConnection());
+        $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $checkStockBefore = (string) ConfigQuery::read('check-available-stock', '1');
+        ConfigQuery::write('check-available-stock', '1');
+
+        try {
+            $this->productUnderTest(quantity: 0);
+            $crawler = $this->client->request('GET', '/'.self::PRODUCT_URL);
+        } finally {
+            ConfigQuery::write('check-available-stock', $checkStockBefore);
+        }
+
+        self::assertCount(0, $crawler->filter('[data-testid="product-delivery-estimate"]'));
+        self::assertStringNotContainsString('within 24 hours', $crawler->filter('body')->text());
+    }
+
+    /**
+     * Counted when the page is drawn, the estimate is carried by the product details through
+     * every later render, which never counts it again.
+     */
+    public function testTheAnnouncedDatesSurviveARenderOfTheProductDetails(): void
+    {
+        $this->skipUnlessTheDetailsCountTheEstimate();
+        $this->serveCountryWithCarrier($this->carrier, $this->defaultCountry(), $this->getPropelConnection());
+        $this->getService(DeliveryDateSettings::class)->saveDeliveryDelays($this->carrier, 1, 2, 3);
+        $product = $this->productUnderTest();
+        $pse = $product->getProductSaleElementss()->getFirst();
+        self::assertNotNull($pse);
+
+        // Driven outside of a page: the request the page would have is provided.
+        $requestStack = $this->getService(RequestStack::class);
+        $request = Request::create('/'.self::PRODUCT_URL);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $requestStack->push($request);
+
+        try {
+            $details = $this->createLiveComponent('Layouts:ProductDetails:Base', [
+                'product' => ['id' => $product->getId(), 'virtual' => false, 'i18ns' => ['title' => 'Product whose delivery is estimated']],
+            ], $this->client);
+            $details->call('updateCurrentPseFromId', ['pseIds' => (string) $pse->getId()]);
+            $rendered = $details->render()->crawler();
+        } finally {
+            $requestStack->pop();
+        }
+
+        self::assertCount(1, $rendered->filter('[data-testid="product-delivery-estimate"]'));
+        self::assertStringContainsString($this->spelled(2), $rendered->filter('[data-testid="product-delivery-estimate"]')->text());
+        self::assertStringNotContainsString('within 24 hours', $rendered->text());
     }
 
     /**
@@ -151,12 +219,21 @@ final class ProductDeliveryEstimateTest extends WebIntegrationTestCase
         self::assertCount(0, $crawler->filter('[data-testid="product-delivery-estimate"]'));
     }
 
-    private function productUnderTest(int $quantity = 100): void
+    private function skipUnlessTheDetailsCountTheEstimate(): void
+    {
+        if (!class_exists(self::RESOLVER)) {
+            self::markTestSkipped('The installed front-office theme still counts the estimate in a component of its own.');
+        }
+    }
+
+    private function productUnderTest(int $quantity = 100): Product
     {
         $factory = new FixtureFactory($this->getPropelConnection());
         $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => $quantity]);
         $product->setLocale('en_US')->setTitle('Product whose delivery is estimated')->save($this->getPropelConnection());
         $product->setRewrittenUrl('en_US', self::PRODUCT_URL);
+
+        return $product;
     }
 
     private function defaultCountry(): Country
