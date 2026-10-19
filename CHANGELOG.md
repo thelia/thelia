@@ -34,9 +34,10 @@
 ## Modules
 
 - `BaseModule::postUpdate($currentVersion, $newVersion)` is called after `update()`, once the core has committed the transaction of the update. A module puts there what cannot run inside that transaction: an `ALTER TABLE`, which MySQL commits implicitly and which, on MySQL 8, waits for the locks the transaction holds on every table linked to `module` by a foreign key. It is not called on install. The new version is already recorded when it runs and a failure is not retried, so it is meant to be idempotent and to catch up on its own.
+
 ## API
 
-- An administration client can set the reference of a customer: `ref` is writable on `POST`, `PUT` and `PATCH /api/admin/customers`, and the model still generates it when it is left out. A reference another customer already holds is a validation error on `ref` (422) instead of the failed write of the unique index. The customer cannot write it through the front API.
+- An administration client can set the reference of a customer: `ref` is writable on `POST`, `PUT` and `PATCH /api/admin/customers`, and the model still generates it when it is left out. A reference another customer already holds is a validation error on `ref` (422) instead of the failed write of the unique index. A blank reference is refused as well (422), and a `PUT` that leaves `ref` out keeps the stored one. The customer cannot write it through the front API.
 - The customer and address collections filter on `createdAt` and `updatedAt` (`updatedAt[after]=2026-10-01T00:00:00`, and `before`, `strictly_before`, `strictly_after`), so a client can read what changed since its last synchronisation, for instance `/api/admin/addresses?updatedAt[after]=...&customer.id=42`.
 - `ResourcePersistedEvent` tells a creation from an update. The persist processor dispatches it with `OPERATION_CREATE` when the model did not exist before the write, which `isCreate()` answers, and with `OPERATION_WRITE` for an update, as before; `isDelete()` is unchanged, so a listener that only told a write from a deletion keeps working. The resource addons are saved, in the same transaction, before the event is dispatched.
 

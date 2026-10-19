@@ -155,9 +155,11 @@ class Customer implements PropelResourceInterface
     /**
      * Left out of the payload, the model generates the reference on creation.
      * An administration client may set it instead, to keep the code another
-     * system knows the customer by. The customer never writes it.
+     * system knows the customer by. The customer never writes it. A blank
+     * reference is refused: the model only generates one for a null.
      */
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Address::GROUP_ADMIN_READ_SINGLE, Order::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
+    #[NotBlank(allowNull: true, normalizer: 'trim', groups: [self::GROUP_ADMIN_WRITE])]
     #[Length(max: 50, groups: [self::GROUP_ADMIN_WRITE])]
     public ?string $ref = null;
 
