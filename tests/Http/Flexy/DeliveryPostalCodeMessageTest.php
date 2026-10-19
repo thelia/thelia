@@ -19,14 +19,21 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaZipCodeRule;
+use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CountryArea;
+use Thelia\Model\Customer;
+use Thelia\Model\Map\CartAddressTableMap;
+use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -101,19 +108,78 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
      */
     public function testEditingTheDeliveryAddressOnTheStepFollowsItsNewPostalCode(): void
     {
-        if (!method_exists(self::DELIVERY_STEP_COMPONENT, 'addressSaved')) {
-            self::markTestSkipped('The installed front-office theme does not choose an edited delivery address again.');
-        }
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
 
+        $blamed = $this->editOnTheStep($address, static fn (Address $edited) => $edited->setZipcode('20000')->setCity('Ajaccio'));
+
+        self::assertSame('20000', $blamed);
+        self::assertSame('20000', $this->deliveryCopyOf($guest)?->getZipcode(), 'The order would leave for the address the buyer no longer reads.');
+    }
+
+    /**
+     * Another street, the same postal code: the copy follows, the carrier the buyer chose stays.
+     */
+    public function testEditingTheDeliveryAddressWithinItsPostalCodeKeepsTheCarrier(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $cart = $this->cartOf($guest);
+        $carrierId = (int) ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()?->getId();
+        $cart->setDeliveryModuleId($carrierId)->save($this->getPropelConnection());
+
+        $this->editOnTheStep($address, static fn (Address $edited) => $edited->setAddress1('2 avenue des Tests'));
+
+        self::assertSame('2 avenue des Tests', $this->deliveryCopyOf($guest)?->getAddress1());
+        CartTableMap::clearInstancePool();
+        self::assertSame($carrierId, (int) CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'A new street took away the carrier.');
+    }
+
+    /**
+     * A new address saved on the step is not the one the cart is delivered to: the copy stays.
+     */
+    public function testSavingANewAddressLeavesTheDeliveryCopy(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $new = $address->copy()->setIsDefault(0)->setLabel('New')->setZipcode('20000');
+
+        $this->editOnTheStep(null, static fn () => $new);
+
+        self::assertSame(self::GUEST_ZIP_CODE, $this->deliveryCopyOf($guest)?->getZipcode());
+    }
+
+    public function testTheDeliveryStepListensToTheSavedAddress(): void
+    {
+        $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
+        $listeners = (new \ReflectionMethod(self::DELIVERY_STEP_COMPONENT, 'addressSaved'))->getAttributes(LiveListener::class);
+
+        self::assertSame([['ADD_NEW_DELIVERY_ADDRESS']], array_map(static fn ($listener): array => $listener->getArguments(), $listeners));
+    }
+
+    /**
+     * @return array{0: Customer, 1: Address}
+     */
+    private function guestOnTheStepOfAZoneExcluding(string $excluded): array
+    {
+        $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
-        $this->deliveryStepOfAGuest(excluding: '20*');
+        $this->deliveryStepOfAGuest(excluding: $excluded);
         $guest = $this->guestCustomerOf(self::GUEST_EMAIL);
         self::assertNotNull($guest);
         $address = AddressQuery::create()->filterByCustomerId($guest->getId())->findOne();
         self::assertNotNull($address);
 
-        // Driven outside of a page: the request of the guest's session is provided.
+        return [$guest, $address];
+    }
+
+    /**
+     * The step opens the edit form of the address (none for a new one), the address is saved,
+     * the form tells the step. Driven outside of a page: the request of the guest's session is
+     * provided. Returns the postal code the step then blames.
+     *
+     * @param callable(?Address): Address $edit
+     */
+    private function editOnTheStep(?Address $address, callable $edit): ?string
+    {
         $requestStack = $this->getService(RequestStack::class);
         $request = Request::create('/checkout/delivery');
         $request->setSession($this->sessionOfTheClient());
@@ -122,17 +188,39 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         try {
             $step = $this->getService(self::DELIVERY_STEP_COMPONENT);
             $step->mount();
-            $step->setEditingAddress((int) $address->getId());
-            $address->setZipcode('20000')->setCity('Ajaccio')->save($this->getPropelConnection());
+            if (null !== $address) {
+                $step->setEditingAddress((int) $address->getId());
+            }
+            $edit($address)->save($this->getPropelConnection());
             $step->addressSaved();
-            $blamed = $step->getPostalCodeWithoutCarrier();
+
+            return $step->getPostalCodeWithoutCarrier();
         } finally {
             $requestStack->pop();
         }
+    }
 
-        self::assertSame('20000', $blamed);
+    private function cartOf(Customer $guest): Cart
+    {
         $cart = CartQuery::create()->filterByCustomerId($guest->getId())->orderById(Criteria::DESC)->findOne();
-        self::assertSame('20000', CartAddressQuery::create()->findPk($cart?->getAddressDeliveryId())?->getZipcode(), 'The order would leave for the address the buyer no longer reads.');
+        self::assertNotNull($cart);
+
+        return $cart;
+    }
+
+    private function deliveryCopyOf(Customer $guest): ?CartAddress
+    {
+        CartTableMap::clearInstancePool();
+        CartAddressTableMap::clearInstancePool();
+
+        return CartAddressQuery::create()->findPk($this->cartOf($guest)->getAddressDeliveryId());
+    }
+
+    private function skipUnlessTheStepChoosesAnEditedAddressAgain(): void
+    {
+        if (!method_exists(self::DELIVERY_STEP_COMPONENT, 'addressSaved')) {
+            self::markTestSkipped('The installed front-office theme does not choose an edited delivery address again.');
+        }
     }
 
     /**
