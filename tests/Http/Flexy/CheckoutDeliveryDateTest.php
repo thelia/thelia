@@ -246,13 +246,18 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         $elsewhere = \Thelia\Model\CountryQuery::create()->filterById($address->getCountryId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)->findOne($this->getPropelConnection()) ?? self::fail('A second country is needed.');
         $address->setCountryId($elsewhere->getId())->save($this->getPropelConnection());
 
-        $step = $this->requestTheDeliveryStep()->filter('[data-live-name-value="Organisms:Delivery:Base"]');
-        $this->callLiveAction($step->children()->first(), 'selectDeliveryAddress', ['addressId' => (int) $address->getId()]);
+        // Back on the step, a theme that follows an address edited elsewhere does it on arrival;
+        // an older one waits for the buyer to choose the address again.
+        $page = $this->requestTheDeliveryStep();
+        if (!(new \ReflectionClass('FlexyBundle\\Components\\Organisms\\Delivery\\Base'))->hasMethod('followTheDeliveryAddress')) {
+            $this->callLiveAction($page->filter('[data-live-name-value="Organisms:Delivery:Base"]')->children()->first(), 'selectDeliveryAddress', ['addressId' => (int) $address->getId()]);
+            $page = new Crawler((string) $this->client->getResponse()->getContent());
+        }
 
         $cart = $this->reread($cart);
         self::assertNull($cart->getDeliveryModuleId());
         self::assertNull($cart->getDeliveryDay());
-        self::assertCount(1, (new Crawler((string) $this->client->getResponse()->getContent()))->filter('[data-testid="delivery-date-notice"]'), 'The buyer is told why the day is gone.');
+        self::assertCount(1, $page->filter('[data-testid="delivery-date-notice"]'), 'The buyer is told why the day is gone.');
     }
 
     private function requestTheDeliveryStep(): Crawler
