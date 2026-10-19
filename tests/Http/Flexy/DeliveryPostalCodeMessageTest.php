@@ -146,6 +146,39 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertSame(self::GUEST_ZIP_CODE, $this->deliveryCopyOf($guest)?->getZipcode());
     }
 
+    /**
+     * The delivery address edited elsewhere, from the account or another step: back on the
+     * delivery step, the cart follows its new postal code.
+     */
+    public function testBackOnTheStepAnAddressEditedElsewhereDecidesTheCarriers(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $address->setZipcode('20000')->setCity('Ajaccio')->save($this->getPropelConnection());
+
+        $crawler = $this->client->request('GET', '/checkout/delivery');
+
+        self::assertStringContainsString('No carrier delivers to the postal code 20000.', $crawler->text());
+        self::assertSame('20000', $this->deliveryCopyOf($guest)?->getZipcode());
+    }
+
+    /**
+     * Another street edited elsewhere: back on the step, the copy follows and the carrier stays.
+     */
+    public function testBackOnTheStepAStreetEditedElsewhereKeepsTheCarrier(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $cart = $this->cartOf($guest);
+        $carrierId = (int) ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()?->getId();
+        $cart->setDeliveryModuleId($carrierId)->save($this->getPropelConnection());
+        $address->setAddress1('2 avenue des Tests')->save($this->getPropelConnection());
+
+        $this->client->request('GET', '/checkout/delivery');
+
+        self::assertSame('2 avenue des Tests', $this->deliveryCopyOf($guest)?->getAddress1());
+        CartTableMap::clearInstancePool();
+        self::assertSame($carrierId, (int) CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'A new street took away the carrier.');
+    }
+
     public function testTheDeliveryStepListensToTheSavedAddress(): void
     {
         $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
