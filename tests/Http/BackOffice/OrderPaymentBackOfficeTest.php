@@ -380,14 +380,36 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertCount(1, $this->sheet($order)->filter('[data-testid="order-payment-capture-once-help"]'));
     }
 
-    public function testOnceASingleCaptureWasAskedTheSheetOffersNoOtherAndLetsTheOrderBeCancelled(): void
+    public function testWhileASingleCaptureWaitsForItsAnswerTheOrderIsNotCancelled(): void
     {
-        // The provider lets the rest go with the capture: nothing is left to capture, nor to
-        // release, so cancelling no longer needs the capture right.
+        // The capture goes through whatever the order becomes: the buyer would be charged on a
+        // cancelled order. Even the capture right does not cancel it; it is refunded once taken.
         DeferredCapturePaymentModule::$capturesOnce = true;
         $order = $this->authorizedOrder(120);
         DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ONCE');
         $this->getService(PaymentCaptureService::class)->capture($order, 40.0);
+        $this->loginAs($this->factory->admin());
+
+        $crawler = $this->sheet($order);
+        $cancelledId = (int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId();
+
+        self::assertCount(0, $crawler->filter('[data-testid="order-payment-capture-btn"]'), 'No second capture.');
+        self::assertCount(0, $crawler->filter('[data-testid="order-cancel-btn"]'));
+
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status', ['_token' => $this->tokenOf($crawler), 'status_id' => $cancelledId]);
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('cancelling the order would not stop it', $crawler->text());
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
+    public function testOnceASingleCaptureIsTakenCancellingNeedsNoCaptureRight(): void
+    {
+        // The provider let the rest go with the capture: nothing is left to release.
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        $order = $this->authorizedOrder(120);
+        $this->getService(PaymentCaptureService::class)->capture($order, 40.0);
+        $this->recorder->recordVoid($order, 'AUTH-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
         $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
 
         $crawler = $this->sheet($order);

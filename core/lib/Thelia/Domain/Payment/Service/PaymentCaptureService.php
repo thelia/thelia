@@ -190,7 +190,9 @@ final readonly class PaymentCaptureService
         return $this->moduleLocator->forOrder($order, function () use ($order): string {
             try {
                 $module = $this->moduleLocator->paymentModuleOf($order);
-            } catch (\Throwable) {
+            } catch (\Throwable $throwable) {
+                // Read on the totals alone, as for a module that captures in several steps.
+                Tlog::getInstance()->warning(\sprintf('The payment module of order %s cannot be instantiated: %s', (string) $order->getRef(), $throwable->getMessage()));
                 $module = null;
             }
 
@@ -207,7 +209,9 @@ final readonly class PaymentCaptureService
         return $this->moduleLocator->forOrder($order, function () use ($order): bool {
             try {
                 $module = $this->moduleLocator->paymentModuleOf($order);
-            } catch (\Throwable) {
+            } catch (\Throwable $throwable) {
+                Tlog::getInstance()->warning(\sprintf('The payment module of order %s cannot be instantiated: %s', (string) $order->getRef(), $throwable->getMessage()));
+
                 return false;
             }
 
