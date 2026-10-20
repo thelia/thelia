@@ -16,6 +16,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 use Thelia\Model\Map\OrderTableMap;
@@ -174,6 +175,26 @@ class OrderQuery extends BaseOrderQuery
             ->filterByCreatedAt(\sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(\sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
+    }
+
+    /**
+     * Locks the order row by its primary key until the end of the transaction, and reads its
+     * status under the lock. Meant as the first statement of the transaction, before any
+     * plain read, since the read view of InnoDB freezes at the first one: what is read
+     * afterwards is what another request committed before this lock was granted.
+     *
+     * @return int|null the status stored, as read under the lock; null when the order is gone
+     */
+    public function lockStatusIdForUpdate(int $orderId, ConnectionInterface $connection): ?int
+    {
+        $statement = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :orderId FOR UPDATE');
+        $statement->bindValue(':orderId', $orderId, \PDO::PARAM_INT);
+        $statement->execute();
+        $statusId = $statement->fetchColumn();
+        $statement->closeCursor();
+
+        // The statement wrapper of Propel answers an empty string for no row at all.
+        return null === $statusId || false === $statusId || '' === $statusId ? null : (int) $statusId;
     }
 }
 

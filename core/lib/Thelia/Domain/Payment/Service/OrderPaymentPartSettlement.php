@@ -33,6 +33,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderPaymentPart;
 use Thelia\Model\OrderPaymentPartQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\InstantPaymentModuleInterface;
@@ -650,14 +651,9 @@ final readonly class OrderPaymentPartSettlement
      */
     private function lockTheOrder(int $orderId, ConnectionInterface $connection): ?OrderStatus
     {
-        $lockTheOrder = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :orderId FOR UPDATE');
-        $lockTheOrder->bindValue(':orderId', $orderId, \PDO::PARAM_INT);
-        $lockTheOrder->execute();
-        $statusId = $lockTheOrder->fetchColumn();
-        $lockTheOrder->closeCursor();
+        $statusId = OrderQuery::create()->lockStatusIdForUpdate($orderId, $connection);
 
-        // The statement wrapper of Propel answers an empty string for no row at all.
-        return null === $statusId || '' === $statusId ? null : OrderStatusQuery::create()->findPk((int) $statusId, $connection);
+        return null === $statusId ? null : OrderStatusQuery::create()->findPk($statusId, $connection);
     }
 
     /**

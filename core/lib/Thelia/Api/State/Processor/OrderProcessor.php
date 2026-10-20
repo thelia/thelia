@@ -16,7 +16,6 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -68,7 +67,10 @@ final readonly class OrderProcessor implements ProcessorInterface
         $event = null;
 
         try {
-            $lockedStatusId = $this->lockTheOrder($connection, (int) $uriVariables['id']) ?? throw new NotFoundHttpException('No such order.');
+            // The first statement of the transaction: the listeners of the status event (the
+            // release of the payment parts asks the modules to give back what they hold) then
+            // read what another request committed before the lock was granted.
+            $lockedStatusId = OrderQuery::create()->lockStatusIdForUpdate((int) $uriVariables['id'], $connection) ?? throw new NotFoundHttpException('No such order.');
             $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
 
             // The status written back is always the one read under the lock: the column itself is
@@ -103,27 +105,6 @@ final readonly class OrderProcessor implements ProcessorInterface
             propelModel: $event->getOrder(),
             context: $operation->getNormalizationContext() ?? [],
         );
-    }
-
-    /**
-     * Locks the order row by its primary key: the first statement of the transaction, before
-     * any plain read, since the read view of InnoDB freezes at the first one. The listeners
-     * of the status event (the release of the payment parts asks the modules to give back
-     * what they hold) then read what another request committed before this lock was granted,
-     * not what a view frozen earlier shows.
-     *
-     * @return int|null the status stored, as read under the lock; null when the order is gone
-     */
-    private function lockTheOrder(ConnectionInterface $connection, int $orderId): ?int
-    {
-        $statement = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :orderId FOR UPDATE');
-        $statement->bindValue(':orderId', $orderId, \PDO::PARAM_INT);
-        $statement->execute();
-        $statusId = $statement->fetchColumn();
-        $statement->closeCursor();
-
-        // The statement wrapper of Propel answers an empty string for no row at all.
-        return null === $statusId || '' === $statusId ? null : (int) $statusId;
     }
 
     /**
