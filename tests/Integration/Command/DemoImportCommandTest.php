@@ -27,6 +27,7 @@ use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Test\IntegrationTestCase;
 
 final class DemoImportCommandTest extends IntegrationTestCase
@@ -71,6 +72,17 @@ final class DemoImportCommandTest extends IntegrationTestCase
 
         self::assertSame($firstProducts, ProductQuery::create()->count(), 'product count is stable across reruns');
         self::assertSame($firstOrders, OrderQuery::create()->count(), 'order count is stable across reruns');
+    }
+
+    public function testReimportDoesNotLeaveOrphanedRewritingUrls(): void
+    {
+        $this->runImport();
+        $firstUrls = RewritingUrlQuery::create()->count();
+        self::assertGreaterThan(0, $firstUrls, 'the demo catalogue is routed by rewriting urls');
+
+        $this->runImport();
+
+        self::assertSame($firstUrls, RewritingUrlQuery::create()->count(), 'a reset import starts from an empty rewriting table');
     }
 
     /**
@@ -120,12 +132,12 @@ final class DemoImportCommandTest extends IntegrationTestCase
         self::assertSame($firstAttachments, AreaDeliveryModuleQuery::create()->count(), 'carrier attachments are stable across reruns');
     }
 
-    private function runImport(): void
+    private function runImport(bool $withImages = false): void
     {
         $tester = new CommandTester(
             (new Application(self::$kernel))->find('thelia:demo:import'),
         );
-        $tester->execute(['--reset' => true, '--skip-images' => true]);
+        $tester->execute(['--reset' => true] + ($withImages ? [] : ['--skip-images' => true]));
 
         self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
     }

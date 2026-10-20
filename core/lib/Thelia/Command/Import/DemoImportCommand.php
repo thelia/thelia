@@ -62,6 +62,7 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\SaleProductQuery;
 use Thelia\Model\SaleQuery;
 use Thelia\Tools\URL;
@@ -220,6 +221,8 @@ class DemoImportCommand extends Command
 
         CartItemQuery::create()->deleteAll($connection);
         CartQuery::create()->deleteAll($connection);
+
+        RewritingUrlQuery::create()->deleteAll($connection);
 
         $output->writeln('Tables cleaned');
     }
