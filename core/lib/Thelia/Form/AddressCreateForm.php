@@ -120,8 +120,8 @@ class AddressCreateForm extends FirewallForm
                 ],
                 'required' => false,
             ])
-            // Required as soon as `company` is filled - the Callback constraints hold that
-            // rule, so `required` stays false and the browser never blocks a private buyer.
+            // Optional: an empty value is accepted. The Callback constraints only check the
+            // format of a value that was typed, once `company` is filled.
             ->add('siret', TextType::class, [
                 'constraints' => [
                     new Callback($this->verifySiret(...)),
