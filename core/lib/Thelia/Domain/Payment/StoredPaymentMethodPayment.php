@@ -25,6 +25,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CustomerPaymentMethod;
 use Thelia\Model\Order;
+use Thelia\Module\PaymentModuleInterface;
 use Thelia\Module\PaymentModuleWithStoredMethodsInterface;
 
 /**
@@ -87,13 +88,19 @@ final readonly class StoredPaymentMethodPayment
     /**
      * The method chosen on a cart about to be ordered, when it can still pay with the
      * payment module the order is placed with; null when MODULE_PAY would pay with a new
-     * one, and so spend no slot of the allowance. Nothing is logged: no order exists yet.
+     * one, and so spend no slot of the allowance: the same answers as methodChosenFor(),
+     * a module that does not keep methods, or no longer offers them, included. Nothing is
+     * logged: no order exists yet.
      */
-    public function usableMethodChosenOn(Cart $cart, int $paymentModuleId): ?CustomerPaymentMethod
+    public function usableMethodChosenOn(Cart $cart, PaymentModuleInterface $paymentModule, int $paymentModuleId): ?CustomerPaymentMethod
     {
         $chosenMethodId = $cart->getCustomerPaymentMethodId();
 
         if (null === $chosenMethodId) {
+            return null;
+        }
+
+        if (!$paymentModule instanceof PaymentModuleWithStoredMethodsInterface || !$paymentModule->supportsStoredMethods()) {
             return null;
         }
 

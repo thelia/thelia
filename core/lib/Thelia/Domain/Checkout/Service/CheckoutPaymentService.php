@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -42,8 +43,10 @@ use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
+use Thelia\Module\PaymentModuleInterface;
 
 readonly class CheckoutPaymentService
 {
@@ -59,6 +62,7 @@ readonly class CheckoutPaymentService
         private StoredPaymentMethodPayment $storedPaymentMethodPayment,
         private OrderPaymentComposer $orderPaymentComposer,
         private OrderPaymentPartSettlement $orderPaymentPartSettlement,
+        private ContainerInterface $container,
     ) {
     }
 
@@ -279,8 +283,9 @@ readonly class CheckoutPaymentService
      *
      * Only a placement MODULE_PAY will pay with the stored method is asked: one the
      * instant means pay in full never reaches the module that keeps the method, and a
-     * method that can no longer pay (expired, forgotten, of another module) leaves the
-     * order to be paid with a new one. Neither spends a slot, so neither is refused.
+     * method that can no longer pay (expired, forgotten, of another module, or kept by a
+     * module that no longer offers stored methods) leaves the order to be paid with a new
+     * one. Neither spends a slot, so neither is refused.
      *
      * @throws StoredMethodPaymentRateLimitedException
      */
@@ -290,12 +295,27 @@ readonly class CheckoutPaymentService
             return;
         }
 
-        if (null === $this->storedPaymentMethodPayment->usableMethodChosenOn($cart, $paymentModuleId)) {
+        $paymentModule = $this->paymentModuleInstance($paymentModuleId);
+
+        if (null === $paymentModule || null === $this->storedPaymentMethodPayment->usableMethodChosenOn($cart, $paymentModule, $paymentModuleId)) {
             return;
         }
 
         if ($this->storedPaymentMethodPayment->customerHasExhaustedTheirAllowance((int) $cart->getCustomerId())) {
             throw new StoredMethodPaymentRateLimitedException();
+        }
+    }
+
+    /**
+     * The instance MODULE_PAY calls (see Action\Module::pay()). A module that cannot be
+     * resolved is not asked to pay with a stored method either: there is nothing to refuse.
+     */
+    private function paymentModuleInstance(int $paymentModuleId): ?PaymentModuleInterface
+    {
+        try {
+            return ModuleQuery::create()->findPk($paymentModuleId)?->getPaymentModuleInstance($this->container);
+        } catch (\InvalidArgumentException) {
+            return null;
         }
     }
 
