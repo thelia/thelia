@@ -94,7 +94,9 @@ knows what it has to check:
   replaced. Each of these reads the line afresh under the lock, and
   `markOutcomeUnknown()` only ever annotates a line still pending: a stale object,
   or one whose save failed — which Propel would then silently ignore — is never
-  written through. A reference holds at most 100 characters.
+  written through. A reference holds at most 100 characters, and no line break,
+  control or formatting character (it is refused, never altered, and the refusal
+  does not repeat it): it reaches the logs and the order sheet.
 
 **Pending lines reserve.** `PaymentTransactionTotalsReader` adds up the
 succeeded lines and, apart, the pending ones. A pending capture is not reported
@@ -213,10 +215,12 @@ published module implements would break them all.
   worker holds past the wait leaves the line pending, annotated `journal_busy`
   with the provider's answer, for the notification to settle. A module that
   answers succeeded without the provider reference leaves it pending as well,
-  annotated `missing_reference`, and one whose reference is longer than the
-  100 characters the journal holds, annotated `invalid_reference`, for the
-  merchant to settle by hand; a refusal with such a reference is settled as
-  failed without it. A failure of the database while the status is read under
+  annotated `missing_reference`, and one whose reference the journal cannot hold
+  (too long, or carrying a control character), annotated `invalid_reference`, for
+  the merchant to settle by hand; a refusal with such a reference is settled as
+  failed without it. A line settled another way while the module was called (a
+  notification, the merchant recording it by hand) keeps that outcome, and the
+  late answer is logged. A failure of the database while the status is read under
   the row lock rolls the transaction back, a refusal closes it as it is.
 
 `Thelia\Domain\Payment\Service\PaymentCaptureService::capture(Order, ?float)`
