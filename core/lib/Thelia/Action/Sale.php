@@ -498,6 +498,17 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 ->filterByActive(true)
                 ->update(['Active' => 0], $con);
 
+            // The products the sales discounted get their promo price back to the
+            // catalog price, as when a single sale is taken off them: the promo price
+            // is served to every visitor, flagged or not.
+            $con->exec(
+                'UPDATE `product_price` `pp`'
+                .' INNER JOIN `product_sale_elements` `pse` ON `pse`.`id` = `pp`.`product_sale_elements_id`'
+                .' SET `pp`.`promo_price` = `pp`.`price`'
+                .' WHERE `pse`.`promo` = 1'
+                .' AND `pse`.`product_id` IN (SELECT `product_id` FROM `sale_product`)',
+            );
+
             // Reset all sale status on PSE
             ProductSaleElementsQuery::create()
                 ->filterByPromo(true)
