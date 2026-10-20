@@ -16,16 +16,28 @@ namespace Thelia\Core\Template\Parser;
 
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 
+/**
+ * The parser picked last is kept statically, for the callers that read it through
+ * getCurrentParser() without the service at hand. PHP-FPM throws it away with the
+ * request, a process serving several requests in a row (a worker, a test sending
+ * several requests through one kernel) does not: it is forgotten when a main request
+ * begins and when the kernel resets its services, so a request never renders with
+ * the parser the previous one left.
+ */
 #[AsAlias(id: 'thelia.parser.resolver', public: true)]
-class ParserResolver
+class ParserResolver implements ResetInterface
 {
     private static ?ParserInterface $currentParser = null;
 
@@ -129,6 +141,19 @@ class ParserResolver
     public static function getCurrentParser(): ?ParserInterface
     {
         return self::$currentParser;
+    }
+
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 4096)]
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        if ($event->isMainRequest()) {
+            self::$currentParser = null;
+        }
+    }
+
+    public function reset(): void
+    {
+        self::$currentParser = null;
     }
 
     public function getDefaultParser(): ParserInterface
