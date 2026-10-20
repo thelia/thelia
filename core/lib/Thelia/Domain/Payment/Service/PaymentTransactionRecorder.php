@@ -392,14 +392,6 @@ final readonly class PaymentTransactionRecorder
     }
 
     /**
-     * Runs $work with the journal of the order locked, so that what it reads still holds
-     * when it writes.
-     *
-     * @template T
-     *
-     * @return T
-     */
-    /**
      * The code a module or the core gives a line, on one line and cut to what the column
      * holds: in a strict SQL mode, a longer one would fail the write and leave the line as
      * it was.
@@ -428,6 +420,16 @@ final readonly class PaymentTransactionRecorder
         return mb_substr(TerminalText::withoutControlCharacters($errorMessage), 0, OrderPaymentTransaction::ERROR_MESSAGE_MAX_LENGTH);
     }
 
+    /**
+     * Runs $work with the journal of the order locked, so that what it reads still holds
+     * when it writes.
+     *
+     * @template T
+     *
+     * @param callable(): T $work
+     *
+     * @return T
+     */
     public function withOrderLock(Order $order, callable $work): mixed
     {
         return $this->locked((int) $order->getId(), $work);
