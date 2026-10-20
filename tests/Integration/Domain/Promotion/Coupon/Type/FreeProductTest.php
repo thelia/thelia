@@ -234,6 +234,37 @@ final class FreeProductTest extends ActionIntegrationPromotionTestCase
         self::assertSame(round($this->taxedUnitPrice($giftLine), 2), (float) $cart->getDiscount());
     }
 
+    /**
+     * A gift out of stock is not offered: the product that triggers it still goes
+     * to the cart, and the customer is not refused for a gift they did not ask for.
+     */
+    public function testAGiftOutOfStockIsNotAddedAndTheTriggerStillIs(): void
+    {
+        $trigger = $this->product();
+        $gift = $this->product(['basePrice' => 7.0, 'baseQuantity' => 0]);
+        $this->automaticPromotion(
+            type: 'thelia.coupon.type.free_product',
+            effects: [
+                FreeProduct::PRODUCTS_LIST => [$trigger->getId()],
+                FreeProduct::CATEGORY_ID => 0,
+                FreeProduct::OFFERED_PRODUCT_ID => $gift->getId(),
+                FreeProduct::OFFERED_CATEGORY_ID => 0,
+            ],
+            conditions: $this->atLeastLines(1),
+        );
+        $cart = $this->newEmptyCart();
+
+        $this->addItem($cart, $trigger);
+
+        self::assertSame(1.0, (float) $this->singleLineOf($cart, $trigger)->getQuantity());
+        self::assertSame([], array_values(array_filter(
+            $this->linesOf($cart),
+            static fn (CartItem $line): bool => $line->getProductId() === $gift->getId(),
+        )), 'The gift out of stock is not in the cart.');
+        $cart->reload();
+        self::assertSame(0.0, (float) $cart->getDiscount());
+    }
+
     private function refusingTheNextCartAddition(callable $action): void
     {
         $listener = static function (): void {

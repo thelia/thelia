@@ -110,6 +110,7 @@
 - The prod container of a checkout of this repository builds with the TheliaCMS module active. The page builder bundle the module depends on was registered for the dev and test environments only; it is now registered in every environment whenever it is installed, and still left out of an install without the development packages.
 - A new cart line beyond the stock is refused with `NotEnoughStockException` wherever it comes from (`CART_ADDITEM`, `CartFacade::addItem()`, a module), unless the shop does not check the stock or the product is virtual. Only the `thelia_cart_add` form checked it, so a line added another way could hold a sale element out of stock.
 - An API read joining many translatable relations no longer fails with "MariaDB can only use 61 tables in a join" once five or more languages are active, as `/api/front/account/orders/{id}` did. The read still joins the translations of every active language while the query stays under the limit; past it, the relations reached last are read without their translation joins and their translations are loaded from the models, so the payload is unchanged.
+- A free product coupon whose gift is out of stock no longer offers it: the product that triggers it is still added to the cart, without an error, and the gift is tried again on the next evaluation.
 
 ## Checkout and payment
 
