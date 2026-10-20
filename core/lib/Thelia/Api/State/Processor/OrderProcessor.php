@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
+use Thelia\Domain\Payment\Exception\CancellationWaitsForCaptureException;
 use Thelia\Domain\Payment\Service\AuthorizedOrderCancellationGuard;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
@@ -99,6 +100,10 @@ final readonly class OrderProcessor implements ProcessorInterface
             $connection->rollBack();
 
             throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+        } catch (CancellationWaitsForCaptureException $exception) {
+            $connection->rollBack();
+
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         } catch (\Throwable $throwable) {
             $connection->rollBack();
 
@@ -122,6 +127,8 @@ final readonly class OrderProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         } catch (CancellationNeedsCaptureRightException $exception) {
             throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+        } catch (CancellationWaitsForCaptureException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 
         return $this->transformer->modelToResource(

@@ -180,13 +180,17 @@ published module implements would break them all.
   it, is said so through `Thelia\Module\PaymentModuleCapturingOnceInterface`
   (`capturesOnce()`): once a capture is asked, pending or taken,
   `PaymentCaptureService::leftToCapture()` reads nothing left, so the back office,
-  the admin API (`remainingToCapture`) and the capture service offer no other, and
-  cancelling the order no longer needs the capture right.
+  the admin API (`remainingToCapture`) and the capture service offer no other. While
+  that capture waits for its answer no administrator cancels the order
+  (`CancellationWaitsForCaptureException`, a 422 on the admin API): it would go
+  through on a cancelled order. Once it is taken, cancelling no longer needs the
+  capture right, and the release the core asks must only let the rest go.
 - The module is called through `PaymentModuleLocator`: the instance the
   container built, so `getContainer()` works in it. A deactivated module is not
   called: its services are no longer compiled, and the refusal names it.
 - Every call of the core into the module about an order
-  (`supportsDeferredCapture()`, `capture()`, `voidAuthorization()`,
+  (`supportsDeferredCapture()`, `capturesOnce()`, `cancelsOrderOnRelease()`,
+  `capture()`, `voidAuthorization()`,
   `managesOrderStatus()`, `manageStockOnCreation()`), and what the journal writes
   and announces around a capture or a release, runs with the configuration of
   the sale unit the order was placed on (`PaymentModuleLocator::forOrder()`),
