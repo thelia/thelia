@@ -1159,4 +1159,32 @@ CREATE TABLE IF NOT EXISTS `product_excluded_delivery_module`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- Country titles the seed left out or wrote in French. The first statement fills a title
+-- that is NULL or empty and keeps one the merchant typed; the second rewrites the French
+-- wording the seed used to put in the English and Spanish rows, and only a title still
+-- equal to it, so a title edited since stays as it is.
+INSERT INTO `country_i18n` (`id`, `locale`, `title`)
+SELECT `country`.`id`, `missing`.`locale`, `missing`.`title`
+FROM `country`
+INNER JOIN (
+    SELECT 'UG' AS `isoalpha2`, 'es_ES' AS `locale`, 'Uganda' AS `title`
+    UNION ALL SELECT 'US', 'es_ES', 'Estados Unidos'
+    UNION ALL SELECT 'CA', 'es_ES', 'Canadá'
+) AS `missing` ON `missing`.`isoalpha2` = `country`.`isoalpha2`
+ON DUPLICATE KEY UPDATE `title` = IF(`country_i18n`.`title` IS NULL OR `country_i18n`.`title` = '', VALUES(`title`), `country_i18n`.`title`);
+
+UPDATE `country_i18n`
+INNER JOIN `country` ON `country`.`id` = `country_i18n`.`id`
+INNER JOIN (
+    SELECT 'GF' AS `isoalpha2`, 'en_US' AS `locale`, 'Guyane Française' AS `old_title`, 'French Guiana' AS `title`
+    UNION ALL SELECT 'RE', 'en_US', 'Réunion(La)', 'Réunion'
+    UNION ALL SELECT 'NC', 'en_US', 'Nouvelle-Calédonie', 'New Caledonia'
+    UNION ALL SELECT 'PF', 'en_US', 'Polynésie française', 'French Polynesia'
+    UNION ALL SELECT 'RE', 'es_ES', 'Réunion(la)', 'Reunión'
+    UNION ALL SELECT 'NC', 'es_ES', 'Nouvelle-Calédonie', 'Nueva Caledonia'
+) AS `wording` ON `wording`.`isoalpha2` = `country`.`isoalpha2`
+    AND `wording`.`locale` = `country_i18n`.`locale`
+    AND `wording`.`old_title` = `country_i18n`.`title`
+SET `country_i18n`.`title` = `wording`.`title`;
+
 SET FOREIGN_KEY_CHECKS = 1;
