@@ -79,7 +79,7 @@ knows what it has to check:
   valid capture — an order that costs nothing is paid without taking anything.
 - `recordRefund()` refuses an amount above what was taken and not yet given
   back, refunds still pending counted as given. The refund itself, towards the
-  provider, belongs to another feature; this is only the line.
+  provider, is `PaymentRefundService`'s, see Refunds below; this is only the line.
 - `recordVoid()` writes what the authorization still held, captures still
   pending set aside, so the totals read zero left afterwards. A void the journal
   already knows — by its reference, or as the one pending void still waiting for
@@ -412,7 +412,9 @@ a right of its own, `admin.order.payment-capture`
 (`AdminResources::ORDER_PAYMENT_CAPTURE`), granted profile by profile, the way
 forcing a status transition already is. The same right is asked to cancel an
 order whose authorization still holds an amount, and to record by hand the
-outcome of a pending line.
+outcome of a pending authorization, capture or release. Refunding is a right of
+its own, `admin.order.payment-refund`, which also records by hand the outcome of
+a pending refund; the capture right does not.
 
 ## Security notes
 
@@ -474,7 +476,8 @@ module supports deferred capture and at least a smallest coin is left; the
 dialog is prefilled with the remainder rounded down to it.
 
 A pending line the provider never confirmed shows, to an administrator holding
-the capture right, a form to record the outcome read in the provider's back
+the right that made the movement (the refund right for a refund, the capture
+right for any other line), a form to record the outcome read in the provider's back
 office, with its reference: `OrderController::settlePaymentTransaction()`
 answers `POST /admin/order/update/{order_id}/payment-transaction/{id}/settle`
 through the `ORDER_PAYMENT_TRANSACTION_SETTLE` event
@@ -503,11 +506,13 @@ when it wraps a technical one.
 
 A fresh install creates the table and seeds the status and the right
 (`setup/thelia.sql`, `setup/insert.sql`). An installed shop gets them from
-`setup/update/sql/3.3.0.sql`: the table empty, the status appended after the
-existing ones, the right with its titles. Orders placed before the update keep
-their transaction reference and show no movement until their next payment
-event; the demonstration database has no journal either, and the screens must
-render an empty one without error.
+`setup/update/sql/3.3.0.sql`: the table, the status appended after the
+existing ones, the rights with their titles. `setup/update/php/3.3.0.php` then
+writes for each order paid, processing or sent (or in a status equivalent to one
+of them) without a journal the capture it was paid with, so that what it
+collected can be refunded; the other orders keep their transaction reference and
+show no movement until their next payment event. The demonstration database has
+no journal either, and the screens must render an empty one without error.
 
 ## Test suites
 
