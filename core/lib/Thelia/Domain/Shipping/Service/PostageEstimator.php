@@ -56,6 +56,12 @@ class PostageEstimator
      * address is in the country estimated for: an estimate never offers a carrier the
      * checkout will refuse for that address.
      *
+     * @param string|null $zipCode the postal code the postal code rules of the zones judge;
+     *                             null means the postal code of the cart's delivery address
+     *                             when that address is in $country, and no postal code
+     *                             otherwise. There is no way to ask for "no postal code" for
+     *                             a cart whose address is in the country.
+     *
      * @throws PropelException
      */
     public function estimatePostageForCountry(
