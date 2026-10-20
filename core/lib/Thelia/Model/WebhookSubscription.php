@@ -25,4 +25,13 @@ use Thelia\Model\Base\WebhookSubscription as BaseWebhookSubscription;
  */
 class WebhookSubscription extends BaseWebhookSubscription
 {
+    /**
+     * @return list<string>
+     */
+    public function getEventNames(): array
+    {
+        $names = json_decode((string) $this->getEvents(), true, 512, \JSON_THROW_ON_ERROR);
+
+        return \is_array($names) ? array_values(array_filter($names, \is_string(...))) : [];
+    }
 }

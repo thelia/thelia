@@ -46,6 +46,8 @@ final class AdminCollectionContractTest extends ApiTestCase
         yield 'modules' => ['/api/admin/modules'];
         yield 'templates' => ['/api/admin/templates'];
         yield 'configs' => ['/api/admin/configs'];
+        yield 'webhook_subscriptions' => ['/api/admin/webhook-subscriptions'];
+        yield 'webhook_deliveries' => ['/api/admin/webhook-deliveries'];
         // states: skipped — API Platform returns 404 "Invalid identifier
         // value or configuration" (StateProvider config issue, not test-related)
         yield 'customer_titles' => ['/api/admin/customer_titles'];
