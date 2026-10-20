@@ -25,6 +25,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
@@ -373,6 +374,34 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertSame(1, $this->countStatementsOn('area_delivery_module', static fn () => self::assertCount(1, $facade->listValidMethods($lyon))), 'The carrier is judged once.');
     }
 
+    public function testTheDeliveryLoopFollowsThePostalCodeOfItsAddress(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $corsica = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
+        $lyon = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($lyon);
+
+        self::assertNotContains((int) $this->module->getId(), $this->deliveryLoopModuleIds($cart, ['address' => $corsica->getId()]));
+        self::assertContains((int) $this->module->getId(), $this->deliveryLoopModuleIds($cart, ['address' => $lyon->getId()]));
+    }
+
+    public function testTheDeliveryLoopReadsNoPostalCodeForAnotherCountryThanTheOneOfItsAddress(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $abroad = $this->newCountry('XT', 'XTX', '993');
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $address = $this->factory->address($customer, $abroad, null, ['zipcode' => '20090']);
+
+        self::assertContains(
+            (int) $this->module->getId(),
+            $this->deliveryLoopModuleIds($this->customerCartShippedTo($address), ['address' => $address->getId(), 'country' => $this->country->getId()]),
+            'The postal code of an address abroad says nothing of the country listed.',
+        );
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -509,6 +538,32 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $this->factory->cartItem($cart, $product);
 
         return $cart;
+    }
+
+    /**
+     * The carriers the `delivery` loop lists for the cart of the session.
+     *
+     * @param array<string, mixed> $arguments
+     *
+     * @return list<int>
+     */
+    private function deliveryLoopModuleIds(Cart $cart, array $arguments): array
+    {
+        $session = $this->getService(RequestStack::class)->getMainRequest()?->getSession();
+        self::assertInstanceOf(Session::class, $session);
+        $session->setSessionCart($cart);
+
+        try {
+            $ids = [];
+
+            foreach ($this->getService(LoopExecutor::class)->execute('delivery', $arguments) as $row) {
+                $ids[] = (int) $row->get('ID');
+            }
+
+            return $ids;
+        } finally {
+            $session->setSessionCart(null);
+        }
     }
 
     /**
