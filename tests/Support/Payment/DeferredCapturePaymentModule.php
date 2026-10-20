@@ -74,8 +74,17 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         return true;
     }
 
+    public function manageStockOnCreation(): bool
+    {
+        self::$scopes[] = ['call' => 'manageStockOnCreation', 'saleUnit' => SaleUnitConfigScope::current()];
+
+        return parent::manageStockOnCreation();
+    }
+
     public function managesOrderStatus(): bool
     {
+        self::$scopes[] = ['call' => 'managesOrderStatus', 'saleUnit' => SaleUnitConfigScope::current()];
+
         // A real module reaches its services through the container.
         $this->getContainer();
 

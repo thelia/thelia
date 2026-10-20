@@ -27,6 +27,7 @@ use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentAmount;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
@@ -742,19 +743,23 @@ class Order extends BaseOrder
      */
     public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher): bool
     {
-        $paymentModule = $this->getPaymentModuleInstance();
+        // Asked from a status change of the back office or the admin API too: the module and
+        // its listeners read the configuration of the sale unit the order was placed on.
+        return SaleUnitConfigScope::runFor($this->getSaleUnitId(), function () use ($dispatcher): bool {
+            $paymentModule = $this->getPaymentModuleInstance();
 
-        $event = new ManageStockOnCreationEvent($paymentModule);
+            $event = new ManageStockOnCreationEvent($paymentModule);
 
-        $dispatcher->dispatch(
-            $event,
-            TheliaEvents::getModuleEvent(
-                TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
-                $paymentModule->getCode(),
-            ),
-        );
+            $dispatcher->dispatch(
+                $event,
+                TheliaEvents::getModuleEvent(
+                    TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
+                    $paymentModule->getCode(),
+                ),
+            );
 
-        return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+            return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+        });
     }
 
     protected function getCart(): ?Cart
