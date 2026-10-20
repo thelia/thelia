@@ -25,11 +25,14 @@ use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
+use Thelia\Domain\Shipping\DestinationRestriction\ProductDestinationRestrictionReader;
 use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\DestinationRestriction;
+use Thelia\Model\Lang;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
 use Thelia\Model\StateQuery;
@@ -57,6 +60,15 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         $this->factory = $this->createFixtureFactory();
         [$this->refused, $this->served] = CountryQuery::create()->filterByHasStates(0)->orderById()->limit(2)->find()->getData();
         $this->getService(DestinationRestrictionChecker::class)->reset();
+    }
+
+    protected function tearDown(): void
+    {
+        // The config cache is static: it would carry the language setting of a test
+        // past the rollback, into the rest of the suite.
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
     }
 
     public function testAProductIsRefusedToACountryItsGroupRefuses(): void
@@ -205,6 +217,55 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         $this->getService(CartGuard::class)->checkValidDelivery($cart);
     }
 
+    public function testAReasonAndATitleWrittenInTheDefaultLanguageOnlyNameTheProductInAnotherOneWhenTheShopFallsBack(): void
+    {
+        [$defaultLocale, $otherLocale] = $this->defaultAndOtherLocale();
+        $this->setTranslationFallback(Lang::REPLACE_BY_DEFAULT_LANGUAGE);
+        $product = $this->product('Calvados', $defaultLocale);
+        $this->group('alcohol', DestinationRestriction::MODE_DENY, [$this->refused], [$product], 'Alcohol licence', $defaultLocale);
+
+        $lines = $this->checker()->violationsForProducts([$product->getId()], new Destination($this->refused->getId()), null, $otherLocale);
+
+        self::assertCount(1, $lines);
+        self::assertSame('Calvados (Alcohol licence)', $lines[0]->label());
+    }
+
+    public function testAShopKeptToTheRequestedLanguageNamesTheProductByItsReferenceWithoutReason(): void
+    {
+        [$defaultLocale, $otherLocale] = $this->defaultAndOtherLocale();
+        $this->setTranslationFallback(Lang::STRICTLY_USE_REQUESTED_LANGUAGE);
+        $product = $this->product('Calvados', $defaultLocale);
+        $this->group('alcohol', DestinationRestriction::MODE_DENY, [$this->refused], [$product], 'Alcohol licence', $defaultLocale);
+
+        $lines = $this->checker()->violationsForProducts([$product->getId()], new Destination($this->refused->getId()), null, $otherLocale);
+
+        self::assertCount(1, $lines);
+        self::assertSame($product->getRef(), $lines[0]->label());
+    }
+
+    public function testTheProductPageReadsTheReasonAndTheCountryNamesInTheDefaultLanguageWhenTheShopFallsBack(): void
+    {
+        [$defaultLocale, $otherLocale] = $this->defaultAndOtherLocale();
+        $country = $this->factory->country(['isocode' => '998', 'isoalpha2' => 'QZ', 'isoalpha3' => 'QZQ']);
+        $country->setLocale($defaultLocale)->setTitle('Atlantis')->save();
+        $product = $this->product('Calvados');
+        $this->group('alcohol', DestinationRestriction::MODE_DENY, [$country], [$product], 'Alcohol licence', $defaultLocale);
+        $reader = $this->getService(ProductDestinationRestrictionReader::class);
+
+        $this->setTranslationFallback(Lang::REPLACE_BY_DEFAULT_LANGUAGE);
+        $groups = $reader->forProduct((int) $product->getId(), $otherLocale);
+
+        self::assertCount(1, $groups);
+        self::assertSame('Alcohol licence', $groups[0]['reason']);
+        self::assertSame(['Atlantis'], $groups[0]['destinations']);
+
+        $this->setTranslationFallback(Lang::STRICTLY_USE_REQUESTED_LANGUAGE);
+        $groups = $reader->forProduct((int) $product->getId(), $otherLocale);
+
+        self::assertSame('', $groups[0]['reason']);
+        self::assertSame([(string) $country->getId()], $groups[0]['destinations']);
+    }
+
     private function checker(): DestinationRestrictionChecker
     {
         return $this->getService(DestinationRestrictionChecker::class);
@@ -215,18 +276,41 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         return $this->getService(DestinationRestrictionFacade::class);
     }
 
-    private function product(string $title): Product
+    private function product(string $title, string $locale = 'en_US'): Product
     {
-        return $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => $title]);
+        return $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => $title, 'locale' => $locale]);
+    }
+
+    /**
+     * @return array{string, string} the default locale of the shop, and another one
+     */
+    private function defaultAndOtherLocale(): array
+    {
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+
+        return [$defaultLocale, 'fr_FR' === $defaultLocale ? 'en_US' : 'fr_FR'];
+    }
+
+    private function setTranslationFallback(int $mode): void
+    {
+        ConfigQuery::write('default_lang_without_translation', (string) $mode);
+
+        $configs = [];
+
+        foreach (ConfigQuery::create()->find() as $config) {
+            $configs[$config->getName()] = $config->getValue();
+        }
+
+        ConfigQuery::initCache($configs);
     }
 
     /**
      * @param list<Country> $countries
      * @param list<Product> $products
      */
-    private function group(string $code, int $mode, array $countries, array $products, string $reason = ''): DestinationRestriction
+    private function group(string $code, int $mode, array $countries, array $products, string $reason = '', string $locale = 'en_US'): DestinationRestriction
     {
-        $group = $this->facade()->save(null, $code, $mode, true, ['en_US' => ['title' => ucfirst($code), 'reason' => $reason]]);
+        $group = $this->facade()->save(null, $code, $mode, true, [$locale => ['title' => ucfirst($code), 'reason' => $reason]]);
 
         foreach ($countries as $country) {
             $this->facade()->addDestination($group->getId(), (int) $country->getId());
