@@ -85,7 +85,8 @@ final class DestinationRestrictionChecker implements ResetInterface
             return [];
         }
 
-        // The active groups of these products, with their mode.
+        // The active groups of these products, with their mode, in the order the merchant
+        // set: when several groups refuse a product, the first one gives the reason.
         $groupsOfProduct = [];
         $modeOfGroup = [];
 
@@ -93,6 +94,8 @@ final class DestinationRestrictionChecker implements ResetInterface
             ->filterByProductId($productIds)
             ->useDestinationRestrictionQuery()
                 ->filterByActive(1)
+                ->orderByPosition()
+                ->orderById()
             ->endUse()
             ->select([ProductDestinationRestrictionTableMap::COL_PRODUCT_ID, ProductDestinationRestrictionTableMap::COL_DESTINATION_RESTRICTION_ID, DestinationRestrictionTableMap::COL_MODE])
             ->find() as $row) {
@@ -122,7 +125,7 @@ final class DestinationRestrictionChecker implements ResetInterface
             $virtual[(int) $row[ProductTableMap::COL_ID]] = 1 === (int) $row[ProductTableMap::COL_VIRTUAL];
         }
 
-        /** @var array<int, int> $refusingGroup product id => the first group that refuses it */
+        /** @var array<int, int> $refusingGroup product id => the first group, by position, that refuses it */
         $refusingGroup = [];
 
         foreach ($groupsOfProduct as $productId => $groupIds) {
