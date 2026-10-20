@@ -40,8 +40,15 @@ final class ProductsImporter extends AbstractDemoImporter
 
     public function import(DemoImportContext $context): void
     {
-        foreach ($this->readCsv($context->dataDir.'products.csv') as $data) {
+        $rows = iterator_to_array($this->readCsv($context->dataDir.'products.csv'), false);
+        $now = new \DateTimeImmutable();
+
+        foreach ($rows as $rank => $data) {
+            // One day apart, the last row being the newest: without it every
+            // product gets the second the import ran, and the "newest first" and
+            // "oldest first" sorts of a category cannot be told apart.
             $product = (new Product())
+                ->setCreatedAt($now->modify(\sprintf('-%d days', \count($rows) - $rank)))
                 ->setRef($data[0])
                 ->setVisible(1)
                 ->setTaxRuleId(1)
