@@ -219,6 +219,19 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertNull(SaleUnitConfigScope::current());
     }
 
+    public function testTheCommentSentToTheProviderIsOneLineOfVisibleText(): void
+    {
+        $order = $this->paidOrder(100);
+
+        $this->service->refund($order, 40.0, RefundReason::Goodwill, "  Parcel\r\ncame\u{202E}back\x07 ".str_repeat('x', 300)."\xFF");
+
+        $comment = DeferredCapturePaymentModule::$refundCalls[0]['comment'];
+        self::assertIsString($comment);
+        self::assertStringStartsWith('Parcel came?back? x', $comment);
+        self::assertSame(255, mb_strlen($comment));
+        self::assertTrue(mb_check_encoding($comment, 'UTF-8'));
+    }
+
     public function testACallThatGotNoAnswerLeavesTheRefundPending(): void
     {
         $order = $this->paidOrder(100);
