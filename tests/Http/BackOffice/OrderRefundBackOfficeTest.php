@@ -117,6 +117,46 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
     }
 
+    public function testAnAmountBeyondWhatTheJournalHoldsIsRefusedWithAMessage(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        $crawler = $this->postRefund($order, ['amount' => '99999999999', 'reason' => 'other']);
+
+        self::assertStringContainsString('9999999999.99', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls, 'Nothing is asked of the provider.');
+    }
+
+    public function testTheCommentOfARefundIsWrittenOnOneLineInTheAdministrationLog(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        $this->postRefund($order, ['amount' => '10', 'reason' => 'other', 'comment' => "Parcel\ncame back\x1B[31m ".str_repeat('x', 400)]);
+
+        $log = AdminLogQuery::create()->filterByMessage('%Payment refund of 10.00%', Criteria::LIKE)->findOne();
+        self::assertNotNull($log);
+        self::assertStringNotContainsString("\n", (string) $log->getMessage());
+        self::assertStringNotContainsString("\x1B", (string) $log->getMessage());
+        self::assertStringContainsString('Parcel came back', (string) $log->getMessage());
+        self::assertLessThan(400, mb_strlen((string) $log->getMessage()), 'The comment is cut.');
+    }
+
+    public function testARefundTheProviderRefusedWithTheCodeOfflineReadsAsARefusal(): void
+    {
+        // The provider's own code may be the word Thelia uses for a refund made outside it:
+        // only a refund that went through reads as one.
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentRefusedException::withProviderCode('Refund declined by the bank', 'offline');
+
+        $crawler = $this->postRefund($order, ['amount' => '10', 'reason' => 'other']);
+
+        $line = $crawler->filter('[data-testid="order-payment-line"][data-payment-type="refund"]');
+        self::assertStringContainsString('Refund declined by the bank', $line->filter('[data-testid="order-payment-line-error"]')->text(''));
+    }
+
     public function testAPartialRefundShowsWhatIsLeftAndASecondOneBeyondItIsRefused(): void
     {
         $this->loginAs($this->factory->admin());
