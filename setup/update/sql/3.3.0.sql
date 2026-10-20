@@ -1248,9 +1248,9 @@ CREATE TABLE IF NOT EXISTS `area_zip_code_rule`
 --
 -- One line per money movement (authorization, capture, refund, void) a payment
 -- module, an administrator or the shop made on an order. An installed shop
--- gets the table empty: its orders keep their transaction reference on
--- `order`.`transaction_ref` and show no movement until their next payment
--- event, which is what happened to them as far as the shop knows.
+-- gets the table empty; setup/update/php/3.3.0.php then writes the capture of
+-- each order already paid, the others keep their transaction reference on
+-- `order`.`transaction_ref` and show no movement until their next payment event.
 -- ---------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `order_payment_transaction`
