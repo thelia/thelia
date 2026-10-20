@@ -14,8 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Model\Admin;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
+use Thelia\Model\ProductExcludedDeliveryModule;
 use Thelia\Model\ProductExcludedDeliveryModuleQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Module\BaseModule;
@@ -111,6 +116,97 @@ final class ProductShippingRulesApiTest extends ApiTestCase
 
         self::assertSame(422, $response->getStatusCode());
         self::assertFalse(ProductExcludedDeliveryModuleQuery::create()->filterByProductId($product->getId())->exists());
+    }
+
+    public function testEveryWriteOfTheShippingRulesWantsAToken(): void
+    {
+        [$product, $carrier] = [$this->product(), $this->carrier()];
+        $exclusionId = $this->exclusionOf($product, $carrier);
+
+        foreach ($this->shippingRuleWrites($product, $carrier, $exclusionId) as $what => [$method, $uri, $payload, $format]) {
+            self::assertSame(401, $this->jsonRequest($method, $uri, $payload, null, $format)->getStatusCode(), $what);
+        }
+    }
+
+    public function testAnAdministratorWithoutTheCatalogueCannotWriteTheShippingRules(): void
+    {
+        $this->assertTheShippingRulesAreRefusedTo($this->createFixtureFactory()->restrictedAdmin([
+            AdminResources::CATEGORY => [AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE],
+        ]));
+    }
+
+    public function testAnAdministratorWhoMayOnlyLookAtTheCatalogueCannotWriteTheShippingRules(): void
+    {
+        $this->assertTheShippingRulesAreRefusedTo($this->createFixtureFactory()->restrictedAdmin([
+            AdminResources::PRODUCT => [AccessManager::VIEW],
+        ]));
+    }
+
+    public function testAnAdministratorWhoMayEditTheCatalogueWritesTheShippingRules(): void
+    {
+        $token = $this->authenticateAsAdmin($this->createFixtureFactory()->restrictedAdmin([
+            AdminResources::PRODUCT => [AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE],
+        ]));
+        [$product, $carrier] = [$this->product(), $this->carrier()];
+
+        self::assertJsonResponseSuccessful($this->jsonRequest('PATCH', '/api/admin/products/'.$product->getId(), [
+            'shippingSurcharge' => 4.0,
+            'shippingSurchargeMode' => 1,
+            'freeShipping' => true,
+            'i18ns' => ['en_US' => ['title' => 'Bulky parcel', 'locale' => 'en_US']],
+        ], $token, 'merge-patch+json'));
+        $response = $this->jsonRequest('POST', '/api/admin/product_excluded_delivery_modules', [
+            'product' => '/api/admin/products/'.$product->getId(),
+            'module' => '/api/admin/modules/'.$carrier->getId(),
+        ], $token);
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+        $exclusion = ProductExcludedDeliveryModuleQuery::create()->filterByProductId($product->getId())->findOne();
+        self::assertNotNull($exclusion);
+        self::assertSame(204, $this->jsonRequest('DELETE', '/api/admin/product_excluded_delivery_modules/'.$exclusion->getId(), token: $token)->getStatusCode());
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertEqualsWithDelta(4.0, (float) $reloaded->getShippingSurcharge(), 0.000001);
+    }
+
+    private function assertTheShippingRulesAreRefusedTo(Admin $admin): void
+    {
+        $token = $this->authenticateAsAdmin($admin);
+        [$product, $carrier] = [$this->product(), $this->carrier()];
+        $exclusionId = $this->exclusionOf($product, $carrier);
+
+        foreach ($this->shippingRuleWrites($product, $carrier, $exclusionId) as $what => [$method, $uri, $payload, $format]) {
+            self::assertSame(403, $this->jsonRequest($method, $uri, $payload, $token, $format)->getStatusCode(), $what);
+        }
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        self::assertEqualsWithDelta(0.0, (float) $reloaded->getShippingSurcharge(), 0.000001);
+        self::assertSame(1, ProductExcludedDeliveryModuleQuery::create()->filterByProductId($product->getId())->count(), 'The exclusion is neither removed nor doubled.');
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: array<string, mixed>, 3: string}>
+     */
+    private function shippingRuleWrites(Product $product, Module $carrier, int $exclusionId): iterable
+    {
+        yield 'rules of the product' => ['PATCH', '/api/admin/products/'.$product->getId(), ['shippingSurcharge' => 9.0, 'shippingSurchargeMode' => 1, 'freeShipping' => true, 'i18ns' => ['en_US' => ['title' => 'Bulky parcel', 'locale' => 'en_US']]], 'merge-patch+json'];
+        yield 'exclusion added' => ['POST', '/api/admin/product_excluded_delivery_modules', ['product' => '/api/admin/products/'.$product->getId(), 'module' => '/api/admin/modules/'.$carrier->getId()], 'jsonld'];
+        yield 'exclusion removed' => ['DELETE', '/api/admin/product_excluded_delivery_modules/'.$exclusionId, [], 'jsonld'];
+    }
+
+    private function exclusionOf(Product $product, Module $carrier): int
+    {
+        $exclusion = (new ProductExcludedDeliveryModule())->setProductId($product->getId())->setModuleId($carrier->getId());
+        $exclusion->save();
+
+        return $exclusion->getId();
+    }
+
+    private function carrier(): Module
+    {
+        return ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()
+            ?? throw new \RuntimeException('No delivery module installed - run bin/test-prepare.');
     }
 
     private function product(): Product
