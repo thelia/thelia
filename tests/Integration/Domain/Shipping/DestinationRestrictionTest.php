@@ -329,6 +329,19 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         self::assertNull($cart->getAddressDeliveryId());
     }
 
+    public function testTheReasonComesFromTheFirstRefusingGroupInTheOrderTheMerchantSet(): void
+    {
+        $product = $this->product('Absinthe');
+        $this->group('created-first', DestinationRestriction::MODE_DENY, [$this->refused], [$product], 'Created first');
+        $placedFirst = $this->group('placed-first', DestinationRestriction::MODE_DENY, [$this->refused], [$product], 'Placed first');
+        $placedFirst->changeAbsolutePosition(1);
+
+        $lines = $this->checker()->violationsForProducts([$product->getId()], new Destination($this->refused->getId()), null, 'en_US');
+
+        self::assertCount(1, $lines);
+        self::assertSame('Absinthe (Placed first)', $lines[0]->label());
+    }
+
     private function checker(): DestinationRestrictionChecker
     {
         return $this->getService(DestinationRestrictionChecker::class);
