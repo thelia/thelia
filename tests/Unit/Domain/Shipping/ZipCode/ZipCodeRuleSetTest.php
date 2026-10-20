@@ -17,9 +17,23 @@ namespace Thelia\Tests\Unit\Domain\Shipping\ZipCode;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
+use Thelia\Tests\Support\Log\SilencedTlog;
 
 final class ZipCodeRuleSetTest extends TestCase
 {
+    use SilencedTlog;
+
+    protected function setUp(): void
+    {
+        $this->silenceTlog();
+    }
+
+    protected function tearDown(): void
+    {
+        ini_restore('pcre.backtrack_limit');
+        $this->restoreTlog();
+    }
+
     public function testAZoneWithoutRuleAcceptsEveryCode(): void
     {
         self::assertTrue((new ZipCodeRuleSet())->accepts('20090'));
@@ -59,5 +73,20 @@ final class ZipCodeRuleSetTest extends TestCase
 
         self::assertTrue($rules->accepts(null));
         self::assertTrue($rules->accepts(' '));
+    }
+
+    /**
+     * A pattern with * runs as a regular expression, which PCRE may give up on: an exclusion
+     * then refuses the code instead of letting it through, and an inclusion does not take it.
+     */
+    public function testAPatternThatCannotBeCheckedFailsClosed(): void
+    {
+        $pattern = ZipCodePattern::fromString('2*0*1');
+        self::assertTrue((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'The code does not match the pattern.');
+
+        ini_set('pcre.backtrack_limit', '1');
+
+        self::assertFalse((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [$pattern]))->accepts('2001090'), 'An inclusion that cannot be checked does not take the code.');
     }
 }

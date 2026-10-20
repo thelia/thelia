@@ -41,8 +41,9 @@ final readonly class ZipCodeRuleSet
             return true;
         }
 
+        // An exclusion that cannot be checked refuses the code: it fails closed.
         foreach ($this->exclusions as $exclusion) {
-            if ($exclusion->matches($zipCode)) {
+            if ($exclusion->matches($zipCode, whenUnsure: true)) {
                 return false;
             }
         }
