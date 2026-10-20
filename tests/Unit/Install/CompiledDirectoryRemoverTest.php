@@ -85,6 +85,20 @@ final class CompiledDirectoryRemoverTest extends TestCase
         self::assertFileExists($leftover.'/App_KernelProdContainer.php');
     }
 
+    public function testTheOwnerReportedForTheLeftoverIsTheOneOfTheDirectoryThatKeptTheFiles(): void
+    {
+        // The top directory can be emptied, a subdirectory cannot: on a live shop the
+        // first belongs to the user running the script, the second to the web server.
+        chmod($this->root.'/var/cache/prod/pools', 0o555);
+
+        $leftover = (new CompiledDirectoryRemover())->remove($this->root.'/var/cache/prod');
+
+        self::assertNotNull($leftover);
+        $directoryKeepingFiles = CompiledDirectoryRemover::directoryKeepingFiles($leftover);
+        self::assertNotSame($leftover, $directoryKeepingFiles);
+        self::assertFileExists($directoryKeepingFiles.'/item');
+    }
+
     public function testADirectoryThatCannotBeMovedStopsTheUpdateAndLeavesItUntouched(): void
     {
         chmod($this->root.'/var/cache', 0o555);
