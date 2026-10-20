@@ -371,6 +371,15 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertGreaterThan(0, $crawler->filter('[data-order-id="'.$unpaid->getId().'"][data-bs-target="#order-cancel-modal"]')->count(), 'An order holding nothing is still cancelled from the list.');
     }
 
+    public function testTheCaptureDialogSaysWhenTheProviderTakesASingleCapture(): void
+    {
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        self::assertCount(1, $this->sheet($order)->filter('[data-testid="order-payment-capture-once-help"]'));
+    }
+
     public function testOnceASingleCaptureWasAskedTheSheetOffersNoOtherAndLetsTheOrderBeCancelled(): void
     {
         // The provider lets the rest go with the capture: nothing is left to capture, nor to
