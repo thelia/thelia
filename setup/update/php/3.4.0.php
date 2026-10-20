@@ -30,9 +30,13 @@ use Thelia\Model\OrderQuery;
 
 $pdo = $database->getConnection();
 
+// A status is read for what it stands for, as Order::isPaid(false) reads it: a custom status
+// declaring itself equivalent to paid, processing or sent (partially_shipped, a merchant's own)
+// collected the money too. A protected status stands for itself.
 $paidStatusIds = array_map(
     'intval',
-    $pdo->query("SELECT `id` FROM `order_status` WHERE `code` IN ('paid', 'processing', 'sent')")->fetchAll(PDO::FETCH_COLUMN),
+    $pdo->query("SELECT `id` FROM `order_status`
+        WHERE (CASE WHEN `protected_status` = 1 THEN `code` ELSE COALESCE(NULLIF(`equivalent_code`, ''), `code`) END) IN ('paid', 'processing', 'sent')")->fetchAll(PDO::FETCH_COLUMN),
 );
 
 if ($paidStatusIds === []) {

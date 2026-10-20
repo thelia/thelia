@@ -50,6 +50,16 @@ final class LegacyPaymentJournalUpdateTest extends ActionIntegrationTestCase
         self::assertSame('84.000000', $this->getService(PaymentTransactionTotalsReader::class)->forOrder((int) $order->getId())->refundable());
     }
 
+    public function testAnOrderInAStatusEquivalentToPaidGetsItsCaptureToo(): void
+    {
+        // partially_shipped is seeded equivalent to paid: the money was collected.
+        $order = $this->order(OrderStatus::CODE_PARTIALLY_SHIPPED, 'PSP-2024-119');
+
+        $this->runTheUpdateStep();
+
+        self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId()));
+    }
+
     public function testOrdersNotPaidOrAlreadyJournaledAreLeftAlone(): void
     {
         $unpaid = $this->order(OrderStatus::CODE_NOT_PAID);
