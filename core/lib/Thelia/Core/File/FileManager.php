@@ -223,6 +223,10 @@ class FileManager
         if (\in_array($contentMimeType, FileConfiguration::SERVER_EXECUTABLE_MIME_TYPES, true)) {
             throw new FileException(\sprintf('The file "%s" cannot be stored: its content is a server-executable script (%s).', $uploadedFile->getClientOriginalName(), $contentMimeType));
         }
+
+        if (null !== $contentMimeType && FileConfiguration::containsPhpOpeningTag($uploadedFile->getPathname(), $contentMimeType)) {
+            throw new FileException(\sprintf('The file "%s" cannot be stored: it contains PHP code.', $uploadedFile->getClientOriginalName()));
+        }
     }
 
     /**

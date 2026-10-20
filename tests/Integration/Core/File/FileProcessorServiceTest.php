@@ -64,6 +64,27 @@ final class FileProcessorServiceTest extends IntegrationTestCase
         $this->expectNotToPerformAssertions();
     }
 
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function phpCodeProvider(): iterable
+    {
+        yield 'document with a short echo tag' => ['notes.txt', "Opening hours\n<?= system(\$_GET['cmd']) ?>", 'document'];
+        yield 'image carrying a script' => ['kitten.png', self::pngData()."<?php system(\$_GET['cmd']); ?>", 'image'];
+    }
+
+    #[DataProvider('phpCodeProvider')]
+    public function testAnUploadHoldingPhpCodeIsRefused(string $fileName, string $content, string $objectType): void
+    {
+        try {
+            $this->validate($fileName, $content, $objectType);
+            self::fail('A file holding PHP code must be refused.');
+        } catch (ProcessFileException $exception) {
+            self::assertSame(415, $exception->getCode());
+            self::assertStringContainsString('PHP code', $exception->getMessage());
+        }
+    }
+
     public function testAllowedImageMimeTypesCanBeNarrowedByConfiguration(): void
     {
         ConfigQuery::write(FileConfiguration::IMAGE_MIME_TYPES_VARIABLE, 'image/png');
@@ -348,6 +369,11 @@ final class FileProcessorServiceTest extends IntegrationTestCase
     }
 
     private function pngBytes(): string
+    {
+        return self::pngData();
+    }
+
+    private static function pngData(): string
     {
         return (string) base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',

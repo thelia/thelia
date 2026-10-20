@@ -604,6 +604,7 @@ return [
     'The email address "%mail" was not found.' => 'L\'adresse e-mail "%mail" n\'as pas été trouvée.',
     'The extension "%extension" is not allowed' => 'L\'extension "%extension" n\'est pas autorisée',
     'The extension "%extension" is not allowed. Accepted formats: %formats' => 'L\'extension "%extension" n\'est pas autorisée. Formats acceptés : %formats',
+    'The file contains PHP code and cannot be uploaded.' => 'Le fichier contient du code PHP et ne peut pas être envoyé.',
     'The file %path has been successfully downloaded' => 'Le fichier %path a été téléchargé',
     'The following columns are missing: %columns' => 'Il manque les colonnes suivantes: %columns',
     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.' => 'L\'image qui remplace un drapeau de pays manquant (%file) n\'a pas été trouvée. Merci de vérifier la variable de configuration unknown-flag-path.',
