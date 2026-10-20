@@ -217,8 +217,20 @@ class FileManager
         if (null !== $executableExtension) {
             throw new FileException(\sprintf('The file "%s" cannot be stored: its name would carry the server-executable extension "%s".', $uploadedFile->getClientOriginalName(), $executableExtension));
         }
+
+        $contentMimeType = $this->detectMimeType($uploadedFile);
+
+        if (\in_array($contentMimeType, FileConfiguration::SERVER_EXECUTABLE_MIME_TYPES, true)) {
+            throw new FileException(\sprintf('The file "%s" cannot be stored: its content is a server-executable script (%s).', $uploadedFile->getClientOriginalName(), $contentMimeType));
+        }
     }
 
+    /**
+     * The name a file is stored under: the base name the client sent, the model id, and
+     * the extension the client sent, unless the content is an image or a video whose
+     * type that extension contradicts. The extension of the content then replaces it,
+     * so "photo.jpg" holding a PNG is stored as "photo-1.png".
+     */
     public function renameFile(int $modelId, UploadedFile $uploadedFile): string
     {
         $extension = $uploadedFile->getClientOriginalExtension();
@@ -232,8 +244,42 @@ class FileManager
                 $extension,
                 '',
                 $uploadedFile->getClientOriginalName(),
-            ).'-'.$modelId.$extension,
+            ).'-'.$modelId.($this->extensionOfContent($uploadedFile, $extension) ?? $extension),
         );
+    }
+
+    /**
+     * The extension of the content, with its dot, when the file is an image or a video
+     * the sent extension contradicts; null otherwise. An SVG is never renamed: its
+     * extension decides whether the sanitizer reads it.
+     */
+    private function extensionOfContent(UploadedFile $uploadedFile, string $sentExtension): ?string
+    {
+        $contentMimeType = $this->detectMimeType($uploadedFile);
+
+        if (null === $contentMimeType || 'image/svg+xml' === $contentMimeType) {
+            return null;
+        }
+
+        $contentExtensions = FileConfiguration::extensionsForMimeType($contentMimeType);
+
+        if ([] === $contentExtensions || \in_array(ltrim($sentExtension, '.'), $contentExtensions, true)) {
+            return null;
+        }
+
+        return '.'.$contentExtensions[0];
+    }
+
+    /**
+     * The mime type read from the content of the file, or null when it cannot be read.
+     */
+    private function detectMimeType(UploadedFile $uploadedFile): ?string
+    {
+        if (!is_file($uploadedFile->getPathname())) {
+            return null;
+        }
+
+        return $uploadedFile->getMimeType();
     }
 
     public function isImage(string $mimeType): bool

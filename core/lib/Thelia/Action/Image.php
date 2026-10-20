@@ -25,6 +25,7 @@ use Imagine\Image\Point;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Mime\MimeTypes;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\SvgSanitizer;
@@ -136,6 +137,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             $sanitizedSvg = $isVectorImage ? $this->readSanitizedSvg($sourceFile) : null;
 
+            // The web space never links to nor copies a file whose content is not an image.
+            if (null === $sanitizedSvg && is_file($sourceFile) && !$this->isImage($sourceFile)) {
+                throw new ImageException(\sprintf('%s is not a recognised image and is not published.', basename($sourceFile)));
+            }
+
             // Create a cached version of the original image in the web space, if not exists
             if (!file_exists($originalImagePathInCache)) {
                 if (null !== $sanitizedSvg) {
@@ -220,6 +226,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     private function isVectorImage(string $extension): bool
     {
         return 'svg' === strtolower($extension);
+    }
+
+    /**
+     * Whether the content of the file, not its name, is an image.
+     */
+    private function isImage(string $sourceFile): bool
+    {
+        return str_starts_with((string) MimeTypes::getDefault()->guessMimeType($sourceFile), 'image/');
     }
 
     /**
