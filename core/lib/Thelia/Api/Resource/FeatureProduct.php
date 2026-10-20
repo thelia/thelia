@@ -26,6 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\State\Processor\FeatureProductProcessor;
+use Thelia\Model\FeatureAvI18nQuery;
+use Thelia\Model\FeatureProduct as FeatureProductModel;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\FeatureProductTableMap;
 
 /**
@@ -287,6 +290,40 @@ class FeatureProduct implements PropelResourceInterface
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * The two free text fields are filled by hand: their snake_case names match
+     * no getter the transformer looks for. A free text is not stored on the row
+     * but as the translated title of a value of its own: it is read back from
+     * that translation, in the language the request asks for, the shop's
+     * default language otherwise.
+     */
+    public function afterModelToResource(array $context): void
+    {
+        $model = $this->getPropelModel();
+
+        if (!$model instanceof FeatureProductModel) {
+            return;
+        }
+
+        $this->setIsFreeText((bool) $model->getIsFreeText());
+
+        if (!$model->getIsFreeText()) {
+            return;
+        }
+
+        $requestedLocale = $context['filters']['locale'] ?? null;
+        $locale = \is_string($requestedLocale) && '' !== $requestedLocale
+            ? $requestedLocale
+            : (string) Lang::getDefaultLanguage()->getLocale();
+
+        $translation = FeatureAvI18nQuery::create()
+            ->filterById((int) $model->getFeatureAvId())
+            ->filterByLocale($locale)
+            ->findOne();
+
+        $this->setFreeTextValue((string) $translation?->getTitle());
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap

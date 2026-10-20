@@ -61,6 +61,20 @@ final class FeatureProductApiTest extends ApiTestCase
         self::assertSame((int) $payload['id'], $this->freeTextRowId($productId, $featureId));
     }
 
+    public function testAFreeTextReadsBackAsItWasWritten(): void
+    {
+        [$productId, $featureId] = $this->productAndFeature();
+        $token = $this->authenticateAsAdmin();
+        $id = $this->postFreeText($productId, $featureId, '0.50', $token);
+
+        $response = $this->jsonRequest('GET', '/api/admin/feature_products/'.$id, token: $token, format: 'json');
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
+        $payload = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertTrue($payload['is_free_text'] ?? null, (string) $response->getContent());
+        self::assertSame('0.50', $payload['free_text_value'] ?? null, (string) $response->getContent());
+    }
+
     public function testAFreeTextIsReplacedInPlace(): void
     {
         [$productId, $featureId] = $this->productAndFeature();
