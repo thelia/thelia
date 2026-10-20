@@ -191,6 +191,34 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertNull(SaleUnitConfigScope::current());
     }
 
+    public function testWhatTheRefundAnnouncesRunsWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        $order = $this->paidOrder(100);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        $chequeOrder = $this->factory->order(null, ['postage' => 100]);
+        $chequeOrder->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        $this->recorder->recordCapture($chequeOrder, 100, 'CHQ-2', moduleCode: 'Cheque');
+        $seen = [];
+        $listener = static function () use (&$seen): void {
+            $seen[] = SaleUnitConfigScope::current();
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+
+        try {
+            $this->service->refund($order, null, RefundReason::Returned);
+            $this->service->recordOfflineRefund($chequeOrder, null, RefundReason::Goodwill);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+        }
+
+        self::assertNotEmpty($seen);
+        self::assertSame([$saleUnitId], array_values(array_unique($seen)), 'Every announcement of the refund runs with the configuration of the order\'s unit.');
+        self::assertNull(SaleUnitConfigScope::current());
+    }
+
     public function testACallThatGotNoAnswerLeavesTheRefundPending(): void
     {
         $order = $this->paidOrder(100);
