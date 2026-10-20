@@ -92,6 +92,38 @@ final readonly class CompiledDirectoryRemover
     }
 
     /**
+     * The directory whose files could not be deleted, inside what remove() left
+     * behind. Deleting a file takes write access to the directory that holds it, so
+     * its owner is the user who can finish the job. The top of the leftover is
+     * usually not that directory: it can belong to the user running the script
+     * while the subdirectories the web server created belong to the web server.
+     */
+    public static function directoryKeepingFiles(string $leftover): string
+    {
+        if (!is_writable($leftover)) {
+            return $leftover;
+        }
+
+        try {
+            $entries = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($leftover, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST,
+                \RecursiveIteratorIterator::CATCH_GET_CHILD,
+            );
+
+            foreach ($entries as $path => $entry) {
+                if ($entry->isDir() && !$entry->isLink() && !is_writable($path)) {
+                    return $path;
+                }
+            }
+        } catch (\UnexpectedValueException) {
+            // An unreadable leftover: its own owner is the best answer there is.
+        }
+
+        return $leftover;
+    }
+
+    /**
      * The name of the user that owns a file, for the command the message suggests.
      */
     public static function ownerOf(string $path): string

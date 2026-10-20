@@ -116,7 +116,12 @@ try {
     removeCompiledEnvironment($_ENV['APP_ENV']);
 
     $thelia = new App\Kernel($_ENV['APP_ENV'], false);
-    $thelia->boot();
+
+    try {
+        $thelia->boot();
+    } catch (Throwable $secondBootFailure) {
+        abortOnBootFailure($secondBootFailure, $_ENV['APP_ENV']);
+    }
 }
 
 /*
@@ -426,7 +431,9 @@ function removeCompiledEnvironment(string $environment): void
         }
 
         if (null !== $leftover) {
-            $owner = Thelia\Setup\CompiledDirectoryRemover::ownerOf($leftover);
+            $owner = Thelia\Setup\CompiledDirectoryRemover::ownerOf(
+                Thelia\Setup\CompiledDirectoryRemover::directoryKeepingFiles($leftover),
+            );
             cliOutput(sprintf(
                 'Some files of %s belong to %s and could not be deleted. They were moved to %s, '
                 .'which is never loaded, and the update goes on. Delete them as that user: sudo -u %s rm -rf %s',
@@ -438,6 +445,39 @@ function removeCompiledEnvironment(string $environment): void
             ), 'warning');
         }
     }
+}
+
+/**
+ * The kernel did not boot on caches the script had just removed. On a live shop
+ * this is the web server recreating the cache directory under its own user while
+ * the script runs, which the script cannot write to. Nothing has touched the
+ * database yet, so the update stops with the code a deployment can test, and with
+ * the command that clears the way.
+ */
+function abortOnBootFailure(Throwable $bootFailure, string $environment): never
+{
+    $cacheDirectory = THELIA_CACHE_DIR.$environment;
+    $message = sprintf('Update aborted, the database was not changed : the kernel could not boot (%s).', $bootFailure->getMessage());
+
+    if (is_dir($cacheDirectory) && !is_writable($cacheDirectory)) {
+        require_once __DIR__.\DIRECTORY_SEPARATOR.'CompiledDirectoryRemover.php';
+
+        $owner = Thelia\Setup\CompiledDirectoryRemover::ownerOf($cacheDirectory);
+        $message .= sprintf(
+            ' %s was recreated by %s while the script ran, usually by the web server serving the shop. '
+            .'Put the shop in maintenance or stop its web server, remove the directory as that user, '
+            .'then run this script again: sudo -u %s rm -rf %s',
+            $cacheDirectory,
+            $owner,
+            $owner,
+            escapeshellarg($cacheDirectory),
+        );
+    } else {
+        $message .= ' Fix the cause above, then run this script again.';
+    }
+
+    cliOutput($message, 'error');
+    exit(8);
 }
 
 function joinPaths()
