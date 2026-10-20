@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\Checkout\Service;
+
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Model\Cart;
+
+/**
+ * The one number a wallet's sheet shows and the shop accepts.
+ *
+ * The sheet asks for it before it opens, and the placement checks the wallet's
+ * confirmation against it: both read it here, so the amount a buyer agrees to is the one
+ * the order is placed at.
+ */
+final readonly class ExpressCheckoutTotal
+{
+    /**
+     * The grand total of the order this cart becomes: the goods taxed for the delivery
+     * address the checkout chose, the postage of the chosen carrier (untaxed for a
+     * tax-exempt cart) and the gift wrapping. Null until a carrier and a delivery address
+     * are on the cart.
+     *
+     * @throws PropelException
+     */
+    public function of(Cart $cart): ?float
+    {
+        $destination = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $country = $destination?->getCountry();
+
+        if (null === $cart->getDeliveryModuleId() || null === $country) {
+            return null;
+        }
+
+        return round($cart->getTaxedAmount($country, true, $destination->getState(), true, true), 2);
+    }
+}
