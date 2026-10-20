@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Payment\Exception;
 
 use Thelia\Model\OrderPaymentTransaction;
+use Thelia\Tools\TerminalText;
 
 /**
  * The provider refused the movement and took nothing: the one exception a payment module
@@ -30,7 +31,19 @@ final class PaymentRefusedException extends PaymentException
 {
     public const PROVIDER_CODE_MAX_LENGTH = OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH;
 
+    public const MESSAGE_MAX_LENGTH = OrderPaymentTransaction::ERROR_MESSAGE_MAX_LENGTH;
+
     private ?string $providerCode = null;
+
+    /**
+     * The message carries the words of a provider, through a module: it is shown in a flash,
+     * written to the administration log and answered by the admin API, so it is kept on one
+     * line, without the characters that reorder or hide text, and cut to what the journal keeps.
+     */
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct(mb_substr(TerminalText::onOneLine($message), 0, self::MESSAGE_MAX_LENGTH), $code, $previous);
+    }
 
     public static function withProviderCode(string $message, ?string $providerCode, ?\Throwable $previous = null): self
     {
