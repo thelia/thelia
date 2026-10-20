@@ -42,7 +42,9 @@ final readonly class CartAdditionDestinationGuard implements EventSubscriberInte
 
     public function refuseARestrictedProduct(CartEvent $event): void
     {
-        if (!$this->checker->hasActiveGroup() || null === $productId = $event->getProductId()) {
+        // The addresses of the cart are only resolved for a product a group holds: adding
+        // anything else costs one query, and none in a shop without active group.
+        if (null === ($productId = $event->getProductId()) || !$this->checker->isRestricted($productId)) {
             return;
         }
 
@@ -50,7 +52,7 @@ final readonly class CartAdditionDestinationGuard implements EventSubscriberInte
         $locale = Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale();
 
         $lines = $this->checker->violationsForProducts(
-            [(int) $productId],
+            [$productId],
             CartDestinations::delivery($cart, true),
             CartDestinations::billing($cart, true),
             $locale,

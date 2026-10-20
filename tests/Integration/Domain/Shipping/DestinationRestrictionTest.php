@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\Exception\InvalidCartException;
@@ -23,11 +24,13 @@ use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
+use Thelia\Domain\Shipping\DestinationRestriction\CartAdditionDestinationGuard;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
 use Thelia\Domain\Shipping\DestinationRestriction\ProductDestinationRestrictionReader;
 use Thelia\Model\Cart;
+use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -352,6 +355,22 @@ final class DestinationRestrictionTest extends IntegrationTestCase
 
         $this->expectException(DestinationRestrictedException::class);
         $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
+    public function testAddingAProductNoGroupHoldsCostsOneQueryWhileAnotherGroupIsActive(): void
+    {
+        $this->group('absinthe', DestinationRestriction::MODE_DENY, [$this->refused], [$this->product('Absinthe')]);
+        $plain = $this->product('Plain chair');
+        $customer = $this->customerLivingIn($this->served);
+        // Read back, so that neither the customer nor the address is already in memory.
+        $cart = CartQuery::create()->findPk($this->cartOf($customer, [])->getId());
+        self::assertNotNull($cart);
+        $this->checker()->hasActiveGroup();
+        $event = (new CartEvent($cart))->setProductId((int) $plain->getId());
+
+        $statements = $this->recordSqlQueries(fn () => $this->getService(CartAdditionDestinationGuard::class)->refuseARestrictedProduct($event));
+
+        self::assertCount(1, $statements, implode("\n", $statements));
     }
 
     private function checker(): DestinationRestrictionChecker

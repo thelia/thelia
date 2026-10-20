@@ -49,6 +49,21 @@ final class DestinationRestrictionChecker implements ResetInterface
         return $this->anyActiveGroup ??= DestinationRestrictionQuery::create()->filterByActive(1)->exists();
     }
 
+    /**
+     * Whether an active group holds this product: one query, asked before anything is
+     * resolved about the addresses of the cart.
+     */
+    public function isRestricted(int $productId): bool
+    {
+        return $this->hasActiveGroup()
+            && ProductDestinationRestrictionQuery::create()
+                ->filterByProductId($productId)
+                ->useDestinationRestrictionQuery()
+                    ->filterByActive(1)
+                ->endUse()
+                ->exists();
+    }
+
     public function reset(): void
     {
         $this->anyActiveGroup = null;
