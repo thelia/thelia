@@ -20,8 +20,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Service\PaymentRefundService;
 
 /**
- * The core answer to ORDER_PAYMENT_REFUND: the back office, the admin API and a module's own
- * automation all refund through this event.
+ * The core answer to ORDER_PAYMENT_REFUND: the back office and a module's own automation
+ * refund through this event. The admin API has no refund operation yet.
  */
 final readonly class RefundOrderPaymentListener
 {
