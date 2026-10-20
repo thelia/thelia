@@ -175,6 +175,25 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertSame('REFUND_WINDOW', $line->getErrorCode());
     }
 
+    public function testAPaymentTheProviderGivesBackInFullOnlyIsNotRefundedInPart(): void
+    {
+        // A card payment not remitted yet is cancelled whole: a part would be refused by the provider.
+        DeferredCapturePaymentModule::$refundsOnlyInFull = true;
+        $order = $this->paidOrder(100);
+
+        self::assertTrue($this->service->refundsOnlyInFull($order));
+
+        try {
+            $this->service->refund($order, 40.0, RefundReason::Goodwill);
+            self::fail('A part is refused before the provider is called.');
+        } catch (InvalidPaymentAmountException $refused) {
+            self::assertStringContainsString('in full', $refused->getMessage());
+        }
+
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
+        self::assertTrue($this->service->refund($order, 100.0, RefundReason::Goodwill)->isSucceeded());
+    }
+
     public function testTheModuleRefundsWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
     {
         $order = $this->paidOrder(100);
