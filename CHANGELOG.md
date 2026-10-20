@@ -104,6 +104,7 @@
 - The comments on the address forms say that the SIRET and the VAT number are optional and that their format is only checked once typed.
 - `RewritingUrlQuery::getResolverSearch()` builds a `ModelJoin`, which ends the Propel warning raised on each rewritten URL.
 - The country choices of `CountryService::getAllCountriesChoiceType()` are sorted on the localized title of the current language, not in the order of the seed data.
+- A request to `/api/front/...` that authenticates with a bearer token gets the reserved prices of the customer of the token, even when it also carries a front-office session cookie for another customer. `CurrentCustomerProvider` read the session first, so the price followed the session; the session is now the fallback, for the theme that calls the API in-process with no token.
 
 ## Checkout and payment
 
