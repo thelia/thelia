@@ -110,7 +110,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
 (100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
 (101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW()),
-(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW())
+(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW()),
+(103, 'express_payment_zones', '', 0, 0, NOW(), NOW())
 
 ;
 
