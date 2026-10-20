@@ -51,6 +51,7 @@ use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
+use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 use Thelia\Model\Accessory;
@@ -76,18 +77,15 @@ use Thelia\Model\ProductAssociationTypeQuery;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductExcludedDeliveryModule;
 use Thelia\Model\ProductExcludedDeliveryModuleQuery;
 use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImage;
-use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Model\ProductVideoQuery;
 use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
@@ -492,36 +490,12 @@ class Product extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            $fileList = ['images' => [], 'documentList' => []];
+            $media = DeletedItemMedia::of($product);
 
-            // Get product's files to delete after product deletion
-            $fileList['images']['list'] = ProductImageQuery::create()
-                ->findByProductId($event->getProductId());
-            $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-            $fileList['documentList']['list'] = ProductDocumentQuery::create()
-                ->findByProductId($event->getProductId());
-            $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-            // The rows go with the product through the foreign key; the files a shop
-            // hosts itself would stay in the video library for ever without this.
-            $fileList['videoList']['list'] = ProductVideoQuery::create()
-                ->findByProductId($event->getProductId());
-            $fileList['videoList']['type'] = TheliaEvents::PRODUCT_VIDEO_DELETE;
-
-            // Delete product
             $product
                 ->delete($con);
 
             $event->setProduct($product);
-
-            // Dispatch delete product's files event
-            foreach ($fileList as $fileTypeList) {
-                foreach ($fileTypeList['list'] as $fileToDelete) {
-                    $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                    $this->eventDispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                }
-            }
 
             $con->commit();
         } catch (\Throwable $e) {
@@ -529,6 +503,8 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
+
+        $media->delete($this->eventDispatcher);
     }
 
     /**

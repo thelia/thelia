@@ -24,16 +24,14 @@ use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
-use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery;
-use Thelia\Model\CategoryDocumentQuery;
-use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\CategoryTableMap;
 
@@ -103,30 +101,12 @@ class Category extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            $fileList = ['images' => [], 'documentList' => []];
+            $media = DeletedItemMedia::of($category);
 
-            // Get category's files to delete after category deletion
-            $fileList['images']['list'] = CategoryImageQuery::create()
-                ->findByCategoryId($event->getCategoryId());
-            $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-            $fileList['documentList']['list'] = CategoryDocumentQuery::create()
-                ->findByCategoryId($event->getCategoryId());
-            $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-            // Delete category
             $category
                 ->delete($con);
 
             $event->setCategory($category);
-
-            // Dispatch delete category's files event
-            foreach ($fileList as $fileTypeList) {
-                foreach ($fileTypeList['list'] as $fileToDelete) {
-                    $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                    $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                }
-            }
 
             $con->commit();
         } catch (\Throwable $e) {
@@ -134,6 +114,8 @@ class Category extends BaseAction implements EventSubscriberInterface
 
             throw $e;
         }
+
+        $media->delete($dispatcher);
     }
 
     /**
