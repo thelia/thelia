@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Shipping\ZipCode;
 
+use Thelia\Log\Tlog;
+
 /**
  * One postal code pattern of a delivery zone, in the syntax merchants already know from
  * other shops: an exact code ("75001"), a pattern where * stands for any characters
@@ -67,7 +69,12 @@ final readonly class ZipCodePattern
         return strtoupper((string) preg_replace('/[\s\-]+/u', '', $zipCode));
     }
 
-    public function matches(string $zipCode): bool
+    /**
+     * @param bool $whenUnsure the answer when the expression of a pattern with * cannot be
+     *                         run (PCRE limits): true for an exclusion, which then refuses
+     *                         the code rather than letting it through
+     */
+    public function matches(string $zipCode, bool $whenUnsure = false): bool
     {
         $zipCode = self::normalize($zipCode);
 
@@ -88,8 +95,19 @@ final readonly class ZipCodePattern
 
         if (str_contains($this->pattern, '*')) {
             $expression = '/^'.str_replace('\\*', '.*', preg_quote($this->pattern, '/')).'$/';
+            $matched = preg_match($expression, $zipCode);
 
-            return 1 === preg_match($expression, $zipCode);
+            if (false === $matched) {
+                // The postal code itself stays out of the log: it is part of an address.
+                Tlog::getInstance()->warning(
+                    'The postal code pattern "{pattern}" could not be checked ({error}): the code is taken as {answer}.',
+                    ['pattern' => $this->pattern, 'error' => preg_last_error_msg(), 'answer' => $whenUnsure ? 'matching it' : 'not matching it'],
+                );
+
+                return $whenUnsure;
+            }
+
+            return 1 === $matched;
         }
 
         return $this->pattern === $zipCode;
