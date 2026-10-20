@@ -728,6 +728,13 @@ final readonly class PaymentTransactionRecorder
 
         $pspReference = trim($pspReference);
 
+        // A reference is written to the journal, the logs and the order sheet: a line break or a
+        // character that reorders text would forge a log line or hide what the sheet shows. No
+        // provider gives one, so the reference is refused rather than altered, and not repeated.
+        if (TerminalText::singleLine($pspReference) !== $pspReference) {
+            throw new InvalidProviderReferenceException('A provider reference holds no line break, control or formatting character, nor any byte outside UTF-8.');
+        }
+
         if (mb_strlen($pspReference) > self::PSP_REFERENCE_MAX_LENGTH) {
             throw new InvalidProviderReferenceException(\sprintf('A provider reference holds at most %d characters, %d given.', self::PSP_REFERENCE_MAX_LENGTH, mb_strlen($pspReference)));
         }
