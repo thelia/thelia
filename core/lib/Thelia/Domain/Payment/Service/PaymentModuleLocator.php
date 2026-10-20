@@ -70,7 +70,9 @@ final readonly class PaymentModuleLocator
      * Runs what is asked of the payment module of an order with the configuration of the
      * sale unit the order was placed on, the national one for a national order: the keys,
      * the account and the mode a module reads are those of its unit, whatever sale unit
-     * the request resolved. Every call of the core into a payment module goes through it.
+     * the request resolved. The core asks a payment module about an order through it, or
+     * through the same scope (Order::isStockManagedOnOrderCreation()); what the checkout asks
+     * before an order exists (isValidPayment()) runs with the sale unit of the request.
      *
      * @template T
      *

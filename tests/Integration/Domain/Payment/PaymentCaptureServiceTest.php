@@ -422,6 +422,24 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertNull(SaleUnitConfigScope::current());
     }
 
+    public function testTheModuleIsAskedAboutStockAndStatusWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        // A status change made from the back office or the admin API runs with the national
+        // configuration: what the order asks its module still reads the order's unit.
+        [$order] = $this->authorizedOrder(120);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        DeferredCapturePaymentModule::$scopes = [];
+
+        $order->isStockManagedOnOrderCreation($this->getService(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class));
+        $this->service->capture($order);
+
+        $calls = array_column(DeferredCapturePaymentModule::$scopes, 'call');
+        self::assertContains('manageStockOnCreation', $calls);
+        self::assertContains('managesOrderStatus', $calls);
+        self::assertSame([$saleUnitId], array_values(array_unique(array_column(DeferredCapturePaymentModule::$scopes, 'saleUnit'))));
+    }
+
     public function testAModuleThatRefusesWithTheCodeOfTheProviderWritesThatCode(): void
     {
         [$order] = $this->authorizedOrder(120);
