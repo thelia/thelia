@@ -91,7 +91,8 @@ final readonly class MoveOrderOnPaymentTransactionListener
             return false;
         }
 
-        return $module instanceof PaymentModuleManagingOrderStatusInterface && $module->managesOrderStatus();
+        return $module instanceof PaymentModuleManagingOrderStatusInterface
+            && $this->moduleLocator->forOrder($order, static fn (): bool => $module->managesOrderStatus());
     }
 
     private function holdForCapture(OrderPaymentTransactionEvent $event): void

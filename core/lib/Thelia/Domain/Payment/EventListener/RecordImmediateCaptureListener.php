@@ -113,7 +113,8 @@ final readonly class RecordImmediateCaptureListener
             return false;
         }
 
-        return $module instanceof PaymentModuleWithCaptureInterface && $module->supportsDeferredCapture();
+        return $module instanceof PaymentModuleWithCaptureInterface
+            && $this->moduleLocator->forOrder($order, static fn (): bool => $module->supportsDeferredCapture());
     }
 
     private function paymentModuleCodeOf(Order $order): ?string

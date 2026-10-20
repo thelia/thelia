@@ -175,6 +175,13 @@ published module implements would break them all.
 - The module is called through `PaymentModuleLocator`: the instance the
   container built, so `getContainer()` works in it. A deactivated module is not
   called: its services are no longer compiled, and the refusal names it.
+- Every call of the core into the module (`supportsDeferredCapture()`,
+  `capture()`, `voidAuthorization()`, `managesOrderStatus()`) runs with the
+  configuration of the sale unit the order was placed on
+  (`PaymentModuleLocator::forOrder()`), the national one for a national order:
+  a module whose keys, account or mode are set per sale unit reads those of the
+  order's unit from the back office and the admin API too, without wrapping its
+  calls itself.
 - The module writes the **authorization** itself, through the recorder, when
   the provider confirms it — typically from its notification controller — with
   the provider reference.
