@@ -60,6 +60,17 @@ final class LegacyPaymentJournalUpdateTest extends ActionIntegrationTestCase
         self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId()));
     }
 
+    public function testAReferenceThatWouldHideTextIsLeftOut(): void
+    {
+        $order = $this->order(OrderStatus::CODE_PAID, "PSP-\u{202E}1");
+
+        $this->runTheUpdateStep();
+
+        $lines = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId());
+        self::assertCount(1, $lines, 'The capture is written all the same.');
+        self::assertNull($lines[0]->getPspReference());
+    }
+
     public function testOrdersNotPaidOrAlreadyJournaledAreLeftAlone(): void
     {
         $unpaid = $this->order(OrderStatus::CODE_NOT_PAID);
