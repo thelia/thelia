@@ -265,8 +265,8 @@ sequenceDiagram
 through `ORDER_UPDATE_STATUS`, so the stock, the invoice numbering and the
 history see each move like any other:
 
-- a succeeded **authorization** puts an unpaid order (not paid, cancelled or
-  refunded, custom equivalents included) in `awaiting_capture`;
+- a succeeded **authorization** puts in `awaiting_capture` an order that is neither
+  paid, cancelled nor refunded (custom equivalents included);
 - once the authorization holds nothing more — everything captured, or the rest
   released by a succeeded **void** — and no capture or void waits for its
   answer, the order is `paid` if anything was taken and back to `not_paid` if it
@@ -293,7 +293,9 @@ line stays written and the provider's notification is answered.
 
 Cancelling an order whose authorization still holds an amount releases it
 through the module (`VoidAuthorizationOnCancelListener`, priority 3); a module
-that cannot is logged for the merchant to release it at the provider. An
+that cannot is logged for the merchant to release it at the provider. It is the
+only release Thelia asks: what a partial capture leaves on an authorization stays
+held until it is captured or the order is cancelled. An
 authorization the provider confirms after the order was cancelled is released
 the same way. An administrator cancels such an order only with the capture
 right (`AuthorizedOrderCancellationGuard`, checked at priority 160 before the
