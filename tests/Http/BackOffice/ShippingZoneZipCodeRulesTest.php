@@ -24,6 +24,9 @@ use Thelia\Model\AdminLogQuery;
 use Thelia\Model\Area;
 use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\AreaZipCodeRuleQuery;
+use Thelia\Model\Country;
+use Thelia\Model\CountryArea;
+use Thelia\Model\LangQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
@@ -83,6 +86,32 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         $row = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rule-'.$rule->getId().'"]');
         self::assertStringContainsString('A country that left the zone', $row->text());
         self::assertStringNotContainsString('Every country of the zone', $row->text());
+    }
+
+    /**
+     * Where the address forms check no postal code format, a customer types any code, or none,
+     * and gets past the exclusions: the card says so for the countries its rules apply to.
+     */
+    public function testTheCardWarnsAboutTheCountriesWhosePostalCodesAreNotChecked(): void
+    {
+        $area = $this->area();
+        $checked = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $unformatted = $this->countryOfTheZone($area, 'XW', '996', '', true);
+        $notRequired = $this->countryOfTheZone($area, 'XY', '997', 'NNNNN', false);
+        $rule = $this->rule($area, '20*', true);
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders($this->zoneUrl($area));
+        $warning = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]');
+        self::assertSame(1, $warning->count(), 'A rule for every country of the zone covers the two countries.');
+        self::assertStringContainsString($unformatted->getTitle(), $warning->text());
+        self::assertStringContainsString($notRequired->getTitle(), $warning->text());
+        self::assertStringNotContainsString($checked->getTitle(), $warning->text());
+
+        $rule->setCountryId($checked->getId())->save($this->getPropelConnection());
+
+        $this->assertPageRenders($this->zoneUrl($area));
+        self::assertSame(0, $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]')->count(), 'The only rule applies to a country whose codes are checked.');
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
@@ -252,6 +281,20 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
             ->filterByResourceId($area->getId())
             ->filterByMessage($message)
             ->count();
+    }
+
+    private function countryOfTheZone(Area $area, string $alpha2, string $isoCode, string $zipCodeFormat, bool $needZipCode): Country
+    {
+        $country = $this->factory()->country(['isoalpha2' => $alpha2, 'isoalpha3' => $alpha2.'X', 'isocode' => $isoCode]);
+        $country->setZipCodeFormat($zipCodeFormat)->setNeedZipCode((int) $needZipCode);
+
+        foreach (LangQuery::create()->find() as $lang) {
+            $country->setLocale($lang->getLocale())->setTitle('Country '.$alpha2);
+        }
+        $country->save($this->getPropelConnection());
+        (new CountryArea())->setAreaId($area->getId())->setCountryId($country->getId())->save($this->getPropelConnection());
+
+        return $country;
     }
 
     private function zoneUrl(Area $area): string
