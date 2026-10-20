@@ -21,12 +21,10 @@ use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\FeatureProduct;
-use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
-use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Product\DTO\ProductFeatureDTO;
+use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProduct as FeatureProductModel;
@@ -48,7 +46,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
 final readonly class FeatureProductProcessor implements ProcessorInterface
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private ProductFacade $productFacade,
         private ApiResourcePropelTransformerService $transformer,
     ) {
     }
@@ -89,7 +87,13 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
                 throw new UnprocessableEntityHttpException('This feature already holds listed values on this product: delete them before writing a free text.');
             }
 
-            $event = new FeatureProductUpdateEvent($productId, $featureId, $text, true);
+            // Rewriting an existing text is an update: it goes through PATCH and
+            // the right to update products, not through the right to create.
+            if ($this->hasValue($productId, $featureId, true)) {
+                throw new UnprocessableEntityHttpException('This feature already holds a free text on this product: edit it with PATCH.');
+            }
+
+            $value = new ProductFeatureDTO($featureId, $text, true, $locale);
         } else {
             $featureAvId = $this->listedValue($data, $featureId);
 
@@ -97,13 +101,10 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
                 throw new UnprocessableEntityHttpException('This feature already holds a free text on this product: delete it before adding a listed value.');
             }
 
-            $event = new FeatureProductUpdateEvent($productId, $featureId, $featureAvId);
+            $value = new ProductFeatureDTO($featureId, $featureAvId, false, $locale);
         }
 
-        $event->setLocale($locale);
-        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
-
-        return $this->asResource($event->getFeatureProduct(), $locale, $operation);
+        return $this->asResource($this->productFacade->setFeatureValue($productId, $value), $locale, $operation);
     }
 
     /**
@@ -125,11 +126,12 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
 
         $locale = $this->locale($data->getLocale());
 
-        $event = new FeatureProductUpdateEvent((int) $model->getProductId(), (int) $model->getFeatureId(), $this->text($data), true);
-        $event->setLocale($locale);
-        $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
+        $written = $this->productFacade->setFeatureValue(
+            (int) $model->getProductId(),
+            new ProductFeatureDTO((int) $model->getFeatureId(), $this->text($data), true, $locale),
+        );
 
-        return $this->asResource($event->getFeatureProduct(), $locale, $operation);
+        return $this->asResource($written, $locale, $operation);
     }
 
     /**
@@ -157,13 +159,10 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
                 ->getData(),
         );
 
-        $this->dispatcher->dispatch(new FeatureProductDeleteEvent($productId, $featureId), TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
+        $this->productFacade->deleteFeatureValue($productId, $featureId);
 
         foreach ($siblingValueIds as $siblingValueId) {
-            $this->dispatcher->dispatch(
-                new FeatureProductUpdateEvent($productId, $featureId, $siblingValueId),
-                TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE,
-            );
+            $this->productFacade->setFeatureValue($productId, new ProductFeatureDTO($featureId, $siblingValueId));
         }
     }
 
