@@ -112,6 +112,29 @@ final readonly class CheckoutTunnelShape
         return $this->slot($leftCode, $leftPosition) <=> $this->slot($rightCode, $rightPosition);
     }
 
+    /**
+     * The rows of the `checkout_step` table in the order the tunnel serves them.
+     *
+     * The table cannot say it on its own: a query orders on columns, and the tie rule is
+     * not one. Every reader of the rows, the back-office list, the moves and the
+     * progression, sorts them here, after the query.
+     *
+     * @param iterable<CheckoutStep> $steps
+     *
+     * @return list<CheckoutStep>
+     */
+    public function sortRows(iterable $steps): array
+    {
+        $sorted = [...$steps];
+
+        usort(
+            $sorted,
+            fn (CheckoutStep $left, CheckoutStep $right): int => $this->compare((string) $left->getCode(), $left->getPosition(), (string) $right->getCode(), $right->getPosition()),
+        );
+
+        return $sorted;
+    }
+
     private function tieRank(string $code): int
     {
         if (CheckoutStep::CODE_CART === $code) {

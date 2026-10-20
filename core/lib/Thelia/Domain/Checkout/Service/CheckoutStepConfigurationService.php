@@ -277,10 +277,7 @@ final readonly class CheckoutStepConfigurationService
      */
     private function orderedSteps(): array
     {
-        return iterator_to_array(
-            CheckoutStepQuery::create()->orderedByTunnel()->find(),
-            false,
-        );
+        return $this->tunnelShape->sortRows(CheckoutStepQuery::create()->orderedByTunnel()->find());
     }
 
     /**

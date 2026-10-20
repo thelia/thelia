@@ -14,12 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Checkout;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
+use Thelia\Domain\Checkout\Service\CheckoutStepTitleResolver;
 use Thelia\Domain\Checkout\Service\CheckoutTunnelShape;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
@@ -191,7 +194,12 @@ final class CheckoutViolationCollectionTest extends IntegrationTestCase
      */
     private function validationWith(array $providers): CheckoutValidationService
     {
-        return new CheckoutValidationService($providers, new CheckoutTunnelShape());
+        return new CheckoutValidationService(new CheckoutProgressionService(
+            $providers,
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        ));
     }
 
     /**

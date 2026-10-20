@@ -424,7 +424,93 @@ final class CheckoutProgressionTest extends IntegrationTestCase
     public function testAModuleStepSharingThePlaceOfTheDeliveryIsCheckedAtPlacementWhereItIsServed(): void
     {
         $checked = new \ArrayObject();
-        $recording = static fn (string $code, int $position): CheckoutStepProviderInterface => new class($code, $position, $checked) implements CheckoutStepProviderInterface {
+        $deliveryPosition = $this->getService(DeliveryStepProvider::class)->defaultPosition();
+
+        $this->placementOf([
+            $this->recordingStep('a_fixture_module_step', $deliveryPosition, $checked),
+            $this->recordingStep('delivery', $deliveryPosition, $checked),
+        ])->validateForOrder($this->cartWithAnItem());
+
+        self::assertSame(['delivery', 'a_fixture_module_step'], $checked->getArrayCopy());
+    }
+
+    /**
+     * A module step declaring `defaultPosition(): 10` and holding no row yet is served
+     * right before the payment, so it is checked there and not behind the confirmation
+     * where its raw position would put it.
+     */
+    public function testAnUnsyncedModuleStepDeclaredPastTheMoneyIsCheckedBeforeThePayment(): void
+    {
+        $checked = new \ArrayObject();
+
+        $this->placementOf([
+            $this->recordingStep('fixture_late_module_step', 10, $checked),
+            ...$this->recordingCoreSteps($checked),
+        ])->validateForOrder($this->cartWithAnItem());
+
+        self::assertSame(['cart', 'delivery', 'fixture_late_module_step', 'payment', 'confirmation'], $checked->getArrayCopy());
+    }
+
+    /**
+     * The position a merchant wrote in the table orders the checks as it orders the
+     * screens, and a step turned off is still checked.
+     */
+    public function testThePositionOfTheRowOrdersThePlacementChecksAndATurnedOffStepIsStillChecked(): void
+    {
+        $checked = new \ArrayObject();
+        (new CheckoutStep())->setCode('fixture_row_module_step')->setPosition(1)->setActive(0)->setMandatory(0)->save($this->getPropelConnection());
+        $this->progression()->forget();
+
+        $this->placementOf([
+            ...$this->recordingCoreSteps($checked),
+            $this->recordingStep('fixture_row_module_step', 9, $checked),
+        ])->validateForOrder($this->cartWithAnItem());
+
+        self::assertSame(['cart', 'fixture_row_module_step', 'delivery', 'payment', 'confirmation'], $checked->getArrayCopy());
+    }
+
+    /**
+     * What orders two rows sharing a position is the tie rule of the tunnel: the
+     * delivery first, whatever the code of the module row.
+     */
+    public function testTwoRowsSharingAPositionAreSortedByTheTunnelTieRule(): void
+    {
+        $deliveryPosition = $this->stepNamedInTable('delivery')->getPosition();
+        (new CheckoutStep())->setCode('agegate')->setPosition($deliveryPosition)->setActive(1)->setMandatory(0)->save($this->getPropelConnection());
+
+        $rows = (new CheckoutTunnelShape())->sortRows(CheckoutStepQuery::create()->orderedByTunnel()->find($this->getPropelConnection()));
+        $codes = array_map(static fn (CheckoutStep $step): string => (string) $step->getCode(), $rows);
+
+        self::assertSame(['cart', 'delivery', 'agegate', 'payment', 'confirmation'], $codes);
+    }
+
+    /**
+     * @param list<CheckoutStepProviderInterface> $providers
+     */
+    private function placementOf(array $providers): CheckoutValidationService
+    {
+        return new CheckoutValidationService(new CheckoutProgressionService(
+            $providers,
+            new CheckoutTunnelShape(),
+            $this->getService(CheckoutStepTitleResolver::class),
+            new NullLogger(),
+        ));
+    }
+
+    /**
+     * @return list<CheckoutStepProviderInterface>
+     */
+    private function recordingCoreSteps(\ArrayObject $checked): array
+    {
+        return array_map(
+            fn (CheckoutStepProviderInterface $provider): CheckoutStepProviderInterface => $this->recordingStep($provider->code(), $provider->defaultPosition(), $checked),
+            $this->stepProviders(),
+        );
+    }
+
+    private function recordingStep(string $code, int $position, \ArrayObject $checked): CheckoutStepProviderInterface
+    {
+        return new class($code, $position, $checked) implements CheckoutStepProviderInterface {
             public function __construct(private string $code, private int $position, private \ArrayObject $checked)
             {
             }
@@ -459,16 +545,6 @@ final class CheckoutProgressionTest extends IntegrationTestCase
                 return null;
             }
         };
-
-        $deliveryPosition = $this->getService(DeliveryStepProvider::class)->defaultPosition();
-        $providers = [
-            $recording('a_fixture_module_step', $deliveryPosition),
-            $recording('delivery', $deliveryPosition),
-        ];
-
-        (new CheckoutValidationService($providers, new CheckoutTunnelShape()))->validateForOrder($this->cartWithAnItem());
-
-        self::assertSame(['delivery', 'a_fixture_module_step'], $checked->getArrayCopy());
     }
 
     /**

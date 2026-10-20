@@ -19,12 +19,13 @@ use Thelia\Model\Base\CheckoutStepQuery as BaseCheckoutStepQuery;
 class CheckoutStepQuery extends BaseCheckoutStepQuery
 {
     /**
-     * The rows in the order the buyer walks them, from the first screen to the last.
+     * The rows by position, then by code, so that what the database returns never
+     * depends on how it happened to store them.
      *
-     * Two rows sharing a position is not something a buyer should see as a tunnel whose
-     * order changes between two page loads, so the code settles the tie: the order is
-     * the same for the back-office list, for the progression and for anything else
-     * reading the table.
+     * This is not the order the buyer walks them in: two rows sharing a position are
+     * ordered by the tie rule of the tunnel, which SQL cannot express. A reader that
+     * shows or acts on the order passes the result through
+     * `CheckoutTunnelShape::sortRows()`.
      *
      * @return $this
      */
