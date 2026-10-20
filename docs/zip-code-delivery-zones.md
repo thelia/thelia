@@ -75,7 +75,8 @@ step instead of the general message.
   again. Flexy's delivery step refreshes the copy of an address edited on it, and chooses
   the address again, asking the carriers and their postage again, when its country, state
   or postal code changed; another edit keeps the carrier and its postage as they were.
-- The radius around a shop (GeolocatedDelivery in Thelia 2) is a separate feature.
+- A radius around a shop is the job of the GeolocatedDelivery module (2.0.0 for Thelia 3),
+  a carrier of its own that zones and their postal code rules filter like any other.
 
 ## Back office
 
