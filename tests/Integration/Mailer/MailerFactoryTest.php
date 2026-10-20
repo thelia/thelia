@@ -141,6 +141,60 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('Your order ORD-42 at Corner Shop', $email->getSubject());
     }
 
+    public function testTheSubjectIsRenderedAsPlainTextWhileTheHtmlBodyStaysEscaped(): void
+    {
+        // A subject is a header, not HTML: the `&` of the shop name or of what the visitor
+        // typed must not reach the inbox as `&amp;`. The HTML body is HTML, and keeps escaping.
+        ConfigQuery::write('store_name', 'R&D Shop');
+        $this->saveContactMessage('test_contact_subject_with_entities');
+
+        $email = $this->mailerFactory->createEmailMessage(
+            'test_contact_subject_with_entities',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            ['subject' => 'Question & "delay" <urgent>'],
+            'en_US',
+        );
+
+        self::assertSame('R&D Shop - Contact: Question & "delay" <urgent>', $email->getSubject());
+        self::assertStringContainsString(
+            '<p>Question &amp; &quot;delay&quot; &lt;urgent&gt;</p>',
+            (string) $email->getHtmlBody(),
+        );
+    }
+
+    public function testALineBreakInASubjectVariableNeverOpensANewHeader(): void
+    {
+        ConfigQuery::write('store_name', 'Corner Shop');
+        $this->saveContactMessage('test_contact_subject_with_line_breaks');
+
+        $email = $this->mailerFactory->createEmailMessage(
+            'test_contact_subject_with_line_breaks',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            ['subject' => "Question\r\nBcc: intruder@example.com\nX-Injected: yes"],
+            'en_US',
+        );
+
+        $headers = strstr($email->toString(), "\r\n\r\n", true);
+        self::assertIsString($headers);
+        self::assertDoesNotMatchRegularExpression('/^(Bcc|X-Injected):/mi', $headers);
+        // Symfony Mime already encodes the break rather than ending the header with it, but the
+        // subject a mail client or an API transport reads must still be a single line.
+        self::assertSame('Corner Shop - Contact: Question Bcc: intruder@example.com X-Injected: yes', $email->getSubject());
+    }
+
+    private function saveContactMessage(string $name): void
+    {
+        $message = new Message();
+        $message->setName($name);
+        $message->setLocale('en_US');
+        $message->setSubject('{{ config(\'store_name\') }} - Contact: {{ subject }}');
+        $message->setHtmlMessage('<p>{{ subject }}</p>');
+        $message->setTextMessage('{{ subject }}');
+        $message->save();
+    }
+
     public function testCreateEmailMessageRestoresTheSessionLangWhenRenderingFails(): void
     {
         $session = $this->getService(RequestStack::class)->getMainRequest()->getSession();
