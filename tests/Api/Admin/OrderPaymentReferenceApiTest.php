@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
@@ -86,6 +87,57 @@ final class OrderPaymentReferenceApiTest extends ApiTestCase
         self::assertSame('pi_set_by_an_integration', $this->reread($order)->getTransactionRef());
     }
 
+    public function testAPatchThatLeavesThePaymentNamesOutChangesTheOtherFields(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->orderWithOneLine('pi_original', journal: true);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/orders/'.$order->getId(), ['deliveryRef' => 'PARCEL-43'], $token, 'merge-patch+json');
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('PARCEL-43', $this->reread($order)->getDeliveryRef());
+        self::assertSame('pi_original', $this->reread($order)->getTransactionRef());
+    }
+
+    public function testAPatchThatEmptiesThePaymentModuleOfAnOrderWithAPaymentJournalIsRefused(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->orderWithOneLine('pi_original', journal: true);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/orders/'.$order->getId(), ['paymentModule' => null], $token, 'merge-patch+json');
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame($order->getPaymentModuleId(), $this->reread($order)->getPaymentModuleId());
+    }
+
+    public function testAnEmptyReferenceIsNoChangeOfAMissingOne(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->orderWithOneLine(null, journal: true);
+
+        $body = $this->bodyOf($token, $order);
+        $body['transactionRef'] = '';
+        $body['deliveryRef'] = 'PARCEL-44';
+        $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $body, $token);
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('PARCEL-44', $this->reread($order)->getDeliveryRef());
+    }
+
+    public function testAPutThatLeavesTheReferenceOutKeepsIt(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $order = $this->orderWithOneLine('pi_original', journal: true);
+
+        $body = $this->bodyOf($token, $order);
+        unset($body['transactionRef']);
+        $body['deliveryRef'] = 'PARCEL-45';
+        $response = $this->jsonRequest('PUT', '/api/admin/orders/'.$order->getId(), $body, $token);
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('pi_original', $this->reread($order)->getTransactionRef());
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -112,7 +164,9 @@ final class OrderPaymentReferenceApiTest extends ApiTestCase
         $order->setTransactionRef($transactionRef)->save();
 
         if ($journal) {
-            $this->getService(PaymentTransactionRecorder::class)->recordCapture($order, 10, $transactionRef, moduleCode: 'Cheque');
+            null === $transactionRef
+                ? $this->getService(PaymentTransactionRecorder::class)->recordCapture($order, 10, null, PaymentTransactionState::PENDING, moduleCode: 'Cheque')
+                : $this->getService(PaymentTransactionRecorder::class)->recordCapture($order, 10, $transactionRef, moduleCode: 'Cheque');
         }
 
         $orderProduct = (new OrderProduct())
