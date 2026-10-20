@@ -27,6 +27,9 @@ use Thelia\Model\Lang;
 
 final readonly class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    /** MySQL and MariaDB refuse a query joining more tables than this, the base table included. */
+    private const int MAX_JOINED_TABLES = 61;
+
     public function __construct(
         private int $maxJoins = 30,
     ) {
@@ -70,12 +73,39 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
             $options['denormalization_groups'] = $denormalizationGroups;
         }
 
+        // Every translatable relation joins its translation table once per active
+        // language, so a resource reaching many of them passes the limit of the
+        // database as languages are added. The joins are tried on a copy first; past
+        // the limit, the relations reached last are joined without their
+        // translations, which the transformer then reads from the models.
+        $probe = clone $query;
+        $probeJoinCount = 0;
+        $probeTranslationTablesLeft = \PHP_INT_MAX;
+        $this->joinRelations(
+            query: $probe,
+            resourceClass: $resourceClass,
+            operation: $operation,
+            context: $context,
+            options: $options,
+            joinCount: $probeJoinCount,
+            translationTablesLeft: $probeTranslationTablesLeft,
+        );
+
+        $joinedTables = 1 + \count($probe->getJoins());
+        $translationTables = \PHP_INT_MAX - $probeTranslationTablesLeft;
+        $translationTablesLeft = $joinedTables > self::MAX_JOINED_TABLES
+            ? self::MAX_JOINED_TABLES - ($joinedTables - $translationTables)
+            : \PHP_INT_MAX;
+
+        $joinCount = 0;
         $this->joinRelations(
             query : $query,
             resourceClass: $resourceClass,
             operation: $operation,
             context: $context,
             options: $options,
+            joinCount: $joinCount,
+            translationTablesLeft: $translationTablesLeft,
         );
     }
 
@@ -91,6 +121,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         ?string $parentClass = null,
         ?\ReflectionClass $parentReflector = null,
         ?string $parentAlias = null,
+        int &$translationTablesLeft = \PHP_INT_MAX,
     ): void {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
@@ -101,7 +132,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         $baseJoinAlias = strtolower($baseJoinAlias).'_';
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class) && $operation instanceof Operation) {
-            $this->joinI18ns($query, $resourceClass, $operation, $reflector, $baseJoinAlias);
+            $this->joinI18ns($query, $resourceClass, $operation, $reflector, $baseJoinAlias, $translationTablesLeft);
         }
 
         foreach ($reflector->getProperties() as $property) {
@@ -213,6 +244,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
                     parentClass: $resourceClass,
                     parentReflector: $reflector,
                     parentAlias: $joinAlias,
+                    translationTablesLeft: $translationTablesLeft,
                 );
                 $relationQuery->endUse();
             }
@@ -228,6 +260,7 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         Operation $operation,
         \ReflectionClass $reflector,
         string $baseJoinAlias,
+        int &$translationTablesLeft,
     ): void {
         $normalizationContextGroups = $operation->getNormalizationContext()['groups'] ?? [];
         $i18nAttributeGroups = $reflector->getProperty('i18ns')->getAttributes(Groups::class, \ReflectionAttribute::IS_INSTANCEOF);
@@ -244,6 +277,14 @@ final readonly class EagerLoadingExtension implements QueryCollectionExtensionIn
         }
 
         $langs = Lang::getActiveLangs();
+
+        // All the languages of a relation or none: a relation left out is read
+        // from its model, one with half of its languages joined would be read twice.
+        if (\count($langs) > $translationTablesLeft) {
+            return;
+        }
+
+        $translationTablesLeft -= \count($langs);
         $i18nResource = new ($resourceClass::getI18nResourceClass());
 
         if (!$i18nResource instanceof I18n) {
