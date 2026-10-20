@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartCheckoutEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementResult;
 use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
@@ -46,6 +49,7 @@ final readonly class ExpressCheckoutPlacementService
         private CheckoutPlacementService $placementService,
         private PostageHandler $postageHandler,
         private ExpressCheckoutTotal $checkoutTotal,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -61,6 +65,7 @@ final readonly class ExpressCheckoutPlacementService
 
         $this->writeThePaymentModuleOnTheCart($cart, $request);
         $this->refuseATotalTheBuyerNeverSaw($cart, $request);
+        $this->writeTheDeliveryAddressOfANothingToShipCart($cart);
 
         return $this->placementService->place(new CheckoutPlacementRequest(
             $cart,
@@ -74,15 +79,33 @@ final readonly class ExpressCheckoutPlacementService
     /**
      * Where the parcel goes: the carrier and the addresses the checkout wrote on the cart.
      * All of them have to be there, or the order would leave without a destination the
-     * buyer chose.
+     * buyer chose. A cart with nothing to ship is never asked for a delivery address: its
+     * carrier and its invoice address are enough.
      */
     private function refuseACartWithoutTheDeliveryTheCheckoutChose(Cart $cart): void
     {
-        $country = $cart->getCartAddressRelatedByAddressDeliveryId()?->getCountry();
+        $country = $this->checkoutTotal->addressTheCartIsTaxedFor($cart)?->getCountry();
 
         if (null === $cart->getDeliveryModuleId() || null === $cart->getAddressInvoiceId() || null === $country) {
             throw ExpressCheckoutRefusedException::becauseNoDeliveryIsChosenYet();
         }
+    }
+
+    /**
+     * An order is written with a delivery address, even when nothing is shipped. The buyer
+     * of a cart with nothing to ship was only asked where they are invoiced, so the order
+     * is delivered there, on a copy of its own the invoice address does not share.
+     */
+    private function writeTheDeliveryAddressOfANothingToShipCart(Cart $cart): void
+    {
+        if (null !== $cart->getAddressDeliveryId() || !$cart->isVirtual()) {
+            return;
+        }
+
+        $event = (new CartCheckoutEvent($cart))
+            ->setCartAddress($cart->getCartAddressRelatedByAddressInvoiceId()?->copy());
+
+        $this->eventDispatcher->dispatch($event, TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL);
     }
 
     /**
