@@ -142,6 +142,46 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
     }
 
     /**
+     * Another city, the same postal code: a carrier may price by city, so the address is
+     * chosen again and the carrier asked again.
+     */
+    public function testEditingTheCityOfTheDeliveryAddressOnTheStepAsksTheCarriersAgain(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $cart = $this->guestWithACarrier($guest);
+
+        $this->editOnTheStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
+
+        self::assertSame('Paris 2e', $this->deliveryCopyOf($guest)?->getCity());
+        CartTableMap::clearInstancePool();
+        self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
+    }
+
+    public function testBackOnTheStepACityEditedElsewhereAsksTheCarriersAgain(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $cart = $this->guestWithACarrier($guest);
+        $address->setCity('Paris 2e')->save($this->getPropelConnection());
+
+        $this->client->request('GET', '/checkout/delivery');
+
+        self::assertSame('Paris 2e', $this->deliveryCopyOf($guest)?->getCity());
+        CartTableMap::clearInstancePool();
+        self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
+    }
+
+    public function testACityEditedOnThePaymentStepSendsBackToTheDeliveryStep(): void
+    {
+        [, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $this->skipUnlessThePaymentStepFollowsTheDeliveryAddress();
+
+        $response = $this->editOnThePaymentStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
+
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('/checkout/delivery', $response->getTargetUrl());
+    }
+
+    /**
      * A new address saved on the step is not the one the cart is delivered to: the copy stays.
      */
     public function testSavingANewAddressLeavesTheDeliveryCopy(): void
@@ -317,6 +357,15 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         if (!method_exists(self::PAYMENT_STEP_INVOICE_COMPONENT, 'addressSaved')) {
             self::markTestSkipped('The installed front-office theme does not follow the delivery address edited on the payment step.');
         }
+    }
+
+    private function guestWithACarrier(Customer $guest): Cart
+    {
+        $cart = $this->cartOf($guest);
+        $carrierId = (int) ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()?->getId();
+        $cart->setDeliveryModuleId($carrierId)->save($this->getPropelConnection());
+
+        return $cart;
     }
 
     private function cartOf(Customer $guest): Cart
