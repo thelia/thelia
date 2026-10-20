@@ -151,11 +151,7 @@ class CartGuard
         }
 
         // Named before the generic refusal: the buyer has to know which product is in the way.
-        $excludingProductIds = $this->cartShippingRules->for($cart)->productsExcluding((int) $module->getId());
-
-        if ([] !== $excludingProductIds) {
-            throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($excludingProductIds, $this->locale()), [] !== $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState()));
-        }
+        $this->refuseACarrierTheProductsExclude($cart, (int) $module->getId());
 
         if (!$this->deliveryModuleEligibilityChecker->isEligible($module, $cart, $country, $address->getState())) {
             throw new InvalidDeliveryException('Delivery module does not deliver to this address');
