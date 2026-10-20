@@ -167,7 +167,13 @@ final class DestinationRestrictionChecker implements ResetInterface
         $reasons = $this->reasonsOf(array_values(array_unique($refusingGroup)), $locale);
         $lines = [];
 
-        foreach ($refusingGroup as $productId => $groupId) {
+        // In the order the products were given (the cart's), not the order the groups were read in.
+        foreach ($productIds as $productId) {
+            if (!isset($refusingGroup[$productId])) {
+                continue;
+            }
+
+            $groupId = $refusingGroup[$productId];
             $lines[] = new RestrictedLine($productId, $titles[$productId] ?? (string) $productId, $reasons[$groupId] ?? '');
         }
 
