@@ -23,8 +23,9 @@ use Thelia\Model\CountryQuery;
 /**
  * Reports on an address form what CompanyIdentifierRules has to say about its identifiers.
  *
- * Both fields are required as soon as a company name is typed, and ignored otherwise: the
- * obligation depends on a sibling field, which no NotBlank can express - hence Callback
+ * Both fields are optional: an empty SIRET or VAT number is always accepted. Their format is
+ * checked only once a value is typed, and only when a company name is given. The check depends
+ * on a sibling field, which no single-field constraint can express - hence Callback
  * constraints, the way AddressCountryValidationTrait handles the zip code and the state.
  */
 trait AddressLegalIdentifiersValidationTrait
