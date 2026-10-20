@@ -196,6 +196,31 @@ final class DeliverWebhookHandlerTest extends IntegrationTestCase
         self::assertSame(WebhookStatus::DELIVERY_FAILED, $this->reread($delivery)->getStatus());
     }
 
+    public function testADeliveryNotYetVisibleOnAQueueIsLookedForAgainLater(): void
+    {
+        $this->handler(inline: false)(new DeliverWebhook(987654321));
+
+        self::assertCount(1, $this->dispatched);
+        self::assertEquals(new DeliverWebhook(987654321, 1), $this->dispatched[0]->getMessage());
+        $delay = $this->dispatched[0]->last(DelayStamp::class);
+        self::assertGreaterThan(0, $delay?->getDelay());
+        self::assertSame(0, $this->requests);
+    }
+
+    public function testTheLookupsStopAfterAFewTries(): void
+    {
+        $this->handler(inline: false)(new DeliverWebhook(987654321, 5));
+
+        self::assertSame([], $this->dispatched);
+    }
+
+    public function testWithoutAQueueAMissingDeliveryIsNotLookedForAgain(): void
+    {
+        $this->handler(inline: true)(new DeliverWebhook(987654321));
+
+        self::assertSame([], $this->dispatched);
+    }
+
     public function testAnUnknownDeliveryIsIgnored(): void
     {
         $this->handler(inline: false)(new DeliverWebhook(987654321));

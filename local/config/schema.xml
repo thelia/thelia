@@ -3362,6 +3362,14 @@
     <index name="idx_webhook_delivery_created_at">
       <index-column name="created_at" />
     </index>
+    <index name="idx_webhook_delivery_event_created">
+      <index-column name="event" />
+      <index-column name="created_at" />
+    </index>
+    <index name="idx_webhook_delivery_status_created">
+      <index-column name="status" />
+      <index-column name="created_at" />
+    </index>
     <unique name="webhook_delivery_uuid_UNIQUE">
       <unique-column name="delivery_uuid" />
     </unique>

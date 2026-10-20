@@ -33,8 +33,9 @@ use Thelia\Model\Map\WebhookDeliveryTableMap;
  * second whatever the receiver chose to echo back. The back office shows both to
  * an administrator; an API client reads the outcome and replays nothing from here.
  *
- * The page is capped below the global ceiling, and every filter reads a column the
- * table indexes (`subscription_id` with `created_at`, `created_at`).
+ * The page is capped below the global ceiling, and every filter reads an indexed
+ * column: `subscription_id` and `event` and `status`, each with `created_at`, and
+ * `created_at` and `delivery_uuid` alone.
  */
 #[ApiResource(
     operations: [

@@ -237,6 +237,41 @@ final class WebhookPublishingTest extends IntegrationTestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testPaymentIsPublishedWhenTheOrderEntersTheStatusesTheShopCountsAsPaid(): void
+    {
+        $this->subscribe(['order.paid']);
+        $order = $this->order();
+
+        $this->moveTo($order, 'processing');
+
+        self::assertSame(['order.paid'], $this->publishedTypes());
+    }
+
+    public function testAnOrderThatStaysAmongThePaidStatusesIsNotPaidAgain(): void
+    {
+        $order = $this->order();
+        $this->moveTo($order, 'paid');
+        $this->subscribe(['order.paid']);
+
+        $this->moveTo($order, 'processing');
+        $this->moveTo($order, 'sent');
+        $this->moveTo($order, 'paid');
+
+        self::assertSame([], $this->publishedTypes());
+    }
+
+    public function testAnOrderThatLeftThePaidStatusesAndComesBackIsPaidAgain(): void
+    {
+        $order = $this->order();
+        $this->moveTo($order, 'paid');
+        $this->moveTo($order, 'canceled');
+        $this->subscribe(['order.paid']);
+
+        $this->moveTo($order, 'paid');
+
+        self::assertSame(['order.paid'], $this->publishedTypes());
+    }
+
     public function testAPaidTransitionPublishesTheStatusChangeAndThePayment(): void
     {
         $this->subscribe(['order.status_changed', 'order.paid']);
@@ -313,6 +348,22 @@ final class WebhookPublishingTest extends IntegrationTestCase
         $body = json_decode($this->requests[0]['body'], true, 512, \JSON_THROW_ON_ERROR);
         self::assertSame('product.updated', $body['type']);
         self::assertSame($product->getId(), $body['data']['id']);
+    }
+
+    private function moveTo(Order $order, string $statusCode): void
+    {
+        $status = OrderStatusQuery::create()->findOneByCode($statusCode, $this->getPropelConnection());
+        self::assertNotNull($status);
+
+        $this->dispatcher()->dispatch((new OrderEvent($order))->setStatus($status->getId()), TheliaEvents::ORDER_UPDATE_STATUS);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function publishedTypes(): array
+    {
+        return array_map(static fn (array $request): string => json_decode($request['body'], true, 512, \JSON_THROW_ON_ERROR)['type'], $this->requests);
     }
 
     private function product(): \Thelia\Model\Product

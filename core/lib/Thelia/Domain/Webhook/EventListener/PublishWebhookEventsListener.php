@@ -15,7 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\Webhook\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
+use Thelia\Api\Resource\Customer as CustomerResource;
+use Thelia\Api\Resource\Product as ProductResource;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -70,9 +74,9 @@ readonly class PublishWebhookEventsListener
             $order = $event->getOrder();
             $this->publisher->publish('order.status_changed', $order);
 
-            $wasPaid = OrderStatusQuery::create()->findPk($previousStatusId)?->isPaid() ?? false;
+            $wasPaid = OrderStatusQuery::create()->findPk($previousStatusId)?->isPaid(false) ?? false;
 
-            if (!$wasPaid && $order->getOrderStatus()?->isPaid()) {
+            if (!$wasPaid && $order->getOrderStatus()?->isPaid(false)) {
                 $this->publisher->publish('order.paid', $order);
             }
         });
@@ -83,6 +87,42 @@ readonly class PublishWebhookEventsListener
     {
         $this->safely(function () use ($event): void {
             $this->publisher->publish('customer.created', $event->getCustomer());
+        });
+    }
+
+    #[AsEventListener(event: TheliaEvents::CREATE_CUSTOMER_MINIMAL, priority: 32)]
+    public function onCustomerRegistered(CustomerCreateOrUpdateMinimalEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            $customer = $event->getCustomer();
+
+            if (null !== $customer) {
+                $this->publisher->publish('customer.created', $customer);
+            }
+        });
+    }
+
+    /**
+     * The API saves the model without going through the actions: a customer it creates
+     * and a product it writes are published from here. It has no state from before the
+     * write to compare with, so a product written through the API is published even
+     * when the write changed nothing.
+     */
+    #[AsEventListener(event: ResourcePersistedEvent::class, priority: 32)]
+    public function onResourcePersisted(ResourcePersistedEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            if ($event->isDelete()) {
+                return;
+            }
+
+            if (CustomerResource::class === $event->getResourceClass() && $event->isCreate()) {
+                $this->publisher->publish('customer.created', $event->getModel());
+            }
+
+            if (ProductResource::class === $event->getResourceClass() && !$event->isCreate()) {
+                $this->publisher->publish('product.updated', $event->getModel());
+            }
         });
     }
 

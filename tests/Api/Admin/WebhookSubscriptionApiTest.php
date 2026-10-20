@@ -51,6 +51,20 @@ final class WebhookSubscriptionApiTest extends ApiTestCase
         self::assertSame($data['secret'], WebhookSubscriptionQuery::create()->findPk($data['id'])?->getSecret());
     }
 
+    public function testARowWhoseEventsCannotBeReadDoesNotBreakTheWholeList(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $this->subscription()->setEvents('not json')->save();
+        $this->subscription();
+
+        $response = $this->jsonRequest('GET', self::URI, token: $token);
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        $events = array_column(json_decode((string) $response->getContent(), true)['hydra:member'], 'events');
+        self::assertContains([], $events);
+        self::assertContains(['order.created'], $events);
+    }
+
     public function testNoReadEverCarriesTheSecret(): void
     {
         $token = $this->authenticateAsAdmin();
