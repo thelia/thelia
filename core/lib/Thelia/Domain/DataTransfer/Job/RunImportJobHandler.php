@@ -110,7 +110,8 @@ final readonly class RunImportJobHandler
 
     private function run(ImportJob $job): ImportEvent
     {
-        $import = $job->getImport() ?? throw new JobRefusedException('The import of this job no longer exists.');
+        // The row goes with its import (ON DELETE CASCADE): a job always has one.
+        $import = $job->getImport();
         $path = $this->storage->pathOf($job);
 
         if (!is_file($path)) {

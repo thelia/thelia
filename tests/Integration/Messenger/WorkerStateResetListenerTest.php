@@ -31,6 +31,7 @@ use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\EventListener\ActiveLangsCacheListener;
 use Thelia\Core\EventListener\DefaultCountryCacheListener;
 use Thelia\Core\EventListener\ModuleConfigCacheListener;
+use Thelia\Core\EventListener\ZipCodeRuleCacheListener;
 use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Translation\Translator;
@@ -41,6 +42,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleQuery;
@@ -84,6 +86,7 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
                 ActiveLangsCacheListener::class,
                 DefaultCountryCacheListener::class,
                 ModuleConfigCacheListener::class,
+                ZipCodeRuleCacheListener::class,
                 ProductPriceCurrencyListener::class,
             ],
             $coreListeners,
@@ -117,6 +120,24 @@ final class WorkerStateResetListenerTest extends IntegrationTestCase
             self::assertSame($next->getId(), Currency::getDefaultCurrency()->getId());
         } finally {
             Currency::resetDefaultCurrencyCache();
+        }
+    }
+
+    public function testADefaultLanguageChangedSinceThePreviousJobIsSeenByTheNext(): void
+    {
+        $previous = Lang::getDefaultLanguage();
+        $next = LangQuery::create()->filterById($previous->getId(), '<>')->findOne();
+        self::assertNotNull($next);
+
+        LangQuery::create()->update(['ByDefault' => 0]);
+        LangQuery::create()->filterById($next->getId())->update(['ByDefault' => 1, 'Active' => 1]);
+
+        try {
+            $this->receiveAJob();
+
+            self::assertSame($next->getId(), Lang::getDefaultLanguage()->getId());
+        } finally {
+            Lang::resetDefaultLanguageCache();
         }
     }
 

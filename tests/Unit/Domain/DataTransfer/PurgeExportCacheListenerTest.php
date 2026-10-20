@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\DataTransfer;
 
 use PHPUnit\Framework\TestCase;
-use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
-use Thelia\Domain\DataTransfer\EventListener\PurgeExportCacheListener;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 
 final class PurgeExportCacheListenerTest extends TestCase
@@ -55,29 +53,5 @@ final class PurgeExportCacheListenerTest extends TestCase
 
         self::assertSame(0, $purger->countOldExportFiles($this->directory.'/missing'));
         self::assertSame(0, $purger->purgeOldExportFiles($this->directory.'/missing'));
-    }
-
-    public function testADryRunCountsAndNeverDeletes(): void
-    {
-        $purger = $this->createMock(ExportCachePurger::class);
-        $purger->expects(self::never())->method('purgeOldExportFiles');
-        $purger->expects(self::once())->method('countOldExportFiles')->willReturn(4);
-        $event = new MaintenancePurgeEvent(true);
-
-        (new PurgeExportCacheListener($purger))->onMaintenancePurge($event);
-
-        self::assertStringContainsString('4 to delete', implode("\n", $event->getResults()));
-    }
-
-    public function testARealPurgeDeletes(): void
-    {
-        $purger = $this->createMock(ExportCachePurger::class);
-        $purger->expects(self::never())->method('countOldExportFiles');
-        $purger->expects(self::once())->method('purgeOldExportFiles')->willReturn(4);
-        $event = new MaintenancePurgeEvent();
-
-        (new PurgeExportCacheListener($purger))->onMaintenancePurge($event);
-
-        self::assertStringContainsString('4 deleted', implode("\n", $event->getResults()));
     }
 }

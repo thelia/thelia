@@ -64,7 +64,8 @@ final readonly class RunExportJobHandler
 
     private function run(ExportJob $job): void
     {
-        $export = $job->getExport() ?? throw new JobRefusedException('The export of this job no longer exists.');
+        // The row goes with its export (ON DELETE CASCADE): a job always has one.
+        $export = $job->getExport();
         // The format may have gone with its module since the export was asked for.
         if (!$this->serializerManager->has($job->getSerializer())) {
             throw new JobRefusedException(\sprintf('The format "%s" is no longer available on this server.', $job->getSerializer()));

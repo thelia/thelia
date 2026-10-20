@@ -17,15 +17,16 @@ namespace Thelia\Messenger\EventListener;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\Routing\Rewriting\RewritingUrlMemoizer;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -39,9 +40,10 @@ use Thelia\Model\TaxRuleQuery;
  *
  * A worker is one process handling thousands of jobs, and the core keeps a few
  * things in memory for as long as a request or a command lasts: the settings, the
- * active languages, the default country and currency, the module settings, the
- * rewritten URLs, the currency of the prices, the taxes of a rule, the return
- * statuses and the results of the loops. Each of them is forgotten when a command starts
+ * active and default languages, the default country and currency, the module
+ * settings, the rewritten URLs, the currency of the prices, the taxes of a rule, the
+ * return statuses, the results of the loops and the postal code rules of the delivery
+ * zones. Each of them is forgotten when a command starts
  * (ConsoleEvents::COMMAND) or a request comes in; without this, a worker started on
  * Monday still applies on Friday the settings it read on Monday, and a job that set
  * a language hands it to the next one.
@@ -93,6 +95,7 @@ final readonly class WorkerStateResetListener
         $this->configCacheService->initCacheConfigs();
 
         Lang::resetActiveLangsCache();
+        Lang::resetDefaultLanguageCache();
         Country::resetDefaultCountryCache();
         ModuleConfigQuery::resetConfigCache();
         $this->rewritingUrlMemoizer->clear();
@@ -104,6 +107,7 @@ final readonly class WorkerStateResetListener
         TaxRuleQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
         BaseLoop::resetCachedResults();
+        AreaZipCodeRuleQuery::forgetRuleSets();
 
         // There is no request in a worker, so the translator answers with the
         // locale it was last given: the one of the previous job, if it set one.

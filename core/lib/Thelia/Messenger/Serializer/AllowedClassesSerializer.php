@@ -103,25 +103,25 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
         $headers = $encodedEnvelope['headers'] ?? null;
 
         if (!\is_array($headers) || !\is_string($headers['type'] ?? null)) {
-            return new Envelope(new UndecodableJob('', 'The queued job does not say what class it is.', (string) ($encodedEnvelope['body'] ?? '')));
+            return new Envelope(new UndecodableJob('', 'The queued job does not say what class it is.', $encodedEnvelope['body']));
         }
 
         try {
             $this->assertAllowedMessage($headers['type'], MessageDecodingFailedException::class);
 
             foreach (array_keys($headers) as $name) {
-                if (\is_string($name) && str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
+                if (str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
                     $this->assertAllowedStamp(substr($name, \strlen(self::STAMP_HEADER_PREFIX)), MessageDecodingFailedException::class);
                 }
             }
         } catch (MessageDecodingFailedException $exception) {
-            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), $exception->getMessage());
+            return $this->undecodable($headers, $encodedEnvelope['body'], $exception->getMessage());
         }
 
         // Told before any part is built: a part built from a path looks at that path at
         // once, and whether it exists would show in the reason kept with the job.
-        if (SendEmailMessage::class === $headers['type'] && QueuedMailFiles::namesAFileBeforeBuilding((string) ($encodedEnvelope['body'] ?? ''))) {
-            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), self::MAIL_READING_A_FILE);
+        if (SendEmailMessage::class === $headers['type'] && QueuedMailFiles::namesAFileBeforeBuilding($encodedEnvelope['body'])) {
+            return $this->undecodable($headers, $encodedEnvelope['body'], self::MAIL_READING_A_FILE);
         }
 
         try {
@@ -133,13 +133,13 @@ final readonly class AllowedClassesSerializer implements SerializerInterface
             // may quote it: the log names the exception, the job keeps a reason of its own.
             Tlog::getInstance()->addError(\sprintf('A queued %s could not be read: %s', $headers['type'], JobFailureMessage::forLog($exception)));
 
-            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), \sprintf('Its content no longer fits the class %s.', $headers['type']));
+            return $this->undecodable($headers, $encodedEnvelope['body'], \sprintf('Its content no longer fits the class %s.', $headers['type']));
         }
 
         $message = $envelope->getMessage();
 
         if ($message instanceof SendEmailMessage && QueuedMailFiles::readsAFile($message)) {
-            return $this->undecodable($headers, (string) ($encodedEnvelope['body'] ?? ''), self::MAIL_READING_A_FILE);
+            return $this->undecodable($headers, $encodedEnvelope['body'], self::MAIL_READING_A_FILE);
         }
 
         return $envelope;

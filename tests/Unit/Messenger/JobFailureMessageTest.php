@@ -93,4 +93,12 @@ final class JobFailureMessageTest extends TestCase
     {
         self::assertSame('The extension "csv ERROR forged" is not allowed', JobFailureMessage::forLog(new UploadRefusedException("The extension \"csv\nERROR forged\" is not allowed")));
     }
+
+    /**
+     * Nor can they hold a character a terminal reading the log would obey or hide.
+     */
+    public function testTheLogKeepsNoControlCharacterOfTheWords(): void
+    {
+        self::assertSame('The extension "csv?[2J?gpj" is not allowed', JobFailureMessage::forLog(new UploadRefusedException("The extension \"csv\x1b[2J\u{202E}gpj\" is not allowed")));
+    }
 }

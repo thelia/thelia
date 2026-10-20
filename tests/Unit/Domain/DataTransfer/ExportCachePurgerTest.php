@@ -45,13 +45,20 @@ final class ExportCachePurgerTest extends TestCase
     }
 
     /**
-     * maintenance:purge --dry-run promises to write nothing.
+     * maintenance:purge --dry-run promises to write nothing: the count deletes nothing.
      */
     public function testADryRunCountsTheFilesAndDeletesNone(): void
     {
         self::assertSame(1, (new ExportCachePurger())->countOldExportFiles($this->directory));
 
         self::assertFileExists($this->directory.'/old.csv');
+        self::assertFileExists($this->directory.'/fresh.csv');
+    }
+
+    public function testAMissingDirectoryHoldsNothing(): void
+    {
+        self::assertSame(0, (new ExportCachePurger())->countOldExportFiles($this->directory.'/missing'));
+        self::assertSame(0, (new ExportCachePurger())->purgeOldExportFiles($this->directory.'/missing'));
     }
 
     /**
