@@ -227,7 +227,7 @@ final readonly class PaymentCaptureService
                 $transaction,
                 PaymentTransactionState::FAILED,
                 null,
-                self::ERROR_CODE_EXCEPTION,
+                $refusal->getProviderCode(),
                 $refusal->getMessage(),
                 $moduleCode,
             ));

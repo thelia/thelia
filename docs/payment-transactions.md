@@ -186,7 +186,10 @@ published module implements would break them all.
   through the recorder under the reference it answered with, which settles the
   pending line.
 - A `PaymentRefusedException` thrown by the module is a refusal: the line is
-  settled as failed with its message, and the exception rethrown. Any other
+  settled as failed with its message, and the exception rethrown. Built with
+  `PaymentRefusedException::withProviderCode($message, $code)`, it also carries
+  the code the provider answered (cut to 50 characters), written as the line's
+  error code; built the usual way, the line has no error code. Any other
   exception — a timeout, a broken connection, an answer it could not read, a
   plain `PaymentException` included — leaves the line **pending**: the call may
   have reached the provider. The technical message goes to the log, never to the
