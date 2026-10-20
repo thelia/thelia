@@ -85,6 +85,18 @@ final class DemoImportCommandTest extends IntegrationTestCase
         self::assertSame($firstUrls, RewritingUrlQuery::create()->count(), 'a reset import starts from an empty rewriting table');
     }
 
+    public function testDemoProductsAreNotAllCreatedAtTheSameInstant(): void
+    {
+        $this->runImport();
+
+        $dates = [];
+        foreach (ProductQuery::create()->find() as $product) {
+            $dates[$product->getCreatedAt()?->format('Y-m-d')] = true;
+        }
+
+        self::assertGreaterThan(1, \count($dates), 'the newest-first and oldest-first sorts need distinct creation dates');
+    }
+
     /**
      * The point of the demo data is that the shop can be walked end to end. Without a
      * carrier the walk stops at the delivery step with "No delivery method is available
