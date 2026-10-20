@@ -109,24 +109,25 @@ class ImportHandler
     public function import(Import $import, File $file, ?Lang $language = null, ?\Closure $onProgress = null): ImportEvent
     {
         $archiver = $this->matchArchiverByExtension($file->getFilename());
-        $extractedDirectory = null;
+        // The archiver and the folder an archive is extracted into, for an archive only.
+        $extraction = null;
 
         if ($archiver instanceof AbstractArchiver) {
             $this->archiveInspector->assertExtractable($file->getPathname(), $archiver->getExtension());
-            $extractedDirectory = $file->getPath().DS.uniqid('', true);
+            $extraction = ['archiver' => $archiver, 'directory' => $file->getPath().DS.uniqid('', true)];
         }
 
         // The extracted copy is only read here: it goes once the import is over,
         // whatever came of it, rather than piling up next to the uploads.
         try {
-            if (null !== $extractedDirectory && $archiver instanceof AbstractArchiver) {
-                $file = $this->extractInto($file, $archiver, $extractedDirectory);
+            if (null !== $extraction) {
+                $file = $this->extractInto($file, $extraction['archiver'], $extraction['directory']);
             }
 
             return $this->importFile($import, $file, $language, $onProgress);
         } finally {
-            if (null !== $extractedDirectory) {
-                (new Filesystem())->remove($extractedDirectory);
+            if (null !== $extraction) {
+                (new Filesystem())->remove($extraction['directory']);
             }
         }
     }

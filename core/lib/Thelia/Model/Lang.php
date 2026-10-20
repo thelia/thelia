@@ -50,6 +50,11 @@ class Lang extends BaseLang
         return self::$defaultLanguage;
     }
 
+    public static function resetDefaultLanguageCache(): void
+    {
+        self::$defaultLanguage = null;
+    }
+
     /**
      * The active languages, read once per process.
      *
