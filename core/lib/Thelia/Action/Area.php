@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Event\AreaEvent;
@@ -67,7 +68,32 @@ class Area extends BaseAction implements EventSubscriberInterface
             ->filterByAreaId($area->getId())
             ->delete();
 
+        $this->removeZipCodeRulesOfCountriesThatLeft((int) $area->getId(), $event->getCountryIds());
+
         return $area;
+    }
+
+    /**
+     * A postal code rule written for a country applies to no one once the country left the
+     * zone, and would apply again, unseen, if the country came back: it goes with it. A
+     * country still in the zone through another of its states keeps its rules.
+     *
+     * @param array<int|string> $countryIds
+     */
+    private function removeZipCodeRulesOfCountriesThatLeft(int $areaId, array $countryIds): void
+    {
+        foreach (array_unique(array_map('intval', $countryIds)) as $countryId) {
+            if (CountryAreaQuery::create()->filterByAreaId($areaId)->filterByCountryId($countryId)->exists()) {
+                continue;
+            }
+
+            // One by one, so that the model hooks of each deleted rule run.
+            AreaZipCodeRuleQuery::create()
+                ->filterByAreaId($areaId)
+                ->filterByCountryId($countryId)
+                ->find()
+                ->delete();
+        }
     }
 
     public function delete(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
