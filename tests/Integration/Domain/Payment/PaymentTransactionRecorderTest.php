@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
@@ -22,6 +23,7 @@ use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\InvalidPaymentAmountException;
+use Thelia\Domain\Payment\Exception\InvalidProviderReferenceException;
 use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Service\PaymentJournalLock;
@@ -299,6 +301,31 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         $this->expectExceptionMessage('100');
 
         $this->recorder->recordCapture($this->order(120), 120, str_repeat('R', 101), moduleCode: 'Cheque');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function forgedReferences(): iterable
+    {
+        yield 'line break' => ["PSP-1\n2026-10-20 [ERROR] forged"];
+        yield 'right-to-left override' => ["PSP-\u{202E}1"];
+        yield 'byte outside UTF-8' => ["PSP-\xFF"];
+    }
+
+    #[DataProvider('forgedReferences')]
+    public function testAReferenceThatWouldForgeALogLineOrHideTextIsRefused(string $reference): void
+    {
+        $order = $this->order(120);
+
+        try {
+            $this->recorder->recordCapture($order, 120, $reference, moduleCode: 'Cheque');
+            self::fail('The reference is refused.');
+        } catch (InvalidProviderReferenceException $refused) {
+            self::assertStringNotContainsString('PSP-', $refused->getMessage(), 'The refusal does not repeat the reference.');
+        }
+
+        self::assertSame(0, OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->count());
     }
 
     public function testAVoidReportedWithoutItsReferenceIsRefused(): void
