@@ -23,6 +23,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
 use Thelia\Test\IntegrationTestCase;
@@ -112,6 +113,32 @@ final class MailerFactoryTest extends IntegrationTestCase
         self::assertSame('Payment of order ORD-42', $email->getSubject());
         self::assertStringContainsString('ORD-42', (string) $email->getHtmlBody());
         self::assertStringContainsString('ORD-42', (string) $email->getTextBody());
+    }
+
+    public function testCreateEmailMessageResolvesTheConfigurationTagOfASubjectMigratedFromThelia2(): void
+    {
+        // The wording the Thelia 2 seed gave its own messages, kept by every migrated shop:
+        // without the rewrite, the customer reads the Smarty tag in the subject line.
+        ConfigQuery::write('store_name', 'Corner Shop');
+
+        $message = new Message();
+        $message->setName('test_thelia2_config_subject');
+        $message->setLocale('en_US');
+        $message->setSubject('Your order {$order_ref} at {config key="store_name"}{config key="shop\'s missing key"}');
+        $message->setHtmlMessage('<p>Order {$order_ref}</p>');
+        $message->setTextMessage('Order {$order_ref}');
+        $message->save();
+
+        $email = $this->mailerFactory->createEmailMessage(
+            'test_thelia2_config_subject',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            ['order_ref' => 'ORD-42'],
+            'en_US',
+        );
+
+        // The second tag names a key with a quote and no value: it compiles, and reads nothing.
+        self::assertSame('Your order ORD-42 at Corner Shop', $email->getSubject());
     }
 
     public function testCreateEmailMessageRestoresTheSessionLangWhenRenderingFails(): void
