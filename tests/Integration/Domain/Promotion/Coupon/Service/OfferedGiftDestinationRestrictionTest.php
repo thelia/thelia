@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Promotion\Coupon\Service;
 
 use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Cart\Service\CartSelectionService;
+use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
@@ -85,6 +87,55 @@ final class OfferedGiftDestinationRestrictionTest extends IntegrationTestCase
             );
         } catch (CheckoutException) {
             // Whatever else the carrier says about this cart is not the point here.
+        }
+
+        self::assertTrue(true);
+    }
+
+    public function testADeliveryAddressRefusedOnlyByTheOfferedGiftIsAccepted(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $this->getService(DestinationRestrictionChecker::class)->reset();
+        $this->getService(OfferedCartLineService::class)->reset();
+        [$refused, $served] = CountryQuery::create()->filterByHasStates(0)->orderById()->limit(2)->find()->getData();
+
+        $category = $factory->category();
+        $taxRule = $factory->taxRule();
+        $currency = $factory->currency();
+        $bought = $factory->product($category, $taxRule, $currency, ['title' => 'Glass', 'baseQuantity' => 50]);
+        $gift = $factory->product($category, $taxRule, $currency, ['title' => 'Miniature of absinthe', 'baseQuantity' => 50]);
+
+        $facade = $this->getService(DestinationRestrictionFacade::class);
+        $group = $facade->save(null, 'v6-gift-address', DestinationRestriction::MODE_DENY, true, ['en_US' => ['title' => 'Absinthe', 'reason' => 'Absinthe ban']]);
+        $facade->addDestination((int) $group->getId(), (int) $refused->getId());
+        $facade->attachProduct((int) $group->getId(), (int) $gift->getId());
+
+        $customer = $factory->customer($factory->customerTitle());
+        $factory->address($customer, $served)->setIsDefault(1)->save();
+        $cart = $factory->cart($customer);
+        $factory->cartItem($cart, $bought);
+
+        $promotion = $factory->coupon();
+        $offer = $this->createStubForIntersectionOfInterfaces([CouponInterface::class, OfferedLineProviderInterface::class]);
+        $offer->method('getOfferedLineRequests')->willReturn([new OfferedLineRequest((int) $gift->getId(), 1, (int) $promotion->getId())]);
+        $offer->method('getTitle')->willReturn('Free miniature');
+        $offer->method('getCode')->willReturn('FREE-MINI');
+
+        // No address chosen yet: the default address of the customer is served, the gift is offered.
+        $this->getService(OfferedCartLineService::class)->reconcile([$offer], $cart);
+        $cart->clearCartItems();
+        self::assertSame(1, CartItemQuery::create()->filterByCartId($cart->getId())->filterByIsOffered(1)->count(), 'Precondition: the gift is offered on the default address.');
+
+        $abroad = $factory->address($customer, $refused);
+
+        try {
+            $this->getService(CartSelectionService::class)->setDeliveryAddress(new CheckoutDTO($cart, deliveryAddressId: $abroad->getId()));
+        } catch (DestinationRestrictedException $refusal) {
+            self::assertNotContains(
+                (int) $gift->getId(),
+                $refusal->violationDetails()['productIds'],
+                'The address is refused for the gift the buyer cannot remove: '.$refusal->getMessage(),
+            );
         }
 
         self::assertTrue(true);
