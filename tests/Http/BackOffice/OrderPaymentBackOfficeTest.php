@@ -24,6 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
@@ -252,6 +253,53 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('62', $crawler->filter('[data-testid="order-payment-line-error"] code')->text(), 'The line shows the code of the provider.');
     }
 
+    public function testAnAmountBeyondWhatTheJournalHoldsIsRefusedWithAMessage(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $this->tokenOf($crawler), 'amount' => '99999999999']);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode(), 'A refusal, not a server error.');
+        $crawler = $this->client->followRedirect();
+        self::assertStringContainsString('9999999999.99', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls, 'Nothing is asked of the provider.');
+    }
+
+    public function testAnAmountWrittenAsAnExponentIsAMistypedAmount(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $this->tokenOf($crawler), 'amount' => '1e400']);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode(), 'A refusal, not a server error.');
+        $crawler = $this->client->followRedirect();
+        self::assertStringContainsString('positive number', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
+        self::assertSame([], DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testAnOutcomeRecordedByHandThatIsRefusedIsWrittenToTheAdministrationLog(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-SILENT');
+        $this->getService(PaymentCaptureService::class)->capture($order);
+        $lineId = $this->latestLineId($order);
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', '/admin/order/update/'.$order->getId().'/payment-transaction/'.$lineId.'/settle', [
+            '_token' => $this->tokenOf($crawler),
+            'outcome' => 'succeeded',
+            'psp_reference' => 'CAP-OF-ANOTHER-MOVEMENT',
+        ]);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%#'.$lineId.'%'.$order->getRef().'%failed%CAP-SILENT%', Criteria::LIKE)->count(), 'The refused record is written to the administration log with its reason.');
+    }
+
     public function testACaptureRefusedForItsTokenIsNotWrittenToTheAdministrationLog(): void
     {
         $this->loginAs($this->factory->admin());
@@ -416,6 +464,20 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         $line = $crawler->filter('[data-testid="order-payment-line"][data-payment-type="void"]');
         self::assertStringContainsString('Authorization expired', $line->text());
         self::assertCount(0, $line->filter('[data-testid="order-payment-line-error"]'));
+    }
+
+    public function testAReleaseTheProviderRefusedWithTheCodeExpiredReadsAsARefusal(): void
+    {
+        // The provider's own code may be the word Thelia uses for a lapsed authorization:
+        // only a void that succeeded reads as one.
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        $this->recorder->recordVoid($order, 'VOID-1', PaymentTransactionState::FAILED, moduleCode: DeferredCapturePaymentModule::getModuleCode(), errorCode: 'expired', errorMessage: 'Session expired at the provider');
+
+        $line = $this->sheet($order)->filter('[data-testid="order-payment-line"][data-payment-type="void"]');
+
+        self::assertStringNotContainsString('Authorization expired', $line->text());
+        self::assertStringContainsString('Session expired at the provider', $line->filter('[data-testid="order-payment-line-error"]')->text());
     }
 
     public function testACaptureWithoutTheFormTokenTakesNothing(): void
