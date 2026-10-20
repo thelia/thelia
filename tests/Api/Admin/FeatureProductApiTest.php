@@ -293,6 +293,39 @@ final class FeatureProductApiTest extends ApiTestCase
         self::assertSame(['en_US' => '6'], $this->freeTextTranslations($productId, $featureId));
     }
 
+    /**
+     * A POST is checked against the right to create products: rewriting a text
+     * the product already holds is an update, so it goes through PATCH.
+     */
+    public function testAFreeTextIsNotRewrittenThroughPost(): void
+    {
+        [$productId, $featureId] = $this->productAndFeature();
+        $this->postFreeText($productId, $featureId, 'original', $this->authenticateAsAdmin());
+
+        $createOnly = $this->authenticateAsAdmin(
+            $this->createFixtureFactory()->restrictedAdmin([
+                AdminResources::PRODUCT => [AccessManager::VIEW, AccessManager::CREATE],
+            ]),
+        );
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/feature_products',
+            [
+                'product' => '/api/admin/products/'.$productId,
+                'feature' => '/api/admin/features/'.$featureId,
+                'is_free_text' => true,
+                'free_text_value' => 'overwritten',
+            ],
+            $createOnly,
+            'json',
+        );
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(['en_US' => 'original'], $this->freeTextTranslations($productId, $featureId));
+        self::assertSame(1, $this->rowCount($productId, $featureId));
+    }
+
     public function testTheFrontRoutesStayReadOnly(): void
     {
         [$productId, $featureId] = $this->productAndFeature();

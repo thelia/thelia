@@ -41,6 +41,7 @@ use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\FeatureProduct;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociationType;
 use Thelia\Model\ProductQuery;
@@ -311,7 +312,7 @@ final readonly class ProductFacade
         return $event->getProduct();
     }
 
-    public function setFeatureValue(int $productId, ProductFeatureDTO $dto): void
+    public function setFeatureValue(int $productId, ProductFeatureDTO $dto): ?FeatureProduct
     {
         $this->assertProductExists($productId);
 
@@ -319,6 +320,8 @@ final readonly class ProductFacade
         $event->setLocale($dto->locale);
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
+
+        return $event->getFeatureProduct();
     }
 
     public function deleteFeatureValue(int $productId, int $featureId): void
