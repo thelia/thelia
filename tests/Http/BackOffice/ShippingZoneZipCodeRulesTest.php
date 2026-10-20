@@ -127,6 +127,24 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         self::assertNull(AreaZipCodeRuleQuery::create()->findPk($rule->getId()));
     }
 
+    public function testDeletingARuleAsksForAConfirmationFirst(): void
+    {
+        $area = $this->area();
+        $rule = $this->rule($area, '20*', true);
+        $this->loginAs($this->factory()->admin());
+        $this->assertPageRenders($this->zoneUrl($area));
+        $crawler = $this->client->getCrawler();
+
+        $button = $crawler->filter('[data-testid="shipping-configuration-zip-code-rule-delete-'.$rule->getId().'"]');
+        self::assertSame('button', $button->attr('type'), 'One click on the row deletes nothing.');
+        self::assertSame('#shipping-configuration-zip-code-rule-delete-modal', $button->attr('data-bs-target'));
+        self::assertSame(0, $crawler->filter('[data-testid="shipping-configuration-zip-code-rule-'.$rule->getId().'"] form')->count());
+        self::assertStringContainsString(
+            'Do you really want to delete this postal code rule?',
+            $crawler->filter('#shipping-configuration-zip-code-rule-delete-modal')->text(),
+        );
+    }
+
     public function testAddingAndDeletingARuleIsWrittenToTheAdministrationLog(): void
     {
         $area = $this->area();
@@ -212,11 +230,19 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
     }
 
     /**
-     * The form that deletes the rule, from the zone page the client is on.
+     * The confirmation dialog of the zone page the client is on, as the delete button of the
+     * rule fills it.
      */
     private function deleteForm(AreaZipCodeRule $rule): Form
     {
-        return $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rule-'.$rule->getId().'"] form')->form();
+        $crawler = $this->client->getCrawler();
+        $button = $crawler->filter('[data-testid="shipping-configuration-zip-code-rule-delete-'.$rule->getId().'"]');
+        self::assertSame(1, $button->count(), 'The rule has a delete button.');
+
+        $form = $crawler->filter('[data-testid="shipping-configuration-zip-code-rule-delete-form"]')->form();
+        $form['rule_id']->setValue((string) $button->attr('data-rule-id'));
+
+        return $form;
     }
 
     private function logEntries(Area $area, string $message): int
