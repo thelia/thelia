@@ -98,6 +98,19 @@ final class FeatureProductApiTest extends ApiTestCase
         self::assertSame(1, $this->rowCount($productId, $featureId));
     }
 
+    public function testASecondPostRewritesTheFreeTextInPlace(): void
+    {
+        [$productId, $featureId] = $this->productAndFeature();
+        $token = $this->authenticateAsAdmin();
+        $id = $this->postFreeText($productId, $featureId, '6', $token);
+
+        $secondId = $this->postFreeText($productId, $featureId, '12', $token);
+
+        self::assertSame($id, $secondId);
+        self::assertSame(['en_US' => '12'], $this->freeTextTranslations($productId, $featureId));
+        self::assertSame(1, $this->rowCount($productId, $featureId));
+    }
+
     public function testAFreeTextWrittenInAnotherLanguageKeepsTheFirstTranslation(): void
     {
         [$productId, $featureId] = $this->productAndFeature();
@@ -344,7 +357,7 @@ final class FeatureProductApiTest extends ApiTestCase
      * A POST is checked against the right to create products: rewriting a text
      * the product already holds is an update, so it goes through PATCH.
      */
-    public function testAFreeTextIsNotRewrittenThroughPost(): void
+    public function testAFreeTextIsNotRewrittenThroughPostWithoutTheUpdateRight(): void
     {
         [$productId, $featureId] = $this->productAndFeature();
         $this->postFreeText($productId, $featureId, 'original', $this->authenticateAsAdmin());
@@ -368,7 +381,7 @@ final class FeatureProductApiTest extends ApiTestCase
             'json',
         );
 
-        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), (string) $response->getContent());
         self::assertSame(['en_US' => 'original'], $this->freeTextTranslations($productId, $featureId));
         self::assertSame(1, $this->rowCount($productId, $featureId));
     }

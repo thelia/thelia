@@ -19,12 +19,18 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\FeatureProduct;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Catalog\Product\DTO\ProductFeatureDTO;
 use Thelia\Domain\Catalog\Product\ProductFacade;
+use Thelia\Model\Admin;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProduct as FeatureProductModel;
 use Thelia\Model\FeatureProductQuery;
@@ -47,6 +53,8 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
     public function __construct(
         private ProductFacade $productFacade,
         private ApiResourcePropelTransformerService $transformer,
+        private Security $security,
+        private SecurityContext $securityContext,
     ) {
     }
 
@@ -86,10 +94,11 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
                 throw new UnprocessableEntityHttpException('This feature already holds listed values on this product: delete them before writing a free text.');
             }
 
-            // Rewriting an existing text is an update: it goes through PATCH and
-            // the right to update products, not through the right to create.
-            if ($this->hasValue($productId, $featureId, true)) {
-                throw new UnprocessableEntityHttpException('This feature already holds a free text on this product: edit it with PATCH.');
+            // A second POST rewrites the free text in place. That is an update,
+            // so it needs the right to update products on top of the right to
+            // create that let the request in.
+            if ($this->hasValue($productId, $featureId, true) && !$this->mayUpdateProducts()) {
+                throw new AccessDeniedHttpException('This feature already holds a free text on this product: rewriting it needs the right to update products.');
             }
 
             $value = new ProductFeatureDTO($featureId, $text, true, $locale);
@@ -104,6 +113,14 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
         }
 
         return $this->asResource($this->productFacade->setFeatureValue($productId, $value), $locale, $operation);
+    }
+
+    private function mayUpdateProducts(): bool
+    {
+        $user = $this->security->getUser();
+
+        return $user instanceof Admin
+            && $this->securityContext->isUserGranted(['ADMIN'], [AdminResources::PRODUCT], [], [AccessManager::UPDATE], $user);
     }
 
     /**
