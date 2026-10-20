@@ -44,6 +44,7 @@ use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
@@ -89,6 +90,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?SaleUnitContext $saleUnitContext = null,
         protected ?SaleUnitStockResolver $saleUnitStockResolver = null,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+        protected ?CartShippingRules $cartShippingRules = null,
     ) {
     }
 
@@ -1063,6 +1065,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         if (null === $deliveryModule) {
             throw new DeliveryException(\sprintf('Delivery module #%d not found', $moduleId));
+        }
+
+        // A carrier a product of the cart refuses does not quote for it, so a product
+        // added after the carrier was chosen takes that carrier off the cart.
+        if ($this->cartShippingRules?->for($cart)->excludes((int) $deliveryModule->getId())) {
+            throw new DeliveryException(\sprintf('Delivery module %s is excluded by a product of the cart', $deliveryModule->getCode()));
         }
 
         $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);

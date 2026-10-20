@@ -32,9 +32,11 @@ use Thelia\Api\Resource\CheckoutPaymentModuleInput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Domain\Cart\CartFacade;
+use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
+use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
@@ -69,6 +71,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         private CheckoutFacade $checkoutFacade,
         private ApiResourcePropelTransformerService $transformer,
         private CartFacade $cartFacade,
+        private CartGuard $cartGuard,
     ) {
     }
 
@@ -94,12 +97,13 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         } catch (GuestCheckoutNotAllowedException $refusal) {
             throw new AccessDeniedHttpException($refusal->getMessage(), $refusal);
         } catch (InvalidDeliveryException $refusal) {
-            if (!$data instanceof CheckoutDeliveryDateInput) {
+            if (!$data instanceof CheckoutDeliveryDateInput && !$refusal instanceof DeliveryExcludedByProductException) {
                 throw $refusal;
             }
 
-            // A refused day is answered in the shape a refused placement is, so the
-            // client branches on the same codes either way.
+            // A refused day, or a carrier a product of the cart refuses, is answered in
+            // the shape a refused placement is, so the client branches on the same codes
+            // either way.
             return new JsonResponse(
                 CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -154,6 +158,9 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     private function selectDeliveryModule(Cart $cart, CheckoutDeliveryModuleInput $input): void
     {
         $module = $this->activatedModule($input->deliveryModuleId, BaseModule::DELIVERY_MODULE_TYPE, 'delivery');
+
+        // Refused before anything is written, the carrier already held included.
+        $this->cartGuard->refuseACarrierTheProductsExclude($cart, $module->getId());
 
         if ($cart->getDeliveryModuleId() === $module->getId()) {
             return;
