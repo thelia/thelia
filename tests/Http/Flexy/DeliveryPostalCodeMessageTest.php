@@ -60,6 +60,8 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 
     private const PAYMENT_STEP_INVOICE_COMPONENT = 'FlexyBundle\\Components\\Organisms\\Invoice\\Base';
 
+    private const DELIVERY_ADDRESS_COPY = 'FlexyBundle\\Service\\DeliveryAddressCopy';
+
     private const GUEST_ZIP_CODE = '75002';
 
     protected function setUp(): void
@@ -179,6 +181,32 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 
         self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame('/checkout/delivery', $response->getTargetUrl());
+    }
+
+    /**
+     * The customer row of a guest carries the addresses of earlier buyers of that e-mail: one
+     * the checkout does not show this buyer never reaches the cart, whatever id is sent.
+     */
+    public function testAnAddressTheBuyerIsNotShownNeverReachesTheCart(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $street = $this->deliveryCopyOf($guest)?->getAddress1();
+        $earlierBuyers = $address->copy()->setIsDefault(0)->setLabel('Earlier buyer')->setAddress1('9 rue des Autres');
+        $earlierBuyers->save($this->getPropelConnection());
+
+        $requestStack = $this->getService(RequestStack::class);
+        $request = Request::create('/checkout/delivery');
+        $request->setSession($this->sessionOfTheClient());
+        $requestStack->push($request);
+
+        try {
+            $moved = $this->getService(self::DELIVERY_ADDRESS_COPY)->followUnlessMoved((int) $earlierBuyers->getId());
+        } finally {
+            $requestStack->pop();
+        }
+
+        self::assertFalse($moved);
+        self::assertSame($street, $this->deliveryCopyOf($guest)?->getAddress1(), 'The address of another buyer reached the cart.');
     }
 
     /**
