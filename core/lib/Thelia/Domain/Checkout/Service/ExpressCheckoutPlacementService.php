@@ -111,10 +111,13 @@ final readonly class ExpressCheckoutPlacementService
     /**
      * Only the payment module changes: the carrier stays the one the buyer chose, and the
      * postage is computed again for it, as the checkout would before placing the order.
+     * The choice goes through the same event as in the checkout, so its listeners see a
+     * wallet the way they see any other payment module.
      */
     private function writeThePaymentModuleOnTheCart(Cart $cart, ExpressCheckoutRequest $request): void
     {
-        $cart->setPaymentModuleId($request->paymentModuleId)->save();
+        $event = (new CartCheckoutEvent($cart))->setPaymentModuleId($request->paymentModuleId);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::CART_SET_PAYMENT_MODULE);
 
         $this->postageHandler->handlePostageOnCart($cart);
     }
