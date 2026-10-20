@@ -173,6 +173,28 @@ class CartGuard
     }
 
     /**
+     * Refuses a carrier the products of the cart exclude, naming them: a buyer may not
+     * pick a carrier the shop declared unable to take what is in the cart.
+     *
+     * @throws DeliveryExcludedByProductException
+     */
+    public function refuseACarrierTheProductsExclude(Cart $cart, int $moduleId): void
+    {
+        $excludingProductIds = $this->cartShippingRules->for($cart)->productsExcluding($moduleId);
+
+        if ([] === $excludingProductIds) {
+            return;
+        }
+
+        $address = null !== $cart->getAddressDeliveryId() ? CartAddressQuery::create()->findPk($cart->getAddressDeliveryId()) : null;
+        $country = $address?->getCountry();
+        $noCarrierLeft = null !== $address && null !== $country
+            && [] !== $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState());
+
+        throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($excludingProductIds, $this->locale()), $noCarrierLeft);
+    }
+
+    /**
      * A cart no carrier can take, because of its products, is told which ones.
      *
      * @throws DeliveryExcludedByProductException

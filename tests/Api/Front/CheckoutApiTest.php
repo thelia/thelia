@@ -20,6 +20,7 @@ use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Exception\TheliaProcessException;
@@ -27,6 +28,7 @@ use Thelia\Model\Address;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
+use Thelia\Model\CartQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
@@ -307,6 +309,26 @@ final class CheckoutApiTest extends ApiTestCase
             'A shortage must name the line the buyer has to change.',
         );
         self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    /**
+     * A carrier a product of the cart refuses is refused when it is chosen, in the shape
+     * of a refused placement, with the product named: nothing is written on the cart.
+     */
+    public function testChoosingACarrierAProductOfTheCartRefusesIsRefusedNamingTheProduct(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+        $this->getService(ProductFacade::class)->excludeDeliveryModule($checkout['product']->getId(), $checkout['deliveryModule']->getId());
+
+        $response = $this->jsonRequest('POST', $this->url($cartId, 'delivery_module'), ['deliveryModuleId' => $checkout['deliveryModule']->getId()], token: $token);
+
+        self::assertSame(422, $response->getStatusCode());
+        $violation = $this->theViolation($this->decode($response)['violations'], CheckoutViolationCode::DeliveryExcludedByProduct->value);
+        self::assertSame([$checkout['product']->getId()], $violation['details']['productIds']);
+        self::assertNull(CartQuery::create()->findPk($cartId, $this->getPropelConnection())?->getDeliveryModuleId(), 'The refused carrier is not written on the cart.');
     }
 
     /**
@@ -856,7 +878,7 @@ final class CheckoutApiTest extends ApiTestCase
 
     private function anIdNoCartHas(): int
     {
-        return 1 + (int) \Thelia\Model\CartQuery::create()->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)->findOne($this->getPropelConnection())?->getId();
+        return 1 + (int) CartQuery::create()->orderById(\Propel\Runtime\ActiveQuery\Criteria::DESC)->findOne($this->getPropelConnection())?->getId();
     }
 
     private function anIdNoAddressHas(): int

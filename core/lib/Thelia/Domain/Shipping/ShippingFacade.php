@@ -19,6 +19,8 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
 use Thelia\Domain\Cart\Service\CartAddressService;
+use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
@@ -51,6 +53,7 @@ final readonly class ShippingFacade
         private DeliveryModuleResourceBuilder $deliveryModuleResourceBuilder,
         private CartAddressService $cartAddressService,
         private ?CartShippingRules $cartShippingRules = null,
+        private ?CartGuard $cartGuard = null,
     ) {
     }
 
@@ -136,9 +139,13 @@ final readonly class ShippingFacade
 
     /**
      * Set the delivery module on the cart (setter + save).
+     *
+     * @throws DeliveryExcludedByProductException when a product of the cart refuses the carrier
      */
     public function chooseDeliveryModule(Cart $cart, int $moduleId): void
     {
+        $this->cartGuard?->refuseACarrierTheProductsExclude($cart, $moduleId);
+
         $cart->setDeliveryModuleId($moduleId)->save();
     }
 

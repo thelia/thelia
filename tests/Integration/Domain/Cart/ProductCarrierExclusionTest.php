@@ -25,9 +25,12 @@ use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
+use Thelia\Domain\Shipping\Service\PostageHandler;
+use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
+use Thelia\Model\CartQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
 use Thelia\Model\Module;
@@ -191,6 +194,51 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
         $estimate = $this->getService(PostageEstimator::class)->estimatePostageForCountry($cart, $country);
 
         self::assertEqualsWithDelta(9.0, $estimate->getBestPostageAmount(), 0.0001, 'The carrier the buyer picked is the one estimated, cheaper or not.');
+    }
+
+    public function testAProductThatRefusesTheChosenCarrierTakesItOffTheCartWithItsPostage(): void
+    {
+        $carrier = $this->carrier();
+        $country = $this->factory->country();
+        $this->serveCountryWith($carrier, $country);
+        [$cart] = $this->cartShippedWith($carrier, $country);
+        $this->answerDeliveryQuote();
+        $postageHandler = $this->getService(PostageHandler::class);
+        $postageHandler->handlePostageOnCart($cart);
+        self::assertSame($carrier->getId(), CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier quotes while no product refuses it.');
+
+        // A product refusing the carrier joins the cart, which then asks for its postage again.
+        $refusingProduct = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());
+        $this->getService(ProductFacade::class)->excludeDeliveryModule($refusingProduct->getId(), $carrier->getId());
+        $this->factory->cartItem($cart, $refusingProduct);
+        $cart->clearCartItems();
+        $postageHandler->handlePostageOnCart($cart);
+
+        $cart = CartQuery::create()->findPk($cart->getId());
+        self::assertNotNull($cart);
+        self::assertNull($cart->getDeliveryModuleId());
+        self::assertNull($cart->getPostage());
+        self::assertEqualsWithDelta(0.0, (float) $cart->getPostageTax(), 0.0001);
+    }
+
+    public function testACarrierAProductOfTheCartRefusesCannotBeChosen(): void
+    {
+        $carrier = $this->carrier();
+        $country = $this->factory->country();
+        $this->serveCountryWith($carrier, $country);
+        [$cart, $product] = $this->cartShippedWith($carrier, $country, 'Garden furnace');
+        $cart->setDeliveryModuleId(null)->save();
+        $this->getService(ProductFacade::class)->excludeDeliveryModule($product->getId(), $carrier->getId());
+
+        try {
+            $this->getService(ShippingFacade::class)->chooseDeliveryModule($cart, $carrier->getId());
+            self::fail('A carrier the product refuses must not be chosen.');
+        } catch (DeliveryExcludedByProductException $refusal) {
+            self::assertSame([$product->getId()], $refusal->violationDetails()['productIds']);
+            self::assertStringContainsString('Garden furnace', $refusal->getMessage());
+        }
+
+        self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId());
     }
 
     private function carrier(): Module
