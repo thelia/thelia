@@ -27,7 +27,9 @@ use Thelia\Model\Order;
 interface PaymentModuleRefundingInFullInterface extends PaymentModuleWithRefundInterface
 {
     /**
-     * Whether, as things stand for the order, its payment can only be given back in full.
+     * Whether, as things stand for the order, its payment can only be given back in full. Read
+     * when the order page is shown: it reads what the module already knows, never the provider,
+     * and throws nothing.
      */
     public function refundsOnlyInFull(Order $order): bool;
 }
