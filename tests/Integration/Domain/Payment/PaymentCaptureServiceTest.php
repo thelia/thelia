@@ -394,6 +394,26 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertNull(SaleUnitConfigScope::current(), 'The configuration of the request is given back.');
     }
 
+    public function testAnAnswerThatComesOnceTheLineWasSettledAnotherWayKeepsThatOutcome(): void
+    {
+        // The merchant recorded what the provider shows while the call was on its way: the
+        // late answer, under another reference, neither fails the capture nor rewrites it.
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$whileCapturing = function () use ($order): void {
+            $pending = OrderPaymentTransactionQuery::create()
+                ->filterByOrderId((int) $order->getId())
+                ->filterByType(PaymentTransactionType::CAPTURE->value)
+                ->findOne();
+            $this->recorder->settle($pending, PaymentTransactionState::SUCCEEDED, 'CAP-BY-HAND');
+        };
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::succeeded('CAP-LATE');
+
+        $capture = $this->service->capture($order);
+
+        self::assertTrue($capture->isSucceeded());
+        self::assertSame('CAP-BY-HAND', $capture->getPspReference());
+    }
+
     public function testWhatTheCaptureAnnouncesRunsWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
     {
         // A listener of the journal or of the status the capture moves (a carrier, an ERP)

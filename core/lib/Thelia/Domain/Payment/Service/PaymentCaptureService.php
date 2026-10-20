@@ -30,6 +30,7 @@ use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
 use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
+use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
@@ -366,7 +367,7 @@ final readonly class PaymentCaptureService
             return $this->recorder->markOutcomeUnknown(
                 $transaction,
                 self::ERROR_CODE_INVALID_REFERENCE,
-                'The payment module answered with a provider reference longer than the journal holds: read the outcome at the provider and record it by hand.',
+                'The payment module answered with a provider reference the journal cannot hold: read the outcome at the provider and record it by hand.',
             );
         } catch (MissingProviderReferenceException $missing) {
             // The module says the money was taken but not under which reference: a line
@@ -402,6 +403,23 @@ final readonly class PaymentCaptureService
                 self::ERROR_CODE_JOURNAL_BUSY,
                 \sprintf('The provider answered %s under the reference %s while the journal was busy: the outcome is recorded once the provider confirms it.', $result->state->value, (string) ($result->pspReference ?? '-')),
             );
+        } catch (PaymentException $settledMeanwhile) {
+            // The line was settled another way while the module was called: a notification,
+            // or the merchant recording what the provider shows. The journal keeps that
+            // outcome; reporting a failure would invite a second capture of money the
+            // provider answered for. The answer is logged for the merchant to compare.
+            Tlog::getInstance()->error(\sprintf(
+                'Payment module %s answered transaction #%d (%s, reference %s) once the line was settled another way: %s',
+                $moduleCode,
+                (int) $transaction->getId(),
+                $result->state->value,
+                (string) ($result->pspReference ?? '-'),
+                $settledMeanwhile->getMessage(),
+            ));
+
+            OrderPaymentTransactionTableMap::removeInstanceFromPool($transaction);
+
+            return OrderPaymentTransactionQuery::create()->findPk($transaction->getId()) ?? $transaction;
         }
     }
 }
