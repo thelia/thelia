@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\File;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\File\Exception\FileException;
 use Thelia\Core\File\FileManager;
@@ -42,6 +43,66 @@ final class FileManagerContentTest extends IntegrationTestCase
         $this->expectException(FileException::class);
 
         (new FileManager([]))->assertStorable(new UploadedFile($path, 'photo.jpg', 'image/jpeg', null, true));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function phpCodeProvider(): iterable
+    {
+        $script = "system(\$_GET['cmd']);";
+
+        yield 'opening tag after blanks' => ["  <?php {$script} ?>", 'photo.jpg'];
+        yield 'short echo tag' => ["<?= {$script} ?>", 'photo.jpg'];
+        yield 'opening tag inside HTML' => ["<html><body><?php {$script} ?></body></html>", 'photo.jpg'];
+        yield 'opening tag in upper case' => ["<html><?PHP\n{$script}", 'notes.txt'];
+        yield 'opening tag closing the file' => ['<html><?php', 'notes.txt'];
+    }
+
+    #[DataProvider('phpCodeProvider')]
+    public function testAFileHoldingPhpCodeIsNotStored(string $content, string $fileName): void
+    {
+        $path = $this->createTestTextFile($content);
+        $this->trackFileForCleanup($path);
+
+        $this->expectException(FileException::class);
+
+        (new FileManager([]))->assertStorable(new UploadedFile($path, $fileName, 'image/jpeg', null, true));
+    }
+
+    public function testAnImageCarryingPhpCodeIsNotStored(): void
+    {
+        $path = $this->createTestPng();
+        $this->trackFileForCleanup($path);
+        file_put_contents($path, "<?php system(\$_GET['cmd']); ?>", \FILE_APPEND);
+
+        $this->expectException(FileException::class);
+
+        (new FileManager([]))->assertStorable(new UploadedFile($path, 'photo.png', 'image/png', null, true));
+    }
+
+    public function testAnOpeningTagSplitBetweenTwoReadBlocksIsFound(): void
+    {
+        $path = $this->createTestPng();
+        $this->trackFileForCleanup($path);
+        // Read blocks are 64 KiB: the tag straddles the end of the first one.
+        file_put_contents($path, str_repeat("\0", 65536 - (int) filesize($path) - 3).'<?php system(1);', \FILE_APPEND);
+
+        $this->expectException(FileException::class);
+
+        (new FileManager([]))->assertStorable(new UploadedFile($path, 'photo.png', 'image/png', null, true));
+    }
+
+    public function testAPdfIsStored(): void
+    {
+        $path = $this->createTestTextFile("%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n");
+        $this->trackFileForCleanup($path);
+        $uploadedFile = new UploadedFile($path, 'brochure.pdf', 'application/pdf', null, true);
+        $fileManager = new FileManager([]);
+
+        $fileManager->assertStorable($uploadedFile);
+
+        self::assertSame('brochure-3.pdf', $fileManager->renameFile(3, $uploadedFile));
     }
 
     public function testAnImageWhoseExtensionMatchesItsContentKeepsItsName(): void

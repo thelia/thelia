@@ -154,6 +154,10 @@ readonly class FileProcessorService
             );
         }
 
+        if (null === $message && $this->containsPhpCode($fileBeingUploaded)) {
+            $message = $this->translator->trans('The file contains PHP code and cannot be uploaded.');
+        }
+
         if (null !== $message) {
             throw new ProcessFileException($message, 415);
         }
@@ -193,6 +197,24 @@ readonly class FileProcessorService
         }
 
         return null;
+    }
+
+    /**
+     * Whether the content is a PHP script, or holds a PHP opening tag anywhere
+     * (FileConfiguration::containsPhpOpeningTag()).
+     */
+    private function containsPhpCode(UploadedFile $fileBeingUploaded): bool
+    {
+        $path = $fileBeingUploaded->getPathname();
+
+        if (!is_file($path)) {
+            return false;
+        }
+
+        $mimeType = $fileBeingUploaded->getMimeType();
+
+        return \in_array($mimeType, FileConfiguration::SERVER_EXECUTABLE_MIME_TYPES, true)
+            || FileConfiguration::containsPhpOpeningTag($path, $mimeType);
     }
 
     /**

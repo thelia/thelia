@@ -224,6 +224,49 @@ class FileConfiguration
     }
 
     /**
+     * Whether the file holds an opening tag PHP executes, wherever it sits: an image
+     * that is also a script (polyglot) runs as soon as a server or an include treats
+     * it as PHP. "<?php" followed by a blank is searched in every file; the short echo
+     * tag "<?=" only in text, where it cannot occur by chance as it does in compressed
+     * binary data. The file is read in blocks, never in full.
+     */
+    public static function containsPhpOpeningTag(string $path, ?string $mimeType): bool
+    {
+        $handle = @fopen($path, 'r');
+
+        if (false === $handle) {
+            return false;
+        }
+
+        $pattern = str_starts_with((string) $mimeType, 'text/') ? '/<\?(?:php\s|=)/i' : '/<\?php\s/i';
+        // The longest tag searched is six bytes: five carried over find one split between two blocks.
+        $carriedOver = '';
+
+        try {
+            while (!feof($handle)) {
+                $block = fread($handle, 65536);
+
+                if (false === $block) {
+                    return false;
+                }
+
+                $buffer = $carriedOver.$block;
+
+                if (1 === preg_match($pattern, $buffer)) {
+                    return true;
+                }
+
+                $carriedOver = substr($buffer, -5);
+            }
+        } finally {
+            fclose($handle);
+        }
+
+        // "<?php" closing the file opens PHP as well.
+        return 1 === preg_match('/<\?php$/iD', $carriedOver);
+    }
+
+    /**
      * Returns the extension of the file name when a browser would open the file as a
      * page or run it as a script (BROWSER_ACTIVE_DOCUMENT_EXTENSIONS), or null.
      */
