@@ -25,7 +25,6 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\FeatureProduct;
 use Thelia\Domain\Catalog\Product\DTO\ProductFeatureDTO;
 use Thelia\Domain\Catalog\Product\ProductFacade;
-use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProduct as FeatureProductModel;
 use Thelia\Model\FeatureProductQuery;
@@ -266,10 +265,7 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
     }
 
     /**
-     * Read back from what was stored. The two free text fields are filled from the
-     * model by hand, since their snake_case names match no getter the transformer
-     * looks for; the text is answered in the language it was written in, from its
-     * translation rather than from the row.
+     * Read back from what was stored, the text in the language it was written in.
      */
     private function asResource(?FeatureProductModel $model, string $locale, Operation $operation): FeatureProduct
     {
@@ -277,23 +273,15 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('The feature value could not be written.');
         }
 
+        $context = $operation->getNormalizationContext() ?? [];
+        $context['filters']['locale'] = $locale;
+
         /** @var FeatureProduct $resource */
         $resource = $this->transformer->modelToResource(
             resourceClass: FeatureProduct::class,
             propelModel: $model,
-            context: $operation->getNormalizationContext() ?? [],
+            context: $context,
         );
-
-        $resource->setIsFreeText((bool) $model->getIsFreeText());
-
-        if ($model->getIsFreeText()) {
-            $translation = FeatureAvI18nQuery::create()
-                ->filterById((int) $model->getFeatureAvId())
-                ->filterByLocale($locale)
-                ->findOne();
-
-            $resource->setFreeTextValue((string) $translation?->getTitle());
-        }
 
         return $resource;
     }
