@@ -26,6 +26,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
+use Thelia\Module\PaymentModuleRefundingInFullInterface;
 use Thelia\Module\PaymentModuleWithRefundInterface;
 use Thelia\Tools\TerminalText;
 
@@ -86,12 +87,14 @@ final readonly class PaymentRefundService
         $moduleCode = $module->getCode();
         $comment = self::cleanComment($comment);
 
-        return $this->requests->during((int) $order->getId(), $reason, $comment, false, function () use ($order, $amount, $reason, $comment, $module, $moduleCode): OrderPaymentTransaction {
+        $inFull = $module instanceof PaymentModuleRefundingInFullInterface && $module->refundsOnlyInFull($order);
+
+        return $this->requests->during((int) $order->getId(), $reason, $comment, false, function () use ($order, $amount, $reason, $comment, $module, $moduleCode, $inFull): OrderPaymentTransaction {
             $transaction = $this->runner->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock(
                 $order,
                 fn (): OrderPaymentTransaction => $this->recorder->recordRefund(
                     $order,
-                    $this->checkedAmount($order, $amount),
+                    $this->checkedAmount($order, $amount, $inFull),
                     null,
                     PaymentTransactionState::PENDING,
                     OrderPaymentTransactionQuery::create()->findLatestSucceededCapture((int) $order->getId()),
@@ -138,6 +141,23 @@ final readonly class PaymentRefundService
     }
 
     /**
+     * Whether the payment of the order, as things stand, can only be given back in full through
+     * its module. A module that cannot refund answers no: a refund recorded by hand is free.
+     */
+    public function refundsOnlyInFull(Order $order): bool
+    {
+        return $this->moduleLocator->forOrder($order, function () use ($order): bool {
+            try {
+                $module = $this->refundModuleOf($order);
+            } catch (\Throwable) {
+                return false;
+            }
+
+            return $module instanceof PaymentModuleRefundingInFullInterface && $module->refundsOnlyInFull($order);
+        });
+    }
+
+    /**
      * Whether the payment module of the order refunds through its provider. A module that
      * cannot even be instantiated answers no, so the order sheet still renders, and the
      * fault is logged.
@@ -161,7 +181,7 @@ final readonly class PaymentRefundService
      * The amount, read under the lock: positive, a whole number of the currency's smallest
      * coin, no more than what is left to give back, and not the one just asked.
      */
-    private function checkedAmount(Order $order, ?float $amount): string
+    private function checkedAmount(Order $order, ?float $amount, bool $inFull = false): string
     {
         $currencyCode = $order->getCurrency()->getCode();
         $refundable = $this->totalsReader->forOrder((int) $order->getId())->refundable();
@@ -170,7 +190,14 @@ final readonly class PaymentRefundService
             throw new InvalidPaymentAmountException(\sprintf('Order %s: nothing collected is left to refund.', (string) $order->getRef()));
         }
 
-        $amount ??= PaymentAmount::toFloat(CurrencyMinorUnit::floor($refundable, $currencyCode));
+        $whole = CurrencyMinorUnit::floor($refundable, $currencyCode);
+
+        // The provider gives this payment back in full or not at all, for now.
+        if ($inFull && null !== $amount && 0 !== PaymentAmount::compare(PaymentAmount::normalize($amount), $whole)) {
+            throw new InvalidPaymentAmountException(\sprintf('Order %s: its payment can only be given back in full for now, %s.', (string) $order->getRef(), PaymentAmount::forMessage($whole)));
+        }
+
+        $amount ??= PaymentAmount::toFloat($whole);
 
         if (!PaymentAmount::isPositive($amount)) {
             throw new InvalidPaymentAmountException(\sprintf('Order %s: a refund needs a positive amount, %s given.', (string) $order->getRef(), PaymentAmount::forMessage($amount)));

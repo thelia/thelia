@@ -222,6 +222,18 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertCount(0, OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->filterByType('refund')->find());
     }
 
+    public function testThePaymentTheProviderGivesBackInFullOnlyIsOfferedInFull(): void
+    {
+        DeferredCapturePaymentModule::$refundsOnlyInFull = true;
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        $crawler = $this->sheet($order);
+
+        self::assertCount(1, $crawler->filter('[data-testid="order-payment-refund-in-full-help"]'));
+        self::assertCount(1, $crawler->filter('[data-testid="order-payment-refund-amount"][readonly]'));
+    }
+
     public function testWithoutTheRefundRightThereIsNoButtonAndTheRequestIsRefused(): void
     {
         $this->loginAs($this->factory->restrictedAdmin([
