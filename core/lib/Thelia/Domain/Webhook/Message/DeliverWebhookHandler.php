@@ -26,6 +26,9 @@ use Thelia\Model\WebhookDeliveryQuery;
 #[AsMessageHandler]
 final readonly class DeliverWebhookHandler
 {
+    private const int MAX_LOOKUPS = 5;
+    private const int LOOKUP_DELAY_SECONDS = 2;
+
     private bool $runsInline;
 
     public function __construct(
@@ -43,7 +46,13 @@ final readonly class DeliverWebhookHandler
     {
         $delivery = WebhookDeliveryQuery::create()->findPk($message->deliveryId);
 
-        if (null === $delivery || WebhookStatus::DELIVERY_PENDING !== $delivery->getStatus()) {
+        if (null === $delivery) {
+            $this->lookAgainLater($message);
+
+            return;
+        }
+
+        if (WebhookStatus::DELIVERY_PENDING !== $delivery->getStatus()) {
             return;
         }
 
@@ -76,5 +85,17 @@ final readonly class DeliverWebhookHandler
                 ->setFailedAt(new \DateTimeImmutable())
                 ->save();
         }
+    }
+
+    private function lookAgainLater(DeliverWebhook $message): void
+    {
+        if ($this->runsInline || $message->lookups >= self::MAX_LOOKUPS) {
+            return;
+        }
+
+        $this->bus->dispatch(
+            new DeliverWebhook($message->deliveryId, $message->lookups + 1),
+            [new DelayStamp(self::LOOKUP_DELAY_SECONDS * ($message->lookups + 1) * 1000)],
+        );
     }
 }

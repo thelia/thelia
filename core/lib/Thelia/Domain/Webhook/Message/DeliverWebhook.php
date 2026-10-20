@@ -18,7 +18,7 @@ use Thelia\Messenger\Message\DescribedJob;
 
 final readonly class DeliverWebhook implements DescribedJob
 {
-    public function __construct(public int $deliveryId)
+    public function __construct(public int $deliveryId, public int $lookups = 0)
     {
     }
 

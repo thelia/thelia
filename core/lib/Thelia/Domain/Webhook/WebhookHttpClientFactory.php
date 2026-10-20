@@ -20,12 +20,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class WebhookHttpClientFactory
 {
+    public const array OPTIONS = [
+        'max_redirects' => 0,
+        'timeout' => 5,
+        'max_duration' => 10,
+    ];
+
     public static function create(): HttpClientInterface
     {
-        return new NoPrivateNetworkHttpClient(HttpClient::create([
-            'max_redirects' => 0,
-            'timeout' => 5,
-            'max_duration' => 10,
-        ]));
+        return new NoPrivateNetworkHttpClient(HttpClient::create(self::OPTIONS));
     }
 }

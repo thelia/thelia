@@ -1833,6 +1833,8 @@ CREATE TABLE IF NOT EXISTS `webhook_delivery`
     UNIQUE INDEX `webhook_delivery_uuid_UNIQUE` (`delivery_uuid`),
     INDEX `idx_webhook_delivery_subscription_created` (`subscription_id`, `created_at`),
     INDEX `idx_webhook_delivery_created_at` (`created_at`),
+    INDEX `idx_webhook_delivery_event_created` (`event`, `created_at`),
+    INDEX `idx_webhook_delivery_status_created` (`status`, `created_at`),
     CONSTRAINT `fk_webhook_delivery_subscription_id`
         FOREIGN KEY (`subscription_id`)
         REFERENCES `webhook_subscription` (`id`)
