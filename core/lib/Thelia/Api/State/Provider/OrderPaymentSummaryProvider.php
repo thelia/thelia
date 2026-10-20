@@ -16,26 +16,24 @@ namespace Thelia\Api\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Resource\OrderPaymentSummary;
+use Thelia\Api\Service\ReachableOrder;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
-use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\Order;
-use Thelia\Model\OrderQuery;
 
 final readonly class OrderPaymentSummaryProvider implements ProviderInterface
 {
     public function __construct(
         private PaymentTransactionTotalsReader $totalsReader,
         private PaymentCaptureService $captureService,
-        private AdminSaleUnitScope $adminSaleUnitScope,
+        private ReachableOrder $reachableOrder,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): OrderPaymentSummary
     {
-        $order = $this->order($uriVariables);
+        $order = $this->reachableOrder->fromUriVariables($uriVariables);
         $totals = $this->totalsReader->forOrder((int) $order->getId());
 
         $summary = new OrderPaymentSummary();
@@ -52,20 +50,6 @@ final readonly class OrderPaymentSummaryProvider implements ProviderInterface
         $summary->supportsCapture = $this->captureService->supportsCapture($order);
 
         return $summary;
-    }
-
-    private function order(array $uriVariables): Order
-    {
-        $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
-        $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
-
-        // An order of a sale unit the administrator is restricted away from is no
-        // order of theirs, the way the order itself answers 404 to them.
-        if (!$order instanceof Order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
-            throw new NotFoundHttpException('No such order.');
-        }
-
-        return $order;
     }
 
     private function paymentModuleCodeOf(Order $order): ?string
