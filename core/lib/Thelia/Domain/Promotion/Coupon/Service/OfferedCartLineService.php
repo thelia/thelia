@@ -17,10 +17,13 @@ namespace Thelia\Domain\Promotion\Coupon\Service;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -28,6 +31,7 @@ use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\Lang;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
@@ -47,6 +51,9 @@ use Thelia\Model\ProductSaleElements;
  * by a LATER request — the redirect after a cart mutation — can still announce
  * them: within one request the in-memory state answers, on any other the
  * session does. Their labels are resolved in the locale the session browses in.
+ *
+ * A gift the destination of the cart refuses is not offered: the buyer could not
+ * remove it, and the order could not be placed with it.
  */
 class OfferedCartLineService implements ResetInterface
 {
@@ -63,6 +70,7 @@ class OfferedCartLineService implements ResetInterface
     public function __construct(
         private readonly FacadeInterface $facade,
         private readonly RequestStack $requestStack,
+        private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
 
@@ -150,6 +158,8 @@ class OfferedCartLineService implements ResetInterface
             }
         }
 
+        $requests = $this->withoutGiftsTheDestinationRefuses($requests, $cart);
+
         $changed = false;
 
         // A key can hold several rows when past writes went wrong (a crash between
@@ -193,6 +203,35 @@ class OfferedCartLineService implements ResetInterface
         }
 
         return $changed;
+    }
+
+    /**
+     * Judged the way the addition to the cart judges a product: on the addresses of the
+     * cart, or the default address of the customer before one is chosen. Choosing an
+     * address reconciles the cart again, so a gift comes back where it can travel.
+     *
+     * @param array<string, OfferedLineRequest> $requests
+     *
+     * @return array<string, OfferedLineRequest>
+     */
+    private function withoutGiftsTheDestinationRefuses(array $requests, Cart $cart): array
+    {
+        if ([] === $requests || null === $this->destinationRestrictionChecker || !$this->destinationRestrictionChecker->hasActiveGroup()) {
+            return $requests;
+        }
+
+        $refused = [];
+
+        foreach ($this->destinationRestrictionChecker->violationsForProducts(
+            array_values(array_map(static fn (OfferedLineRequest $request): int => $request->productId, $requests)),
+            CartDestinations::delivery($cart, true),
+            CartDestinations::billing($cart, true),
+            Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
+        ) as $restrictedLine) {
+            $refused[$restrictedLine->productId] = true;
+        }
+
+        return array_filter($requests, static fn (OfferedLineRequest $request): bool => !isset($refused[$request->productId]));
     }
 
     private function updateOfferedLine(CartItem $line, OfferedLineRequest $request, string $label, Cart $cart): bool
