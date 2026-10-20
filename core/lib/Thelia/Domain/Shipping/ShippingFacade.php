@@ -329,7 +329,7 @@ final readonly class ShippingFacade
      *
      * @param int|null $addressId id of a customer `address`
      *
-     * @return array{0: ?\Thelia\Model\Address, 1: ?Country, 2: ?State, 3: ?string}
+     * @return array{0: ?Address, 1: ?Country, 2: ?State, 3: ?string}
      */
     private function resolveAddressContext(
         Cart $cart,
