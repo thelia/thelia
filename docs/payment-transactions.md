@@ -271,8 +271,12 @@ sequenceDiagram
 A module that gives money back through its provider implements
 `Thelia\Module\PaymentModuleWithRefundInterface` (`supportsRefund()`,
 `refund(Order, float $amount, OrderPaymentTransaction $pending, RefundReason $reason, ?string $comment)`),
-optional like the capture. `Thelia\Domain\Payment\Service\PaymentRefundService`
-is what the back office calls, through the `ORDER_PAYMENT_REFUND` event
+optional like the capture. A provider that, for some orders, can only give the
+payment back in full (a card payment not remitted yet is cancelled whole) is said so
+through `Thelia\Module\PaymentModuleRefundingInFullInterface`
+(`refundsOnlyInFull(Order)`): the service then refuses any other amount than
+everything still refundable, and the back office offers that amount alone.
+`Thelia\Domain\Payment\Service\PaymentRefundService` is what the back office calls, through the `ORDER_PAYMENT_REFUND` event
 (`OrderPaymentRefundEvent`, null amount for everything still refundable):
 
 - what can be given back is read in the journal — captured, less refunded, less

@@ -24,7 +24,7 @@ use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\PaymentModuleCancellingOnReleaseInterface;
 use Thelia\Module\PaymentModuleCapturingOnceInterface;
 use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
-use Thelia\Module\PaymentModuleWithRefundInterface;
+use Thelia\Module\PaymentModuleRefundingInFullInterface;
 
 /**
  * A payment module that reserves the amount first and takes it later, the way a
@@ -34,7 +34,7 @@ use Thelia\Module\PaymentModuleWithRefundInterface;
  * Registered under a `module` row by the tests that need it; the core instantiates it
  * from that row's namespace, so it needs no container.
  */
-final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleCapturingOnceInterface, PaymentModuleManagingOrderStatusInterface, PaymentModuleCancellingOnReleaseInterface, PaymentModuleWithRefundInterface
+final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleCapturingOnceInterface, PaymentModuleManagingOrderStatusInterface, PaymentModuleCancellingOnReleaseInterface, PaymentModuleRefundingInFullInterface
 {
     public static bool $deferredCapture = true;
 
@@ -46,6 +46,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     /** Whether the module cancels the order itself once its provider ended the authorization. */
     public static bool $cancelsOrderOnRelease = false;
+
+    /** Whether the provider gives the payment back in full only, for now. */
+    public static bool $refundsOnlyInFull = false;
 
     /** @var PaymentOperationResult|\Throwable|null what the next capture answers, or throws */
     public static PaymentOperationResult|\Throwable|null $nextCaptureAnswer = null;
@@ -81,6 +84,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$managesOrderStatus = false;
         self::$capturesOnce = false;
         self::$cancelsOrderOnRelease = false;
+        self::$refundsOnlyInFull = false;
         self::$refunds = true;
         self::$nextRefundAnswer = null;
         self::$refundCalls = [];
@@ -121,6 +125,11 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     public function cancelsOrderOnRelease(): bool
     {
         return self::$cancelsOrderOnRelease;
+    }
+
+    public function refundsOnlyInFull(Order $order): bool
+    {
+        return self::$refundsOnlyInFull;
     }
 
     public function supportsDeferredCapture(): bool
