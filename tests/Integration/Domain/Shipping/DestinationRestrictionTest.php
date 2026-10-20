@@ -21,6 +21,7 @@ use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
@@ -33,6 +34,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\DestinationRestriction;
 use Thelia\Model\Lang;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
 use Thelia\Model\StateQuery;
@@ -266,6 +268,55 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         self::assertSame([(string) $country->getId()], $groups[0]['destinations']);
     }
 
+    public function testADeliveryAddressServingTheParcelsIsAcceptedForADownloadBeforeAnyInvoiceAddress(): void
+    {
+        $download = $this->download('E-book');
+        $this->group('ebook', DestinationRestriction::MODE_DENY, [$this->refused], [$download]);
+        // The customer's default address lies in the refused country, but the cart has no invoice address yet.
+        $customer = $this->customerLivingIn($this->refused);
+        $cart = $this->cartOf($customer, [$download]);
+        $servedAddress = $this->factory->address($customer, $this->served);
+
+        $this->getService(CartSelectionService::class)->setDeliveryAddress(new CheckoutDTO($cart, deliveryAddressId: $servedAddress->getId()));
+
+        self::assertNotNull($cart->getAddressDeliveryId());
+    }
+
+    public function testAnOrderIsRefusedWhenTheInvoiceAddressOfTheCartIsRefusedToADownload(): void
+    {
+        $download = $this->download('E-book');
+        $this->group('ebook', DestinationRestriction::MODE_DENY, [$this->refused], [$download]);
+        $cart = $this->cartOf(null, [$download]);
+        $cart->setAddressDeliveryId($this->factory->cartAddress(null, $this->served)->getId())
+            ->setAddressInvoiceId($this->factory->cartAddress(null, $this->refused)->getId())
+            ->setDeliveryModuleId($this->carrier()->getId())
+            ->save();
+
+        $this->expectException(DestinationRestrictedException::class);
+        $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
+    public function testThePlacementDoesNotJudgeADownloadOnTheDefaultAddressOfTheCustomer(): void
+    {
+        $download = $this->download('E-book');
+        $this->group('ebook', DestinationRestriction::MODE_DENY, [$this->refused], [$download]);
+        $customer = $this->customerLivingIn($this->refused);
+        $cart = $this->cartOf($customer, [$download]);
+        $cart->setAddressDeliveryId($this->factory->cartAddress(null, $this->served)->getId())
+            ->setDeliveryModuleId($this->carrier()->getId())
+            ->save();
+        $refusal = null;
+
+        try {
+            $this->getService(CartGuard::class)->checkValidDelivery($cart);
+        } catch (CheckoutException $exception) {
+            // The carrier may still refuse this cart: only the destination refusal matters here.
+            $refusal = $exception;
+        }
+
+        self::assertNotInstanceOf(DestinationRestrictedException::class, $refusal);
+    }
+
     private function checker(): DestinationRestrictionChecker
     {
         return $this->getService(DestinationRestrictionChecker::class);
@@ -279,6 +330,22 @@ final class DestinationRestrictionTest extends IntegrationTestCase
     private function product(string $title, string $locale = 'en_US'): Product
     {
         return $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => $title, 'locale' => $locale]);
+    }
+
+    private function download(string $title): Product
+    {
+        $download = $this->product($title);
+        $download->setVirtual(1)->save();
+
+        return $download;
+    }
+
+    private function carrier(): Module
+    {
+        $carrier = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->orderById()->findOne();
+        self::assertNotNull($carrier);
+
+        return $carrier;
     }
 
     /**

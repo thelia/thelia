@@ -156,11 +156,13 @@ class CartGuard
         }
 
         // The one refusal that holds whatever path placed the order, theme or API: the earlier
-        // ones, at the cart and at the address, only save the buyer some time.
+        // ones, at the cart and at the address, only save the buyer some time. A download is
+        // judged on the invoice address of the cart, never on the default address of the
+        // customer: without an invoice address the payment step refuses the order anyway.
         $restrictedLines = $this->destinationRestrictionChecker?->violationsFor(
             $cart,
             Destination::of($address),
-            CartDestinations::billing($cart, true),
+            CartDestinations::billing($cart),
             $this->locale(),
         ) ?? [];
 
