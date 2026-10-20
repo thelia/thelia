@@ -21,15 +21,16 @@ use Thelia\Model\Customer;
 /**
  * The customer the reserved prices of the current request are resolved for.
  *
- * Thelia's own SecurityContext comes first: the front-office theme calls the API
- * in-process, where the stateless `api` firewall is never traversed and the token
- * storage is therefore empty, while the Thelia session still holds the customer
- * who signed in.
+ * The token storage comes first: it holds who a caller reaching /api/front/...
+ * over HTTP with a bearer token authenticated as. That request may also carry a
+ * stale front-office session cookie for someone else, and the price must follow
+ * the identity the request authenticated as, not the one the session remembers.
  *
- * The token storage is the second answer, not the first, and it is what a caller
- * reaching /api/front/... over HTTP with a bearer token authenticates as: that
- * firewall opens no session at all, so the session has nobody to offer. Reading
- * only one of the two would leave one of the two front paths priceless.
+ * Thelia's own SecurityContext is the fallback: the front-office theme calls the
+ * API in-process, where the stateless `api` firewall is never traversed and the
+ * token storage is therefore empty, while the Thelia session still holds the
+ * customer who signed in. Reading only one of the two would leave one of the two
+ * front paths priceless.
  *
  * Outside a request — the scheduled command that opens and closes operations,
  * a console command, a worker — there is neither, and this answers null, which
@@ -45,10 +46,10 @@ class CurrentCustomerProvider
 
     public function getCurrentCustomer(): ?Customer
     {
-        $customer = $this->securityContext->getCustomerUser();
+        $customer = $this->tokenStorage->getToken()?->getUser();
 
         if (!$customer instanceof Customer) {
-            $customer = $this->tokenStorage->getToken()?->getUser();
+            $customer = $this->securityContext->getCustomerUser();
         }
 
         if (!$customer instanceof Customer) {
