@@ -167,6 +167,8 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function supportsRefund(): bool
     {
+        self::$scopes[] = ['call' => 'supportsRefund', 'saleUnit' => SaleUnitConfigScope::current()];
+
         return self::$refunds;
     }
 
@@ -176,6 +178,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         $this->getContainer();
 
         self::$refundCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId(), 'reason' => $reason->value, 'comment' => $comment];
+        self::$scopes[] = ['call' => 'refund', 'saleUnit' => SaleUnitConfigScope::current()];
 
         $answer = self::$nextRefundAnswer;
         self::$nextRefundAnswer = null;

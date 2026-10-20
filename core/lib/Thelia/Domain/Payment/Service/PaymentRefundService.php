@@ -91,7 +91,7 @@ final readonly class PaymentRefundService
             ));
 
             return $this->runner->run(
-                static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment),
+                fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment)),
                 $transaction,
                 $moduleCode,
             );
@@ -192,7 +192,7 @@ final readonly class PaymentRefundService
             throw new RefundNotSupportedException((string) $order->getRef(), $this->moduleLocator->nameOf($order));
         }
 
-        if (!$module instanceof PaymentModuleWithRefundInterface || !$module->supportsRefund()) {
+        if (!$module instanceof PaymentModuleWithRefundInterface || !$this->moduleLocator->forOrder($order, static fn (): bool => $module->supportsRefund())) {
             throw new RefundNotSupportedException((string) $order->getRef(), $module->getCode());
         }
 
