@@ -139,9 +139,8 @@ final readonly class OrderProcessor implements ProcessorInterface
      */
     private function assertPaymentNamesUntouched(Order $order, OrderResource $data): void
     {
-        $referenceChanged = $data->getTransactionRef() !== $order->getTransactionRef();
-        $moduleChanged = (new \ReflectionProperty($data, 'paymentModule'))->isInitialized($data)
-            && $data->getPaymentModule()?->getId() !== $order->getPaymentModuleId();
+        $referenceChanged = self::referenceOf($data->getTransactionRef()) !== self::referenceOf($order->getTransactionRef());
+        $moduleChanged = $data->getPaymentModule()?->getId() !== $order->getPaymentModuleId();
 
         if (!$referenceChanged && !$moduleChanged) {
             return;
@@ -152,6 +151,14 @@ final readonly class OrderProcessor implements ProcessorInterface
         }
 
         throw new UnprocessableEntityHttpException(\sprintf('Order %s has a payment journal: its transaction reference and payment module are no longer changed by hand.', (string) $order->getRef()));
+    }
+
+    /**
+     * No reference and an empty one are the same: neither names a transaction.
+     */
+    private static function referenceOf(?string $transactionRef): ?string
+    {
+        return null === $transactionRef || '' === trim($transactionRef) ? null : $transactionRef;
     }
 
     /**
