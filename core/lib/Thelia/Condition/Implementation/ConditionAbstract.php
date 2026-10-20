@@ -292,7 +292,7 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function drawBackOfficeCurrencyInput(string $inputKey): string
     {
-        $currencies = CurrencyQuery::create()->find();
+        $currencies = CurrencyQuery::create()->filterByVisible(true)->find();
 
         $cleanedCurrencies = [];
 
