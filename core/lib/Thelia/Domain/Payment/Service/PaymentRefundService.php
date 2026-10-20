@@ -27,6 +27,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Module\PaymentModuleWithRefundInterface;
+use Thelia\Tools\TerminalText;
 
 /**
  * Gives back all or part of what an order's payment collected: through the module that took
@@ -214,8 +215,9 @@ final readonly class PaymentRefundService
     }
 
     /**
-     * Typed by an administrator and sent to the provider: no control character, at most 255
-     * characters, nothing for an empty text.
+     * Typed by an administrator and sent to the provider: on one line, without the control and
+     * formatting characters that hide or reorder text, at most 255 characters, nothing for an
+     * empty text. A byte that is not UTF-8 is replaced, it does not empty the comment.
      */
     private static function cleanComment(?string $comment): ?string
     {
@@ -223,7 +225,7 @@ final readonly class PaymentRefundService
             return null;
         }
 
-        $comment = trim((string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $comment));
+        $comment = trim(TerminalText::onOneLine($comment));
 
         return '' === $comment ? null : mb_substr($comment, 0, self::COMMENT_MAX_LENGTH);
     }
