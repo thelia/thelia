@@ -16,10 +16,13 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
+use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -51,6 +54,8 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
      * the current namespace, and the guard would then skip the whole file for ever.
      */
     private const DELIVERY_STEP_COMPONENT = 'FlexyBundle\\Components\\Organisms\\Delivery\\Base';
+
+    private const PAYMENT_STEP_INVOICE_COMPONENT = 'FlexyBundle\\Components\\Organisms\\Invoice\\Base';
 
     private const GUEST_ZIP_CODE = '75002';
 
@@ -179,6 +184,48 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertSame($carrierId, (int) CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'A new street took away the carrier.');
     }
 
+    /**
+     * The delivery address edited on the payment step moves elsewhere: the buyer is sent back
+     * to the delivery step, which chooses it again and asks its carriers.
+     */
+    public function testMovingTheDeliveryAddressFromThePaymentStepSendsBackToTheDeliveryStep(): void
+    {
+        [, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $this->skipUnlessThePaymentStepFollowsTheDeliveryAddress();
+
+        $response = $this->editOnThePaymentStep($address, static fn (Address $edited) => $edited->setZipcode('20000')->setCity('Ajaccio'));
+
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('/checkout/delivery', $response->getTargetUrl());
+    }
+
+    /**
+     * Another street on the payment step: the cart's copy follows at once, nothing moves.
+     */
+    public function testAStreetEditedOnThePaymentStepReachesTheCartAndKeepsTheCarrier(): void
+    {
+        [$guest, $address] = $this->guestOnTheStepOfAZoneExcluding('20*');
+        $this->skipUnlessThePaymentStepFollowsTheDeliveryAddress();
+        $cart = $this->cartOf($guest);
+        $carrierId = (int) ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()?->getId();
+        $cart->setDeliveryModuleId($carrierId)->save($this->getPropelConnection());
+
+        $response = $this->editOnThePaymentStep($address, static fn (Address $edited) => $edited->setAddress1('2 avenue des Tests'));
+
+        self::assertNull($response);
+        self::assertSame('2 avenue des Tests', $this->deliveryCopyOf($guest)?->getAddress1());
+        CartTableMap::clearInstancePool();
+        self::assertSame($carrierId, (int) CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId());
+    }
+
+    public function testThePaymentStepListensToTheSavedAddress(): void
+    {
+        $this->skipUnlessThePaymentStepFollowsTheDeliveryAddress();
+        $listeners = (new \ReflectionMethod(self::PAYMENT_STEP_INVOICE_COMPONENT, 'addressSaved'))->getAttributes(LiveListener::class);
+
+        self::assertSame([['ADD_NEW_DELIVERY_ADDRESS']], array_map(static fn ($listener): array => $listener->getArguments(), $listeners));
+    }
+
     public function testTheDeliveryStepListensToTheSavedAddress(): void
     {
         $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
@@ -230,6 +277,42 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
             return $step->getPostalCodeWithoutCarrier();
         } finally {
             $requestStack->pop();
+        }
+    }
+
+    /**
+     * The buyer is on the payment step, billed where the order ships, as the step leaves
+     * them once open; the billing card opens the edit form of the address, the address is
+     * saved, the form tells the card. Returns what the card answers.
+     *
+     * @param callable(Address): Address $edit
+     */
+    private function editOnThePaymentStep(Address $address, callable $edit): ?Response
+    {
+        $billingCopy = $this->getService(CartAddressService::class)->getOrCreateCartAddressFromAddress($address);
+        $this->cartOf($this->guestCustomerOf(self::GUEST_EMAIL) ?? self::fail('No guest.'))->setAddressInvoiceId($billingCopy->getId())->save($this->getPropelConnection());
+
+        $requestStack = $this->getService(RequestStack::class);
+        $request = Request::create('/checkout/payment');
+        $request->setSession($this->sessionOfTheClient());
+        $requestStack->push($request);
+
+        try {
+            $card = $this->getService(self::PAYMENT_STEP_INVOICE_COMPONENT);
+            $card->mount();
+            $card->setEditingAddress((int) $address->getId());
+            $edit($address)->save($this->getPropelConnection());
+
+            return $card->addressSaved();
+        } finally {
+            $requestStack->pop();
+        }
+    }
+
+    private function skipUnlessThePaymentStepFollowsTheDeliveryAddress(): void
+    {
+        if (!method_exists(self::PAYMENT_STEP_INVOICE_COMPONENT, 'addressSaved')) {
+            self::markTestSkipped('The installed front-office theme does not follow the delivery address edited on the payment step.');
         }
     }
 
