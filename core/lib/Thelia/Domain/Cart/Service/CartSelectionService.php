@@ -20,7 +20,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
-use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\Service\PostageHandler;
@@ -61,6 +60,9 @@ class CartSelectionService
     /**
      * The address is refused before it is written, naming the products of the cart that
      * cannot ship there, so the buyer can pick another one or empty the cart.
+     *
+     * Only what travels is judged here: a download follows the invoice address, which
+     * the buyer may not have chosen yet, and is judged at the placement of the order.
      */
     private function refuseARestrictedDestination(CheckoutDTO $checkoutDTO): void
     {
@@ -80,7 +82,7 @@ class CartSelectionService
         $lines = $this->destinationRestrictionChecker->violationsFor(
             $cart,
             Destination::of($address),
-            CartDestinations::billing($cart, true),
+            null,
             Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
         );
 
