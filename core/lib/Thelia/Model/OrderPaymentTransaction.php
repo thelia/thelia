@@ -21,6 +21,12 @@ use Thelia\Model\Base\OrderPaymentTransaction as BaseOrderPaymentTransaction;
 
 class OrderPaymentTransaction extends BaseOrderPaymentTransaction
 {
+    /** The size of the `error_code` column. */
+    public const ERROR_CODE_MAX_LENGTH = 50;
+
+    /** What the journal keeps of an error message: the words of a provider, never a whole answer. */
+    public const ERROR_MESSAGE_MAX_LENGTH = 1000;
+
     public function getTypeEnum(): ?PaymentTransactionType
     {
         return PaymentTransactionType::tryFrom((string) $this->getType());

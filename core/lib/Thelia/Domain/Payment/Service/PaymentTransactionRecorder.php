@@ -36,6 +36,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\TerminalText;
 
 /**
  * Writes the payment journal of an order.
@@ -332,8 +333,8 @@ final readonly class PaymentTransactionRecorder
             }
 
             $transaction
-                ->setErrorCode($errorCode)
-                ->setErrorMessage($errorMessage);
+                ->setErrorCode(self::errorCodeOf($errorCode))
+                ->setErrorMessage(self::errorMessageOf($errorMessage));
 
             // A reference another line carries is refused here, the line left pending as the
             // database holds it, for the caller to note why and the notification to settle.
@@ -396,10 +397,37 @@ final readonly class PaymentTransactionRecorder
      *
      * @template T
      *
-     * @param callable(): T $work
-     *
      * @return T
      */
+    /**
+     * The code a module or the core gives a line, on one line and cut to what the column
+     * holds: in a strict SQL mode, a longer one would fail the write and leave the line as
+     * it was.
+     */
+    private static function errorCodeOf(?string $errorCode): ?string
+    {
+        if (null === $errorCode) {
+            return null;
+        }
+
+        $code = trim(TerminalText::onOneLine($errorCode));
+
+        return '' === $code ? null : mb_substr($code, 0, OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH);
+    }
+
+    /**
+     * The message of a line comes from a provider, through a module: its control characters
+     * are replaced and it is cut, so that a whole answer cannot be kept, nor shown.
+     */
+    private static function errorMessageOf(?string $errorMessage): ?string
+    {
+        if (null === $errorMessage) {
+            return null;
+        }
+
+        return mb_substr(TerminalText::withoutControlCharacters($errorMessage), 0, OrderPaymentTransaction::ERROR_MESSAGE_MAX_LENGTH);
+    }
+
     public function withOrderLock(Order $order, callable $work): mixed
     {
         return $this->locked((int) $order->getId(), $work);
@@ -464,8 +492,8 @@ final readonly class PaymentTransactionRecorder
                 ->setActorType($actor->actorType->value)
                 ->setActorLabel($actor->label)
                 ->setAdminId($actor->adminId)
-                ->setErrorCode($errorCode)
-                ->setErrorMessage($errorMessage);
+                ->setErrorCode(self::errorCodeOf($errorCode))
+                ->setErrorMessage(self::errorMessageOf($errorMessage));
 
             $this->save($transaction);
             $this->announce($order, $transaction, $moduleCode);

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Exception;
 
+use Thelia\Model\OrderPaymentTransaction;
+
 /**
  * The provider refused the movement and took nothing: the one exception a payment module
  * throws to have the line settled as failed, with this message. Anything else it throws
@@ -25,8 +27,7 @@ namespace Thelia\Domain\Payment\Exception;
  */
 class PaymentRefusedException extends PaymentException
 {
-    /** The size of `order_payment_transaction`.`error_code`. */
-    public const PROVIDER_CODE_MAX_LENGTH = 50;
+    public const PROVIDER_CODE_MAX_LENGTH = OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH;
 
     private ?string $providerCode = null;
 
