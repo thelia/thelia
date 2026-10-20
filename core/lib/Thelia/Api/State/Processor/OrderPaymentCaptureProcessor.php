@@ -19,21 +19,18 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\OrderPaymentCapture;
 use Thelia\Api\Resource\OrderPaymentTransaction;
+use Thelia\Api\Service\ReachableOrder;
 use Thelia\Core\Event\Order\OrderPaymentCaptureEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Exception\DuplicateCaptureException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Domain\Payment\Exception\PaymentJournalBusyException;
 use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
-use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
-use Thelia\Model\Order;
-use Thelia\Model\OrderQuery;
 
 /**
  * Captures through ORDER_PAYMENT_CAPTURE, the way the back office does, so a module
@@ -46,7 +43,7 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
-        private AdminSaleUnitScope $adminSaleUnitScope,
+        private ReachableOrder $reachableOrder,
     ) {
     }
 
@@ -56,7 +53,7 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
             throw new \LogicException(\sprintf('Expected a %s, got %s.', OrderPaymentCapture::class, get_debug_type($data)));
         }
 
-        $event = new OrderPaymentCaptureEvent($this->order($uriVariables), $data->amount);
+        $event = new OrderPaymentCaptureEvent($this->reachableOrder->fromUriVariables($uriVariables), $data->amount);
 
         try {
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_PAYMENT_CAPTURE);
@@ -81,19 +78,5 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
             propelModel: $event->getTransaction(),
             context: $context,
         );
-    }
-
-    private function order(array $uriVariables): Order
-    {
-        $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
-        $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
-
-        // An order of a sale unit the administrator is restricted away from is no
-        // order of theirs, the way the order itself answers 404 to them.
-        if (!$order instanceof Order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
-            throw new NotFoundHttpException('No such order.');
-        }
-
-        return $order;
     }
 }

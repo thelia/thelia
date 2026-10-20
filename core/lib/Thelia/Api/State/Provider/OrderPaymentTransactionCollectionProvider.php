@@ -18,14 +18,12 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\State\Pagination\PropelPaginator;
 use Thelia\Api\Resource\OrderPaymentTransaction;
-use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
+use Thelia\Api\Service\ReachableOrder;
 use Thelia\Model\OrderPaymentTransaction as OrderPaymentTransactionModel;
 use Thelia\Model\OrderPaymentTransactionQuery;
-use Thelia\Model\OrderQuery;
 
 /**
  * The payment journal of one order, latest movement first, as a sub-collection of the
@@ -36,14 +34,14 @@ final readonly class OrderPaymentTransactionCollectionProvider implements Provid
     public function __construct(
         private Pagination $pagination,
         private ApiResourcePropelTransformerService $apiResourcePropelTransformerService,
-        private AdminSaleUnitScope $adminSaleUnitScope,
+        private ReachableOrder $reachableOrder,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
         $query = OrderPaymentTransactionQuery::create()
-            ->filterByOrderId($this->orderId($uriVariables))
+            ->filterByOrderId((int) $this->reachableOrder->fromUriVariables($uriVariables)->getId())
             ->orderById(Criteria::DESC);
 
         if (!$this->pagination->isEnabled($operation, $context)) {
@@ -55,21 +53,6 @@ final readonly class OrderPaymentTransactionCollectionProvider implements Provid
         $pager = $query->paginate($page, $itemsPerPage);
 
         return new PropelPaginator($pager, $this->toResources(iterator_to_array($pager->getResults()), $context));
-    }
-
-    private function orderId(array $uriVariables): int
-    {
-        $orderId = filter_var($uriVariables['orderId'] ?? null, \FILTER_VALIDATE_INT);
-
-        $order = false === $orderId || $orderId < 1 ? null : OrderQuery::create()->findPk($orderId);
-
-        // An order of a sale unit the administrator is restricted away from is no
-        // order of theirs, the way the order itself answers 404 to them.
-        if (null === $order || !$this->adminSaleUnitScope->allows($order->getSaleUnitId())) {
-            throw new NotFoundHttpException('No such order.');
-        }
-
-        return $orderId;
     }
 
     private function toResources(array $models, array $context): array
