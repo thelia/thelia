@@ -19,6 +19,7 @@ use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
+use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutPlacementService;
 use Thelia\Model\AddressQuery;
@@ -169,23 +170,10 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
      */
     public function testACartWithNothingToShipIsPaidWithItsInvoiceAddressAlone(): void
     {
-        [$cart, $country] = $this->aCartReadyForAWallet();
-
-        foreach ($cart->getCartItems() as $item) {
-            $saleElements = $item->getProductSaleElements();
-            $saleElements->setWeight(0)->save($this->getPropelConnection());
-            $saleElements->getProduct()->setVirtual(1)->save($this->getPropelConnection());
-        }
-        $cart->clearCartItems();
+        [$cart, $country] = $this->aCartWithNothingToShipReadyForAWallet();
 
         $invoice = $this->createFixtureFactory()->cartAddress(null, $country, null, ['city' => 'Lyon']);
-        $virtualCarrier = ModuleQuery::create()->findOneByCode('VirtualProductDelivery');
-        self::assertNotNull($virtualCarrier);
-        $cart->setAddressInvoiceId($invoice->getId())
-            ->setDeliveryModuleId($virtualCarrier->getId())
-            ->save($this->getPropelConnection());
-        self::assertTrue($cart->isVirtual(), 'This test is only meaningful on a cart with nothing to ship.');
-        $this->answerTheCarrierQuoteWithoutASession();
+        $cart->setAddressInvoiceId($invoice->getId())->save($this->getPropelConnection());
 
         $wallet = ModuleQuery::create()->findOneByCode(ExpressPaymentTestModule::MODULE_CODE);
         $result = $this->service()->place(new ExpressCheckoutRequest(
@@ -199,6 +187,65 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
         self::assertNotNull($order);
         self::assertSame('Lyon', OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getCity());
         self::assertNotSame($cart->getAddressInvoiceId(), $cart->getAddressDeliveryId(), 'The invoice address is not shared with the delivery.');
+    }
+
+    /**
+     * A refused confirmation leaves no delivery address behind: the next one is delivered
+     * to the invoice address the buyer corrected in between, not to the one of the refusal.
+     */
+    public function testARefusedConfirmationDoesNotKeepTheDeliveryAddressOfACartWithNothingToShip(): void
+    {
+        [$cart, $country] = $this->aCartWithNothingToShipReadyForAWallet();
+        self::assertGreaterThan(0, ConsentQuery::create()->filterByActive(1)->count(), 'This shop asks for no consent.');
+        $factory = $this->createFixtureFactory();
+        $wallet = (int) ModuleQuery::create()->findOneByCode(ExpressPaymentTestModule::MODULE_CODE)?->getId();
+
+        $firstInvoice = $factory->cartAddress(null, $country, null, ['city' => 'Lyon']);
+        $cart->setAddressInvoiceId($firstInvoice->getId())->save($this->getPropelConnection());
+
+        try {
+            $this->service()->place(new ExpressCheckoutRequest($cart, $wallet, round($cart->getTaxedAmount($country), 2), []));
+            self::fail('A confirmation without the mandatory consents must be refused.');
+        } catch (CheckoutRefusedException) {
+        }
+        self::assertNull($cart->getAddressDeliveryId(), 'The refused attempt left a delivery address on the cart.');
+
+        $secondInvoice = $factory->cartAddress(null, $country, null, ['city' => 'Paris']);
+        $cart->setAddressInvoiceId($secondInvoice->getId())->save($this->getPropelConnection());
+
+        $result = $this->service()->place(new ExpressCheckoutRequest(
+            $cart,
+            $wallet,
+            round($cart->getTaxedAmount($country), 2),
+            $this->consentsAcceptedInTheSheet(),
+        ));
+
+        $order = OrderQuery::create()->findPk($result->orderId);
+        self::assertNotNull($order);
+        self::assertSame('Paris', OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getCity());
+    }
+
+    /**
+     * @return array{0: Cart, 1: Country}
+     */
+    private function aCartWithNothingToShipReadyForAWallet(): array
+    {
+        [$cart, $country] = $this->aCartReadyForAWallet();
+
+        foreach ($cart->getCartItems() as $item) {
+            $saleElements = $item->getProductSaleElements();
+            $saleElements->setWeight(0)->save($this->getPropelConnection());
+            $saleElements->getProduct()->setVirtual(1)->save($this->getPropelConnection());
+        }
+        $cart->clearCartItems();
+
+        $virtualCarrier = ModuleQuery::create()->findOneByCode('VirtualProductDelivery');
+        self::assertNotNull($virtualCarrier);
+        $cart->setDeliveryModuleId($virtualCarrier->getId())->save($this->getPropelConnection());
+        self::assertTrue($cart->isVirtual(), 'This test is only meaningful on a cart with nothing to ship.');
+        $this->answerTheCarrierQuoteWithoutASession();
+
+        return [$cart, $country];
     }
 
     /**
