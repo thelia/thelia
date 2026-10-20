@@ -343,15 +343,47 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         $order = $this->authorizedOrder(120);
 
         $crawler = $this->sheet($order);
+        $cancelledId = (int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId();
+        self::assertCount(0, $crawler->filter('[data-testid="order-cancel-btn"]'), 'The sheet offers no cancellation the core refuses.');
+        self::assertCount(0, $crawler->filter('[data-testid="order-status-select"] option[value="'.$cancelledId.'"]'));
+
         $this->client->request('POST', '/admin/order/update/'.$order->getId().'/status', [
             '_token' => $this->tokenOf($crawler),
-            'status_id' => OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId(),
+            'status_id' => $cancelledId,
         ]);
         $crawler = $this->client->followRedirect();
 
         self::assertStringContainsString('needs the right to capture payments', $crawler->text());
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame([], DeferredCapturePaymentModule::$voidCalls);
+    }
+
+    public function testTheOrderListOffersNoCancellationOfAnAuthorizedOrderWithoutTheCaptureRight(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
+        $authorized = $this->authorizedOrder(120);
+        $unpaid = $this->factory->order();
+
+        $crawler = $this->client->request('GET', '/admin/orders');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertCount(0, $crawler->filter('[data-order-id="'.$authorized->getId().'"][data-bs-target="#order-cancel-modal"]'));
+        self::assertGreaterThan(0, $crawler->filter('[data-order-id="'.$unpaid->getId().'"][data-bs-target="#order-cancel-modal"]')->count(), 'An order holding nothing is still cancelled from the list.');
+    }
+
+    public function testTheCaptureRightOffersTheCancellationOfAnAuthorizedOrder(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_PAYMENT_CAPTURE => [AccessManager::CREATE],
+        ]));
+        $order = $this->authorizedOrder(120);
+        $cancelledId = (int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId();
+
+        $crawler = $this->sheet($order);
+
+        self::assertCount(1, $crawler->filter('[data-testid="order-cancel-btn"]'));
+        self::assertCount(1, $crawler->filter('[data-testid="order-status-select"] option[value="'.$cancelledId.'"]'));
     }
 
     public function testTheOutcomeOfALineTheProviderNeverConfirmedIsRecordedFromTheSheet(): void
