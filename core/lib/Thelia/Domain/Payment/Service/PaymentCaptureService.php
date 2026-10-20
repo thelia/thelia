@@ -90,6 +90,14 @@ final readonly class PaymentCaptureService
      */
     public function capture(Order $order, ?float $amount = null): OrderPaymentTransaction
     {
+        // The whole movement runs with the configuration of the order's sale unit: the call of
+        // the module, and what the journal writes and announces before and after it, so that a
+        // listener of the journal or of the status reads the same as the module.
+        return $this->moduleLocator->forOrder($order, fn (): OrderPaymentTransaction => $this->captureForItsSaleUnit($order, $amount));
+    }
+
+    private function captureForItsSaleUnit(Order $order, ?float $amount): OrderPaymentTransaction
+    {
         $module = $this->captureModuleOf($order);
         $moduleCode = $module->getCode();
         $currencyCode = $order->getCurrency()->getCode();
@@ -134,7 +142,7 @@ final readonly class PaymentCaptureService
         }));
 
         $result = $this->callModule(
-            fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->capture($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction)),
+            static fn (): PaymentOperationResult => $module->capture($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction),
             $transaction,
             $moduleCode,
         );
@@ -143,6 +151,11 @@ final readonly class PaymentCaptureService
     }
 
     public function voidAuthorization(Order $order): OrderPaymentTransaction
+    {
+        return $this->moduleLocator->forOrder($order, fn (): OrderPaymentTransaction => $this->voidForItsSaleUnit($order));
+    }
+
+    private function voidForItsSaleUnit(Order $order): OrderPaymentTransaction
     {
         $module = $this->captureModuleOf($order);
         $moduleCode = $module->getCode();
@@ -155,7 +168,7 @@ final readonly class PaymentCaptureService
             $moduleCode,
         ));
 
-        $result = $this->callModule(fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->voidAuthorization($order, $transaction)), $transaction, $moduleCode);
+        $result = $this->callModule(static fn (): PaymentOperationResult => $module->voidAuthorization($order, $transaction), $transaction, $moduleCode);
 
         return $this->conclude($transaction, $result, $moduleCode);
     }

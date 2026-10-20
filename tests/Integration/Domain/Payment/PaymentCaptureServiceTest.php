@@ -394,6 +394,34 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertNull(SaleUnitConfigScope::current(), 'The configuration of the request is given back.');
     }
 
+    public function testWhatTheCaptureAnnouncesRunsWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        // A listener of the journal or of the status the capture moves (a carrier, an ERP)
+        // reads the configuration of the order's unit, whether the module records the line
+        // itself while it is called or the core records what it answered.
+        [$order] = $this->authorizedOrder(120);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        $seen = [];
+        $listener = static function () use (&$seen): void {
+            $seen[] = SaleUnitConfigScope::current();
+        };
+        $dispatcher = $this->getService(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        $dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+
+        try {
+            $this->service->capture($order);
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+            $dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+        }
+
+        self::assertNotEmpty($seen);
+        self::assertSame([$saleUnitId], array_values(array_unique($seen)), 'Every announcement of the capture runs with the configuration of the order\'s unit.');
+        self::assertNull(SaleUnitConfigScope::current());
+    }
+
     public function testAModuleThatRefusesWithTheCodeOfTheProviderWritesThatCode(): void
     {
         [$order] = $this->authorizedOrder(120);
