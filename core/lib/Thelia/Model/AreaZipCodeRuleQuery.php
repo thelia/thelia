@@ -44,7 +44,10 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
                 $pattern = ZipCodePattern::fromString((string) $rule->getPattern());
             } catch (\InvalidArgumentException) {
                 // Written by hand in the database: the back office never saves one.
-                Tlog::getInstance()->warning(\sprintf('Postal code rule %d of zone %d is ignored: "%s" matches nothing.', $rule->getId(), $areaId, $rule->getPattern()));
+                Tlog::getInstance()->warning(
+                    'Postal code rule {rule_id} of zone {area_id} is ignored: "{pattern}" matches nothing.',
+                    ['rule_id' => $rule->getId(), 'area_id' => $areaId, 'pattern' => $rule->getPattern()],
+                );
 
                 continue;
             }
