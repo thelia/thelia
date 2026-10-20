@@ -64,7 +64,9 @@ class CartSelectionService
      * Only what travels is judged here: a download follows the invoice address, which
      * the buyer may not have chosen yet, and is judged at the placement of the order.
      * An address of another customer is not looked at, as the action that writes the
-     * address ignores it too.
+     * address ignores it too. A gift offered by a promotion is not judged either: the
+     * buyer cannot remove it, and writing the address reconciles the offered lines,
+     * which withdraws the gift this destination refuses.
      */
     private function refuseARestrictedDestination(CheckoutDTO $checkoutDTO): void
     {
@@ -84,8 +86,16 @@ class CartSelectionService
             return;
         }
 
-        $lines = $this->destinationRestrictionChecker->violationsFor(
-            $cart,
+        $boughtProductIds = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (1 !== (int) $cartItem->getIsOffered()) {
+                $boughtProductIds[] = (int) $cartItem->getProductId();
+            }
+        }
+
+        $lines = $this->destinationRestrictionChecker->violationsForProducts(
+            $boughtProductIds,
             Destination::of($address),
             null,
             Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
