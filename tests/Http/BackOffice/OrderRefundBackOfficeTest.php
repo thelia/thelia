@@ -102,6 +102,8 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_REFUNDED, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
         self::assertSame('Parcel came back', DeferredCapturePaymentModule::$refundCalls[0]['comment']);
         self::assertSame(1, AdminLogQuery::create()->filterByMessage('%Payment refund of 100%Parcel came back%', Criteria::LIKE)->count());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%refund of 100.00 '.$order->getCurrency()->getCode().' asked%', Criteria::LIKE)->count(), 'The amount reads as money, in its currency.');
+        self::assertSame(0, AdminLogQuery::create()->filterByMessage('%100.000000%', Criteria::LIKE)->count());
     }
 
     public function testAnAmountThatIsNotAPlainNumberIsRefused(): void
@@ -128,6 +130,7 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertStringContainsString('70.00', $crawler->filter('[data-testid="order-payment-refundable"]')->text());
         self::assertCount(1, DeferredCapturePaymentModule::$refundCalls);
         self::assertSame(OrderStatus::CODE_PAID, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%refund of 80.00 %'.$order->getRef().'%failed%exceeds%', Criteria::LIKE)->count(), 'The refused refund is written to the administration log.');
     }
 
     public function testAProviderRefusalIsShownAndNothingIsRefunded(): void
@@ -140,6 +143,7 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
 
         self::assertStringContainsString('Refund window closed', $crawler->filter('[data-testid="bo-flash-danger"]')->text(''));
         self::assertStringContainsString('100.00', $crawler->filter('[data-testid="order-payment-refundable"]')->text());
+        self::assertSame(1, AdminLogQuery::create()->filterByMessage('%refund of 40.00 %failed: Refund window closed%', Criteria::LIKE)->count(), 'The refusal of the provider is written to the administration log.');
     }
 
     public function testAnOrderWhoseModuleCannotRefundOffersToRecordARefundMadeOutsideIt(): void
