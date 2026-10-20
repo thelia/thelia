@@ -27,7 +27,9 @@ use Thelia\Model\OrderPaymentTransaction;
  * was collected and not given back, and written $transaction as pending; the module calls
  * the provider and reports the outcome, the same way as a capture: a refusal through the
  * result or a PaymentRefusedException, a call without answer by any other exception, which
- * leaves the line pending until the provider's notification settles it.
+ * leaves the line pending until the provider's notification settles it. A provider that, for
+ * some orders, gives the payment back in full only is said so through
+ * PaymentModuleRefundingInFullInterface.
  */
 interface PaymentModuleWithRefundInterface extends PaymentModuleInterface
 {
