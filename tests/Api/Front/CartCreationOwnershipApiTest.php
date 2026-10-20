@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
+use Thelia\Model\Currency;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -65,6 +67,28 @@ final class CartCreationOwnershipApiTest extends ApiTestCase
         );
     }
 
+    public function testACartCreatedWithACustomerTokenBelongsToThatCustomerInTheShopCurrency(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $token = $this->authenticateAsCustomer($customer);
+
+        $cart = $this->createCartWithAnEmptyBody($token);
+
+        self::assertNotNull($cart);
+        self::assertSame($customer->getId(), $cart->getCustomerId());
+        self::assertSame(Currency::getDefaultCurrency()->getId(), $cart->getCurrencyId());
+    }
+
+    public function testAnAnonymousCartBelongsToNobodyInTheShopCurrency(): void
+    {
+        $cart = $this->createCartWithAnEmptyBody();
+
+        self::assertNotNull($cart);
+        self::assertNull($cart->getCustomerId());
+        self::assertSame(Currency::getDefaultCurrency()->getId(), $cart->getCurrencyId());
+    }
+
     public function testTheCartTokenIsServerGeneratedNotChosenByTheBody(): void
     {
         $chosen = 'attacker-chosen-token-value';
@@ -81,5 +105,22 @@ final class CartCreationOwnershipApiTest extends ApiTestCase
         // be able to fix it, and the server must always assign an unguessable one.
         self::assertNotEmpty($token, 'A created cart must carry a server-generated token.');
         self::assertNotSame($chosen, $token, 'The body must not be able to choose the cart token.');
+    }
+
+    private function createCartWithAnEmptyBody(?string $token = null): ?Cart
+    {
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+
+        if (null !== $token) {
+            $server['HTTP_AUTHORIZATION'] = 'Bearer '.$token;
+        }
+
+        $this->client->request('POST', '/api/front/carts', server: $server, content: '{}');
+        $response = $this->client->getResponse();
+        self::assertContains($response->getStatusCode(), [200, 201], (string) $response->getContent());
+
+        $data = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        return CartQuery::create()->findPk((int) $data['id'], $this->getPropelConnection());
     }
 }
