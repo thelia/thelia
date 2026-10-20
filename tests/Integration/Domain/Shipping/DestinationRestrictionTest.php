@@ -138,6 +138,17 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         self::assertSame([$second->getId()], array_map(static fn ($line): int => $line->productId, $lines));
     }
 
+    public function testTheRefusedProductsAreNamedInTheOrderTheyWereGiven(): void
+    {
+        $first = $this->product('Calvados');
+        $second = $this->product('Armagnac');
+        $this->group('alcohol', DestinationRestriction::MODE_DENY, [$this->refused], [$first, $second]);
+
+        $lines = $this->checker()->violationsForProducts([$second->getId(), $first->getId()], new Destination($this->refused->getId()), null, 'en_US');
+
+        self::assertSame([$second->getId(), $first->getId()], array_map(static fn ($line): int => $line->productId, $lines));
+    }
+
     public function testAGroupTurnedOffRefusesNothing(): void
     {
         $product = $this->product('Cider');
