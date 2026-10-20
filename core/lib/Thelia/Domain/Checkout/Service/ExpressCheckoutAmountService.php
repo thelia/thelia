@@ -29,29 +29,23 @@ final readonly class ExpressCheckoutAmountService
 {
     public function __construct(
         private ExpressCheckoutGate $gate,
+        private ExpressCheckoutTotal $checkoutTotal,
     ) {
     }
 
     /**
-     * The goods taxed for the delivery address the checkout chose, plus the postage of the
-     * chosen carrier. Null until a carrier and a delivery address are on the cart, which is
-     * when the sheet may not open yet.
+     * The grand total of the checkout: goods, postage and gift wrapping. Null until a
+     * carrier and a delivery address are on the cart, which is when the sheet may not open
+     * yet.
      *
-     * The same sum the placement checks the wallet's total against, so the number a buyer
-     * agrees to is the one the shop accepts.
+     * The same total the placement checks the wallet's total against, so the number a
+     * buyer agrees to is the one the shop accepts.
      *
      * @throws ExpressCheckoutConfirmationDeniedException when the request is not one the shop reads at all
      * @throws ExpressCheckoutRefusedException            when there is nothing to pay for
      */
     public function amountOfTheCheckout(Request $request, string $moduleCode, string $token): ?float
     {
-        $cart = $this->gate->open($request, $moduleCode, $token)->cart;
-        $country = $cart->getCartAddressRelatedByAddressDeliveryId()?->getCountry();
-
-        if (null === $cart->getDeliveryModuleId() || null === $country) {
-            return null;
-        }
-
-        return round((float) $cart->getTaxedAmount($country) + (float) $cart->getPostage(), 2);
+        return $this->checkoutTotal->of($this->gate->open($request, $moduleCode, $token)->cart);
     }
 }
