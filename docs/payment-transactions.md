@@ -192,9 +192,10 @@ published module implements would break them all.
   called: its services are no longer compiled, and the refusal names it.
 - Every call of the core into the module about an order
   (`supportsDeferredCapture()`, `capturesOnce()`, `cancelsOrderOnRelease()`,
-  `capture()`, `voidAuthorization()`,
-  `managesOrderStatus()`, `manageStockOnCreation()`), and what the journal writes
-  and announces around a capture or a release, runs with the configuration of
+  `capture()`, `voidAuthorization()`, `supportsRefund()`, `refundsOnlyInFull()`,
+  `refund()`, `managesOrderStatus()`, `manageStockOnCreation()`), and what the
+  journal writes and announces around a capture, a release or a refund, runs with
+  the configuration of
   the sale unit the order was placed on (`PaymentModuleLocator::forOrder()`),
   the national one for a national order:
   a module whose keys, account or mode are set per sale unit reads those of the
