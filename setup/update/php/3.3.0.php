@@ -18,6 +18,7 @@ use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\TerminalText;
 
 // 3.3.0 brings the payment journal, which refunds read to know what an order collected.
 // Orders paid before it have none: each paid, processing or sent order without a journal
@@ -63,9 +64,11 @@ do {
             continue;
         }
 
-        // Both columns hold 100 characters: the reference fits as it is.
+        // Both columns hold 100 characters: the reference fits as it is. One carrying a line break
+        // or a character that hides text is left out, as the journal refuses it from a module: the
+        // line is written without it.
         $reference = trim((string) $order->getTransactionRef());
-        $reference = $reference === '' ? null : $reference;
+        $reference = $reference === '' || TerminalText::singleLine($reference) !== $reference ? null : $reference;
 
         (new OrderPaymentTransaction())
             ->setOrderId($orderId)
