@@ -690,6 +690,7 @@ return [
     'This product reference is already assigned to another product.' => 'Cette référence est déjà assignée à un produit.',
     'This product_sale_elements_id does not exists for this product : %d' => "Le product_sale_elements_id n'existe pas pour ce produit : %d",
     "This state doesn't belong to this country." => 'Cet état n\'appartient pas à ce pays.',
+    'This reference already exists.' => 'Cette référence existe déjà.',
     'This state is online' => 'Cet état est en ligne',
     'This status is protected.' => 'Ce statut de commande est protégé',
     'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.' => 'Ce gabarit est utilisé par des produits, et ne peut être supprimé. Retirez-le de tous vos produits, et ré-essayez.',
