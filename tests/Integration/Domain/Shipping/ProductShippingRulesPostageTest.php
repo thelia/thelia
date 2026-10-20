@@ -52,9 +52,12 @@ use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderPostageTaxQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\State;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountry;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Tests\Support\Module\SessionCartCarrierModule;
 
 /**
  * The shipping rules of the products applied to what a carrier quotes: the carrier
@@ -281,11 +284,37 @@ final class ProductShippingRulesPostageTest extends ActionIntegrationTestCase
     }
 
     /**
+     * A carrier written the way published modules are (state-aware, reading the cart of
+     * the session, taxing under a rule of its own), with no listener cutting it short.
+     */
+    public function testACarrierWithAStateReadingTheSessionCartPricesTheShippedLinesAndTaxesTheSurcharge(): void
+    {
+        $country = $this->factory->country();
+        $state = (new State())->setCountryId($country->getId())->setIsocode('ZZ')->setVisible(1);
+        $state->save($this->getPropelConnection());
+        $carrier = $this->sessionCartCarrier($this->taxRule($country, '20', 'Carrier VAT 20'));
+        $fixtures = $this->cart([
+            ['price' => '30.00', 'weight' => 2.0, 'surcharge' => '10', 'mode' => ShippingSurchargeMode::PerLine],
+            ['price' => '50.00', 'weight' => 5.0, 'free' => true],
+        ], $carrier['module']);
+        CartAddressQuery::create()->findPk($fixtures['deliveryAddressId'])?->setStateId($state->getId())->save($this->getPropelConnection());
+
+        $postage = $this->priceOnTheCart($fixtures);
+
+        // The carrier saw the 2 kilos it carries, not the 5 offered, and the state.
+        self::assertSame([['weight' => 2.0, 'stateId' => $state->getId()]], $carrier['instance']->seen);
+        // 5.00 + 2.00 quoted, 10.00 of surcharge, all at the 20 % of the carrier.
+        self::assertEqualsWithDelta(17.0, $postage->getUntaxedAmount(), 0.0001);
+        self::assertEqualsWithDelta(1.4 + 2.0, $postage->getAmountTax(), 0.0001);
+        self::assertEqualsWithDelta(20.4, $postage->getAmount(), 0.0001);
+    }
+
+    /**
      * @param list<array{price: string, quantity?: int, weight?: float, surcharge?: string, mode?: ShippingSurchargeMode, free?: bool, virtual?: bool, taxRule?: TaxRule}> $lines
      *
      * @return array{cart: Cart, deliveryModule: Module, deliveryAddressId: int, invoiceAddressId: int, paymentModule: Module, customer: \Thelia\Model\Customer, currency: Currency}
      */
-    private function cart(array $lines): array
+    private function cart(array $lines, ?Module $deliveryModule = null): array
     {
         $currency = $this->factory->currency();
         $customerTitle = $this->factory->customerTitle();
@@ -306,7 +335,7 @@ final class ProductShippingRulesPostageTest extends ActionIntegrationTestCase
         $invoiceAddress = $deliveryAddress->copy();
         $invoiceAddress->save($this->getPropelConnection());
 
-        $deliveryModule = ModuleQuery::create()->findOneByCode('CustomDelivery')
+        $deliveryModule ??= ModuleQuery::create()->findOneByCode('CustomDelivery')
             ?? throw new \RuntimeException('No delivery module installed - run bin/test-prepare.');
         $paymentModule = ModuleQuery::create()->findOneByCode('Cheque')
             ?? throw new \RuntimeException('No payment module installed - run bin/test-prepare.');
@@ -379,6 +408,16 @@ final class ProductShippingRulesPostageTest extends ActionIntegrationTestCase
             },
         );
 
+        return $this->priceOnTheCart($fixtures);
+    }
+
+    /**
+     * The postage Action\Cart writes on the cart, asked to the carrier of the cart.
+     *
+     * @param array{cart: Cart, deliveryModule: Module, deliveryAddressId: int, customer: \Thelia\Model\Customer} $fixtures
+     */
+    private function priceOnTheCart(array $fixtures): OrderPostage
+    {
         $this->getService(SecurityContext::class)->setCustomerUser($fixtures['customer']);
         $this->session()->setSessionCart($fixtures['cart']);
 
@@ -448,6 +487,26 @@ final class ProductShippingRulesPostageTest extends ActionIntegrationTestCase
         $parser->setTemplateDefinition($pdfTemplate, true);
 
         return $parser->render('invoice', ['order_id' => $order->getId()]);
+    }
+
+    /**
+     * @return array{module: Module, instance: SessionCartCarrierModule}
+     */
+    private function sessionCartCarrier(TaxRule $taxRule): array
+    {
+        $code = 'SessionCartCarrier';
+        $module = (new Module())
+            ->setCode($code)
+            ->setType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->setActivate(BaseModule::IS_ACTIVATED)
+            ->setFullNamespace(SessionCartCarrierModule::class);
+        $module->save($this->getPropelConnection());
+
+        $instance = new SessionCartCarrierModule($code, $taxRule->getId());
+        $instance->setContainer(static::getContainer());
+        static::getContainer()->set('module.'.$code, $instance);
+
+        return ['module' => $module, 'instance' => $instance];
     }
 
     private function taxRule(Country $country, string $percent, string $title): TaxRule
