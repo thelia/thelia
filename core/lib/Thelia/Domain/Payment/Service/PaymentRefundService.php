@@ -73,6 +73,14 @@ final readonly class PaymentRefundService
      */
     public function refund(Order $order, ?float $amount, RefundReason $reason, ?string $comment = null): OrderPaymentTransaction
     {
+        // The whole movement runs with the configuration of the order's sale unit: the call of
+        // the module, and what the journal writes and announces before and after it, so that a
+        // listener of the journal or of the status reads the same as the module.
+        return $this->moduleLocator->forOrder($order, fn (): OrderPaymentTransaction => $this->refundForItsSaleUnit($order, $amount, $reason, $comment));
+    }
+
+    private function refundForItsSaleUnit(Order $order, ?float $amount, RefundReason $reason, ?string $comment): OrderPaymentTransaction
+    {
         $module = $this->refundModuleOf($order);
         $moduleCode = $module->getCode();
         $comment = self::cleanComment($comment);
@@ -91,7 +99,7 @@ final readonly class PaymentRefundService
             ));
 
             return $this->runner->run(
-                fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment)),
+                static fn (): PaymentOperationResult => $module->refund($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction, $reason, $comment),
                 $transaction,
                 $moduleCode,
             );
@@ -103,6 +111,12 @@ final readonly class PaymentRefundService
      * its module: the line says so, with the merchant's comment.
      */
     public function recordOfflineRefund(Order $order, ?float $amount, RefundReason $reason, ?string $comment = null): OrderPaymentTransaction
+    {
+        // No module is called, but what the journal announces still reads the order's sale unit.
+        return $this->moduleLocator->forOrder($order, fn (): OrderPaymentTransaction => $this->recordOfflineRefundForItsSaleUnit($order, $amount, $reason, $comment));
+    }
+
+    private function recordOfflineRefundForItsSaleUnit(Order $order, ?float $amount, RefundReason $reason, ?string $comment): OrderPaymentTransaction
     {
         $comment = self::cleanComment($comment);
 
