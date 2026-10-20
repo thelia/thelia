@@ -30,6 +30,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductImageI18nQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -81,11 +82,13 @@ final class DemoImportCommandTest extends IntegrationTestCase
     {
         $this->runImport();
         $firstUrls = RewritingUrlQuery::create()->count();
+        $firstArguments = RewritingArgumentQuery::create()->count();
         self::assertGreaterThan(0, $firstUrls, 'the demo catalogue is routed by rewriting urls');
 
         $this->runImport();
 
         self::assertSame($firstUrls, RewritingUrlQuery::create()->count(), 'a reset import starts from an empty rewriting table');
+        self::assertSame($firstArguments, RewritingArgumentQuery::create()->count(), 'a reset import leaves no argument of a purged url behind');
     }
 
     public function testDemoProductsAreNotAllCreatedAtTheSameInstant(): void

@@ -62,6 +62,7 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\SaleProductQuery;
 use Thelia\Model\SaleQuery;
@@ -99,7 +100,7 @@ class DemoImportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('reset', null, InputOption::VALUE_NONE, 'Empty the affected tables before importing')
+            ->addOption('reset', null, InputOption::VALUE_NONE, 'Empty the affected tables before importing (required when the demo data is already there: a second import without it fails on duplicate references)')
             ->addOption('skip-images', null, InputOption::VALUE_NONE, 'Does not import or copy images')
             ->addOption('quiet-errors', null, InputOption::VALUE_NONE, 'Displays errors concisely');
     }
@@ -222,6 +223,8 @@ class DemoImportCommand extends Command
         CartItemQuery::create()->deleteAll($connection);
         CartQuery::create()->deleteAll($connection);
 
+        // Foreign key checks are off here: the cascade to rewriting_argument does not run.
+        RewritingArgumentQuery::create()->deleteAll($connection);
         RewritingUrlQuery::create()->deleteAll($connection);
 
         $output->writeln('Tables cleaned');
