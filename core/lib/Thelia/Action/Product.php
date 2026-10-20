@@ -52,6 +52,7 @@ use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundExcept
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
 use Thelia\Domain\Media\DeletedItemMedia;
+use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 use Thelia\Model\Accessory;
@@ -488,9 +489,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
         $con->beginTransaction();
+        PendingMediaDeletions::begin();
 
         try {
-            $media = DeletedItemMedia::of($product);
+            PendingMediaDeletions::add(DeletedItemMedia::of($product));
 
             $product
                 ->delete($con);
@@ -500,11 +502,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $e) {
             $con->rollBack();
+            PendingMediaDeletions::rollBack();
 
             throw $e;
         }
 
-        $media->delete($this->eventDispatcher);
+        PendingMediaDeletions::commit($this->eventDispatcher);
     }
 
     /**
