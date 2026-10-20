@@ -238,13 +238,49 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $this->rule($area, '20*', excluded: true);
         $customer = $this->factory->customer($this->factory->customerTitle());
         $address = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '69001']));
         $facade = $this->getService(ShippingFacade::class);
         $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
 
         self::assertNotContains(
             $this->module->getId(),
-            $ids($facade->listValidMethodsAsResourceApi($this->guestCartShippedTo('69001'), $this->country, null, $address->getId())),
+            $ids($facade->listValidMethodsAsResourceApi($cart, $this->country, null, $address->getId())),
             'The address named by the request decides, not the cart.',
+        );
+    }
+
+    /**
+     * GET /api/front/delivery_modules?addressId=N: the carriers offered must not tell whether
+     * the postal code of an address of someone else is excluded.
+     */
+    public function testTheListReadsNoPostalCodeOfAnAddressOfAnotherCustomer(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $title = $this->factory->customerTitle();
+        $cart = $this->customerCartShippedTo($this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '69001']));
+        $someoneElses = $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '20090']);
+        $facade = $this->getService(ShippingFacade::class);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($facade->listValidMethodsAsResourceApi($cart, $this->country, null, $someoneElses->getId())),
+            'The postal code of the cart decides, not the one of an address of someone else.',
+        );
+        self::assertContains($this->module->getId(), $ids($facade->listValidMethodsAsResourceApi($cart, null, null, $someoneElses->getId())));
+    }
+
+    public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $address = $this->factory->address($this->factory->customer($this->factory->customerTitle()), $this->country, null, ['zipcode' => '20090']);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($this->guestCartShippedTo('69001'), $this->country, null, $address->getId())),
         );
     }
 
