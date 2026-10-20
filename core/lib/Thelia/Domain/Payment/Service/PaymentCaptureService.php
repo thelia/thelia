@@ -198,6 +198,23 @@ final readonly class PaymentCaptureService
         });
     }
 
+    /**
+     * Whether the payment module of the order takes a single capture per authorization, as
+     * configured for the order's sale unit.
+     */
+    public function capturesOnce(Order $order): bool
+    {
+        return $this->moduleLocator->forOrder($order, function () use ($order): bool {
+            try {
+                $module = $this->moduleLocator->paymentModuleOf($order);
+            } catch (\Throwable) {
+                return false;
+            }
+
+            return $module instanceof PaymentModuleCapturingOnceInterface && $module->capturesOnce();
+        });
+    }
+
     private function leftOf(?PaymentModuleInterface $module, PaymentTransactionTotals $totals): string
     {
         if ($module instanceof PaymentModuleCapturingOnceInterface
