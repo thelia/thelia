@@ -36,7 +36,16 @@ is written, and ignored with a log line if one reaches the table by another way.
 `AreaDeliveryModuleQuery::findByCountryAndModule()` takes an optional postal code. With
 one, a zone whose rules refuse the code is skipped, and the next zone of the carrier
 covering the country is tried: a carrier with a mainland zone excluding `20*` and a
-Corsica zone including it serves both. Without a postal code, the rules are not read.
+Corsica zone including it delivers to both. It does not charge Corsica the price of the
+Corsica zone for all that: the rules decide which carriers deliver, the carrier decides
+its price (see Limits). Without a postal code, the rules are not read.
+
+`AreaZipCodeRuleQuery::ruleSetFor()` keeps the rules it read for the request: a checkout
+page that lists, estimates and checks the carriers reads the rules of a zone once. A rule
+saved or deleted through the model drops them, and so do a new request, a console
+command and the reset of the services between two messages of a worker
+(`ZipCodeRuleCacheListener`). A bulk write on `AreaZipCodeRuleQuery`, which skips the
+model hooks, is seen from the next request on.
 
 The postal code is passed by:
 
@@ -50,38 +59,60 @@ The postal code is passed by:
 - the `delivery` loop, when the address it reads is in the country of the loop.
 
 The postal code goes with the address it belongs to: the cart's copy for the cart's own
-address (a guest's cart address points to no customer address), the customer address for
-an `addressId`, also when a country is given next to it as the API does, provided the
-address is in that country. A country given alone takes the postal code of the cart's
+address (a guest's cart address points to no customer address), whose country and state
+are read too, as `CartGuard` reads them; the customer address for an `addressId`, also
+when a country is given next to it as the API does, provided the address is in that
+country and belongs to the customer of the cart (a guest's own customer row included). A
+country given alone, or an address of someone else, takes the postal code of the cart's
 delivery address when that address is in the country, as the postage estimate does.
 
 A postal code that is not valid UTF-8 normalises to nothing, and counts as unknown.
 
+A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
+limit), the failure is logged and an exclusion refuses the code, an inclusion does not
+take it.
+
 `ShippingFacade::postalCodeWithoutCarrier()` names the postal code of the cart's
-address when it is the reason no carrier is offered: some active carrier serves the
-country, and the rules of its zones refuse that code. Flexy shows it on the delivery
-step instead of the general message.
+address when it is the reason no carrier is offered: some active carrier would be offered
+without it (its zones serve the country and it quotes the cart), and the rules of its
+zones refuse that code. Flexy shows it on the delivery step instead of the general
+message.
 
 ## Limits
 
-- The rules decide who delivers, not at which price. A carrier that prices by zone
-  (`AbstractDeliveryModule::getAreaForCountry()`) still reads the first zone covering the
-  country, without the postal code.
+- The rules decide who delivers, not at which price. A carrier prices the address the way
+  it always did, without the postal code: `AbstractDeliveryModule::getAreaForCountry()`
+  still answers the first zone of the carrier covering the country, and CustomDelivery
+  takes its price slice among all the zones of the country
+  (`CustomDelivery::getSlicePostage()`). A mainland zone excluding `20*` and a Corsica
+  zone including it therefore make the carrier deliver to Corsica, at a price that need
+  not be the one written for the Corsica zone. A price by postal code is the job of the
+  carrier module.
+- On a country without a postal code format (`country.zip_code_format` empty, or
+  `need_zip_code` off, in which case the format is not checked), the customer can type any
+  code, or none. An empty code is unknown and accepted by every zone, a mistyped one
+  matches no exclusion: both pass the exclusions, and only inclusions hold. The back
+  office warns on the card of a zone whose rules apply to such a country.
+- A rule written for a country goes with the country when it leaves the zone
+  (`TheliaEvents::AREA_REMOVE_COUNTRY`).
 - A module that decides eligibility on its own (`isValidDelivery()`, the postage event)
   is not affected by the rules of the zones it is not linked to.
 - The carriers follow the cart's copy of its delivery address, which only choosing the
   address again refreshes: an address edited elsewhere (another checkout step, the
   customer account, the API) keeps its old postal code in the cart until it is chosen
   again. Flexy's delivery step refreshes the copy of an address edited on it, and chooses
-  the address again, asking the carriers and their postage again, when its country, state
-  or postal code changed; another edit keeps the carrier and its postage as they were.
+  the address again, asking the carriers and their postage again, when its country, state,
+  postal code or city changed (a carrier may price by city, as GeolocatedDelivery does);
+  another edit keeps the carrier and its postage as they were.
 - A radius around a shop is the job of the GeolocatedDelivery module (2.0.0 for Thelia 3),
   a carrier of its own that zones and their postal code rules filter like any other.
 
 ## Back office
 
 The page of a shipping zone (Configuration, Shipping zones) lists its rules and adds or
-deletes one, under the `admin.configuration.area` resource.
+deletes one, under the `admin.configuration.area` resource. A deletion is confirmed first,
+each addition and deletion is written to the administration log, and the card warns when
+a rule applies to a country without a postal code format (see Limits).
 `Thelia\Domain\Shipping\ZipCode\AreaZipCodeRuleWriter` refuses a pattern that matches
 nothing and a country the zone does not hold.
 
@@ -89,7 +120,12 @@ nothing and a country the zone does not hold.
 
 - `tests/Unit/Domain/Shipping/ZipCode/`: patterns and rule sets.
 - `tests/Integration/Domain/Shipping/ZipCodeDeliveryZoneTest.php`: eligibility, the
-  checkout list, the API list, the guard, the estimate and the reason.
+  checkout list, the API list, the guard, the estimate, the cart payload, the `delivery`
+  loop, the reason, and the rules read once per request.
+- `tests/Integration/Model/AreaZipCodeRuleQueryTest.php`: a row that matches nothing, the
+  reset of the rules read.
+- `tests/Integration/Action/AreaActionTest.php`: the rules of a country removed from its
+  zone.
 - `tests/Integration/Domain/Shipping/AreaZipCodeRuleWriterTest.php`: writing a rule.
 - `tests/Http/BackOffice/ShippingZoneZipCodeRulesTest.php` and
   `tests/Http/Flexy/DeliveryPostalCodeMessageTest.php`, skipped when the installed theme
