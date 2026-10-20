@@ -30,6 +30,7 @@ use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentRefundService;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -156,6 +157,38 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertSame('Refund window closed', $line->getErrorMessage());
         self::assertSame('100.000000', $this->totals->forOrder((int) $order->getId())->refundable());
         self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($order));
+    }
+
+    public function testARefusalWithTheCodeOfTheProviderWritesThatCode(): void
+    {
+        $order = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentRefusedException::withProviderCode('Refund window closed', 'REFUND_WINDOW');
+
+        try {
+            $this->service->refund($order, 40.0, RefundReason::Other);
+            self::fail('The refusal must reach the merchant.');
+        } catch (PaymentRefusedException) {
+        }
+
+        $line = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())[0];
+        self::assertTrue($line->isFailed());
+        self::assertSame('REFUND_WINDOW', $line->getErrorCode());
+    }
+
+    public function testTheModuleRefundsWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        $order = $this->paidOrder(100);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        DeferredCapturePaymentModule::$scopes = [];
+
+        $this->service->refund($order, 40.0, RefundReason::Goodwill);
+
+        $calls = array_column(DeferredCapturePaymentModule::$scopes, 'call');
+        self::assertContains('supportsRefund', $calls);
+        self::assertContains('refund', $calls);
+        self::assertSame([$saleUnitId], array_values(array_unique(array_column(DeferredCapturePaymentModule::$scopes, 'saleUnit'))), 'Every call runs with the configuration of the sale unit of the order.');
+        self::assertNull(SaleUnitConfigScope::current());
     }
 
     public function testACallThatGotNoAnswerLeavesTheRefundPending(): void
