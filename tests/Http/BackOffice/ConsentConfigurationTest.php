@@ -233,7 +233,7 @@ final class ConsentConfigurationTest extends WebIntegrationTestCase
         // theme moved to Intl, "Feb 3, 2020, 2:05 PM" in en_US since (the space before PM
         // is a narrow no-break space on recent ICU versions).
         self::assertMatchesRegularExpression(
-            '#03/02/2020 14:05|Feb 3, 2020, 2:05\\s?PM#u',
+            '#03/02/2020 14:05|Feb 3, 2020, 2:05[\\s\\x{202F}]?PM#u',
             (string) $this->client->getResponse()->getContent(),
             'The order sheet shows when the buyer answered the box, not when the order was written.',
         );
