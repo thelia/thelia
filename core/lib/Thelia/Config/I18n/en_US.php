@@ -687,6 +687,7 @@ return [
     'This product reference is already assigned to another product.' => 'This product reference is already assigned to another product.',
     'This product_sale_elements_id does not exists for this product : %d' => 'This product_sale_elements_id does not exists for this product : %d',
     "This state doesn't belong to this country." => "This state doesn't belong to this country.",
+    'This reference already exists.' => 'This reference already exists.',
     'This state is online' => 'This state is online',
     'This status is protected.' => 'This status is protected.',
     'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.' => 'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.',
