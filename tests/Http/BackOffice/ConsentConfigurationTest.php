@@ -229,8 +229,11 @@ final class ConsentConfigurationTest extends WebIntegrationTestCase
         $this->client->request('GET', \sprintf('/admin/order/update/%d', $order->getId()));
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
-        self::assertStringContainsString(
-            '03/02/2020 14:05',
+        // The sheet formats the date with the admin locale: 03/02/2020 14:05 before the
+        // theme moved to Intl, "Feb 3, 2020, 2:05 PM" in en_US since (the space before PM
+        // is a narrow no-break space on recent ICU versions).
+        self::assertMatchesRegularExpression(
+            '#03/02/2020 14:05|Feb 3, 2020, 2:05\\s?PM#u',
             (string) $this->client->getResponse()->getContent(),
             'The order sheet shows when the buyer answered the box, not when the order was written.',
         );
