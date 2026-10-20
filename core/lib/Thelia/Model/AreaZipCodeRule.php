@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\AreaZipCodeRule as BaseAreaZipCodeRule;
 
 /**
@@ -22,4 +23,17 @@ use Thelia\Model\Base\AreaZipCodeRule as BaseAreaZipCodeRule;
  */
 class AreaZipCodeRule extends BaseAreaZipCodeRule
 {
+    public function postSave(?ConnectionInterface $con = null): void
+    {
+        AreaZipCodeRuleQuery::forgetRuleSets();
+
+        parent::postSave($con);
+    }
+
+    public function postDelete(?ConnectionInterface $con = null): void
+    {
+        AreaZipCodeRuleQuery::forgetRuleSets();
+
+        parent::postDelete($con);
+    }
 }

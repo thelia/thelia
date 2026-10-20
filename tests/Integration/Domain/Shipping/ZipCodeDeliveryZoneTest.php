@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use ApiPlatform\Metadata\GetCollection;
+use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -33,6 +34,7 @@ use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Address;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -304,6 +306,36 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $this->getService(CartGuard::class)->checkValidDelivery($cart);
     }
 
+    /**
+     * A checkout page asks for the carriers of a zone several times over: its rules are read
+     * once, until a rule is written.
+     */
+    public function testTheRulesOfAZoneAreReadOnceUntilARuleIsWritten(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        [$country, $module] = [$this->country, $this->module];
+        $query = static fn (?string $zipCode): ?AreaDeliveryModule => AreaDeliveryModuleQuery::create()
+            ->findByCountryAndModule($country, $module, null, $zipCode);
+
+        $reads = $this->countRuleReads(static function () use ($query): void {
+            self::assertNull($query('20090'));
+            self::assertNull($query('20090'));
+            self::assertNotNull($query('69001'));
+        });
+        self::assertSame(1, $reads, 'The rules of the zone are read once.');
+
+        self::assertSame(0, $this->countRuleReads(static fn () => $query(null)), 'Without a postal code no rule is read.');
+
+        $inclusion = $this->rule($area, '75*');
+
+        self::assertSame(1, $this->countRuleReads(static fn () => self::assertNull($query('69001'), 'The rule just written applies.')));
+
+        $inclusion->delete($this->getPropelConnection());
+
+        self::assertSame(1, $this->countRuleReads(static fn () => self::assertNotNull($query('69001'), 'The rule just deleted no longer applies.')));
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -315,6 +347,35 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
         self::assertNull($corsica->getBestPostageAmount(), 'No carrier serves the address: no postage to estimate.');
         self::assertNotNull($lyon->getBestPostageAmount());
+    }
+
+    /**
+     * The queries on the postal code rules the callable runs.
+     */
+    private function countRuleReads(callable $evaluate): int
+    {
+        $connection = $this->getPropelConnection();
+        $logger = $connection->getLogger();
+        $statements = new class extends AbstractLogger {
+            /** @var list<string> */
+            public array $lines = [];
+
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                $this->lines[] = (string) $message;
+            }
+        };
+        $connection->setLogger($statements);
+        $connection->useDebug(true);
+
+        try {
+            $evaluate();
+        } finally {
+            $connection->useDebug(false);
+            $connection->setLogger($logger);
+        }
+
+        return \count(array_filter($statements->lines, static fn (string $line): bool => str_contains($line, 'area_zip_code_rule')));
     }
 
     private function isEligible(?string $zipCode): bool
@@ -382,14 +443,16 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         return $area;
     }
 
-    private function rule(Area $area, string $pattern, bool $excluded = false, ?Country $country = null): void
+    private function rule(Area $area, string $pattern, bool $excluded = false, ?Country $country = null): AreaZipCodeRule
     {
-        (new AreaZipCodeRule())
+        $rule = (new AreaZipCodeRule())
             ->setAreaId($area->getId())
             ->setCountryId($country?->getId())
             ->setPattern($pattern)
-            ->setExcluded($excluded)
-            ->save($this->getPropelConnection());
+            ->setExcluded($excluded);
+        $rule->save($this->getPropelConnection());
+
+        return $rule;
     }
 
     private function guestCartShippedTo(string $zipCode): Cart

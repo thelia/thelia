@@ -25,6 +25,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Tools\URL;
@@ -120,6 +121,8 @@ abstract class WebIntegrationTestCase extends WebTestCase
         SaleUnitConfigScope::reset();
         ConfigQuery::forgetSaleUnitValues();
         ModuleConfigQuery::resetConfigCache();
+        // The postal code rules a request of the test read, rows rolled back since.
+        AreaZipCodeRuleQuery::forgetRuleSets();
 
         parent::tearDown();
     }

@@ -28,6 +28,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -192,6 +193,7 @@ abstract class IntegrationTestCase extends KernelTestCase
         ModuleQuery::resetActivated();
         ModuleConfigQuery::resetConfigCache();
         OrderReturnStatusQuery::resetCache();
+        AreaZipCodeRuleQuery::forgetRuleSets();
 
         foreach ([
             [Currency::class, 'defaultCurrency', null],

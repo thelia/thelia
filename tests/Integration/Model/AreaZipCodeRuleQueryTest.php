@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use Thelia\Core\EventListener\ZipCodeRuleCacheListener;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
 use Thelia\Log\AbstractTlogDestination;
 use Thelia\Log\Tlog;
@@ -24,8 +25,8 @@ use Thelia\Model\CountryArea;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The postal code rules of a zone as the carriers read them: a row nobody could have
- * written through the back office is left aside.
+ * The postal code rules of a zone as the carriers read them: kept for the request, and a
+ * row nobody could have written through the back office left aside.
  */
 final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
 {
@@ -51,7 +52,7 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
         parent::tearDown();
     }
 
-    public function testARowThatMatchesNothingIsIgnoredAndLogged(): void
+    public function testARowThatMatchesNothingIsIgnoredAndLoggedOnce(): void
     {
         $lines = $this->captureTheLog();
         $ruleId = $this->insertStraightIntoTheTable('***', excluded: true);
@@ -63,8 +64,25 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
             $lines->lines,
             static fn (string $line): bool => str_contains($line, 'Postal code rule '.$ruleId.' of zone '),
         ));
-        self::assertNotEmpty($warnings);
+        self::assertCount(1, $warnings, 'The rule is logged once for the request.');
         self::assertStringContainsString('Postal code rule '.$ruleId.' of zone '.$this->area->getId().' is ignored: "***" matches nothing.', $warnings[0]);
+    }
+
+    /**
+     * Between two messages of a worker the services are reset: a rule written by another
+     * process, which no model hook of this one saw, is read from then on.
+     */
+    public function testAResetOfTheServicesForgetsTheRulesRead(): void
+    {
+        self::assertTrue($this->ruleSet()->accepts('20090'));
+
+        $this->insertStraightIntoTheTable('20*', excluded: true);
+
+        self::assertTrue($this->ruleSet()->accepts('20090'), 'Kept for the request.');
+
+        $this->getService(ZipCodeRuleCacheListener::class)->reset();
+
+        self::assertFalse($this->ruleSet()->accepts('20090'));
     }
 
     private function ruleSet(): ZipCodeRuleSet
