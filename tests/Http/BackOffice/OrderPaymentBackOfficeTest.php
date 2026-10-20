@@ -24,9 +24,11 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Model\Admin;
+use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -151,6 +153,8 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertNotNull($log, 'The capture is written to the administration log.');
         self::assertStringContainsString((string) $order->getRef(), (string) $log->getMessage());
         self::assertStringContainsString('succeeded', (string) $log->getMessage());
+        self::assertStringContainsString('capture of 120.00 '.$order->getCurrency()->getCode(), (string) $log->getMessage(), 'The amount reads as money, in its currency.');
+        self::assertStringNotContainsString('120.000000', (string) $log->getMessage());
 
         $crawler = $this->client->followRedirect();
         self::assertCount(0, $crawler->filter('[data-testid="order-payment-capture-btn"]'), 'Nothing is left to capture.');
@@ -223,6 +227,39 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
 
         self::assertStringNotContainsString('SECRET', $crawler->text());
         self::assertStringContainsString('The details are in the log', $crawler->text());
+
+        $log = $this->latestCaptureLog();
+        self::assertNotNull($log, 'A capture that failed is written to the administration log as well.');
+        self::assertStringContainsString((string) $order->getRef(), (string) $log->getMessage());
+        self::assertStringNotContainsString('SECRET', (string) $log->getMessage(), 'A technical message stays in the application log.');
+    }
+
+    public function testACaptureTheModuleRefusesIsWrittenToTheAdministrationLog(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentRefusedException::withProviderCode('Card blocked by the issuer', '62');
+
+        $crawler = $this->sheet($order);
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => $this->tokenOf($crawler), 'amount' => '50']);
+        $crawler = $this->client->followRedirect();
+
+        $log = $this->latestCaptureLog();
+        self::assertNotNull($log, 'The refused capture is written to the administration log.');
+        self::assertStringContainsString('capture of 50.00 '.$order->getCurrency()->getCode(), (string) $log->getMessage());
+        self::assertStringContainsString((string) $order->getRef(), (string) $log->getMessage());
+        self::assertStringContainsString('Card blocked by the issuer', (string) $log->getMessage());
+        self::assertSame('62', $crawler->filter('[data-testid="order-payment-line-error"] code')->text(), 'The line shows the code of the provider.');
+    }
+
+    public function testACaptureRefusedForItsTokenIsNotWrittenToTheAdministrationLog(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->authorizedOrder(120);
+
+        $this->client->request('POST', $this->captureUrl($order), ['_token' => 'forged', 'amount' => '50']);
+
+        self::assertNull($this->latestCaptureLog(), 'A request without the form token asked nothing of the provider.');
     }
 
     public function testAnAdministratorWithoutOrderAccessSeesNoSheetAndNoJournal(): void
@@ -527,5 +564,14 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
             ->setCategory('payment')
             ->setActivate(BaseModule::IS_ACTIVATED)
             ->save($this->getPropelConnection());
+    }
+
+    private function latestCaptureLog(): ?AdminLog
+    {
+        return AdminLogQuery::create()
+            ->filterByResource(AdminResources::ORDER_PAYMENT_CAPTURE)
+            ->filterByAction(AccessManager::CREATE)
+            ->orderById(Criteria::DESC)
+            ->findOne();
     }
 }
