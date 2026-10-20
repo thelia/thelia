@@ -20,7 +20,7 @@ use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
-use Thelia\Model\Country;
+use Thelia\Model\CartAddress;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
@@ -76,15 +76,15 @@ final readonly class ExpressCheckoutPlacementService
      * All of them have to be there, or the order would leave without a destination the
      * buyer chose.
      */
-    private function destinationTheCheckoutChose(Cart $cart): Country
+    private function destinationTheCheckoutChose(Cart $cart): CartAddress
     {
-        $country = $cart->getCartAddressRelatedByAddressDeliveryId()?->getCountry();
+        $destination = $cart->getCartAddressRelatedByAddressDeliveryId();
 
-        if (null === $cart->getDeliveryModuleId() || null === $cart->getAddressInvoiceId() || null === $country) {
+        if (null === $cart->getDeliveryModuleId() || null === $cart->getAddressInvoiceId() || null === $destination?->getCountry()) {
             throw ExpressCheckoutRefusedException::becauseNoDeliveryIsChosenYet();
         }
 
-        return $country;
+        return $destination;
     }
 
     /**
@@ -115,10 +115,13 @@ final readonly class ExpressCheckoutPlacementService
     /**
      * What the shop computes, against what the sheet showed. The shop wins, and a
      * difference means nothing is created at all.
+     *
+     * The grand total the order is placed at: the goods taxed for the destination, the
+     * postage (untaxed for a tax-exempt cart) and the gift wrapping.
      */
-    private function refuseATotalTheBuyerNeverSaw(Cart $cart, Country $destination, ExpressCheckoutRequest $request): void
+    private function refuseATotalTheBuyerNeverSaw(Cart $cart, CartAddress $destination, ExpressCheckoutRequest $request): void
     {
-        $computed = round((float) $cart->getTaxedAmount($destination) + (float) $cart->getPostage(), 2);
+        $computed = round($cart->getTaxedAmount($destination->getCountry(), true, $destination->getState(), true, true), 2);
         $shown = round($request->totalTaxIncludedShownToTheBuyer, 2);
 
         if (abs($computed - $shown) > self::TOTAL_TOLERANCE) {
