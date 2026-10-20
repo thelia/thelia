@@ -136,6 +136,7 @@
 ## Fixed
 
 - `maintenance:purge --dry-run` no longer deletes the export cache files; it counts them.
+- The `delivery` loop failed with a `TypeError` ("Return value must be of type mixed, none returned") when it was given no `country` or no `state` argument, which is how a template lists the carriers of the address of the session: `Delivery::getCurrentCountry()` and `getCurrentState()` now return `null` and the loop reads the country and the state of the address.
 - `ShippingFacade::listValidMethodsAsResourceApi()` called without a country for a guest cart threw a `TypeError`: the cart has no customer address behind its delivery address, and the list took no country from it. It now uses the country of the cart's address, then the default country, as `listValidMethods()` does.
 
 ## Performance
