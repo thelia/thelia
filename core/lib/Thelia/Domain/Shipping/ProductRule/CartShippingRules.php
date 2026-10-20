@@ -18,6 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductExcludedDeliveryModuleQuery;
@@ -55,8 +57,9 @@ final class CartShippingRules implements ResetInterface, EventSubscriberInterfac
     }
 
     /**
-     * Titles of the products a refusal names, in the given language, falling back on
-     * the reference of a product with no title there.
+     * Titles of the products a refusal names, in the given language, then in the default
+     * language when the shop falls back on it for a missing translation, then the
+     * reference of the product.
      *
      * @param list<int> $productIds
      *
@@ -64,24 +67,37 @@ final class CartShippingRules implements ResetInterface, EventSubscriberInterfac
      */
     public function titlesOf(array $productIds, string $locale): array
     {
+        $fallbackLocale = $this->fallbackLocale($locale);
+        $locales = null !== $fallbackLocale ? [$locale, $fallbackLocale] : [$locale];
+
         // Read from the translation table: setLocale() on a shared product instance
         // would leave it in this language for whoever reads it next.
+        /** @var array<string, array<int, string>> $titles locale => product id => title */
         $titles = [];
 
         foreach (ProductI18nQuery::create()
             ->filterById($productIds)
-            ->filterByLocale($locale)
-            ->select([ProductI18nTableMap::COL_ID, ProductI18nTableMap::COL_TITLE])
+            ->filterByLocale($locales)
+            ->select([ProductI18nTableMap::COL_ID, ProductI18nTableMap::COL_LOCALE, ProductI18nTableMap::COL_TITLE])
             ->find() as $row) {
-            $titles[(int) $row[ProductI18nTableMap::COL_ID]] = (string) $row[ProductI18nTableMap::COL_TITLE];
+            $titles[(string) $row[ProductI18nTableMap::COL_LOCALE]][(int) $row[ProductI18nTableMap::COL_ID]] = (string) $row[ProductI18nTableMap::COL_TITLE];
         }
 
         $named = [];
 
         foreach (ProductQuery::create()->filterById($productIds)->orderById()->select([ProductTableMap::COL_ID, ProductTableMap::COL_REF])->find() as $row) {
             $productId = (int) $row[ProductTableMap::COL_ID];
-            $title = (string) ($titles[$productId] ?? '');
-            $named[$productId] = '' !== $title ? $title : (string) $row[ProductTableMap::COL_REF];
+            $named[$productId] = (string) $row[ProductTableMap::COL_REF];
+
+            foreach ($locales as $titleLocale) {
+                $title = $titles[$titleLocale][$productId] ?? '';
+
+                if ('' !== $title) {
+                    $named[$productId] = $title;
+
+                    break;
+                }
+            }
         }
 
         return $named;
@@ -102,6 +118,20 @@ final class CartShippingRules implements ResetInterface, EventSubscriberInterfac
             TheliaEvents::PRODUCT_EXCLUDE_DELIVERY_MODULE => ['reset', -128],
             TheliaEvents::PRODUCT_ALLOW_DELIVERY_MODULE => ['reset', -128],
         ];
+    }
+
+    /**
+     * The default language, when the shop shows it in place of a missing translation.
+     */
+    private function fallbackLocale(string $locale): ?string
+    {
+        if (Lang::REPLACE_BY_DEFAULT_LANGUAGE !== (int) ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+            return null;
+        }
+
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+
+        return $defaultLocale === $locale ? null : $defaultLocale;
     }
 
     /**
