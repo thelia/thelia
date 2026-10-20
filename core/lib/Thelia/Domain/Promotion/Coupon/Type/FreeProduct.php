@@ -17,6 +17,7 @@ namespace Thelia\Domain\Promotion\Coupon\Type;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Product;
@@ -205,7 +206,18 @@ class FreeProduct extends AbstractRemoveOnProducts
                 $cartEvent->setQuantity(1);
                 $cartEvent->setProductSaleElementsId($freeProduct->getDefaultSaleElements()->getId());
                 $cartEvent->setProductId($this->offeredProductId);
-                $this->facade->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
+
+                try {
+                    $this->facade->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
+                } catch (NotEnoughStockException) {
+                    // A gift the shop cannot ship is not offered, and the customer's own
+                    // addition goes through. The marker is dropped so the gift is tried
+                    // again once it is back in stock.
+                    $this->clearFreeProductsCartItemIds();
+
+                    return 0.0;
+                }
+
                 // Store the final cart item ID.
                 $this->setRelatedCartItem($eligibleProduct, $cartEvent->getCartItem()->getId());
                 $freeProductCartItem = $cartEvent->getCartItem();
