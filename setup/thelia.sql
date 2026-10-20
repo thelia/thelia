@@ -1544,6 +1544,7 @@ CREATE TABLE `webhook_delivery`
     `response_body` TEXT COMMENT 'the beginning of the answer, truncated',
     `payload` LONGTEXT NOT NULL COMMENT 'the body that was signed, kept so that a delivery can be replayed and purged with the log',
     `delivered_at` DATETIME,
+    `replayed_at` DATETIME COMMENT 'when an administrator last replayed this delivery, so a failure of the replay does not put the subscription in error',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

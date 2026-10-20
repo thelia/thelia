@@ -786,4 +786,15 @@ final class TheliaEvents
     public const MAINTENANCE_PURGE = 'action.maintenance.purge';
 
     // -- END MAINTENANCE EVENTS -----------------------------------------------
+
+    // -- WEBHOOK EVENTS -------------------------------------------------------
+
+    public const WEBHOOK_SUBSCRIPTION_CREATE = 'action.webhook.subscription.create';
+    public const WEBHOOK_SUBSCRIPTION_UPDATE = 'action.webhook.subscription.update';
+    public const WEBHOOK_SUBSCRIPTION_DELETE = 'action.webhook.subscription.delete';
+    public const WEBHOOK_SUBSCRIPTION_ROTATE_SECRET = 'action.webhook.subscription.rotate_secret';
+    public const WEBHOOK_SUBSCRIPTION_TEST = 'action.webhook.subscription.test';
+    public const WEBHOOK_DELIVERY_REPLAY = 'action.webhook.delivery.replay';
+
+    // -- END WEBHOOK EVENTS ---------------------------------------------------
 }
