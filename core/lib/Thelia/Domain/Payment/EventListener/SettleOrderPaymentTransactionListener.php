@@ -19,13 +19,16 @@ use Thelia\Core\Event\Order\OrderPaymentSettlementEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
+use Thelia\Domain\Payment\Service\PaymentModuleLocator;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
+use Thelia\Model\OrderPaymentTransaction;
 
 /**
  * The core answer to ORDER_PAYMENT_TRANSACTION_SETTLE: a pending line the provider never
  * confirmed gets the outcome the merchant read at the provider. The line says it was
  * settled by hand, by whom, with the merchant's note; the administration log keeps the
- * same.
+ * same. As every other movement, it runs with the configuration of the order's sale unit,
+ * so that what the line announces, and the status it moves, read that unit.
  */
 final readonly class SettleOrderPaymentTransactionListener
 {
@@ -36,6 +39,7 @@ final readonly class SettleOrderPaymentTransactionListener
     public function __construct(
         private PaymentTransactionRecorder $recorder,
         private OrderHistoryActorResolver $actorResolver,
+        private PaymentModuleLocator $moduleLocator,
     ) {
     }
 
@@ -50,14 +54,16 @@ final readonly class SettleOrderPaymentTransactionListener
             $note .= \sprintf(' (recorded by %s)', $administrator->getUsername());
         }
 
+        $transaction = $event->getTransaction();
+
         try {
-            $event->setTransaction($this->recorder->settle(
-                $event->getTransaction(),
+            $event->setTransaction($this->moduleLocator->forOrder($transaction->getOrder(), fn (): OrderPaymentTransaction => $this->recorder->settle(
+                $transaction,
                 $event->getState(),
                 $event->getPspReference(),
                 self::ERROR_CODE_SETTLED_BY_HAND,
                 $note,
-            ));
+            )));
         } catch (PaymentAnnouncementFailedException $announcementFailure) {
             // The line is settled; a listener that broke afterwards is logged by the
             // recorder, and the merchant's gesture is reported, and logged, as done.

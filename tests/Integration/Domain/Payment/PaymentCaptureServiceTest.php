@@ -217,6 +217,32 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_PAID, $this->statusCodeOf($order));
     }
 
+    public function testALineRecordedByHandIsAnnouncedWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-SILENT');
+        $pending = $this->service->capture($order);
+        $seen = [];
+        $listener = static function () use (&$seen): void {
+            $seen[] = SaleUnitConfigScope::current();
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+        $this->dispatcher->addListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+
+        try {
+            $this->dispatch(new OrderPaymentSettlementEvent($pending, PaymentTransactionState::SUCCEEDED), TheliaEvents::ORDER_PAYMENT_TRANSACTION_SETTLE);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_PAYMENT_TRANSACTION_RECORDED, $listener);
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_UPDATE_STATUS, $listener);
+        }
+
+        self::assertNotEmpty($seen);
+        self::assertSame([$saleUnitId], array_values(array_unique($seen)));
+        self::assertNull(SaleUnitConfigScope::current());
+    }
+
     public function testALineRecordedByHandAsFailedGivesItsAmountBack(): void
     {
         [$order] = $this->authorizedOrder(120);
