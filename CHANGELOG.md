@@ -108,6 +108,7 @@
 - A process that serves several requests in a row, a worker runtime or a test sending several requests through one kernel, no longer renders a request with the parser the previous request picked. `ParserResolver` keeps that parser in a static property, now emptied when a main request starts and when the kernel resets its services.
 - `POST /api/front/carts` creates the cart of the customer whose token the request carries, in the currency being browsed (the default currency of the shop without a session). Both were left NULL. A guest token still creates a cart that belongs to nobody, its scope being the one cart it was issued for.
 - Signing in through the API no longer triggers the Symfony 7.3 deprecation of `eraseCredentials()` on `Customer` and `Admin`: the core sets `security.erase_credentials` to false unless the project sets it, the API firewalls being stateless and the session login erasing the password itself. `SessionUserAuthorizationChecker::isGranted()` takes the `?AccessDecision $accessDecision` argument of the Symfony interface and passes it on.
+- The prod container of a checkout of this repository builds with the TheliaCMS module active. The page builder bundle the module depends on was registered for the dev and test environments only; it is now registered in every environment whenever it is installed, and still left out of an install without the development packages.
 
 ## Checkout and payment
 

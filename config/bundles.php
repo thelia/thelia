@@ -5,7 +5,10 @@ return [
     Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle::class => ['all' => true],
     Liip\ImagineBundle\LiipImagineBundle::class => ['all' => true],
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
-    OpenStudio\PageBuilderBundle\OpenStudioPageBuilderBundle::class => ['dev' => true, 'test' => true],
+    // Required by the TheliaCMS module, which this repository installs as a development
+    // package: registered in every environment when installed, so the module builds in prod,
+    // and left out of an install without the development packages.
+    OpenStudio\PageBuilderBundle\OpenStudioPageBuilderBundle::class => ['all' => class_exists(OpenStudio\PageBuilderBundle\OpenStudioPageBuilderBundle::class)],
     Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
     Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
