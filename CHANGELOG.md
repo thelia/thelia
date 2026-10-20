@@ -107,6 +107,7 @@
 - A request to `/api/front/...` that authenticates with a bearer token gets the reserved prices of the customer of the token, even when it also carries a front-office session cookie for another customer. `CurrentCustomerProvider` read the session first, so the price followed the session; the session is now the fallback, for the theme that calls the API in-process with no token.
 - A process that serves several requests in a row, a worker runtime or a test sending several requests through one kernel, no longer renders a request with the parser the previous request picked. `ParserResolver` keeps that parser in a static property, now emptied when a main request starts and when the kernel resets its services.
 - `POST /api/front/carts` creates the cart of the customer whose token the request carries, in the currency being browsed (the default currency of the shop without a session). Both were left NULL. A guest token still creates a cart that belongs to nobody, its scope being the one cart it was issued for.
+- Signing in through the API no longer triggers the Symfony 7.3 deprecation of `eraseCredentials()` on `Customer` and `Admin`: the core sets `security.erase_credentials` to false unless the project sets it, the API firewalls being stateless and the session login erasing the password itself. `SessionUserAuthorizationChecker::isGranted()` takes the `?AccessDecision $accessDecision` argument of the Symfony interface and passes it on.
 
 ## Checkout and payment
 
