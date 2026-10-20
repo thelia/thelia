@@ -20,6 +20,7 @@ use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+use Thelia\Domain\Checkout\Service\CheckoutTunnelShape;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Checkout\Service\Step\CartStepProvider;
@@ -190,7 +191,7 @@ final class CheckoutViolationCollectionTest extends IntegrationTestCase
      */
     private function validationWith(array $providers): CheckoutValidationService
     {
-        return new CheckoutValidationService($providers);
+        return new CheckoutValidationService($providers, new CheckoutTunnelShape());
     }
 
     /**

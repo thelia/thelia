@@ -325,11 +325,11 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
             // Sharing a position, the step of the core comes first, then the steps of
             // the modules by their code, and the payment last: the money is taken next
             // to last, whatever the code of the step that shares its position.
-            $slot = [$position, $this->tieRank($code), $code];
+            $slot = $this->tunnelShape->slot($code, $position);
             $index = \count($codes);
 
             foreach ($codes as $rank => $existing) {
-                $existingSlot = [$positions[$existing], $this->tieRank($existing), $existing];
+                $existingSlot = $this->tunnelShape->slot($existing, $positions[$existing]);
 
                 if ($existingSlot > $slot) {
                     $index = $rank;
@@ -343,24 +343,6 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         }
 
         return $codes;
-    }
-
-    /**
-     * Who goes first when steps share a position: the cart, which opens the tunnel, the
-     * steps the core ships, then the ones a module adds, then the payment and the
-     * confirmation, which close it.
-     */
-    private function tieRank(string $code): int
-    {
-        if (CheckoutStep::CODE_CART === $code) {
-            return -1;
-        }
-
-        if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
-            return 2;
-        }
-
-        return CheckoutStep::CODE_DELIVERY === $code ? 0 : 1;
     }
 
     /**
@@ -406,7 +388,7 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         // Two steps sharing a position is not an error the buyer should see as a tunnel
         // whose order changes between two page loads: the same tie rule as for a step
         // no row names yet settles it, and the code last.
-        usort($codes, fn (string $left, string $right): int => [$positions[$left], $this->tieRank($left), $left] <=> [$positions[$right], $this->tieRank($right), $right]);
+        usort($codes, fn (string $left, string $right): int => $this->tunnelShape->compare($left, $positions[$left], $right, $positions[$right]));
 
         return $codes;
     }

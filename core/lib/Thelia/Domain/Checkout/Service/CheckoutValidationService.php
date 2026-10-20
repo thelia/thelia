@@ -46,6 +46,7 @@ readonly class CheckoutValidationService
     public function __construct(
         #[AutowireIterator('thelia.checkout.step_provider')]
         private iterable $stepProviders,
+        private CheckoutTunnelShape $tunnelShape,
     ) {
     }
 
@@ -124,11 +125,11 @@ readonly class CheckoutValidationService
     {
         $providers = iterator_to_array($this->stepProviders, false);
 
-        // Two steps declaring the same position is not a reason to check them in
-        // whichever order the container happened to build them in.
+        // Two steps declaring the same position are ordered by the rule the buyer walks
+        // them by, not by whichever order the container happened to build them in.
         usort(
             $providers,
-            static fn (CheckoutStepProviderInterface $left, CheckoutStepProviderInterface $right): int => [$left->defaultPosition(), $left->code()] <=> [$right->defaultPosition(), $right->code()],
+            fn (CheckoutStepProviderInterface $left, CheckoutStepProviderInterface $right): int => $this->tunnelShape->compare($left->code(), $left->defaultPosition(), $right->code(), $right->defaultPosition()),
         );
 
         return $providers;
