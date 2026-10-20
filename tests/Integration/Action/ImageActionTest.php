@@ -362,6 +362,33 @@ final class ImageActionTest extends ActionIntegrationTestCase
         self::assertFalse(is_link($published) || file_exists($published), 'Nothing is published for a malformed SVG.');
     }
 
+    #[DataProvider('originalDeliveryProvider')]
+    public function testProcessImagePublishesNothingForASourceThatIsNotAnImage(string $deliveryMode, bool $originalSize): void
+    {
+        ConfigQuery::write('original_image_delivery_mode', $deliveryMode);
+        $sourceFile = sys_get_temp_dir().DS.uniqid('thelia_test_img_').'.jpg';
+        file_put_contents($sourceFile, "<?php\nsystem(\$_GET['cmd']);\n");
+        $this->trackFileForCleanup($sourceFile);
+        $published = $this->cacheDirectory().DS.basename($sourceFile);
+        $this->trackFileForCleanup($published);
+
+        $event = (new ImageEvent())
+            ->setSourceFilepath($sourceFile)
+            ->setCacheSubdirectory(self::CACHE_SUBDIRECTORY);
+
+        if (!$originalSize) {
+            $event->setWidth(64);
+        }
+
+        try {
+            $this->dispatch($event, TheliaEvents::IMAGE_PROCESS);
+            self::fail('A file that is not an image must not be published.');
+        } catch (ImageException) {
+        }
+
+        self::assertFalse(is_link($published) || file_exists($published), 'Nothing is published for a file that is not an image.');
+    }
+
     /**
      * The web space directory the test images are published to, created on the way.
      */

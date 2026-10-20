@@ -113,6 +113,17 @@ class FileConfiguration
     ];
 
     /**
+     * Mime types content sniffing reports for a PHP script. A file holding one is never
+     * stored, whatever its name: a shop that includes it, or a web server told to run
+     * it, would execute it.
+     */
+    public const SERVER_EXECUTABLE_MIME_TYPES = [
+        'text/x-php',
+        'application/x-php',
+        'application/x-httpd-php',
+    ];
+
+    /**
      * Extensions a mime type is allowed to carry, so that a PNG named ".jpg"
      * is rejected. A mime type absent from this table is matched on the mime
      * type alone, which lets a shop add a new one without a core change.
@@ -221,6 +232,17 @@ class FileConfiguration
         $extension = strtolower(pathinfo($fileName, \PATHINFO_EXTENSION));
 
         return \in_array($extension, self::BROWSER_ACTIVE_DOCUMENT_EXTENSIONS, true) ? $extension : null;
+    }
+
+    /**
+     * The extensions a file of this mime type may carry, the usual one first, or an
+     * empty list for a mime type the table does not know.
+     *
+     * @return list<string>
+     */
+    public static function extensionsForMimeType(string $mimeType): array
+    {
+        return self::MIME_TYPE_EXTENSIONS[$mimeType] ?? [];
     }
 
     /**
