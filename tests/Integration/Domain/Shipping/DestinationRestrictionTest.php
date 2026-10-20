@@ -317,6 +317,18 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         self::assertNotInstanceOf(DestinationRestrictedException::class, $refusal);
     }
 
+    public function testTheAddressOfAnotherCustomerTellsNothingAboutItsCountry(): void
+    {
+        $restricted = $this->product('Whisky');
+        $this->group('whisky', DestinationRestriction::MODE_DENY, [$this->refused], [$restricted], 'Spirits');
+        $cart = $this->cartOf($this->customerLivingIn($this->served), [$restricted]);
+        $addressOfSomeoneElse = $this->factory->address($this->customerLivingIn($this->served), $this->refused);
+
+        $this->getService(CartSelectionService::class)->setDeliveryAddress(new CheckoutDTO($cart, deliveryAddressId: $addressOfSomeoneElse->getId()));
+
+        self::assertNull($cart->getAddressDeliveryId());
+    }
+
     private function checker(): DestinationRestrictionChecker
     {
         return $this->getService(DestinationRestrictionChecker::class);

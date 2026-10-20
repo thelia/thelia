@@ -63,6 +63,8 @@ class CartSelectionService
      *
      * Only what travels is judged here: a download follows the invoice address, which
      * the buyer may not have chosen yet, and is judged at the placement of the order.
+     * An address of another customer is not looked at, as the action that writes the
+     * address ignores it too.
      */
     private function refuseARestrictedDestination(CheckoutDTO $checkoutDTO): void
     {
@@ -72,13 +74,16 @@ class CartSelectionService
             return;
         }
 
-        $address = AddressQuery::create()->findPk($addressId);
+        $cart = $checkoutDTO->getCart();
+        $address = AddressQuery::create()
+            ->filterByCustomerId($cart->getCustomerId())
+            ->filterById($addressId)
+            ->findOne();
 
         if (null === $address) {
             return;
         }
 
-        $cart = $checkoutDTO->getCart();
         $lines = $this->destinationRestrictionChecker->violationsFor(
             $cart,
             Destination::of($address),
