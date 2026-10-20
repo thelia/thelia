@@ -47,4 +47,21 @@ final class CountryChoicesTest extends IntegrationTestCase
         self::assertSame($first->getId(), $choices['YA'] ?? null, 'an untranslated country falls back to its ISO code');
         self::assertSame($second->getId(), $choices['YB'] ?? null, 'a second untranslated country must not replace the first');
     }
+
+    public function testCountriesAreSortedOnTheirTitleInTheCurrentLanguage(): void
+    {
+        $this->createFixtureFactory()->country();
+
+        $service = $this->getService(CountryService::class);
+        $locale = $this->getService('request_stack')->getSession()->getLang()->getLocale();
+
+        $titles = array_map('strval', array_keys($service->getAllCountriesChoiceType()));
+        $collator = new \Collator($locale);
+
+        $expected = $titles;
+        usort($expected, static fn (string $left, string $right): int => $collator->compare($left, $right) ?: 0);
+
+        self::assertGreaterThan(1, \count($titles));
+        self::assertSame($expected, $titles, 'the list follows the title order of the current language, not the seed order');
+    }
 }

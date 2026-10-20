@@ -50,6 +50,11 @@ readonly class CountryService
             $choices[$title ?: ($country->getIsoalpha2() ?: $country->getIsocode())] = $country->getId();
         }
 
+        // Row order is the seed order, not the order of any language: sort on the
+        // localized title the way the reader's language sorts it.
+        $collator = new \Collator($locale);
+        uksort($choices, static fn (int|string $left, int|string $right): int => $collator->compare((string) $left, (string) $right) ?: 0);
+
         return $choices;
     }
 
