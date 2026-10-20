@@ -26,6 +26,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Model\Brand as BrandModel;
 use Thelia\Model\BrandQuery;
 
@@ -103,9 +104,13 @@ class Brand extends BaseAction implements EventSubscriberInterface
         if (null === $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             return;
         }
+        $media = DeletedItemMedia::of($brand);
+
         $brand->delete();
 
         $event->setBrand($brand);
+
+        $media->delete($dispatcher);
     }
 
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

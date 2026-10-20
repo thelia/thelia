@@ -76,6 +76,24 @@ trait LocalizedFileTrait
         return false;
     }
 
+    /**
+     * Keeps the translations that name a file on the model, so that getStoredFiles()
+     * still answers once the rows are gone: deleting the item the image belongs to
+     * removes its translations through the foreign keys before its files are deleted.
+     */
+    public function retainStoredFiles(): void
+    {
+        if ($this->isNew()) {
+            return;
+        }
+
+        foreach ($this->createTranslationQuery()->filterById($this->getId())->find() as $translation) {
+            if (!isset($this->currentTranslations[$translation->getLocale()]) && null !== self::nonEmptyFile($translation->getFile())) {
+                $this->currentTranslations[$translation->getLocale()] = $translation;
+            }
+        }
+    }
+
     private function storedFileOf(string $locale): ?string
     {
         if (isset($this->currentTranslations[$locale])) {

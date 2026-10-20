@@ -18,7 +18,6 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
@@ -27,9 +26,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Model\Folder as FolderModel;
-use Thelia\Model\FolderDocumentQuery;
-use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\FolderTableMap;
 
@@ -72,30 +70,12 @@ class Folder extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-                $fileList = ['images' => [], 'documentList' => []];
+                $media = DeletedItemMedia::of($folder);
 
-                // Get folder's files to delete after folder deletion
-                $fileList['images']['list'] = FolderImageQuery::create()
-                    ->findByFolderId($event->getFolderId());
-                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
-
-                $fileList['documentList']['list'] = FolderDocumentQuery::create()
-                    ->findByFolderId($event->getFolderId());
-                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-                // Delete folder
                 $folder
                     ->delete($con);
 
                 $event->setFolder($folder);
-
-                // Dispatch delete folder's files event
-                foreach ($fileList as $fileTypeList) {
-                    foreach ($fileTypeList['list'] as $fileToDelete) {
-                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
-                    }
-                }
 
                 $con->commit();
             } catch (\Throwable $e) {
@@ -103,6 +83,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
 
                 throw $e;
             }
+
+            $media->delete($dispatcher);
         }
     }
 
