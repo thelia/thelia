@@ -78,9 +78,9 @@ final readonly class ProductDestinationRestrictionReader
             }
         }
 
-        $countryNames = $this->namesOf(CountryI18nQuery::create(), CountryI18nTableMap::COL_ID, CountryI18nTableMap::COL_TITLE, array_keys($countryIds), $locale);
-        $stateNames = [] !== $stateIds ? $this->namesOf(StateI18nQuery::create(), StateI18nTableMap::COL_ID, StateI18nTableMap::COL_TITLE, array_keys($stateIds), $locale) : [];
-        $reasons = $this->reasonsOf(array_keys($modeOfGroup), $locale);
+        $countryNames = FallbackTranslation::valuesOf(CountryI18nQuery::create(), CountryI18nTableMap::COL_ID, CountryI18nTableMap::COL_LOCALE, CountryI18nTableMap::COL_TITLE, array_keys($countryIds), $locale);
+        $stateNames = FallbackTranslation::valuesOf(StateI18nQuery::create(), StateI18nTableMap::COL_ID, StateI18nTableMap::COL_LOCALE, StateI18nTableMap::COL_TITLE, array_keys($stateIds), $locale);
+        $reasons = FallbackTranslation::valuesOf(DestinationRestrictionI18nQuery::create(), DestinationRestrictionI18nTableMap::COL_ID, DestinationRestrictionI18nTableMap::COL_LOCALE, DestinationRestrictionI18nTableMap::COL_REASON, array_keys($modeOfGroup), $locale);
         $groups = [];
 
         foreach ($modeOfGroup as $groupId => $mode) {
@@ -103,37 +103,5 @@ final readonly class ProductDestinationRestrictionReader
         }
 
         return $groups;
-    }
-
-    /**
-     * @param list<int> $ids
-     *
-     * @return array<int, string>
-     */
-    private function namesOf(CountryI18nQuery|StateI18nQuery $query, string $idColumn, string $titleColumn, array $ids, string $locale): array
-    {
-        $names = [];
-
-        foreach ($query->filterById($ids)->filterByLocale($locale)->select([$idColumn, $titleColumn])->find() as $row) {
-            $names[(int) $row[$idColumn]] = (string) $row[$titleColumn];
-        }
-
-        return $names;
-    }
-
-    /**
-     * @param list<int> $groupIds
-     *
-     * @return array<int, string>
-     */
-    private function reasonsOf(array $groupIds, string $locale): array
-    {
-        $reasons = [];
-
-        foreach (DestinationRestrictionI18nQuery::create()->filterById($groupIds)->filterByLocale($locale)->select([DestinationRestrictionI18nTableMap::COL_ID, DestinationRestrictionI18nTableMap::COL_REASON])->find() as $row) {
-            $reasons[(int) $row[DestinationRestrictionI18nTableMap::COL_ID]] = trim((string) $row[DestinationRestrictionI18nTableMap::COL_REASON]);
-        }
-
-        return $reasons;
     }
 }

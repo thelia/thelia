@@ -175,9 +175,9 @@ final class DestinationRestrictionChecker implements ResetInterface
     }
 
     /**
-     * Titles of the products a refusal names, read from the translation table: setLocale()
-     * on a shared product instance would leave it in this language for whoever reads it
-     * next. A product with no title there is named by its reference.
+     * Titles of the products a refusal names, in the buyer's language or the default one
+     * of the shop (FallbackTranslation). A product with no title there is named by its
+     * reference.
      *
      * @param list<int> $productIds
      *
@@ -185,17 +185,12 @@ final class DestinationRestrictionChecker implements ResetInterface
      */
     private function titlesOf(array $productIds, string $locale): array
     {
-        $titles = [];
-
-        foreach (ProductI18nQuery::create()->filterById($productIds)->filterByLocale($locale)->select([ProductI18nTableMap::COL_ID, ProductI18nTableMap::COL_TITLE])->find() as $row) {
-            $titles[(int) $row[ProductI18nTableMap::COL_ID]] = (string) $row[ProductI18nTableMap::COL_TITLE];
-        }
-
+        $titles = FallbackTranslation::valuesOf(ProductI18nQuery::create(), ProductI18nTableMap::COL_ID, ProductI18nTableMap::COL_LOCALE, ProductI18nTableMap::COL_TITLE, $productIds, $locale);
         $named = [];
 
         foreach (ProductQuery::create()->filterById($productIds)->select([ProductTableMap::COL_ID, ProductTableMap::COL_REF])->find() as $row) {
             $productId = (int) $row[ProductTableMap::COL_ID];
-            $named[$productId] = '' !== ($titles[$productId] ?? '') ? $titles[$productId] : (string) $row[ProductTableMap::COL_REF];
+            $named[$productId] = $titles[$productId] ?? (string) $row[ProductTableMap::COL_REF];
         }
 
         return $named;
@@ -204,20 +199,10 @@ final class DestinationRestrictionChecker implements ResetInterface
     /**
      * @param list<int> $groupIds
      *
-     * @return array<int, string> group id => reason, in the given language
+     * @return array<int, string> group id => reason, in the buyer's language or the default one of the shop
      */
     private function reasonsOf(array $groupIds, string $locale): array
     {
-        $reasons = [];
-
-        foreach (DestinationRestrictionI18nQuery::create()
-            ->filterById($groupIds)
-            ->filterByLocale($locale)
-            ->select([DestinationRestrictionI18nTableMap::COL_ID, DestinationRestrictionI18nTableMap::COL_REASON])
-            ->find() as $row) {
-            $reasons[(int) $row[DestinationRestrictionI18nTableMap::COL_ID]] = trim((string) $row[DestinationRestrictionI18nTableMap::COL_REASON]);
-        }
-
-        return $reasons;
+        return FallbackTranslation::valuesOf(DestinationRestrictionI18nQuery::create(), DestinationRestrictionI18nTableMap::COL_ID, DestinationRestrictionI18nTableMap::COL_LOCALE, DestinationRestrictionI18nTableMap::COL_REASON, $groupIds, $locale);
     }
 }
