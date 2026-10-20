@@ -274,32 +274,41 @@ final readonly class ShippingFacade
 
     /**
      * The postal code of the cart's delivery address when it is the reason no carrier is
-     * offered: some active carrier serves the country, and the postal code rules of its
-     * zones refuse that code. Null otherwise, including when carriers are offered.
+     * offered: some active carrier would be offered without it (its zones serve the country
+     * and it quotes the cart), and the postal code rules of its zones refuse that code. Null
+     * otherwise, including when carriers are offered.
      *
      * A front office reads it to explain an empty list of carriers instead of only
      * showing one.
      */
     public function postalCodeWithoutCarrier(Cart $cart): ?string
     {
-        [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
+        [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
         $country = $this->handleCountry($cart, $country);
 
         if (null === $zipCode || '' === trim($zipCode)) {
             return null;
         }
 
-        $servesTheCountry = false;
+        $refusedByThePostalCode = [];
 
         foreach ($this->getActiveDeliveryModules() as $module) {
             if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
                 return null;
             }
 
-            $servesTheCountry = $servesTheCountry || $this->eligibilityChecker->isEligible($module, $cart, $country, $state);
+            $refusedByThePostalCode[] = $module;
         }
 
-        return $servesTheCountry ? $zipCode : null;
+        // Asked last, and only of the carriers the rules turned away: a carrier that would not
+        // quote this cart anyway is not one the postal code took away.
+        foreach ($refusedByThePostalCode as $module) {
+            if (null !== $this->resourceBuilder->build($module, $cart, $address, $country, $state, true)) {
+                return $zipCode;
+            }
+        }
+
+        return null;
     }
 
     /**
