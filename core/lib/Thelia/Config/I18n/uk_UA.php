@@ -187,7 +187,7 @@ return [
     'Folder' => 'Каталог',
     'Folder page' => 'Сторінка папки',
     'Folder title *' => 'Назва папки *',
-    'For one ore more customers' => 'Для одного або більше клієнтів',
+    'For one or more customers' => 'Для одного або більше клієнтів',
     'Free product when buying one or more selected products' => 'Безкоштовний продукт при покупці одного або більше вибраних продуктів',
     'Front Office' => 'Фронт-Офіс',
     'Full Name' => 'Повне ім\'я',

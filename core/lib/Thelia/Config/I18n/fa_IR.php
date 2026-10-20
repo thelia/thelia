@@ -217,7 +217,7 @@ return [
     'Folder' => 'پوشه',
     'Folder page' => 'صفحه پوشه',
     'Folder title *' => 'عنوان پوشه*',
-    'For one ore more customers' => 'برای یک یا بیشتر از مشتری(ها)',
+    'For one or more customers' => 'برای یک یا بیشتر از مشتری(ها)',
     'Free product when buying one or more selected products' => 'محصول رایگان درهنگام خرید یک یا بیشتر از محصولات انتخاب شده',
     'Front Office' => 'بخش فروشگاهی',
     'Full Name' => 'نام و نام خانوادگی',
