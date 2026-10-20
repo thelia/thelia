@@ -101,7 +101,9 @@ final class ProductsImporter extends AbstractDemoImporter
                 continue;
             }
 
-            (new ProductImage())->setProduct($product)->setFile($imageName)->save($context->connection);
+            $productImage = (new ProductImage())->setProduct($product);
+            $this->setFileForEveryLocale($context, $productImage, $imageName);
+            $productImage->save($context->connection);
             $this->copyImage($context, $imageName, 'product');
         }
     }

@@ -62,7 +62,9 @@ final class CategoriesImporter extends AbstractDemoImporter
                         continue;
                     }
 
-                    (new CategoryImage())->setCategory($category)->setFile($imageName)->save($context->connection);
+                    $categoryImage = (new CategoryImage())->setCategory($category);
+                    $this->setFileForEveryLocale($context, $categoryImage, $imageName);
+                    $categoryImage->save($context->connection);
                     $this->copyImage($context, $imageName, 'category');
                 }
             }
