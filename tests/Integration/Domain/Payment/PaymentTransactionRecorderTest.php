@@ -28,6 +28,7 @@ use Thelia\Domain\Payment\Service\PaymentJournalLock;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
@@ -182,6 +183,30 @@ final class PaymentTransactionRecorderTest extends ActionIntegrationTestCase
         self::assertNull($line->getAdminId());
         self::assertSame($order->getPaymentModuleId(), $line->getPaymentModuleId());
         self::assertSame($order->getCurrencyId(), $line->getCurrencyId());
+    }
+
+    public function testWhatAModuleAnswersAsAnErrorIsBoundedAndCleanedBeforeTheJournalKeepsIt(): void
+    {
+        // A provider may answer a long code or a whole page as its message; the journal keeps
+        // what its columns hold, on readable characters, whichever way the module reported it.
+        $order = $this->order(120);
+        $pending = $this->recorder->recordCapture($order, 120, null, PaymentTransactionState::PENDING);
+
+        $settled = $this->recorder->settle(
+            $pending,
+            PaymentTransactionState::FAILED,
+            null,
+            str_repeat('C', 80),
+            "Declined\x1B[31m by the issuer\n".str_repeat('x', 5000),
+        );
+
+        self::assertSame(str_repeat('C', OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH), $settled->getErrorCode());
+        self::assertSame(OrderPaymentTransaction::ERROR_MESSAGE_MAX_LENGTH, mb_strlen((string) $settled->getErrorMessage()));
+        self::assertStringStartsWith("Declined?[31m by the issuer\n", (string) $settled->getErrorMessage(), 'Control characters are replaced, line feeds kept.');
+        self::assertTrue($settled->isFailed(), 'The line is settled, not left pending by a value too long for its column.');
+
+        $failed = $this->recorder->recordCapture($order, 10, 'CAP-LONG', PaymentTransactionState::FAILED, errorCode: str_repeat('D', 70), errorMessage: '  ');
+        self::assertSame(str_repeat('D', OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH), $failed->getErrorCode());
     }
 
     public function testAPendingLineIsSettledOnceWithItsOutcome(): void
