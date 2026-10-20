@@ -111,8 +111,8 @@ final class ProductShippingRulesMigrationTest extends IntegrationTestCase
             $columns = $this->columnsOf($table);
 
             self::assertSame(['decimal(16,6)', 'NO', '0.000000'], $this->shapeOf($columns, 'shipping_surcharge'), $table);
-            self::assertSame(['tinyint(4)', 'NO', '0'], $this->shapeOf($columns, 'shipping_surcharge_mode'), $table);
-            self::assertSame(['tinyint(4)', 'NO', '0'], $this->shapeOf($columns, 'free_shipping'), $table);
+            self::assertSame(['tinyint', 'NO', '0'], $this->shapeOf($columns, 'shipping_surcharge_mode'), $table);
+            self::assertSame(['tinyint', 'NO', '0'], $this->shapeOf($columns, 'free_shipping'), $table);
 
             // In the order of the fresh install, after the guest checkout flag.
             $names = array_keys($columns);
@@ -211,8 +211,11 @@ final class ProductShippingRulesMigrationTest extends IntegrationTestCase
             return null;
         }
 
-        // MariaDB quotes nothing for a numeric default, MySQL may: compare the value.
-        return [$columns[$column]['COLUMN_TYPE'], $columns[$column]['IS_NULLABLE'], trim((string) $columns[$column]['COLUMN_DEFAULT'], "'")];
+        // MySQL 8 drops the display width of an integer type that MariaDB still shows, and
+        // MariaDB quotes nothing for a numeric default while MySQL may: compare the shape only.
+        $type = preg_replace('/^((?:tiny|small|medium|big)?int)\(\d+\)/', '$1', (string) $columns[$column]['COLUMN_TYPE']) ?? '';
+
+        return [$type, $columns[$column]['IS_NULLABLE'], trim((string) $columns[$column]['COLUMN_DEFAULT'], "'")];
     }
 
     /**
