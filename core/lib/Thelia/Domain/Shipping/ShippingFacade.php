@@ -31,6 +31,7 @@ use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\Service\DeliverySessionStorage;
 use Thelia\Domain\Shipping\Service\DeliverySetupService;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -312,9 +313,11 @@ final readonly class ShippingFacade
      *   state and postal code, with the customer address behind it.
      * - Else, return (null, null, null, null).
      *
-     * The postal code comes with the address it belongs to: none for an explicit country,
-     * the cart's own copy for the cart's address, so that a guest, whose cart address
-     * points to no customer address, is judged on the code typed.
+     * The postal code comes with the address it belongs to: the cart's own copy for the
+     * cart's address, so that a guest, whose cart address points to no customer address, is
+     * judged on the code typed. An `addressId` gives its postal code only when it is an
+     * address of the cart's customer; otherwise, as for a country given alone, the postal
+     * code of the cart's address is read when that address is in the country.
      *
      * @param int|null $addressId id of a customer `address`
      *
@@ -327,14 +330,16 @@ final readonly class ShippingFacade
         ?int $addressId,
     ): array {
         if (null !== $country) {
-            // Explicit (country/state) context over address; the address still gives its
-            // postal code when it is in that country, as the API passes both.
-            if (null === $addressId) {
+            // Explicit (country/state) context over address; an address of the cart's
+            // customer still gives its postal code when it is in that country, as the API
+            // passes both.
+            $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
+
+            if (null === $address) {
                 return [null, $country, $state, $this->cartZipCodeIn($cart, $country)];
             }
 
-            $address = AddressQuery::create()->findPk($addressId);
-            $zipCode = null !== $address && $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
+            $zipCode = $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
 
             return [null, $country, $state, $zipCode];
         }
@@ -342,9 +347,16 @@ final readonly class ShippingFacade
         if (null !== $addressId) {
             $address = AddressQuery::create()->findPk($addressId);
 
-            return null === $address
-                ? [null, null, null, null]
-                : [$address, $address->getCountry(), $address->getState(), $address->getZipcode()];
+            if (null === $address) {
+                return [null, null, null, null];
+            }
+
+            $addressCountry = $address->getCountry();
+            $zipCode = null !== $this->addressOfTheCartCustomer($cart, $addressId)
+                ? $address->getZipcode()
+                : (null === $addressCountry ? null : $this->cartZipCodeIn($cart, $addressCountry));
+
+            return [$address, $addressCountry, $address->getState(), $zipCode];
         }
 
         $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
@@ -360,6 +372,27 @@ final readonly class ShippingFacade
         // for and the one CartGuard judges: the customer address may have moved since it was
         // chosen. The customer address is still the one handed to the modules.
         return [$address, $cartAddress->getCountry(), $cartAddress->getState(), $cartAddress->getZipcode()];
+    }
+
+    /**
+     * The address, when it belongs to the customer of the cart, a guest included: the
+     * checkout gives a guest a customer row of its own and binds the cart to it.
+     *
+     * An id comes with a request: the postal code of an address of someone else would
+     * otherwise be read out through the carriers offered for it.
+     */
+    private function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
+    {
+        $customerId = $cart->getCustomerId();
+
+        if (null === $customerId) {
+            return null;
+        }
+
+        return AddressQuery::create()
+            ->filterById($addressId)
+            ->filterByCustomerId($customerId)
+            ->findOne();
     }
 
     /**
