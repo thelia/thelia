@@ -836,6 +836,12 @@ class TheliaKernel extends Kernel
             $extensionConfigs['security'][0]['providers'] ?? [],
         );
 
+        // Symfony 7.3 deprecates calling eraseCredentials() on the authenticated user, and
+        // removes the method from its UserInterface in 8.0. The API firewalls are stateless, so nothing keeps
+        // the user after the request; the session login of the shop erases the password
+        // itself (SecurityContext). A project can still turn it back on.
+        $extensionConfigs['security'][0]['erase_credentials'] ??= false;
+
         $extensionConfigs['security'][0]['firewalls'] = array_merge(
             [
                 'frontLogin' => [

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Service\API;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Thelia\Core\Security\User\UserInterface;
 
@@ -33,13 +34,13 @@ final readonly class SessionUserAuthorizationChecker implements AuthorizationChe
     ) {
     }
 
-    public function isGranted(mixed $attribute, mixed $subject = null): bool
+    public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
     {
         if (\is_string($attribute) && str_starts_with($attribute, 'ROLE_')) {
             return $this->user instanceof UserInterface
                 && \in_array($attribute, $this->user->getRoles(), true);
         }
 
-        return $this->decorated?->isGranted($attribute, $subject) ?? false;
+        return $this->decorated?->isGranted($attribute, $subject, $accessDecision) ?? false;
     }
 }
