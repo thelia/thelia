@@ -48,6 +48,11 @@ final readonly class DeliveryModuleResourceBuilder
     ): ?DeliveryModuleResource {
         $eligible = $this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode);
 
+        // A carrier that does not serve the address is not asked for a price it cannot give.
+        if (!$eligible && $onlyValid) {
+            return null;
+        }
+
         $postage = $this->postageQuerier->query($module, $cart, $address, $country, $state);
         $isValid = $eligible && $postage['valid'];
         if (!$isValid && $onlyValid) {
