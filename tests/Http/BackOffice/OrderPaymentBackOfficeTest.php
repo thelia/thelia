@@ -371,6 +371,22 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertGreaterThan(0, $crawler->filter('[data-order-id="'.$unpaid->getId().'"][data-bs-target="#order-cancel-modal"]')->count(), 'An order holding nothing is still cancelled from the list.');
     }
 
+    public function testOnceASingleCaptureWasAskedTheSheetOffersNoOtherAndLetsTheOrderBeCancelled(): void
+    {
+        // The provider lets the rest go with the capture: nothing is left to capture, nor to
+        // release, so cancelling no longer needs the capture right.
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ONCE');
+        $this->getService(PaymentCaptureService::class)->capture($order, 40.0);
+        $this->loginAs($this->factory->restrictedAdmin([AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE]]));
+
+        $crawler = $this->sheet($order);
+
+        self::assertCount(0, $crawler->filter('[data-testid="order-payment-capture-btn"]'));
+        self::assertCount(1, $crawler->filter('[data-testid="order-cancel-btn"]'));
+    }
+
     public function testTheCaptureRightOffersTheCancellationOfAnAuthorizedOrder(): void
     {
         $this->loginAs($this->factory->restrictedAdmin([

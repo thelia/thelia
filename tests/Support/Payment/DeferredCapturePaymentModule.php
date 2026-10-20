@@ -20,8 +20,9 @@ use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Module\AbstractPaymentModule;
+use Thelia\Module\PaymentModuleCancellingOnReleaseInterface;
+use Thelia\Module\PaymentModuleCapturingOnceInterface;
 use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
-use Thelia\Module\PaymentModuleWithCaptureInterface;
 
 /**
  * A payment module that reserves the amount first and takes it later, the way a
@@ -31,12 +32,18 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  * Registered under a `module` row by the tests that need it; the core instantiates it
  * from that row's namespace, so it needs no container.
  */
-final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleWithCaptureInterface, PaymentModuleManagingOrderStatusInterface
+final class DeferredCapturePaymentModule extends AbstractPaymentModule implements PaymentModuleCapturingOnceInterface, PaymentModuleManagingOrderStatusInterface, PaymentModuleCancellingOnReleaseInterface
 {
     public static bool $deferredCapture = true;
 
     /** Whether the module moves the order status itself, from its own configuration. */
     public static bool $managesOrderStatus = false;
+
+    /** Whether the provider takes a single capture per authorization. */
+    public static bool $capturesOnce = false;
+
+    /** Whether the module cancels the order itself once its provider ended the authorization. */
+    public static bool $cancelsOrderOnRelease = false;
 
     /** @var PaymentOperationResult|\Throwable|null what the next capture answers, or throws */
     public static PaymentOperationResult|\Throwable|null $nextCaptureAnswer = null;
@@ -62,6 +69,8 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$whileCapturing = null;
         self::$scopes = [];
         self::$managesOrderStatus = false;
+        self::$capturesOnce = false;
+        self::$cancelsOrderOnRelease = false;
     }
 
     public function pay(Order $order): ?Response
@@ -89,6 +98,16 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         $this->getContainer();
 
         return self::$managesOrderStatus;
+    }
+
+    public function capturesOnce(): bool
+    {
+        return self::$capturesOnce;
+    }
+
+    public function cancelsOrderOnRelease(): bool
+    {
+        return self::$cancelsOrderOnRelease;
     }
 
     public function supportsDeferredCapture(): bool

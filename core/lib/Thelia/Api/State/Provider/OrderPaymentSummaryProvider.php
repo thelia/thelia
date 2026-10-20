@@ -46,7 +46,8 @@ final readonly class OrderPaymentSummaryProvider implements ProviderInterface
         $summary->voided = $totals->voided;
         $summary->refunded = $totals->refunded;
         $summary->pendingCapture = $totals->pendingCapture;
-        $summary->remainingToCapture = $totals->remainingToCapture;
+        // As the module takes it: nothing more once a module capturing once was asked a capture.
+        $summary->remainingToCapture = $this->captureService->leftToCapture($order);
         $summary->supportsCapture = $this->captureService->supportsCapture($order);
 
         return $summary;

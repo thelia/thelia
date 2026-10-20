@@ -32,7 +32,7 @@ final readonly class AuthorizedOrderCancellationGuard
     public function __construct(
         private OrderHistoryActorResolver $actorResolver,
         private SecurityContext $securityContext,
-        private PaymentTransactionTotalsReader $totalsReader,
+        private PaymentCaptureService $captureService,
     ) {
     }
 
@@ -53,7 +53,8 @@ final readonly class AuthorizedOrderCancellationGuard
 
         $administrator = $this->actorResolver->actingAdministrator($moduleCode);
 
-        if (null === $administrator || !$this->totalsReader->forOrder((int) $order->getId())->hasSomethingLeftToCapture()) {
+        // What is left as the module takes it: nothing more once a single capture was asked.
+        if (null === $administrator || !PaymentAmount::isPositive($this->captureService->leftToCapture($order))) {
             return;
         }
 
