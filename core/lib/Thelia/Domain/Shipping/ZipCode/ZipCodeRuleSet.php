@@ -60,9 +60,4 @@ final readonly class ZipCodeRuleSet
 
         return false;
     }
-
-    public function isEmpty(): bool
-    {
-        return [] === $this->inclusions && [] === $this->exclusions;
-    }
 }
