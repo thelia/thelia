@@ -336,6 +336,30 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertSame(1, $this->countRuleReads(static fn () => self::assertNotNull($query('69001'), 'The rule just deleted no longer applies.')));
     }
 
+    public function testTheListsJudgeEachCarrierOnceAndAskNoPriceOfACarrierTheAddressIsRefused(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $facade = $this->getService(ShippingFacade::class);
+        $moduleId = (int) $this->module->getId();
+        $quotes = 0;
+        $countQuotes = static function (DeliveryPostageEvent $event) use (&$quotes, $moduleId): void {
+            if ($moduleId === (int) $event->getModule()->getModuleModel()->getId()) {
+                ++$quotes;
+            }
+        };
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $countQuotes, 2048);
+        $corsica = $this->guestCartShippedTo('20090');
+        $lyon = $this->guestCartShippedTo('69001');
+
+        self::assertSame([], $facade->listValidMethodsAsResourceApi($corsica));
+        self::assertSame([], $facade->listValidMethods($corsica));
+        self::assertSame(0, $quotes, 'A carrier the address is refused is not asked for a price.');
+
+        self::assertSame(1, $this->countStatementsOn('area_delivery_module', static fn () => self::assertCount(1, $facade->listValidMethods($lyon))), 'The carrier is judged once.');
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -353,6 +377,14 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
      * The queries on the postal code rules the callable runs.
      */
     private function countRuleReads(callable $evaluate): int
+    {
+        return $this->countStatementsOn('area_zip_code_rule', $evaluate);
+    }
+
+    /**
+     * The queries naming the table the callable runs.
+     */
+    private function countStatementsOn(string $table, callable $evaluate): int
     {
         $connection = $this->getPropelConnection();
         $logger = $connection->getLogger();
@@ -375,7 +407,7 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             $connection->setLogger($logger);
         }
 
-        return \count(array_filter($statements->lines, static fn (string $line): bool => str_contains($line, 'area_zip_code_rule')));
+        return \count(array_filter($statements->lines, static fn (string $line): bool => str_contains($line, $table)));
     }
 
     private function isEligible(?string $zipCode): bool
@@ -490,12 +522,16 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
      */
     private function quoteEveryCart(): void
     {
-        $listener = static function (DeliveryPostageEvent $event): void {
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event): void {
             $event->setValidModule(true)->setPostage(new OrderPostage(5.0, 0.0, 'Test'));
             $event->stopPropagation();
-        };
-        $this->dispatcher()->addListener(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener, 1024);
-        $this->registeredListeners[] = [TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener];
+        }, 1024);
+    }
+
+    private function listen(string $eventName, callable $listener, int $priority): void
+    {
+        $this->dispatcher()->addListener($eventName, $listener, $priority);
+        $this->registeredListeners[] = [$eventName, $listener];
     }
 
     private function dispatcher(): EventDispatcherInterface

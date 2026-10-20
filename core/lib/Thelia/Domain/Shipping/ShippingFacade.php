@@ -243,9 +243,8 @@ final readonly class ShippingFacade
         $modules = $this->getActiveDeliveryModules();
 
         foreach ($modules as $module) {
-            if (!$this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
-                continue;
-            }
+            // Only valid: the builder judges the eligibility, and returns null for a carrier
+            // that does not serve the address before asking it for a price.
             $resourceDeliveryModule = $this->deliveryModuleResourceBuilder->build(
                 $module,
                 $cart,
