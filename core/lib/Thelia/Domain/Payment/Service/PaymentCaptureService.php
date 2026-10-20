@@ -134,7 +134,7 @@ final readonly class PaymentCaptureService
         }));
 
         $result = $this->callModule(
-            static fn (): PaymentOperationResult => $module->capture($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction),
+            fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->capture($order, PaymentAmount::toFloat((string) $transaction->getAmount()), $transaction)),
             $transaction,
             $moduleCode,
         );
@@ -155,7 +155,7 @@ final readonly class PaymentCaptureService
             $moduleCode,
         ));
 
-        $result = $this->callModule(static fn (): PaymentOperationResult => $module->voidAuthorization($order, $transaction), $transaction, $moduleCode);
+        $result = $this->callModule(fn (): PaymentOperationResult => $this->moduleLocator->forOrder($order, static fn (): PaymentOperationResult => $module->voidAuthorization($order, $transaction)), $transaction, $moduleCode);
 
         return $this->conclude($transaction, $result, $moduleCode);
     }
@@ -208,7 +208,7 @@ final readonly class PaymentCaptureService
             throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $this->moduleLocator->nameOf($order));
         }
 
-        if (!$module instanceof PaymentModuleWithCaptureInterface || !$module->supportsDeferredCapture()) {
+        if (!$module instanceof PaymentModuleWithCaptureInterface || !$this->moduleLocator->forOrder($order, static fn (): bool => $module->supportsDeferredCapture())) {
             throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $module->getCode());
         }
 

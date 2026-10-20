@@ -35,6 +35,7 @@ use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentJournalLock;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -371,6 +372,26 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('Authorization expired', $line->getErrorMessage());
         self::assertNull($line->getErrorCode(), 'A refusal that names no code of the provider is written without one.');
         self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+    }
+
+    public function testTheModuleIsAskedWithTheConfigurationOfTheSaleUnitOfTheOrder(): void
+    {
+        // The back office and the admin API run with the national configuration; a module
+        // whose keys or mode are set per sale unit must still read those of the order's unit.
+        [$order] = $this->authorizedOrder(120);
+        $saleUnitId = (int) $this->factory->saleUnit()->getId();
+        $order->setSaleUnitId($saleUnitId)->save($this->getPropelConnection());
+        DeferredCapturePaymentModule::$scopes = [];
+
+        $this->service->capture($order, 50.0);
+        $this->service->voidAuthorization($order);
+
+        $calls = array_column(DeferredCapturePaymentModule::$scopes, 'call');
+        self::assertContains('supportsDeferredCapture', $calls);
+        self::assertContains('capture', $calls);
+        self::assertContains('voidAuthorization', $calls);
+        self::assertSame([$saleUnitId], array_values(array_unique(array_column(DeferredCapturePaymentModule::$scopes, 'saleUnit'))), 'Every call runs with the configuration of the sale unit of the order.');
+        self::assertNull(SaleUnitConfigScope::current(), 'The configuration of the request is given back.');
     }
 
     public function testAModuleThatRefusesWithTheCodeOfTheProviderWritesThatCode(): void

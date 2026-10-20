@@ -16,6 +16,7 @@ namespace Thelia\Tests\Support\Payment;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Module\AbstractPaymentModule;
@@ -49,6 +50,9 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
     /** What happens elsewhere while the provider is being called — another worker taking the journal. */
     public static ?\Closure $whileCapturing = null;
 
+    /** @var list<array{call: string, saleUnit: int|null}> the configuration each call of the core ran with */
+    public static array $scopes = [];
+
     public static function reset(): void
     {
         self::$deferredCapture = true;
@@ -56,6 +60,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         self::$captureCalls = [];
         self::$voidCalls = [];
         self::$whileCapturing = null;
+        self::$scopes = [];
         self::$managesOrderStatus = false;
     }
 
@@ -79,6 +84,8 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
 
     public function supportsDeferredCapture(): bool
     {
+        self::$scopes[] = ['call' => 'supportsDeferredCapture', 'saleUnit' => SaleUnitConfigScope::current()];
+
         return self::$deferredCapture;
     }
 
@@ -88,6 +95,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         $this->getContainer();
 
         self::$captureCalls[] = ['order' => (int) $order->getId(), 'amount' => $amount, 'transaction' => (int) $transaction->getId()];
+        self::$scopes[] = ['call' => 'capture', 'saleUnit' => SaleUnitConfigScope::current()];
 
         if (null !== self::$whileCapturing) {
             (self::$whileCapturing)();
@@ -111,6 +119,7 @@ final class DeferredCapturePaymentModule extends AbstractPaymentModule implement
         $this->getContainer();
 
         self::$voidCalls[] = (int) $order->getId();
+        self::$scopes[] = ['call' => 'voidAuthorization', 'saleUnit' => SaleUnitConfigScope::current()];
 
         return PaymentOperationResult::succeeded('VOID-'.$transaction->getId());
     }

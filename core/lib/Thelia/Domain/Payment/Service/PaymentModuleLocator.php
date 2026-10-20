@@ -16,6 +16,7 @@ namespace Thelia\Domain\Payment\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -63,6 +64,23 @@ final readonly class PaymentModuleLocator
         }
 
         return $module;
+    }
+
+    /**
+     * Runs what is asked of the payment module of an order with the configuration of the
+     * sale unit the order was placed on, the national one for a national order: the keys,
+     * the account and the mode a module reads are those of its unit, whatever sale unit
+     * the request resolved. Every call of the core into a payment module goes through it.
+     *
+     * @template T
+     *
+     * @param callable(): T $call
+     *
+     * @return T
+     */
+    public function forOrder(Order $order, callable $call): mixed
+    {
+        return SaleUnitConfigScope::runFor($order->getSaleUnitId(), $call);
     }
 
     /**
