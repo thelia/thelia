@@ -192,6 +192,19 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNull($facade->postalCodeWithoutCarrier($this->guestCartShippedTo('69001')), 'A carrier is offered.');
     }
 
+    public function testThePostalCodeIsNotBlamedForACarrierThatWouldNotQuoteTheCartAnyway(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event): void {
+            $event->setValidModule(false);
+            $event->stopPropagation();
+        }, 2048);
+
+        self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
+    }
+
     public function testThePostalCodeIsNotBlamedWhenNoCarrierServesTheCountry(): void
     {
         $this->onlyTheModuleOfTheTestIsActive();

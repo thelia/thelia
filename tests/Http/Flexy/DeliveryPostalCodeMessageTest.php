@@ -39,6 +39,7 @@ use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
 
 /**
  * The delivery step of a guest whose postal code no zone takes: the step names the postal
@@ -49,6 +50,8 @@ use Thelia\Module\BaseModule;
  */
 final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 {
+    use RegistersDeliveryDateTestCarrier;
+
     /**
      * Written as a string on purpose: `::class` on a missing import resolves silently in
      * the current namespace, and the guard would then skip the whole file for ever.
@@ -88,7 +91,7 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
 
         // The carrier is eligible but quotes nothing here: the step shows the general
         // message, and must not put the blame on the postal code.
-        $crawler = $this->deliveryStepOfAGuest(excluding: '20*');
+        $crawler = $this->deliveryStepOfAGuest(excluding: '20*', quoting: false);
 
         self::assertStringNotContainsString('No carrier delivers to the postal code', $crawler->text());
         self::assertStringContainsString('No delivery method is available for this order.', $crawler->text());
@@ -343,7 +346,7 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
      * The guest identifies, then a zone served by an active carrier takes their country
      * with one exclusion, before the delivery step is displayed.
      */
-    private function deliveryStepOfAGuest(string $excluding, string $zipCode = self::GUEST_ZIP_CODE): Crawler
+    private function deliveryStepOfAGuest(string $excluding, string $zipCode = self::GUEST_ZIP_CODE, bool $quoting = true): Crawler
     {
         $this->openASessionWithACart();
         $this->client->submit($this->guestFormOf($this->requestIdentificationPage(), [
@@ -355,7 +358,7 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertNotNull($guest);
         $countryId = AddressQuery::create()->filterByCustomerId($guest->getId())->findOne()?->getCountryId();
         self::assertNotNull($countryId);
-        $this->zoneServingTheCountryExcept((int) $countryId, $excluding);
+        $this->zoneServingTheCountryExcept((int) $countryId, $excluding, $quoting);
 
         $crawler = $this->client->request('GET', '/checkout/delivery');
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
@@ -374,10 +377,16 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         return $session;
     }
 
-    private function zoneServingTheCountryExcept(int $countryId, string $excluded): void
+    /**
+     * A carrier that quotes every cart, the postal code being then the one reason it is not
+     * offered, or else an installed carrier that quotes nothing in the guest's country.
+     */
+    private function zoneServingTheCountryExcept(int $countryId, string $excluded, bool $quoting): void
     {
         $connection = $this->getPropelConnection();
-        $carrier = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne($connection);
+        $carrier = $quoting
+            ? $this->registerDeliveryDateTestCarrier(static::getContainer(), $connection)
+            : ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne($connection);
         self::assertNotNull($carrier, 'An active carrier is installed.');
 
         $area = (new Area())->setName('Postal code message zone');
