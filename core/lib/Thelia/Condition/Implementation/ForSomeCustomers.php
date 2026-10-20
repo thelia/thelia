@@ -90,7 +90,7 @@ class ForSomeCustomers extends ConditionAbstract
     public function getName(): string
     {
         return $this->translator->trans(
-            'For one ore more customers',
+            'For one or more customers',
             [],
         );
     }

@@ -199,7 +199,7 @@ return [
     'Folder' => 'Priečinok',
     'Folder page' => 'Stránka priečinka',
     'Folder title *' => 'Názov priečinka *',
-    'For one ore more customers' => 'Pre jedného alebo viacerých zákazníkov',
+    'For one or more customers' => 'Pre jedného alebo viacerých zákazníkov',
     'Format' => 'Formát',
     'Free product when buying one or more selected products' => 'Produkt zadarmo pri kúpe jedného alebo viac vybraných produktov',
     'Front Office' => 'Verejná časť obchodu',

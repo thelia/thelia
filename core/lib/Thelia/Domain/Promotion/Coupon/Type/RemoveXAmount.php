@@ -42,7 +42,7 @@ class RemoveXAmount extends AbstractRemove
         return $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
+                'This coupon will subtract a set amount from the total cost of an order. If the discount is greater than the total order cost, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 [],
             );
     }
