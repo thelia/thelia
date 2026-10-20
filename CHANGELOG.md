@@ -105,6 +105,7 @@
 - `RewritingUrlQuery::getResolverSearch()` builds a `ModelJoin`, which ends the Propel warning raised on each rewritten URL.
 - The country choices of `CountryService::getAllCountriesChoiceType()` are sorted on the localized title of the current language, not in the order of the seed data.
 - A request to `/api/front/...` that authenticates with a bearer token gets the reserved prices of the customer of the token, even when it also carries a front-office session cookie for another customer. `CurrentCustomerProvider` read the session first, so the price followed the session; the session is now the fallback, for the theme that calls the API in-process with no token.
+- A process that serves several requests in a row, a worker runtime or a test sending several requests through one kernel, no longer renders a request with the parser the previous request picked. `ParserResolver` keeps that parser in a static property, now emptied when a main request starts and when the kernel resets its services.
 
 ## Checkout and payment
 
