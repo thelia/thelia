@@ -308,7 +308,8 @@ final readonly class ShippingFacade
      * Rules:
      * - If country is provided, use the provided (country, state) over address.
      * - Else, if addressId is provided, resolve through that customer address.
-     * - Else, resolve through the cart's own copy of its delivery address.
+     * - Else, resolve through the cart's own copy of its delivery address: its country,
+     *   state and postal code, with the customer address behind it.
      * - Else, return (null, null, null, null).
      *
      * The postal code comes with the address it belongs to: none for an explicit country,
@@ -355,7 +356,10 @@ final readonly class ShippingFacade
             return [null, null, $cartAddress?->getState(), $cartAddress?->getZipcode()];
         }
 
-        return [$address, $address->getCountry(), $address->getState(), $cartAddress->getZipcode()];
+        // The country, the state and the postal code of the copy, the place the order leaves
+        // for and the one CartGuard judges: the customer address may have moved since it was
+        // chosen. The customer address is still the one handed to the modules.
+        return [$address, $cartAddress->getCountry(), $cartAddress->getState(), $cartAddress->getZipcode()];
     }
 
     /**
