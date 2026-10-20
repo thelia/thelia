@@ -23,6 +23,7 @@ use Thelia\Domain\Catalog\Product\Exception\NotAnActiveDeliveryModuleException;
 use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
 use Thelia\Domain\Shipping\Service\PostageHandler;
@@ -31,8 +32,10 @@ use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
+use Thelia\Model\Lang;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
@@ -65,6 +68,9 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
             $this->dispatcher()->removeListener($eventName, $listener);
         }
         $this->registeredListeners = [];
+
+        // ConfigQuery keeps what it reads in a static cache that outlives the rollback.
+        ConfigQuery::resetCache();
 
         parent::tearDown();
     }
@@ -239,6 +245,45 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
         }
 
         self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId());
+    }
+
+    public function testAProductUntranslatedInTheLanguageOfTheBuyerIsNamedInTheDefaultLanguage(): void
+    {
+        ConfigQuery::write('default_lang_without_translation', (string) Lang::REPLACE_BY_DEFAULT_LANGUAGE);
+        ConfigQuery::resetCache();
+        [$product, $otherLocale] = $this->productTitledInTheDefaultLanguageOnly('Garden furnace');
+
+        $titles = $this->getService(CartShippingRules::class)->titlesOf([$product->getId()], $otherLocale);
+
+        self::assertSame([$product->getId() => 'Garden furnace'], $titles);
+    }
+
+    public function testAProductUntranslatedInTheLanguageOfTheBuyerIsNamedByItsReferenceWhenTheShopDoesNotFallBack(): void
+    {
+        ConfigQuery::write('default_lang_without_translation', (string) Lang::STRICTLY_USE_REQUESTED_LANGUAGE);
+        ConfigQuery::resetCache();
+        [$product, $otherLocale] = $this->productTitledInTheDefaultLanguageOnly('Garden furnace');
+
+        $titles = $this->getService(CartShippingRules::class)->titlesOf([$product->getId()], $otherLocale);
+
+        self::assertSame([$product->getId() => $product->getRef()], $titles);
+    }
+
+    /**
+     * @return array{0: Product, 1: string} the product, and a language it has no title in
+     */
+    private function productTitledInTheDefaultLanguageOnly(string $title): array
+    {
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+        $otherLocale = 'fr_FR' === $defaultLocale ? 'en_US' : 'fr_FR';
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['title' => $title, 'locale' => $defaultLocale],
+        );
+
+        return [$product, $otherLocale];
     }
 
     private function carrier(): Module
