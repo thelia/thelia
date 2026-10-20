@@ -417,6 +417,61 @@ final class CheckoutProgressionTest extends IntegrationTestCase
     }
 
     /**
+     * The placement checks the steps in the order the buyer walks them: a module step
+     * sharing the place of the delivery is checked after it, as it is served after it,
+     * though its code sorts first.
+     */
+    public function testAModuleStepSharingThePlaceOfTheDeliveryIsCheckedAtPlacementWhereItIsServed(): void
+    {
+        $checked = new \ArrayObject();
+        $recording = static fn (string $code, int $position): CheckoutStepProviderInterface => new class($code, $position, $checked) implements CheckoutStepProviderInterface {
+            public function __construct(private string $code, private int $position, private \ArrayObject $checked)
+            {
+            }
+
+            public function code(): string
+            {
+                return $this->code;
+            }
+
+            public function defaultPosition(): int
+            {
+                return $this->position;
+            }
+
+            public function isMandatory(): bool
+            {
+                return false;
+            }
+
+            public function isSkippedFor(Cart $cart): bool
+            {
+                return false;
+            }
+
+            public function check(Cart $cart): void
+            {
+                $this->checked[] = $this->code;
+            }
+
+            public function componentName(): ?string
+            {
+                return null;
+            }
+        };
+
+        $deliveryPosition = $this->getService(DeliveryStepProvider::class)->defaultPosition();
+        $providers = [
+            $recording('a_fixture_module_step', $deliveryPosition),
+            $recording('delivery', $deliveryPosition),
+        ];
+
+        (new CheckoutValidationService($providers, new CheckoutTunnelShape()))->validateForOrder($this->cartWithAnItem());
+
+        self::assertSame(['delivery', 'a_fixture_module_step'], $checked->getArrayCopy());
+    }
+
+    /**
      * A row created by an earlier version on the place of the delivery, as the 3.1 series
      * did for a module asking for 2 or 3: the delivery is still served first, whatever
      * the code of the module step.

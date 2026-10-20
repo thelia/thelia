@@ -89,6 +89,43 @@ final readonly class CheckoutTunnelShape
     }
 
     /**
+     * Where a step stands when it is sorted: its position, then who goes first when steps
+     * share it, then its code so that the order never depends on how the steps were read.
+     *
+     * Sharing a position, the cart, which opens the tunnel, goes first, then the steps the
+     * core ships, then the ones a module adds, then the payment and the confirmation,
+     * which close it.
+     *
+     * @return array{int, int, string}
+     */
+    public function slot(string $code, int $position): array
+    {
+        return [$position, $this->tieRank($code), $code];
+    }
+
+    /**
+     * The order of two steps in the tunnel, for usort(): the one rule behind the order the
+     * buyer walks the steps in and the order the placement checks them in.
+     */
+    public function compare(string $leftCode, int $leftPosition, string $rightCode, int $rightPosition): int
+    {
+        return $this->slot($leftCode, $leftPosition) <=> $this->slot($rightCode, $rightPosition);
+    }
+
+    private function tieRank(string $code): int
+    {
+        if (CheckoutStep::CODE_CART === $code) {
+            return -1;
+        }
+
+        if (\in_array($code, CheckoutStep::REQUIRED_CODES, true)) {
+            return 2;
+        }
+
+        return CheckoutStep::CODE_DELIVERY === $code ? 0 : 1;
+    }
+
+    /**
      * Between which positions a step of that code may be created, given where the cart
      * and the payment stand today.
      *

@@ -22,6 +22,7 @@ use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
+use Thelia\Domain\Checkout\Service\CheckoutTunnelShape;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Checkout\Service\Step\CartStepProvider;
@@ -194,7 +195,7 @@ final class CheckoutPlacementGuardsTest extends IntegrationTestCase
      */
     private function validationWith(array $providers): CheckoutValidationService
     {
-        return new CheckoutValidationService($providers);
+        return new CheckoutValidationService($providers, new CheckoutTunnelShape());
     }
 
     /**
