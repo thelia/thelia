@@ -29,6 +29,8 @@ use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
 use Thelia\Domain\Payment\Service\AuthorizedOrderCancellationGuard;
+use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -55,6 +57,11 @@ final readonly class OrderProcessor implements ProcessorInterface
         }
 
         $order = OrderQuery::create()->findPk((int) $uriVariables['id']);
+
+        if (null !== $order) {
+            $this->assertPaymentNamesUntouched($order, $data);
+        }
+
         $requestedStatusId = $this->requestedStatusId($data);
 
         if (null === $order || null === $requestedStatusId || $requestedStatusId === $order->getStatusId()) {
@@ -94,6 +101,29 @@ final readonly class OrderProcessor implements ProcessorInterface
             propelModel: $event->getOrder(),
             context: $operation->getNormalizationContext() ?? [],
         );
+    }
+
+    /**
+     * Once money moved on the order, its payment journal names the provider reference and
+     * the module of each movement: a refund or a release goes to the reference of the order,
+     * through its module. Changing either by hand would send them to another order's
+     * transaction, so they are refused; an order with no journal line takes them as before.
+     */
+    private function assertPaymentNamesUntouched(Order $order, OrderResource $data): void
+    {
+        $referenceChanged = $data->getTransactionRef() !== $order->getTransactionRef();
+        $moduleChanged = (new \ReflectionProperty($data, 'paymentModule'))->isInitialized($data)
+            && $data->getPaymentModule()?->getId() !== $order->getPaymentModuleId();
+
+        if (!$referenceChanged && !$moduleChanged) {
+            return;
+        }
+
+        if (!OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->exists()) {
+            return;
+        }
+
+        throw new UnprocessableEntityHttpException(\sprintf('Order %s has a payment journal: its transaction reference and payment module are no longer changed by hand.', (string) $order->getRef()));
     }
 
     private function requestedStatusId(OrderResource $data): ?int
