@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelInterface;
 use Thelia\Model\BrandImage;
 use Thelia\Model\CategoryImage;
+use Thelia\Model\CategoryQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
@@ -77,6 +78,49 @@ final class DeletedItemMediaTest extends ActionIntegrationTestCase
         $this->dispatch(new CategoryDeleteEvent($category->getId()), TheliaEvents::CATEGORY_DELETE);
 
         self::assertFileDoesNotExist($imageFile);
+    }
+
+    public function testDeletingACategoryDeletesTheFilesOfItsSubcategoryImages(): void
+    {
+        $category = $this->factory->category();
+        $subcategory = $this->factory->category(['parent' => $category->getId()]);
+
+        $image = $this->attach(new CategoryImage(), $category->getId(), 'Category', 'deleted-category.png', $this->createTestPng(), 'image/png');
+        $imageFile = $image->getUploadDir().DS.$image->getOwnFile();
+        $subcategoryImage = $this->attach(new CategoryImage(), $subcategory->getId(), 'Category', 'deleted-subcategory.png', $this->createTestPng(), 'image/png');
+        $subcategoryImageFile = $subcategoryImage->getUploadDir().DS.$subcategoryImage->getOwnFile();
+
+        $this->dispatch(new CategoryDeleteEvent($category->getId()), TheliaEvents::CATEGORY_DELETE);
+
+        self::assertNull(CategoryQuery::create()->findPk($subcategory->getId()));
+        self::assertFileDoesNotExist($imageFile);
+        self::assertFileDoesNotExist($subcategoryImageFile);
+    }
+
+    public function testACategoryDeletionRolledBackKeepsTheFilesOfItsProducts(): void
+    {
+        $category = $this->factory->category();
+        $product = $this->factory->product($category, $this->factory->taxRule(), $this->factory->currency());
+
+        $image = $this->attach(new ProductImage(), $product->getId(), 'Product', 'kept-product.png', $this->createTestPng(), 'image/png');
+        $imageFile = $image->getUploadDir().DS.$image->getOwnFile();
+
+        // Fails the category deletion once its products are deleted.
+        $failure = static function (): never {
+            throw new \RuntimeException('Category deletion aborted.');
+        };
+        $this->dispatcher->addListener(TheliaEvents::PRODUCT_DELETE, $failure, -128);
+
+        try {
+            $this->dispatch(new CategoryDeleteEvent($category->getId()), TheliaEvents::CATEGORY_DELETE);
+            self::fail('The category deletion was expected to fail.');
+        } catch (\RuntimeException $exception) {
+            self::assertSame('Category deletion aborted.', $exception->getMessage());
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::PRODUCT_DELETE, $failure);
+        }
+
+        self::assertFileExists($imageFile);
     }
 
     public function testDeletingABrandDeletesTheFilesOfItsImages(): void

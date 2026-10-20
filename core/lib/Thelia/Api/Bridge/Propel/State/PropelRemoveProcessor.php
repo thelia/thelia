@@ -23,6 +23,7 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Domain\Media\DeletedItemMedia;
+use Thelia\Domain\Media\PendingMediaDeletions;
 
 readonly class PropelRemoveProcessor implements ProcessorInterface
 {
@@ -36,6 +37,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
     {
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();
+        PendingMediaDeletions::begin();
 
         try {
             $propelModel = $data->getPropelModel();
@@ -50,7 +52,7 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
             }
 
             // Read while the media rows still exist, deleted once the item is gone.
-            $media = DeletedItemMedia::of($propelModel);
+            PendingMediaDeletions::add(DeletedItemMedia::of($propelModel));
 
             $propelModel->delete();
 
@@ -61,13 +63,12 @@ readonly class PropelRemoveProcessor implements ProcessorInterface
             $connection->commit();
         } catch (\Throwable $exception) {
             $connection->rollBack();
+            PendingMediaDeletions::rollBack();
 
             throw $exception;
         }
 
-        if (null !== $this->eventDispatcher) {
-            $media->delete($this->eventDispatcher);
-        }
+        PendingMediaDeletions::commit($this->eventDispatcher);
 
         $this->eventDispatcher?->dispatch(new ResourcePersistedEvent($data::class, $propelModel, ResourcePersistedEvent::OPERATION_DELETE));
     }

@@ -27,6 +27,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Domain\Media\DeletedItemMedia;
+use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Folder as FolderModel;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\FolderTableMap;
@@ -68,9 +69,10 @@ class Folder extends BaseAction implements EventSubscriberInterface
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $con = Propel::getWriteConnection(FolderTableMap::DATABASE_NAME);
             $con->beginTransaction();
+            PendingMediaDeletions::begin();
 
             try {
-                $media = DeletedItemMedia::of($folder);
+                PendingMediaDeletions::add(DeletedItemMedia::of($folder));
 
                 $folder
                     ->delete($con);
@@ -80,11 +82,12 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 $con->commit();
             } catch (\Throwable $e) {
                 $con->rollback();
+                PendingMediaDeletions::rollBack();
 
                 throw $e;
             }
 
-            $media->delete($dispatcher);
+            PendingMediaDeletions::commit($dispatcher);
         }
     }
 

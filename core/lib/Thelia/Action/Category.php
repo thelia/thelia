@@ -29,6 +29,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Domain\Media\DeletedItemMedia;
+use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery;
@@ -99,9 +100,10 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
         $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
         $con->beginTransaction();
+        PendingMediaDeletions::begin();
 
         try {
-            $media = DeletedItemMedia::of($category);
+            PendingMediaDeletions::add(DeletedItemMedia::of($category));
 
             $category
                 ->delete($con);
@@ -111,11 +113,12 @@ class Category extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $e) {
             $con->rollback();
+            PendingMediaDeletions::rollBack();
 
             throw $e;
         }
 
-        $media->delete($dispatcher);
+        PendingMediaDeletions::commit($dispatcher);
     }
 
     /**

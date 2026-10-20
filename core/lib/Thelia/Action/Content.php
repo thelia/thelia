@@ -30,6 +30,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Domain\Media\DeletedItemMedia;
+use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Content as ContentModel;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
@@ -131,11 +132,12 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
         $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
         $con->beginTransaction();
+        PendingMediaDeletions::begin();
 
         try {
             $defaultFolderId = $content->getDefaultFolderId();
 
-            $media = DeletedItemMedia::of($content);
+            PendingMediaDeletions::add(DeletedItemMedia::of($content));
 
             $content
                 ->delete($con);
@@ -146,11 +148,12 @@ class Content extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $e) {
             $con->rollback();
+            PendingMediaDeletions::rollBack();
 
             throw $e;
         }
 
-        $media->delete($dispatcher);
+        PendingMediaDeletions::commit($dispatcher);
     }
 
     /**

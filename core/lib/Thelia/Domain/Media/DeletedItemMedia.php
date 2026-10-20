@@ -24,6 +24,7 @@ use Thelia\Model\BrandImageQuery;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\CategoryImageQuery;
+use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentImageQuery;
@@ -44,10 +45,7 @@ use Thelia\Model\ProductVideoQuery;
  * knows its files and they stay on disk, with their published copies. So the media
  * are read before the item is deleted, and their files are deleted once that
  * deletion is committed, never before: a deletion rolled back keeps them.
- *
- *     $media = DeletedItemMedia::of($product);
- *     // delete the product, commit
- *     $media->delete($dispatcher);
+ * PendingMediaDeletions holds them until the outermost deletion is committed.
  */
 final readonly class DeletedItemMedia
 {
@@ -70,9 +68,10 @@ final readonly class DeletedItemMedia
                 ProductDocumentQuery::create()->findByProductId($item->getId()),
                 ProductVideoQuery::create()->findByProductId($item->getId()),
             ],
+            // A category takes its whole subtree with it.
             $item instanceof Category => [
-                CategoryImageQuery::create()->findByCategoryId($item->getId()),
-                CategoryDocumentQuery::create()->findByCategoryId($item->getId()),
+                CategoryImageQuery::create()->filterByCategoryId(self::categoryTreeIds($item))->find(),
+                CategoryDocumentQuery::create()->filterByCategoryId(self::categoryTreeIds($item))->find(),
                 [],
             ],
             $item instanceof Content => [
@@ -112,8 +111,19 @@ final readonly class DeletedItemMedia
     }
 
     /**
+     * @return list<int> the category and every category under it
+     */
+    private static function categoryTreeIds(Category $category): array
+    {
+        return [
+            $category->getId(),
+            ...array_map(static fn (Category $child): int => $child->getId(), CategoryQuery::findAllChild($category->getId())),
+        ];
+    }
+
+    /**
      * Deletes the files of the media, their published copies included, through the
-     * events that delete a single medium. Call it once the item deletion is committed.
+     * events that delete a single medium.
      */
     public function delete(EventDispatcherInterface $dispatcher): void
     {
