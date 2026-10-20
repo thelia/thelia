@@ -342,6 +342,18 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         self::assertSame('Absinthe (Placed first)', $lines[0]->label());
     }
 
+    public function testARefusedDestinationIsToldBeforeTheMissingCarrier(): void
+    {
+        $product = $this->product('Brandy');
+        $this->group('brandy', DestinationRestriction::MODE_DENY, [$this->refused], [$product]);
+        $cart = $this->cartOf(null, [$product]);
+        // No carrier chosen yet: the product is still what keeps the order from this address.
+        $cart->setAddressDeliveryId($this->factory->cartAddress(null, $this->refused)->getId())->save();
+
+        $this->expectException(DestinationRestrictedException::class);
+        $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
     private function checker(): DestinationRestrictionChecker
     {
         return $this->getService(DestinationRestrictionChecker::class);

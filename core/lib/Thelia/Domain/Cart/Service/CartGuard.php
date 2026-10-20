@@ -130,6 +130,10 @@ class CartGuard
     {
         $this->checkDeliveryAddress($cart);
 
+        // Before anything about the carrier: no carrier may take a product its destination
+        // refuses, and the buyer has to be told which product is in the way.
+        $this->refuseARestrictedDestination($cart);
+
         if (!$cart?->getDeliveryModuleId()) {
             $this->refuseProductsNoCarrierTakes($cart);
 
@@ -155,21 +159,6 @@ class CartGuard
             throw new MissingAddressException('Delivery address has no country');
         }
 
-        // The one refusal that holds whatever path placed the order, theme or API: the earlier
-        // ones, at the cart and at the address, only save the buyer some time. A download is
-        // judged on the invoice address of the cart, never on the default address of the
-        // customer: without an invoice address the payment step refuses the order anyway.
-        $restrictedLines = $this->destinationRestrictionChecker?->violationsFor(
-            $cart,
-            Destination::of($address),
-            CartDestinations::billing($cart),
-            $this->locale(),
-        ) ?? [];
-
-        if ([] !== $restrictedLines) {
-            throw new DestinationRestrictedException($restrictedLines);
-        }
-
         // Named before the generic refusal: the buyer has to know which product is in the way.
         $this->refuseACarrierTheProductsExclude($cart, (int) $module->getId());
 
@@ -186,6 +175,38 @@ class CartGuard
         // Last, once the carrier itself is settled: the day only means something for a
         // carrier that will ship this cart to this address.
         $this->deliveryDateGuard->check($cart, $module);
+    }
+
+    /**
+     * The one refusal that holds whatever path placed the order, theme or API: the earlier
+     * ones, at the cart and at the address, only save the buyer some time. A download is
+     * judged on the invoice address of the cart, never on the default address of the
+     * customer: without an invoice address the payment step refuses the order anyway.
+     *
+     * @throws DestinationRestrictedException
+     */
+    private function refuseARestrictedDestination(Cart $cart): void
+    {
+        if (null === $this->destinationRestrictionChecker || !$this->destinationRestrictionChecker->hasActiveGroup()) {
+            return;
+        }
+
+        $address = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId());
+
+        if (null === $address) {
+            return;
+        }
+
+        $restrictedLines = $this->destinationRestrictionChecker->violationsFor(
+            $cart,
+            Destination::of($address),
+            CartDestinations::billing($cart),
+            $this->locale(),
+        );
+
+        if ([] !== $restrictedLines) {
+            throw new DestinationRestrictedException($restrictedLines);
+        }
     }
 
     /**
