@@ -174,7 +174,7 @@ class Message extends BaseMessage
         );
 
         try {
-            $subject = $parser->renderString(LegacyMessagePlaceholders::interpolate($this->getSubjectWithFallback()));
+            $subject = $this->getSubjectLine($parser);
             $htmlMessage = $this->getHtmlMessageBody($parser);
             $textMessage = $this->getTextMessageBody($parser);
 
@@ -194,5 +194,31 @@ class Message extends BaseMessage
         }
 
         return $messageInstance;
+    }
+
+    /**
+     * The rendered subject, as the plain text single line a mail header carries.
+     *
+     * The parser renders the subject the way it renders an HTML body, and Twig escapes it for
+     * HTML: an `&` in the shop name or in a variable reached the inbox as `&amp;`. The escaping
+     * is undone on the rendered line rather than turned off inside the template, because the
+     * parser is picked per message and need not be Twig: a Twig `autoescape` tag wrapped around
+     * the source would break any other engine. An entity a merchant typed in a subject means
+     * nothing in a header either, so it reads as the character it stands for.
+     *
+     * Symfony Mime already keeps a line break from opening a new header, by encoding it, but
+     * the break would still reach the mail client and any transport that reads getSubject()
+     * as is: line breaks, from the wording or from a variable a visitor filled in, are folded
+     * into a single space.
+     */
+    protected function getSubjectLine(ParserInterface $parser): string
+    {
+        $subject = html_entity_decode(
+            $parser->renderString(LegacyMessagePlaceholders::interpolate($this->getSubjectWithFallback())),
+            \ENT_QUOTES | \ENT_HTML5,
+            'UTF-8',
+        );
+
+        return trim(preg_replace('/\s*[\r\n]\s*/', ' ', $subject) ?? $subject);
     }
 }
