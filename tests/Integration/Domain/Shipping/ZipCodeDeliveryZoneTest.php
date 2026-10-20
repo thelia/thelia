@@ -30,6 +30,7 @@ use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
 use Thelia\Domain\Shipping\ShippingFacade;
+use Thelia\Model\Address;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaZipCodeRule;
@@ -247,6 +248,26 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * The customer address moved abroad after it was chosen: the cart's copy, which the order
+     * leaves for and the guard judges, still decides the country, the state and the postal code.
+     */
+    public function testTheListJudgesTheCartCopyOfACustomerAddressThatMovedSince(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $address = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($address);
+        $abroad = $this->newCountry('XS', 'XSX', '992');
+        $address->setCountryId($abroad->getId())->setZipcode('20090')->save($this->getPropelConnection());
+
+        self::assertContains($this->module->getId(), $this->offeredModuleIds($cart), 'The list reads the copy, as the guard does.');
+
+        $cart->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+        $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -340,6 +361,20 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $address = $this->factory->cartAddress(null, $this->country, null, ['zipcode' => $zipCode]);
         $cart = $this->factory->cart();
         $cart->setAddressDeliveryId($address->getId())->save($this->getPropelConnection());
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());
+        $this->factory->cartItem($cart, $product);
+
+        return $cart;
+    }
+
+    /**
+     * The cart of a signed-in customer, delivered to its copy of one of their addresses.
+     */
+    private function customerCartShippedTo(Address $address): Cart
+    {
+        $copy = $this->factory->cartAddress($address, $address->getCountry());
+        $cart = $this->factory->cart($address->getCustomer());
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
         $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());
         $this->factory->cartItem($cart, $product);
 
