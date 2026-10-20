@@ -23,9 +23,10 @@ use Thelia\Model\OrderPaymentTransaction;
  *
  * The code the provider answered, when the module has one, goes with the message:
  * build the refusal with withProviderCode(). A refusal without a code is written
- * without one; the line already reads as failed.
+ * without one; the line already reads as failed. The integer code of the exception
+ * (`new PaymentRefusedException($message, 51)`) is not read: it is no provider code.
  */
-class PaymentRefusedException extends PaymentException
+final class PaymentRefusedException extends PaymentException
 {
     public const PROVIDER_CODE_MAX_LENGTH = OrderPaymentTransaction::ERROR_CODE_MAX_LENGTH;
 
