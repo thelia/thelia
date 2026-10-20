@@ -16,6 +16,7 @@ namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 
 /**
  * The one number a wallet's sheet shows and the shop accepts.
@@ -27,22 +28,38 @@ use Thelia\Model\Cart;
 final readonly class ExpressCheckoutTotal
 {
     /**
-     * The grand total of the order this cart becomes: the goods taxed for the delivery
-     * address the checkout chose, the postage of the chosen carrier (untaxed for a
-     * tax-exempt cart) and the gift wrapping. Null until a carrier and a delivery address
-     * are on the cart.
+     * The grand total of the order this cart becomes: the goods taxed for the address the
+     * cart is taxed for, the postage of the chosen carrier (untaxed for a tax-exempt cart)
+     * and the gift wrapping. Null until a carrier and that address are on the cart.
      *
      * @throws PropelException
      */
     public function of(Cart $cart): ?float
     {
-        $destination = $cart->getCartAddressRelatedByAddressDeliveryId();
-        $country = $destination?->getCountry();
+        $taxedFor = $this->addressTheCartIsTaxedFor($cart);
+        $country = $taxedFor?->getCountry();
 
         if (null === $cart->getDeliveryModuleId() || null === $country) {
             return null;
         }
 
-        return round($cart->getTaxedAmount($country, true, $destination->getState(), true, true), 2);
+        return round($cart->getTaxedAmount($country, true, $taxedFor->getState(), true, true), 2);
+    }
+
+    /**
+     * The delivery address the checkout chose. A cart with nothing to ship is never asked
+     * for one, and its buyer is taxed where they are invoiced.
+     *
+     * @throws PropelException
+     */
+    public function addressTheCartIsTaxedFor(Cart $cart): ?CartAddress
+    {
+        $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+        if (null !== $delivery || !$cart->isVirtual()) {
+            return $delivery;
+        }
+
+        return $cart->getCartAddressRelatedByAddressInvoiceId();
     }
 }

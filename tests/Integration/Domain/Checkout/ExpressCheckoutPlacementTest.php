@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Checkout;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
@@ -29,6 +32,7 @@ use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\IntegrationTestCase;
@@ -48,6 +52,9 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
 
     private ?\Thelia\Model\Customer $owner = null;
 
+    /** @var list<array{string, callable}> */
+    private array $registeredListeners = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,6 +65,11 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
 
     protected function tearDown(): void
     {
+        foreach ($this->registeredListeners as [$eventName, $listener]) {
+            $this->getService(EventDispatcherInterface::class)->removeListener($eventName, $listener);
+        }
+        $this->registeredListeners = [];
+
         ConfigQuery::write('guest_checkout_mode', (string) $this->previousGuestMode);
 
         parent::tearDown();
@@ -149,6 +161,60 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
         $this->expectExceptionMessageMatches('/belongs to nobody/');
 
         $this->service()->place($this->requestFor($cart, $country));
+    }
+
+    /**
+     * A cart with nothing to ship is never asked for a delivery address. The wallet pays it
+     * with the invoice address alone, and the order is delivered there, on a copy of its own.
+     */
+    public function testACartWithNothingToShipIsPaidWithItsInvoiceAddressAlone(): void
+    {
+        [$cart, $country] = $this->aCartReadyForAWallet();
+
+        foreach ($cart->getCartItems() as $item) {
+            $saleElements = $item->getProductSaleElements();
+            $saleElements->setWeight(0)->save($this->getPropelConnection());
+            $saleElements->getProduct()->setVirtual(1)->save($this->getPropelConnection());
+        }
+        $cart->clearCartItems();
+
+        $invoice = $this->createFixtureFactory()->cartAddress(null, $country, null, ['city' => 'Lyon']);
+        $virtualCarrier = ModuleQuery::create()->findOneByCode('VirtualProductDelivery');
+        self::assertNotNull($virtualCarrier);
+        $cart->setAddressInvoiceId($invoice->getId())
+            ->setDeliveryModuleId($virtualCarrier->getId())
+            ->save($this->getPropelConnection());
+        self::assertTrue($cart->isVirtual(), 'This test is only meaningful on a cart with nothing to ship.');
+        $this->answerTheCarrierQuoteWithoutASession();
+
+        $wallet = ModuleQuery::create()->findOneByCode(ExpressPaymentTestModule::MODULE_CODE);
+        $result = $this->service()->place(new ExpressCheckoutRequest(
+            $cart,
+            (int) $wallet?->getId(),
+            round($cart->getTaxedAmount($country), 2),
+            $this->consentsAcceptedInTheSheet(),
+        ));
+
+        $order = OrderQuery::create()->findPk($result->orderId);
+        self::assertNotNull($order);
+        self::assertSame('Lyon', OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getCity());
+        self::assertNotSame($cart->getAddressInvoiceId(), $cart->getAddressDeliveryId(), 'The invoice address is not shared with the delivery.');
+    }
+
+    /**
+     * The carrier of a cart with nothing to ship reads the cart of the session, and a
+     * placement run here has none: its quote is answered the way it would be in a browser.
+     */
+    private function answerTheCarrierQuoteWithoutASession(): void
+    {
+        $listener = static function (DeliveryPostageEvent $event): void {
+            $event->setValidModule(true);
+            $event->setPostage(new OrderPostage(0.0, 0.0, 'VAT'));
+            $event->stopPropagation();
+        };
+
+        $this->getService(EventDispatcherInterface::class)->addListener(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener, 512);
+        $this->registeredListeners[] = [TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener];
     }
 
     /**
