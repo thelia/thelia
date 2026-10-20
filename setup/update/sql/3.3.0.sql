@@ -1187,4 +1187,27 @@ INNER JOIN (
     AND `wording`.`old_title` = `country_i18n`.`title`
 SET `country_i18n`.`title` = `wording`.`title`;
 
+-- ---------------------------------------------------------------------
+-- Discount of a public sale switched to a reserved audience
+-- ---------------------------------------------------------------------
+-- Until this release, a sale that ran publicly and was then reserved for named
+-- customers set `promo` back to 0 on its products but left the discounted
+-- `promo_price`, which the front API and the loops serve to every visitor. The
+-- products of a reserved sale that no public promotion flags get their promo
+-- price back to the catalog price, the value of a product nothing discounts.
+-- The statement only matches a row still holding another value, so the
+-- script can be replayed.
+
+UPDATE `product_price` `pp`
+INNER JOIN `product_sale_elements` `pse` ON `pse`.`id` = `pp`.`product_sale_elements_id`
+SET `pp`.`promo_price` = `pp`.`price`
+WHERE `pse`.`promo` = 0
+  AND `pp`.`promo_price` <> `pp`.`price`
+  AND `pse`.`product_id` IN (
+      SELECT `sp`.`product_id`
+      FROM `sale_product` `sp`
+      INNER JOIN `sale` `s` ON `s`.`id` = `sp`.`sale_id`
+      WHERE `s`.`audience_mode` <> 0
+  );
+
 SET FOREIGN_KEY_CHECKS = 1;
