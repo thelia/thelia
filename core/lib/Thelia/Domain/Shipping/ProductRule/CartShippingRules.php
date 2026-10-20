@@ -44,7 +44,7 @@ final class CartShippingRules implements ResetInterface, EventSubscriberInterfac
         $lines = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
-            $lines[] = [(int) $cartItem->getId(), (int) $cartItem->getProductId(), (int) $cartItem->getQuantity()];
+            $lines[] = [(int) $cartItem->getId(), (int) $cartItem->getProductId(), (float) $cartItem->getQuantity()];
         }
 
         if ([] === $lines) {
@@ -135,7 +135,7 @@ final class CartShippingRules implements ResetInterface, EventSubscriberInterfac
     }
 
     /**
-     * @param list<array{int, int, int}> $lines cart item id, product id, quantity
+     * @param list<array{int, int, float}> $lines cart item id, product id, quantity
      */
     private function read(array $lines): CartShippingRuleSet
     {
