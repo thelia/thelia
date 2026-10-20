@@ -109,6 +109,7 @@
 - `POST /api/front/carts` creates the cart of the customer whose token the request carries, in the currency being browsed (the default currency of the shop without a session). Both were left NULL. A guest token still creates a cart that belongs to nobody, its scope being the one cart it was issued for.
 - Signing in through the API no longer triggers the Symfony 7.3 deprecation of `eraseCredentials()` on `Customer` and `Admin`: the core sets `security.erase_credentials` to false unless the project sets it, the API firewalls being stateless and the session login erasing the password itself. `SessionUserAuthorizationChecker::isGranted()` takes the `?AccessDecision $accessDecision` argument of the Symfony interface and passes it on.
 - The prod container of a checkout of this repository builds with the TheliaCMS module active. The page builder bundle the module depends on was registered for the dev and test environments only; it is now registered in every environment whenever it is installed, and still left out of an install without the development packages.
+- A new cart line beyond the stock is refused with `NotEnoughStockException` wherever it comes from (`CART_ADDITEM`, `CartFacade::addItem()`, a module), unless the shop does not check the stock or the product is virtual. Only the `thelia_cart_add` form checked it, so a line added another way could hold a sale element out of stock.
 
 ## Checkout and payment
 

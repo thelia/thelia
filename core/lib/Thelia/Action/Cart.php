@@ -300,11 +300,15 @@ class Cart extends BaseAction implements EventSubscriberInterface
         // national counter may well cover a quantity the unit itself cannot sell.
         $saleUnitQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
 
-        if (null !== $saleUnitQuantity) {
-            $this->assertSaleUnitStock(
+        // A new line is checked here, whoever adds it (the cart form, the API, a
+        // module through CartFacade): nothing else stands between it and the cart.
+        // An addition to a line on the national counter keeps the cap of
+        // CartItem::addQuantity().
+        if (null !== $saleUnitQuantity || !$appends) {
+            $this->assertStock(
                 $productSaleElements,
                 ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity,
-                $saleUnitQuantity,
+                $saleUnitQuantity ?? (float) $productSaleElements->getQuantity(),
             );
         }
 
@@ -625,12 +629,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * A line of a sale unit that keeps its own stock is refused beyond that stock, the
-     * way the checkout would refuse it, rather than accepted on the national counter.
+     * A line is refused beyond the stock it sells from (the sale unit's own stock when
+     * it keeps one, the national counter otherwise), unless the shop does not check
+     * the stock or the product is virtual: the rule of the CartAdd form.
      *
      * @throws NotEnoughStockException
      */
-    private function assertSaleUnitStock(ProductSaleElements $productSaleElements, float $requestedQuantity, float $saleUnitQuantity): void
+    private function assertStock(ProductSaleElements $productSaleElements, float $requestedQuantity, float $availableQuantity): void
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return;
@@ -638,7 +643,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $product = $productSaleElements->getProduct();
 
-        if (0 !== (int) $product->getVirtual() || $requestedQuantity <= $saleUnitQuantity) {
+        if (0 !== (int) $product->getVirtual() || $requestedQuantity <= $availableQuantity) {
             return;
         }
 
