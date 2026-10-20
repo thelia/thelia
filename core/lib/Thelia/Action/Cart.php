@@ -307,7 +307,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null !== $saleUnitQuantity || !$appends) {
             $this->assertStock(
                 $productSaleElements,
-                ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity,
+                ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity
+                    + $this->quantityInOtherLines($cart, $productSaleElements, $appends ? $cartItem : null),
                 $saleUnitQuantity ?? (float) $productSaleElements->getQuantity(),
             );
         }
@@ -626,6 +627,29 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->save();
 
         return $cartItem;
+    }
+
+    /**
+     * The units of a sale element the cart already holds in lines other than the one
+     * being extended: they draw on the same stock as the line being checked.
+     */
+    private function quantityInOtherLines(CartModel $cart, ProductSaleElements $productSaleElements, ?CartItem $extendedLine): float
+    {
+        $lines = CartItemQuery::create()
+            ->filterByCartId($cart->getId())
+            ->filterByProductSaleElementsId($productSaleElements->getId());
+
+        if (null !== $extendedLine) {
+            $lines->filterById($extendedLine->getId(), Criteria::NOT_EQUAL);
+        }
+
+        $quantity = 0.0;
+
+        foreach ($lines->find() as $line) {
+            $quantity += (float) $line->getQuantity();
+        }
+
+        return $quantity;
     }
 
     /**

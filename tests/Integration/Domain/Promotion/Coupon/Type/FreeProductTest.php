@@ -265,6 +265,31 @@ final class FreeProductTest extends ActionIntegrationPromotionTestCase
         self::assertSame(0.0, (float) $cart->getDiscount());
     }
 
+    /**
+     * "X bought, X offered" on a product whose stock the customer's own lines use up
+     * (the marker of the gift line points to a line that no longer exists, so the
+     * gift is added as a new line): it would take the sale element beyond its stock,
+     * so it is not offered.
+     */
+    public function testAGiftTheExistingLinesLeaveNoStockForIsNotAddedAndTheTriggerStillIs(): void
+    {
+        $trigger = $this->product(['baseQuantity' => 5]);
+        $coupon = $this->freeProduct('GIFT', [$trigger->getId()], $trigger);
+        $cart = $this->newEmptyCart();
+
+        $this->addItem($cart, $trigger, 5);
+        $this->getService('thelia.facade')->getRequest()->getSession()->set(
+            'coupon.free_product.cart_items.GIFT',
+            [$trigger->getId() => 0],
+        );
+
+        self::assertSame(0.0, $coupon->exec());
+
+        $lines = $this->linesOf($cart);
+        self::assertCount(1, $lines, 'The gift is not added.');
+        self::assertSame(5.0, (float) $lines[0]->getQuantity(), 'The customer line is kept.');
+    }
+
     private function refusingTheNextCartAddition(callable $action): void
     {
         $listener = static function (): void {

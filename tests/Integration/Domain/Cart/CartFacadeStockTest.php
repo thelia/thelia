@@ -94,13 +94,35 @@ final class CartFacadeStockTest extends ActionIntegrationTestCase
         self::assertSame(1, $this->lineCount());
     }
 
-    private function add(int $quantity): void
+    public function testASecondLineOfTheSameSaleElementCountsTheUnitsOfTheFirst(): void
+    {
+        $this->add(2);
+
+        try {
+            $this->add(1, append: false);
+            self::fail('A second line must not take the sale element beyond its stock.');
+        } catch (NotEnoughStockException) {
+        }
+
+        self::assertSame(1, $this->lineCount(), 'Only the first line is written.');
+    }
+
+    public function testASecondLineWithinTheRemainingStockIsAccepted(): void
+    {
+        $this->add(1);
+        $this->add(1, append: false);
+
+        self::assertSame(2, $this->lineCount());
+    }
+
+    private function add(int $quantity, bool $append = true): void
     {
         $this->getService(CartFacade::class)->addItem(new CartItemAddDTO(
             cart: $this->cart,
             productId: $this->product->getId(),
             productSaleElementId: $this->productSaleElements->getId(),
             quantity: $quantity,
+            append: $append,
         ));
     }
 
