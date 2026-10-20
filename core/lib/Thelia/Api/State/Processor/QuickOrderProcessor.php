@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Thelia\Api\Resource\QuickOrderInput;
 use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Api\Service\ReferenceQuantityRows;
+use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
@@ -75,6 +76,10 @@ final readonly class QuickOrderProcessor implements ProcessorInterface
             throw new TooManyRequestsHttpException(message: $exception->getMessage(), previous: $exception);
         } catch (QuickOrderCartNotFoundException $exception) {
             throw new NotFoundHttpException('No such cart.', $exception);
+        } catch (InvalidCartException $exception) {
+            // A line the cart refuses (a destination that does not take the product): the
+            // whole addition was rolled back, the buyer is told why, as the cart API does.
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 
         return new JsonResponse($table->toArray());
