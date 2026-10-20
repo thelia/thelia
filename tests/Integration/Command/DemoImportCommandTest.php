@@ -22,10 +22,13 @@ use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\ProductImageI18nQuery;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -95,6 +98,24 @@ final class DemoImportCommandTest extends IntegrationTestCase
         }
 
         self::assertGreaterThan(1, \count($dates), 'the newest-first and oldest-first sorts need distinct creation dates');
+    }
+
+    public function testDemoImagesCarryTheirFileInEveryActiveLanguage(): void
+    {
+        $this->runImport(withImages: true);
+
+        $image = ProductImageQuery::create()->findOne();
+        self::assertNotNull($image, 'the demo products have images');
+
+        $locales = LangQuery::create()->filterByActive(1)->find()->toKeyValue('Id', 'Locale');
+        self::assertNotSame([], $locales);
+
+        foreach ($locales as $locale) {
+            $translation = ProductImageI18nQuery::create()->filterById($image->getId())->filterByLocale($locale)->findOne();
+
+            self::assertNotNull($translation, 'a file row exists for '.$locale);
+            self::assertNotEmpty($translation->getFile(), 'the image has a file for '.$locale);
+        }
     }
 
     /**

@@ -61,7 +61,9 @@ final class BrandsImporter extends AbstractDemoImporter
             }
 
             $brandImage = new BrandImage();
-            $brandImage->setBrandId($brand->getId())->setFile($imageName)->save($context->connection);
+            $brandImage->setBrandId($brand->getId());
+            $this->setFileForEveryLocale($context, $brandImage, $imageName);
+            $brandImage->save($context->connection);
             $logoId ??= $brandImage->getId();
 
             $this->copyImage($context, $imageName, 'brand');

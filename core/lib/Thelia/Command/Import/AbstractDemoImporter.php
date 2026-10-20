@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Command\Import;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Model\LangQuery;
 
 abstract class AbstractDemoImporter implements DemoImporterInterface
 {
@@ -55,6 +56,29 @@ abstract class AbstractDemoImporter implements DemoImporterInterface
             }
         } finally {
             fclose($handle);
+        }
+    }
+
+    /**
+     * Sets the file of an image for every active language and the default one:
+     * a language without a file only falls back to the default language, so a
+     * file written for en_US alone leaves no image once another language is
+     * the default.
+     *
+     * @param object $image a model with translated files (ProductImage, CategoryImage...)
+     */
+    protected function setFileForEveryLocale(DemoImportContext $context, object $image, string $file): void
+    {
+        $locales = LangQuery::create()
+            ->filterByActive(1)
+            ->_or()
+            ->filterByByDefault(1)
+            ->find($context->connection)
+            ->toKeyValue('Id', 'Locale');
+
+        foreach ($locales as $locale) {
+            $image->setLocale($locale);
+            $image->setFile($file);
         }
     }
 

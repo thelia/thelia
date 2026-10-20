@@ -51,7 +51,9 @@ final class FoldersImporter extends AbstractDemoImporter
                         continue;
                     }
 
-                    (new FolderImage())->setFolderId($folder->getId())->setFile($imageName)->save($context->connection);
+                    $folderImage = (new FolderImage())->setFolderId($folder->getId());
+                    $this->setFileForEveryLocale($context, $folderImage, $imageName);
+                    $folderImage->save($context->connection);
                     $this->copyImage($context, $imageName, 'folder');
                 }
             }

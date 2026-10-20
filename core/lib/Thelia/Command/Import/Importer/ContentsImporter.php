@@ -56,7 +56,9 @@ final class ContentsImporter extends AbstractDemoImporter
                         continue;
                     }
 
-                    (new ContentImage())->setContentId($content->getId())->setFile($imageName)->save($context->connection);
+                    $contentImage = (new ContentImage())->setContentId($content->getId());
+                    $this->setFileForEveryLocale($context, $contentImage, $imageName);
+                    $contentImage->save($context->connection);
                     $this->copyImage($context, $imageName, 'content');
                 }
             }
