@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Thelia\Model\Base\RewritingUrlQuery as BaseRewritingUrlQuery;
 use Thelia\Model\Map\RewritingUrlTableMap;
 
@@ -30,7 +30,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 {
     public function getResolverSearch($rewrittenUrl): ?RewritingArgument
     {
-        $redirectedJoin = new Join();
+        $redirectedJoin = new ModelJoin();
         $redirectedJoin->addExplicitCondition(
             RewritingUrlTableMap::TABLE_NAME,
             'REDIRECTED',
@@ -40,9 +40,11 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             'is_redirected',
         );
         $redirectedJoin->setJoinType(Criteria::LEFT_JOIN);
+        $redirectedJoin->setTableMap(RewritingUrlTableMap::getTableMap());
 
         return RewritingArgumentQuery::create()
             ->joinRewritingUrl('ru', Criteria::RIGHT_JOIN)
+            ->addAlias('is_redirected', RewritingUrlTableMap::TABLE_NAME)
             ->addJoinObject($redirectedJoin)
             ->where('`ru`.URL = ?', $rewrittenUrl, \PDO::PARAM_STR)
             ->withColumn('`ru`.URL', 'ru_url')

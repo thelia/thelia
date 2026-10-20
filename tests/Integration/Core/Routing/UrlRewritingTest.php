@@ -37,6 +37,29 @@ final class UrlRewritingTest extends IntegrationTestCase
         return $category;
     }
 
+    public function testResolverSearchRaisesNoPropelWarning(): void
+    {
+        $category = $this->createCategoryWithTitle('Warning free');
+        $url = $category->generateRewrittenUrl('en_US', Propel::getConnection('TheliaMain'));
+
+        $warnings = [];
+        set_error_handler(static function (int $level, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        }, \E_USER_WARNING);
+
+        try {
+            $argument = RewritingUrlQuery::create()->getResolverSearch($url);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame([], $warnings);
+        self::assertNotNull($argument);
+        self::assertSame($url, $argument->getVirtualColumn('ru_url'));
+    }
+
     public function testGenerateRewrittenUrlCreatesSlugFromTitle(): void
     {
         $category = $this->createCategoryWithTitle('Summer Collection');
