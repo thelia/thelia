@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Front;
 
 use Thelia\Domain\Order\Service\OrderTrackingUrlResolver;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
 use Thelia\Model\Customer;
+use Thelia\Model\DestinationRestriction;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\Order;
@@ -73,6 +75,47 @@ final class AccountOrderApiTest extends ApiTestCase
         self::assertCount(1, $data['orderProducts']);
         self::assertTrue($data['orderProducts'][0]['virtual']);
         self::assertSame('user-guide.pdf', $data['orderProducts'][0]['virtualDocument']);
+    }
+
+    /**
+     * A restriction declared after the order was placed judges the carts to come, not
+     * the orders already taken: the buyer and the shop still read the order whole.
+     */
+    public function testAnOrderPlacedBeforeARestrictionOfItsProductStaysReadable(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $order = $factory->order($customer, ['statusCode' => 'paid']);
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['title' => 'Calvados']);
+
+        $orderProduct = new OrderProduct();
+        $orderProduct
+            ->setOrderId($order->getId())
+            ->setProductRef($product->getRef())
+            ->setProductSaleElementsRef($product->getDefaultSaleElements()->getRef())
+            ->setTitle('Calvados')
+            ->setQuantity(1.0)
+            ->setPrice('10.000000')
+            ->setPromoPrice('0.000000')
+            ->setWasNew(0)
+            ->setWasInPromo(0)
+            ->save($this->getPropelConnection());
+
+        $restrictions = $this->getService(DestinationRestrictionFacade::class);
+        $group = $restrictions->save(null, 'after-the-order', DestinationRestriction::MODE_DENY, true, ['en_US' => ['title' => 'After the order', 'reason' => 'Alcohol licence']]);
+        $restrictions->addDestination($group->getId(), (int) $order->getOrderAddressRelatedByDeliveryOrderAddressId()->getCountryId());
+        $restrictions->attachProduct($group->getId(), (int) $product->getId());
+
+        $front = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($customer));
+
+        self::assertJsonResponseSuccessful($front);
+        $data = json_decode($front->getContent(), true);
+        self::assertCount(1, $data['orderProducts']);
+        self::assertSame($product->getRef(), $data['orderProducts'][0]['productRef']);
+
+        $admin = $this->jsonRequest('GET', '/api/admin/orders/'.$order->getId(), token: $this->authenticateAsAdmin());
+
+        self::assertJsonResponseSuccessful($admin);
     }
 
     public function testOrderPayloadExposesItsFrozenVatExemptionState(): void
