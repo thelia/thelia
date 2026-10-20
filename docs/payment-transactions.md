@@ -403,18 +403,15 @@ the amount twice on the buyer's card — and its cart is consumed.
 
 ## Rights
 
-The refund is a third right, `admin.order.payment-refund`
-(`AdminResources::ORDER_PAYMENT_REFUND`), granted to no profile by the update.
-
-
 Reading the journal goes with reading orders (`admin.order`). Taking money is
 a right of its own, `admin.order.payment-capture`
 (`AdminResources::ORDER_PAYMENT_CAPTURE`), granted profile by profile, the way
 forcing a status transition already is. The same right is asked to cancel an
 order whose authorization still holds an amount, and to record by hand the
-outcome of a pending authorization, capture or release. Refunding is a right of
-its own, `admin.order.payment-refund`, which also records by hand the outcome of
-a pending refund; the capture right does not.
+outcome of a pending authorization, capture or release. Refunding is a third
+right, `admin.order.payment-refund` (`AdminResources::ORDER_PAYMENT_REFUND`),
+which also records by hand the outcome of a pending refund; the capture right
+does not. The update grants neither to any profile.
 
 ## Security notes
 
