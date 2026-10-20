@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Action;
 
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
+use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
@@ -139,6 +140,42 @@ final class ReservedSaleActionTest extends ActionIntegrationTestCase
             (int) $this->defaultPseFor($product)->getPromo(),
             'the promo flag the operation wrote while it was public is taken back',
         );
+    }
+
+    /**
+     * Clearing every sale takes them off their products: the discount they wrote
+     * goes with the promo flag, and a promotion set by hand outside any sale keeps
+     * its price.
+     */
+    public function testClearingEverySaleGivesTheirProductsTheCatalogPriceBack(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->catalogProduct($currency);
+        $handPromotion = $this->catalogProduct($currency);
+
+        $sale = $this->createSale();
+        $this->updateSale($sale, [
+            'active' => true,
+            'products' => [$product->getId()],
+            'priceOffsets' => [$currency->getId() => '10'],
+        ]);
+        self::assertSame(90.0, $this->promoPriceOf($this->defaultPseFor($product), $currency));
+
+        $handPse = $this->defaultPseFor($handPromotion);
+        $handPse->setPromo(1)->save();
+        ProductPriceQuery::create()
+            ->filterByProductSaleElementsId($handPse->getId())
+            ->filterByCurrencyId($currency->getId())
+            ->findOne()
+            ->setPromoPrice('70.000000')
+            ->save();
+
+        $this->dispatch(new SaleClearStatusEvent(), TheliaEvents::SALE_CLEAR_SALE_STATUS);
+
+        $pse = $this->defaultPseFor($product);
+        self::assertSame(0, (int) $pse->getPromo());
+        self::assertSame(100.0, $this->promoPriceOf($pse, $currency), 'the discount of the cleared sale stays readable');
+        self::assertSame(70.0, $this->promoPriceOf($this->defaultPseFor($handPromotion), $currency));
     }
 
     public function testUpdatePersistsTheAudienceAndCountdownFields(): void
