@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
@@ -26,10 +25,12 @@ use Thelia\Model\Cart;
  * The last word before an order is placed.
  *
  * Every step the installed code declares is asked about the cart, in the order the
- * tunnel declares them in, and the first refusal is the answer. Nothing here reads the
- * `checkout_step` table, and that is the point: turning a step off removes its screen,
- * never its check, so an order the step would have refused is refused whether or not the
- * merchant still shows it. `isSkippedFor()` is ignored for the same reason — it answers
+ * tunnel serves them in, the one `CheckoutProgressionService` resolves from the
+ * `checkout_step` rows and the positions the steps declare, and the first refusal is the
+ * answer. The table orders the checks and never selects them, and that is the point:
+ * turning a step off removes its screen, never its check, so an order the step would
+ * have refused is refused whether or not the merchant still shows it.
+ * `isSkippedFor()` is ignored for the same reason — it answers
  * "is there a question to ask this buyer", not "may this order go through": the delivery
  * step of a virtual cart is skipped on screen and still demands the carrier the order
  * cannot be shipped without.
@@ -40,13 +41,8 @@ use Thelia\Model\Cart;
  */
 readonly class CheckoutValidationService
 {
-    /**
-     * @param iterable<CheckoutStepProviderInterface> $stepProviders
-     */
     public function __construct(
-        #[AutowireIterator('thelia.checkout.step_provider')]
-        private iterable $stepProviders,
-        private CheckoutTunnelShape $tunnelShape,
+        private CheckoutProgressionService $progression,
     ) {
     }
 
@@ -116,22 +112,12 @@ readonly class CheckoutValidationService
      * address or a carrier to choose is told about that first rather than about a box
      * further down the tunnel they never reached.
      *
-     * The declared position is what orders them, not the table: the table can be missing
-     * a row, and this has to answer the same whatever state it is in.
-     *
      * @return list<CheckoutStepProviderInterface>
+     *
+     * @throws PropelException
      */
     private function orderedProviders(): array
     {
-        $providers = iterator_to_array($this->stepProviders, false);
-
-        // Two steps declaring the same position are ordered by the rule the buyer walks
-        // them by, not by whichever order the container happened to build them in.
-        usort(
-            $providers,
-            fn (CheckoutStepProviderInterface $left, CheckoutStepProviderInterface $right): int => $this->tunnelShape->compare($left->code(), $left->defaultPosition(), $right->code(), $right->defaultPosition()),
-        );
-
-        return $providers;
+        return $this->progression->providersInTunnelOrder();
     }
 }

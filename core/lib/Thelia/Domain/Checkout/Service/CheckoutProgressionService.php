@@ -144,6 +144,28 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
     }
 
     /**
+     * Every step the installed code declares, in the order the tunnel serves them, the
+     * steps the merchant turned off and the ones a cart skips included.
+     *
+     * This is what the placement of an order checks the steps in: turning a step off
+     * removes its screen and never its check, but the check still comes where the screen
+     * stood, at the position of its row, or at the place of an unsynchronised step.
+     *
+     * @return list<CheckoutStepProviderInterface>
+     *
+     * @throws PropelException
+     */
+    public function providersInTunnelOrder(): array
+    {
+        $providers = $this->providersByCode();
+
+        return array_map(
+            static fn (string $code): CheckoutStepProviderInterface => $providers[$code],
+            $this->orderedCodes($providers, $this->rowsByCode(), true),
+        );
+    }
+
+    /**
      * Drops everything memoized, so the next question is answered against the table and
      * the carts as they are now.
      */
@@ -212,18 +234,21 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
     /**
      * The codes of the tunnel, ordered, whatever state the table is in.
      *
+     * A step turned off is left out unless the caller asks for them all: the screens
+     * leave it out, the placement still has to check it.
+     *
      * @param array<string, CheckoutStepProviderInterface> $providers
      * @param array<string, CheckoutStep>                  $rows
      *
      * @return list<string>
      */
-    private function orderedCodes(array $providers, array $rows): array
+    private function orderedCodes(array $providers, array $rows, bool $withTurnedOffSteps = false): array
     {
         $positions = [];
         $unsynced = [];
 
         foreach ($rows as $code => $row) {
-            if (!$row->isActive()) {
+            if (!$withTurnedOffSteps && !$row->isActive()) {
                 continue;
             }
 
@@ -478,7 +503,7 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
 
         $rows = [];
 
-        foreach ($found as $row) {
+        foreach ($this->tunnelShape->sortRows($found) as $row) {
             $rows[(string) $row->getCode()] = $row;
         }
 
