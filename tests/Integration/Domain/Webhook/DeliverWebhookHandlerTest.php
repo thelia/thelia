@@ -100,6 +100,17 @@ final class DeliverWebhookHandlerTest extends IntegrationTestCase
         self::assertStringNotContainsString(self::SECRET, (string) $subscription->getFailureReason());
     }
 
+    public function testTheLastFailedAttemptOfAReplayedDeliveryLeavesTheSubscriptionActive(): void
+    {
+        [$subscription, $delivery] = $this->delivery(attempts: 4);
+        $delivery->setReplayedAt(new \DateTimeImmutable())->save($this->getPropelConnection());
+
+        $this->handler(inline: false)(new DeliverWebhook($delivery->getId()));
+
+        self::assertSame(WebhookStatus::DELIVERY_FAILED, $this->reread($delivery)->getStatus());
+        self::assertSame(WebhookStatus::SUBSCRIPTION_ACTIVE, $this->subscription($subscription)->getStatus());
+    }
+
     public function testWithoutAQueueAFailureIsNotRetriedAndDoesNotSilenceTheSubscription(): void
     {
         [$subscription, $delivery] = $this->delivery();

@@ -34,6 +34,12 @@ final class WebhookUrlValidatorTest extends TestCase
         yield 'private 172' => ['https://172.16.4.1/hook'];
         yield 'private 192' => ['https://192.168.1.1/hook'];
         yield 'link local metadata' => ['https://169.254.169.254/latest/meta-data'];
+        yield 'shared address space' => ['https://100.64.0.1/hook'];
+        yield 'alibaba metadata' => ['https://100.100.100.200/latest/meta-data'];
+        yield 'ietf protocol assignments' => ['https://192.0.0.1/hook'];
+        yield 'multicast' => ['https://224.0.0.1/hook'];
+        yield 'documentation range' => ['https://203.0.113.9/hook'];
+        yield 'benchmarking' => ['https://198.18.0.1/hook'];
         yield 'unspecified' => ['https://0.0.0.0/hook'];
         yield 'ipv6 loopback' => ['https://[::1]/hook'];
         yield 'ipv6 unique local' => ['https://[fd00::1]/hook'];

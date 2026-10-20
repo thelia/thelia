@@ -69,7 +69,7 @@ final readonly class DeliverWebhookHandler
 
         $delivery->setStatus(WebhookStatus::DELIVERY_FAILED)->save();
 
-        if (!$this->runsInline) {
+        if (!$this->runsInline && null === $delivery->getReplayedAt()) {
             $subscription
                 ->setStatus(WebhookStatus::SUBSCRIPTION_ERROR)
                 ->setFailureReason(\sprintf('Delivery %s failed after %d attempts.', $delivery->getDeliveryUuid(), $attempt))

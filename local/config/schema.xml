@@ -3351,6 +3351,7 @@
     <column description="the beginning of the answer, truncated" name="response_body" type="LONGVARCHAR" />
     <column description="the body that was signed, kept so that a delivery can be replayed and purged with the log" name="payload" required="true" type="CLOB" />
     <column name="delivered_at" type="TIMESTAMP" />
+    <column description="when an administrator last replayed this delivery, so a failure of the replay does not put the subscription in error" name="replayed_at" type="TIMESTAMP" />
     <foreign-key foreignTable="webhook_subscription" name="fk_webhook_delivery_subscription_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="subscription_id" />
     </foreign-key>
