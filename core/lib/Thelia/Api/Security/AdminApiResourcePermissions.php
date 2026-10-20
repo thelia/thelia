@@ -95,6 +95,8 @@ use Thelia\Api\Resource\Tax;
 use Thelia\Api\Resource\TaxRule;
 use Thelia\Api\Resource\TaxRuleCountry;
 use Thelia\Api\Resource\Template;
+use Thelia\Api\Resource\WebhookDelivery;
+use Thelia\Api\Resource\WebhookSubscription;
 use Thelia\Core\Security\Resource\AdminResources;
 
 /**
@@ -196,6 +198,8 @@ final readonly class AdminApiResourcePermissions
         TaxRule::class => AdminResources::TAX,
         TaxRuleCountry::class => AdminResources::TAX,
         Template::class => AdminResources::TEMPLATE,
+        WebhookDelivery::class => AdminResources::WEBHOOK,
+        WebhookSubscription::class => AdminResources::WEBHOOK,
     ];
 
     /** @var array<class-string, string> */
