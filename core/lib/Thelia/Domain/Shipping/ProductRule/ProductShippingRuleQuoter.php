@@ -28,8 +28,11 @@ use Thelia\Model\State;
  * Applies the shipping rules of the products to what a carrier quotes.
  *
  * The carrier prices the cart without the offered lines, then the surcharges are added
- * on top, taxed under the rule the carrier applies to its own postage. A cart whose
- * products carry no rule goes through untouched, so its postage does not move.
+ * on top, taxed at the rate of the quote the carrier gave, under its tax rule title.
+ * With no quote to read a rate from (the carrier offers its postage, every line is
+ * offered, a coupon offers the carrier), the surcharge is taxed the way the carrier
+ * builds a postage of its own. A cart whose products carry no rule goes through
+ * untouched, so its postage does not move.
  */
 final readonly class ProductShippingRuleQuoter
 {
@@ -56,13 +59,16 @@ final readonly class ProductShippingRuleQuoter
             return $postage;
         }
 
+        // Read before the quote is dropped: an offered cart leaves no rate to follow.
+        $surcharge = $this->surchargeFor($rules, $module, $cart, $country, $rules->isEntirelyFree() ? null : $postage);
+
         if ($rules->isEntirelyFree()) {
             $postage->setAmount(0.0);
             $postage->setAmountTax(0.0);
             $postage->setUntaxedAmount(0.0);
         }
 
-        $this->addSurcharge($postage, $this->surchargeFor($rules, $module, $cart, $country));
+        $this->addSurcharge($postage, $surcharge);
 
         return $postage;
     }
@@ -83,7 +89,6 @@ final readonly class ProductShippingRuleQuoter
         }
 
         $options = $this->askOnTheShippedLines($rules, $cart, $askCarrier);
-        $surcharge = $this->surchargeFor($rules, $module, $cart, $country);
 
         foreach ($options as $option) {
             if (!$option instanceof DeliveryModuleOption || null === $option->getPostage()) {
@@ -98,7 +103,8 @@ final readonly class ProductShippingRuleQuoter
                 $postage->setUntaxedAmount($option->getPostageUntaxed());
             }
 
-            $this->addSurcharge($postage, $surcharge);
+            // Each option is taxed at the rate of its own quote.
+            $this->addSurcharge($postage, $this->surchargeFor($rules, $module, $cart, $country, $rules->isEntirelyFree() ? null : $postage));
 
             $option
                 ->setPostage($postage->getAmount())
@@ -168,16 +174,32 @@ final readonly class ProductShippingRuleQuoter
         return $shippedCart;
     }
 
-    private function surchargeFor(CartShippingRuleSet $rules, Module $module, Cart $cart, Country $country): ?OrderPostage
+    /**
+     * @param ?OrderPostage $quote what the carrier quoted for the cart, whose rate the surcharge follows
+     */
+    private function surchargeFor(CartShippingRuleSet $rules, Module $module, Cart $cart, Country $country, ?OrderPostage $quote = null): ?OrderPostage
     {
         if ($rules->untaxedSurcharge() <= 0) {
             return null;
         }
 
         $untaxedSurcharge = round($this->toCartCurrency($rules->untaxedSurcharge(), $cart), 2);
+
+        // Taxed at the rate the carrier charged on its quote, under the same title: a
+        // carrier taxing its postage under a rule of its own taxes the surcharge with it.
+        $untaxedQuote = null !== $quote ? round((float) $quote->getUntaxedAmount(), 2) : 0.0;
+
+        if (null !== $quote && $untaxedQuote > 0) {
+            $tax = round($untaxedSurcharge * (float) $quote->getAmountTax() / $untaxedQuote, 2);
+            $surcharge = new OrderPostage(round($untaxedSurcharge + $tax, 2), $tax, $quote->getTaxRuleTitle());
+            $surcharge->setUntaxedAmount($untaxedSurcharge);
+
+            return $surcharge;
+        }
+
         $carrier = $module->getDeliveryModuleInstance($this->container);
 
-        // Taxed the way the carrier taxes its postage, when it says how.
+        // No quote to follow: taxed the way the carrier taxes its postage, when it says how.
         if (method_exists($carrier, 'buildOrderPostage')) {
             $surcharge = $carrier->buildOrderPostage($untaxedSurcharge, $country, Lang::getDefaultLanguage()->getLocale());
 
