@@ -189,6 +189,18 @@ final readonly class FeatureProductProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('This featureAv is not a value of this feature.');
         }
 
+        // A free text is stored as a value of its own, private to the product
+        // that wrote it: linking another product to it would let the owner's
+        // edits and deletion reach that product too.
+        $ownedByAFreeText = FeatureProductQuery::create()
+            ->filterByFeatureAvId((int) $featureAv->getId())
+            ->filterByIsFreeText(true)
+            ->exists();
+
+        if ($ownedByAFreeText) {
+            throw new UnprocessableEntityHttpException('This featureAv is the free text of a product, not a value the feature lists.');
+        }
+
         return (int) $featureAv->getId();
     }
 

@@ -208,6 +208,39 @@ final class FeatureProductApiTest extends ApiTestCase
     }
 
     /**
+     * The value a free text is stored as belongs to the product that wrote it:
+     * shared, it would be renamed and deleted along with the owner's text.
+     */
+    public function testTheValueOfAnotherProductsFreeTextIsRefused(): void
+    {
+        [$ownerId, $featureId] = $this->productAndFeature();
+        $factory = $this->createFixtureFactory();
+        $otherId = (int) $factory->product($factory->category(), $factory->taxRule(), $factory->currency())->getId();
+        $token = $this->authenticateAsAdmin();
+        $this->postFreeText($ownerId, $featureId, 'Private text', $token);
+        $freeTextValueId = (int) FeatureProductQuery::create()
+            ->filterByProductId($ownerId)
+            ->filterByFeatureId($featureId)
+            ->select([FeatureProductTableMap::COL_FEATURE_AV_ID])
+            ->findOne();
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/feature_products',
+            [
+                'product' => '/api/admin/products/'.$otherId,
+                'feature' => '/api/admin/features/'.$featureId,
+                'featureAv' => '/api/admin/feature_avs/'.$freeTextValueId,
+            ],
+            $token,
+            'json',
+        );
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(0, $this->rowCount($otherId, $featureId));
+    }
+
+    /**
      * The update action looks a free text up by product and feature only: let it
      * reach a listed value and it would rename a value other products share.
      */
