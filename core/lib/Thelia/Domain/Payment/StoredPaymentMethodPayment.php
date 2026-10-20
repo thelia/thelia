@@ -21,6 +21,7 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
+use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CustomerPaymentMethod;
 use Thelia\Model\Order;
@@ -79,6 +80,26 @@ final readonly class StoredPaymentMethodPayment
                 $unusable::class,
             ));
 
+            return null;
+        }
+    }
+
+    /**
+     * The method chosen on a cart about to be ordered, when it can still pay with the
+     * payment module the order is placed with; null when MODULE_PAY would pay with a new
+     * one, and so spend no slot of the allowance. Nothing is logged: no order exists yet.
+     */
+    public function usableMethodChosenOn(Cart $cart, int $paymentModuleId): ?CustomerPaymentMethod
+    {
+        $chosenMethodId = $cart->getCustomerPaymentMethodId();
+
+        if (null === $chosenMethodId) {
+            return null;
+        }
+
+        try {
+            return $this->selection->usableMethod($cart->getCustomer(), $paymentModuleId, $chosenMethodId);
+        } catch (CustomerPaymentMethodException) {
             return null;
         }
     }

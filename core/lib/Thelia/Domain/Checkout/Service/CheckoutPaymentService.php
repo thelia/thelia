@@ -117,7 +117,7 @@ readonly class CheckoutPaymentService
             return $this->payAgain($unpaidOrder, $cart);
         }
 
-        $this->refuseAStoredMethodPaymentOverTheAllowance($cart);
+        $this->refuseAStoredMethodPaymentOverTheAllowance($cart, $request->paymentModuleId, $composition);
 
         if ($unpaidOrder instanceof Order) {
             // Through the status flow, not written to the row: the stock the previous
@@ -277,15 +277,41 @@ readonly class CheckoutPaymentService
      * the cart names, and a caller that left it out of the request would otherwise get
      * its order written before being refused.
      *
+     * Only a placement MODULE_PAY will pay with the stored method is asked: one the
+     * instant means pay in full never reaches the module that keeps the method, and a
+     * method that can no longer pay (expired, forgotten, of another module) leaves the
+     * order to be paid with a new one. Neither spends a slot, so neither is refused.
+     *
      * @throws StoredMethodPaymentRateLimitedException
      */
-    private function refuseAStoredMethodPaymentOverTheAllowance(Cart $cart): void
+    private function refuseAStoredMethodPaymentOverTheAllowance(Cart $cart, int $paymentModuleId, PaymentComposition $composition): void
     {
-        if (null !== $cart->getCustomerPaymentMethodId()
-            && $this->storedPaymentMethodPayment->customerHasExhaustedTheirAllowance((int) $cart->getCustomerId())
-        ) {
+        if ($this->isPaidByInstantPartsOnly($composition)) {
+            return;
+        }
+
+        if (null === $this->storedPaymentMethodPayment->usableMethodChosenOn($cart, $paymentModuleId)) {
+            return;
+        }
+
+        if ($this->storedPaymentMethodPayment->customerHasExhaustedTheirAllowance((int) $cart->getCustomerId())) {
             throw new StoredMethodPaymentRateLimitedException();
         }
+    }
+
+    private function isPaidByInstantPartsOnly(PaymentComposition $composition): bool
+    {
+        if ($composition->isEmpty()) {
+            return false;
+        }
+
+        foreach ($composition->parts as $part) {
+            if (!$part->isInstant) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
