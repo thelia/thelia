@@ -29,6 +29,7 @@ use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -493,6 +494,50 @@ class TheliaKernel extends Kernel
         $this->registerTemplateClassLoader($container, $activatedModules);
 
         return $container;
+    }
+
+    /**
+     * The preload file Symfony writes next to the container (opcache.preload) requires
+     * the core loops, which extend the Propel models, before any kernel exists: the
+     * generated model classes are only autoloadable once the constructor above has
+     * registered var/propel/<env>/model. The preload file registers that directory
+     * first, so pointing opcache.preload at config/preload.php works.
+     */
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
+    {
+        parent::dumpContainer($cache, $container, $class, $baseClass);
+
+        $cacheDirectory = \dirname($cache->getPath());
+        $preloadFile = $cacheDirectory.'/'.$class.'.preload.php';
+
+        $code = is_file($preloadFile) ? (string) file_get_contents($preloadFile) : '';
+
+        if (!str_starts_with($code, "<?php\n")) {
+            return;
+        }
+
+        $filesystem = new Filesystem();
+        // Relative, like the paths Symfony writes in the file: the project may be moved after the build.
+        $modelDirectory = $filesystem->makePathRelative(
+            THELIA_ROOT.\sprintf('var/propel/%s/model', $this->environment.TestToken::suffix()),
+            $cacheDirectory,
+        );
+
+        $autoloader = <<<PHP
+            <?php
+
+            // Written by Thelia: the Propel models are generated in var/propel/<env>/model.
+            spl_autoload_register(static function (string \$class): void {
+                \$file = __DIR__.'/{$modelDirectory}'.strtr(\$class, '\\\\', '/').'.php';
+
+                if (is_file(\$file)) {
+                    require \$file;
+                }
+            });
+
+            PHP;
+
+        $filesystem->dumpFile($preloadFile, $autoloader.substr($code, \strlen("<?php\n")));
     }
 
     protected function getKernelParameters(): array
