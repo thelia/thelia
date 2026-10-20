@@ -329,6 +329,20 @@ final class OrderPaymentApiTest extends ApiTestCase
         self::assertSame(Response::HTTP_CREATED, $response->getStatusCode());
     }
 
+    public function testAProviderTakingASingleCaptureLeavesNothingToCaptureOnceOneWasAsked(): void
+    {
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ONCE');
+        $this->jsonRequest('POST', $this->capturePath($order), ['amount' => 40], token: $this->authenticateAsAdmin());
+
+        $second = $this->jsonRequest('POST', $this->capturePath($order), ['amount' => 20], token: $this->authenticateAsAdmin());
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $second->getStatusCode());
+        self::assertSame('0.000000', $this->summaryOf($order)['remainingToCapture']);
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+    }
+
     public function testCancellingAnOrderThatHoldsAnAuthorizationNeedsTheCaptureRight(): void
     {
         // Cancelling releases the amount at the provider: a decision on the money, which

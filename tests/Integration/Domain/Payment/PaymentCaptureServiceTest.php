@@ -674,6 +674,58 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame(OrderStatus::CODE_NOT_PAID, $this->statusCodeOf($order));
     }
 
+    public function testAProviderTakingASingleCaptureIsOfferedNoSecondOne(): void
+    {
+        // The first capture set the amount taken; the provider lets the rest go with it.
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ONCE');
+        $this->service->capture($order, 40.0);
+
+        self::assertSame('0.000000', $this->service->leftToCapture($order));
+
+        try {
+            $this->service->capture($order, 20.0);
+            self::fail('A second capture is refused before the module is called.');
+        } catch (InvalidPaymentAmountException $refused) {
+            self::assertStringContainsString('single capture', $refused->getMessage());
+        }
+
+        self::assertCount(1, DeferredCapturePaymentModule::$captureCalls);
+    }
+
+    public function testAProviderTakingSeveralCapturesLeavesTheRestToCapture(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-PART');
+        $this->service->capture($order, 40.0);
+
+        self::assertSame('80.000000', $this->service->leftToCapture($order));
+    }
+
+    public function testAnAuthorizationTakenBeforeTheModuleStoppedAuthorizingFirstIsStillCapturedFromThelia(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$deferredCapture = false;
+
+        self::assertTrue($this->service->supportsCapture($order), 'The journal holds the authorization open.');
+        self::assertTrue($this->service->capture($order, 40.0)->isSucceeded());
+        self::assertTrue($this->service->voidAuthorization($order)->isSucceeded());
+        self::assertFalse($this->service->supportsCapture($order), 'Nothing is held any more: the module answers as configured.');
+    }
+
+    public function testAModuleCancellingTheOrderItselfKeepsItFromGoingBackToUnpaid(): void
+    {
+        // The module cancels the order once its provider ended the authorization: one move.
+        DeferredCapturePaymentModule::$cancelsOrderOnRelease = true;
+        [$order] = $this->authorizedOrder(120);
+
+        $this->recorder->recordVoid($order, 'AUTH-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
+
+        self::assertSame('0.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
     public function testAModuleAnsweringWithAReferenceAlreadyUsedLeavesTheLineWaitingForTheProvider(): void
     {
         [$order] = $this->authorizedOrder(120);

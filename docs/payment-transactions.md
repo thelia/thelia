@@ -173,7 +173,15 @@ A module that reserves the amount first implements
 published module implements would break them all.
 
 - `supportsDeferredCapture()` says whether, as currently configured, the module
-  authorizes first. A module can expose that choice to the merchant.
+  authorizes first. A module can expose that choice to the merchant. Switched off,
+  it applies to the orders paid afterwards: an authorization the journal still holds
+  open is captured or released from Thelia through the module all the same.
+- A provider that takes a single capture per authorization, letting the rest go with
+  it, is said so through `Thelia\Module\PaymentModuleCapturingOnceInterface`
+  (`capturesOnce()`): once a capture is asked, pending or taken,
+  `PaymentCaptureService::leftToCapture()` reads nothing left, so the back office,
+  the admin API (`remainingToCapture`) and the capture service offer no other, and
+  cancelling the order no longer needs the capture right.
 - The module is called through `PaymentModuleLocator`: the instance the
   container built, so `getContainer()` works in it. A deactivated module is not
   called: its services are no longer compiled, and the refusal names it.
@@ -301,7 +309,11 @@ leaves those statuses.
 A payment module that maps movements to statuses in its own configuration
 implements `Thelia\Module\PaymentModuleManagingOrderStatusInterface` and answers
 `managesOrderStatus()` with true: its journal lines are written as usual, and the
-core leaves the status of its orders alone.
+core leaves the status of its orders alone. A module that only cancels the order
+itself once its provider ended the authorization (cancelled or lapsed, nothing
+taken) implements `Thelia\Module\PaymentModuleCancellingOnReleaseInterface`
+(`cancelsOrderOnRelease()`): it writes the release first, then cancels, and the
+core does not move the order back to not paid in between.
 
 An authorization that lapses at the provider before it was all captured is
 recorded with `recordExpiry()`: a void of what it still held, annotated with the

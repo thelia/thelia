@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Payment\Service;
 
 use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\DTO\PaymentTransactionTotals;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Exception\CaptureExceedsAuthorizationException;
 use Thelia\Domain\Payment\Exception\ConflictingPaymentReferenceException;
@@ -34,6 +35,8 @@ use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderPaymentTransactionQuery;
+use Thelia\Module\PaymentModuleCapturingOnceInterface;
+use Thelia\Module\PaymentModuleInterface;
 use Thelia\Module\PaymentModuleWithCaptureInterface;
 
 /**
@@ -107,14 +110,17 @@ final readonly class PaymentCaptureService
             $this->assertCapturable($order, $amount, $currencyCode);
         }
 
-        $transaction = $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock($order, function () use ($order, $amount, $currencyCode, $moduleCode): OrderPaymentTransaction {
+        $transaction = $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->withOrderLock($order, function () use ($order, $amount, $currencyCode, $moduleCode, $module): OrderPaymentTransaction {
             $totals = $this->totalsReader->forOrder((int) $order->getId());
+            $left = $this->leftOf($module, $totals);
 
-            if (!$totals->hasSomethingLeftToCapture()) {
-                throw new InvalidPaymentAmountException($totals->hasPendingCapture() ? \sprintf('Order %s: a capture is waiting for the provider\'s answer; nothing else is left to capture.', (string) $order->getRef()) : \sprintf('Order %s: no authorization holds anything to capture.', (string) $order->getRef()));
+            if (!PaymentAmount::isPositive($left)) {
+                throw new InvalidPaymentAmountException(match (true) {
+                    $totals->hasSomethingLeftToCapture() => \sprintf('Order %s: its payment module takes a single capture per authorization, and one was already asked; the rest is released with it.', (string) $order->getRef()), $totals->hasPendingCapture() => \sprintf('Order %s: a capture is waiting for the provider\'s answer; nothing else is left to capture.', (string) $order->getRef()), default => \sprintf('Order %s: no authorization holds anything to capture.', (string) $order->getRef()),
+                });
             }
 
-            $amount ??= PaymentAmount::toFloat(CurrencyMinorUnit::floor($totals->remainingToCapture, $currencyCode));
+            $amount ??= PaymentAmount::toFloat(CurrencyMinorUnit::floor($left, $currencyCode));
             $this->assertCapturable($order, $amount, $currencyCode);
             $normalizedAmount = PaymentAmount::normalize($amount);
 
@@ -175,6 +181,35 @@ final readonly class PaymentCaptureService
     }
 
     /**
+     * What the order's authorization still holds to capture, as its payment module takes it:
+     * nothing once a capture was asked from a module whose provider takes a single one. The
+     * back office, the admin API and the cancellation rights read this rather than the totals.
+     */
+    public function leftToCapture(Order $order): string
+    {
+        return $this->moduleLocator->forOrder($order, function () use ($order): string {
+            try {
+                $module = $this->moduleLocator->paymentModuleOf($order);
+            } catch (\Throwable) {
+                $module = null;
+            }
+
+            return $this->leftOf($module, $this->totalsReader->forOrder((int) $order->getId()));
+        });
+    }
+
+    private function leftOf(?PaymentModuleInterface $module, PaymentTransactionTotals $totals): string
+    {
+        if ($module instanceof PaymentModuleCapturingOnceInterface
+            && (PaymentAmount::isPositive($totals->captured) || $totals->hasPendingCapture())
+            && $module->capturesOnce()) {
+            return PaymentAmount::normalize(0);
+        }
+
+        return $totals->remainingToCapture;
+    }
+
+    /**
      * Whether the payment module of the order can capture by hand. A module that cannot
      * even be instantiated answers no here, so the order sheet still renders, and is
      * logged; asked to capture, it fails loudly.
@@ -222,7 +257,11 @@ final readonly class PaymentCaptureService
             throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $this->moduleLocator->nameOf($order));
         }
 
-        if (!$module instanceof PaymentModuleWithCaptureInterface || !$this->moduleLocator->forOrder($order, static fn (): bool => $module->supportsDeferredCapture())) {
+        // A module switched to take the price at once still captures or releases the
+        // authorizations it took before: the journal holds them open.
+        if (!$module instanceof PaymentModuleWithCaptureInterface
+            || (!$this->moduleLocator->forOrder($order, static fn (): bool => $module->supportsDeferredCapture())
+                && !$this->totalsReader->forOrder((int) $order->getId())->hasSomethingLeftToCapture())) {
             throw new DeferredCaptureNotSupportedException((string) $order->getRef(), $module->getCode());
         }
 

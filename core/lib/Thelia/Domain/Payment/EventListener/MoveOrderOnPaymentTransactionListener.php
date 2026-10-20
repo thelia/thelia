@@ -30,6 +30,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Module\PaymentModuleCancellingOnReleaseInterface;
 use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
 
 /**
@@ -49,7 +50,9 @@ use Thelia\Module\PaymentModuleManagingOrderStatusInterface;
  * decided from the current status and totals, so the second call changes nothing.
  *
  * The hold status is the custom status seeded as `awaiting_capture`: a shop that deleted
- * it keeps its authorized orders unpaid.
+ * it keeps its authorized orders unpaid. A module that cancels the order itself once its
+ * provider ended the authorization says so through PaymentModuleCancellingOnReleaseInterface:
+ * its released orders are not moved back to not paid first.
  *
  * A payment module that moves the status itself, from its own configuration, says so
  * through PaymentModuleManagingOrderStatusInterface: its orders are left alone.
@@ -93,6 +96,22 @@ final readonly class MoveOrderOnPaymentTransactionListener
 
         return $module instanceof PaymentModuleManagingOrderStatusInterface
             && $this->moduleLocator->forOrder($order, static fn (): bool => $module->managesOrderStatus());
+    }
+
+    /**
+     * A module that cancels the order itself once its provider ended the authorization: the
+     * order goes to cancelled from there, not through not paid first.
+     */
+    private function moduleCancelsOnRelease(Order $order): bool
+    {
+        try {
+            $module = $this->moduleLocator->paymentModuleOf($order);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $module instanceof PaymentModuleCancellingOnReleaseInterface
+            && $this->moduleLocator->forOrder($order, static fn (): bool => $module->cancelsOrderOnRelease());
     }
 
     private function holdForCapture(OrderPaymentTransactionEvent $event): void
@@ -141,7 +160,7 @@ final readonly class MoveOrderOnPaymentTransactionListener
             return;
         }
 
-        if (OrderStatus::CODE_AWAITING_CAPTURE === $status->getCode()) {
+        if (OrderStatus::CODE_AWAITING_CAPTURE === $status->getCode() && !$this->moduleCancelsOnRelease($order)) {
             $this->move($order, (int) OrderStatusQuery::getNotPaidStatus()->getId(), $event);
         }
     }

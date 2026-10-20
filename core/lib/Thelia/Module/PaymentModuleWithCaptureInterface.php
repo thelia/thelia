@@ -35,9 +35,11 @@ use Thelia\Model\OrderPaymentTransaction;
  *   it already holds, and refuses it for another outcome or another amount;
  * - the recorder is never called inside a database transaction the module opened: the
  *   lock of the journal would be released before that transaction commits;
- * - while the authorization still holds an amount, a capture the module switches off
- *   (supportsDeferredCapture() turning false) leaves that amount to be captured at the
- *   provider: marking the order paid takes nothing.
+ * - a capture the module switches off (supportsDeferredCapture() turning false) applies to
+ *   the orders paid afterwards: the authorizations the journal still holds open are captured
+ *   and released from Thelia all the same, through this module, until nothing is left;
+ * - a provider that takes a single capture per authorization is said so through
+ *   PaymentModuleCapturingOnceInterface, so that the core offers no second one.
  */
 interface PaymentModuleWithCaptureInterface extends PaymentModuleInterface
 {
