@@ -94,18 +94,32 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->filterByCurrencyId($currencyId)
                     ->findOne($con);
 
-                if (null !== $productPrice) {
-                    $promoPrice = $this->saleDiscountCalculator->computeUntaxedPromoPrice(
-                        (float) $productPrice->getPrice(),
-                        $offsetType,
-                        (float) $offset,
-                        $taxCalculator,
-                    );
-
-                    $productPrice
-                        ->setPromoPrice((string) $promoPrice)
-                        ->save($con);
+                if (null === $productPrice) {
+                    continue;
                 }
+
+                // An operation taken off the products gives the promo price back the
+                // catalog price, the value a product carries when nothing discounts it:
+                // the promo price is served to every visitor, flagged or not, and an
+                // operation that turns reserved must not leave its discount readable.
+                if (!$promoStatus) {
+                    $productPrice
+                        ->setPromoPrice($productPrice->getPrice())
+                        ->save($con);
+
+                    continue;
+                }
+
+                $promoPrice = $this->saleDiscountCalculator->computeUntaxedPromoPrice(
+                    (float) $productPrice->getPrice(),
+                    $offsetType,
+                    (float) $offset,
+                    $taxCalculator,
+                );
+
+                $productPrice
+                    ->setPromoPrice((string) $promoPrice)
+                    ->save($con);
             }
         }
     }
