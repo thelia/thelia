@@ -20,9 +20,11 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementResult;
 use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
+use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
@@ -65,15 +67,24 @@ final readonly class ExpressCheckoutPlacementService
 
         $this->writeThePaymentModuleOnTheCart($cart, $request);
         $this->refuseATotalTheBuyerNeverSaw($cart, $request);
-        $this->writeTheDeliveryAddressOfANothingToShipCart($cart);
+        $writtenDeliveryAddress = $this->writeTheDeliveryAddressOfANothingToShipCart($cart);
 
-        return $this->placementService->place(new CheckoutPlacementRequest(
-            $cart,
-            $customer,
-            $this->currencyOf($cart),
-            $this->langOf($customer),
-            $request->consentAnswers,
-        ));
+        try {
+            return $this->placementService->place(new CheckoutPlacementRequest(
+                $cart,
+                $customer,
+                $this->currencyOf($cart),
+                $this->langOf($customer),
+                $request->consentAnswers,
+            ));
+        } catch (CheckoutPlacementInProgressException $inProgress) {
+            // Another request is placing this cart and may be reading this address.
+            throw $inProgress;
+        } catch (\Throwable $refused) {
+            $this->forgetTheDeliveryAddressWrittenForThisAttempt($cart, $writtenDeliveryAddress);
+
+            throw $refused;
+        }
     }
 
     /**
@@ -96,16 +107,33 @@ final readonly class ExpressCheckoutPlacementService
      * of a cart with nothing to ship was only asked where they are invoiced, so the order
      * is delivered there, on a copy of its own the invoice address does not share.
      */
-    private function writeTheDeliveryAddressOfANothingToShipCart(Cart $cart): void
+    private function writeTheDeliveryAddressOfANothingToShipCart(Cart $cart): ?CartAddress
     {
         if (null !== $cart->getAddressDeliveryId() || !$cart->isVirtual()) {
+            return null;
+        }
+
+        $copy = $cart->getCartAddressRelatedByAddressInvoiceId()?->copy();
+        $event = (new CartCheckoutEvent($cart))->setCartAddress($copy);
+
+        $this->eventDispatcher->dispatch($event, TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL);
+
+        return $copy;
+    }
+
+    /**
+     * A refused attempt leaves the cart as it found it. The copy was made from the invoice
+     * address of that attempt: kept on the cart, it would become the delivery address of
+     * the next one, even after the buyer corrected where they are invoiced.
+     */
+    private function forgetTheDeliveryAddressWrittenForThisAttempt(Cart $cart, ?CartAddress $writtenDeliveryAddress): void
+    {
+        if (null === $writtenDeliveryAddress || $cart->getAddressDeliveryId() !== $writtenDeliveryAddress->getId()) {
             return;
         }
 
-        $event = (new CartCheckoutEvent($cart))
-            ->setCartAddress($cart->getCartAddressRelatedByAddressInvoiceId()?->copy());
-
-        $this->eventDispatcher->dispatch($event, TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL);
+        $this->eventDispatcher->dispatch(new CartCheckoutEvent($cart), TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL);
+        $writtenDeliveryAddress->delete();
     }
 
     /**
