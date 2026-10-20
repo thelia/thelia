@@ -156,13 +156,13 @@
             <export_descriptive locale="en_US">
                 <title>Conversion funnel</title>
                 <description>
-                    Carts created, carts with a line, carts with a delivery module, carts with a payment module, orders placed and orders paid, one row per day. Without a period, the last twelve months.
+                    Carts created, carts with a line, carts with a delivery module, carts with a payment module, orders placed and orders paid, one row per day. Without a period, from the earliest date still covered by the cart retention window until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Entonnoir de conversion</title>
                 <description>
-                    Paniers créés, paniers avec article, paniers avec mode de livraison, paniers avec moyen de paiement, commandes passées et payées, une ligne par jour. Sans période, les douze derniers mois.
+                    Paniers créés, paniers avec article, paniers avec mode de livraison, paniers avec moyen de paiement, commandes passées et payées, une ligne par jour. Sans période, depuis la date la plus ancienne encore couverte par la durée de conservation des paniers jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
