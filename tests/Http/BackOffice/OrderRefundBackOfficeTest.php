@@ -20,6 +20,9 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Domain\Payment\DTO\PaymentOperationResult;
+use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Enum\RefundReason;
 use Thelia\Domain\Payment\Exception\PaymentRefusedException;
 use Thelia\Domain\Payment\Service\PaymentCaptureService;
 use Thelia\Domain\Payment\Service\PaymentRefundService;
@@ -234,6 +237,67 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
 
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
         self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
+    }
+
+    public function testARefundTheProviderNeverConfirmedIsRecordedByHandUnderTheRefundRight(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_PAYMENT_REFUND => [AccessManager::CREATE],
+        ]));
+        $order = $this->pendingRefundOf($this->paidOrder(100));
+        $lineId = $this->pendingRefundLineId($order);
+
+        $crawler = $this->sheet($order);
+        self::assertCount(1, $crawler->filter('[data-testid="order-payment-settle-form"]'));
+
+        $this->client->request('POST', $this->settleUrl($order, $lineId), ['_token' => $this->tokenOf($crawler), 'outcome' => 'succeeded']);
+
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+        self::assertTrue(OrderPaymentTransactionQuery::create()->findPk($lineId)->isSucceeded());
+    }
+
+    public function testTheCaptureRightDoesNotRecordARefundByHand(): void
+    {
+        $this->loginAs($this->factory->restrictedAdmin([
+            AdminResources::ORDER => [AccessManager::VIEW, AccessManager::UPDATE],
+            AdminResources::ORDER_PAYMENT_CAPTURE => [AccessManager::CREATE],
+        ]));
+        $order = $this->pendingRefundOf($this->paidOrder(100));
+        $lineId = $this->pendingRefundLineId($order);
+
+        $crawler = $this->sheet($order);
+        self::assertCount(0, $crawler->filter('[data-testid="order-payment-settle-form"]'));
+
+        $this->client->request('POST', $this->settleUrl($order, $lineId), ['_token' => $this->tokenOf($crawler), 'outcome' => 'succeeded']);
+
+        self::assertSame(403, $this->client->getResponse()->getStatusCode());
+        self::assertTrue(OrderPaymentTransactionQuery::create()->findPk($lineId)->isPending());
+    }
+
+    private function pendingRefundOf(Order $order): Order
+    {
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentOperationResult::pending('REF-SILENT');
+        $this->getService(PaymentRefundService::class)->refund($order, 40.0, RefundReason::Goodwill);
+
+        return $order;
+    }
+
+    private function pendingRefundLineId(Order $order): int
+    {
+        $line = OrderPaymentTransactionQuery::create()
+            ->filterByOrderId((int) $order->getId())
+            ->filterByType(PaymentTransactionType::REFUND->value)
+            ->findOne();
+        self::assertNotNull($line);
+        self::assertTrue($line->isPending());
+
+        return (int) $line->getId();
+    }
+
+    private function settleUrl(Order $order, int $lineId): string
+    {
+        return '/admin/order/update/'.$order->getId().'/payment-transaction/'.$lineId.'/settle';
     }
 
     /**
