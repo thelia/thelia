@@ -26,6 +26,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -41,6 +42,7 @@ use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -218,6 +220,15 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
     public bool $virtual = false;
 
+    /**
+     * Working days the product needs before it can be shipped, added to the preparation
+     * days of the carrier in the delivery estimate. Admin only: a long delay can tell a
+     * competitor that the product is out of stock.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Range(min: 0, max: DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS, groups: [self::GROUP_ADMIN_WRITE])]
+    public ?int $availabilityDelayDays = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
@@ -362,6 +373,18 @@ class Product extends AbstractTranslatableResource
     public function setVirtual(bool $virtual): self
     {
         $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    public function getAvailabilityDelayDays(): ?int
+    {
+        return $this->availabilityDelayDays;
+    }
+
+    public function setAvailabilityDelayDays(?int $availabilityDelayDays): self
+    {
+        $this->availabilityDelayDays = $availabilityDelayDays;
 
         return $this;
     }

@@ -16,8 +16,12 @@ namespace Thelia\Domain\Order\Service;
 
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
+use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryEstimate;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateCalendar;
+use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryTimeEstimator;
+use Thelia\Log\ThrowableTrace;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
@@ -32,6 +36,7 @@ readonly class OrderFactory
     public function __construct(
         private DeliveryDateCalendar $deliveryDateCalendar,
         private SaleUnitContext $saleUnitContext,
+        private DeliveryTimeEstimator $deliveryTimeEstimator,
     ) {
     }
 
@@ -41,6 +46,7 @@ readonly class OrderFactory
         LangModel $language,
         CartModel $cart,
         UserInterface $customer,
+        ?DeliveryEstimate $deliveryEstimate = null,
     ): ModelOrder {
         $order = $sessionOrder->copy();
 
@@ -72,8 +78,48 @@ readonly class OrderFactory
         $order->setGiftMessage($cart->getGiftMessage());
 
         $this->copyDeliveryDate($cart, $order);
+        $this->keepDeliveryEstimate($order, $deliveryEstimate);
 
         return $order;
+    }
+
+    /**
+     * The interval the carrier delays give for this cart now, to be kept on the order. It is
+     * counted before the order transaction opens: it only reads settings, and an estimate
+     * that fails must not run inside the transaction that writes the order. An order paid
+     * after the cutoff hour gets the next day, which is the day it will really be prepared.
+     */
+    public function estimateDeliveryOf(ModelOrder $sessionOrder, CartModel $cart): ?DeliveryEstimate
+    {
+        $moduleId = $sessionOrder->getDeliveryModuleId();
+
+        if (null === $moduleId) {
+            return null;
+        }
+
+        // Read here, outside the guard of the estimator: a failure still leaves the order
+        // placed without an estimate.
+        try {
+            $module = ModuleQuery::create()->findPk($moduleId);
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->addError(\sprintf('The carrier #%d of the order could not be read for a delivery estimate', $moduleId)."\n".ThrowableTrace::describe($throwable));
+
+            return null;
+        }
+
+        return null === $module ? null : $this->deliveryTimeEstimator->estimateForCart($module, $cart);
+    }
+
+    /**
+     * Kept as it was counted, whatever the delays become; none for an order with a picked day.
+     */
+    private function keepDeliveryEstimate(ModelOrder $order, ?DeliveryEstimate $deliveryEstimate): void
+    {
+        $estimate = null === $order->getDeliveryDate() ? $deliveryEstimate : null;
+
+        $order
+            ->setEstimatedDeliveryFrom($estimate?->earliestDay())
+            ->setEstimatedDeliveryTo($estimate?->latestDay());
     }
 
     /**

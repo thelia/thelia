@@ -392,6 +392,10 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $product->setGuestCheckoutForbidden((int) $event->getGuestCheckoutForbidden());
             }
 
+            if ($event->carriesAvailabilityDelay()) {
+                $product->setAvailabilityDelayDays($event->getAvailabilityDelayDays());
+            }
+
             $product->save($con);
 
             // Update default PSE (if product has no attributes and the product's ref change)

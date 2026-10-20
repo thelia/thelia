@@ -39,6 +39,9 @@ Written through `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSetting
 | Closed days of the week of a carrier | `delivery_date_rule.closed_weekdays` | NULL follows the shop; an empty string means every day is open |
 | Slots | `delivery_slot` (+ `delivery_slot_i18n.title`) | Local start and end hours, the same every open day; `capacity` in orders, NULL for no limit |
 | Exceptional closures | `delivery_closure` | Both days included; `module_id` NULL closes the whole shop |
+| Cutoff hour of the shop | config `delivery_cutoff_time` | `H:i`; an order at or after it is prepared the next working day; empty for none |
+| Preparation and transit days of a carrier | `delivery_date_rule.preparation_days`, `transit_min_days`, `transit_max_days` | Working days; both transit bounds set the estimate on, all three NULL take it off; 0 is a delay. Any carrier, whether it accepts dates or not |
+| Availability delay of a product | `product.availability_delay_days` | Working days added to the preparation; NULL adds none |
 
 ## How a day is judged
 
@@ -56,6 +59,26 @@ The three exceptions extend `InvalidDeliveryException`, so a caller that already
 
 The choice falls by itself when the carrier of the cart changes (`Cart::preSave()`). `CartFacade::dropDeliveryDateIfNoLongerPossible()` takes off a day that became impossible and says whether it did, for a theme to tell the buyer.
 
+## Estimated delivery
+
+The buyer picks nothing here: each carrier announces the days a parcel is expected between, before the order. `DeliveryTimeEstimator` reads the delays and the calendar, `DeliveryIntervalCalculator` counts:
+
+- The day the order comes in is the first day of preparation, unless the shop is closed that day or the order comes in at or after the cutoff: preparation starts on the next working day of the shop. The parcel leaves at the end of the last day of preparation; zero days of preparation leave the same day, like one.
+- The transit counts working days of the carrier from the day after the parcel leaves; zero days deliver that day, or on the next day the carrier works.
+- Preparation days follow the shop closed days of the week and the shop closures; transit days follow the carrier closed days of the week (or the shop's) and the closures of the carrier and of the shop.
+- The slowest product of the cart that is shipped adds its `availability_delay_days` (a virtual product is not in the parcel and holds nothing back) to the preparation, counted after the first day: zero or one day of preparation plus two days of the product ship on the third working day. A delay is read as at most 366 days, and a count as at most 732 working days; the calendar is walked for at most a week per working day, so a shop open one day a week still gets a date; a closure is stepped over at once, however long, and a week closed every day gives no estimate without being walked.
+- A carrier that lets the buyer pick a day (`choice_mode` it accepts) shows its calendar and announces no estimate, on the delivery step, on the product page and on the order.
+
+So one day of preparation and two of transit deliver an order of Tuesday morning on Thursday, and on Friday once the cutoff is passed.
+
+| Where | What is shown |
+|---|---|
+| Delivery options (delivery step, `GET /api/front/delivery_modules`) | `minimumDeliveryDate` and `maximumDeliveryDate`, `Y-m-d`, filled by `DeliveryOptionsProvider` unless the module wrote its own (an empty string counts as none) |
+| Order | `order.estimated_delivery_from` / `estimated_delivery_to`, counted again when the order is placed (`OrderFactory`): an order paid after the cutoff hour gets the next day, which is the day it will really be prepared. It then does not move when the delays change. Empty when the buyer picked a day, and when the count fails, which never refuses the order. Order API: `estimatedDeliveryFrom`, `estimatedDeliveryTo` |
+| Product page | `ShippingFacade::estimateProductDelivery($product, $cart)`, or `estimateProductDeliveryById($productId, $cart)` for a theme that holds the id only (null for a product the visitor cannot see: unknown, offline, or out of their catalogue by a `ProductVisibility` rule): the soonest of the active carriers delivering to the delivery address of the cart, else the default address of its customer, else the default country of the shop, with that country, for the theme to name it. Null for a virtual product or when no carrier there announces delays. Meant for one product page: each call reads the carriers and their zones again, so a theme does not call it for every card of a list |
+
+`DeliveryEstimateCalendar` loads the delays of every carrier, the closures and the shop settings once per request, so listing or comparing several carriers costs no query per carrier; `DeliveryDateSettings` empties it on every write. A failure to count an estimate (a database that does not answer, settings that cannot be read) is logged with its class and a trace without arguments, and leaves the page or the order without one. The order counts its estimate before its transaction opens. The estimate reads neither the session nor the request, and counts days in the time zone PHP runs in, so a command that writes an e-mail gets the same days as the delivery step. Thelia has no time zone setting of its own: set `date.timezone` to the shop's, for the web server and the command line alike. The estimate depends on the visitor's address and on today: Flexy serves the product page as `private`, and a theme or a proxy must not put it in a shared cache.
+
 ## Capacity
 
 The place in a slot is taken in the transaction of `OrderFacade::createOrder()`, by a single conditional UPDATE on `delivery_slot_booking` (`DeliverySlotBooker`), the way stock is decremented: two buyers racing for the last place are arbitrated by the database, and the one refused gets `delivery-slot-full` with the order rolled back. A cancelled or refunded order gives its place back; brought back to another status, it takes it again whatever the capacity says. The number of orders a slot holds is never published.
@@ -65,6 +88,7 @@ The place in a slot is taken in the transaction of `OrderFacade::createOrder()`,
 `order.delivery_date`, `delivery_slot_id` (NULL once the slot is deleted) and the hours `delivery_slot_start` / `delivery_slot_end`, copied when the order is placed: editing or deleting a slot afterwards changes nothing on placed orders. The date is information of the order, never a state: a day gone by blocks no transition.
 
 - Loop `order`: `DELIVERY_DATE` (Y-m-d), `DELIVERY_SLOT_START`, `DELIVERY_SLOT_END` (H:i).
+- Loop `order`: `ESTIMATED_DELIVERY_FROM`, `ESTIMATED_DELIVERY_TO` (Y-m-d), the interval announced when the order was placed; the order e-mails of the default mail template repeat it.
 - Customer data export: `delivery_date` and `delivery_slot` per order.
 
 ## Front API

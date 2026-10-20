@@ -19,6 +19,8 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
 use Thelia\Domain\Cart\Service\CartAddressService;
+use Thelia\Domain\Shipping\DeliveryDate\DTO\ProductDeliveryEstimate;
+use Thelia\Domain\Shipping\DeliveryDate\Service\ProductDeliveryEstimator;
 use Thelia\Domain\Shipping\DTO\DeliveryModuleWithOptionDTO;
 use Thelia\Domain\Shipping\DTO\PostageEstimateView;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
@@ -34,6 +36,7 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\Product;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
 
@@ -49,7 +52,26 @@ final readonly class ShippingFacade
         private DeliveryOptionsProvider $deliveryOptionsProvider,
         private DeliveryModuleResourceBuilder $deliveryModuleResourceBuilder,
         private CartAddressService $cartAddressService,
+        private ProductDeliveryEstimator $productDeliveryEstimator,
     ) {
+    }
+
+    /**
+     * The soonest delivery a product page can announce, and the country it holds for; null
+     * when no carrier delivering there announces delays, or for a virtual product.
+     */
+    public function estimateProductDelivery(Product $product, ?Cart $cart = null): ?ProductDeliveryEstimate
+    {
+        return $this->productDeliveryEstimator->estimate($product, $cart);
+    }
+
+    /**
+     * The same, for a theme that holds the id of the product only; null for a product the
+     * visitor cannot see: unknown, offline or out of their catalogue.
+     */
+    public function estimateProductDeliveryById(int $productId, ?Cart $cart = null): ?ProductDeliveryEstimate
+    {
+        return $this->productDeliveryEstimator->estimateById($productId, $cart);
     }
 
     /**

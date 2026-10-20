@@ -28,9 +28,9 @@ use Thelia\Model\DeliverySlotQuery;
 use Thelia\Model\Module;
 
 /**
- * What the merchant sets about delivery dates: the closed days of the shop, and per carrier
- * the shape of the choice, the delay, the horizon, its own closed days, its slots and its
- * closures.
+ * What the merchant sets about delivery dates: the closed days and the cutoff hour of the
+ * shop, and per carrier the shape of the choice, the delay, the horizon, its own closed days,
+ * its slots, its closures, and the preparation and transit days a delivery is estimated with.
  *
  * Every rule a setting has to follow is checked here, so a back office, an import or a test
  * writing the same setting meets the same refusals. Orders already placed are never touched:
@@ -40,6 +40,7 @@ final readonly class DeliveryDateSettings
 {
     public function __construct(
         private DeliveryDateCalendar $calendar,
+        private DeliveryEstimateCalendar $estimateCalendar,
     ) {
     }
 
@@ -57,6 +58,30 @@ final readonly class DeliveryDateSettings
     public function saveShopClosedWeekdays(iterable $weekdays): void
     {
         ConfigQuery::write(ClosedWeekdays::SHOP_CONFIG_NAME, ClosedWeekdays::format($weekdays), false, true);
+        $this->estimateCalendar->reset();
+    }
+
+    /**
+     * The local hour, H:i, from which an order is prepared the next working day, null for none.
+     */
+    public function shopCutoffTime(): ?string
+    {
+        return $this->estimateCalendar->cutoff();
+    }
+
+    /**
+     * @throws InvalidDeliveryDateSettingsException
+     */
+    public function saveShopCutoffTime(?string $cutoff): void
+    {
+        $cutoff = null === $cutoff ? '' : trim($cutoff);
+
+        if ('' !== $cutoff && 1 !== preg_match(DeliveryTimeEstimator::CUTOFF_PATTERN, $cutoff)) {
+            throw new InvalidDeliveryDateSettingsException('The cutoff hour must be written as hours and minutes, such as 14:00.');
+        }
+
+        ConfigQuery::write(DeliveryTimeEstimator::CUTOFF_CONFIG_NAME, $cutoff, false, true);
+        $this->estimateCalendar->reset();
     }
 
     public function ruleOf(Module $module): ?DeliveryDateRule
@@ -101,6 +126,46 @@ final readonly class DeliveryDateSettings
             ->setHorizonDays($horizonDays)
             ->setClosedWeekdays(null === $closedWeekdays ? null : ClosedWeekdays::format($closedWeekdays))
             ->save();
+        $this->estimateCalendar->reset();
+
+        return $rule;
+    }
+
+    /**
+     * The delays a delivery by this carrier is estimated with, in working days. Both transit
+     * bounds set the estimate on, all three null take it off; zero is a delay like any other.
+     *
+     * @throws InvalidDeliveryDateSettingsException
+     * @throws PropelException
+     */
+    public function saveDeliveryDelays(Module $module, ?int $preparationDays, ?int $transitMinDays, ?int $transitMaxDays): DeliveryDateRule
+    {
+        if ((null === $transitMinDays) !== (null === $transitMaxDays)) {
+            throw new InvalidDeliveryDateSettingsException('Set both the fewest and the most transit days, or neither.');
+        }
+
+        if (null !== $preparationDays && null === $transitMinDays) {
+            throw new InvalidDeliveryDateSettingsException('A preparation delay needs the transit days of the carrier to estimate a delivery.');
+        }
+
+        foreach ([$preparationDays, $transitMinDays, $transitMaxDays] as $days) {
+            if (null !== $days && ($days < 0 || $days > DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS)) {
+                throw new InvalidDeliveryDateSettingsException('A delay must be between 0 and %max days.', ['%max' => (string) DeliveryDateCalendar::MAXIMUM_HORIZON_DAYS]);
+            }
+        }
+
+        if (null !== $transitMinDays && $transitMaxDays < $transitMinDays) {
+            throw new InvalidDeliveryDateSettingsException('The most transit days cannot be fewer than the fewest.');
+        }
+
+        $rule = $this->ruleOf($module) ?? (new DeliveryDateRule())->setModuleId($module->getId());
+
+        $rule
+            ->setPreparationDays($preparationDays)
+            ->setTransitMinDays($transitMinDays)
+            ->setTransitMaxDays($transitMaxDays)
+            ->save();
+        $this->estimateCalendar->reset();
 
         return $rule;
     }
@@ -193,6 +258,7 @@ final readonly class DeliveryDateSettings
             ->setEndDate($end->format('Y-m-d'))
             ->setLabel('' === $label ? null : $label);
         $closure->save();
+        $this->estimateCalendar->reset();
 
         return $closure;
     }
@@ -203,6 +269,7 @@ final readonly class DeliveryDateSettings
     public function deleteClosure(DeliveryClosure $closure): void
     {
         $closure->delete();
+        $this->estimateCalendar->reset();
     }
 
     /**

@@ -150,6 +150,32 @@ final class ProductApiTest extends ApiTestCase
         self::assertSame(0, (int) $reloaded->getVisible());
     }
 
+    /**
+     * The availability delay is walked day by day by the delivery estimate: a value beyond
+     * the calendar horizon is refused, a value within it is kept.
+     */
+    public function testTheAvailabilityDelayOfAProductIsBoundedByTheCalendarHorizon(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+
+        $i18ns = ['en_US' => ['title' => 'Delay probe', 'locale' => 'en_US']];
+
+        $refused = $this->jsonRequest('PATCH', '/api/admin/products/'.$product->getId(), ['availabilityDelayDays' => 100000, 'i18ns' => $i18ns], $token, 'merge-patch+json');
+        self::assertSame(422, $refused->getStatusCode());
+        self::assertSame(['availabilityDelayDays'], array_column(json_decode((string) $refused->getContent(), true, flags: \JSON_THROW_ON_ERROR)['violations'] ?? [], 'propertyPath'));
+
+        $kept = $this->jsonRequest('PATCH', '/api/admin/products/'.$product->getId(), ['availabilityDelayDays' => 5, 'i18ns' => $i18ns], $token, 'merge-patch+json');
+        self::assertJsonResponseSuccessful($kept);
+
+        $reloaded = ProductQuery::create()->findPk($product->getId());
+        self::assertNotNull($reloaded);
+        $reloaded->reload();
+        self::assertSame(5, $reloaded->getAvailabilityDelayDays());
+    }
+
     public function testUpdateProductViaPutWithoutPositionKeepsIt(): void
     {
         $token = $this->authenticateAsAdmin();

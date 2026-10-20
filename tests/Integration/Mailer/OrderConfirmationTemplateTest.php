@@ -85,6 +85,63 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
     }
 
     /**
+     * The interval announced at checkout is repeated as it was said: the template reads it
+     * off the order, frozen there when the order was placed.
+     */
+    public function testTheConfirmationMailRepeatsTheAnnouncedDeliveryInterval(): void
+    {
+        $this->skipUnlessTheInstalledTemplateCarries('ESTIMATED_DELIVERY_FROM', 'the estimated delivery interval');
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order($factory->customer($factory->customerTitle()));
+        $parameters = $this->parametersTheCoreSendsFor($order);
+
+        $without = $this->renderConfirmation($parameters);
+        $order->setEstimatedDeliveryFrom('2026-09-03')->setEstimatedDeliveryTo('2026-09-07')->save($this->getPropelConnection());
+        $with = $this->renderConfirmation($parameters);
+
+        self::assertStringNotContainsString('Estimated delivery', (string) $without->getHtmlBody());
+        foreach ([(string) $with->getHtmlBody(), (string) $with->getTextBody()] as $body) {
+            self::assertStringContainsString('Estimated delivery:', $body);
+            self::assertMatchesRegularExpression('/between .*3.* and .*7/', $body);
+        }
+    }
+
+    /**
+     * A day with no end, written by anything else than the core, is said as a day rather
+     * than as an interval that stops nowhere.
+     */
+    public function testAnIntervalWithoutItsEndIsSaidAsItsFirstDay(): void
+    {
+        $this->skipUnlessTheInstalledTemplateCarries('ESTIMATED_DELIVERY_FROM', 'the estimated delivery interval');
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order($factory->customer($factory->customerTitle()));
+        $parameters = $this->parametersTheCoreSendsFor($order);
+        $order->setEstimatedDeliveryFrom('2026-09-03')->setEstimatedDeliveryTo('2026-09-03')->save($this->getPropelConnection());
+        $oneDay = $this->renderConfirmation($parameters);
+        $order->setEstimatedDeliveryTo(null)->save($this->getPropelConnection());
+        $withoutEnd = $this->renderConfirmation($parameters);
+
+        // Said word for word as an interval of one day is.
+        self::assertSame($this->estimateLineOf((string) $oneDay->getHtmlBody()), $this->estimateLineOf((string) $withoutEnd->getHtmlBody()));
+        self::assertSame($this->estimateLineOf((string) $oneDay->getTextBody()), $this->estimateLineOf((string) $withoutEnd->getTextBody()));
+        // And that day is said: a date, not a blank and not an interval.
+        foreach ([(string) $oneDay->getHtmlBody(), (string) $oneDay->getTextBody()] as $body) {
+            $line = $this->estimateLineOf($body);
+            self::assertMatchesRegularExpression('/^Estimated delivery:\s+[^<\s][^<]*3/', $line);
+            self::assertStringNotContainsString('between', $line);
+        }
+    }
+
+    private function estimateLineOf(string $body): string
+    {
+        self::assertSame(1, preg_match('/Estimated delivery:[^\n]*/', $body, $line), 'The mail states an estimated delivery.');
+
+        return $line[0];
+    }
+
+    /**
      * The confirmation exactly as Thelia\Action\Order sends it, parameters included.
      *
      * @return array<string, mixed>
@@ -146,12 +203,17 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
      */
     private function skipUnlessTheInstalledTemplateCarriesTheTrackingLink(): void
     {
+        $this->skipUnlessTheInstalledTemplateCarries('guest_order_tracking_url', 'the guest tracking link');
+    }
+
+    private function skipUnlessTheInstalledTemplateCarries(string $marker, string $what): void
+    {
         $templatePath = $this->getService(TemplateHelperInterface::class)
             ->getActiveMailTemplate()
             ->getAbsolutePath().DS.'order_confirmation.html.twig';
 
-        if (!str_contains((string) @file_get_contents($templatePath), 'guest_order_tracking_url')) {
-            self::markTestSkipped('The installed mail template does not carry the guest tracking link yet.');
+        if (!str_contains((string) @file_get_contents($templatePath), $marker)) {
+            self::markTestSkipped(\sprintf('The installed mail template does not carry %s yet.', $what));
         }
     }
 }

@@ -58,6 +58,7 @@
     <column name="meta_keywords" type="LONGVARCHAR" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column defaultValue="0" description="the product may only be bought from an account, so a cart holding it is refused the guest checkout" name="guest_checkout_forbidden" required="true" type="TINYINT" />
+    <column description="working days the product needs before it can be shipped, added to the preparation days of the carrier; NULL when the product adds none" name="availability_delay_days" type="INTEGER" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -708,6 +709,10 @@
     <column description="the local hour the picked slot started at, copied off the slot" name="delivery_slot_start" type="TIME" />
     <column description="the local hour the picked slot ended at, copied off the slot" name="delivery_slot_end" type="TIME" />
     <column defaultValue="NULL" description="the sale unit this order was placed on, NULL for a national (single-shop) order" name="sale_unit_id" type="INTEGER" />
+    <!-- The interval the shop announced when the order was placed, kept as it was said: it
+         does not move when the carrier delays are changed afterwards. -->
+    <column description="the earliest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay" name="estimated_delivery_from" type="DATE" />
+    <column description="the latest day the delivery was estimated at when the order was placed, NULL when the carrier had no delay" name="estimated_delivery_to" type="DATE" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
@@ -1232,8 +1237,10 @@
     <behavior name="timestampable" />
   </table>
   <!-- How a carrier lets the buyer pick a delivery day. Only a delivery module that declares it
-       accepts dates (DeliveryDateAwareInterface) is offered one: a row left for another module
-       is ignored. The shape is none, a free date in a window, or named slots of a day. -->
+       accepts dates (DeliveryDateAwareInterface) is offered one: a choice mode left for another
+       module is ignored. The shape is none, a free date in a window, or named slots of a day.
+       The preparation and transit days hold for any carrier: they estimate when a parcel
+       arrives, the buyer picks nothing. -->
   <table name="delivery_date_rule" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="module_id" required="true" type="INTEGER" />
@@ -1241,6 +1248,9 @@
     <column defaultValue="0" description="how many days after today the first day offered is" name="minimum_delay_days" required="true" type="INTEGER" />
     <column defaultValue="30" description="how many days after today the last day offered is" name="horizon_days" required="true" type="INTEGER" />
     <column description="the days of the week the carrier does not deliver, ISO numbers from 1 (Monday) to 7 (Sunday) separated by commas; NULL follows the shop days" name="closed_weekdays" size="20" type="VARCHAR" />
+    <column description="working days of the shop the order takes to be prepared before it is shipped, NULL when the carrier announces no delivery estimate" name="preparation_days" type="INTEGER" />
+    <column description="the fewest working days of the carrier a parcel travels, NULL when the carrier announces no delivery estimate" name="transit_min_days" type="INTEGER" />
+    <column description="the most working days of the carrier a parcel travels, NULL when the carrier announces no delivery estimate" name="transit_max_days" type="INTEGER" />
     <foreign-key foreignTable="module" name="fk_delivery_date_rule_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="module_id" />
     </foreign-key>
