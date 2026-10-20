@@ -17,12 +17,14 @@ namespace Thelia\Tests\Integration\Domain\Cart;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Catalog\Product\Exception\NotAnActiveDeliveryModuleException;
 use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
+use Thelia\Domain\Shipping\Service\PostageEstimator;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
@@ -159,6 +161,38 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
         self::assertTrue($this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($carrier, $cart, $country, null));
     }
 
+    public function testTheEstimateMovesToAnotherCarrierWhenAProductRefusesTheOneOfTheSession(): void
+    {
+        [$sessionCarrier, $otherCarrier] = $this->twoCarriers();
+        $country = $this->factory->country();
+        $this->serveCountryWith($sessionCarrier, $country);
+        $this->serveCountryWith($otherCarrier, $country);
+        [$cart, $product] = $this->cartShippedWith($sessionCarrier, $country);
+        $this->answerDeliveryQuoteByCarrier([$sessionCarrier->getCode() => 9.0, $otherCarrier->getCode() => 4.0]);
+        $this->session()->getOrder()->setDeliveryModuleId($sessionCarrier->getId());
+        $this->getService(ProductFacade::class)->excludeDeliveryModule($product->getId(), $sessionCarrier->getId());
+
+        $estimate = $this->getService(PostageEstimator::class)->estimatePostageForCountry($cart, $country);
+
+        self::assertNotNull($estimate->getBestPostageAmount(), 'A carrier is left: the estimate is not empty.');
+        self::assertEqualsWithDelta(4.0, $estimate->getBestPostageAmount(), 0.0001);
+    }
+
+    public function testTheEstimateKeepsToTheCarrierOfTheSessionWhileNoProductRefusesIt(): void
+    {
+        [$sessionCarrier, $otherCarrier] = $this->twoCarriers();
+        $country = $this->factory->country();
+        $this->serveCountryWith($sessionCarrier, $country);
+        $this->serveCountryWith($otherCarrier, $country);
+        [$cart] = $this->cartShippedWith($sessionCarrier, $country);
+        $this->answerDeliveryQuoteByCarrier([$sessionCarrier->getCode() => 9.0, $otherCarrier->getCode() => 4.0]);
+        $this->session()->getOrder()->setDeliveryModuleId($sessionCarrier->getId());
+
+        $estimate = $this->getService(PostageEstimator::class)->estimatePostageForCountry($cart, $country);
+
+        self::assertEqualsWithDelta(9.0, $estimate->getBestPostageAmount(), 0.0001, 'The carrier the buyer picked is the one estimated, cheaper or not.');
+    }
+
     private function carrier(): Module
     {
         return ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->findOne()
@@ -201,6 +235,50 @@ final class ProductCarrierExclusionTest extends IntegrationTestCase
         };
         $this->dispatcher()->addListener(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener, 512);
         $this->registeredListeners[] = [TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener];
+    }
+
+    /**
+     * @return array{0: Module, 1: Module}
+     */
+    private function twoCarriers(): array
+    {
+        $carriers = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->orderById()->limit(2)->find();
+
+        if (2 !== $carriers->count()) {
+            self::markTestSkipped('Two active delivery modules are needed.');
+        }
+
+        return [$carriers[0], $carriers[1]];
+    }
+
+    /**
+     * Each carrier quotes its own price, tax included, with a fifth of it as tax.
+     *
+     * @param array<string, float> $prices module code => price
+     */
+    private function answerDeliveryQuoteByCarrier(array $prices): void
+    {
+        $listener = static function (DeliveryPostageEvent $event) use ($prices): void {
+            $price = $prices[$event->getModule()->getCode()] ?? null;
+
+            if (null === $price) {
+                return;
+            }
+
+            $event->setValidModule(true);
+            $event->setPostage(new OrderPostage($price, round($price / 6, 2), 'VAT'));
+            $event->stopPropagation();
+        };
+        $this->dispatcher()->addListener(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener, 512);
+        $this->registeredListeners[] = [TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener];
+    }
+
+    /**
+     * The session the estimator is given, which holds the carrier the buyer picked.
+     */
+    private function session(): Session
+    {
+        return $this->getService(Session::class);
     }
 
     private function dispatcher(): EventDispatcherInterface

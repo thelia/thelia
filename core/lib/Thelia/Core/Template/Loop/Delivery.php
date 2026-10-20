@@ -20,10 +20,14 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
+use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
@@ -42,6 +46,15 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class Delivery extends BaseSpecificModule
 {
+    /**
+     * Nullable: the loop executor builds a loop with no argument when it is not a service.
+     */
+    public function __construct(
+        protected readonly ?CartShippingRules $cartShippingRules = null,
+        protected readonly ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         $collection = parent::getArgDefinitions();
@@ -92,19 +105,36 @@ class Delivery extends BaseSpecificModule
                 continue;
             }
 
+            // A carrier a product of the cart refuses is not offered for it.
+            if ($this->cartShippingRules?->for($cart)->excludes((int) $deliveryModule->getId())) {
+                continue;
+            }
+
             $loopResultRow = new LoopResultRow($deliveryModule);
 
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
-                $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
-                $this->dispatcher->dispatch(
-                    $deliveryPostageEvent,
-                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                );
+                $deliveryPostageEvent = null;
 
-                if ($deliveryPostageEvent->isValidModule()) {
-                    $postage = $deliveryPostageEvent->getPostage();
+                $askCarrier = function (Cart $quotedCart) use ($moduleInstance, $address, $country, $state, &$deliveryPostageEvent): ?OrderPostage {
+                    $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $quotedCart, $address, $country, $state);
+                    $this->dispatcher->dispatch(
+                        $deliveryPostageEvent,
+                        TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                    );
+
+                    return $deliveryPostageEvent->isValidModule() ? $deliveryPostageEvent->getPostage() : null;
+                };
+
+                // The shipping rules of the products: the carrier prices what it
+                // carries, the surcharges come on top, as on the cart.
+                $postage = null !== $this->productShippingRuleQuoter && null !== $country
+                    ? $this->productShippingRuleQuoter->quote($deliveryModule, $cart, $country, $state, $askCarrier)
+                    : $askCarrier($cart);
+
+                if ($deliveryPostageEvent instanceof DeliveryPostageEvent && $deliveryPostageEvent->isValidModule()) {
+                    $postage ??= new OrderPostage();
 
                     $loopResultRow
                         ->set('ID', $deliveryModule->getId())
@@ -115,7 +145,7 @@ class Delivery extends BaseSpecificModule
                         ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
                         ->set('POSTAGE', $postage->getAmount())
                         ->set('POSTAGE_TAX', $postage->getAmountTax())
-                        ->set('POSTAGE_UNTAXED', $postage->getAmount() - $postage->getAmountTax())
+                        ->set('POSTAGE_UNTAXED', $postage->getUntaxedAmount())
                         ->set('POSTAGE_TAX_RULE_TITLE', $postage->getTaxRuleTitle())
                         ->set('DELIVERY_DATE', $deliveryPostageEvent->getDeliveryDate());
 
@@ -156,6 +186,8 @@ class Delivery extends BaseSpecificModule
 
             return $country;
         }
+
+        return null;
     }
 
     protected function getCurrentState(): mixed
@@ -171,6 +203,8 @@ class Delivery extends BaseSpecificModule
 
             return $state;
         }
+
+        return null;
     }
 
     protected function getDeliveryAddress(): mixed

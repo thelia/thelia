@@ -62,7 +62,8 @@ class PostageEstimator
         $orderSession = $this->session->getOrder();
 
         $deliveryModules = $this->resolveCandidateDeliveryModules(
-            $orderSession->getDeliveryModuleId()
+            $orderSession->getDeliveryModuleId(),
+            $cart,
         );
 
         $virtual = $cart->isVirtual();
@@ -116,11 +117,13 @@ class PostageEstimator
      *
      * @throws PropelException
      */
-    private function resolveCandidateDeliveryModules(?int $sessionDeliveryModuleId): array
+    private function resolveCandidateDeliveryModules(?int $sessionDeliveryModuleId, Cart $cart): array
     {
         $deliveryModules = [];
 
-        if (null !== $sessionDeliveryModuleId) {
+        // The carrier of the session, unless a product of the cart refuses it: the
+        // estimate then falls back on the carriers the buyer can still pick.
+        if (null !== $sessionDeliveryModuleId && !$this->cartShippingRules?->for($cart)->excludes($sessionDeliveryModuleId)) {
             if ($deliveryModule = ModuleQuery::create()->findPk($sessionDeliveryModuleId)) {
                 $deliveryModules[] = $deliveryModule;
             }
