@@ -369,7 +369,25 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
         self::assertTrue($line->isFailed());
         self::assertSame('Authorization expired', $line->getErrorMessage());
+        self::assertNull($line->getErrorCode(), 'A refusal that names no code of the provider is written without one.');
         self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+    }
+
+    public function testAModuleThatRefusesWithTheCodeOfTheProviderWritesThatCode(): void
+    {
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentRefusedException::withProviderCode('Amount above the authorization', ' PSP_100 ');
+
+        try {
+            $this->service->capture($order);
+            self::fail('The refusal must reach the caller.');
+        } catch (PaymentRefusedException) {
+        }
+
+        $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        self::assertTrue($line->isFailed());
+        self::assertSame('PSP_100', $line->getErrorCode());
+        self::assertSame('Amount above the authorization', $line->getErrorMessage());
     }
 
     public function testAPendingCaptureKeepsASecondCaptureFromCallingTheProviderAgain(): void
