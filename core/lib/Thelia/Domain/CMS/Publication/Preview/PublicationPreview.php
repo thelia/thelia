@@ -27,7 +27,8 @@ final readonly class PublicationPreview
     /**
      * The request attribute a preview sets, read by a theme to show its banner:
      * `app.request.attributes.get('_publication_preview')`. Its value names the row
-     * previewed, `['type' => 'content', 'id' => 12]`.
+     * previewed, `['type' => 'content', 'id' => 12, 'locale' => 'fr_FR']` (`locale` null when
+     * the link named none).
      */
     public const string ATTRIBUTE = '_publication_preview';
 
@@ -42,16 +43,22 @@ final readonly class PublicationPreview
     private function __construct(
         public string $type,
         public int $id,
+        public ?string $locale,
     ) {
     }
 
-    public static function of(string $type, int $id): self
+    /**
+     * `$locale` is the language the page is previewed in (`fr_FR`), signed with the rest
+     * of the link; without it the page renders in the language of the session, as the
+     * public page does.
+     */
+    public static function of(string $type, int $id, ?string $locale = null): self
     {
         if (!\in_array($type, self::TYPES, true)) {
             throw new \InvalidArgumentException(\sprintf('"%s" is not a type a preview knows.', $type));
         }
 
-        return new self($type, $id);
+        return new self($type, $id, '' === $locale ? null : $locale);
     }
 
     public static function fromRequest(?Request $request): ?self
@@ -62,12 +69,12 @@ final readonly class PublicationPreview
             return null;
         }
 
-        return new self((string) $value['type'], (int) $value['id']);
+        return new self((string) $value['type'], (int) $value['id'], isset($value['locale']) ? (string) $value['locale'] : null);
     }
 
     public function markRequest(Request $request): void
     {
-        $request->attributes->set(self::ATTRIBUTE, ['type' => $this->type, 'id' => $this->id]);
+        $request->attributes->set(self::ATTRIBUTE, ['type' => $this->type, 'id' => $this->id, 'locale' => $this->locale]);
     }
 
     public function covers(string $view, mixed $viewId): bool

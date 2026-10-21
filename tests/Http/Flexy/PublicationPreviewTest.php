@@ -100,6 +100,33 @@ final class PublicationPreviewTest extends WebIntegrationTestCase
         self::assertSame('noindex, nofollow', $response->headers->get('X-Robots-Tag'));
     }
 
+    public function testTheLinkNamesTheLanguageThePageIsPreviewedIn(): void
+    {
+        $draft = $this->draftContent('flexy-preview-language.html');
+        $draft->setLocale('fr_FR')->setTitle('Titre français de prévisualisation')->setDescription('<p>Corps</p>')->save($this->getPropelConnection());
+
+        $this->client->request('GET', $this->signedUrl('content', (int) $draft->getId(), 'fr_FR'));
+        $french = $this->client->getResponse();
+
+        $this->client->request('GET', $this->signedUrl('content', (int) $draft->getId(), 'en_US'));
+        $english = $this->client->getResponse();
+
+        self::assertSame(200, $french->getStatusCode());
+        self::assertStringContainsString('Titre français de prévisualisation', (string) $french->getContent());
+        self::assertSame(200, $english->getStatusCode());
+        self::assertStringContainsString('Preview content', (string) $english->getContent());
+        self::assertStringNotContainsString('Titre français de prévisualisation', (string) $english->getContent());
+    }
+
+    public function testALinkNamingALanguageTheShopDoesNotHaveAnswersNotFound(): void
+    {
+        $draft = $this->draftContent('flexy-preview-unknown-language.html');
+
+        $this->client->request('GET', $this->signedUrl('content', (int) $draft->getId(), 'xx_XX'));
+
+        self::assertSame(404, $this->client->getResponse()->getStatusCode());
+    }
+
     public function testALinkWithoutASignatureAnswersNotFound(): void
     {
         $draft = $this->draftContent('flexy-preview-no-hash.html');
@@ -202,8 +229,8 @@ final class PublicationPreviewTest extends WebIntegrationTestCase
         return $content;
     }
 
-    private function signedUrl(string $type, int $id): string
+    private function signedUrl(string $type, int $id, ?string $locale = null): string
     {
-        return $this->getService(PublicationPreviewLinkGenerator::class)->generate(PublicationPreview::of($type, $id))->url;
+        return $this->getService(PublicationPreviewLinkGenerator::class)->generate(PublicationPreview::of($type, $id, $locale))->url;
     }
 }
