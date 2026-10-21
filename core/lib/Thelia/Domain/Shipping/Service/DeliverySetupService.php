@@ -62,7 +62,10 @@ final readonly class DeliverySetupService
 
         $customer = $cart->getCustomer();
 
-        if (null !== $customer) {
+        // Never the default address of a guest row: the row is reused by whoever types the
+        // same e-mail address, and each identification makes its own address the default
+        // one, so it may be another buyer's. A guest keeps the address the cart has, if any.
+        if (null !== $customer && !$customer->isGuest()) {
             $defaultAddress = AddressQuery::create()
                 ->filterByCustomerId($customer->getId())
                 ->filterByIsDefault(1)
