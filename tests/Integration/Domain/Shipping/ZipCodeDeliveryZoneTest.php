@@ -336,6 +336,31 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * The carriers are asked for a price with the address the request names only when it is
+     * an address of the cart's customer: anyone else's never reaches a module.
+     */
+    public function testNoModuleIsHandedTheAddressOfAnotherCustomer(): void
+    {
+        $this->zoneServedByTheModule();
+        $title = $this->factory->customerTitle();
+        $mine = $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '69001']);
+        $someoneElses = $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '20090']);
+        $cart = $this->customerCartShippedTo($mine);
+        $addressesHandedOver = [];
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use (&$addressesHandedOver): void {
+            $addressesHandedOver[] = $event->getAddress()?->getId();
+        }, 4096);
+        $facade = $this->getService(ShippingFacade::class);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $named = $ids($facade->listValidMethodsAsResourceApi($cart, null, null, $someoneElses->getId()));
+
+        self::assertNotContains($someoneElses->getId(), $addressesHandedOver, 'A module was handed the address of another customer.');
+        self::assertContains($mine->getId(), $addressesHandedOver);
+        self::assertSame($ids($facade->listValidMethodsAsResourceApi($cart)), $named, 'The list is the one of the cart.');
+    }
+
     public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
     {
         $area = $this->zoneServedByTheModule();
