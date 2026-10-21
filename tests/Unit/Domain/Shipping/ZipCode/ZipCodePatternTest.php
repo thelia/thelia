@@ -51,6 +51,12 @@ final class ZipCodePatternTest extends TestCase
         yield 'zero-width space' => ['20090', "20\u{200B}090", true];
         yield 'no-break space' => ['SW1A1AA', "SW1A\u{00A0}1AA", true];
         yield 'non-breaking hyphen' => ['1000-001', "1000\u{2011}001", true];
+        yield 'an en dash' => ['1000-001', "1000\u{2013}001", true];
+        yield 'a figure dash' => ['1000-001', "1000\u{2012}001", true];
+        yield 'a horizontal bar' => ['1000-001', "1000\u{2015}001", true];
+        yield 'a minus sign' => ['1000-001', "1000\u{2212}001", true];
+        yield 'arabic-indic digits' => ['20*', "\u{0662}\u{0660}\u{0660}\u{0669}\u{0660}", true];
+        yield 'devanagari digits in a range' => ['75001...75020', "\u{096D}\u{096B}\u{0966}\u{0967}\u{0966}", true];
         yield 'range of long codes, outside' => ['12345678901234567890...12345678901234567899', '12345678901234567900', false];
     }
 
@@ -109,5 +115,33 @@ final class ZipCodePatternTest extends TestCase
     {
         self::assertSame('20*\\r\\n[ERROR] forged\\000\\177', ZipCodePattern::forLog("20*\r\n[ERROR] forged\0\x7F"));
         self::assertSame('SW1A1AA', ZipCodePattern::forLog('SW1A1AA'));
+    }
+
+    /**
+     * A removed character no longer keeps apart what composes: the normal form composes it,
+     * and is the same applied twice.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    public static function codesToNormalizeTwice(): iterable
+    {
+        yield 'a soft hyphen before a combining accent' => ["A\u{00AD}\u{0301}", "\u{00C1}"];
+        yield 'a zero-width space before a combining accent' => ["E\u{200B}\u{0301}1", "\u{00C9}1"];
+        yield 'full-width digits' => ["\u{FF12}\u{FF10} 090", '20090'];
+    }
+
+    #[DataProvider('codesToNormalizeTwice')]
+    public function testTheNormalFormIsTheSameAppliedTwice(string $zipCode, string $normalForm): void
+    {
+        self::assertSame($normalForm, ZipCodePattern::normalize($zipCode));
+        self::assertSame($normalForm, ZipCodePattern::normalize($normalForm));
+    }
+
+    public function testThePatternLengthIsCountedInCharacters(): void
+    {
+        self::assertSame(str_repeat("\u{00C9}", 26), (string) ZipCodePattern::fromString(str_repeat("\u{00C9}", 26)), '26 accented letters are 52 bytes and 26 characters.');
+
+        $this->expectException(InvalidZipCodeRuleException::class);
+        ZipCodePattern::fromString(str_repeat("\u{00C9}", 51));
     }
 }

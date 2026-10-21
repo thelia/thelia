@@ -24,15 +24,23 @@ use Thelia\Log\Tlog;
  * range matches the codes of the length of its bounds only, so "01000...01999" takes
  * "01500" and neither "1500" nor "001500".
  *
- * Codes are compared in their normal form: upper case, without spaces or hyphens, so
- * "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001".
+ * Codes are compared in their normal form (normalize()): compatibility characters folded
+ * (Unicode NFKC, so a full-width "２０" is "20"), without spaces, hyphens, dashes or
+ * invisible format characters, with the digits of every script written in ASCII, and in
+ * upper case. So "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001".
  */
 final readonly class ZipCodePattern
 {
     private const RANGE_SEPARATOR = '...';
 
-    /** The length of the `pattern` column of `area_zip_code_rule`. */
+    /** The length of the `pattern` column of `area_zip_code_rule`, in characters. */
     public const MAX_LENGTH = 50;
+
+    /**
+     * Spaces, hyphens, dashes (U+2010 to U+2015, the minus sign) and invisible format
+     * characters (a soft hyphen, a zero-width space, a word joiner...).
+     */
+    private const SEPARATORS = '/[\s\-\x{2010}-\x{2015}\x{2212}\p{Z}\p{Cf}]+/u';
 
     private function __construct(
         private string $pattern,
@@ -50,7 +58,7 @@ final readonly class ZipCodePattern
             throw new InvalidZipCodeRuleException('A postal code pattern needs at least one character other than *.');
         }
 
-        if (\strlen($normalized) > self::MAX_LENGTH) {
+        if (mb_strlen($normalized) > self::MAX_LENGTH) {
             throw new InvalidZipCodeRuleException('A postal code pattern is 50 characters long at most.');
         }
 
@@ -95,12 +103,15 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * The normal form of a postal code, or null when it cannot be read (not valid UTF-8):
-     * such a code is neither unknown nor any code, the rules cannot tell where it is.
+     * The normal form of a postal code, or null when it cannot be read (not valid UTF-8, or
+     * an expression PCRE gives up on): such a code is neither unknown nor any code, the rules
+     * cannot tell where it is.
      *
-     * Compatibility characters are folded first (NFKC: "２０" is "20"), then every space,
-     * hyphen and invisible format character goes (a no-break space, a non-breaking hyphen,
-     * a zero-width space), and the letters are put in upper case.
+     * Compatibility characters are folded (NFKC: "２０" is "20"), every space, hyphen, dash
+     * and invisible format character goes (a no-break space, a non-breaking hyphen, a soft
+     * hyphen, a zero-width space), the digits of other scripts become ASCII digits, the text
+     * is folded again so that what was split by a removed character composes as it would
+     * have, and the letters are put in upper case. Applied twice, it gives the same code.
      */
     public static function normalize(string $zipCode): ?string
     {
@@ -110,9 +121,20 @@ final readonly class ZipCodePattern
             return null;
         }
 
-        $withoutSeparators = preg_replace('/[\s\-\x{2010}\x{2011}\p{Z}\p{Cf}]+/u', '', $folded);
+        $withoutSeparators = preg_replace(self::SEPARATORS, '', $folded);
 
-        return null === $withoutSeparators ? null : strtoupper($withoutSeparators);
+        if (null === $withoutSeparators) {
+            return null;
+        }
+
+        $asciiDigits = preg_replace_callback(
+            '/[^\x{0030}-\x{0039}\P{Nd}]/u',
+            static fn (array $digit): string => (string) \IntlChar::charDigitValue((int) mb_ord($digit[0])),
+            $withoutSeparators,
+        );
+        $refolded = null === $asciiDigits ? false : \Normalizer::normalize($asciiDigits, \Normalizer::FORM_KC);
+
+        return false === $refolded ? null : strtoupper($refolded);
     }
 
     /**
