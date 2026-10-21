@@ -274,9 +274,12 @@ final readonly class ShippingFacade
 
     /**
      * The postal code of the cart's delivery address when it is the reason no carrier is
-     * offered: some active carrier would be offered without it (its zones serve the country
-     * and it quotes the cart), and the postal code rules of its zones refuse that code. Null
-     * otherwise, including when carriers are offered.
+     * offered: no carrier is offered, and some active carrier would be without it (its zones
+     * serve the country and it quotes the cart) but the postal code rules of its zones refuse
+     * that code. Null otherwise, including when carriers are offered.
+     *
+     * Each carrier is asked its price for the cart (TheliaEvents::MODULE_DELIVERY_GET_POSTAGE),
+     * those the postal code turned away included.
      *
      * A front office reads it to explain an empty list of carriers instead of only
      * showing one.
