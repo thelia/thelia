@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 #[Exclude]
 final class EmptyContentPublicationException extends PublicationException
 {
-    public const MESSAGE = 'This content has no body in the default language (%locale) and cannot be published.';
+    public const MESSAGE = 'This content has no body in the default language (%language) and cannot be published.';
 
     private function __construct(
         string $message,
@@ -34,8 +34,14 @@ final class EmptyContentPublicationException extends PublicationException
         parent::__construct($message);
     }
 
-    public static function forContent(int $contentId, string $locale): self
+    /**
+     * `$languageName` is what the person reads, "English" rather than "en_US"; the locale
+     * stands in when the language has no name.
+     */
+    public static function forContent(int $contentId, string $locale, ?string $languageName = null): self
     {
-        return new self(self::translated(self::MESSAGE, ['%locale' => $locale]), $contentId, $locale);
+        $languageName = null === $languageName || '' === trim($languageName) ? $locale : $languageName;
+
+        return new self(self::translated(self::MESSAGE, ['%language' => $languageName]), $contentId, $locale);
     }
 }

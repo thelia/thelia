@@ -18,6 +18,7 @@ use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Model\Content;
 use Thelia\Model\ContentI18nQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 /**
  * Refuses to put a content online with no body in the default language of the shop.
@@ -47,13 +48,23 @@ final readonly class PublicationGuard
         $body = $bodyInMemory ?? $this->bodyInDatabase($content, $defaultLocale);
 
         if ($this->detector->isEmpty($body)) {
-            throw EmptyContentPublicationException::forContent((int) $content->getId(), $defaultLocale);
+            throw EmptyContentPublicationException::forContent((int) $content->getId(), $defaultLocale, self::languageName($defaultLocale));
         }
     }
 
     public static function defaultLocale(): string
     {
         return (string) Lang::getDefaultLanguage()->getLocale();
+    }
+
+    /**
+     * The name of the language as the shop writes it ("English"), null when it has none.
+     */
+    private static function languageName(string $locale): ?string
+    {
+        $lang = Lang::getDefaultLanguage();
+
+        return $lang->getLocale() === $locale ? $lang->getTitle() : LangQuery::create()->findOneByLocale($locale)?->getTitle();
     }
 
     private function bodyInDatabase(Content $content, string $locale): ?string
