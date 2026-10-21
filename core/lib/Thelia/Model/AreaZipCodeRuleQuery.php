@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Shipping\ZipCode\Exception\InvalidZipCodeRuleException;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
 use Thelia\Log\Tlog;
@@ -92,7 +93,7 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
             try {
                 $pattern = ZipCodePattern::fromString((string) $rule->getPattern());
                 $readableInclusions += $rule->getExcluded() ? 0 : 1;
-            } catch (\InvalidArgumentException $exception) {
+            } catch (InvalidZipCodeRuleException $exception) {
                 $pattern = ZipCodePattern::matchingNothing();
                 $unreadable[] = ['rule' => $rule, 'reason' => $exception->getMessage()];
             }
