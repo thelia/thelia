@@ -40,9 +40,10 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     {
         $response = null;
 
-        // A blank code is an unknown one: every zone takes it, no rule is read. A code that
-        // cannot be normalised (null) is not blank: the rules judge it as uncertain.
-        if (null !== $zipCode && '' === ZipCodePattern::normalize($zipCode)) {
+        // A blank code (only spaces) is an unknown one: every zone takes it, no rule is read.
+        // A code that cannot be read, or that its normal form empties, is not unknown: the
+        // rules judge it as uncertain.
+        if (ZipCodePattern::isUnknown($zipCode)) {
             $zipCode = null;
         }
 

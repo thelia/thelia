@@ -85,6 +85,16 @@ final readonly class ZipCodePattern
     }
 
     /**
+     * Whether a postal code is unknown: none, or only spaces. Every rule accepts it, the
+     * address decides later. A code that is not blank but that the normal form empties (a
+     * zero-width space alone) is not unknown: it is uncertain, as a code that cannot be read.
+     */
+    public static function isUnknown(?string $zipCode): bool
+    {
+        return null === $zipCode || 1 === preg_match('/^\s*$/u', $zipCode);
+    }
+
+    /**
      * The normal form of a postal code, or null when it cannot be read (not valid UTF-8):
      * such a code is neither unknown nor any code, the rules cannot tell where it is.
      *
@@ -107,26 +117,36 @@ final readonly class ZipCodePattern
 
     /**
      * @param bool $whenUnsure the answer when the code cannot be checked, because it cannot
-     *                         be read (not valid UTF-8) or because the expression of a
-     *                         pattern with * cannot be run (PCRE limits): true for an
-     *                         exclusion, which then refuses the code rather than letting it
-     *                         through
+     *                         be read (not valid UTF-8, or emptied by its normal form) or
+     *                         because the expression of a pattern with * cannot be run
+     *                         (PCRE limits): true for an exclusion, which then refuses the
+     *                         code rather than letting it through
      */
     public function matches(string $zipCode, bool $whenUnsure = false): bool
+    {
+        if (self::isUnknown($zipCode)) {
+            return false;
+        }
+
+        return $this->matchesNormalized(self::normalize($zipCode), $whenUnsure);
+    }
+
+    /**
+     * matches() for a code already in its normal form (null when it could not be read), as
+     * ZipCodeRuleSet passes it once for all its rules.
+     *
+     * @internal
+     */
+    public function matchesNormalized(?string $zipCode, bool $whenUnsure = false): bool
     {
         // The pattern of an unreadable rule matches nothing, an uncertain code included.
         if ('' === $this->pattern) {
             return false;
         }
 
-        $zipCode = self::normalize($zipCode);
-
-        if (null === $zipCode) {
+        // A code that cannot be read, or that its normal form empties, is uncertain.
+        if (null === $zipCode || '' === $zipCode) {
             return $whenUnsure;
-        }
-
-        if ('' === $zipCode) {
-            return false;
         }
 
         if (str_contains($this->pattern, self::RANGE_SEPARATOR)) {
@@ -141,7 +161,7 @@ final readonly class ZipCodePattern
         }
 
         if (str_contains($this->pattern, '*')) {
-            $expression = '/^'.str_replace('\\*', '.*', preg_quote($this->pattern, '/')).'$/';
+            $expression = '/^'.str_replace('\\*', '.*', preg_quote($this->pattern, '/')).'$/u';
             $matched = preg_match($expression, $zipCode);
 
             if (false === $matched) {

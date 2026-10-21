@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Domain\Shipping\ZipCode;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
@@ -115,5 +116,36 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertTrue((new ZipCodeRuleSet())->accepts($unreadable), 'A zone without a rule takes every code.');
         self::assertFalse((new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('75*')]))->accepts($unreadable), 'An exclusion refuses it.');
         self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($unreadable), 'An inclusion does not take it.');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invisibleCodes(): iterable
+    {
+        yield 'a zero-width space' => ["\u{200B}"];
+        yield 'a soft hyphen' => ["\u{00AD}"];
+        yield 'a word joiner' => ["\u{2060}"];
+    }
+
+    /**
+     * A code that is not blank but that its normal form empties is not unknown: the rules
+     * cannot tell where it is, so they fail closed on it.
+     */
+    #[DataProvider('invisibleCodes')]
+    public function testACodeOfInvisibleCharactersIsUncertainNotUnknown(string $zipCode): void
+    {
+        self::assertTrue((new ZipCodeRuleSet())->accepts($zipCode), 'A zone without a rule takes every code.');
+        self::assertFalse((new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('75*')]))->accepts($zipCode), 'An exclusion refuses it.');
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($zipCode), 'An inclusion does not take it.');
+    }
+
+    public function testOnlyNoCodeOrSpacesAreUnknown(): void
+    {
+        $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]);
+
+        self::assertTrue($rules->accepts(null));
+        self::assertTrue($rules->accepts(''));
+        self::assertTrue($rules->accepts(" \t\u{00A0}"));
     }
 }
