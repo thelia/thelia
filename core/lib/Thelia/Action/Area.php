@@ -87,8 +87,9 @@ class Area extends BaseAction implements EventSubscriberInterface
             throw $throwable;
         }
 
-        // Written once the deletion is committed. The merchant removed a country, not its
-        // rules: the log keeps what went with it.
+        // Written once the deletion is committed. A trace for the shop's developers: the
+        // NOTICE is written only when `tlog_level` lets it through (the default level is
+        // ERROR); the merchant's trace is the administration log of the back office.
         foreach ($deletedPatterns as $countryId => $patterns) {
             Tlog::getInstance()->notice(
                 'Country {country_id} left shipping zone {area_id}: {count} postal code rule(s) deleted with it ({patterns}).',
