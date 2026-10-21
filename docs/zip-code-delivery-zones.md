@@ -21,9 +21,11 @@ optionally one country of the zone (no country: every country of the zone).
 
 Codes and patterns are compared in their normal form: compatibility characters folded
 (Unicode NFKC, through `ext-intl`, which the core requires: `２０000` is `20000`), upper
-case, without spaces, hyphens (a non-breaking one included) or invisible format characters
-(a zero-width space). `SW1A 1AA` matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern that can
-match nothing (empty, only `*`, a range with letters or upside down) is refused when it
+case, without spaces, hyphens and dashes (a non-breaking hyphen, an en dash, a minus sign)
+or invisible format characters (a soft hyphen, a zero-width space), and with the digits of
+every script written in ASCII (Arabic-Indic or Devanagari digits included). `SW1A 1AA`
+matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern is 50 characters long at
+most. A pattern that can match nothing (empty, only `*`, a range with letters or upside down) is refused when it
 is written. One that reaches the table by another way matches no postal code and is logged
 with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
