@@ -1659,3 +1659,115 @@ INNER JOIN (
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
 SET FOREIGN_KEY_CHECKS = 1;
+-- ---------------------------------------------------------------------
+-- Publication of contents and folders
+--
+-- A content or a folder is a draft, scheduled, published or unpublished.
+-- The `visible` column stays the public truth; `publish_at` and
+-- `unpublish_at` carry the dates the state is read from, on the row and on
+-- its versions. Every row the shop already holds gets a state once: a
+-- visible row is published since its creation, a hidden row is unpublished
+-- since its last change. No row is ever turned into a draft, and the dates
+-- are only written on the run that adds the columns, so a replay leaves a
+-- draft written since then alone.
+-- ---------------------------------------------------------------------
+
+SET @content_publication_added := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content' AND `COLUMN_NAME` = 'publish_at');
+SET @folder_publication_added := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder' AND `COLUMN_NAME` = 'publish_at');
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content' AND `COLUMN_NAME` = 'publish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `content` ADD `publish_at` DATETIME NULL COMMENT ''when the content went or goes online; NULL on a draft'' AFTER `position`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content' AND `COLUMN_NAME` = 'unpublish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `content` ADD `unpublish_at` DATETIME NULL COMMENT ''when the content went or goes offline; NULL while nothing takes it offline'' AFTER `publish_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content_version' AND `COLUMN_NAME` = 'publish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `content_version` ADD `publish_at` DATETIME NULL COMMENT ''when the content went or goes online; NULL on a draft'' AFTER `position`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content_version' AND `COLUMN_NAME` = 'unpublish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `content_version` ADD `unpublish_at` DATETIME NULL COMMENT ''when the content went or goes offline; NULL while nothing takes it offline'' AFTER `publish_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder' AND `COLUMN_NAME` = 'publish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `folder` ADD `publish_at` DATETIME NULL COMMENT ''when the folder went or goes online; NULL on a draft'' AFTER `position`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder' AND `COLUMN_NAME` = 'unpublish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `folder` ADD `unpublish_at` DATETIME NULL COMMENT ''when the folder went or goes offline; NULL while nothing takes it offline'' AFTER `publish_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder_version' AND `COLUMN_NAME` = 'publish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `folder_version` ADD `publish_at` DATETIME NULL COMMENT ''when the folder went or goes online; NULL on a draft'' AFTER `position`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder_version' AND `COLUMN_NAME` = 'unpublish_at');
+SET @statement := IF(@add_column, 'ALTER TABLE `folder_version` ADD `unpublish_at` DATETIME NULL COMMENT ''when the folder went or goes offline; NULL while nothing takes it offline'' AFTER `publish_at`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The scheduled publication command and the back-office filter read the rows by their dates.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content' AND `INDEX_NAME` = 'idx_content_publish_at');
+SET @statement := IF(@add_index, 'ALTER TABLE `content` ADD INDEX `idx_content_publish_at` (`publish_at`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'content' AND `INDEX_NAME` = 'idx_content_unpublish_at');
+SET @statement := IF(@add_index, 'ALTER TABLE `content` ADD INDEX `idx_content_unpublish_at` (`unpublish_at`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder' AND `INDEX_NAME` = 'idx_folder_publish_at');
+SET @statement := IF(@add_index, 'ALTER TABLE `folder` ADD INDEX `idx_folder_publish_at` (`publish_at`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'folder' AND `INDEX_NAME` = 'idx_folder_unpublish_at');
+SET @statement := IF(@add_index, 'ALTER TABLE `folder` ADD INDEX `idx_folder_unpublish_at` (`unpublish_at`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+-- The state of what the shop already holds: visible rows are published since their
+-- creation, hidden rows unpublished since their last change. Only on the run that
+-- adds the columns, so a draft or a schedule written since then survives a replay.
+SET @statement := IF(@content_publication_added, 'UPDATE `content` SET `publish_at` = COALESCE(`created_at`, NOW()) WHERE `visible` = 1 AND `publish_at` IS NULL', 'DO 0');
+PREPARE migrate_statement FROM @statement;
+EXECUTE migrate_statement;
+DEALLOCATE PREPARE migrate_statement;
+
+SET @statement := IF(@content_publication_added, 'UPDATE `content` SET `unpublish_at` = COALESCE(`updated_at`, `created_at`, NOW()) WHERE (`visible` IS NULL OR `visible` <> 1) AND `unpublish_at` IS NULL', 'DO 0');
+PREPARE migrate_statement FROM @statement;
+EXECUTE migrate_statement;
+DEALLOCATE PREPARE migrate_statement;
+
+SET @statement := IF(@folder_publication_added, 'UPDATE `folder` SET `publish_at` = COALESCE(`created_at`, NOW()) WHERE `visible` = 1 AND `publish_at` IS NULL', 'DO 0');
+PREPARE migrate_statement FROM @statement;
+EXECUTE migrate_statement;
+DEALLOCATE PREPARE migrate_statement;
+
+SET @statement := IF(@folder_publication_added, 'UPDATE `folder` SET `unpublish_at` = COALESCE(`updated_at`, `created_at`, NOW()) WHERE (`visible` IS NULL OR `visible` <> 1) AND `unpublish_at` IS NULL', 'DO 0');
+PREPARE migrate_statement FROM @statement;
+EXECUTE migrate_statement;
+DEALLOCATE PREPARE migrate_statement;
+
