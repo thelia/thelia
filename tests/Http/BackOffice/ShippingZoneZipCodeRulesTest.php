@@ -16,6 +16,7 @@ namespace Thelia\Tests\Http\BackOffice;
 
 use BackOfficeDefaultTwigBundle\Controller\Configuration\AreaZipCodeRuleController;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\AccessManager;
@@ -28,6 +29,7 @@ use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
 use Thelia\Model\LangQuery;
+use Thelia\Model\State;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
@@ -177,6 +179,61 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
             $area,
             \sprintf('Country %d removed from shipping zone "%s" (ID %d), with its 2 postal code rule(s): excluded 20*, included 75001...75020', $country->getId(), $area->getName(), $area->getId()),
         ), 'The administration log names the rules that left with the country.');
+    }
+
+    public function testRemovingAStateOfACountryThatStaysLogsNoRule(): void
+    {
+        $this->skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText();
+        $area = $this->area();
+        $country = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $state = (new State())->setCountryId($country->getId())->setIsocode('XV1')->setVisible(1);
+        $state->save($this->getPropelConnection());
+        (new CountryArea())->setAreaId($area->getId())->setCountryId($country->getId())->setStateId($state->getId())->save($this->getPropelConnection());
+        $this->rule($area, '20*', true)->setCountryId($country->getId())->save($this->getPropelConnection());
+
+        $this->removeFromTheZone($area, ['country_id' => (string) $country->getId(), 'state_id' => (string) $state->getId()]);
+
+        self::assertSame(1, AreaZipCodeRuleQuery::create()->filterByAreaId($area->getId())->count(), 'The country stays: so do its rules.');
+        self::assertSame(1, $this->logEntries($area, \sprintf('Country %d (state %d) removed from shipping zone "%s" (ID %d)', $country->getId(), $state->getId(), $area->getName(), $area->getId())));
+    }
+
+    /**
+     * A country without a rule: the log says it left, and no more. The name of the zone, the
+     * merchant's text, is escaped as the patterns are.
+     */
+    public function testRemovingACountryWithoutARuleLogsTheRemovalOnly(): void
+    {
+        $this->skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText();
+        $area = $this->area();
+        $area->setName("Zone\r\n[forged]")->save($this->getPropelConnection());
+        $country = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+
+        $this->removeFromTheZone($area, ['country_id' => (string) $country->getId()]);
+
+        self::assertSame(1, $this->logEntries($area, \sprintf('Country %d removed from shipping zone "Zone\\r\\n[forged]" (ID %d)', $country->getId(), $area->getId())));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function removalPaths(): iterable
+    {
+        yield 'one country' => ['/admin/configuration/shipping_configuration/country/remove'];
+        yield 'the countries ticked' => ['/admin/configuration/shipping_configuration/countries/remove'];
+    }
+
+    #[DataProvider('removalPaths')]
+    public function testRemovingACountryTheZoneDoesNotHoldLogsNothing(string $path): void
+    {
+        $this->skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText();
+        $area = $this->area();
+        $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $elsewhere = $this->factory()->country(['isoalpha2' => 'XW', 'isoalpha3' => 'XWX', 'isocode' => '996']);
+        $countryField = str_ends_with($path, 'countries/remove') ? ['country_id' => [(string) $elsewhere->getId()]] : ['country_id' => (string) $elsewhere->getId()];
+
+        $this->removeFromTheZone($area, $countryField, $path);
+
+        self::assertSame(0, AdminLogQuery::create()->filterByResource(AdminResources::AREA)->filterByResourceId($area->getId())->filterByMessage('Country %', Criteria::LIKE)->count(), 'Nothing left the zone.');
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
@@ -354,6 +411,20 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         $form['rule_id']->setValue((string) $button->attr('data-rule-id'));
 
         return $form;
+    }
+
+    /**
+     * @param array<string, string|list<string>> $fields
+     */
+    private function removeFromTheZone(Area $area, array $fields, string $path = '/admin/configuration/shipping_configuration/country/remove'): void
+    {
+        $this->loginAs($this->factory()->admin());
+        $this->assertPageRenders($this->zoneUrl($area));
+        $token = (string) $this->client->getCrawler()->filter('[data-testid="shipping-configuration-add-country-form"] input[name="_token"]')->attr('value');
+
+        $this->client->request('POST', $path, ['area_id' => (string) $area->getId(), '_token' => $token] + $fields);
+
+        self::assertTrue($this->client->getResponse()->isRedirect());
     }
 
     private function logEntries(Area $area, string $message): int
