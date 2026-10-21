@@ -378,28 +378,36 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
     }
 
     /**
-     * @return iterable<string, array{string, bool}>
+     * @return iterable<string, array{string, bool, bool}>
      */
     public static function addressesNamedForACartWithoutACopy(): iterable
     {
-        yield 'another address of the customer' => ['own', true];
-        yield 'an address of another customer' => ['someone else', false];
-        yield 'an id that reads as none' => ['abc', false];
+        yield 'another address of the customer' => ['own', true, true];
+        yield 'an address of another customer' => ['someone else', false, false];
+        yield 'an id that reads as none' => ['abc', true, false];
     }
 
     /**
      * A cart without a delivery address yet. The zone serves the country of the customer's
-     * addresses but excludes the postal code of their default address, and the shop's
-     * default country is served by none: only the address named, another address of the
-     * customer, is listed for. An address of someone else gives the default country of the
-     * shop, never its own; an id that reads as none falls back on the address of the session,
-     * here the default address of the customer, which the zone excludes.
+     * addresses, and the shop's default country is served by none. Each case is listed for
+     * one place only:
+     *
+     * - another address of the customer named: the zone excludes the postal code of their
+     *   default address, so only the address named is listed for;
+     * - an address of someone else: the default country of the shop, served by none, never
+     *   the address named nor the default address of the customer, which the zone serves;
+     * - an id that reads as none: the address of the session, here the default address of
+     *   the customer, which the zone serves, never the default country of the shop.
      */
     #[DataProvider('addressesNamedForACartWithoutACopy')]
-    public function testTheFrontApiListsForACartWithoutACopy(string $named, bool $listed): void
+    public function testTheFrontApiListsForACartWithoutACopy(string $named, bool $listed, bool $defaultExcluded): void
     {
         $area = $this->zoneServedByTheModule();
-        $this->rule($area, '69001', excluded: true);
+
+        if ($defaultExcluded) {
+            $this->rule($area, '69001', excluded: true);
+        }
+
         CountryQuery::create()->update(['ByDefault' => 0], $this->getPropelConnection());
         $this->newCountry('XR', 'XRX', '986')->setByDefault(1)->save($this->getPropelConnection());
         $title = $this->factory->customerTitle();
@@ -414,7 +422,11 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         };
         $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
 
-        self::assertSame($listed, \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => $addressId])), true));
+        self::assertSame(
+            $listed,
+            \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => $addressId])), true),
+            $listed ? 'The list did not follow the one place this case is listed for.' : 'The list read a place this case must not reach.',
+        );
     }
 
     public function testAnEmptyRouteAttributeDoesNotHideTheAddressTheQueryNames(): void
