@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Shipping\ZipCode;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Domain\Shipping\ZipCode\InvalidZipCodeRuleException;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 
 final class ZipCodePatternTest extends TestCase
@@ -77,7 +78,7 @@ final class ZipCodePatternTest extends TestCase
     #[DataProvider('patternsThatMatchNothing')]
     public function testAPatternThatCanMatchNothingIsRefused(string $pattern): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidZipCodeRuleException::class);
 
         ZipCodePattern::fromString($pattern);
     }

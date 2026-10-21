@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use Thelia\Domain\Shipping\ZipCode\AreaZipCodeRuleWriter;
+use Thelia\Domain\Shipping\ZipCode\InvalidZipCodeRuleException;
 use Thelia\Model\Area;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;
@@ -46,6 +47,7 @@ final class AreaZipCodeRuleWriterTest extends IntegrationTestCase
 
     public function testAPatternThatMatchesNothingIsRefused(): void
     {
+        $this->expectException(InvalidZipCodeRuleException::class);
         $this->expectExceptionMessage('A postal code pattern needs at least one character other than *.');
 
         $this->writer->add($this->area()->getId(), '*', false, null);
@@ -56,9 +58,18 @@ final class AreaZipCodeRuleWriterTest extends IntegrationTestCase
         $area = $this->area();
         $foreign = $this->factory->country(['isoalpha2' => 'XS', 'isoalpha3' => 'XSX', 'isocode' => '992']);
 
+        $this->expectException(InvalidZipCodeRuleException::class);
         $this->expectExceptionMessage('A rule can only name a country of its zone.');
 
         $this->writer->add($area->getId(), '20*', true, $foreign->getId());
+    }
+
+    public function testARuleOfAZoneThatDoesNotExistIsRefused(): void
+    {
+        $this->expectException(InvalidZipCodeRuleException::class);
+        $this->expectExceptionMessage('This delivery zone does not exist.');
+
+        $this->writer->add(999999999, '20*', true, null);
     }
 
     public function testARuleCanNameACountryOfItsZone(): void
