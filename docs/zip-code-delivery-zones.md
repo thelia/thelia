@@ -98,7 +98,8 @@ message.
   carrier module.
 - On a country without a postal code format (`country.zip_code_format` empty, or
   `need_zip_code` off, in which case the format is not checked), the customer can type any
-  code, or none. An empty code is unknown and accepted by every zone, a mistyped one
+  code, or none. A format holding `C` is no better: `Country::getZipCodeRE()` reads it as
+  `.+`, any characters. An empty code is unknown and accepted by every zone, a mistyped one
   matches no exclusion: both pass the exclusions, and only inclusions hold. The back
   office warns on the card of a zone whose rules apply to such a country.
 - A rule written for a country goes with the country when it leaves the zone
