@@ -24,11 +24,15 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Domain\CMS\Publication\Exception\PublicationException;
+use Thelia\Domain\CMS\Publication\PublicationStatus;
+use Thelia\Domain\CMS\Publication\PublishableInterface;
 use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
@@ -36,6 +40,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
     operations: [
         new Post(
             uriTemplate: '/admin/folders',
+            exceptionToStatus: [PublicationException::class => 422],
         ),
         new GetCollection(
             uriTemplate: '/admin/folders',
@@ -46,9 +51,11 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         ),
         new Put(
             uriTemplate: '/admin/folders/{id}',
+            exceptionToStatus: [PublicationException::class => 422],
         ),
         new Patch(
             uriTemplate: '/admin/folders/{id}',
+            exceptionToStatus: [PublicationException::class => 422],
         ),
         new Delete(
             uriTemplate: '/admin/folders/{id}',
@@ -125,6 +132,13 @@ class Folder extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $position = null;
 
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    public ?\DateTimeInterface $publishAt = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Assert\GreaterThan(propertyPath: 'publishAt', message: 'The withdrawal date must come after the publication date.')]
+    public ?\DateTimeInterface $unpublishAt = null;
+
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
 
@@ -189,6 +203,46 @@ class Folder extends AbstractTranslatableResource
         $this->position = $position;
 
         return $this;
+    }
+
+    public function getPublishAt(): ?\DateTimeInterface
+    {
+        return $this->publishAt;
+    }
+
+    public function setPublishAt(?\DateTimeInterface $publishAt): self
+    {
+        $this->publishAt = $publishAt;
+
+        return $this;
+    }
+
+    public function getUnpublishAt(): ?\DateTimeInterface
+    {
+        return $this->unpublishAt;
+    }
+
+    public function setUnpublishAt(?\DateTimeInterface $unpublishAt): self
+    {
+        $this->unpublishAt = $unpublishAt;
+
+        return $this;
+    }
+
+    /**
+     * The publication state read from the row: draft, scheduled, published or unpublished.
+     * Read only; the state is changed by writing `visible`, `publishAt` and `unpublishAt`.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getPublicationState(): ?string
+    {
+        $propelModel = $this->getPropelModel();
+
+        if (!$propelModel instanceof PublishableInterface) {
+            return null;
+        }
+
+        return PublicationStatus::ofPublishable($propelModel, new \DateTimeImmutable())->state->value;
     }
 
     public function getCreatedAt(): ?\DateTime
