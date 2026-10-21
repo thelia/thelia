@@ -65,6 +65,16 @@ final readonly class ZipCodePattern
     }
 
     /**
+     * Text of a rule as a log line may carry it: control characters escaped (a carriage
+     * return becomes "\r"), so that a pattern written by hand in the database cannot forge
+     * a line of the log. Tlog writes its context as it comes.
+     */
+    public static function forLog(string $text): string
+    {
+        return addcslashes($text, "\0..\37\177");
+    }
+
+    /**
      * A pattern that matches no postal code: what an unreadable rule of the database stands
      * for (AreaZipCodeRuleQuery::ruleSetFor()).
      */
@@ -127,7 +137,7 @@ final readonly class ZipCodePattern
                 // The postal code itself stays out of the log: it is part of an address.
                 Tlog::getInstance()->warning(
                     'The postal code pattern "{pattern}" could not be checked ({error}): the code is taken as {answer}.',
-                    ['pattern' => $this->pattern, 'error' => preg_last_error_msg(), 'answer' => $whenUnsure ? 'matching it' : 'not matching it'],
+                    ['pattern' => self::forLog($this->pattern), 'error' => preg_last_error_msg(), 'answer' => $whenUnsure ? 'matching it' : 'not matching it'],
                 );
 
                 return $whenUnsure;

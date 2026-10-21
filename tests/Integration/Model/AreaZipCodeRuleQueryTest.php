@@ -81,6 +81,22 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
     }
 
     /**
+     * A pattern written by hand may hold a line break: logged as it is, it would forge a line
+     * of the log.
+     */
+    public function testAnUnreadableRuleCannotForgeALineOfTheLog(): void
+    {
+        $lines = $this->captureTheLog();
+        $ruleId = $this->insertStraightIntoTheTable("1...2\r\n[ERROR] forged", excluded: true);
+
+        $this->ruleSet()->accepts('20090');
+
+        $warning = $this->warningAbout($lines, $ruleId);
+        self::assertStringNotContainsString("\n", $warning, 'A line break of the pattern reached the log.');
+        self::assertStringContainsString('1...2\\r\\n[ERROR] forged', $warning);
+    }
+
+    /**
      * An unreadable inclusion must not open the zone to every postal code: it takes none, and
      * the zone keeps its other inclusions.
      */
