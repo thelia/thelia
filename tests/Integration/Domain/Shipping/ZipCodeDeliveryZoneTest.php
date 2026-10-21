@@ -316,6 +316,26 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertContains($this->module->getId(), $ids($facade->listValidMethodsAsResourceApi($cart, null, null, $someoneElses->getId())));
     }
 
+    /**
+     * A guest row is reused by whoever types the same e-mail address: an earlier buyer's
+     * address hangs off the row, and only the one the cart was copied from is this buyer's.
+     */
+    public function testAGuestReadsNoPostalCodeOfAnEarlierBuyerOfTheSameRow(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $earlierBuyers = $this->factory->address($guest, $this->country, null, ['zipcode' => '20090']);
+        $cart = $this->customerCartShippedTo($this->factory->address($guest, $this->country, null, ['zipcode' => '69001']));
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $earlierBuyers->getId())),
+            'The postal code of an earlier buyer of the guest row decides nothing.',
+        );
+    }
+
     public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
     {
         $area = $this->zoneServedByTheModule();

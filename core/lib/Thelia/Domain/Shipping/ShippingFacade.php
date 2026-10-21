@@ -389,23 +389,29 @@ final readonly class ShippingFacade
     }
 
     /**
-     * The address, when it belongs to the customer of the cart, a guest included: the
-     * checkout gives a guest a customer row of its own and binds the cart to it.
+     * The address, when it belongs to the customer of the cart.
      *
      * An id comes with a request: the postal code of an address of someone else would
-     * otherwise be read out through the carriers offered for it.
+     * otherwise be read out through the carriers offered for it. A guest row is reused by
+     * whoever types the same e-mail address (CustomerGuestRegistrationService), so it
+     * carries the addresses of earlier buyers: for a guest, only the address the cart's copy
+     * was taken from is theirs.
      */
     private function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
     {
-        $customerId = $cart->getCustomerId();
+        $customer = $cart->getCustomer();
 
-        if (null === $customerId) {
+        if (null === $customer) {
+            return null;
+        }
+
+        if ($customer->isGuest() && $addressId !== $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId()) {
             return null;
         }
 
         return AddressQuery::create()
             ->filterById($addressId)
-            ->filterByCustomerId($customerId)
+            ->filterByCustomerId($customer->getId())
             ->findOne();
     }
 
