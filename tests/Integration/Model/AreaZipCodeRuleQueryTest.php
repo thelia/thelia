@@ -14,6 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\EventListener\ZipCodeRuleCacheListener;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
 use Thelia\Log\AbstractTlogDestination;
@@ -69,20 +78,61 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
     }
 
     /**
-     * Between two messages of a worker the services are reset: a rule written by another
+     * Between two messages of a worker Symfony resets the services: a rule written by another
      * process, which no model hook of this one saw, is read from then on.
      */
-    public function testAResetOfTheServicesForgetsTheRulesRead(): void
+    public function testTheResetOfTheServicesForgetsTheRulesRead(): void
     {
+        $this->getService(ZipCodeRuleCacheListener::class);
         self::assertTrue($this->ruleSet()->accepts('20090'));
-
         $this->insertStraightIntoTheTable('20*', excluded: true);
 
-        self::assertTrue($this->ruleSet()->accepts('20090'), 'Kept for the request.');
-
-        $this->getService(ZipCodeRuleCacheListener::class)->reset();
+        $this->getService('services_resetter')->reset();
 
         self::assertFalse($this->ruleSet()->accepts('20090'));
+    }
+
+    public function testANewMainRequestForgetsTheRulesReadAndASubRequestDoesNot(): void
+    {
+        self::assertTrue($this->ruleSet()->accepts('20090'));
+        $this->insertStraightIntoTheTable('20*', excluded: true);
+        $onRequest = $this->listenerOf(KernelEvents::REQUEST);
+
+        $onRequest(new RequestEvent(static::$kernel, Request::create('/'), HttpKernelInterface::SUB_REQUEST), KernelEvents::REQUEST, $this->dispatcher());
+        self::assertTrue($this->ruleSet()->accepts('20090'), 'A sub-request belongs to the request being served.');
+
+        $onRequest(new RequestEvent(static::$kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST), KernelEvents::REQUEST, $this->dispatcher());
+        self::assertFalse($this->ruleSet()->accepts('20090'));
+    }
+
+    public function testAConsoleCommandForgetsTheRulesRead(): void
+    {
+        self::assertTrue($this->ruleSet()->accepts('20090'));
+        $this->insertStraightIntoTheTable('20*', excluded: true);
+
+        $this->listenerOf(ConsoleEvents::COMMAND)(new ConsoleCommandEvent(null, new ArrayInput([]), new NullOutput()), ConsoleEvents::COMMAND, $this->dispatcher());
+
+        self::assertFalse($this->ruleSet()->accepts('20090'));
+    }
+
+    /**
+     * The listener the event dispatcher of the application holds for the event: the test
+     * goes through the registration, not through the class.
+     */
+    private function listenerOf(string $eventName): callable
+    {
+        foreach ($this->dispatcher()->getListeners($eventName) as $listener) {
+            if (\is_array($listener) && $listener[0] instanceof ZipCodeRuleCacheListener) {
+                return $listener;
+            }
+        }
+
+        self::fail('No postal code rule listener is registered on '.$eventName.'.');
+    }
+
+    private function dispatcher(): EventDispatcherInterface
+    {
+        return static::getContainer()->get('event_dispatcher');
     }
 
     private function ruleSet(): ZipCodeRuleSet
