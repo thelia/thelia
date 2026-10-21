@@ -396,7 +396,8 @@ final class DestinationRestrictionTest extends IntegrationTestCase
 
     private function product(string $title, string $locale = 'en_US'): Product
     {
-        return $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => $title, 'locale' => $locale]);
+        // In stock: the cart refuses a line beyond the stock before any restriction is read.
+        return $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency(), ['title' => $title, 'locale' => $locale, 'baseQuantity' => 10]);
     }
 
     private function download(string $title): Product
