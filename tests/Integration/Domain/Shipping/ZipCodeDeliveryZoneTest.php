@@ -148,6 +148,47 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertTrue($this->isEligible(null));
     }
 
+    /**
+     * "-" typed for no code: a zone with an inclusion does not take it, a zone with
+     * exclusions only or without a rule does. No code at all (null) is still taken.
+     */
+    public function testAPlaceholderIsTakenOnlyByAZoneWithoutAnInclusion(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        self::assertTrue($this->isEligible('-'), 'A zone without a rule takes it.');
+
+        $exclusion = $this->rule($area, '75*', excluded: true);
+        self::assertTrue($this->isEligible('-'), 'A zone with exclusions only takes it.');
+
+        $exclusion->delete($this->getPropelConnection());
+        $this->rule($area, '75*');
+        self::assertFalse($this->isEligible('-'), 'A zone with an inclusion does not take it.');
+        self::assertFalse($this->isEligible(''), 'Nor an empty code.');
+        self::assertTrue($this->isEligible(null), 'No code at all is still taken.');
+    }
+
+    public function testTheGuardRefusesACartWhosePostalCodeIsAPlaceholderInAZoneWithAnInclusion(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*');
+        $cart = $this->guestCartShippedTo('-');
+        $cart->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+
+        $this->expectException(InvalidDeliveryException::class);
+        $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
+    public function testAPlaceholderIsNotNamed(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*');
+        $cart = $this->guestCartShippedTo('-');
+
+        self::assertNotContains($this->module->getId(), $this->offeredModuleIds($cart));
+        self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($cart), 'A placeholder gives the buyer nothing to read.');
+    }
+
     public function testAPostalCodeThatCannotBeReadIsNotTakenForAnUnknownOne(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -169,7 +210,7 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             $this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($this->module, $this->guestCartShippedTo('69001'), $this->country, null, "\u{200B}"),
             'An exclusion refuses a code its normal form empties.',
         );
-        self::assertTrue($this->isEligible(' '), 'A blank code is unknown.');
+        self::assertTrue($this->isEligible(' '), 'A blank code is a placeholder, which exclusions do not refuse.');
     }
 
     public function testTheGuardRefusesACartWhosePostalCodeTheZoneExcludes(): void

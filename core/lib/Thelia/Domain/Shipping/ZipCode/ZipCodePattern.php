@@ -31,6 +31,11 @@ use Thelia\Log\Tlog;
  * that keeps anything else (a letter outside A to Z, a variation selector, a control
  * character) has no normal form: it is uncertain. A pattern holds the same characters, with
  * * and the range separator ...
+ *
+ * A postal code is in one of three states before the rules read it: unknown (none at all,
+ * isUnknown()), a placeholder (typed, but only spaces and dashes, as a buyer types "-" for
+ * no code, isPlaceholder()), or a code, certain when it has a normal form and uncertain
+ * otherwise.
  */
 final readonly class ZipCodePattern
 {
@@ -47,10 +52,9 @@ final readonly class ZipCodePattern
     private const SEPARATORS = '/[\s\p{Z}\p{Pd}\x{2212}\p{Cf}]+/u';
 
     /**
-     * A code that is none, or only spaces, dashes and minus signs, as a buyer types "-" for
-     * no code.
+     * A typed code of only spaces, dashes and minus signs, as a buyer types "-" for no code.
      */
-    private const UNKNOWN = '/^[\s\p{Pd}\x{2212}]*$/u';
+    private const PLACEHOLDER = '/^[\s\p{Pd}\x{2212}]*$/u';
 
     /**
      * The characters forLog() writes as \u{...}: the C1 controls, line and paragraph
@@ -123,27 +127,38 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * Whether a postal code is unknown: none, or only spaces and dashes (a buyer types "-"
-     * for no code). Every rule accepts it, the address decides later. Any other code goes to
-     * the rules: one without a normal form is uncertain.
+     * Whether there is no postal code at all: no address yet, a cart estimated without one.
+     * Every zone takes it, and no rule is read: the address decides later.
+     *
+     * @phpstan-assert-if-false string $zipCode
      */
     public static function isUnknown(?string $zipCode): bool
     {
-        return null === $zipCode || 1 === preg_match(self::UNKNOWN, $zipCode);
+        return null === $zipCode;
     }
 
     /**
-     * The postal code as a buyer can be told it is why no carrier is offered: a known code
-     * that has a normal form. Null for an unknown code and for an uncertain one, which give
+     * Whether a typed postal code is a placeholder: empty, or only spaces, dashes and minus
+     * signs, as a buyer types "-" for no code. A zone with an inclusion does not take it, a
+     * zone with exclusions only or without a rule does (ZipCodeRuleSet).
+     */
+    public static function isPlaceholder(?string $zipCode): bool
+    {
+        return null !== $zipCode && 1 === preg_match(self::PLACEHOLDER, $zipCode);
+    }
+
+    /**
+     * The postal code as a buyer can be told it is why no carrier is offered: a code that has
+     * a normal form. Null for an unknown code, a placeholder and an uncertain code, which give
      * the buyer nothing to read.
      */
     public static function nameable(?string $zipCode): ?string
     {
-        if (self::isUnknown($zipCode)) {
+        if (null === $zipCode || self::isPlaceholder($zipCode) || null === self::normalize($zipCode)) {
             return null;
         }
 
-        return null === self::normalize((string) $zipCode) ? null : $zipCode;
+        return $zipCode;
     }
 
     /**
@@ -166,15 +181,16 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * @param bool $whenUnsure the answer when the code cannot be checked, because it cannot
-     *                         be read (not valid UTF-8, or emptied by its normal form) or
-     *                         because the expression of a pattern with * cannot be run
-     *                         (PCRE limits): true for an exclusion, which then refuses the
-     *                         code rather than letting it through
+     * A placeholder matches no pattern.
+     *
+     * @param bool $whenUnsure the answer when the code is uncertain, because it has no normal
+     *                         form (see normalize()), or when the expression of a pattern
+     *                         with * cannot be run (PCRE limits): true for an exclusion,
+     *                         which then refuses the code rather than letting it through
      */
     public function matches(string $zipCode, bool $whenUnsure = false): bool
     {
-        if (self::isUnknown($zipCode)) {
+        if (self::isPlaceholder($zipCode)) {
             return false;
         }
 
