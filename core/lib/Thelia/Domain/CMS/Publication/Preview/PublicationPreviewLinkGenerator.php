@@ -42,11 +42,14 @@ final readonly class PublicationPreviewLinkGenerator
     {
         $expiresAt = $this->clock->now()->modify(\sprintf('+%d days', max(1, $this->lifetimeDays)));
 
-        $url = $this->urlGenerator->generate(
-            PublicationPreview::ROUTE,
-            ['type' => $preview->type, 'id' => $preview->id],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $parameters = ['type' => $preview->type, 'id' => $preview->id];
+
+        if (null !== $preview->locale) {
+            // Not a route parameter: it travels as a query parameter, signed with the rest.
+            $parameters['locale'] = $preview->locale;
+        }
+
+        $url = $this->urlGenerator->generate(PublicationPreview::ROUTE, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new PublicationPreviewLink($this->uriSigner->sign($url, $expiresAt), \DateTimeImmutable::createFromInterface($expiresAt));
     }
