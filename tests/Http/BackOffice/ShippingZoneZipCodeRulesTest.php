@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\BackOffice;
 
 use BackOfficeDefaultTwigBundle\Controller\Configuration\AreaZipCodeRuleController;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\AccessManager;
@@ -141,6 +142,41 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         self::assertStringContainsString($aDot->getTitle(), $warning, 'A dot is any character to the regular expression.');
         self::assertStringNotContainsString($checked->getTitle(), $warning);
         self::assertStringContainsString('the format leaves free text', $warning);
+    }
+
+    /**
+     * The merchant's trace of a country removed from a zone: the administration log names the
+     * postal code rules that left with it, read before they went.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function removals(): iterable
+    {
+        yield 'one country' => ['/admin/configuration/shipping_configuration/country/remove'];
+        yield 'the countries ticked' => ['/admin/configuration/shipping_configuration/countries/remove'];
+    }
+
+    #[DataProvider('removals')]
+    public function testRemovingACountryLogsThePostalCodeRulesThatLeaveWithIt(string $path): void
+    {
+        $this->skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText();
+        $area = $this->area();
+        $country = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $this->rule($area, '20*', true)->setCountryId($country->getId())->save($this->getPropelConnection());
+        $this->rule($area, '75001...75020', false)->setCountryId($country->getId())->save($this->getPropelConnection());
+        $this->loginAs($this->factory()->admin());
+        $this->assertPageRenders($this->zoneUrl($area));
+        $token = (string) $this->client->getCrawler()->filter('[data-testid="shipping-configuration-add-country-form"] input[name="_token"]')->attr('value');
+
+        $countryField = str_ends_with($path, 'countries/remove') ? ['country_id' => [(string) $country->getId()]] : ['country_id' => (string) $country->getId()];
+        $this->client->request('POST', $path, ['area_id' => (string) $area->getId(), '_token' => $token] + $countryField);
+
+        self::assertTrue($this->client->getResponse()->isRedirect());
+        self::assertSame(0, AreaZipCodeRuleQuery::create()->filterByAreaId($area->getId())->count(), 'The rules left with the country.');
+        self::assertSame(1, $this->logEntries(
+            $area,
+            \sprintf('Country %d removed from shipping zone "%s" (ID %d), with its 2 postal code rule(s): excluded 20*, included 75001...75020', $country->getId(), $area->getName(), $area->getId()),
+        ), 'The administration log names the rules that left with the country.');
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
