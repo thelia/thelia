@@ -185,7 +185,7 @@ class CartGuard
         $address = null !== $cart->getAddressDeliveryId() ? CartAddressQuery::create()->findPk($cart->getAddressDeliveryId()) : null;
         $country = $address?->getCountry();
         $noCarrierLeft = null !== $address && null !== $country
-            && [] !== $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState());
+            && [] !== $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState(), $address->getZipcode());
 
         throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($excludingProductIds, $this->locale()), $noCarrierLeft);
     }
@@ -204,7 +204,7 @@ class CartGuard
             return;
         }
 
-        $blockingProductIds = $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState());
+        $blockingProductIds = $this->deliveryModuleEligibilityChecker->productsBlockingEveryCarrier($cart, $country, $address->getState(), $address->getZipcode());
 
         if ([] !== $blockingProductIds) {
             throw new DeliveryExcludedByProductException($this->cartShippingRules->titlesOf($blockingProductIds, $this->locale()), true);

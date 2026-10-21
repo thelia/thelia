@@ -67,7 +67,7 @@ final readonly class ShippingFacade
      */
     public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state, string $locale): array
     {
-        $productIds = $this->eligibilityChecker->productsBlockingEveryCarrier($cart, $country, $state);
+        $productIds = $this->eligibilityChecker->productsBlockingEveryCarrier($cart, $country, $state, $this->cartZipCodeIn($cart, $country));
 
         if ([] === $productIds || null === $this->cartShippingRules) {
             return [];

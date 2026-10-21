@@ -51,16 +51,19 @@ final readonly class DeliveryModuleEligibilityChecker
      * that serves the address is excluded by one of them. Empty while one carrier is
      * left, and when no carrier serves the address anyway, which is not their doing.
      *
+     * @param string|null $zipCode the postal code of the delivery address: a carrier the
+     *                             postal code rules turn away does not serve the address
+     *
      * @return list<int> product ids
      */
-    public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state): array
+    public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state, ?string $zipCode = null): array
     {
         $rules = $this->cartShippingRules->for($cart);
         $blockingProductIds = [];
         $servingCarrierCount = 0;
 
         foreach (ModuleQuery::create()->filterByActivate(1)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find() as $module) {
-            if (!$this->servesTheCart($module, $cart, $country, $state, null)) {
+            if (!$this->servesTheCart($module, $cart, $country, $state, $zipCode)) {
                 continue;
             }
 
