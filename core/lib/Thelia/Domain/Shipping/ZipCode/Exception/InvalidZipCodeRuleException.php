@@ -12,7 +12,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Domain\Shipping\ZipCode;
+namespace Thelia\Domain\Shipping\ZipCode\Exception;
 
 /**
  * A postal code rule refused for what the merchant wrote: a pattern that can match nothing,

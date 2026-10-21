@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use Thelia\Domain\Shipping\ZipCode\AreaZipCodeRuleWriter;
-use Thelia\Domain\Shipping\ZipCode\InvalidZipCodeRuleException;
+use Thelia\Domain\Shipping\ZipCode\Exception\InvalidZipCodeRuleException;
 use Thelia\Model\Area;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;

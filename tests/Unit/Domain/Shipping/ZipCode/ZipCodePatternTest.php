@@ -16,7 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Shipping\ZipCode;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Thelia\Domain\Shipping\ZipCode\InvalidZipCodeRuleException;
+use Thelia\Domain\Shipping\ZipCode\Exception\InvalidZipCodeRuleException;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 
 final class ZipCodePatternTest extends TestCase
