@@ -1243,6 +1243,20 @@ CREATE TABLE IF NOT EXISTS `area_zip_code_rule`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- What the customer wishes to receive when a return expects an exchange, in their own words, apart
+-- from the comment that explains the return. Null on every return that predates it: the wish, if
+-- any, is in the comment. The versioned copy of a return carries it too.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return' AND `COLUMN_NAME` = 'expected_exchange');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_return` ADD `expected_exchange` TEXT NULL COMMENT ''what the customer wishes to receive in exchange, in their own words'' AFTER `customer_comment`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return_version' AND `COLUMN_NAME` = 'expected_exchange');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_return_version` ADD `expected_exchange` TEXT NULL COMMENT ''what the customer wishes to receive in exchange, in their own words'' AFTER `customer_comment`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 -- ---------------------------------------------------------------------
 -- Destination restrictions
 --

@@ -398,6 +398,7 @@ final readonly class CustomerPersonalDataExporter
             'reason' => $return->getReasonTitle(),
             'expected_resolution' => $return->getExpectedResolution(),
             'customer_comment' => $return->getCustomerComment(),
+            'expected_exchange' => $return->getExpectedExchange(),
             'refund_amount' => $return->getRefundAmount(),
             'created_at' => $this->formatDate($return->getCreatedAt()),
             'lines' => $lines,

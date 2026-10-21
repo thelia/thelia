@@ -174,6 +174,7 @@ final readonly class CustomerAnonymizer
         foreach ($returns as $return) {
             $return
                 ->setCustomerComment(null)
+                ->setExpectedExchange(null)
                 ->setRefusalReason(null)
                 ->setVersion(0)
                 ->setDisableVersioning(true)

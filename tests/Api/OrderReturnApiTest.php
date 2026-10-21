@@ -259,6 +259,118 @@ final class OrderReturnApiTest extends ApiTestCase
         self::assertSame(10.0, (float) $created->getRefundAmount());
     }
 
+    public function testACustomerSaysWhatTheyWishToReceiveInExchange(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'expectedResolution' => OrderReturn::RESOLUTION_EXCHANGE,
+                'customerComment' => 'Too small.',
+                'expectedExchange' => 'The same one in size L.',
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $token,
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()
+            ->filterByCustomerId((int) $customer->getId())
+            ->findOne($this->getPropelConnection());
+
+        self::assertNotNull($created);
+        self::assertSame('Too small.', $created->getCustomerComment(), 'The comment keeps the reason of the return.');
+        self::assertSame('The same one in size L.', $created->getExpectedExchange(), 'The wish is kept apart from the comment.');
+
+        $read = $this->jsonRequest('GET', '/api/front/account/order_returns/'.$created->getId(), token: $token);
+        self::assertJsonResponseSuccessful($read);
+        self::assertSame('The same one in size L.', self::decodeJson($read)['expectedExchange'] ?? null, 'The customer reads their wish back on their return.');
+    }
+
+    public function testAWishIsKeptOnAnExchangeOnly(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'expectedResolution' => OrderReturn::RESOLUTION_REFUND,
+                'expectedExchange' => 'The same one in size L.',
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+        $created = OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->findOne($this->getPropelConnection());
+        self::assertNotNull($created);
+        self::assertNull($created->getExpectedExchange(), 'A refund is not something sent back in exchange.');
+    }
+
+    public function testAWishLongerThanAReturnKeepsIsRefused(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'expectedResolution' => OrderReturn::RESOLUTION_EXCHANGE,
+                'expectedExchange' => str_repeat('L', \Thelia\Api\Resource\OrderReturn::MAX_EXPECTED_EXCHANGE_LENGTH + 1),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertSame(0, OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()), 'Nothing is written.');
+    }
+
+    /**
+     * The wish is the customer's, written with the return: an admin update goes round the
+     * hydrator, so it would keep a wish under a refund or one of any length.
+     */
+    public function testAnAdminUpdateLeavesTheWishAsTheCustomerWroteIt(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_returns/'.$return->getId(),
+            ['expectedExchange' => str_repeat('L', \Thelia\Api\Resource\OrderReturn::MAX_EXPECTED_EXCHANGE_LENGTH + 1)],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertJsonResponseSuccessful($response);
+        $return->reload(false, $this->getPropelConnection());
+        self::assertNull($return->getExpectedExchange());
+    }
+
     public function testAnAdminOpensAReturnOnBehalfOfACustomer(): void
     {
         $customer = $this->customer();

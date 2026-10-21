@@ -35,6 +35,8 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
 {
     private const COMMENT = 'The parcel arrived open.';
 
+    private const EXCHANGE = 'The same jacket in size M.';
+
     private const REFUSAL_REASON = 'Refused: Mrs Martin sent back a different item.';
 
     private FixtureFactory $factory;
@@ -63,6 +65,7 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
         self::assertArrayHasKey('order_returns', $data);
         self::assertCount(1, $data['order_returns']);
         self::assertSame(self::COMMENT, $data['order_returns'][0]['customer_comment']);
+        self::assertSame(self::EXCHANGE, $data['order_returns'][0]['expected_exchange']);
     }
 
     public function testAnonymizationClearsTheReturnCommentButKeepsTheReturn(): void
@@ -83,6 +86,7 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
         $reloaded = OrderReturnQuery::create()->findPk($return->getId(), $this->getPropelConnection());
         self::assertNotNull($reloaded, 'the return itself is kept for the accounting record');
         self::assertNull($reloaded->getCustomerComment(), 'the free text personal data is erased');
+        self::assertNull($reloaded->getExpectedExchange(), 'the wished exchange, free text too, is erased');
 
         self::assertSame(
             0,
@@ -135,6 +139,7 @@ final class CustomerReturnsPersonalDataTest extends IntegrationTestCase
             ->setCustomer($customer)
             ->setOrderReturnStatus($status)
             ->setCustomerComment(self::COMMENT)
+            ->setExpectedExchange(self::EXCHANGE)
             ->setRefusalReason($refusalReason);
         $return->save($this->getPropelConnection());
 
