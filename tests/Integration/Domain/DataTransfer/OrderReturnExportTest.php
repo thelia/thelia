@@ -143,13 +143,14 @@ final class OrderReturnExportTest extends IntegrationTestCase
     public function testAProductOrACombinationThatStartsLikeAFormulaIsExportedAsText(): void
     {
         $order = $this->orderWithALine(['Helmet size' => '=2+2']);
-        $order->getOrderProducts()->getFirst()->setTitle('@SUM(A1)')->save($this->getPropelConnection());
+        $order->getOrderProducts()->getFirst()->setTitle('@SUM(A1)')->setProductSaleElementsRef('=REF()')->save($this->getPropelConnection());
         $this->returnOf($order, OrderReturnStatus::CODE_REQUESTED, OrderReturn::RESOLUTION_REFUND, 'Too big', null, null);
 
         $row = $this->rowsOf($order, $this->locale('en_US'))[0];
 
         self::assertSame("'@SUM(A1)", $row['Product']);
         self::assertSame("'=2+2", $row['Combination values']);
+        self::assertSame("'=REF()", $row['Ref']);
     }
 
     public function testTheExportIsRegisteredInTheCatalogue(): void
