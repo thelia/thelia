@@ -29,11 +29,16 @@ final readonly class DeliverySetupService
     ) {
     }
 
+    /**
+     * Copies the default address of the cart's customer onto the cart, into the copy the cart
+     * already has when it has one. Nothing for a cart without a customer, nor for a guest:
+     * the default address of a guest row may be another buyer's (see setupVirtualDelivery()).
+     */
     public function setCustomerDefaultDeliveryAddress(Cart $cart): void
     {
         $customer = $cart->getCustomer();
 
-        if (null === $customer) {
+        if (null === $customer || $customer->isGuest()) {
             return;
         }
 
@@ -43,7 +48,10 @@ final readonly class DeliverySetupService
             throw new \RuntimeException(Translator::getInstance()->trans('Customer default address is null'));
         }
 
-        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($defaultAddress);
+        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
+            $defaultAddress,
+            $cart->getCartAddressRelatedByAddressDeliveryId(),
+        );
 
         $cart->setAddressDeliveryId($defaultCartAddress->getId())->save();
     }

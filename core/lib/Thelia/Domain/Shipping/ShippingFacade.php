@@ -159,7 +159,9 @@ final readonly class ShippingFacade
     }
 
     /**
-     * Set cart delivery address to the customer's default address.
+     * Copies the default address of the cart's customer onto the cart, into the copy it
+     * already has when it has one. Nothing for a guest, whose row's default address may be
+     * another buyer's.
      */
     public function setCustomerDefaultDeliveryAddress(Cart $cart): void
     {

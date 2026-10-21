@@ -1,0 +1,98 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Tests\Integration\Domain\Shipping;
+
+use Thelia\Domain\Shipping\ShippingFacade;
+use Thelia\Model\CartAddressQuery;
+use Thelia\Test\FixtureFactory;
+use Thelia\Test\IntegrationTestCase;
+
+/**
+ * The default address of the customer, put on the cart as its delivery address, as a pickup
+ * of the Flexy theme does for a customer with an account.
+ */
+final class CustomerDefaultDeliveryAddressTest extends IntegrationTestCase
+{
+    private FixtureFactory $factory;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->factory = $this->createFixtureFactory();
+    }
+
+    /**
+     * The default address of a guest row may be another buyer's: nothing of it reaches the
+     * cart, which keeps the address it has.
+     */
+    public function testAGuestCartIsLeftAsItIs(): void
+    {
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $this->factory->address($guest, $this->factory->country(), null, ['address1' => '9 Another Buyer Street'])
+            ->setIsDefault(1)
+            ->save($this->getPropelConnection());
+        $ownCopy = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '1 Own Street']);
+        $cart = $this->factory->cart($guest);
+        $cart->setAddressDeliveryId($ownCopy->getId())->save($this->getPropelConnection());
+        $emptyCart = $this->factory->cart($guest);
+
+        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
+        $this->shipping()->setCustomerDefaultDeliveryAddress($emptyCart);
+
+        self::assertSame($ownCopy->getId(), $cart->getAddressDeliveryId());
+        self::assertSame('1 Own Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+        self::assertNull($emptyCart->getAddressDeliveryId());
+    }
+
+    /**
+     * The default address is written into the copy the cart has: no second copy, no copy
+     * left behind.
+     */
+    public function testTheCopyOfACustomerCartIsRewrittenInPlace(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $default = $this->factory->address($customer, $this->factory->country(), null, ['address1' => '3 Default Street']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $copy = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '4 Former Street']);
+        $cart = $this->factory->cart($customer);
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
+        $copiesBefore = CartAddressQuery::create()->count($this->getPropelConnection());
+
+        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
+
+        self::assertSame($copy->getId(), $cart->getAddressDeliveryId());
+        self::assertSame('3 Default Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+        self::assertSame($default->getId(), $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId());
+        self::assertSame($copiesBefore, CartAddressQuery::create()->count($this->getPropelConnection()));
+    }
+
+    public function testACustomerCartWithoutACopyGetsOne(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $default = $this->factory->address($customer, $this->factory->country(), null, ['address1' => '5 Default Street']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $cart = $this->factory->cart($customer);
+
+        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
+
+        self::assertSame('5 Default Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+        self::assertSame($default->getId(), $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId());
+    }
+
+    private function shipping(): ShippingFacade
+    {
+        return $this->getService(ShippingFacade::class);
+    }
+}
