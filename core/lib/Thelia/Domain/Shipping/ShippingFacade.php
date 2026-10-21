@@ -322,7 +322,7 @@ final readonly class ShippingFacade
      *
      * Rules:
      * - If country is provided, use the provided (country, state) over address.
-     * - Else, if addressId is provided, resolve through that customer address.
+     * - Else, if addressId names an address of the cart's customer, resolve through it.
      * - Else, resolve through the cart's own copy of its delivery address: its country,
      *   state and postal code, with the customer address behind it.
      * - Else, return (null, null, null, null).
@@ -358,19 +358,12 @@ final readonly class ShippingFacade
             return [null, $country, $state, $zipCode];
         }
 
-        if (null !== $addressId) {
-            $address = AddressQuery::create()->findPk($addressId);
+        // An address of someone else, or none at all, is not handed to the modules: the list
+        // is then the one of the cart, as without an address.
+        $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
-            if (null === $address) {
-                return [null, null, null, null];
-            }
-
-            $addressCountry = $address->getCountry();
-            $zipCode = null !== $this->addressOfTheCartCustomer($cart, $addressId)
-                ? $address->getZipcode()
-                : (null === $addressCountry ? null : $this->postageEstimator->cartZipCodeIn($cart, $addressCountry));
-
-            return [$address, $addressCountry, $address->getState(), $zipCode];
+        if (null !== $address) {
+            return [$address, $address->getCountry(), $address->getState(), $address->getZipcode()];
         }
 
         $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
