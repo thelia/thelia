@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\Tlog;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryAreaQuery;
@@ -77,13 +78,22 @@ class Area extends BaseAction implements EventSubscriberInterface
                 ->filterByAreaId($area->getId())
                 ->delete($connection);
 
-            $this->removeZipCodeRulesOfCountriesThatLeft((int) $area->getId(), $event->getCountryIds(), $connection);
+            $deletedPatterns = $this->removeZipCodeRulesOfCountriesThatLeft((int) $area->getId(), $event->getCountryIds(), $connection);
 
             $connection->commit();
         } catch (\Throwable $throwable) {
             $connection->rollBack();
 
             throw $throwable;
+        }
+
+        // Written once the deletion is committed. The merchant removed a country, not its
+        // rules: the log keeps what went with it.
+        foreach ($deletedPatterns as $countryId => $patterns) {
+            Tlog::getInstance()->notice(
+                'Country {country_id} left shipping zone {area_id}: {count} postal code rule(s) deleted with it ({patterns}).',
+                ['country_id' => $countryId, 'area_id' => $area->getId(), 'count' => \count($patterns), 'patterns' => implode(', ', $patterns)],
+            );
         }
 
         return $area;
@@ -95,21 +105,32 @@ class Area extends BaseAction implements EventSubscriberInterface
      * country still in the zone through another of its states keeps its rules.
      *
      * @param array<int|string> $countryIds
+     *
+     * @return array<int, list<string>> the patterns of the rules deleted, by country
      */
-    private function removeZipCodeRulesOfCountriesThatLeft(int $areaId, array $countryIds, ConnectionInterface $connection): void
+    private function removeZipCodeRulesOfCountriesThatLeft(int $areaId, array $countryIds, ConnectionInterface $connection): array
     {
+        $deletedPatterns = [];
+
         foreach (array_unique(array_map('intval', $countryIds)) as $countryId) {
             if (CountryAreaQuery::create()->filterByAreaId($areaId)->filterByCountryId($countryId)->exists($connection)) {
                 continue;
             }
 
-            // One by one, so that the model hooks of each deleted rule run.
-            AreaZipCodeRuleQuery::create()
+            $rules = AreaZipCodeRuleQuery::create()
                 ->filterByAreaId($areaId)
                 ->filterByCountryId($countryId)
-                ->find($connection)
-                ->delete($connection);
+                ->find($connection);
+
+            foreach ($rules as $rule) {
+                $deletedPatterns[$countryId][] = ($rule->getExcluded() ? 'excluded ' : 'included ').$rule->getPattern();
+            }
+
+            // One by one, so that the model hooks of each deleted rule run.
+            $rules->delete($connection);
         }
+
+        return $deletedPatterns;
     }
 
     public function delete(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
