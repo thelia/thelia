@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -116,6 +117,9 @@ class OrderReturn implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
+    /** The longest wished exchange a return keeps: it is printed back in the back office, the e-mails and the exports. */
+    public const MAX_EXPECTED_EXCHANGE_LENGTH = 2000;
+
     public const GROUP_ADMIN_READ = 'admin:order_return:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:order_return:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:order_return:write';
@@ -202,6 +206,19 @@ class OrderReturn implements PropelResourceInterface
         self::GROUP_FRONT_WRITE,
     ])]
     public ?string $customerComment = null;
+
+    /**
+     * What the customer wishes to receive in exchange, in their own words, when the expected resolution is an exchange.
+     * Written with the return only: an update would bypass the rules of the hydrator.
+     */
+    #[Length(max: self::MAX_EXPECTED_EXCHANGE_LENGTH, groups: [self::GROUP_FRONT_WRITE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_WRITE,
+    ])]
+    public ?string $expectedExchange = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_UPDATE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $refusalReason = null;
@@ -343,6 +360,18 @@ class OrderReturn implements PropelResourceInterface
     public function setCustomerComment(?string $customerComment): self
     {
         $this->customerComment = $customerComment;
+
+        return $this;
+    }
+
+    public function getExpectedExchange(): ?string
+    {
+        return $this->expectedExchange;
+    }
+
+    public function setExpectedExchange(?string $expectedExchange): self
+    {
+        $this->expectedExchange = $expectedExchange;
 
         return $this;
     }

@@ -23,6 +23,7 @@ use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Customer;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturn as OrderReturnModel;
 use Thelia\Model\OrderReturnReasonQuery;
 
 /**
@@ -54,6 +55,7 @@ final readonly class OrderReturnHydrator
     {
         $data->setCustomer((new CustomerResource())->setId($customer->getId()));
         $data->setCreatedByAdmin($byAdmin);
+        $data->setExpectedExchange($this->expectedExchange($data));
 
         $requestedStatusId = $this->composer->initialStatusId();
         if (null !== $requestedStatusId) {
@@ -108,5 +110,26 @@ final readonly class OrderReturnHydrator
         }
 
         $data->setRefundAmount(round($total, 2));
+    }
+
+    /**
+     * The wish of the customer, trimmed, kept on an exchange only: under a refund or a
+     * credit note it would be shown as something the shop is asked to send.
+     *
+     * @throws ReturnNotAllowedException when it is longer than a return keeps
+     */
+    private function expectedExchange(OrderReturnResource $data): ?string
+    {
+        $wish = trim((string) $data->getExpectedExchange());
+
+        if ('' === $wish || OrderReturnModel::RESOLUTION_EXCHANGE !== $data->getExpectedResolution()) {
+            return null;
+        }
+
+        if (mb_strlen($wish) > OrderReturnResource::MAX_EXPECTED_EXCHANGE_LENGTH) {
+            throw new ReturnNotAllowedException('The wished exchange is too long.');
+        }
+
+        return $wish;
     }
 }

@@ -942,6 +942,7 @@
     <column description="the reason label snapshot, kept when the reason is deleted" name="reason_title" size="255" type="VARCHAR" />
     <column description="what the customer expects: refund, credit or exchange" name="expected_resolution" size="45" type="VARCHAR" />
     <column name="customer_comment" type="LONGVARCHAR" />
+    <column description="what the customer wishes to receive in exchange, in their own words" name="expected_exchange" type="LONGVARCHAR" />
     <column description="the motive given by the merchant when the request is refused" name="refusal_reason" type="LONGVARCHAR" />
     <column defaultValue="0.000000" description="the amount to refund, computed on the paid prices of the returned lines" name="refund_amount" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0" description="whether the postage is included in the refundable amount" name="include_postage" type="BOOLEAN" />
