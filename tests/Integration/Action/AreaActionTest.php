@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -23,6 +24,7 @@ use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Event\AreaEvent;
+use Thelia\Model\Map\CountryAreaTableMap;
 use Thelia\Model\State;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -108,6 +110,33 @@ final class AreaActionTest extends ActionIntegrationTestCase
 
         self::assertSame(1, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count());
         self::assertNotNull(AreaZipCodeRuleQuery::create()->findPk($rule));
+    }
+
+    /**
+     * The rules cannot be read (their table is masked for the connection, with no implicit
+     * commit): the removal of the country is rolled back with them. The test runs inside a
+     * transaction of its own, so Propel only marks it as not committable instead of rolling
+     * the rows back at once: that mark is what proves the action rolled back its work.
+     */
+    public function testACountryDoesNotLeaveTheZoneWithoutItsRules(): void
+    {
+        $area = $this->persistArea('Postal codes, all or nothing');
+        $country = $this->factory->country(['isoalpha2' => 'XD', 'isoalpha3' => 'XDX', 'isocode' => '985']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        $connection = Propel::getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
+        self::assertTrue($connection->isCommitable());
+
+        $connection->exec('CREATE TEMPORARY TABLE `area_zip_code_rule` (id INT)');
+
+        try {
+            $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+            self::fail('The rules could not be read: the removal must fail.');
+        } catch (\Propel\Runtime\Exception\ExceptionInterface) {
+        } finally {
+            $connection->exec('DROP TEMPORARY TABLE `area_zip_code_rule`');
+        }
+
+        self::assertFalse($connection->isCommitable(), 'The removal of the country was not rolled back.');
     }
 
     public function testDeleteRemovesArea(): void
