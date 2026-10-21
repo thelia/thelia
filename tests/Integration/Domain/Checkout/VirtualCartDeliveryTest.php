@@ -24,6 +24,7 @@ use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
@@ -199,7 +200,8 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
     {
         $this->turnMandatoryConsentsOff();
         $this->answerPaymentValidityWith(valid: true);
-        $this->answerDeliveryQuoteWith(valid: true);
+        // A virtual carrier that charges, so that the catch-up is seen to price the cart.
+        $this->answerDeliveryQuoteWith(valid: true, amount: 2.5);
         [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
         $paymentModule = ModuleQuery::create()->findOneByCode('Cheque') ?? self::fail('No payment module installed.');
         $cart->setPaymentModuleId($paymentModule->getId())->save($this->getPropelConnection());
@@ -216,6 +218,12 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
         self::assertSame('3 Later Street', $delivery?->getAddress1(), 'The billing address given since is the delivery address.');
         self::assertNotSame($billing->getId(), $delivery?->getId());
         self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertEqualsWithDelta(2.5, (float) $cart->getPostage(), 0.001, 'The cart is priced on the address it got.');
+
+        $copies = CartAddressQuery::create()->count($this->getPropelConnection());
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+        self::assertSame($delivery?->getId(), $cart->getAddressDeliveryId(), 'Settled again, the cart keeps its copy.');
+        self::assertSame($copies, CartAddressQuery::create()->count($this->getPropelConnection()), 'No second copy.');
 
         $this->validation()->validateForOrder($cart);
     }
@@ -320,12 +328,12 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
         });
     }
 
-    private function answerDeliveryQuoteWith(bool $valid): void
+    private function answerDeliveryQuoteWith(bool $valid, float $amount = 0.0): void
     {
-        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($valid): void {
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($valid, $amount): void {
             $event->setValidModule($valid);
             if ($valid) {
-                $event->setPostage(new OrderPostage(0.0, 0.0, 'VAT'));
+                $event->setPostage(new OrderPostage($amount, 0.0, 'VAT'));
             }
             $event->stopPropagation();
         });
