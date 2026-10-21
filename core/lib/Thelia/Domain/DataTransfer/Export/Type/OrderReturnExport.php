@@ -24,9 +24,10 @@ use Thelia\Model\OrderReturnStatus;
  * One row per returned line, the latest returns first, bounded by the optional dates of
  * the export screen on the day the return was opened.
  *
- * The reason is the title picked by the customer, or their own words when they picked
- * none, as the back-office queue shows it; the comment column holds their words only
- * when a title took the reason column. The combination is the attribute values of the
+ * The reason is the title the customer picked, as it was when the return was opened
+ * (the snapshot kept on the return, never a title renamed since), or their own words
+ * when they picked none; the comment column holds their words only when a title took
+ * the reason column. The combination is the attribute values of the
  * order line as they were sold. The type is the code of the expected resolution, and
  * "settled" is 1 once the effective status of the return is settled.
  */
@@ -50,10 +51,11 @@ class OrderReturnExport extends JsonFileAbstractExport
 
     public function beforeSerialize(array $data): array
     {
-        // Typed by the customer: a value that starts like a formula is not run by a spreadsheet.
+        // Free texts, typed by the customer or the merchant: a value that starts like a
+        // formula is not run by a spreadsheet.
         return SpreadsheetFormulaGuard::neutralizeColumns(
             parent::beforeSerialize($data),
-            ['reason', 'expected_exchange', 'comment'],
+            ['product_title', 'combination', 'reason', 'expected_exchange', 'comment'],
         );
     }
 

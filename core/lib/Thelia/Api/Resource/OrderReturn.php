@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -209,9 +208,9 @@ class OrderReturn implements PropelResourceInterface
 
     /**
      * What the customer wishes to receive in exchange, in their own words, when the expected resolution is an exchange.
-     * Written with the return only: an update would bypass the rules of the hydrator.
+     * Written with the return only: OrderReturnHydrator trims it, keeps it on an exchange and bounds it to
+     * MAX_EXPECTED_EXCHANGE_LENGTH; an update would bypass those rules.
      */
-    #[Length(max: self::MAX_EXPECTED_EXCHANGE_LENGTH, groups: [self::GROUP_FRONT_WRITE, self::GROUP_ADMIN_WRITE])]
     #[Groups([
         self::GROUP_ADMIN_READ_SINGLE,
         self::GROUP_ADMIN_WRITE,
