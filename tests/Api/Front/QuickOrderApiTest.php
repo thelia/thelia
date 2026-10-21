@@ -15,8 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Front;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\Country;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\DestinationRestriction;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
@@ -73,6 +78,48 @@ final class QuickOrderApiTest extends ApiTestCase
         self::assertNotNull($item);
         self::assertSame((int) $saleElements->getId(), (int) $item->getProductSaleElementsId());
         self::assertSame(3.0, (float) $item->getQuantity());
+    }
+
+    public function testALineTheAddressRefusesKeepsEveryLineOutOfTheCart(): void
+    {
+        [$refused] = $this->twoCountries();
+        $customer = $this->customerLivingIn($refused);
+        $cart = $this->factory->cart($customer);
+        $allowed = $this->saleElements();
+        $restricted = $this->saleElements();
+        $this->restrict($restricted, $refused, 'Spirits licence');
+
+        $response = $this->quickOrder('/api/front/account/quick-order/'.$cart->getId().'/add', $customer, [
+            ['reference' => (string) $allowed->getRef(), 'quantity' => 2],
+            ['reference' => (string) $restricted->getRef(), 'quantity' => 1],
+        ]);
+
+        self::assertSame(0, CartItemQuery::create()->filterByCartId($cart->getId())->count(), 'a line reached the cart');
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        $table = self::decode($response);
+        self::assertSame(['resolved', 'destination_refused'], array_column($table['lines'], 'status'));
+        self::assertSame([false, false], array_column($table['lines'], 'added'));
+        self::assertSame([null, 'Spirits licence'], array_column($table['lines'], 'refusalReason'));
+        self::assertSame(1, $table['summary']['destination_refused']);
+    }
+
+    public function testEveryLineReachesTheCartWhenTheAddressServesThemAll(): void
+    {
+        [$refused, $served] = $this->twoCountries();
+        $customer = $this->customerLivingIn($served);
+        $cart = $this->factory->cart($customer);
+        $allowed = $this->saleElements();
+        $restricted = $this->saleElements();
+        $this->restrict($restricted, $refused, 'Spirits licence');
+
+        $response = $this->quickOrder('/api/front/account/quick-order/'.$cart->getId().'/add', $customer, [
+            ['reference' => (string) $allowed->getRef(), 'quantity' => 2],
+            ['reference' => (string) $restricted->getRef(), 'quantity' => 1],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame([true, true], array_column(self::decode($response)['lines'], 'added'));
+        self::assertSame(2, CartItemQuery::create()->filterByCartId($cart->getId())->count());
     }
 
     public function testTheCartOfAnotherAccountAnswersAsIfItDidNotExist(): void
@@ -156,6 +203,35 @@ final class QuickOrderApiTest extends ApiTestCase
     private static function decode(Response $response): array
     {
         return json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @return array{Country, Country}
+     */
+    private function twoCountries(): array
+    {
+        $countries = CountryQuery::create()->filterByHasStates(0)->orderById()->limit(2)->find()->getData();
+        self::assertCount(2, $countries);
+
+        return $countries;
+    }
+
+    private function customerLivingIn(Country $country): Customer
+    {
+        $customer = $this->customer();
+        $this->factory->address($customer, $country)->setIsDefault(1)->save();
+
+        return $customer;
+    }
+
+    private function restrict(ProductSaleElements $saleElements, Country $country, string $reason): void
+    {
+        $facade = $this->getService(DestinationRestrictionFacade::class);
+        $group = $facade->save(null, 'quick-order-'.$saleElements->getProductId(), DestinationRestriction::MODE_DENY, true, ['en_US' => ['title' => 'Spirits', 'reason' => $reason]]);
+        $facade->addDestination($group->getId(), (int) $country->getId());
+        $facade->attachProduct($group->getId(), (int) $saleElements->getProductId());
+        // The shop had no active group until now, and the checker keeps that answer for the request.
+        $this->getService(DestinationRestrictionChecker::class)->reset();
     }
 
     private function customer(): Customer

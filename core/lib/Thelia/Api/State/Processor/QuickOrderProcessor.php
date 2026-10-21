@@ -77,8 +77,9 @@ final readonly class QuickOrderProcessor implements ProcessorInterface
         } catch (QuickOrderCartNotFoundException $exception) {
             throw new NotFoundHttpException('No such cart.', $exception);
         } catch (InvalidCartException $exception) {
-            // A line the cart refuses (a destination that does not take the product): the
-            // whole addition was rolled back, the buyer is told why, as the cart API does.
+            // A line the cart refuses while it is added (a module listening to the addition,
+            // a restriction set since the destinations were checked): the whole addition was
+            // rolled back, the buyer is told why, as the cart API does.
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 

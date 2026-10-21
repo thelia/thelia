@@ -33,4 +33,10 @@ enum LineStatus: string
 
     /** The quantity asked for is more than the stock holds. */
     case QuantityRefused = 'quantity_refused';
+
+    /**
+     * A destination restriction keeps the product from the address known for the cart.
+     * Set when adding only, and then nothing of the table reaches the cart.
+     */
+    case DestinationRefused = 'destination_refused';
 }

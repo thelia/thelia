@@ -38,6 +38,7 @@ final readonly class QuickOrderLine
         public ?float $availableQuantity = null,
         public array $candidates = [],
         public bool $added = false,
+        public ?string $refusalReason = null,
     ) {
     }
 
@@ -81,6 +82,29 @@ final readonly class QuickOrderLine
     }
 
     /**
+     * The line a destination restriction keeps from the address of the cart, with the
+     * reason its group gives the buyer, if it gives one.
+     */
+    public function refusedByTheDestination(string $reason): self
+    {
+        return new self(
+            $this->reference,
+            $this->quantity,
+            LineStatus::DestinationRefused,
+            $this->productSaleElementsId,
+            $this->productId,
+            $this->title,
+            $this->untaxedUnitPrice,
+            $this->taxedUnitPrice,
+            $this->promo,
+            $this->availableQuantity,
+            $this->candidates,
+            false,
+            '' === $reason ? null : $reason,
+        );
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -98,6 +122,7 @@ final readonly class QuickOrderLine
             'availableQuantity' => $this->availableQuantity,
             'candidates' => array_map(static fn (Candidate $candidate): array => $candidate->toArray(), $this->candidates),
             'added' => $this->added,
+            'refusalReason' => $this->refusalReason,
         ];
     }
 }

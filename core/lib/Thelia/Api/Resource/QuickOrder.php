@@ -62,14 +62,14 @@ use Thelia\Api\State\Processor\QuickOrderProcessor;
             status: 200,
             openapi: new OpenApiOperation(
                 summary: 'Add the resolved references to a cart',
-                description: 'Resolves the lines again and adds the `resolved` ones to the cart, in one transaction: either all of them are in the cart, or none is. A reference already in the cart adds to its quantity. The other lines come back with their status and `added: false`. Prices are in the currency of the cart.',
+                description: 'Resolves the lines again and adds the `resolved` ones to the cart, in one transaction: either all of them are in the cart, or none is. A reference already in the cart adds to its quantity. The other lines come back with their status and `added: false`. A product a destination restriction keeps from the address known for the cart (its delivery or invoice address, else the default address of the account) comes back `destination_refused` with the reason of its group in `refusalReason`, and then no line is added. Prices are in the currency of the cart.',
                 responses: [
                     '200' => new OpenApiResponse(
                         description: 'The table as resolved when adding, each line saying whether it reached the cart.',
                         content: new \ArrayObject(['application/json' => ['example' => self::TABLE_EXAMPLE]]),
                     ),
                     '404' => new OpenApiResponse(description: 'No such cart: the same answer for a cart of another account.'),
-                    '422' => new OpenApiResponse(description: 'A line the shop cannot take: no reference, a quantity below one, more than 500 lines.'),
+                    '422' => new OpenApiResponse(description: 'A line the shop cannot take: no reference, a quantity below one, more than 500 lines; or a line the cart refused while it was being added, and then none was.'),
                     '429' => new OpenApiResponse(description: 'Too many quick order requests from this account in the last minute.'),
                 ],
             ),
@@ -113,6 +113,7 @@ final class QuickOrder
                     ['productSaleElementsId' => 412, 'productId' => 57, 'ref' => 'TSHIRT-01', 'isDefault' => false, 'preselected' => false, 'attributes' => [['attribute' => 'Size', 'value' => 'M']]],
                 ],
                 'added' => false,
+                'refusalReason' => null,
             ],
             [
                 'reference' => 'TSHIRT-01',
@@ -127,6 +128,7 @@ final class QuickOrder
                 'availableQuantity' => null,
                 'candidates' => [],
                 'added' => true,
+                'refusalReason' => null,
             ],
             [
                 'reference' => '3760123450012',
@@ -141,9 +143,10 @@ final class QuickOrder
                 'availableQuantity' => 0.0,
                 'candidates' => [],
                 'added' => false,
+                'refusalReason' => null,
             ],
         ],
-        'summary' => ['resolved' => 1, 'ambiguous' => 1, 'unknown' => 0, 'unavailable' => 0, 'quantity_refused' => 1],
+        'summary' => ['resolved' => 1, 'ambiguous' => 1, 'unknown' => 0, 'unavailable' => 0, 'quantity_refused' => 1, 'destination_refused' => 0],
     ];
 
     #[ApiProperty(identifier: true, description: 'Identifier of the cart the lines are added to.')]
