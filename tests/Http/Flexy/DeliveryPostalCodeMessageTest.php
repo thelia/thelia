@@ -100,16 +100,20 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertStringContainsString('No delivery method is available for this order.', $crawler->text());
     }
 
-    public function testThePostalCodeIsPrintedAsTextNotAsMarkup(): void
+    /**
+     * The snack bar prints its text raw. A code holding markup keeps a character outside A
+     * to Z and 0 to 9: it is uncertain, the step never names it, and it never becomes an
+     * element of the page.
+     */
+    public function testAPostalCodeHoldingMarkupIsNeverNamed(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
 
-        // The snack bar prints its text raw; the code typed by the buyer must not be markup.
-        $crawler = $this->deliveryStepOfAGuest(excluding: '<*', zipCode: '<b>20</b>');
+        $crawler = $this->deliveryStepOfAGuest(excluding: '20*', zipCode: '<b>20</b>');
 
-        self::assertStringContainsString('No carrier delivers to the postal code <b>20</b>.', $crawler->text());
-        self::assertSame(0, $crawler->filter('.SnackBar-message b')->count(), 'The postal code became an element of the page.');
+        self::assertStringNotContainsString('No carrier delivers to the postal code', $crawler->text());
+        self::assertSame(0, $crawler->filter('b')->reduce(static fn (Crawler $node): bool => '20' === $node->text())->count(), 'The postal code became an element of the page.');
     }
 
     /**
