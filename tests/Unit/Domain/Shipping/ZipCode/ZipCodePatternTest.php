@@ -144,4 +144,24 @@ final class ZipCodePatternTest extends TestCase
         $this->expectException(InvalidZipCodeRuleException::class);
         ZipCodePattern::fromString(str_repeat("\u{00C9}", 51));
     }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function textsForTheLog(): iterable
+    {
+        yield 'a backslash' => ['20\\*', '20\\\\*'];
+        yield 'a next line' => ["20\u{0085}*", '20\\u{0085}*'];
+        yield 'a line separator' => ["20\u{2028}*", '20\\u{2028}*'];
+        yield 'a paragraph separator' => ["20\u{2029}*", '20\\u{2029}*'];
+        yield 'a right-to-left override' => ["20\u{202E}*", '20\\u{202E}*'];
+        yield 'a first strong isolate' => ["20\u{2068}*", '20\\u{2068}*'];
+        yield 'a text that is not UTF-8' => ["20\xC3\x28", '20\\303('];
+    }
+
+    #[DataProvider('textsForTheLog')]
+    public function testATextIsLoggedWithWhatCouldForgeOrTurnALineEscaped(string $text, string $logged): void
+    {
+        self::assertSame($logged, ZipCodePattern::forLog($text));
+    }
 }

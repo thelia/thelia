@@ -42,6 +42,12 @@ final readonly class ZipCodePattern
      */
     private const SEPARATORS = '/[\s\-\x{2010}-\x{2015}\x{2212}\p{Z}\p{Cf}]+/u';
 
+    /**
+     * The characters forLog() writes as \u{...}: line and paragraph separators, and the
+     * controls that change the direction of the text around them.
+     */
+    private const LOG_UNSAFE_CHARACTERS = '/[\x{0085}\x{2028}\x{2029}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
+
     private function __construct(
         private string $pattern,
     ) {
@@ -74,13 +80,22 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * Text of a rule as a log line may carry it: control characters escaped (a carriage
-     * return becomes "\r"), so that a pattern written by hand in the database cannot forge
-     * a line of the log. Tlog writes its context as it comes.
+     * Text of a rule as a log line may carry it, so that a pattern written by hand in the
+     * database cannot forge a line of the log, nor turn the text after it around: control
+     * characters and the backslash escaped (a carriage return becomes "\r"), line and
+     * paragraph separators and the direction controls written as "\u{2028}". Tlog writes its
+     * context as it comes. A text that is not valid UTF-8 has every byte above ASCII escaped.
      */
     public static function forLog(string $text): string
     {
-        return addcslashes($text, "\0..\37\177");
+        $escaped = addcslashes($text, "\0..\37\177\\");
+        $readable = preg_replace_callback(
+            self::LOG_UNSAFE_CHARACTERS,
+            static fn (array $match): string => \sprintf('\\u{%04X}', mb_ord($match[0])),
+            $escaped,
+        );
+
+        return $readable ?? addcslashes($escaped, "\200..\377");
     }
 
     /**
