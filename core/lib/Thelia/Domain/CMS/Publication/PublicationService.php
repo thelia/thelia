@@ -67,7 +67,7 @@ final readonly class PublicationService
         $unpublishAt = $request->unpublishAt;
 
         if (null !== $unpublishAt) {
-            $this->assertInTheFuture($unpublishAt, $now, 'withdrawal');
+            $this->assertWithdrawalInTheFuture($unpublishAt, $now);
         } else {
             // A withdrawal date already set and still ahead is kept: publishing earlier than
             // planned does not cancel the planned end.
@@ -83,8 +83,8 @@ final readonly class PublicationService
 
     private function schedule(PublishableInterface $publishable, PublicationRequest $request, \DateTimeImmutable $now): void
     {
-        $publishAt = $request->publishAt ?? throw new InvalidPublicationDatesException('A scheduled publication needs a publication date.');
-        $this->assertInTheFuture($publishAt, $now, 'publication');
+        $publishAt = $request->publishAt ?? throw InvalidPublicationDatesException::publicationDateMissing();
+        $this->assertPublicationInTheFuture($publishAt, $now);
 
         $publishable
             ->setVisible(0)
@@ -123,16 +123,23 @@ final readonly class PublicationService
         }
 
         if (null !== $request->unpublishAt) {
-            $this->assertInTheFuture($request->unpublishAt, $now, 'withdrawal');
+            $this->assertWithdrawalInTheFuture($request->unpublishAt, $now);
         }
 
         $publishable->setUnpublishAt($request->unpublishAt);
     }
 
-    private function assertInTheFuture(\DateTimeImmutable $date, \DateTimeImmutable $now, string $what): void
+    private function assertPublicationInTheFuture(\DateTimeImmutable $date, \DateTimeImmutable $now): void
     {
         if ($date <= $now) {
-            throw new InvalidPublicationDatesException(\sprintf('The %s date must be in the future.', $what));
+            throw InvalidPublicationDatesException::publicationDateInThePast();
+        }
+    }
+
+    private function assertWithdrawalInTheFuture(\DateTimeImmutable $date, \DateTimeImmutable $now): void
+    {
+        if ($date <= $now) {
+            throw InvalidPublicationDatesException::withdrawalDateInThePast();
         }
     }
 
