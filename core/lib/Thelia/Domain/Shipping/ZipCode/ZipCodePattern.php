@@ -93,6 +93,11 @@ final readonly class ZipCodePattern
      */
     public function matches(string $zipCode, bool $whenUnsure = false): bool
     {
+        // The pattern of an unreadable rule matches nothing, an uncertain code included.
+        if ('' === $this->pattern) {
+            return false;
+        }
+
         $zipCode = self::normalize($zipCode);
 
         if (null === $zipCode) {
