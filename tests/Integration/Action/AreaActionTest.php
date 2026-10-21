@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Propel\Runtime\Exception\ExceptionInterface as PropelError;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
@@ -151,7 +152,7 @@ final class AreaActionTest extends ActionIntegrationTestCase
         try {
             $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
             self::fail('The rules could not be read: the removal must fail.');
-        } catch (\Propel\Runtime\Exception\ExceptionInterface) {
+        } catch (PropelError) {
         } finally {
             $connection->exec('DROP TEMPORARY TABLE `area_zip_code_rule`');
         }

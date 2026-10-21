@@ -87,7 +87,9 @@ class Area extends BaseAction implements EventSubscriberInterface
             throw $throwable;
         }
 
-        // Written once the deletion is committed. A trace for the shop's developers: the
+        // Written once this transaction is committed: within a transaction of the caller, the
+        // deletion is final only when the caller commits, and a rollback there leaves the
+        // line behind. A trace for the shop's developers: the
         // NOTICE is written only when `tlog_level` lets it through (the default level is
         // ERROR); the merchant's trace is the administration log of the back office.
         foreach ($deletedPatterns as $countryId => $patterns) {
