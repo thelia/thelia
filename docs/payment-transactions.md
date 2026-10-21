@@ -503,6 +503,17 @@ other failure — a module listening to the capture, say — is shown as an inte
 error, its message going to the log. A trusted failure is shown as worded even
 when it wraps a technical one.
 
+The *Refund* dialog of the same card gives back all or part of what was collected
+and not refunded yet, to an administrator holding `admin.order.payment-refund`
+(create): `OrderController::refundPayment()` answers
+`POST /admin/order/update/{order_id}/payment-refund` through the
+`ORDER_PAYMENT_REFUND` event, with a reason from `RefundReason` and an optional
+comment written to the administration log on one line. The dialog says whether the
+money goes back through the payment module or is recorded as given back outside
+it (the `mode` it was shown in is checked again, so a module that changed since
+is refused rather than guessed), and when the module gives the payment back in
+full only, the amount is the whole and read only.
+
 ## Installation and update
 
 A fresh install creates the table and seeds the status and the right
@@ -549,3 +560,14 @@ no journal either, and the screens must render an empty one without error.
   guard, a retried capture while the first is pending, the amount bound, and
   who is refused (anonymous, a customer token, order readers without the
   capture right, the capture right alone).
+- `tests/Integration/Domain/Payment/PaymentRefundServiceTest.php` — refunds
+  through the module or recorded by hand, the bounds, the repeat guard, the
+  configuration of the sale unit, the comment, the refund in full only.
+- `tests/Http/BackOffice/OrderRefundBackOfficeTest.php` — the refund dialog, its
+  mode, its refusals and its right, the manual record of a pending refund.
+- `tests/Api/Admin/OrderPaymentReferenceApiTest.php` — the transaction reference
+  and the payment module of an order with a journal are not changed by the API.
+- `tests/Integration/Domain/Payment/AuthorizedOrderStockTest.php` — an order on
+  hold for capture keeps its stock as the placement left it.
+- `tests/Integration/Install/LegacyPaymentJournalUpdateTest.php` — the capture of
+  the orders paid before 3.3.0, equivalent statuses and references included.
