@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
@@ -23,6 +25,7 @@ use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Event\AreaEvent;
+use Thelia\Model\Map\CountryAreaTableMap;
 
 /**
  * Class Area.
@@ -62,13 +65,26 @@ class Area extends BaseAction implements EventSubscriberInterface
     {
         $area = $event->getModel();
 
-        CountryAreaQuery::create()
-            ->filterByCountryId($event->getCountryIds())
-            ->filterByStateId($event->getStateId())
-            ->filterByAreaId($area->getId())
-            ->delete();
+        // The country leaves with its rules or not at all: a zone must not lose a country and
+        // keep the rules written for it.
+        $connection = Propel::getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
 
-        $this->removeZipCodeRulesOfCountriesThatLeft((int) $area->getId(), $event->getCountryIds());
+        try {
+            CountryAreaQuery::create()
+                ->filterByCountryId($event->getCountryIds())
+                ->filterByStateId($event->getStateId())
+                ->filterByAreaId($area->getId())
+                ->delete($connection);
+
+            $this->removeZipCodeRulesOfCountriesThatLeft((int) $area->getId(), $event->getCountryIds(), $connection);
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
 
         return $area;
     }
@@ -80,10 +96,10 @@ class Area extends BaseAction implements EventSubscriberInterface
      *
      * @param array<int|string> $countryIds
      */
-    private function removeZipCodeRulesOfCountriesThatLeft(int $areaId, array $countryIds): void
+    private function removeZipCodeRulesOfCountriesThatLeft(int $areaId, array $countryIds, ConnectionInterface $connection): void
     {
         foreach (array_unique(array_map('intval', $countryIds)) as $countryId) {
-            if (CountryAreaQuery::create()->filterByAreaId($areaId)->filterByCountryId($countryId)->exists()) {
+            if (CountryAreaQuery::create()->filterByAreaId($areaId)->filterByCountryId($countryId)->exists($connection)) {
                 continue;
             }
 
@@ -91,8 +107,8 @@ class Area extends BaseAction implements EventSubscriberInterface
             AreaZipCodeRuleQuery::create()
                 ->filterByAreaId($areaId)
                 ->filterByCountryId($countryId)
-                ->find()
-                ->delete();
+                ->find($connection)
+                ->delete($connection);
         }
     }
 
