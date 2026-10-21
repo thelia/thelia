@@ -1243,6 +1243,7 @@ CREATE TABLE IF NOT EXISTS `area_zip_code_rule`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
 -- Payment journal of an order
 --
 -- One line per money movement (authorization, capture, refund, void) a payment
