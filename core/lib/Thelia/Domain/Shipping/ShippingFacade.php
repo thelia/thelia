@@ -165,10 +165,13 @@ final readonly class ShippingFacade
      * Copies the default address of the cart's customer onto the cart, into the copy it
      * already has when it has one. Nothing for a guest, whose row's default address may be
      * another buyer's.
+     *
+     * @return bool whether the cart is delivered to another place (another country, state,
+     *              postal code or city, or no copy before): its carrier has to be priced again
      */
-    public function setCustomerDefaultDeliveryAddress(Cart $cart): void
+    public function setCustomerDefaultDeliveryAddress(Cart $cart): bool
     {
-        $this->deliverySetupService->setCustomerDefaultDeliveryAddress($cart);
+        return $this->deliverySetupService->setCustomerDefaultDeliveryAddress($cart);
     }
 
     /**

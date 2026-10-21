@@ -48,8 +48,8 @@ final class CustomerDefaultDeliveryAddressTest extends IntegrationTestCase
         $cart->setAddressDeliveryId($ownCopy->getId())->save($this->getPropelConnection());
         $emptyCart = $this->factory->cart($guest);
 
-        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
-        $this->shipping()->setCustomerDefaultDeliveryAddress($emptyCart);
+        self::assertFalse($this->shipping()->setCustomerDefaultDeliveryAddress($cart));
+        self::assertFalse($this->shipping()->setCustomerDefaultDeliveryAddress($emptyCart));
 
         self::assertSame($ownCopy->getId(), $cart->getAddressDeliveryId());
         self::assertSame('1 Own Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
@@ -65,12 +65,13 @@ final class CustomerDefaultDeliveryAddressTest extends IntegrationTestCase
         $customer = $this->factory->customer($this->factory->customerTitle());
         $default = $this->factory->address($customer, $this->factory->country(), null, ['address1' => '3 Default Street']);
         $default->setIsDefault(1)->save($this->getPropelConnection());
-        $copy = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '4 Former Street']);
+        // A copy typed by hand, with no source address, elsewhere: replaced all the same.
+        $copy = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '4 Former Street', 'city' => 'Lyon']);
         $cart = $this->factory->cart($customer);
         $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
         $copiesBefore = CartAddressQuery::create()->count($this->getPropelConnection());
 
-        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
+        self::assertTrue($this->shipping()->setCustomerDefaultDeliveryAddress($cart), 'Another place: the carrier is priced again.');
 
         self::assertSame($copy->getId(), $cart->getAddressDeliveryId());
         self::assertSame('3 Default Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
@@ -85,10 +86,28 @@ final class CustomerDefaultDeliveryAddressTest extends IntegrationTestCase
         $default->setIsDefault(1)->save($this->getPropelConnection());
         $cart = $this->factory->cart($customer);
 
-        $this->shipping()->setCustomerDefaultDeliveryAddress($cart);
+        self::assertTrue($this->shipping()->setCustomerDefaultDeliveryAddress($cart), 'A cart without a copy is delivered somewhere new.');
 
         self::assertSame('5 Default Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
         self::assertSame($default->getId(), $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId());
+    }
+
+    /**
+     * Another street in the same place: the carriers read the same country, state, postal
+     * code and city, nothing to price again.
+     */
+    public function testAnotherStreetOfTheSamePlaceIsNoNewPlace(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $country = $this->factory->country();
+        $default = $this->factory->address($customer, $country, null, ['address1' => '6 Default Street', 'zipcode' => '75001', 'city' => 'Paris']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $copy = $this->factory->cartAddress(null, $country, null, ['address1' => '7 Other Street', 'zipcode' => '75001', 'city' => 'Paris']);
+        $cart = $this->factory->cart($customer);
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
+
+        self::assertFalse($this->shipping()->setCustomerDefaultDeliveryAddress($cart));
+        self::assertSame('6 Default Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
     }
 
     private function shipping(): ShippingFacade

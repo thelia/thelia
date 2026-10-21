@@ -18,6 +18,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddress;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -31,15 +32,20 @@ final readonly class DeliverySetupService
 
     /**
      * Copies the default address of the cart's customer onto the cart, into the copy the cart
-     * already has when it has one. Nothing for a cart without a customer, nor for a guest:
-     * the default address of a guest row may be another buyer's (see setupVirtualDelivery()).
+     * already has when it has one, a copy typed by hand included. Nothing for a cart without
+     * a customer, nor for a guest: the default address of a guest row may be another buyer's
+     * (see setupVirtualDelivery()).
+     *
+     * @return bool whether the cart is delivered to another place: it had no copy, or its
+     *              copy changed country, state, postal code or city, which the carriers and
+     *              their postage depend on; false when nothing was copied
      */
-    public function setCustomerDefaultDeliveryAddress(Cart $cart): void
+    public function setCustomerDefaultDeliveryAddress(Cart $cart): bool
     {
         $customer = $cart->getCustomer();
 
         if (null === $customer || $customer->isGuest()) {
-            return;
+            return false;
         }
 
         $defaultAddress = $customer->getDefaultAddress();
@@ -48,12 +54,14 @@ final readonly class DeliverySetupService
             throw new \RuntimeException(Translator::getInstance()->trans('Customer default address is null'));
         }
 
-        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress(
-            $defaultAddress,
-            $cart->getCartAddressRelatedByAddressDeliveryId(),
-        );
+        $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $placeBefore = null === $copy ? null : self::placeOf($copy);
+
+        $defaultCartAddress = $this->cartAddressService->getOrCreateCartAddressFromAddress($defaultAddress, $copy);
 
         $cart->setAddressDeliveryId($defaultCartAddress->getId())->save();
+
+        return $placeBefore !== self::placeOf($defaultCartAddress);
     }
 
     public function setupVirtualDelivery(Cart $cart): void
@@ -134,5 +142,16 @@ final readonly class DeliverySetupService
         $deliveryAddress->save();
 
         $cart->setAddressDeliveryId($deliveryAddress->getId())->save();
+    }
+
+    /**
+     * Where a copy delivers to, as the carriers read it: the country, the state, the postal
+     * code and the city (the same four DeliveryAddressCopy of the Flexy theme compares).
+     *
+     * @return array{0: int|null, 1: int|null, 2: string, 3: string}
+     */
+    private static function placeOf(CartAddress $copy): array
+    {
+        return [$copy->getCountryId(), $copy->getStateId(), (string) $copy->getZipcode(), (string) $copy->getCity()];
     }
 }
