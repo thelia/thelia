@@ -388,23 +388,25 @@ final readonly class ShippingFacade
     }
 
     /**
-     * The address, when it belongs to the customer of the cart.
+     * The address an `addressId` names for the carriers, when it is another address of the
+     * customer of the cart than the one the cart's copy was taken from.
      *
      * An id comes with a request: the postal code of an address of someone else would
-     * otherwise be read out through the carriers offered for it. A guest row is reused by
-     * whoever types the same e-mail address (CustomerGuestRegistrationService), so it
-     * carries the addresses of earlier buyers: for a guest, only the address the cart's copy
-     * was taken from is theirs.
+     * otherwise be read out through the carriers offered for it. The source of the copy is
+     * the copy's to judge, as CartGuard judges the order: the address may have been edited
+     * since it was chosen. A guest row is reused by whoever types the same e-mail address
+     * (CustomerGuestRegistrationService), so it carries the addresses of earlier buyers: the
+     * only address a guest owns for sure is the source of the copy, so a guest names none.
      */
     private function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
     {
         $customer = $cart->getCustomer();
 
-        if (null === $customer) {
+        if (null === $customer || $customer->isGuest()) {
             return null;
         }
 
-        if ($customer->isGuest() && $addressId !== $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId()) {
+        if ($addressId === $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId()) {
             return null;
         }
 

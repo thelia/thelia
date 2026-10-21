@@ -70,9 +70,10 @@ The postal code is passed by:
 The postal code goes with the address it belongs to: the cart's copy for the cart's own
 address, whose country and state are read too, as `CartGuard` reads them; the customer
 address for an `addressId`, also when a country is given next to it as the API does,
-provided the address is in that country and belongs to the customer of the cart. A guest
-row is reused by whoever types the same e-mail address, so for a guest only the address
-the cart's copy was taken from counts as theirs. A country given alone, or any other
+provided the address is in that country, belongs to the customer of the cart and is not
+the one the copy was taken from (the copy judges its own source, which may have been
+edited since). A guest names no address this way: a guest row is reused by whoever types
+the same e-mail address. A country given alone, or any other
 address, takes the postal code of the cart's delivery address when that address is in the
 country, as the postage estimate does. The front API (`GET /api/front/delivery_modules`)
 judges the cart's copy unless the request names, as a strictly positive integer, another
