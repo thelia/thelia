@@ -21,7 +21,9 @@ namespace Thelia\Domain\Shipping\ZipCode;
  * - a code matching an exclusion is refused, whatever the inclusions say;
  * - when the zone has inclusions, a code must match one of them;
  * - an unknown postal code is accepted: the address decides later, and a missing code
- *   never hides every carrier.
+ *   never hides every carrier;
+ * - a code that cannot be checked (not valid UTF-8, or a pattern PCRE gives up on) is
+ *   uncertain: an exclusion refuses it, an inclusion does not take it.
  */
 final readonly class ZipCodeRuleSet
 {
@@ -37,6 +39,7 @@ final readonly class ZipCodeRuleSet
 
     public function accepts(?string $zipCode): bool
     {
+        // Unknown, not unreadable: a code that cannot be normalised goes on to the rules.
         if (null === $zipCode || '' === ZipCodePattern::normalize($zipCode)) {
             return true;
         }

@@ -101,4 +101,17 @@ final class ZipCodeRuleSetTest extends TestCase
 
         self::assertFalse($rules->accepts('2001091'), 'An inclusion that cannot be checked does not take the code.');
     }
+
+    /**
+     * A postal code that is not valid UTF-8 cannot be normalised: it is not unknown, it is
+     * uncertain, and the rules fail closed on it.
+     */
+    public function testAPostalCodeThatCannotBeReadIsUncertain(): void
+    {
+        $unreadable = "20\xC3\x28";
+
+        self::assertTrue((new ZipCodeRuleSet())->accepts($unreadable), 'A zone without a rule takes every code.');
+        self::assertFalse((new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('75*')]))->accepts($unreadable), 'An exclusion refuses it.');
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($unreadable), 'An inclusion does not take it.');
+    }
 }
