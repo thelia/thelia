@@ -331,8 +331,9 @@ final readonly class ShippingFacade
      * - Else, return (null, null, null, null).
      *
      * The postal code comes with the address it belongs to: the cart's own copy for the
-     * cart's address, so that a guest, whose cart address points to no customer address, is
-     * judged on the code typed. An `addressId` gives its postal code only when it is an
+     * cart's address, the place the order leaves for, also when no customer address stands
+     * behind the copy (its customer was anonymized, or a module wrote the copy itself). An
+     * `addressId` gives its postal code only when it is an
      * address of the cart's customer in the country asked for; otherwise, as for a country
      * given alone, the postal code of the cart's address is read when that address is in
      * the country.
@@ -374,8 +375,9 @@ final readonly class ShippingFacade
         $address = $cartAddress?->getAddress();
 
         if (null === $address) {
-            // A guest: no customer address behind the cart's copy, whose country
-            // handleCountry() reads, and whose postal code goes with it.
+            // No customer address behind the copy (its customer was anonymized, or a module
+            // wrote the copy itself): the copy's country, which handleCountry() reads, its
+            // state and its postal code.
             return [null, null, $cartAddress?->getState(), $cartAddress?->getZipcode()];
         }
 
