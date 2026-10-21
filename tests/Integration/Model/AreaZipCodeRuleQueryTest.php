@@ -80,6 +80,14 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
         );
     }
 
+    public function testAPatternStoredInFullWidthCharactersIsReadInItsNormalForm(): void
+    {
+        $this->insertStraightIntoTheTable("\u{FF12}\u{FF10}\u{FF0A}", excluded: true);
+
+        self::assertFalse($this->ruleSet()->accepts('20090'), 'The full-width 20* excludes Corsica.');
+        self::assertTrue($this->ruleSet()->accepts('69001'));
+    }
+
     /**
      * A pattern written by hand may hold a line break: logged as it is, it would forge a line
      * of the log.

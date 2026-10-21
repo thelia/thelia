@@ -231,6 +231,18 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
     }
 
+    public function testAPostalCodeOfInvisibleCharactersIsNotNamed(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        self::assertNull(
+            $this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo("\u{200B}")),
+            'A code its normal form empties gives the buyer nothing to read.',
+        );
+    }
+
     public function testThePostalCodeIsNotBlamedWhenNoCarrierServesTheCountry(): void
     {
         $this->onlyTheModuleOfTheTestIsActive();
