@@ -20,7 +20,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Api\Bridge\Propel\Event\DeliveryModuleOptionEvent;
 use Thelia\Api\Resource\DeliveryModuleOption;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session as TheliaSession;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -33,6 +35,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Tests\Support\Delivery\DeliveryDateTestCarrier;
 use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
 
@@ -54,7 +58,11 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
      */
     private const string DELIVERY_STEP_COMPONENT = 'FlexyBundle\\Components\\Organisms\\Delivery\\Base';
 
-    private const string GUEST_CHECKOUT_GATE = 'FlexyBundle\\Service\\GuestCheckoutGate';
+    /**
+     * The release of the theme that keeps a guest's own address on a pickup and on a virtual
+     * order: the service both go through.
+     */
+    private const string GUEST_DELIVERY_ADDRESS = 'FlexyBundle\\Service\\GuestDeliveryAddress';
 
     private const string PICKUP = 'localpickup';
 
@@ -68,8 +76,8 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
 
     protected function setUp(): void
     {
-        if (!method_exists(self::GUEST_CHECKOUT_GATE, 'ownAddressId')) {
-            self::markTestSkipped('The installed front-office theme puts the default address of the guest row on a pickup.');
+        if (!class_exists(self::GUEST_DELIVERY_ADDRESS)) {
+            self::markTestSkipped('The installed front-office theme puts the default address of the guest row on a pickup and on a virtual order.');
         }
 
         parent::setUp();
@@ -118,6 +126,59 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
         $copy = $this->deliveryCopyOf($firstCart);
         self::assertNotSame('9 rue des Autres', $copy?->getAddress1(), 'The cart of the first buyer received the address of another buyer.');
         self::assertSame('12 rue de la Paix', $copy?->getAddress1());
+        $this->assertThePickupWasTaken($firstCart);
+    }
+
+    /**
+     * The cart of the first buyer carries a copy of an address they are not shown (another
+     * buyer's, on the same row): a pickup puts one of their own on it instead.
+     */
+    public function testAPickupReplacesACopyOfAnAddressTheGuestIsNotShown(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession();
+        $earlierBuyers = $this->guestCustomerOf(self::GUEST_EMAIL)?->getDefaultAddress() ?? self::fail('No default address on the row.');
+        $this->reread($firstCart)->setAddressDeliveryId($this->copyOf($earlierBuyers)->getId())->save($this->getPropelConnection());
+        // The carrier prices the address it is given: 7.00 for the other buyer's, 5.00 for theirs.
+        $carrierId = (int) $this->carrier->getId();
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($carrierId): void {
+            if ($carrierId !== (int) $event->getModule()->getModuleModel()->getId()) {
+                return;
+            }
+
+            $street = $event->getCart()->getCartAddressRelatedByAddressDeliveryId()?->getAddress1();
+            $event->setValidModule(true)->setPostage(new OrderPostage('12 rue de la Paix' === $street ? 5.0 : 7.0));
+            $event->stopPropagation();
+        }, 2048);
+
+        $step = $this->pickUpInTheSessionOfTheClient();
+
+        $copy = $this->deliveryCopyOf($firstCart);
+        self::assertSame('12 rue de la Paix', $copy?->getAddress1(), 'The copy of an address of another buyer stayed on the cart.');
+        $this->assertThePickupWasTaken($firstCart);
+        self::assertSame($copy?->getAddressId(), $step->deliveryAddressId, 'The step shows the address now on the cart.');
+        self::assertEqualsWithDelta(5.0, (float) $this->reread($firstCart)->getPostage(), 0.001, 'The pickup is priced on the address now on the cart.');
+    }
+
+    /**
+     * A guest with several addresses of their own: the default one among them comes before
+     * the first.
+     */
+    public function testAGuestWithSeveralAddressesPicksUpWithTheirDefaultOne(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession();
+        $guest = $this->guestCustomerOf(self::GUEST_EMAIL) ?? self::fail('No guest.');
+        $own = AddressQuery::create()->filterByCustomerId($guest->getId())->filterByAddress1('12 rue de la Paix')->findOne() ?? self::fail('The first buyer has no address.');
+        $ownDefault = $own->copy()->setLabel('Second own')->setAddress1('3 rue du Défaut')->setIsDefault(1);
+        $ownDefault->save($this->getPropelConnection());
+        $own->setIsDefault(0)->save($this->getPropelConnection());
+        // A copy of the other buyer's address: the step leaves it, the pickup replaces it.
+        $earlierBuyers = $this->guestCustomerOf(self::GUEST_EMAIL)?->getDefaultAddress() ?? self::fail('No default address on the row.');
+        self::assertSame('9 rue des Autres', $earlierBuyers->getAddress1());
+        $this->reread($firstCart)->setAddressDeliveryId($this->copyOf($earlierBuyers)->getId())->save($this->getPropelConnection());
+
+        $this->pickUpInTheSessionOfTheClient(extraIdentificationAddressIds: [(int) $ownDefault->getId()]);
+
+        self::assertSame('3 rue du Défaut', $this->deliveryCopyOf($firstCart)?->getAddress1(), 'The first of the guest\'s addresses was taken over their default one.');
     }
 
     /**
@@ -138,18 +199,27 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
      * the same e-mail address with another address, which the row then holds as its default
      * one; the client is back in the session of the first.
      */
-    private function twoBuyersOfOneRowBackInTheFirstSession(): Cart
+    private function twoBuyersOfOneRowBackInTheFirstSession(bool $virtual = false): Cart
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
 
         $firstCart = $this->openASessionWithACart();
+
+        if ($virtual) {
+            $this->makeEverythingInTheCartVirtual($firstCart);
+        }
+
         $this->client->submit($this->guestFormOf($this->requestIdentificationPage()));
-        $this->assertResponseRedirectsTo('/checkout/delivery');
+        self::assertTrue($this->client->getResponse()->isRedirect(), 'The identification goes through.');
         $this->serveTheCountryOfTheGuest();
-        // The delivery step puts the buyer's address on the cart, as it opens.
-        $this->client->request('GET', '/checkout/delivery');
-        self::assertSame('12 rue de la Paix', $this->deliveryCopyOf($firstCart)?->getAddress1());
+
+        if (!$virtual) {
+            // The delivery step puts the buyer's address on the cart, as it opens.
+            $this->client->request('GET', '/checkout/delivery');
+            self::assertSame('12 rue de la Paix', $this->deliveryCopyOf($firstCart)?->getAddress1());
+        }
+
         $firstSession = $this->client->getCookieJar()->all();
 
         $this->client->getCookieJar()->clear();
@@ -159,7 +229,7 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
             'flexybundle_form_guest_checkout[zipcode]' => '13001',
             'flexybundle_form_guest_checkout[city]' => 'Marseille',
         ]));
-        $this->assertResponseRedirectsTo('/checkout/delivery');
+        self::assertTrue($this->client->getResponse()->isRedirect(), 'The second identification goes through.');
         self::assertSame(
             '9 rue des Autres',
             $this->guestCustomerOf(self::GUEST_EMAIL)?->getDefaultAddress()?->getAddress1(),
@@ -172,6 +242,23 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
         }
 
         return $firstCart;
+    }
+
+    /**
+     * A virtual order has no delivery step: the checkout settles its carrier, and the core
+     * put the default address of the customer row on the cart, another buyer's for a guest
+     * row shared by an e-mail address. The first buyer's cart carries their own address.
+     */
+    public function testAGuestOfAVirtualOrderNeverGetsTheAddressOfAnotherBuyerOfTheSameRow(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession(virtual: true);
+
+        $this->client->request('GET', '/checkout/payment');
+
+        $copy = $this->deliveryCopyOf($firstCart);
+        self::assertNotSame('9 rue des Autres', $copy?->getAddress1(), 'The virtual order of the first buyer received the address of another buyer.');
+        self::assertSame('12 rue de la Paix', $copy?->getAddress1(), 'The virtual order carries the buyer\'s own address.');
+        self::assertSame((int) ModuleQuery::create()->findOneByCode('VirtualProductDelivery')?->getId(), (int) $this->reread($firstCart)->getDeliveryModuleId(), 'The virtual carrier was settled.');
     }
 
     /**
@@ -195,7 +282,11 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
         self::assertSame('1 rue du Compte', $this->deliveryCopyOf($cart)?->getAddress1(), 'A pickup puts the default address of the account on the cart.');
     }
 
-    private function pickUpInTheSessionOfTheClient(bool $forgetTheIdentification = false): void
+    /**
+     * @param list<int> $extraIdentificationAddressIds addresses the identification of the
+     *                                                 session holds besides its own
+     */
+    private function pickUpInTheSessionOfTheClient(bool $forgetTheIdentification = false, array $extraIdentificationAddressIds = []): object
     {
         $requestStack = $this->getService(RequestStack::class);
         $request = Request::create('/checkout/delivery');
@@ -205,6 +296,10 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
             $session->remove(self::IDENTIFICATION_ADDRESS_IDS_KEY);
         }
 
+        if ([] !== $extraIdentificationAddressIds) {
+            $session->set(self::IDENTIFICATION_ADDRESS_IDS_KEY, [...(array) $session->get(self::IDENTIFICATION_ADDRESS_IDS_KEY, []), ...$extraIdentificationAddressIds]);
+        }
+
         $request->setSession($session);
         $requestStack->push($request);
 
@@ -212,9 +307,33 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
             $step = $this->getService(self::DELIVERY_STEP_COMPONENT);
             $step->mount();
             $step->selectDeliveryModuleOption(self::PICKUP, (int) $this->carrier->getId());
+
+            return $step;
         } finally {
             $requestStack->pop();
         }
+    }
+
+    private function assertThePickupWasTaken(Cart $cart): void
+    {
+        self::assertSame((int) $this->carrier->getId(), (int) $this->reread($cart)->getDeliveryModuleId(), 'The carrier of the pickup is on the cart.');
+        // The step writes the option through the session service it is given.
+        self::assertSame(self::PICKUP, $this->getService(TheliaSession::class)->get('deliveryModuleOption'), 'The pickup is the option of the session.');
+    }
+
+    private function makeEverythingInTheCartVirtual(Cart $cart): void
+    {
+        $connection = $this->getPropelConnection();
+        CartTableMap::clearInstancePool();
+
+        foreach ((CartQuery::create()->findPk($cart->getId(), $connection) ?? self::fail('The cart is gone.'))->getCartItems() as $cartItem) {
+            // Both halves of what makes a cart virtual: a virtual product, no weight to ship.
+            $cartItem->getProductSaleElements()->setWeight(0)->save($connection);
+            $cartItem->getProductSaleElements()->getProduct()->setVirtual(1)->save($connection);
+        }
+
+        CartTableMap::clearInstancePool();
+        CartTableMap::clearRelatedInstancePool();
     }
 
     private function serveTheCountryOfTheGuest(): void
