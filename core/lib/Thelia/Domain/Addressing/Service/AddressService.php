@@ -16,6 +16,7 @@ namespace Thelia\Domain\Addressing\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -157,6 +158,22 @@ readonly class AddressService
         );
     }
 
+    /**
+     * The id of the address a request names, in its route, its body or its query string: a
+     * strictly positive integer, or null when it names none (missing, empty, zero, not a
+     * number).
+     */
+    public function requestedAddressId(HttpRequest $request): ?int
+    {
+        $addressId = $request->attributes->get('addressId')
+            ?? $request->request->get('addressId')
+            ?? $request->query->get('addressId');
+
+        $addressId = filter_var($addressId, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+        return false === $addressId ? null : $addressId;
+    }
+
     public function getDeliveryAddress(
         Request $request,
         SecurityContext $securityContext,
@@ -164,9 +181,7 @@ readonly class AddressService
         if (null === $request) {
             return null;
         }
-        $addressId = $request->attributes->get('addressId')
-            ?? $request->request->get('addressId')
-            ?? $request->query->get('addressId');
+        $addressId = $this->requestedAddressId($request);
 
         if (null === $addressId) {
             // The cart holds a `cart_address` id, which is its own frozen copy
