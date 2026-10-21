@@ -22,10 +22,12 @@ use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
+use Thelia\Core\Event\Folder\FolderUpdatePublicationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\CMS\Publication\PublicationService;
 use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Folder as FolderModel;
@@ -39,6 +41,26 @@ use Thelia\Model\Map\FolderTableMap;
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly PublicationService $publicationService,
+    ) {
+    }
+
+    /**
+     * Publish, schedule, cancel or take offline. The state the folder reached is left
+     * on the event; a refused gesture throws a `PublicationException` and writes nothing.
+     */
+    public function updatePublication(FolderUpdatePublicationEvent $event): void
+    {
+        $folder = $event->getFolder();
+
+        if (null === $folder) {
+            return;
+        }
+
+        $event->setStatus($this->publicationService->apply($folder, $event->request));
+    }
+
     public function update(FolderUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
@@ -169,6 +191,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
             TheliaEvents::FOLDER_UPDATE => ['update', 128],
             TheliaEvents::FOLDER_DELETE => ['delete', 128],
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
+            TheliaEvents::FOLDER_UPDATE_PUBLICATION => ['updatePublication', 128],
 
             TheliaEvents::FOLDER_UPDATE_POSITION => ['updatePosition', 128],
             TheliaEvents::FOLDER_UPDATE_SEO => ['updateSeo', 128],

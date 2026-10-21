@@ -64,6 +64,7 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
             TheliaEvents::CONTENT_UPDATE_SEO,
             TheliaEvents::CONTENT_UPDATE_POSITION,
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
+            TheliaEvents::CONTENT_UPDATE_PUBLICATION,
 
             TheliaEvents::FOLDER_CREATE,
             TheliaEvents::FOLDER_UPDATE,
@@ -71,6 +72,7 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
             TheliaEvents::FOLDER_UPDATE_SEO,
             TheliaEvents::FOLDER_UPDATE_POSITION,
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
+            TheliaEvents::FOLDER_UPDATE_PUBLICATION,
 
             TheliaEvents::BRAND_CREATE,
             TheliaEvents::BRAND_UPDATE,
