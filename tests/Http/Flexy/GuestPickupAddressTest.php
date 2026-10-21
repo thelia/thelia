@@ -23,6 +23,7 @@ use Thelia\Api\Resource\DeliveryModuleOption;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session as TheliaSession;
+use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -30,6 +31,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CartAddressTableMap;
@@ -71,6 +73,8 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
 
     private Module $carrier;
 
+    private ?string $previousDisplayMode = null;
+
     /** @var list<array{0: string, 1: callable}> */
     private array $registeredListeners = [];
 
@@ -108,6 +112,11 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
             static::getContainer()->get('event_dispatcher')->removeListener($eventName, $listener);
         }
         $this->registeredListeners = [];
+
+        if (null !== $this->previousDisplayMode) {
+            ConfigQuery::write('checkout_display_mode', $this->previousDisplayMode);
+            $this->previousDisplayMode = null;
+        }
 
         parent::tearDown();
     }
@@ -262,6 +271,101 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
     }
 
     /**
+     * The order of a virtual cart paid straight away: the payment settles its carrier, after
+     * the theme put an address of the buyer on the cart. The cart carries no billing address,
+     * which the core would copy: the address comes from the theme.
+     */
+    public function testAVirtualOrderPaidStraightAwayKeepsTheGuestsOwnAddress(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession(virtual: true);
+        $this->reread($firstCart)->setAddressInvoiceId(null)->save($this->getPropelConnection());
+
+        $this->client->request('GET', '/checkout/pay');
+
+        $this->assertTheVirtualOrderCarriesTheBuyersOwnAddress($firstCart);
+    }
+
+    /**
+     * The same on a checkout of one page, which the cart page serves whole.
+     */
+    public function testAVirtualOrderOnAOnePageCheckoutKeepsTheGuestsOwnAddress(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession(virtual: true);
+        $this->reread($firstCart)->setAddressInvoiceId(null)->save($this->getPropelConnection());
+        $this->previousDisplayMode = ConfigQuery::getCheckoutDisplayMode();
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::OnePage->value);
+
+        $this->client->request('GET', '/checkout/cart');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertTheVirtualOrderCarriesTheBuyersOwnAddress($firstCart);
+    }
+
+    /**
+     * A copy with no source address was written for this cart alone, by this buyer: the
+     * address a pickup or a virtual order puts on the cart is not put over it. Asked of the
+     * service: the step, as it mounts, puts an address of the buyer over a copy it cannot
+     * show.
+     */
+    public function testAPickupKeepsACopyWrittenForTheCartAlone(): void
+    {
+        $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession();
+        $typed = (new CartAddress())
+            ->setCustomerTitleId((int) $this->deliveryCopyOf($firstCart)?->getCustomerTitleId())
+            ->setFirstname('Jean')
+            ->setLastname('Dupont')
+            ->setAddress1('7 rue Saisie')
+            ->setZipcode('75001')
+            ->setCity('Paris')
+            ->setCountryId((int) $this->deliveryCopyOf($firstCart)?->getCountryId());
+        $typed->save($this->getPropelConnection());
+        $this->reread($firstCart)->setAddressDeliveryId($typed->getId())->save($this->getPropelConnection());
+
+        $changed = $this->inTheSessionOfTheClient(fn (): bool => $this->getService(self::GUEST_DELIVERY_ADDRESS)->keepAnAddressOfTheGuest($this->reread($firstCart)));
+
+        self::assertFalse($changed);
+        self::assertSame($typed->getId(), $this->reread($firstCart)->getAddressDeliveryId());
+        self::assertSame('7 rue Saisie', $this->deliveryCopyOf($firstCart)?->getAddress1(), 'The copy written for the cart was replaced.');
+    }
+
+    /**
+     * The pickup cannot quote the default address of the account: once that address is on
+     * the cart, the pickup goes, and the step says so.
+     */
+    public function testAPickupThatCannotQuoteTheDefaultAddressOfTheAccountGoes(): void
+    {
+        $cart = $this->openASessionWithACart();
+        $account = $this->signInAsARealAccount();
+        $country = $this->countryOfTheShop();
+        $fixtures = $this->fixtures();
+        $default = $fixtures->address($account, $country, null, ['address1' => '1 Far Street']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $other = $fixtures->address($account, $country, null, ['address1' => '2 rue Secondaire']);
+        $this->serveCountryWithCarrier($this->carrier, $country, $this->getPropelConnection());
+        $carrierId = (int) $this->carrier->getId();
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($carrierId): void {
+            if ($carrierId !== (int) $event->getModule()->getModuleModel()->getId()) {
+                return;
+            }
+
+            $street = $event->getCart()->getCartAddressRelatedByAddressDeliveryId()?->getAddress1();
+            $event->setValidModule('1 Far Street' !== $street)->setPostage(new OrderPostage(5.0));
+            $event->stopPropagation();
+        }, 2048);
+        $cart = $this->reread($cart);
+        $cart->setAddressDeliveryId($this->copyOf($other)->getId())->save($this->getPropelConnection());
+
+        $step = $this->pickUpInTheSessionOfTheClient();
+
+        self::assertSame('1 Far Street', $this->deliveryCopyOf($cart)?->getAddress1());
+        self::assertNull($this->reread($cart)->getDeliveryModuleId(), 'A pickup that cannot quote the address stayed on the cart.');
+        self::assertNull($step->deliveryModuleId, 'The step still shows the pickup as chosen.');
+        self::assertNull($step->deliveryModuleOptionCode);
+        self::assertSame('carrier_gone', $step->deliveryDateNotice);
+        self::assertNull($this->getService(TheliaSession::class)->get('deliveryModuleOption'), 'The session still holds the pickup.');
+    }
+
+    /**
      * A customer with an account picks up with the default address of the account, as before.
      */
     public function testACustomerWithAnAccountPicksUpWithTheDefaultAddressOfTheAccount(): void
@@ -309,6 +413,33 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
             $step->selectDeliveryModuleOption(self::PICKUP, (int) $this->carrier->getId());
 
             return $step;
+        } finally {
+            $requestStack->pop();
+        }
+    }
+
+    private function assertTheVirtualOrderCarriesTheBuyersOwnAddress(Cart $cart): void
+    {
+        self::assertSame('12 rue de la Paix', $this->deliveryCopyOf($cart)?->getAddress1(), 'The virtual order carries the buyer\'s own address.');
+        self::assertSame((int) ModuleQuery::create()->findOneByCode('VirtualProductDelivery')?->getId(), (int) $this->reread($cart)->getDeliveryModuleId(), 'The virtual carrier was settled.');
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(): T $call
+     *
+     * @return T
+     */
+    private function inTheSessionOfTheClient(callable $call): mixed
+    {
+        $requestStack = $this->getService(RequestStack::class);
+        $request = Request::create('/checkout/delivery');
+        $request->setSession($this->sessionOfTheClient());
+        $requestStack->push($request);
+
+        try {
+            return $call();
         } finally {
             $requestStack->pop();
         }
