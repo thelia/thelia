@@ -86,6 +86,8 @@ final class TheliaEvents
     public const CONTENT_UPDATE_SEO = 'action.updateContentSeo';
     public const CONTENT_ADD_FOLDER = 'action.contentAddFolder';
     public const CONTENT_REMOVE_FOLDER = 'action.contentRemoveFolder';
+    /** Publish, schedule, cancel or take offline a content ({@see Content\ContentUpdatePublicationEvent}). */
+    public const CONTENT_UPDATE_PUBLICATION = 'action.updateContentPublication';
     public const VIEW_CONTENT_ID_NOT_VISIBLE = 'action.viewContentIdNotVisible';
 
     // -- END CONTENT EVENTS ---------------------------------------------------------
@@ -172,6 +174,8 @@ final class TheliaEvents
     public const FOLDER_TOGGLE_VISIBILITY = 'action.toggleFolderVisibility';
     public const FOLDER_UPDATE_POSITION = 'action.updateFolderPosition';
     public const FOLDER_UPDATE_SEO = 'action.updateFolderSeo';
+    /** Publish, schedule, cancel or take offline a folder ({@see Folder\FolderUpdatePublicationEvent}). */
+    public const FOLDER_UPDATE_PUBLICATION = 'action.updateFolderPublication';
     public const VIEW_FOLDER_ID_NOT_VISIBLE = 'action.viewFolderIdNotVisible';
 
     // -- END FOLDER EVENTS ---------------------------------------------------------

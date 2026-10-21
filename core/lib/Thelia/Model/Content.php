@@ -18,12 +18,15 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
+use Thelia\Domain\CMS\Publication\PublicationGuard;
+use Thelia\Domain\CMS\Publication\PublishableInterface;
 use Thelia\Model\Base\Content as BaseContent;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Content extends BaseContent implements FileModelParentInterface
+class Content extends BaseContent implements FileModelParentInterface, PublishableInterface
 {
     use PositionManagementTrait;
     use UrlRewritingTrait;
@@ -167,6 +170,37 @@ class Content extends BaseContent implements FileModelParentInterface
     public function getPosition(): ?int
     {
         return parent::getPosition();
+    }
+
+    /**
+     * An existing content going from hidden to visible needs a body in the default
+     * language, whichever path writes the flag (publication event, update or toggle
+     * event, facade, admin API, scheduled command). A new content is not checked.
+     *
+     * @throws EmptyContentPublicationException
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        if (!$this->isNew() && $this->isColumnModified(ContentTableMap::COL_VISIBLE) && 1 === (int) $this->getVisible()) {
+            $locale = PublicationGuard::defaultLocale();
+            // The translation held in memory carries the body being saved along with the
+            // flag; it is not in the database yet. Reading it through getTranslation() would
+            // switch the locale of the row, so the array is read directly.
+            $bodyInMemory = isset($this->currentTranslations[$locale]) ? $this->currentTranslations[$locale]->getDescription() : null;
+
+            try {
+                (new PublicationGuard())->assertHasBody($this, $bodyInMemory, $locale);
+            } catch (EmptyContentPublicationException $exception) {
+                // With the instance pool on, the row in memory is the one every later read of
+                // this content gets: left as it is, it says visible, and the next save of the
+                // same content would put it online after all.
+                $this->reload(false, $con);
+
+                throw $exception;
+            }
+        }
+
+        return parent::preSave($con);
     }
 
     public function postSave(?ConnectionInterface $con = null): void

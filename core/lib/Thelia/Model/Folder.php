@@ -18,11 +18,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\CMS\Publication\PublishableInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Folder extends BaseFolder implements FileModelParentInterface
+class Folder extends BaseFolder implements FileModelParentInterface, PublishableInterface
 {
     use PositionManagementTrait;
     use UrlRewritingTrait;
