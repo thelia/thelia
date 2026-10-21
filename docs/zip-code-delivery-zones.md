@@ -112,8 +112,11 @@ deleted, or deleted with a country is the administration log of the back office.
   carrier module.
 - On a country without a postal code format (`country.zip_code_format` empty, or
   `need_zip_code` off, in which case the format is not checked), the customer can type any
-  code, or none. A format holding `C` is no better: `Country::getZipCodeRE()` reads it as
-  `.+`, any characters. An empty code is unknown and accepted by every zone, a mistyped one
+  code, or none. A format that leaves free text is not much better: `Country::getZipCodeRE()`
+  reads `C` as `.+`, any characters, and copies every other character unescaped into the
+  regular expression, so a `.`, `*`, `?`, `+`, `|`, brackets, braces or a backslash act as
+  regular expression characters. The part they cover is free; the rest of the code is
+  checked. An empty code is unknown and accepted by every zone, a mistyped one
   matches no exclusion: both pass the exclusions, and only inclusions hold. The back
   office warns on the card of a zone whose rules apply to such a country.
 - A rule written for a country goes with the country when it leaves the zone

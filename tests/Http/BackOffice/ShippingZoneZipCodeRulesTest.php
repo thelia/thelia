@@ -37,6 +37,11 @@ use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
  */
 final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
 {
+    /**
+     * Written as a string: `::class` on a class the installed theme lacks resolves silently.
+     */
+    private const string THEME_ZIP_CODE_FORMAT = 'BackOfficeDefaultTwigBundle\\Service\\Shipping\\ZipCodeFormat';
+
     private AdminSessionInjector $injector;
 
     protected function setUp(): void
@@ -98,22 +103,44 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         $checked = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
         $unformatted = $this->countryOfTheZone($area, 'XW', '996', '', true);
         $notRequired = $this->countryOfTheZone($area, 'XY', '997', 'NNNNN', false);
-        $anyCharacters = $this->countryOfTheZone($area, 'XQ', '998', 'CNNN', true);
         $rule = $this->rule($area, '20*', true);
         $this->loginAs($this->factory()->admin());
 
         $this->assertPageRenders($this->zoneUrl($area));
         $warning = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]');
-        self::assertSame(1, $warning->count(), 'A rule for every country of the zone covers the three countries.');
+        self::assertSame(1, $warning->count(), 'A rule for every country of the zone covers the two countries.');
         self::assertStringContainsString($unformatted->getTitle(), $warning->text());
         self::assertStringContainsString($notRequired->getTitle(), $warning->text());
-        self::assertStringContainsString($anyCharacters->getTitle(), $warning->text(), 'C stands for any characters: the format checks nothing there.');
         self::assertStringNotContainsString($checked->getTitle(), $warning->text());
 
         $rule->setCountryId($checked->getId())->save($this->getPropelConnection());
 
         $this->assertPageRenders($this->zoneUrl($area));
         self::assertSame(0, $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]')->count(), 'The only rule applies to a country whose codes are checked.');
+    }
+
+    /**
+     * Country::getZipCodeRE() reads C as any characters and copies every other character
+     * unescaped into a regular expression: such a format leaves free text.
+     */
+    public function testTheCardWarnsAboutAFormatThatLeavesFreeText(): void
+    {
+        $this->skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText();
+        $area = $this->area();
+        $checked = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $anyCharactersFirst = $this->countryOfTheZone($area, 'XQ', '998', 'CNNN', true);
+        $twoFreeCharacters = $this->countryOfTheZone($area, 'XR', '991', 'CC NNN', true);
+        $aDot = $this->countryOfTheZone($area, 'XS', '992', 'NN.NNN', true);
+        $this->rule($area, '20*', true);
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders($this->zoneUrl($area));
+        $warning = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]')->text();
+        self::assertStringContainsString($anyCharactersFirst->getTitle(), $warning, 'C stands for any characters.');
+        self::assertStringContainsString($twoFreeCharacters->getTitle(), $warning);
+        self::assertStringContainsString($aDot->getTitle(), $warning, 'A dot is any character to the regular expression.');
+        self::assertStringNotContainsString($checked->getTitle(), $warning);
+        self::assertStringContainsString('the format leaves free text', $warning);
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
@@ -314,6 +341,18 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         (new CountryArea())->setAreaId($area->getId())->setCountryId($country->getId())->save($this->getPropelConnection());
 
         return $country;
+    }
+
+    /**
+     * The release of the theme that reads the formats leaving free text, gets the merchant's
+     * trace of a country removed with its rules and tells a refused rule from another
+     * refusal. A core test of it must stay green while the theme of the core CI predates it.
+     */
+    private function skipUnlessTheThemeKnowsTheFormatsThatLeaveFreeText(): void
+    {
+        if (!class_exists(self::THEME_ZIP_CODE_FORMAT)) {
+            self::markTestSkipped('The installed back-office theme predates the review of the postal code rules.');
+        }
     }
 
     private function zoneUrl(Area $area): string
