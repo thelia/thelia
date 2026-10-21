@@ -84,8 +84,8 @@ edited since). A guest names no address this way: a guest row is reused by whoev
 the same e-mail address. A country given alone, or any other
 address, takes the postal code of the cart's delivery address when that address is in the
 country, as the postage estimate does. The front API (`GET /api/front/delivery_modules`)
-judges the cart's copy unless the request names, as a strictly positive integer, another
-existing address than the one the copy was taken from.
+judges the cart's copy unless the request names another address of the cart's customer
+(never for a guest) than the one the copy was taken from.
 
 A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is not
 unknown but uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion

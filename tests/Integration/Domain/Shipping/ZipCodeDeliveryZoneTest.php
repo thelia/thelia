@@ -289,6 +289,38 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function addressesNamedToTheFrontApi(): iterable
+    {
+        yield 'an address of another customer' => ['someone else', true];
+        yield 'another address of the guest row' => ['guest row', true];
+        yield 'another address of the customer' => ['own', false];
+    }
+
+    /**
+     * The address a request names, in a country no zone of the carrier serves: only another
+     * address of the cart's customer is listed for; anything else lists the carriers of the
+     * cart's copy, so the country and the state of an address of someone else are never read
+     * out through the list.
+     */
+    #[DataProvider('addressesNamedToTheFrontApi')]
+    public function testTheFrontApiListsForANamedAddressOnlyWhenItIsTheCustomers(string $whose, bool $listedForTheCopy): void
+    {
+        $this->zoneServedByTheModule();
+        $title = $this->factory->customerTitle();
+        $customer = 'guest row' === $whose ? $this->factory->guestCustomer($title) : $this->factory->customer($title);
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '69001']));
+        $owner = 'someone else' === $whose ? $this->factory->customer($title) : $customer;
+        $abroad = $this->factory->address($owner, $this->newCountry('XY', 'XYX', '987'), null, ['zipcode' => '69001']);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $listed = \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => (string) $abroad->getId()])), true);
+
+        self::assertSame($listedForTheCopy, $listed, $listedForTheCopy ? 'The list read an address that is not the customer\'s.' : 'An address of the customer decides.');
+    }
+
     public function testAnEmptyRouteAttributeDoesNotHideTheAddressTheQueryNames(): void
     {
         $area = $this->zoneServedByTheModule();

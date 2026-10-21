@@ -61,18 +61,22 @@ readonly class DeliveryModuleProvider implements ProviderInterface
 
         $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
 
-        // A request that names no other address asks for the carriers of the cart: its own copy
-        // of the delivery address decides, as CartGuard judges it when the order is placed, and
-        // not the customer address behind it, which may have been edited since (or may be none,
-        // for a guest whose address was typed in the API and never saved).
+        // A request that names no other address of the cart's customer asks for the carriers of
+        // the cart: its own copy of the delivery address decides, as CartGuard judges it when
+        // the order is placed, and not the customer address behind it, which may have been
+        // edited since. The country and the state of an address of someone else would otherwise
+        // be read out through the carriers listed for it.
         $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
-        $namedAddress = $this->anotherAddressNamedBy($request, $copy?->getAddressId());
+        $requestedId = $request instanceof HttpRequest ? $this->addressService->requestedAddressId($request) : null;
+        $namedAddress = $this->anotherAddressOfTheCustomer($cart, $requestedId, $copy?->getAddressId());
 
         if (null !== $copy && null === $namedAddress) {
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
         }
 
-        $deliveryAddress = $namedAddress ?? ($request instanceof Request
+        // Without a copy: the address named when it is the customer's, the address of the
+        // session when none is named, nothing when one is named that is not theirs.
+        $deliveryAddress = $namedAddress ?? (null === $requestedId && $request instanceof Request
             ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
             : null);
 
@@ -92,18 +96,21 @@ readonly class DeliveryModuleProvider implements ProviderInterface
     }
 
     /**
-     * The address the request names when it is another one than the one the cart's copy was
-     * taken from: an id AddressService reads as one (a strictly positive integer) that
-     * resolves to an address. The source of the copy is the copy's to judge.
+     * The address the request names when it is another address of the cart's customer than
+     * the one the cart's copy was taken from. Never for a guest: a guest row is reused by
+     * whoever types the same e-mail address, so its other addresses may be other buyers'.
      */
-    private function anotherAddressNamedBy(?HttpRequest $request, ?int $copySourceId): ?Address
+    private function anotherAddressOfTheCustomer(Cart $cart, ?int $addressId, ?int $copySourceId): ?Address
     {
-        $addressId = $request instanceof HttpRequest ? $this->addressService->requestedAddressId($request) : null;
+        $customer = $cart->getCustomer();
 
-        if (null === $addressId || $addressId === $copySourceId) {
+        if (null === $addressId || $addressId === $copySourceId || null === $customer || $customer->isGuest()) {
             return null;
         }
 
-        return AddressQuery::create()->findPk($addressId);
+        return AddressQuery::create()
+            ->filterById($addressId)
+            ->filterByCustomerId($customer->getId())
+            ->findOne();
     }
 }
