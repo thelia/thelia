@@ -160,9 +160,10 @@ readonly class AddressService
 
     /**
      * The id of the address a request names, read from the first of its route, its body and
-     * its query string that holds a value (an empty one is no value): a strictly positive
-     * integer in decimal, or null when it names none (missing, empty, zero, negative, not a
-     * number, written with leading zeros).
+     * its query string that holds a value (a blank string is no value). Strictly a positive
+     * decimal integer: an int above zero, or digits only, without a sign, a space or a
+     * leading zero. Anything else names none: zero, a negative or signed number, "007",
+     * " 7", a boolean or a float of a JSON body, text.
      */
     public function requestedAddressId(HttpRequest $request): ?int
     {
@@ -173,9 +174,15 @@ readonly class AddressService
                 continue;
             }
 
-            $addressId = filter_var($addressId, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (\is_int($addressId)) {
+                return $addressId > 0 ? $addressId : null;
+            }
 
-            return false === $addressId ? null : $addressId;
+            if (!\is_string($addressId) || !ctype_digit($addressId) || '0' === $addressId[0] || \strlen($addressId) > 18) {
+                return null;
+            }
+
+            return (int) $addressId;
         }
 
         return null;
@@ -185,9 +192,6 @@ readonly class AddressService
         Request $request,
         SecurityContext $securityContext,
     ): ?Address {
-        if (null === $request) {
-            return null;
-        }
         $addressId = $this->requestedAddressId($request);
 
         if (null === $addressId) {
