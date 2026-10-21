@@ -25,10 +25,13 @@ use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Core\Event\Content\ContentUpdatePublicationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
+use Thelia\Domain\CMS\Publication\PublicationService;
 use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Content as ContentModel;
@@ -44,6 +47,12 @@ use Thelia\Model\Map\ContentTableMap;
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly PublicationService $publicationService,
+        private readonly ContentFolderPublicationRule $folderPublicationRule,
+    ) {
+    }
+
     public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $content = (new ContentModel())
@@ -125,6 +134,21 @@ class Content extends BaseAction implements EventSubscriberInterface
         $event->setContent($content);
     }
 
+    /**
+     * Publish, schedule, cancel or take offline. The state the content reached is left
+     * on the event; a refused gesture throws a `PublicationException` and writes nothing.
+     */
+    public function updatePublication(ContentUpdatePublicationEvent $event): void
+    {
+        $content = $event->getContent();
+
+        if (null === $content) {
+            return;
+        }
+
+        $event->setStatus($this->publicationService->apply($content, $event->request));
+    }
+
     public function delete(ContentDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null === $content = ContentQuery::create()->findPk($event->getContentId())) {
@@ -191,7 +215,8 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Check if is a content view and if content_id is visible.
+     * Check if is a content view and if content_id is visible. A content whose default
+     * folder is not online yet (a draft or a scheduled folder) is not on the shop either.
      */
     public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -201,6 +226,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         $content = ContentQuery::create()
             ->filterById($event->getViewId())
             ->filterByVisible(1)
+            ->where($this->folderPublicationRule->outsideAnUnreleasedFolderClause(ContentTableMap::COL_ID))
             ->count();
 
         if (0 === $content) {
@@ -223,6 +249,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CONTENT_UPDATE => ['update', 128],
             TheliaEvents::CONTENT_DELETE => ['delete', 128],
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
+            TheliaEvents::CONTENT_UPDATE_PUBLICATION => ['updatePublication', 128],
 
             TheliaEvents::CONTENT_UPDATE_POSITION => ['updatePosition', 128],
             TheliaEvents::CONTENT_UPDATE_SEO => ['updateSeo', 128],
