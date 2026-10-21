@@ -265,6 +265,22 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    public function testAnEmptyRouteAttributeDoesNotHideTheAddressTheQueryNames(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '69001']));
+        $another = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => (string) $another->getId()], ['addressId' => ''])),
+            'The address the query names decides.',
+        );
+    }
+
     /**
      * An `addressId` names an address only when it is a strictly positive integer that
      * resolves to one other than the source of the cart's copy: otherwise the copy judges, as
@@ -278,6 +294,9 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         yield 'zero' => ['0'];
         yield 'not a number' => ['abc'];
         yield 'an unknown id' => ['999999999'];
+        yield 'a negative id' => ['-5'];
+        yield 'an id with leading zeros' => ['007'];
+        yield 'the id of another address with leading zeros' => ['zeros'];
         yield 'the source of the copy' => ['source'];
     }
 
@@ -295,7 +314,12 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
         self::assertContains(
             $this->module->getId(),
-            $ids($this->frontApiListFor($cart, ['addressId' => 'source' === $addressId ? (string) $source->getId() : $addressId])),
+            $ids($this->frontApiListFor($cart, ['addressId' => match ($addressId) {
+                'source' => (string) $source->getId(),
+                // Read as an id, it would name an address the zone excludes.
+                'zeros' => '00'.$this->factory->address($customer, $this->country, null, ['zipcode' => '20090'])->getId(),
+                default => $addressId,
+            }])),
             'The copy, in Lyon, judges.',
         );
     }
@@ -672,10 +696,11 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
      * What GET /api/front/delivery_modules answers for a session holding the cart.
      *
      * @param array<string, string> $query
+     * @param array<string, string> $attributes
      *
      * @return list<mixed>
      */
-    private function frontApiListFor(Cart $cart, array $query = []): array
+    private function frontApiListFor(Cart $cart, array $query = [], array $attributes = []): array
     {
         $session = new Session(new MockArraySessionStorage());
         // The cart of a customer is the session's only once the customer is signed in.
@@ -683,7 +708,7 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             $session->setCustomerUser($cart->getCustomer());
         }
         $session->setSessionCart($cart);
-        $request = new Request($query);
+        $request = new Request($query, [], $attributes);
         $request->setSession($session);
         $requestStack = new RequestStack();
         $requestStack->push($request);

@@ -159,19 +159,26 @@ readonly class AddressService
     }
 
     /**
-     * The id of the address a request names, in its route, its body or its query string: a
-     * strictly positive integer, or null when it names none (missing, empty, zero, not a
-     * number).
+     * The id of the address a request names, read from the first of its route, its body and
+     * its query string that holds a value (an empty one is no value): a strictly positive
+     * integer in decimal, or null when it names none (missing, empty, zero, negative, not a
+     * number, written with leading zeros).
      */
     public function requestedAddressId(HttpRequest $request): ?int
     {
-        $addressId = $request->attributes->get('addressId')
-            ?? $request->request->get('addressId')
-            ?? $request->query->get('addressId');
+        foreach ([$request->attributes, $request->request, $request->query] as $parameters) {
+            $addressId = $parameters->get('addressId');
 
-        $addressId = filter_var($addressId, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (null === $addressId || (\is_string($addressId) && '' === trim($addressId))) {
+                continue;
+            }
 
-        return false === $addressId ? null : $addressId;
+            $addressId = filter_var($addressId, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+            return false === $addressId ? null : $addressId;
+        }
+
+        return null;
     }
 
     public function getDeliveryAddress(

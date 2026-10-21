@@ -66,14 +66,15 @@ readonly class DeliveryModuleProvider implements ProviderInterface
         // not the customer address behind it, which may have been edited since (or may be none,
         // for a guest whose address was typed in the API and never saved).
         $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $namedAddress = $this->anotherAddressNamedBy($request, $copy?->getAddressId());
 
-        if (null !== $copy && !$this->namesAnotherAddress($request, $copy->getAddressId())) {
+        if (null !== $copy && null === $namedAddress) {
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
         }
 
-        $deliveryAddress = $request instanceof Request
+        $deliveryAddress = $namedAddress ?? ($request instanceof Request
             ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
-            : null;
+            : null);
 
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
@@ -91,20 +92,18 @@ readonly class DeliveryModuleProvider implements ProviderInterface
     }
 
     /**
-     * Whether the request names an address other than the one the cart's copy was taken
-     * from: an id AddressService reads as one (a strictly positive integer) and that resolves
-     * to an address. The source of the copy is the copy's to judge.
+     * The address the request names when it is another one than the one the cart's copy was
+     * taken from: an id AddressService reads as one (a strictly positive integer) that
+     * resolves to an address. The source of the copy is the copy's to judge.
      */
-    private function namesAnotherAddress(?HttpRequest $request, ?int $copySourceId): bool
+    private function anotherAddressNamedBy(?HttpRequest $request, ?int $copySourceId): ?Address
     {
-        if (!$request instanceof HttpRequest) {
-            return false;
+        $addressId = $request instanceof HttpRequest ? $this->addressService->requestedAddressId($request) : null;
+
+        if (null === $addressId || $addressId === $copySourceId) {
+            return null;
         }
 
-        $addressId = $this->addressService->requestedAddressId($request);
-
-        return null !== $addressId
-            && $addressId !== $copySourceId
-            && null !== AddressQuery::create()->findPk($addressId);
+        return AddressQuery::create()->findPk($addressId);
     }
 }
