@@ -140,6 +140,18 @@ final class OrderReturnExportTest extends IntegrationTestCase
         self::assertSame("'=1+1", $row['Expected exchange']);
     }
 
+    public function testAProductOrACombinationThatStartsLikeAFormulaIsExportedAsText(): void
+    {
+        $order = $this->orderWithALine(['Helmet size' => '=2+2']);
+        $order->getOrderProducts()->getFirst()->setTitle('@SUM(A1)')->save($this->getPropelConnection());
+        $this->returnOf($order, OrderReturnStatus::CODE_REQUESTED, OrderReturn::RESOLUTION_REFUND, 'Too big', null, null);
+
+        $row = $this->rowsOf($order, $this->locale('en_US'))[0];
+
+        self::assertSame("'@SUM(A1)", $row['Product']);
+        self::assertSame("'=2+2", $row['Combination values']);
+    }
+
     public function testTheExportIsRegisteredInTheCatalogue(): void
     {
         $export = ExportQuery::create()->findOneByRef('thelia.export.order_returns');
