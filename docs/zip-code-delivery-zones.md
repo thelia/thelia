@@ -34,17 +34,22 @@ when it is written. One that reaches the table by another way matches no postal 
 logged with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
 unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
-other inclusion therefore closes the zone to every known postal code of the country; an
-unknown postal code is still accepted.
+other inclusion therefore closes the zone to every known postal code of the country; no
+postal code at all is still accepted.
 
 `ZipCodeRuleSet` applies the rules of a zone for one country:
 
 - a zone without a rule takes every postal code, as zones always did;
 - a code matching an exclusion is refused, whatever the inclusions say;
 - when the zone has inclusions, a code must match one of them;
-- an unknown postal code (none, or only spaces and dashes, as a buyer types `-` for no
-  code) is accepted; a code without a normal form (a zero-width space alone, `é1`, a
-  variation selector) is not unknown but uncertain, as below.
+- no postal code at all (`null`: no address yet, a cart estimated without one) is unknown:
+  every zone takes it, and `AreaDeliveryModuleQuery::findByCountryAndModule()` reads no
+  rule for it;
+- a typed code made only of spaces and dashes (a buyer typing `-` for no code, an empty
+  code through the API) is a placeholder (`ZipCodePattern::isPlaceholder()`): a zone with
+  an inclusion does not take it, a zone with exclusions only or without a rule does;
+- a code without a normal form (a zero-width space alone, `é1`, a variation selector) is
+  uncertain, as below.
 
 ## Where it applies
 
@@ -87,12 +92,12 @@ country, as the postage estimate does. The front API (`GET /api/front/delivery_m
 judges the cart's copy unless the request names another address of the cart's customer
 (never for a guest) than the one the copy was taken from.
 
-A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is not
-unknown but uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
+A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is
+uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
 does not take it; a zone without a rule still takes it. The database refuses a code that
 is not valid UTF-8 in an address, so only a caller passing one itself meets that case.
-`ShippingFacade::postalCodeWithoutCarrier()` names neither an unknown nor an uncertain
-code (`ZipCodePattern::nameable()`).
+`ShippingFacade::postalCodeWithoutCarrier()` names neither an unknown code, a placeholder
+nor an uncertain code (`ZipCodePattern::nameable()`).
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not
@@ -131,8 +136,8 @@ deleted, or deleted with a country is the administration log of the back office.
   reads `C` as `.+`, any characters, and copies every other character unescaped into the
   regular expression, so a `.`, `*`, `?`, `+`, `|`, brackets, braces or a backslash act as
   regular expression characters. The part they cover is free; the rest of the code is
-  checked. An empty code is unknown and accepted by every zone, a mistyped one
-  matches no exclusion: both pass the exclusions, and only inclusions hold. The back
+  checked. An empty code is a placeholder, a mistyped one matches no exclusion: both pass
+  the exclusions, and only inclusions hold. The back
   office warns on the card of a zone whose rules apply to such a country.
 - A rule written for a country goes with the country when it leaves the zone
   (`TheliaEvents::AREA_REMOVE_COUNTRY`).

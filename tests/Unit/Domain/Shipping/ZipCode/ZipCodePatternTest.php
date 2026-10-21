@@ -125,13 +125,15 @@ final class ZipCodePatternTest extends TestCase
     {
         self::assertNull(ZipCodePattern::normalize($zipCode));
         self::assertFalse(ZipCodePattern::isUnknown($zipCode), 'It is not unknown either.');
+        self::assertFalse(ZipCodePattern::isPlaceholder($zipCode), 'Nor a placeholder.');
     }
 
     /**
      * @return iterable<string, array{string}>
      */
-    public static function unknownCodes(): iterable
+    public static function placeholders(): iterable
     {
+        yield 'nothing typed' => [''];
         yield 'a hyphen' => ['-'];
         yield 'an en dash' => ["\u{2013}"];
         yield 'a hyphen between spaces' => [' - '];
@@ -140,18 +142,29 @@ final class ZipCodePatternTest extends TestCase
     }
 
     /**
-     * A buyer who types "-" means "no code": the code is unknown, as an empty one.
+     * A buyer who types "-" means "no code": a placeholder, which is not unknown, since a
+     * code was typed.
      */
-    #[DataProvider('unknownCodes')]
-    public function testADashOrSpacesAloneIsAnUnknownCode(string $zipCode): void
+    #[DataProvider('placeholders')]
+    public function testADashOrSpacesAloneIsAPlaceholder(string $zipCode): void
     {
-        self::assertTrue(ZipCodePattern::isUnknown($zipCode));
-        self::assertNull(ZipCodePattern::nameable($zipCode), 'An unknown code is not named.');
+        self::assertTrue(ZipCodePattern::isPlaceholder($zipCode));
+        self::assertFalse(ZipCodePattern::isUnknown($zipCode));
+        self::assertNull(ZipCodePattern::nameable($zipCode), 'A placeholder is not named.');
+        self::assertFalse(ZipCodePattern::fromString('*0*')->matches($zipCode, whenUnsure: true), 'A placeholder matches no pattern.');
     }
 
-    public function testOnlyAKnownCodeWithANormalFormIsNamed(): void
+    public function testOnlyNoCodeAtAllIsUnknown(): void
+    {
+        self::assertTrue(ZipCodePattern::isUnknown(null));
+        self::assertFalse(ZipCodePattern::isPlaceholder(null));
+        self::assertNull(ZipCodePattern::nameable(null));
+    }
+
+    public function testOnlyACodeWithANormalFormIsNamed(): void
     {
         self::assertSame('20 090', ZipCodePattern::nameable('20 090'));
+        self::assertSame('1000-001', ZipCodePattern::nameable('1000-001'), 'Spaces and dashes are kept.');
         self::assertNull(ZipCodePattern::nameable("\u{200B}"));
         self::assertNull(ZipCodePattern::nameable("2\u{FE0F}0000"));
     }

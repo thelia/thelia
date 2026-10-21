@@ -68,12 +68,11 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertTrue($rules->accepts('75015'));
     }
 
-    public function testAnUnknownCodeIsAccepted(): void
+    public function testNoCodeAtAllIsAccepted(): void
     {
         $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('75*')]);
 
         self::assertTrue($rules->accepts(null));
-        self::assertTrue($rules->accepts(' '));
     }
 
     /**
@@ -144,14 +143,21 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($zipCode), 'An inclusion does not take it.');
     }
 
-    public function testOnlyNoCodeOrSpacesAndDashesAreUnknown(): void
+    /**
+     * A typed code of only spaces and dashes says where nothing is: a zone that names the
+     * codes it takes does not take it, a zone that only names codes it refuses does.
+     */
+    public function testAPlaceholderIsTakenOnlyByAZoneWithoutAnInclusion(): void
     {
-        $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]);
+        $inclusions = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]);
+        $exclusions = new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('20*')]);
 
-        self::assertTrue($rules->accepts(null));
-        self::assertTrue($rules->accepts(''));
-        self::assertTrue($rules->accepts(" \t\u{00A0}"));
-        self::assertTrue($rules->accepts('-'), 'A buyer who types "-" means no code.');
-        self::assertTrue($rules->accepts(" \u{2013} "));
+        foreach (['-', '', " \t\u{00A0}", " \u{2013} "] as $placeholder) {
+            self::assertFalse($inclusions->accepts($placeholder), 'A zone with an inclusion does not take a placeholder.');
+            self::assertTrue($exclusions->accepts($placeholder), 'A zone with exclusions only takes it.');
+            self::assertTrue((new ZipCodeRuleSet())->accepts($placeholder), 'A zone without a rule takes it.');
+        }
+
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')], exclusions: [ZipCodePattern::fromString('75*')]))->accepts('-'));
     }
 }
