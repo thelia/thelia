@@ -48,7 +48,9 @@ page that lists, estimates and checks the carriers reads the rules of a zone onc
 saved or deleted through the model drops them, and so do a new request, a console
 command and the reset of the services between two messages of a worker
 (`ZipCodeRuleCacheListener`). A bulk write on `AreaZipCodeRuleQuery`, which skips the
-model hooks, is seen from the next request on.
+model hooks, is seen from the next request on, and so are the rows deleted in cascade with
+their zone or their country, SQL written straight to the table, a rule read then rolled back
+with its transaction, and what another process writes during a long console command.
 
 The postal code is passed by:
 
@@ -103,6 +105,13 @@ message.
   (`TheliaEvents::AREA_REMOVE_COUNTRY`).
 - A module that decides eligibility on its own (`isValidDelivery()`, the postage event)
   is not affected by the rules of the zones it is not linked to.
+- The carriers are judged on the cart's copy of its address (its country, state and postal
+  code), and so is the order by `CartGuard`; the modules, however, still receive the
+  customer address behind the copy in `DeliveryPostageEvent::getAddress()`, which may have
+  been edited since it was chosen (and is null for a guest whose copy points to no customer
+  address). A module that prices on the address (postal code, city, coordinates) reads the
+  cart's copy, `$cart->getCartAddressRelatedByAddressDeliveryId()`, as GeolocatedDelivery
+  does: the event carries the cart.
 - The carriers follow the cart's copy of its delivery address, which only choosing the
   address again refreshes: an address edited elsewhere (another checkout step, the
   customer account, the API) keeps its old postal code in the cart until it is chosen
