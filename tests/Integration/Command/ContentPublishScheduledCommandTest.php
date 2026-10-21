@@ -21,12 +21,15 @@ use Thelia\Core\Event\Content\ContentUpdatePublicationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\CMS\Publication\PublicationService;
 use Thelia\Domain\CMS\Publication\PublicationState;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Log\CollectingTlogDestination;
 
 /**
  * `content:publish-scheduled` acts on the dates that have come, reports what it did,
@@ -114,6 +117,43 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
         self::assertSame(PublicationState::Published, $this->stateOf($ready), 'the pass goes on with the others');
         self::assertStringContainsString(\sprintf('content #%d left as it is', $empty->getId()), $tester->getDisplay());
         self::assertStringContainsString('no body in the default language', $tester->getDisplay());
+    }
+
+    public function testADryRunAnnouncesTheRefusalOfAContentWithNoBodyWithoutWriting(): void
+    {
+        $empty = $this->scheduledContent('-1 hour', '<p>&nbsp;</p>');
+        $ready = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+
+        $tester = $this->runTheCommand(dryRun: true);
+
+        self::assertSame(1, $tester->getStatusCode(), 'the same exit code as the real pass');
+        self::assertStringContainsString(\sprintf('content #%d left as it is', $empty->getId()), $tester->getDisplay());
+        self::assertStringNotContainsString(\sprintf('content #%d published', $empty->getId()), $tester->getDisplay());
+        self::assertStringContainsString(\sprintf('content #%d published (would be)', $ready->getId()), $tester->getDisplay());
+        self::assertSame(PublicationState::Scheduled, $this->stateOf($empty));
+        self::assertSame(PublicationState::Scheduled, $this->stateOf($ready), 'nothing is written');
+    }
+
+    public function testARefusalIsLoggedAtTheErrorLevelTheLogKeepsByDefault(): void
+    {
+        $empty = $this->scheduledContent('-1 hour', '<p>&nbsp;</p>');
+
+        ConfigQuery::initCache([Tlog::VAR_DESTINATIONS => CollectingTlogDestination::class, Tlog::VAR_LEVEL => (string) Tlog::DEFAULT_LEVEL]);
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+        CollectingTlogDestination::$lines = [];
+
+        try {
+            $this->runTheCommand();
+            $lines = CollectingTlogDestination::$lines;
+        } finally {
+            ConfigQuery::resetCache();
+            (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+            CollectingTlogDestination::$lines = [];
+        }
+
+        $refusals = array_values(array_filter($lines, static fn (string $line): bool => str_contains($line, \sprintf('Scheduled publication of content #%d refused', $empty->getId()))));
+        self::assertCount(1, $refusals, implode("\n", $lines));
+        self::assertStringContainsString('ERROR', $refusals[0]);
     }
 
     public function testEachRowGoesThroughItsPublicationEvent(): void
