@@ -19,7 +19,9 @@ use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Domain\CMS\Publication\PublishableInterface;
+use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Base\Folder as BaseFolder;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
@@ -82,6 +84,19 @@ class Folder extends BaseFolder implements FileModelParentInterface, Publishable
     protected function addCriteriaToPositionQuery(FolderQuery $query): void
     {
         $query->filterByParent($this->getParent());
+    }
+
+    /**
+     * The dates are kept in step with `visible` whichever path writes the flag, so the
+     * state read from the row is always the one the flag says.
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        if (!$this->isNew() && $this->isColumnModified(FolderTableMap::COL_VISIBLE)) {
+            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
+        }
+
+        return parent::preSave($con);
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool

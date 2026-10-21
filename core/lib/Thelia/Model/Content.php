@@ -21,6 +21,7 @@ use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Domain\CMS\Publication\PublicationGuard;
 use Thelia\Domain\CMS\Publication\PublishableInterface;
+use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Base\Content as BaseContent;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -175,13 +176,17 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
     /**
      * An existing content going from hidden to visible needs a body in the default
      * language, whichever path writes the flag (publication event, update or toggle
-     * event, facade, admin API, scheduled command). A new content is not checked.
+     * event, facade, admin API, scheduled command). A new content is not checked. The
+     * dates are then kept in step with the flag, so the state read from the row is
+     * always the one the flag says.
      *
      * @throws EmptyContentPublicationException
      */
     public function preSave(?ConnectionInterface $con = null): bool
     {
-        if (!$this->isNew() && $this->isColumnModified(ContentTableMap::COL_VISIBLE) && 1 === (int) $this->getVisible()) {
+        $visibilityChanged = !$this->isNew() && $this->isColumnModified(ContentTableMap::COL_VISIBLE);
+
+        if ($visibilityChanged && 1 === (int) $this->getVisible()) {
             $locale = PublicationGuard::defaultLocale();
             // The translation held in memory carries the body being saved along with the
             // flag; it is not in the database yet. Reading it through getTranslation() would
@@ -198,6 +203,10 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
 
                 throw $exception;
             }
+        }
+
+        if ($visibilityChanged) {
+            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
         }
 
         return parent::preSave($con);
