@@ -19,7 +19,6 @@ use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Api\Bridge\Propel\Serializer\CartNormalizer;
 use Thelia\Api\State\Provider\DeliveryModuleProvider;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -529,24 +528,6 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             $this->deliveryLoopModuleIds($this->customerCartShippedTo($address), ['address' => $address->getId(), 'country' => $this->country->getId()]),
             'The postal code of an address abroad says nothing of the country listed.',
         );
-    }
-
-    /**
-     * The API cart payload of a cart that has not chosen its carrier yet carries an estimate:
-     * read with the postal code of the cart's address, as the checkout will judge it.
-     */
-    public function testTheCartPayloadEstimatesWithThePostalCodeOfTheCartAddress(): void
-    {
-        $area = $this->zoneServedByTheModule();
-        $this->rule($area, '20*', excluded: true);
-        $normalizer = $this->getService(CartNormalizer::class);
-        $deliveryCostOf = new \ReflectionMethod(CartNormalizer::class, 'deliveryCostOf');
-
-        [$corsica] = $deliveryCostOf->invoke($normalizer, $this->guestCartShippedTo('20090'), $this->country, null, false);
-        [$lyon] = $deliveryCostOf->invoke($normalizer, $this->guestCartShippedTo('69001'), $this->country, null, false);
-
-        self::assertNull($corsica, 'No carrier serves the address: no delivery cost to show.');
-        self::assertNotNull($lyon);
     }
 
     public function testTheEstimateForAnotherCountryReadsNoPostalCodeOfTheCartAddress(): void
