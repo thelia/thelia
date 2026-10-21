@@ -47,6 +47,7 @@ use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Delivery\RegistersDeliveryDateTestCarrier;
 
 /**
  * A delivery zone narrowed down by postal codes: the carriers it brings are offered, quoted
@@ -54,6 +55,8 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 {
+    use RegistersDeliveryDateTestCarrier;
+
     private FixtureFactory $factory;
     private Module $module;
     private Country $country;
@@ -205,6 +208,30 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         }, 2048);
 
         self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
+    }
+
+    /**
+     * One carrier serves the code but does not quote the cart, another would quote it but the
+     * code is excluded from its zones: nothing is offered, and the postal code is why.
+     */
+    public function testThePostalCodeIsNamedWhenTheCarrierThatServesItDoesNotQuoteTheCart(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $notQuoting = $this->registerDeliveryDateTestCarrier(static::getContainer(), $this->getPropelConnection());
+        $this->serveCountryWithCarrier($notQuoting, $this->country, $this->getPropelConnection());
+        $notQuotingId = (int) $notQuoting->getId();
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($notQuotingId): void {
+            if ($notQuotingId === (int) $event->getModule()->getModuleModel()->getId()) {
+                $event->setValidModule(false);
+                $event->stopPropagation();
+            }
+        }, 2048);
+        $cart = $this->guestCartShippedTo('20090');
+
+        self::assertSame([], $this->getService(ShippingFacade::class)->listValidMethods($cart), 'Nothing is offered.');
+        self::assertSame('20090', $this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($cart));
     }
 
     public function testThePostalCodeIsNotBlamedWhenNoCarrierServesTheCountry(): void
