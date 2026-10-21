@@ -56,8 +56,11 @@ final readonly class ZipCodePattern
      */
     private const PLACEHOLDER = '/^[\s\p{Pd}\x{2212}]*$/u';
 
-    /** The invisible format characters nameable() takes out of the code it names. */
-    private const FORMAT_CHARACTERS = '/\p{Cf}+/u';
+    /**
+     * What nameable() takes out of the code it names: invisible format characters, controls
+     * (a line feed, a tab, NEL) and line and paragraph separators.
+     */
+    private const UNPRINTABLE_CHARACTERS = '/[\p{Cf}\p{Cc}\p{Zl}\p{Zp}]+/u';
 
     /**
      * The characters forLog() writes as \u{...}: the C1 controls, line and paragraph
@@ -152,18 +155,19 @@ final readonly class ZipCodePattern
 
     /**
      * The postal code as a buyer can be told it is why no carrier is offered: a code that has
-     * a normal form, as it was typed, its spaces and dashes kept, without the invisible format
-     * characters (direction marks and overrides, zero-width spaces) that would turn the text
-     * of the message around. Null for an unknown code, a placeholder and an uncertain code,
-     * which give the buyer nothing to read.
+     * a normal form, as it was typed, its visible spaces and dashes kept, without what would
+     * break or turn the text of the message around: invisible format characters (direction
+     * marks and overrides, zero-width spaces), controls (line feeds, tabs, NEL) and line and
+     * paragraph separators. Null for an unknown code, a placeholder (which has no normal
+     * form) and an uncertain code, which give the buyer nothing to read.
      */
     public static function nameable(?string $zipCode): ?string
     {
-        if (null === $zipCode || self::isPlaceholder($zipCode) || null === self::normalize($zipCode)) {
+        if (null === $zipCode || null === self::normalize($zipCode)) {
             return null;
         }
 
-        return preg_replace(self::FORMAT_CHARACTERS, '', $zipCode);
+        return preg_replace(self::UNPRINTABLE_CHARACTERS, '', $zipCode);
     }
 
     /**

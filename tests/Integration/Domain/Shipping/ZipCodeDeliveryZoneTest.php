@@ -260,6 +260,19 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNull($facade->postalCodeWithoutCarrier($this->guestCartShippedTo('69001')), 'A carrier is offered.');
     }
 
+    /**
+     * The code the tunnel prints is the one nameable() gives: a right-to-left override typed
+     * in it would otherwise turn the message around.
+     */
+    public function testThePostalCodeIsNamedWithoutWhatWouldTurnTheMessageAround(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+
+        self::assertSame('20090', $this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo("20\u{202E}090")));
+    }
+
     public function testThePostalCodeIsNotBlamedForACarrierThatWouldNotQuoteTheCartAnyway(): void
     {
         $this->onlyTheModuleOfTheTestIsActive();

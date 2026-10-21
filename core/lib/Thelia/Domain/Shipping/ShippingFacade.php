@@ -287,8 +287,10 @@ final readonly class ShippingFacade
         [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
         $country = $this->handleCountry($cart, $country);
 
-        // Nothing to name: an unknown code, or an uncertain one the buyer could not read.
-        if (null === ZipCodePattern::nameable($zipCode)) {
+        // Nothing to name: an unknown code, a placeholder or an uncertain one.
+        $nameable = ZipCodePattern::nameable($zipCode);
+
+        if (null === $nameable) {
             return null;
         }
 
@@ -312,7 +314,7 @@ final readonly class ShippingFacade
         // quote this cart anyway is not one the postal code took away.
         foreach ($refusedByThePostalCode as $module) {
             if (null !== $this->resourceBuilder->build($module, $cart, $address, $country, $state, true)) {
-                return $zipCode;
+                return $nameable;
             }
         }
 

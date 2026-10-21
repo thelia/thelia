@@ -177,6 +177,8 @@ final class ZipCodePatternTest extends TestCase
     {
         self::assertSame('75001', ZipCodePattern::nameable("75\u{202E}001"));
         self::assertSame('SW1A 1AA', ZipCodePattern::nameable("SW1A\u{200B} 1AA\u{200F}"));
+        self::assertSame('20090', ZipCodePattern::nameable("20\n0\t9\u{0085}0"), 'Controls go: a line feed, a tab, NEL.');
+        self::assertSame('20 090', ZipCodePattern::nameable("20\u{2028} 090\u{2029}"), 'Line and paragraph separators go, the space stays.');
     }
 
     public function testThePatternOfAnUnreadableRuleMatchesNothingEvenAnUncertainCode(): void
