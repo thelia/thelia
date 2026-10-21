@@ -49,15 +49,18 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
      *
      * A row whose pattern cannot be read (empty, only *, holding a character other than A
      * to Z, 0 to 9 and *, a range upside down or of two lengths, too long: the back office
-     * refuses all of them, so it was written by another way) matches no postal code, and is logged once per zone and country a request reads.
+     * refuses all of them, so it was written by another way) matches no postal code, and is
+     * logged once per zone and country a request reads.
+     *
      * As an exclusion it then excludes nothing: it says nothing the shop could honour, and
      * refusing every code of the country for it would take the carriers of the zone away
      * from the whole country because of one unreadable row. As an inclusion it takes
      * nothing, and the zone keeps its other inclusions only: an unreadable inclusion must
      * not open the zone to every code. With no other inclusion, the zone then takes no typed
      * postal code of the country, a placeholder ("-") included; no postal code at all is
-     * still accepted, as always. A pattern
-     * that can be read but that PCRE gives up on for one code is another case
+     * still accepted, as always.
+     *
+     * A pattern that can be read but that PCRE gives up on for one code is another case
      * (ZipCodePattern::matches()): its intent is known, only that code is uncertain, and an
      * exclusion refuses it.
      */
@@ -119,7 +122,7 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
                     'reason' => ZipCodePattern::forLog($reason),
                     'consequence' => match (true) {
                         (bool) $rule->getExcluded() => 'it excludes no postal code.',
-                        0 === $readableInclusions => 'it takes no postal code, and with no other inclusion the zone takes no known postal code of the country.',
+                        0 === $readableInclusions => 'it takes no postal code, and with no other inclusion the zone takes no typed postal code of the country, a placeholder included.',
                         default => 'it takes no postal code, and the zone keeps its other inclusions only.',
                     },
                 ],

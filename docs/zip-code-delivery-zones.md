@@ -34,8 +34,8 @@ when it is written. One that reaches the table by another way matches no postal 
 logged with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
 unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
-other inclusion therefore closes the zone to every known postal code of the country; no
-postal code at all is still accepted.
+other inclusion therefore closes the zone to every typed postal code of the country, a
+placeholder included; no postal code at all is still accepted.
 
 `ZipCodeRuleSet` applies the rules of a zone for one country:
 
@@ -45,9 +45,11 @@ postal code at all is still accepted.
 - no postal code at all (`null`: no address yet, a cart estimated without one) is unknown:
   every zone takes it, and `AreaDeliveryModuleQuery::findByCountryAndModule()` reads no
   rule for it;
-- a typed code made only of spaces and dashes (a buyer typing `-` for no code, an empty
-  code through the API) is a placeholder (`ZipCodePattern::isPlaceholder()`): a zone with
-  an inclusion does not take it, a zone with exclusions only or without a rule does;
+- a typed code made only of spaces and dashes (a buyer typing `-` for no code, a code of
+  spaces through the API) or empty (which only an address written outside the forms and
+  the API can hold: both refuse a blank code) is a placeholder
+  (`ZipCodePattern::isPlaceholder()`): a zone with an inclusion does not take it, a zone
+  with exclusions only or without a rule does;
 - a code without a normal form (a zero-width space alone, `é1`, a variation selector) is
   uncertain, as below.
 
