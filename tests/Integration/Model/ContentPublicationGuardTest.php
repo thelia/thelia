@@ -40,13 +40,18 @@ final class ContentPublicationGuardTest extends IntegrationTestCase
         $this->factory = $this->createFixtureFactory();
     }
 
-    public function testAPlainSaveTurningAnEmptyContentVisibleIsRefused(): void
+    public function testAPlainSaveTurningAnEmptyContentVisibleIsRefusedNamingTheLanguage(): void
     {
         $content = $this->hidden('<p>&nbsp;</p>');
 
-        $this->expectException(EmptyContentPublicationException::class);
-
-        $content->setVisible(1)->save();
+        try {
+            $content->setVisible(1)->save();
+            self::fail('An empty content went online.');
+        } catch (EmptyContentPublicationException $exception) {
+            self::assertStringContainsString('(English)', $exception->getMessage(), 'the language is named as the shop writes it, not by its code');
+            self::assertStringNotContainsString('en_US', $exception->getMessage());
+            self::assertSame('en_US', $exception->locale);
+        }
     }
 
     public function testTheBodyBeingSavedAlongWithTheFlagCounts(): void

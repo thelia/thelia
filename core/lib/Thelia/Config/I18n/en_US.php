@@ -677,7 +677,7 @@ return [
     'This category is online' => 'This category is online',
     'This code is already used.' => 'This code is already used.',
     'This condition is always true' => 'This condition is always true',
-    'This content has no body in the default language (%locale) and cannot be published.' => 'This content has no body in the default language (%locale) and cannot be published.',
+    'This content has no body in the default language (%language) and cannot be published.' => 'This content has no body in the default language (%language) and cannot be published.',
     'This content is online.' => 'This content is online.',
     'This country has states / provinces' => 'This country has states / provinces',
     'This country is online' => 'This country is online',

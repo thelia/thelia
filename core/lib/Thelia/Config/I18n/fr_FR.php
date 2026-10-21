@@ -680,7 +680,7 @@ return [
     'This category is online' => 'Cette catégorie est en ligne',
     'This code is already used.' => 'Ce code est déjà utilisé par un autre statut.',
     'This condition is always true' => 'Cette condition est troujours vérifiée',
-    'This content has no body in the default language (%locale) and cannot be published.' => 'Ce contenu n\'a pas de corps dans la langue par défaut (%locale) et ne peut pas être publié.',
+    'This content has no body in the default language (%language) and cannot be published.' => 'Ce contenu n\'a pas de corps dans la langue par défaut (%language) et ne peut pas être publié.',
     'This content is online.' => 'Ce contenu est en ligne.',
     'This country has states / provinces' => 'Ce pays possède des états / provinces',
     'This country is online' => 'Ce pays est en ligne',
