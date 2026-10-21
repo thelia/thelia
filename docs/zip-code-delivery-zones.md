@@ -25,8 +25,8 @@ case, without spaces, hyphens and dashes (a non-breaking hyphen, an en dash, a m
 or invisible format characters (a soft hyphen, a zero-width space), and with the digits of
 every script written in ASCII (Arabic-Indic or Devanagari digits included). `SW1A 1AA`
 matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern is 50 characters long at
-most. A pattern that can match nothing (empty, only `*`, a range with letters or upside down) is refused when it
-is written. One that reaches the table by another way matches no postal code and is logged
+most. A pattern that can match nothing (empty, only `*`, a range with letters or upside
+down) is refused when it is written. One that reaches the table by another way matches no postal code and is logged
 with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
 unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
@@ -97,6 +97,10 @@ code is excluded from would quote the cart. To know it, it asks the price
 (`TheliaEvents::MODULE_DELIVERY_GET_POSTAGE`) of the carriers the postal code turned away
 as well as of those it lets through. Flexy shows it on the delivery step instead of the
 general message.
+
+A pattern written into a log line has its control characters, its backslashes, its line
+and paragraph separators and its direction controls escaped (`ZipCodePattern::forLog()`),
+so that a rule written by hand cannot forge or turn around a line of the log.
 
 The log lines of the feature are for the shop's developers and go through `Tlog`, whose
 default level is ERROR (`tlog_level`, seeded by no install): the unreadable rules and the
