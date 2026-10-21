@@ -36,7 +36,8 @@ unknown postal code is still accepted.
 - a zone without a rule takes every postal code, as zones always did;
 - a code matching an exclusion is refused, whatever the inclusions say;
 - when the zone has inclusions, a code must match one of them;
-- an unknown postal code is accepted.
+- an unknown postal code (none, or only spaces) is accepted; a code its normal form
+  empties (a zero-width space alone) is not unknown but uncertain, as below.
 
 ## Where it applies
 

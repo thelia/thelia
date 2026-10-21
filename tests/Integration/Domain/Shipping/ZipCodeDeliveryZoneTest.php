@@ -160,6 +160,18 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    public function testAPostalCodeOfInvisibleCharactersIsNotTakenForAnUnknownOne(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        self::assertFalse(
+            $this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($this->module, $this->guestCartShippedTo('69001'), $this->country, null, "\u{200B}"),
+            'An exclusion refuses a code its normal form empties.',
+        );
+        self::assertTrue($this->isEligible(' '), 'A blank code is unknown.');
+    }
+
     public function testTheGuardRefusesACartWhosePostalCodeTheZoneExcludes(): void
     {
         $area = $this->zoneServedByTheModule();
