@@ -361,6 +361,22 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertSame($ids($facade->listValidMethodsAsResourceApi($cart)), $named, 'The list is the one of the cart.');
     }
 
+    public function testAnAddressInAnotherCountryLeavesThePostalCodeOfTheCartToSpeak(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $abroad = $this->factory->address($customer, $this->newCountry('XN', 'XNX', '988'), null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '20090']));
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $abroad->getId())),
+            'The cart is in Corsica: an address abroad does not make the code unknown.',
+        );
+    }
+
     public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
     {
         $area = $this->zoneServedByTheModule();

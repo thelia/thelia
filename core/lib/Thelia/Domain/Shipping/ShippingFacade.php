@@ -330,8 +330,9 @@ final readonly class ShippingFacade
      * The postal code comes with the address it belongs to: the cart's own copy for the
      * cart's address, so that a guest, whose cart address points to no customer address, is
      * judged on the code typed. An `addressId` gives its postal code only when it is an
-     * address of the cart's customer; otherwise, as for a country given alone, the postal
-     * code of the cart's address is read when that address is in the country.
+     * address of the cart's customer in the country asked for; otherwise, as for a country
+     * given alone, the postal code of the cart's address is read when that address is in
+     * the country.
      *
      * @param int|null $addressId id of a customer `address`
      *
@@ -347,15 +348,15 @@ final readonly class ShippingFacade
             // Explicit (country/state) context over address; an address of the cart's
             // customer still gives its postal code when it is in that country, as the API
             // passes both.
+            // An address in another country says nothing of this one: as for an address of
+            // someone else, the cart's address speaks when it is in the country.
             $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
-            if (null === $address) {
+            if (null === $address || $address->getCountryId() !== $country->getId()) {
                 return [null, $country, $state, $this->postageEstimator->cartZipCodeIn($cart, $country)];
             }
 
-            $zipCode = $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
-
-            return [null, $country, $state, $zipCode];
+            return [null, $country, $state, $address->getZipcode()];
         }
 
         // An address of someone else, or none at all, is not handed to the modules: the list
