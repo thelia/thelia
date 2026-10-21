@@ -28,6 +28,7 @@ use Thelia\Core\View\ViewRenderer;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\LangQuery;
 
 /**
  * `GET /preview/{type}/{id}`: the page of a content or a folder whatever its state.
@@ -41,7 +42,10 @@ use Thelia\Model\FolderQuery;
  *
  * The page is then rendered through the view renderer like the public one, with the
  * request marked as a preview: the visibility check lets the row through, the answer is
- * kept out of the caches and the theme shows its banner.
+ * kept out of the caches and the theme shows its banner. The language the link names
+ * travels as the `locale` query parameter, which the kernel listener applies to the
+ * session on every front request (`LangService::handleLang()`) before the controller
+ * runs; a language the shop does not have, which that listener ignores, answers 404.
  */
 #[AsController]
 final readonly class PublicationPreviewController
@@ -75,9 +79,13 @@ final readonly class PublicationPreviewController
             }
         }
 
-        $preview = PublicationPreview::of($type, $id);
+        $preview = PublicationPreview::of($type, $id, $request->query->getString('locale'));
 
         if (!$this->exists($preview)) {
+            throw new NotFoundHttpException();
+        }
+
+        if (null !== $preview->locale && !LangQuery::create()->filterByActive(1)->filterByLocale($preview->locale)->exists()) {
             throw new NotFoundHttpException();
         }
 
