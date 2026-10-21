@@ -86,10 +86,20 @@ final readonly class ZipCodePattern
     /**
      * The normal form of a postal code, or null when it cannot be read (not valid UTF-8):
      * such a code is neither unknown nor any code, the rules cannot tell where it is.
+     *
+     * Compatibility characters are folded first (NFKC: "２０" is "20"), then every space,
+     * hyphen and invisible format character goes (a no-break space, a non-breaking hyphen,
+     * a zero-width space), and the letters are put in upper case.
      */
     public static function normalize(string $zipCode): ?string
     {
-        $withoutSeparators = preg_replace('/[\s\-]+/u', '', $zipCode);
+        $folded = \Normalizer::normalize($zipCode, \Normalizer::FORM_KC);
+
+        if (false === $folded) {
+            return null;
+        }
+
+        $withoutSeparators = preg_replace('/[\s\-\x{2010}\x{2011}\p{Z}\p{Cf}]+/u', '', $folded);
 
         return null === $withoutSeparators ? null : strtoupper($withoutSeparators);
     }

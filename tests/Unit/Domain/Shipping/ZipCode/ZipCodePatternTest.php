@@ -45,6 +45,11 @@ final class ZipCodePatternTest extends TestCase
         yield 'range against a longer code' => ['01000...01999', '001500', false];
         yield 'range above its upper bound' => ['01000...01999', '02000', false];
         yield 'range of long codes' => ['12345678901234567890...12345678901234567899', '12345678901234567895', true];
+        yield 'full-width digits' => ['20*', "\u{FF12}\u{FF10}090", true];
+        yield 'a full-width pattern' => ["\u{FF17}\u{FF15}001", '75001', true];
+        yield 'zero-width space' => ['20090', "20\u{200B}090", true];
+        yield 'no-break space' => ['SW1A1AA', "SW1A\u{00A0}1AA", true];
+        yield 'non-breaking hyphen' => ['1000-001', "1000\u{2011}001", true];
         yield 'range of long codes, outside' => ['12345678901234567890...12345678901234567899', '12345678901234567900', false];
     }
 
@@ -82,6 +87,7 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame('SW1A1AA', (string) ZipCodePattern::fromString(' sw1a 1aa '));
         self::assertSame('75001...75020', (string) ZipCodePattern::fromString('75 001...75-020'));
         self::assertSame('7*1', (string) ZipCodePattern::fromString('7***1'), 'One star per gap.');
+        self::assertSame('20*', (string) ZipCodePattern::fromString("\u{FF12}\u{FF10}\u{FF0A}"), 'Written in full-width characters, kept in its normal form.');
     }
 
     public function testACodeThatIsNotValidUtf8HasNoNormalForm(): void
