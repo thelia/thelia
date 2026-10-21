@@ -613,6 +613,23 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    public function testTheEstimateOfACartReadsTheStateOfItsCopy(): void
+    {
+        $state = (new State())->setCountryId($this->country->getId())->setIsocode('XQ2')->setVisible(1);
+        $state->save($this->getPropelConnection());
+        $area = (new Area())->setName('State zone');
+        $area->save($this->getPropelConnection());
+        (new CountryArea())->setAreaId($area->getId())->setCountryId($this->country->getId())->setStateId($state->getId())->save($this->getPropelConnection());
+        (new AreaDeliveryModule())->setAreaId($area->getId())->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+        $cart = $this->guestCartShippedTo('69001');
+        $cart->getCartAddressRelatedByAddressDeliveryId()->setStateId($state->getId())->save($this->getPropelConnection());
+
+        self::assertNotNull(
+            $this->getService(ShippingFacade::class)->estimateCartPostage($cart)->totalTtc,
+            'The carrier of the zone of the state of the copy is estimated.',
+        );
+    }
+
     public function testTheEstimateOfACartOffersNoCarrierItsAddressIsRefused(): void
     {
         $area = $this->zoneServedByTheModule();

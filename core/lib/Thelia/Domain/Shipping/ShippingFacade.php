@@ -87,13 +87,10 @@ final readonly class ShippingFacade
         ?State $state = null,
         ?int $addressId = null,
     ): PostageEstimateView {
-        $country = $this->handleCountry($cart, $country);
-
+        // The cart's copy first, with its state, and the default country only then, as the
+        // lists of carriers do.
         [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
-
-        if (null === $country) {
-            return new PostageEstimateView(null, null, null);
-        }
+        $country = $this->handleCountry($cart, $country);
 
         $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state, $zipCode);
 
