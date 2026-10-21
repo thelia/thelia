@@ -43,7 +43,7 @@ final readonly class DeliveryModuleEligibilityChecker
             return false;
         }
 
-        return $this->servesTheCart($module, $cart, $country, $state);
+        return $this->servesTheCart($module, $cart, $country, $state, $zipCode);
     }
 
     /**
@@ -60,7 +60,7 @@ final readonly class DeliveryModuleEligibilityChecker
         $servingCarrierCount = 0;
 
         foreach (ModuleQuery::create()->filterByActivate(1)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find() as $module) {
-            if (!$this->servesTheCart($module, $cart, $country, $state)) {
+            if (!$this->servesTheCart($module, $cart, $country, $state, null)) {
                 continue;
             }
 
@@ -76,7 +76,7 @@ final readonly class DeliveryModuleEligibilityChecker
         return 0 === $servingCarrierCount ? [] : array_values(array_unique($blockingProductIds));
     }
 
-    private function servesTheCart(Module $module, Cart $cart, Country $country, ?State $state): bool
+    private function servesTheCart(Module $module, Cart $cart, Country $country, ?State $state, ?string $zipCode): bool
     {
         $isCartVirtual = $cart->isVirtual();
 
