@@ -39,25 +39,25 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * @throws \InvalidArgumentException when the pattern can match nothing
+     * @throws InvalidZipCodeRuleException when the pattern can match nothing
      */
     public static function fromString(string $pattern): self
     {
         $normalized = self::normalizePattern($pattern);
 
         if ('' === str_replace(['*', self::RANGE_SEPARATOR], '', $normalized)) {
-            throw new \InvalidArgumentException('A postal code pattern needs at least one character other than *.');
+            throw new InvalidZipCodeRuleException('A postal code pattern needs at least one character other than *.');
         }
 
         if (\strlen($normalized) > self::MAX_LENGTH) {
-            throw new \InvalidArgumentException('A postal code pattern is 50 characters long at most.');
+            throw new InvalidZipCodeRuleException('A postal code pattern is 50 characters long at most.');
         }
 
         if (str_contains($normalized, self::RANGE_SEPARATOR)) {
             [$from, $to] = explode(self::RANGE_SEPARATOR, $normalized, 2);
 
             if (!ctype_digit($from) || !ctype_digit($to) || \strlen($from) !== \strlen($to) || strcmp($from, $to) > 0) {
-                throw new \InvalidArgumentException('A postal code range goes from a number to a greater or equal number of the same length, as in 75001...75020.');
+                throw new InvalidZipCodeRuleException('A postal code range goes from a number to a greater or equal number of the same length, as in 75001...75020.');
             }
         }
 
