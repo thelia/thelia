@@ -102,7 +102,9 @@ is not valid UTF-8 in an address, so only a caller passing one itself meets that
 nor an uncertain code (`ZipCodePattern::nameable()`), and names a code without what would
 break or turn its message around: invisible format characters (direction marks and
 overrides, zero-width spaces), controls (line feeds, tabs, NEL) and line and paragraph
-separators; its visible spaces and dashes are kept.
+separators; its visible spaces and dashes are kept. A code that holds a right-to-left
+character (a digit of N'Ko or Adlam) is not named at all; Arabic-Indic digits, numbers to
+the bidirectional algorithm, are.
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not

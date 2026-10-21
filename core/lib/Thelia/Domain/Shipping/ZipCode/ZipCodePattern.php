@@ -158,7 +158,10 @@ final readonly class ZipCodePattern
      * a normal form, as it was typed, its visible spaces and dashes kept, without what would
      * break or turn the text of the message around: invisible format characters (direction
      * marks and overrides, zero-width spaces), controls (line feeds, tabs, NEL) and line and
-     * paragraph separators. Null for an unknown code, a placeholder (which has no normal
+     * paragraph separators; or not at all when it holds a right-to-left character (a digit of
+     * N'Ko or Adlam, say), which would carry the text around it. Arabic-Indic digits are
+     * numbers to the bidirectional algorithm: they keep their place in a left-to-right
+     * sentence and are named. Null for an unknown code, a placeholder (which has no normal
      * form) and an uncertain code, which give the buyer nothing to read.
      */
     public static function nameable(?string $zipCode): ?string
@@ -167,7 +170,24 @@ final readonly class ZipCodePattern
             return null;
         }
 
-        return preg_replace(self::UNPRINTABLE_CHARACTERS, '', $zipCode);
+        // Read once the marks are gone: a right-to-left mark is one of them, not a character
+        // of the code.
+        $named = preg_replace(self::UNPRINTABLE_CHARACTERS, '', $zipCode);
+
+        return null === $named || self::holdsARightToLeftCharacter($named) ? null : $named;
+    }
+
+    private static function holdsARightToLeftCharacter(string $text): bool
+    {
+        foreach (mb_str_split($text) as $character) {
+            $direction = \IntlChar::charDirection((int) mb_ord($character));
+
+            if (\IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT === $direction || \IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ARABIC === $direction) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

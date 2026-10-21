@@ -181,6 +181,18 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame('20 090', ZipCodePattern::nameable("20\u{2028} 090\u{2029}"), 'Line and paragraph separators go, the space stays.');
     }
 
+    /**
+     * A right-to-left digit would carry the text of the message around it: such a code is
+     * not named. Arabic-Indic digits are numbers to the bidirectional algorithm, and are.
+     */
+    public function testACodeHoldingARightToLeftCharacterIsNotNamed(): void
+    {
+        self::assertSame('75001', ZipCodePattern::normalize("\u{07C7}\u{07C5}\u{07C0}\u{07C0}\u{07C1}"), 'N\'Ko digits are a code.');
+        self::assertNull(ZipCodePattern::nameable("\u{07C7}\u{07C5}\u{07C0}\u{07C0}\u{07C1}"), 'N\'Ko digits are not named.');
+        self::assertNull(ZipCodePattern::nameable("75\u{1E950}\u{1E950}1"), 'Adlam digits are not named.');
+        self::assertSame("\u{0667}\u{0665}\u{0660}\u{0660}\u{0661}", ZipCodePattern::nameable("\u{0667}\u{0665}\u{0660}\u{0660}\u{0661}"), 'Arabic-Indic digits are named.');
+    }
+
     public function testThePatternOfAnUnreadableRuleMatchesNothingEvenAnUncertainCode(): void
     {
         $nothing = ZipCodePattern::matchingNothing();
