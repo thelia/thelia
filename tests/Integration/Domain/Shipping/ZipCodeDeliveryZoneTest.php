@@ -41,6 +41,7 @@ use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
@@ -360,6 +361,44 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $listed = \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => (string) $abroad->getId()])), true);
 
         self::assertSame($listedForTheCopy, $listed, $listedForTheCopy ? 'The list read an address that is not the customer\'s.' : 'An address of the customer decides.');
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function addressesNamedForACartWithoutACopy(): iterable
+    {
+        yield 'another address of the customer' => ['own', true];
+        yield 'an address of another customer' => ['someone else', false];
+        yield 'an id that reads as none' => ['abc', true];
+    }
+
+    /**
+     * A cart without a delivery address yet. The zone serves the country of the customer's
+     * addresses, the shop's default country is served by none: another address of the
+     * customer is listed for; an address of someone else gives the default country of the
+     * shop, never its own; an id that reads as none falls back on the address of the session,
+     * here the default address of the customer.
+     */
+    #[DataProvider('addressesNamedForACartWithoutACopy')]
+    public function testTheFrontApiListsForACartWithoutACopy(string $named, bool $listed): void
+    {
+        $this->zoneServedByTheModule();
+        CountryQuery::create()->update(['ByDefault' => 0], $this->getPropelConnection());
+        $this->newCountry('XR', 'XRX', '986')->setByDefault(1)->save($this->getPropelConnection());
+        $title = $this->factory->customerTitle();
+        $customer = $this->factory->customer($title);
+        $this->factory->address($customer, $this->country, null, ['zipcode' => '69001'])->setIsDefault(1)->save($this->getPropelConnection());
+        $cart = $this->factory->cart($customer);
+        $this->factory->cartItem($cart, $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency()));
+        $addressId = match ($named) {
+            'own' => (string) $this->factory->address($customer, $this->country, null, ['zipcode' => '69002'])->getId(),
+            'someone else' => (string) $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '69003'])->getId(),
+            default => $named,
+        };
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertSame($listed, \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => $addressId])), true));
     }
 
     public function testAnEmptyRouteAttributeDoesNotHideTheAddressTheQueryNames(): void
@@ -830,7 +869,8 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $provider = new DeliveryModuleProvider(
             $requestStack,
             $session,
-            $this->getService(SecurityContext::class),
+            // The security context of this request, which holds the signed-in customer.
+            new SecurityContext($requestStack),
             $this->getService(AddressService::class),
             $this->dispatcher(),
             $this->getService(ShippingFacade::class),

@@ -74,8 +74,10 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
         }
 
-        // Without a copy: the address named when it is the customer's, the address of the
-        // session when none is named, nothing when one is named that is not theirs.
+        // Another address of the customer named: that address. Otherwise, without a copy: the
+        // address of the session when the request names none (an id that does not read as
+        // one names none), the default country of the shop when it names an address that is
+        // not the customer's.
         $deliveryAddress = $namedAddress ?? (null === $requestedId && $request instanceof Request
             ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
             : null);
