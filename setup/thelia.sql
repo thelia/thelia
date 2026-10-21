@@ -645,12 +645,16 @@ CREATE TABLE `folder`
     `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
+    `publish_at` DATETIME COMMENT 'when the folder went or goes online; NULL on a draft',
+    `unpublish_at` DATETIME COMMENT 'when the folder went or goes offline; NULL while nothing takes it offline',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `idx_folder_publish_at` (`publish_at`),
+    INDEX `idx_folder_unpublish_at` (`unpublish_at`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -664,12 +668,16 @@ CREATE TABLE `content`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `visible` TINYINT,
     `position` INTEGER,
+    `publish_at` DATETIME COMMENT 'when the content went or goes online; NULL on a draft',
+    `unpublish_at` DATETIME COMMENT 'when the content went or goes offline; NULL while nothing takes it offline',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `idx_content_publish_at` (`publish_at`),
+    INDEX `idx_content_unpublish_at` (`unpublish_at`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -4522,6 +4530,8 @@ CREATE TABLE `folder_version`
     `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
+    `publish_at` DATETIME COMMENT 'when the folder went or goes online; NULL on a draft',
+    `unpublish_at` DATETIME COMMENT 'when the folder went or goes offline; NULL while nothing takes it offline',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -4545,6 +4555,8 @@ CREATE TABLE `content_version`
     `id` INTEGER NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
+    `publish_at` DATETIME COMMENT 'when the content went or goes online; NULL on a draft',
+    `unpublish_at` DATETIME COMMENT 'when the content went or goes offline; NULL while nothing takes it offline',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

@@ -550,6 +550,8 @@
     <column defaultValue="0" name="parent" required="true" type="INTEGER" />
     <column name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
+    <column description="when the folder went or goes online; NULL on a draft" name="publish_at" type="TIMESTAMP" />
+    <column description="when the folder went or goes offline; NULL while nothing takes it offline" name="unpublish_at" type="TIMESTAMP" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -557,6 +559,12 @@
     <column name="meta_title" size="255" type="VARCHAR" />
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
+    <index name="idx_folder_publish_at">
+      <index-column name="publish_at" />
+    </index>
+    <index name="idx_folder_unpublish_at">
+      <index-column name="unpublish_at" />
+    </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum, meta_title, meta_description, meta_keywords" />
@@ -570,6 +578,8 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
+    <column description="when the content went or goes online; NULL on a draft" name="publish_at" type="TIMESTAMP" />
+    <column description="when the content went or goes offline; NULL while nothing takes it offline" name="unpublish_at" type="TIMESTAMP" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -577,6 +587,12 @@
     <column name="meta_title" size="255" type="VARCHAR" />
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
+    <index name="idx_content_publish_at">
+      <index-column name="publish_at" />
+    </index>
+    <index name="idx_content_unpublish_at">
+      <index-column name="unpublish_at" />
+    </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum, meta_title, meta_description, meta_keywords" />
