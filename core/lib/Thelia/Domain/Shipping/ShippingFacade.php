@@ -67,7 +67,7 @@ final readonly class ShippingFacade
      */
     public function productsBlockingEveryCarrier(Cart $cart, Country $country, ?State $state, string $locale): array
     {
-        $productIds = $this->eligibilityChecker->productsBlockingEveryCarrier($cart, $country, $state, $this->cartZipCodeIn($cart, $country));
+        $productIds = $this->eligibilityChecker->productsBlockingEveryCarrier($cart, $country, $state, $this->postageEstimator->cartZipCodeIn($cart, $country));
 
         if ([] === $productIds || null === $this->cartShippingRules) {
             return [];
@@ -350,7 +350,7 @@ final readonly class ShippingFacade
             $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
             if (null === $address) {
-                return [null, $country, $state, $this->cartZipCodeIn($cart, $country)];
+                return [null, $country, $state, $this->postageEstimator->cartZipCodeIn($cart, $country)];
             }
 
             $zipCode = $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
@@ -368,7 +368,7 @@ final readonly class ShippingFacade
             $addressCountry = $address->getCountry();
             $zipCode = null !== $this->addressOfTheCartCustomer($cart, $addressId)
                 ? $address->getZipcode()
-                : (null === $addressCountry ? null : $this->cartZipCodeIn($cart, $addressCountry));
+                : (null === $addressCountry ? null : $this->postageEstimator->cartZipCodeIn($cart, $addressCountry));
 
             return [$address, $addressCountry, $address->getState(), $zipCode];
         }
@@ -407,18 +407,6 @@ final readonly class ShippingFacade
             ->filterById($addressId)
             ->filterByCustomerId($customerId)
             ->findOne();
-    }
-
-    /**
-     * The postal code of the cart's delivery address when that address is in the given
-     * country, as the postage estimate reads it: a list and an estimate for one cart and
-     * one country never judge two different codes.
-     */
-    private function cartZipCodeIn(Cart $cart, Country $country): ?string
-    {
-        $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
-
-        return null !== $cartAddress && $cartAddress->getCountryId() === $country->getId() ? $cartAddress->getZipcode() : null;
     }
 
     /**

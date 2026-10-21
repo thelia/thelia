@@ -50,6 +50,20 @@ class PostageEstimator
     }
 
     /**
+     * The postal code of the cart's delivery address when that address is in the given
+     * country, null otherwise. The estimate and the lists of carriers both read it, so that
+     * they never judge two different codes for one cart and one country.
+     */
+    public function cartZipCodeIn(Cart $cart, Country $country): ?string
+    {
+        $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+        return null !== $deliveryAddress && $deliveryAddress->getCountryId() === $country->getId()
+            ? $deliveryAddress->getZipcode()
+            : null;
+    }
+
+    /**
      * Return the minimum expected postage, tax included, for a cart in a given country.
      *
      * Without a postal code, the one of the cart's delivery address is used when that
@@ -70,13 +84,7 @@ class PostageEstimator
         ?State $state = null,
         ?string $zipCode = null,
     ): EstimatedPostageDTO {
-        if (null === $zipCode) {
-            $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
-
-            if (null !== $deliveryAddress && $deliveryAddress->getCountryId() === $country->getId()) {
-                $zipCode = $deliveryAddress->getZipcode();
-            }
-        }
+        $zipCode ??= $this->cartZipCodeIn($cart, $country);
 
         $orderSession = $this->session->getOrder();
 
