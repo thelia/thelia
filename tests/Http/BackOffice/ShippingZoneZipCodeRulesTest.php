@@ -28,6 +28,7 @@ use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
+use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\State;
 use Thelia\Test\FixtureFactory;
@@ -332,6 +333,25 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
             ->filterByResource(AdminResources::AREA)
             ->filterByMessage('Shipping zone "Zone\\\\r\\\\n[forged]" (ID %) created', Criteria::LIKE)
             ->count());
+    }
+
+    /**
+     * A removal posted with a forged token changes nothing, and the log says nothing left.
+     */
+    #[DataProvider('removalPaths')]
+    public function testARemovalWithAnInvalidTokenLeavesTheZoneAsItIs(string $path): void
+    {
+        $area = $this->area();
+        $country = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
+        $this->rule($area, '20*', true)->setCountryId($country->getId())->save($this->getPropelConnection());
+        $this->loginAs($this->factory()->admin());
+        $countryField = str_ends_with($path, 'countries/remove') ? ['country_id' => [(string) $country->getId()]] : ['country_id' => (string) $country->getId()];
+
+        $this->client->request('POST', $path, ['area_id' => (string) $area->getId(), '_token' => 'forged'] + $countryField);
+
+        self::assertSame(1, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count(), 'The country is still in the zone.');
+        self::assertSame(1, AreaZipCodeRuleQuery::create()->filterByAreaId($area->getId())->count(), 'Its rule is still there.');
+        self::assertSame(0, AdminLogQuery::create()->filterByResource(AdminResources::AREA)->filterByResourceId($area->getId())->count(), 'Nothing is logged as removed.');
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
