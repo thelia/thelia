@@ -337,10 +337,14 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
 
     /**
      * A removal posted with a forged token changes nothing, and the log says nothing left.
+     * The one removal goes back to the zone (AdminFormAction::tokenAction() catches the
+     * refusal), the removal of the countries ticked answers 403. The same request with the
+     * token of the page does remove the country.
      */
     #[DataProvider('removalPaths')]
     public function testARemovalWithAnInvalidTokenLeavesTheZoneAsItIs(string $path): void
     {
+        $this->skipUnlessTheThemeLogsWhatLeftTheZone();
         $area = $this->area();
         $country = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
         $this->rule($area, '20*', true)->setCountryId($country->getId())->save($this->getPropelConnection());
@@ -349,9 +353,20 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
 
         $this->client->request('POST', $path, ['area_id' => (string) $area->getId(), '_token' => 'forged'] + $countryField);
 
+        $response = $this->client->getResponse();
+        if (str_ends_with($path, 'countries/remove')) {
+            self::assertSame(403, $response->getStatusCode());
+            self::assertStringContainsString('Invalid or expired security token.', (string) $response->getContent());
+        } else {
+            self::assertTrue($response->isRedirect($this->zoneUrl($area)), 'The one removal goes back to the zone.');
+        }
         self::assertSame(1, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count(), 'The country is still in the zone.');
         self::assertSame(1, AreaZipCodeRuleQuery::create()->filterByAreaId($area->getId())->count(), 'Its rule is still there.');
         self::assertSame(0, AdminLogQuery::create()->filterByResource(AdminResources::AREA)->filterByResourceId($area->getId())->count(), 'Nothing is logged as removed.');
+
+        $this->removeFromTheZone($area, $countryField, $path);
+
+        self::assertSame(0, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count(), 'With the token of the page, the route removes the country.');
     }
 
     public function testARuleAddedFromTheCardIsSavedInItsNormalForm(): void
