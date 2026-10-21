@@ -68,6 +68,12 @@ A content cannot go online with nothing to show in the default language of the s
 the publication events, the old update and toggle events, the facade, the admin API and the scheduled command. A
 content created visible is not checked, nor are the other languages; a back office may warn about them.
 
+Whichever path writes `visible` on an existing row, the dates are kept in step with it (`VisibilityDatesAligner`,
+also asked from `preSave()`): a row taken offline by the old toggle or update events, the admin API or a module gets
+`unpublish_at = now` unless a schedule carries it, a row turned on gets its `publish_at` and forgets a past withdrawal.
+The state read from the row is therefore always the one the flag says, and the scheduled command never puts back
+online a row somebody hid.
+
 `EmptyBodyDetector` decides: tags, `<style>` and `<script>` blocks, entities, non-breaking and zero-width spaces are
 nothing to show; an image, a video, an embedded frame on its own is a body. The exception is translated for the
 person who asked and never quotes the body. The row in memory is reloaded from the database on a refusal, so a later
@@ -80,7 +86,7 @@ save of the same instance does not put it online after all.
   the behaviour an invisible folder always had, its contents stay reachable by their own url.
   `ContentFolderPublicationRule::outsideAnUnreleasedFolderClause()` is the SQL clause both readers share.
 - `/api/front/contents` and `/api/front/folders` serve published rows only, under the same folder rule, whatever
-  `visible` filter the caller passes. The admin endpoints read every state: `publicationState` (read only) and
+  `visible` filter the caller passes; `/api/front/content_folders` serves the links of those contents only. The admin endpoints read every state: `publicationState` (read only) and
   `publishAt`, `unpublishAt` (writable) are on both resources; a withdrawal before the publication, or an empty
   content put online, answers 422.
 
@@ -93,16 +99,21 @@ A signed-in administrator reaches it as it is. Anyone else needs the signed link
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreviewLinkGenerator;
 
-$link = $generator->generate(PublicationPreview::of('content', $contentId));
-$link->url;       // absolute, signed, carrying its expiry
+$link = $generator->generate(PublicationPreview::of('content', $contentId, 'fr_FR'));
+$link->url;       // absolute, signed, carrying its expiry and the language
 $link->expiresAt; // seven days by default: parameter thelia.publication.preview_lifetime_days
 ```
+
+The third argument names the language the page is previewed in: it travels as the `locale` query parameter, signed
+with the rest of the link, and the kernel applies it to the session as it does for any front url carrying `?locale=`
+(`LangService::handleLang()`); a link naming a language the shop does not have answers 404. Without it the page renders in the language of the session, as the public page does.
 
 A link with no signature answers 404, so the route gives nothing away; an altered or expired link answers the same
 403; signatures are tried under the `publication_preview_per_client` limit (60 an hour per address), which an
 administrator does not spend. A row that does not exist answers 404 once the caller is allowed to ask.
 
-The request carries the attribute `_publication_preview` (`['type' => 'content', 'id' => 12]`), which a theme reads
+The request carries the attribute `_publication_preview` (`['type' => 'content', 'id' => 12, 'locale' => 'fr_FR']`,
+`locale` null when the link named none), which a theme reads
 with `app.request.attributes.get('_publication_preview')` to show its banner. The visibility check lets the previewed
 row through (and only it), and the answer is `private`, `no-store` and `X-Robots-Tag: noindex, nofollow`, so neither
 a proxy nor a search engine keeps it.
