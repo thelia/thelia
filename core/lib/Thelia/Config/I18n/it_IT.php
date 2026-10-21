@@ -349,5 +349,7 @@ return [
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Il corriere scelto non può spedire %products. Scegli un altro corriere.',
     '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products non può essere spedito a questo indirizzo. Rimuovilo dal carrello o scegli un altro indirizzo.',
     '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products non possono essere spediti a questo indirizzo. Rimuovili dal carrello o scegli un altro indirizzo.',
+    '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.' => '%products non può essere ordinato con questo indirizzo di fatturazione. Rimuovilo dal carrello o scegli un altro indirizzo di fatturazione.',
+    '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products non possono essere ordinati con questo indirizzo di fatturazione. Rimuovili dal carrello o scegli un altro indirizzo di fatturazione.',
     '%product cannot be shipped to your address.' => '%product non può essere spedito al tuo indirizzo.',
 ];

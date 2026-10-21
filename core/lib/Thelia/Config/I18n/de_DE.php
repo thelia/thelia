@@ -844,5 +844,7 @@ return [
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'Der gewählte Versanddienst kann %products nicht versenden. Wählen Sie einen anderen Versanddienst.',
     '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products kann nicht an diese Adresse geliefert werden. Entfernen Sie es aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
     '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products können nicht an diese Adresse geliefert werden. Entfernen Sie sie aus Ihrem Warenkorb oder wählen Sie eine andere Adresse.',
+    '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.' => '%products kann nicht mit dieser Rechnungsadresse bestellt werden. Entfernen Sie es aus Ihrem Warenkorb oder wählen Sie eine andere Rechnungsadresse.',
+    '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products können nicht mit dieser Rechnungsadresse bestellt werden. Entfernen Sie sie aus Ihrem Warenkorb oder wählen Sie eine andere Rechnungsadresse.',
     '%product cannot be shipped to your address.' => '%product kann nicht an Ihre Adresse geliefert werden.',
 ];

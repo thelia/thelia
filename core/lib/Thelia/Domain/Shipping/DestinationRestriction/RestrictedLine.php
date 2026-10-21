@@ -18,6 +18,9 @@ namespace Thelia\Domain\Shipping\DestinationRestriction;
  * A product of the cart its destination refuses, with the reason its group gives. It
  * never carries the destinations of the group: a refusal names what the buyer holds,
  * not the map of what the shop does not ship.
+ *
+ * A download is judged on the invoice address, a parcel on the delivery address: the
+ * refusal tells the buyer which of the two to change.
  */
 final readonly class RestrictedLine
 {
@@ -25,6 +28,7 @@ final readonly class RestrictedLine
         public int $productId,
         public string $productTitle,
         public string $reason,
+        public bool $judgedOnInvoiceAddress = false,
     ) {
     }
 

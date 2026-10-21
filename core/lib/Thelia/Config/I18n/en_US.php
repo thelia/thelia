@@ -970,5 +970,7 @@ return [
     'The chosen carrier cannot ship %products. Choose another carrier.' => 'The chosen carrier cannot ship %products. Choose another carrier.',
     '%products cannot be shipped to this address. Remove it from your cart or choose another address.' => '%products cannot be shipped to this address. Remove it from your cart or choose another address.',
     '%products cannot be shipped to this address. Remove them from your cart or choose another address.' => '%products cannot be shipped to this address. Remove them from your cart or choose another address.',
+    '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.' => '%products cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.',
+    '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.',
     '%product cannot be shipped to your address.' => '%product cannot be shipped to your address.',
 ];

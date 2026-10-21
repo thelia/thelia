@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\Exception\InvalidCartException;
@@ -37,6 +39,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\DestinationRestriction;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
@@ -368,6 +371,72 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         $this->getService(CartGuard::class)->checkValidDelivery($cart);
     }
 
+    public function testADownloadRefusedOnItsInvoiceAddressIsToldToChooseAnotherInvoiceAddress(): void
+    {
+        $download = $this->download('E-book');
+        $this->group('ebook', DestinationRestriction::MODE_DENY, [$this->refused], [$download], 'Territorial licence');
+
+        $refusal = $this->placementRefusal($this->cartRefusedOn([$download], $this->served, $this->refused), 'en_US');
+
+        self::assertSame(
+            'E-book (Territorial licence) cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.',
+            $refusal->getMessage(),
+        );
+        self::assertSame(CheckoutViolationCode::DeliveryDestinationRestricted->value, $refusal->violationCode());
+        self::assertSame([$download->getId()], $refusal->violationDetails()['productIds']);
+    }
+
+    public function testAParcelRefusedOnItsDeliveryAddressKeepsTheDeliveryAddressWording(): void
+    {
+        $parcel = $this->product('Whisky');
+        $this->group('whisky', DestinationRestriction::MODE_DENY, [$this->refused], [$parcel], 'Spirits');
+
+        $refusal = $this->placementRefusal($this->cartRefusedOn([$parcel], $this->refused, $this->served), 'en_US');
+
+        self::assertSame(
+            'Whisky (Spirits) cannot be shipped to this address. Remove it from your cart or choose another address.',
+            $refusal->getMessage(),
+        );
+    }
+
+    public function testACartRefusedOnBothAddressesTellsEachProductWhichAddressToChange(): void
+    {
+        $parcel = $this->product('Whisky');
+        $download = $this->download('E-book');
+        $this->group('regulated', DestinationRestriction::MODE_DENY, [$this->refused], [$parcel, $download], 'Licence');
+
+        $refusal = $this->placementRefusal($this->cartRefusedOn([$parcel, $download], $this->refused, $this->refused), 'en_US');
+
+        self::assertSame(
+            'Whisky (Licence) cannot be shipped to this address. Remove it from your cart or choose another address.'
+            .' E-book (Licence) cannot be ordered with this invoice address. Remove it from your cart or choose another invoice address.',
+            $refusal->getMessage(),
+        );
+        self::assertSame([$parcel->getId(), $download->getId()], $refusal->violationDetails()['productIds']);
+    }
+
+    public function testTheInvoiceAddressWordingIsTranslated(): void
+    {
+        $downloads = [$this->product('Livre', 'fr_FR'), $this->product('Film', 'fr_FR')];
+        $parcel = $this->product('Cognac', 'fr_FR');
+
+        foreach ($downloads as $download) {
+            $download->setVirtual(1)->save();
+        }
+
+        $this->group('licence', DestinationRestriction::MODE_DENY, [$this->refused], [...$downloads, $parcel], 'Licence', 'fr_FR');
+
+        self::assertSame(
+            'Livre (Licence), Film (Licence) ne peuvent pas être commandés avec cette adresse de facturation. Retirez-les de votre panier ou choisissez une autre adresse de facturation.',
+            $this->placementRefusal($this->cartRefusedOn($downloads, $this->served, $this->refused), 'fr_FR')->getMessage(),
+        );
+        self::assertSame(
+            'Cognac (Licence) ne peut pas être livré à cette adresse. Retirez-le de votre panier ou choisissez une autre adresse.'
+            .' Livre (Licence) ne peut pas être commandé avec cette adresse de facturation. Retirez-le de votre panier ou choisissez une autre adresse de facturation.',
+            $this->placementRefusal($this->cartRefusedOn([$parcel, $downloads[0]], $this->refused, $this->refused), 'fr_FR')->getMessage(),
+        );
+    }
+
     public function testAddingAProductNoGroupHoldsCostsOneQueryWhileAnotherGroupIsActive(): void
     {
         $this->group('absinthe', DestinationRestriction::MODE_DENY, [$this->refused], [$this->product('Absinthe')]);
@@ -382,6 +451,46 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         $statements = $this->recordSqlQueries(fn () => $this->getService(CartAdditionDestinationGuard::class)->refuseARestrictedProduct($event));
 
         self::assertCount(1, $statements, implode("\n", $statements));
+    }
+
+    /**
+     * A cart holding these products, its delivery address in $delivery and its invoice address in $invoice.
+     *
+     * @param list<Product> $products
+     */
+    private function cartRefusedOn(array $products, Country $delivery, Country $invoice): Cart
+    {
+        $cart = $this->cartOf(null, $products);
+        $cart->setAddressDeliveryId($this->factory->cartAddress(null, $delivery)->getId())
+            ->setAddressInvoiceId($this->factory->cartAddress(null, $invoice)->getId())
+            ->setDeliveryModuleId($this->carrier()->getId())
+            ->save();
+
+        return $cart;
+    }
+
+    /**
+     * The refusal the placement of the order gives, read in $locale.
+     */
+    private function placementRefusal(Cart $cart, string $locale): DestinationRestrictedException
+    {
+        // The translator reads the language of the shop session before its own locale.
+        $session = $this->getService(RequestStack::class)->getMainRequest()?->getSession();
+        self::assertInstanceOf(Session::class, $session);
+        $previousLang = $session->getLang();
+        $lang = LangQuery::create()->findOneByLocale($locale);
+        self::assertNotNull($lang, $locale.' is not a language of the test shop.');
+        $session->setLang($lang);
+
+        try {
+            $this->getService(CartGuard::class)->checkValidDelivery($cart);
+        } catch (DestinationRestrictedException $refusal) {
+            return $refusal;
+        } finally {
+            $session->setLang($previousLang);
+        }
+
+        self::fail('The placement did not refuse the destination.');
     }
 
     private function checker(): DestinationRestrictionChecker

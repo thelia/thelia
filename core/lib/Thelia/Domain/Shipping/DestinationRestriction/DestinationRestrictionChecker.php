@@ -174,7 +174,7 @@ final class DestinationRestrictionChecker implements ResetInterface
             }
 
             $groupId = $refusingGroup[$productId];
-            $lines[] = new RestrictedLine($productId, $titles[$productId] ?? (string) $productId, $reasons[$groupId] ?? '');
+            $lines[] = new RestrictedLine($productId, $titles[$productId] ?? (string) $productId, $reasons[$groupId] ?? '', $virtual[$productId] ?? false);
         }
 
         return $lines;
