@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Http\Flexy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -261,6 +262,8 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
     public function testAGuestOfAVirtualOrderNeverGetsTheAddressOfAnotherBuyerOfTheSameRow(): void
     {
         $firstCart = $this->twoBuyersOfOneRowBackInTheFirstSession(virtual: true);
+        // No billing address, which the core would copy: the address comes from the theme.
+        $this->reread($firstCart)->setAddressInvoiceId(null)->save($this->getPropelConnection());
 
         $this->client->request('GET', '/checkout/payment');
 
@@ -329,16 +332,27 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
     }
 
     /**
-     * The pickup cannot quote the default address of the account: once that address is on
-     * the cart, the pickup goes, and the step says so.
+     * @return iterable<string, array{bool}>
      */
-    public function testAPickupThatCannotQuoteTheDefaultAddressOfTheAccountGoes(): void
+    public static function withOrWithoutADeliveryDay(): iterable
+    {
+        yield 'a delivery day picked' => [true];
+        yield 'no delivery day' => [false];
+    }
+
+    /**
+     * The pickup cannot quote the default address of the account: once that address is on
+     * the cart, the pickup goes. The notice, which speaks of the delivery day cleared with
+     * the carrier, is said only when a day was picked, as on a change of address.
+     */
+    #[DataProvider('withOrWithoutADeliveryDay')]
+    public function testAPickupThatCannotQuoteTheDefaultAddressOfTheAccountGoes(bool $withADay): void
     {
         $cart = $this->openASessionWithACart();
         $account = $this->signInAsARealAccount();
         $country = $this->countryOfTheShop();
         $fixtures = $this->fixtures();
-        $default = $fixtures->address($account, $country, null, ['address1' => '1 Far Street']);
+        $default = $fixtures->address($account, $country, null, ['address1' => '1 Far Street', 'city' => 'Faraway']);
         $default->setIsDefault(1)->save($this->getPropelConnection());
         $other = $fixtures->address($account, $country, null, ['address1' => '2 rue Secondaire']);
         $this->serveCountryWithCarrier($this->carrier, $country, $this->getPropelConnection());
@@ -348,12 +362,22 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
                 return;
             }
 
-            $street = $event->getCart()->getCartAddressRelatedByAddressDeliveryId()?->getAddress1();
-            $event->setValidModule('1 Far Street' !== $street)->setPostage(new OrderPostage(5.0));
+            // A carrier quotes a place: the city of the copy decides.
+            $city = $event->getCart()->getCartAddressRelatedByAddressDeliveryId()?->getCity();
+            $event->setValidModule('Faraway' !== $city)->setPostage(new OrderPostage(5.0));
             $event->stopPropagation();
         }, 2048);
         $cart = $this->reread($cart);
         $cart->setAddressDeliveryId($this->copyOf($other)->getId())->save($this->getPropelConnection());
+
+        if ($withADay) {
+            // The day of the carrier the pickup belongs to, written with it: the day falls
+            // with a change of carrier (Cart::preSave()), not when the same one is chosen again.
+            $cart
+                ->setDeliveryModuleId($carrierId)
+                ->setDeliveryDate((new \DateTimeImmutable('+3 days'))->format('Y-m-d'))
+                ->save($this->getPropelConnection());
+        }
 
         $step = $this->pickUpInTheSessionOfTheClient();
 
@@ -361,8 +385,45 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
         self::assertNull($this->reread($cart)->getDeliveryModuleId(), 'A pickup that cannot quote the address stayed on the cart.');
         self::assertNull($step->deliveryModuleId, 'The step still shows the pickup as chosen.');
         self::assertNull($step->deliveryModuleOptionCode);
-        self::assertSame('carrier_gone', $step->deliveryDateNotice);
+        self::assertSame($withADay ? 'carrier_gone' : null, $step->deliveryDateNotice, $withADay ? 'The buyer is not told the day went.' : 'The buyer is told of a day they never picked.');
         self::assertNull($this->getService(TheliaSession::class)->get('deliveryModuleOption'), 'The session still holds the pickup.');
+    }
+
+    /**
+     * The default address of the account moves to another city, from another tab, while the
+     * step is open: the pickup puts it on the cart and is priced on it.
+     */
+    public function testAPickupIsPricedAgainOnTheDefaultAddressOfTheAccountMovedSince(): void
+    {
+        $cart = $this->openASessionWithACart();
+        $account = $this->signInAsARealAccount();
+        $country = $this->countryOfTheShop();
+        $fixtures = $this->fixtures();
+        $default = $fixtures->address($account, $country, null, ['address1' => '1 rue du Compte', 'city' => 'Paris']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $other = $fixtures->address($account, $country, null, ['address1' => '2 rue Secondaire', 'city' => 'Paris']);
+        $this->serveCountryWithCarrier($this->carrier, $country, $this->getPropelConnection());
+        $carrierId = (int) $this->carrier->getId();
+        // The carrier prices the city: 5.00 in Paris, 9.00 in Lyon.
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($carrierId): void {
+            if ($carrierId !== (int) $event->getModule()->getModuleModel()->getId()) {
+                return;
+            }
+
+            $city = $event->getCart()->getCartAddressRelatedByAddressDeliveryId()?->getCity();
+            $event->setValidModule(true)->setPostage(new OrderPostage('Lyon' === $city ? 9.0 : 5.0));
+            $event->stopPropagation();
+        }, 2048);
+        $cart = $this->reread($cart);
+        $cart->setAddressDeliveryId($this->copyOf($other)->getId())->save($this->getPropelConnection());
+
+        $this->pickUpInTheSessionOfTheClient(beforeThePickup: function () use ($default): void {
+            $default->setCity('Lyon')->save($this->getPropelConnection());
+        });
+
+        self::assertSame('Lyon', $this->deliveryCopyOf($cart)?->getCity());
+        self::assertSame($carrierId, (int) $this->reread($cart)->getDeliveryModuleId());
+        self::assertEqualsWithDelta(9.0, (float) $this->reread($cart)->getPostage(), 0.001, 'The pickup is priced on the city the cart now carries.');
     }
 
     /**
@@ -390,7 +451,7 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
      * @param list<int> $extraIdentificationAddressIds addresses the identification of the
      *                                                 session holds besides its own
      */
-    private function pickUpInTheSessionOfTheClient(bool $forgetTheIdentification = false, array $extraIdentificationAddressIds = []): object
+    private function pickUpInTheSessionOfTheClient(bool $forgetTheIdentification = false, array $extraIdentificationAddressIds = [], ?\Closure $beforeThePickup = null): object
     {
         $requestStack = $this->getService(RequestStack::class);
         $request = Request::create('/checkout/delivery');
@@ -410,6 +471,11 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
         try {
             $step = $this->getService(self::DELIVERY_STEP_COMPONENT);
             $step->mount();
+
+            if (null !== $beforeThePickup) {
+                $beforeThePickup();
+            }
+
             $step->selectDeliveryModuleOption(self::PICKUP, (int) $this->carrier->getId());
 
             return $step;
