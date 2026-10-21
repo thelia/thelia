@@ -224,6 +224,34 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('69001'))));
     }
 
+    /**
+     * A signed-in customer chose an address, then edited it from the account: the front API,
+     * asked for the carriers of the cart, judges the cart's copy, as the guard will.
+     */
+    public function testTheFrontApiJudgesTheCartCopyOfACustomerAddressEditedSince(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $excludedSince = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($excludedSince);
+        $excludedSince->setZipcode('20090')->save($this->getPropelConnection());
+        self::assertContains($this->module->getId(), $ids($this->frontApiListFor($cart)), 'The copy is in Lyon.');
+
+        $movedAbroad = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $abroadCart = $this->customerCartShippedTo($movedAbroad);
+        $movedAbroad->setCountryId($this->newCountry('XZ', 'XZX', '989')->getId())->save($this->getPropelConnection());
+        self::assertContains($this->module->getId(), $ids($this->frontApiListFor($abroadCart)), 'The copy is in the country of the zone.');
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => (string) $excludedSince->getId()])),
+            'An address the request names decides.',
+        );
+    }
+
     public function testAGuestIsListedTheCarriersOfTheZoneOfItsState(): void
     {
         $state = (new State())->setCountryId($this->country->getId())->setIsocode('XQ1')->setVisible(1);
@@ -518,13 +546,19 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
     /**
      * What GET /api/front/delivery_modules answers for a session holding the cart.
      *
+     * @param array<string, string> $query
+     *
      * @return list<mixed>
      */
-    private function frontApiListFor(Cart $cart): array
+    private function frontApiListFor(Cart $cart, array $query = []): array
     {
         $session = new Session(new MockArraySessionStorage());
+        // The cart of a customer is the session's only once the customer is signed in.
+        if (null !== $cart->getCustomer()) {
+            $session->setCustomerUser($cart->getCustomer());
+        }
         $session->setSessionCart($cart);
-        $request = new Request();
+        $request = new Request($query);
         $request->setSession($session);
         $requestStack = new RequestStack();
         $requestStack->push($request);

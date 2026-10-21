@@ -17,6 +17,7 @@ namespace Thelia\Api\State\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
@@ -58,14 +59,18 @@ readonly class DeliveryModuleProvider implements ProviderInterface
         }
 
         $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
+
+        // A request that names no address asks for the carriers of the cart: its own copy of
+        // the delivery address decides, as CartGuard judges it when the order is placed, and
+        // not the customer address behind it, which may have been edited since. A guest's copy
+        // points to no customer address at all.
+        if (!$this->namesAnAddress($request) && null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+            return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
+        }
+
         $deliveryAddress = $request instanceof Request
             ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
             : null;
-        // A guest's cart address points to no customer address: its own copy carries the
-        // country and the postal code the carriers are judged on.
-        if (!$deliveryAddress instanceof Address && null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
-            return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
-        }
 
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
@@ -80,5 +85,20 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             : StateQuery::create()->filterByCountryId($country->getId())->findOne();
 
         return $this->shippingFacade->listValidMethodsAsResourceApi($cart, $country, $state, $deliveryAddress?->getId());
+    }
+
+    /**
+     * Whether the request names an address, where AddressService::getDeliveryAddress()
+     * looks for one: the route, the body, the query string.
+     */
+    private function namesAnAddress(?HttpRequest $request): bool
+    {
+        if (!$request instanceof HttpRequest) {
+            return false;
+        }
+
+        return null !== ($request->attributes->get('addressId')
+            ?? $request->request->get('addressId')
+            ?? $request->query->get('addressId'));
     }
 }
