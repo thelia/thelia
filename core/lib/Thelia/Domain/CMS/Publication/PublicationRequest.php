@@ -75,7 +75,7 @@ final readonly class PublicationRequest
     public static function fromStrings(string $action, ?string $publishAt = null, ?string $unpublishAt = null): self
     {
         $publicationAction = PublicationAction::tryFrom($action)
-            ?? throw new InvalidPublicationDatesException(\sprintf('Unknown publication action "%s".', $action));
+            ?? throw InvalidPublicationDatesException::unknownAction($action);
 
         $publishDate = self::parse($publishAt);
         $unpublishDate = self::parse($unpublishAt);
@@ -83,7 +83,7 @@ final readonly class PublicationRequest
         return match ($publicationAction) {
             PublicationAction::Publish => self::publish($unpublishDate),
             PublicationAction::Schedule => self::schedule(
-                $publishDate ?? throw new InvalidPublicationDatesException('A scheduled publication needs a publication date.'),
+                $publishDate ?? throw InvalidPublicationDatesException::publicationDateMissing(),
                 $unpublishDate,
             ),
             PublicationAction::Cancel => self::cancel(),
@@ -98,7 +98,7 @@ final readonly class PublicationRequest
         $unpublishAt = self::immutable($unpublishAt);
 
         if (null !== $publishAt && null !== $unpublishAt && $unpublishAt <= $publishAt) {
-            throw new InvalidPublicationDatesException('The withdrawal date must come after the publication date.');
+            throw InvalidPublicationDatesException::withdrawalBeforePublication();
         }
 
         return new self($action, $publishAt, $unpublishAt);
@@ -118,7 +118,7 @@ final readonly class PublicationRequest
         try {
             return new \DateTimeImmutable($date);
         } catch (\Exception) {
-            throw new InvalidPublicationDatesException(\sprintf('"%s" is not a date.', $date));
+            throw InvalidPublicationDatesException::notADate($date);
         }
     }
 }

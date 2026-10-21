@@ -25,6 +25,6 @@ final class InvalidPublicationTransitionException extends PublicationException
 {
     public static function of(PublicationAction $action, PublicationState $state): self
     {
-        return new self(\sprintf('The "%s" gesture does not apply to a %s row.', $action->value, $state->value));
+        return new self(self::translated('The "%action" gesture does not apply to a %state row.', ['%action' => $action->value, '%state' => $state->value]));
     }
 }
