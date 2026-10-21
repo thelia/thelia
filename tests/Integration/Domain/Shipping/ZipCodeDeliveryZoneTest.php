@@ -426,23 +426,36 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
     }
 
     /**
-     * The address the guest's cart was copied from is the guest's own: named with a country,
-     * it gives its postal code, here edited since the copy was taken.
+     * @return iterable<string, array{bool, bool}>
      */
-    public function testAGuestReadsThePostalCodeOfTheAddressItsCartWasCopiedFrom(): void
+    public static function sourcesOfTheCopy(): iterable
+    {
+        yield 'a guest, with a country' => [true, true];
+        yield 'a guest, without a country' => [true, false];
+        yield 'a customer, with a country' => [false, true];
+        yield 'a customer, without a country' => [false, false];
+    }
+
+    /**
+     * The address the cart's copy was taken from, edited since, named by the request: the
+     * copy judges, as CartGuard does, whoever calls the facade.
+     */
+    #[DataProvider('sourcesOfTheCopy')]
+    public function testTheSourceOfTheCopyIsJudgedOnTheCopy(bool $guest, bool $withACountry): void
     {
         $area = $this->zoneServedByTheModule();
         $this->rule($area, '20*', excluded: true);
-        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
-        $source = $this->factory->address($guest, $this->country, null, ['zipcode' => '69001']);
+        $title = $this->factory->customerTitle();
+        $customer = $guest ? $this->factory->guestCustomer($title) : $this->factory->customer($title);
+        $source = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
         $cart = $this->customerCartShippedTo($source);
         $source->setZipcode('20090')->save($this->getPropelConnection());
         $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
 
-        self::assertNotContains(
+        self::assertContains(
             $this->module->getId(),
-            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $source->getId())),
-            'The address the guest\'s cart was copied from is the guest\'s own.',
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $withACountry ? $this->country : null, null, $source->getId())),
+            'The copy, in Lyon, judges its own source.',
         );
     }
 
