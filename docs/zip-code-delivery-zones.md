@@ -92,6 +92,12 @@ code is excluded from would quote the cart. To know it, it asks the price
 as well as of those it lets through. Flexy shows it on the delivery step instead of the
 general message.
 
+The log lines of the feature are for the shop's developers and go through `Tlog`, whose
+default level is ERROR (`tlog_level`, seeded by no install): the unreadable rules and the
+patterns PCRE gives up on are WARNING, the rules deleted with a country NOTICE. They are
+written only once `tlog_level` is set that low. The merchant's trace of the rules added,
+deleted, or deleted with a country is the administration log of the back office.
+
 ## Limits
 
 - The rules decide who delivers, not at which price. A carrier prices the address the way
