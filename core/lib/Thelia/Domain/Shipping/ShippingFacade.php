@@ -294,7 +294,13 @@ final readonly class ShippingFacade
 
         foreach ($this->getActiveDeliveryModules() as $module) {
             if ($this->eligibilityChecker->isEligible($module, $cart, $country, $state, $zipCode)) {
-                return null;
+                // A carrier that serves the address and quotes the cart is offered. One that
+                // serves it but does not quote the cart is not a carrier the postal code took away.
+                if (null !== $this->resourceBuilder->build($module, $cart, $address, $country, $state, true, $zipCode)) {
+                    return null;
+                }
+
+                continue;
             }
 
             $refusedByThePostalCode[] = $module;

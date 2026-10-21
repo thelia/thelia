@@ -15,10 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Catalog\Product\ProductFacade;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
+use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaZipCodeRule;
@@ -28,6 +31,7 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\Product;
 use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
@@ -94,6 +98,40 @@ final class ZipCodeRulesAndOtherReasonsTest extends IntegrationTestCase
                 'The postal code leaves no carrier whatever the products: the buyer is not told to remove a product.',
             );
         }
+    }
+
+    /**
+     * Carrier A serves the address but does not quote the cart; carrier B would quote it and
+     * only its postal code rule turns it away: the list is empty because of the postal code.
+     */
+    public function testThePostalCodeIsNamedWhenAnotherCarrierServesTheAddressButDoesNotQuoteTheCart(): void
+    {
+        $carriers = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->orderById()->limit(2)->find();
+        self::assertCount(2, $carriers, 'Two active delivery modules are needed.');
+        [$notQuoting, $refusedByThePostalCode] = [$carriers[0], $carriers[1]];
+
+        $this->serve($this->zone(), $notQuoting);
+        $restricted = $this->zone();
+        $this->serve($restricted, $refusedByThePostalCode);
+        $this->exclude($restricted, '20*');
+
+        $notQuotingCode = $notQuoting->getCode();
+        $listener = static function (DeliveryPostageEvent $event) use ($notQuotingCode): void {
+            if ($event->getModule()->getCode() === $notQuotingCode) {
+                $event->setValidModule(false);
+            } else {
+                $event->setValidModule(true)->setPostage(new OrderPostage(5.0, 0.0, 'Test'));
+            }
+            $event->stopPropagation();
+        };
+        $this->dispatcher()->addListener(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener, 2048);
+        $this->registeredListeners[] = [TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, $listener];
+
+        [$cart] = $this->cartShippedTo('20090');
+        $facade = $this->getService(ShippingFacade::class);
+
+        self::assertSame([], $facade->listValidMethods($cart), 'No carrier is offered.');
+        self::assertSame('20090', $facade->postalCodeWithoutCarrier($cart), 'The postal code is why no carrier is offered.');
     }
 
     private function zone(): Area
