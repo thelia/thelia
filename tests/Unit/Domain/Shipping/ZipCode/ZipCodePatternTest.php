@@ -89,4 +89,12 @@ final class ZipCodePatternTest extends TestCase
         self::assertNull(ZipCodePattern::normalize("20\xC3\x28"));
         self::assertSame('', ZipCodePattern::normalize(' - '), 'A blank code is unknown, not unreadable.');
     }
+
+    public function testThePatternOfAnUnreadableRuleMatchesNothingEvenAnUncertainCode(): void
+    {
+        $nothing = ZipCodePattern::matchingNothing();
+
+        self::assertFalse($nothing->matches('75001', whenUnsure: true));
+        self::assertFalse($nothing->matches("20\xC3\x28", whenUnsure: true), 'An unreadable exclusion excludes nothing, not even a code that cannot be read.');
+    }
 }
