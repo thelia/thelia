@@ -77,16 +77,28 @@ final class ZipCodeRuleSetTest extends TestCase
 
     /**
      * A pattern with * runs as a regular expression, which PCRE may give up on: an exclusion
-     * then refuses the code instead of letting it through, and an inclusion does not take it.
+     * then refuses the code instead of letting it through.
      */
-    public function testAPatternThatCannotBeCheckedFailsClosed(): void
+    public function testAnExclusionThatCannotBeCheckedRefusesTheCode(): void
     {
-        $pattern = ZipCodePattern::fromString('2*0*1');
-        self::assertTrue((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'The code does not match the pattern.');
+        $rules = new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('2*0*1')]);
+        self::assertTrue($rules->accepts('2001090'), 'The code does not match the exclusion.');
 
         ini_set('pcre.backtrack_limit', '1');
 
-        self::assertFalse((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
-        self::assertFalse((new ZipCodeRuleSet(inclusions: [$pattern]))->accepts('2001090'), 'An inclusion that cannot be checked does not take the code.');
+        self::assertFalse($rules->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
+    }
+
+    /**
+     * An inclusion PCRE gives up on does not take the code, even one it would match.
+     */
+    public function testAnInclusionThatCannotBeCheckedDoesNotTakeTheCode(): void
+    {
+        $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('2*0*1')]);
+        self::assertTrue($rules->accepts('2001091'), 'The code matches the inclusion.');
+
+        ini_set('pcre.backtrack_limit', '1');
+
+        self::assertFalse($rules->accepts('2001091'), 'An inclusion that cannot be checked does not take the code.');
     }
 }
