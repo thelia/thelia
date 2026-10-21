@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use ApiPlatform\Metadata\GetCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -283,10 +284,46 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $movedAbroad->setCountryId($this->newCountry('XZ', 'XZX', '989')->getId())->save($this->getPropelConnection());
         self::assertContains($this->module->getId(), $ids($this->frontApiListFor($abroadCart)), 'The copy is in the country of the zone.');
 
+        $another = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
         self::assertNotContains(
             $this->module->getId(),
-            $ids($this->frontApiListFor($cart, ['addressId' => (string) $excludedSince->getId()])),
-            'An address the request names decides.',
+            $ids($this->frontApiListFor($cart, ['addressId' => (string) $another->getId()])),
+            'Another address the request names decides.',
+        );
+    }
+
+    /**
+     * An `addressId` names an address only when it is a strictly positive integer that
+     * resolves to one other than the source of the cart's copy: otherwise the copy judges, as
+     * CartGuard will.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function idsThatNameNoOtherAddress(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'zero' => ['0'];
+        yield 'not a number' => ['abc'];
+        yield 'an unknown id' => ['999999999'];
+        yield 'the source of the copy' => ['source'];
+    }
+
+    #[DataProvider('idsThatNameNoOtherAddress')]
+    public function testTheFrontApiJudgesTheCartCopyWhenTheRequestNamesNoOtherAddress(string $addressId): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $source = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($source);
+        // Edited since it was chosen: read, the source would exclude the carrier.
+        $source->setZipcode('20090')->save($this->getPropelConnection());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => 'source' === $addressId ? (string) $source->getId() : $addressId])),
+            'The copy, in Lyon, judges.',
         );
     }
 

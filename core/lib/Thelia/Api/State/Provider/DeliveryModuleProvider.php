@@ -26,6 +26,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Address;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
@@ -60,11 +61,13 @@ readonly class DeliveryModuleProvider implements ProviderInterface
 
         $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
 
-        // A request that names no address asks for the carriers of the cart: its own copy of
-        // the delivery address decides, as CartGuard judges it when the order is placed, and
-        // not the customer address behind it, which may have been edited since. A guest's copy
-        // points to no customer address at all.
-        if (!$this->namesAnAddress($request) && null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+        // A request that names no other address asks for the carriers of the cart: its own copy
+        // of the delivery address decides, as CartGuard judges it when the order is placed, and
+        // not the customer address behind it, which may have been edited since (or may be none,
+        // for a guest whose address was typed in the API and never saved).
+        $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
+
+        if (null !== $copy && !$this->namesAnotherAddress($request, $copy->getAddressId())) {
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
         }
 
@@ -88,17 +91,20 @@ readonly class DeliveryModuleProvider implements ProviderInterface
     }
 
     /**
-     * Whether the request names an address, where AddressService::getDeliveryAddress()
-     * looks for one: the route, the body, the query string.
+     * Whether the request names an address other than the one the cart's copy was taken
+     * from: an id AddressService reads as one (a strictly positive integer) and that resolves
+     * to an address. The source of the copy is the copy's to judge.
      */
-    private function namesAnAddress(?HttpRequest $request): bool
+    private function namesAnotherAddress(?HttpRequest $request, ?int $copySourceId): bool
     {
         if (!$request instanceof HttpRequest) {
             return false;
         }
 
-        return null !== ($request->attributes->get('addressId')
-            ?? $request->request->get('addressId')
-            ?? $request->query->get('addressId'));
+        $addressId = $this->addressService->requestedAddressId($request);
+
+        return null !== $addressId
+            && $addressId !== $copySourceId
+            && null !== AddressQuery::create()->findPk($addressId);
     }
 }
