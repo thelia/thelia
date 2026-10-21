@@ -137,6 +137,21 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.order_returns" class="Thelia\Domain\DataTransfer\Export\Type\OrderReturnExport" category_id="thelia.export.orders">
+            <export_descriptive locale="en_US">
+                <title>Returns</title>
+                <description>
+                    One row per returned product: date of the request, order, product and combination, reason, expected resolution, wished exchange and whether the return is settled.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Retours</title>
+                <description>
+                    Une ligne par produit retourné : date de la demande, commande, produit et déclinaison, motif, solution attendue, échange souhaité et retour soldé ou non.
+                </description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.product_i18n" class="Thelia\Domain\DataTransfer\Export\Type\ProductI18nExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product I18n information</title>
