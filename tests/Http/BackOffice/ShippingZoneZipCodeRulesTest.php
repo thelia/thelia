@@ -98,14 +98,16 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
         $checked = $this->countryOfTheZone($area, 'XV', '995', 'NNNNN', true);
         $unformatted = $this->countryOfTheZone($area, 'XW', '996', '', true);
         $notRequired = $this->countryOfTheZone($area, 'XY', '997', 'NNNNN', false);
+        $anyCharacters = $this->countryOfTheZone($area, 'XQ', '998', 'CNNN', true);
         $rule = $this->rule($area, '20*', true);
         $this->loginAs($this->factory()->admin());
 
         $this->assertPageRenders($this->zoneUrl($area));
         $warning = $this->client->getCrawler()->filter('[data-testid="shipping-configuration-zip-code-rules-unformatted"]');
-        self::assertSame(1, $warning->count(), 'A rule for every country of the zone covers the two countries.');
+        self::assertSame(1, $warning->count(), 'A rule for every country of the zone covers the three countries.');
         self::assertStringContainsString($unformatted->getTitle(), $warning->text());
         self::assertStringContainsString($notRequired->getTitle(), $warning->text());
+        self::assertStringContainsString($anyCharacters->getTitle(), $warning->text(), 'C stands for any characters: the format checks nothing there.');
         self::assertStringNotContainsString($checked->getTitle(), $warning->text());
 
         $rule->setCountryId($checked->getId())->save($this->getPropelConnection());
@@ -172,6 +174,23 @@ final class ShippingZoneZipCodeRulesTest extends WebIntegrationTestCase
             'Do you really want to delete this postal code rule?',
             $crawler->filter('#shipping-configuration-zip-code-rule-delete-modal')->text(),
         );
+    }
+
+    public function testARuleOfAnotherZoneIsNotDeletedFromThisOne(): void
+    {
+        $area = $this->area();
+        $own = $this->rule($area, '75*', false);
+        $otherZonesRule = $this->rule($this->area(), '20*', true);
+        $this->loginAs($this->factory()->admin());
+        $this->assertPageRenders($this->zoneUrl($area));
+
+        $form = $this->deleteForm($own);
+        $form['rule_id']->setValue((string) $otherZonesRule->getId());
+        $this->client->submit($form);
+
+        self::assertNotNull(AreaZipCodeRuleQuery::create()->findPk($otherZonesRule->getId()), 'The rule of another zone was deleted.');
+        $this->client->followRedirect();
+        self::assertStringContainsString('This postal code rule does not exist anymore.', $this->client->getCrawler()->filter('[data-testid="bo-flash-danger"]')->text());
     }
 
     public function testAddingAndDeletingARuleIsWrittenToTheAdministrationLog(): void
