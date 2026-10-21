@@ -19,8 +19,10 @@ optionally one country of the zone (no country: every country of the zone).
 - a pattern where `*` stands for any characters, `20*` or `75*1`;
 - a range of numeric codes, `75001...75020`, bounds included.
 
-Codes and patterns are compared in their normal form: upper case, without spaces or
-hyphens. `SW1A 1AA` matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern that can
+Codes and patterns are compared in their normal form: compatibility characters folded
+(Unicode NFKC, through `ext-intl`, which the core requires: `２０000` is `20000`), upper
+case, without spaces, hyphens (a non-breaking one included) or invisible format characters
+(a zero-width space). `SW1A 1AA` matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern that can
 match nothing (empty, only `*`, a range with letters or upside down) is refused when it
 is written. One that reaches the table by another way matches no postal code and is logged
 with its reason, once per zone and country a request reads: as an exclusion it excludes
