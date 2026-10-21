@@ -53,10 +53,10 @@ final readonly class ZipCodePattern
     private const UNKNOWN = '/^[\s\p{Pd}\x{2212}]*$/u';
 
     /**
-     * The characters forLog() writes as \u{...}: line and paragraph separators, and the
-     * controls that change the direction of the text around them.
+     * The characters forLog() writes as \u{...}: the C1 controls, line and paragraph
+     * separators, and the controls that change the direction of the text around them.
      */
-    private const LOG_UNSAFE_CHARACTERS = '/[\x{0085}\x{2028}\x{2029}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
+    private const LOG_UNSAFE_CHARACTERS = '/[\x{0080}-\x{009F}\x{061C}\x{200E}\x{200F}\x{2028}\x{2029}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
 
     private function __construct(
         private string $pattern,
@@ -79,7 +79,7 @@ final readonly class ZipCodePattern
         }
 
         if (mb_strlen($normalized) > self::MAX_LENGTH) {
-            throw new InvalidZipCodeRuleException('A postal code pattern is 50 characters long at most.');
+            throw new InvalidZipCodeRuleException(\sprintf('A postal code pattern is %d characters long at most.', self::MAX_LENGTH));
         }
 
         if (str_contains($normalized, self::RANGE_SEPARATOR)) {
@@ -95,10 +95,11 @@ final readonly class ZipCodePattern
 
     /**
      * Text of a rule as a log line may carry it, so that a pattern written by hand in the
-     * database cannot forge a line of the log, nor turn the text after it around: control
-     * characters and the backslash escaped (a carriage return becomes "\r"), line and
-     * paragraph separators and the direction controls written as "\u{2028}". Tlog writes its
-     * context as it comes. A text that is not valid UTF-8 has every byte above ASCII escaped.
+     * database cannot forge a line of the log, nor turn the text after it around: the C0
+     * controls, DEL and the backslash escaped (a carriage return becomes "\r"), the C1
+     * controls, line and paragraph separators and the direction controls (bidi embeddings,
+     * isolates and marks) written as "\u{2028}". Tlog writes its context as it comes. A text
+     * that is not valid UTF-8 has every byte above ASCII escaped.
      */
     public static function forLog(string $text): string
     {
@@ -181,8 +182,9 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * matches() for a code already in its normal form (null when it could not be read), as
-     * ZipCodeRuleSet passes it once for all its rules.
+     * matches() for a code already in its normal form, as normalize() gives it and as
+     * ZipCodeRuleSet passes it once for all its rules. A code without a normal form (null)
+     * or empty is uncertain: the answer is $whenUnsure.
      *
      * @internal
      */
