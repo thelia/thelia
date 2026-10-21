@@ -64,6 +64,15 @@ final readonly class ZipCodePattern
         return new self($normalized);
     }
 
+    /**
+     * A pattern that matches no postal code: what an unreadable rule of the database stands
+     * for (AreaZipCodeRuleQuery::ruleSetFor()).
+     */
+    public static function matchingNothing(): self
+    {
+        return new self('');
+    }
+
     public static function normalize(string $zipCode): string
     {
         return strtoupper((string) preg_replace('/[\s\-]+/u', '', $zipCode));

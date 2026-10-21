@@ -61,20 +61,41 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
         parent::tearDown();
     }
 
-    public function testARowThatMatchesNothingIsIgnoredAndLoggedOnce(): void
+    public function testAnUnreadableExclusionExcludesNothingAndIsLoggedOnceWithItsReason(): void
     {
         $lines = $this->captureTheLog();
         $ruleId = $this->insertStraightIntoTheTable('***', excluded: true);
 
-        self::assertTrue($this->ruleSet()->accepts('20090'), 'A pattern that matches nothing excludes nothing.');
+        self::assertTrue($this->ruleSet()->accepts('20090'), 'An unreadable exclusion excludes nothing.');
         self::assertTrue($this->ruleSet()->accepts('75001'));
 
         $warnings = array_values(array_filter(
             $lines->lines,
             static fn (string $line): bool => str_contains($line, 'Postal code rule '.$ruleId.' of zone '),
         ));
-        self::assertCount(1, $warnings, 'The rule is logged once for the request.');
-        self::assertStringContainsString('Postal code rule '.$ruleId.' of zone '.$this->area->getId().' is ignored: "***" matches nothing.', $warnings[0]);
+        self::assertCount(1, $warnings, 'The rule is logged once for the zone and the country read in the request.');
+        self::assertStringContainsString(
+            'Postal code rule '.$ruleId.' of zone '.$this->area->getId().' cannot be read ("***": A postal code pattern needs at least one character other than *.): it excludes no postal code.',
+            $warnings[0],
+        );
+    }
+
+    /**
+     * An unreadable inclusion must not open the zone to every postal code: it takes none, and
+     * the zone keeps its other inclusions.
+     */
+    public function testAnUnreadableInclusionKeepsTheZoneToItsOtherInclusions(): void
+    {
+        $this->captureTheLog();
+        $this->insertStraightIntoTheTable('75020...75001', excluded: false);
+
+        self::assertFalse($this->ruleSet()->accepts('69001'), 'The zone was limited by an inclusion: it does not take every code.');
+
+        $this->insertStraightIntoTheTable('75*', excluded: false);
+        AreaZipCodeRuleQuery::forgetRuleSets();
+
+        self::assertTrue($this->ruleSet()->accepts('75001'));
+        self::assertFalse($this->ruleSet()->accepts('69001'));
     }
 
     /**
