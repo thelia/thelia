@@ -156,7 +156,7 @@ the module (or by the administrator who marked the order paid). Cheque,
 FreeOrder and every published module get their line without a line of code.
 
 Nothing is written for a module that implements the capture interface and
-answers `supportsDeferredCapture()`, nor when the journal already holds an
+answers `supportsDeferredCapture()` with true, nor when the journal already holds an
 authorization or a capture, succeeded or pending, whatever wrote them: an open
 authorization is not taken by marking the order paid, and a module that writes
 its own captures keeps a single line. A failure here is logged and the status
@@ -184,7 +184,9 @@ published module implements would break them all.
   that capture waits for its answer no administrator cancels the order
   (`CancellationWaitsForCaptureException`, a 422 on the admin API): it would go
   through on a cancelled order. Once it is taken, cancelling no longer needs the
-  capture right, and the release the core asks must only let the rest go.
+  capture right, and the release the core asks must only let the rest go. The
+  module writes that release itself (`recordVoid()`) when the provider confirms
+  the capture; until then the order stays on hold for its capture.
 - The module is called through `PaymentModuleLocator`: the instance the
   container built, so `getContainer()` works in it. A deactivated module is not
   called: its services are no longer compiled, and the refusal names it.

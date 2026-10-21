@@ -201,8 +201,8 @@ final readonly class PaymentCaptureService
     }
 
     /**
-     * Whether the payment module of the order takes a single capture per authorization, as
-     * configured for the order's sale unit.
+     * Whether the payment module of the order takes a single capture per authorization: a
+     * property of its provider, asked under the order's sale unit as every call about it.
      */
     public function capturesOnce(Order $order): bool
     {

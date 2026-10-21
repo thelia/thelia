@@ -24,6 +24,10 @@ namespace Thelia\Module;
  * that capture waits for its answer, no administrator cancels the order; once it is taken,
  * cancelling no longer needs the capture right. The release the core still asks then
  * (voidAuthorization()) must only let the rest go, never cancel the capture.
+ *
+ * The module writes the release of the rest itself (PaymentTransactionRecorder::recordVoid())
+ * when the provider confirms the capture: until then the journal holds that rest, and the order
+ * stays on hold for its capture.
  */
 interface PaymentModuleCapturingOnceInterface extends PaymentModuleWithCaptureInterface
 {
