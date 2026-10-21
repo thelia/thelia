@@ -245,11 +245,11 @@ ALTER TABLE `cart`
 ALTER TABLE `product_sale_elements` ADD COLUMN `position` INT NOT NULL DEFAULT 0 AFTER `quantity`;
 ALTER TABLE `product_sale_elements` ADD COLUMN `visible` BOOLEAN NOT NULL DEFAULT TRUE AFTER `quantity`;
 
-UPDATE `config` SET `value`='2.6.0' WHERE `name`='thelia_version';
-UPDATE `config` SET `value`='2' WHERE `name`='thelia_major_version';
-UPDATE `config` SET `value`='6' WHERE `name`='thelia_minus_version';
+UPDATE `config` SET `value`='3.0.0-alpha1' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='3' WHERE `name`='thelia_major_version';
+UPDATE `config` SET `value`='0' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
-UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
+UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
 -- WebProfiler is not bundled in thelia-project on T3; disable it if it survived from T2.
 UPDATE `module` SET `activate` = 0 WHERE `code` = 'WebProfiler';
