@@ -34,6 +34,7 @@ use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CountryArea;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\CartTableMap;
@@ -155,6 +156,32 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         $this->editOnTheStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
 
         self::assertSame('Paris 2e', $this->deliveryCopyOf($guest)?->getCity());
+        CartTableMap::clearInstancePool();
+        self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
+    }
+
+    /**
+     * The same for a signed-in customer, whose address book is the account's own.
+     */
+    public function testASignedInCustomerEditingTheCityOnTheStepIsAskedForACarrierAgain(): void
+    {
+        $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
+        $this->openASessionWithACart();
+        $account = $this->signInAsARealAccount();
+        $country = CountryQuery::create()->filterByHasStates(0)->filterByNeedZipCode(0)->orderById()->findOne();
+        self::assertNotNull($country);
+        $address = $this->fixtures()->address($account, $country, null, ['zipcode' => self::GUEST_ZIP_CODE, 'city' => 'Paris']);
+        $address->setIsDefault(1)->save($this->getPropelConnection());
+        $this->zoneServingTheCountryExcept((int) $country->getId(), '20*', true);
+
+        $this->client->request('GET', '/checkout/delivery');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $cart = $this->guestWithACarrier($account);
+        self::assertSame(self::GUEST_ZIP_CODE, $this->deliveryCopyOf($account)?->getZipcode(), 'The step chose the address of the account.');
+
+        $this->editOnTheStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
+
+        self::assertSame('Paris 2e', $this->deliveryCopyOf($account)?->getCity());
         CartTableMap::clearInstancePool();
         self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
     }
