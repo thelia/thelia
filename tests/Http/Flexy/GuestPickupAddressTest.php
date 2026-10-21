@@ -390,10 +390,14 @@ final class GuestPickupAddressTest extends GuestCheckoutTestCase
     }
 
     /**
-     * The default address of the account moves to another city, from another tab, while the
-     * step is open: the pickup puts it on the cart and is priced on it.
+     * The cart carries another address of the account; the default address moves to another
+     * city, from another tab, while the step is open: the pickup puts it on the cart and is
+     * priced on it. A copy of the default address itself is no case for the pickup: choosing
+     * the option refreshes the copy from its source first (CheckoutDTO), and the carrier is
+     * priced on it then. What setCustomerDefaultDeliveryAddress() answers for such a copy is
+     * checked in the core (CustomerDefaultDeliveryAddressTest).
      */
-    public function testAPickupIsPricedAgainOnTheDefaultAddressOfTheAccountMovedSince(): void
+    public function testAPickupFromAnotherAddressIsPricedOnTheDefaultAddressOfTheAccountMovedSince(): void
     {
         $cart = $this->openASessionWithACart();
         $account = $this->signInAsARealAccount();

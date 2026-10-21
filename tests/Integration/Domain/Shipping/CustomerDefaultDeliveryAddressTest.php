@@ -93,6 +93,27 @@ final class CustomerDefaultDeliveryAddressTest extends IntegrationTestCase
     }
 
     /**
+     * The cart carries a copy of the default address, which moved to another city since: the
+     * copy keeps its id and its source, and only the answer tells the caller the place changed.
+     */
+    public function testACopyOfTheDefaultAddressMovedSinceIsAnotherPlace(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $country = $this->factory->country();
+        $default = $this->factory->address($customer, $country, null, ['address1' => '8 Default Street', 'city' => 'Paris']);
+        $default->setIsDefault(1)->save($this->getPropelConnection());
+        $copy = $this->factory->cartAddress($default, $country);
+        $cart = $this->factory->cart($customer);
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
+        $default->setCity('Lyon')->save($this->getPropelConnection());
+
+        self::assertTrue($this->shipping()->setCustomerDefaultDeliveryAddress($cart));
+        self::assertSame($copy->getId(), $cart->getAddressDeliveryId(), 'The same copy.');
+        self::assertSame($default->getId(), $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId(), 'From the same source.');
+        self::assertSame('Lyon', $cart->getCartAddressRelatedByAddressDeliveryId()?->getCity());
+    }
+
+    /**
      * Another street in the same place: the carriers read the same country, state, postal
      * code and city, nothing to price again.
      */
