@@ -197,6 +197,7 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame(str_repeat('7', ZipCodePattern::MAX_LENGTH), (string) ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH)));
 
         $this->expectException(InvalidZipCodeRuleException::class);
+        $this->expectExceptionMessage(\sprintf('A postal code pattern is %d characters long at most.', ZipCodePattern::MAX_LENGTH));
         ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH + 1));
     }
 
@@ -212,6 +213,10 @@ final class ZipCodePatternTest extends TestCase
         yield 'a right-to-left override' => ["20\u{202E}*", '20\\u{202E}*'];
         yield 'a first strong isolate' => ["20\u{2068}*", '20\\u{2068}*'];
         yield 'a text that is not UTF-8' => ["20\xC3\x28", '20\\303('];
+        yield 'a C1 control sequence introducer' => ["20\u{009B}*", '20\\u{009B}*'];
+        yield 'a left-to-right mark' => ["20\u{200E}*", '20\\u{200E}*'];
+        yield 'a right-to-left mark' => ["20\u{200F}*", '20\\u{200F}*'];
+        yield 'an Arabic letter mark' => ["20\u{061C}*", '20\\u{061C}*'];
     }
 
     #[DataProvider('textsForTheLog')]
