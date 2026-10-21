@@ -25,9 +25,12 @@ use Thelia\Log\Tlog;
  * "01500" and neither "1500" nor "001500".
  *
  * Codes are compared in their normal form (normalize()): compatibility characters folded
- * (Unicode NFKC, so a full-width "２０" is "20"), without spaces, hyphens, dashes or
- * invisible format characters, with the digits of every script written in ASCII, and in
- * upper case. So "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001".
+ * (Unicode NFKC, so a full-width "２０" is "20"), without spaces, dashes or invisible format
+ * characters, with the digits of every script written in ASCII and the letters in ASCII
+ * upper case. So "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001". A code
+ * that keeps anything else (a letter outside A to Z, a variation selector, a control
+ * character) has no normal form: it is uncertain. A pattern holds the same characters, with
+ * * and the range separator ...
  */
 final readonly class ZipCodePattern
 {
@@ -37,10 +40,17 @@ final readonly class ZipCodePattern
     public const MAX_LENGTH = 50;
 
     /**
-     * Spaces, hyphens, dashes (U+2010 to U+2015, the minus sign) and invisible format
-     * characters (a soft hyphen, a zero-width space, a word joiner...).
+     * Spaces, every dash (\p{Pd}: a hyphen, an en dash, a wave dash...), the minus sign, a
+     * math symbol to Unicode, and invisible format characters (a soft hyphen, a zero-width
+     * space, a word joiner...).
      */
-    private const SEPARATORS = '/[\s\-\x{2010}-\x{2015}\x{2212}\p{Z}\p{Cf}]+/u';
+    private const SEPARATORS = '/[\s\p{Z}\p{Pd}\x{2212}\p{Cf}]+/u';
+
+    /**
+     * A code that is none, or only spaces, dashes and minus signs, as a buyer types "-" for
+     * no code.
+     */
+    private const UNKNOWN = '/^[\s\p{Pd}\x{2212}]*$/u';
 
     /**
      * The characters forLog() writes as \u{...}: line and paragraph separators, and the
@@ -59,6 +69,10 @@ final readonly class ZipCodePattern
     public static function fromString(string $pattern): self
     {
         $normalized = self::normalizePattern($pattern);
+
+        if (null === $normalized) {
+            throw new InvalidZipCodeRuleException('A postal code pattern holds digits, letters from A to Z, * and ... only.');
+        }
 
         if ('' === str_replace(['*', self::RANGE_SEPARATOR], '', $normalized)) {
             throw new InvalidZipCodeRuleException('A postal code pattern needs at least one character other than *.');
@@ -108,48 +122,46 @@ final readonly class ZipCodePattern
     }
 
     /**
-     * Whether a postal code is unknown: none, or only spaces. Every rule accepts it, the
-     * address decides later. A code that is not blank but that the normal form empties (a
-     * zero-width space alone) is not unknown: it is uncertain, as a code that cannot be read.
+     * Whether a postal code is unknown: none, or only spaces and dashes (a buyer types "-"
+     * for no code). Every rule accepts it, the address decides later. Any other code goes to
+     * the rules: one without a normal form is uncertain.
      */
     public static function isUnknown(?string $zipCode): bool
     {
-        return null === $zipCode || 1 === preg_match('/^\s*$/u', $zipCode);
+        return null === $zipCode || 1 === preg_match(self::UNKNOWN, $zipCode);
     }
 
     /**
-     * The normal form of a postal code, or null when it cannot be read (not valid UTF-8, or
-     * an expression PCRE gives up on): such a code is neither unknown nor any code, the rules
-     * cannot tell where it is.
+     * The postal code as a buyer can be told it is why no carrier is offered: a known code
+     * that has a normal form. Null for an unknown code and for an uncertain one, which give
+     * the buyer nothing to read.
+     */
+    public static function nameable(?string $zipCode): ?string
+    {
+        if (self::isUnknown($zipCode)) {
+            return null;
+        }
+
+        return null === self::normalize((string) $zipCode) ? null : $zipCode;
+    }
+
+    /**
+     * The normal form of a postal code, or null when it has none: not valid UTF-8, emptied,
+     * keeping a character outside A to Z and 0 to 9, or an expression PCRE gives up on. Such
+     * a code is uncertain: the rules cannot tell where it is.
      *
-     * Compatibility characters are folded (NFKC: "２０" is "20"), every space, hyphen, dash
-     * and invisible format character goes (a no-break space, a non-breaking hyphen, a soft
+     * Compatibility characters are folded (NFKC: "２０" is "20"), every space, dash and
+     * invisible format character goes (a no-break space, a non-breaking hyphen, a soft
      * hyphen, a zero-width space), the digits of other scripts become ASCII digits, the text
      * is folded again so that what was split by a removed character composes as it would
-     * have, and the letters are put in upper case. Applied twice, it gives the same code.
+     * have, and the ASCII letters are put in upper case. What is left must be A to Z and 0
+     * to 9 only. Applied twice, it gives the same code.
      */
     public static function normalize(string $zipCode): ?string
     {
-        $folded = \Normalizer::normalize($zipCode, \Normalizer::FORM_KC);
+        $folded = self::fold($zipCode);
 
-        if (false === $folded) {
-            return null;
-        }
-
-        $withoutSeparators = preg_replace(self::SEPARATORS, '', $folded);
-
-        if (null === $withoutSeparators) {
-            return null;
-        }
-
-        $asciiDigits = preg_replace_callback(
-            '/[^\x{0030}-\x{0039}\P{Nd}]/u',
-            static fn (array $digit): string => (string) \IntlChar::charDigitValue((int) mb_ord($digit[0])),
-            $withoutSeparators,
-        );
-        $refolded = null === $asciiDigits ? false : \Normalizer::normalize($asciiDigits, \Normalizer::FORM_KC);
-
-        return false === $refolded ? null : strtoupper($refolded);
+        return null !== $folded && 1 === preg_match('/^[A-Z0-9]+$/', $folded) ? $folded : null;
     }
 
     /**
@@ -222,13 +234,60 @@ final readonly class ZipCodePattern
         return $this->pattern;
     }
 
-    private static function normalizePattern(string $pattern): string
+    /**
+     * The folded form of a postal code or of a part of a pattern, before the check of its
+     * characters: NFKC, without separators, with ASCII digits, NFKC again, ASCII letters in
+     * upper case. Null when it cannot be computed.
+     */
+    private static function fold(string $text): ?string
     {
-        // The range separator survives the normal form, the hyphens and spaces do not.
-        // A part that cannot be read leaves nothing, and the pattern is refused as empty.
-        $normalized = implode(self::RANGE_SEPARATOR, array_map(static fn (string $part): string => self::normalize($part) ?? '', explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
+        $folded = \Normalizer::normalize($text, \Normalizer::FORM_KC);
+
+        if (false === $folded) {
+            return null;
+        }
+
+        $withoutSeparators = preg_replace(self::SEPARATORS, '', $folded);
+
+        if (null === $withoutSeparators) {
+            return null;
+        }
+
+        // A character that is a digit to Unicode but has no value to ICU stays as it is, and
+        // the check of the characters then leaves the code without a normal form.
+        $asciiDigits = preg_replace_callback(
+            '/[^\x{0030}-\x{0039}\P{Nd}]/u',
+            static function (array $digit): string {
+                $value = \IntlChar::charDigitValue((int) mb_ord($digit[0]));
+
+                return $value >= 0 && $value <= 9 ? (string) $value : $digit[0];
+            },
+            $withoutSeparators,
+        );
+        $refolded = null === $asciiDigits ? false : \Normalizer::normalize($asciiDigits, \Normalizer::FORM_KC);
+
+        return false === $refolded ? null : strtoupper($refolded);
+    }
+
+    /**
+     * The normal form of a pattern: each side of the range separator folded as a code is,
+     * with * kept, or null when a side keeps another character.
+     */
+    private static function normalizePattern(string $pattern): ?string
+    {
+        $parts = [];
+
+        foreach (explode(self::RANGE_SEPARATOR, trim($pattern), 2) as $part) {
+            $folded = self::fold($part);
+
+            if (null === $folded || 1 !== preg_match('/^[A-Z0-9*]*$/', $folded)) {
+                return null;
+            }
+
+            $parts[] = $folded;
+        }
 
         // "**" means "*": one star per gap keeps the expression linear.
-        return (string) preg_replace('/\*+/', '*', $normalized);
+        return (string) preg_replace('/\*+/', '*', implode(self::RANGE_SEPARATOR, $parts));
     }
 }

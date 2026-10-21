@@ -126,6 +126,10 @@ final class ZipCodeRuleSetTest extends TestCase
         yield 'a zero-width space' => ["\u{200B}"];
         yield 'a soft hyphen' => ["\u{00AD}"];
         yield 'a word joiner' => ["\u{2060}"];
+        yield 'a variation selector' => ["\u{FE0F}"];
+        yield 'a variation selector inside a code' => ["2\u{FE0F}0000"];
+        yield 'a C1 control' => ["\u{0090}"];
+        yield 'a letter outside A to Z' => ["\u{00E9}1"];
     }
 
     /**
@@ -140,12 +144,14 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($zipCode), 'An inclusion does not take it.');
     }
 
-    public function testOnlyNoCodeOrSpacesAreUnknown(): void
+    public function testOnlyNoCodeOrSpacesAndDashesAreUnknown(): void
     {
         $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]);
 
         self::assertTrue($rules->accepts(null));
         self::assertTrue($rules->accepts(''));
         self::assertTrue($rules->accepts(" \t\u{00A0}"));
+        self::assertTrue($rules->accepts('-'), 'A buyer who types "-" means no code.');
+        self::assertTrue($rules->accepts(" \u{2013} "));
     }
 }
