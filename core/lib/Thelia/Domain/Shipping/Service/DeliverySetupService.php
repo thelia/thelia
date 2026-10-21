@@ -69,19 +69,22 @@ final readonly class DeliverySetupService
      * A guest's virtual cart settled before it had a billing address keeps the virtual carrier
      * and no delivery address, and the order is refused for the address: once the cart has a
      * billing address, it gets a copy of it, as setupVirtualDelivery() would have given it,
-     * and is priced again. Nothing for another cart.
+     * and is priced again. Nothing for another cart, and nothing a second time.
+     *
+     * The guards that read no line of the cart come first: a guest, no delivery address, the
+     * virtual carrier. Whether the cart is virtual, which reads every line, comes last.
      *
      * @return bool whether the cart got a delivery address
      */
     public function completeAGuestVirtualDelivery(Cart $cart): bool
     {
-        if (true !== $cart->getCustomer()?->isGuest() || null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+        if (null !== $cart->getAddressDeliveryId() || null === $cart->getDeliveryModuleId() || true !== $cart->getCustomer()?->isGuest()) {
             return false;
         }
 
         $virtualDeliveryModule = $this->virtualDeliveryModule();
 
-        if (null === $virtualDeliveryModule || $cart->getDeliveryModuleId() !== $virtualDeliveryModule->getId()) {
+        if (null === $virtualDeliveryModule || $cart->getDeliveryModuleId() !== $virtualDeliveryModule->getId() || !$cart->isVirtual()) {
             return false;
         }
 

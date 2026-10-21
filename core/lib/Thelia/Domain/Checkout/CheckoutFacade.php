@@ -106,8 +106,8 @@ final readonly class CheckoutFacade
         if (null !== $cart->getDeliveryModuleId()) {
             // A guest's cart settled before it had a billing address got the carrier and no
             // address: the address alone is given once the billing address is there. Any
-            // other settled cart is left as it is.
-            if ($cart->isVirtual() && $this->shippingFacade->completeAGuestVirtualDelivery($cart)) {
+            // other settled cart is left as it is, on guards that read no line of it.
+            if ($this->shippingFacade->completeAGuestVirtualDelivery($cart)) {
                 $this->progressionService->forget();
             }
 
