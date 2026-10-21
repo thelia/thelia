@@ -22,7 +22,10 @@ optionally one country of the zone (no country: every country of the zone).
 Codes and patterns are compared in their normal form: upper case, without spaces or
 hyphens. `SW1A 1AA` matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern that can
 match nothing (empty, only `*`, a range with letters or upside down) is refused when it
-is written, and ignored with a log line if one reaches the table by another way.
+is written. One that reaches the table by another way matches no postal code and is logged
+with its reason, once per zone and country a request reads: as an exclusion it excludes
+nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
+unreadable inclusion never opens the zone to every code).
 
 `ZipCodeRuleSet` applies the rules of a zone for one country:
 
