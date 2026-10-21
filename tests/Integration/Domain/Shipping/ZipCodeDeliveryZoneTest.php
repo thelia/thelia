@@ -151,6 +151,18 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertTrue($this->isEligible(null));
     }
 
+    public function testAPostalCodeThatCannotBeReadIsNotTakenForAnUnknownOne(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        // The database refuses such a code: it can only come from the caller.
+        self::assertFalse(
+            $this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($this->module, $this->guestCartShippedTo('69001'), $this->country, null, "20\xC3\x28"),
+            'An exclusion refuses a code it cannot check.',
+        );
+    }
+
     public function testTheGuardRefusesACartWhosePostalCodeTheZoneExcludes(): void
     {
         $area = $this->zoneServedByTheModule();

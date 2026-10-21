@@ -73,19 +73,31 @@ final readonly class ZipCodePattern
         return new self('');
     }
 
-    public static function normalize(string $zipCode): string
+    /**
+     * The normal form of a postal code, or null when it cannot be read (not valid UTF-8):
+     * such a code is neither unknown nor any code, the rules cannot tell where it is.
+     */
+    public static function normalize(string $zipCode): ?string
     {
-        return strtoupper((string) preg_replace('/[\s\-]+/u', '', $zipCode));
+        $withoutSeparators = preg_replace('/[\s\-]+/u', '', $zipCode);
+
+        return null === $withoutSeparators ? null : strtoupper($withoutSeparators);
     }
 
     /**
-     * @param bool $whenUnsure the answer when the expression of a pattern with * cannot be
-     *                         run (PCRE limits): true for an exclusion, which then refuses
-     *                         the code rather than letting it through
+     * @param bool $whenUnsure the answer when the code cannot be checked, because it cannot
+     *                         be read (not valid UTF-8) or because the expression of a
+     *                         pattern with * cannot be run (PCRE limits): true for an
+     *                         exclusion, which then refuses the code rather than letting it
+     *                         through
      */
     public function matches(string $zipCode, bool $whenUnsure = false): bool
     {
         $zipCode = self::normalize($zipCode);
+
+        if (null === $zipCode) {
+            return $whenUnsure;
+        }
 
         if ('' === $zipCode) {
             return false;
@@ -130,7 +142,8 @@ final readonly class ZipCodePattern
     private static function normalizePattern(string $pattern): string
     {
         // The range separator survives the normal form, the hyphens and spaces do not.
-        $normalized = implode(self::RANGE_SEPARATOR, array_map(self::normalize(...), explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
+        // A part that cannot be read leaves nothing, and the pattern is refused as empty.
+        $normalized = implode(self::RANGE_SEPARATOR, array_map(static fn (string $part): string => self::normalize($part) ?? '', explode(self::RANGE_SEPARATOR, trim($pattern), 2)));
 
         // "**" means "*": one star per gap keeps the expression linear.
         return (string) preg_replace('/\*+/', '*', $normalized);

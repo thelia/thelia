@@ -83,4 +83,10 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame('75001...75020', (string) ZipCodePattern::fromString('75 001...75-020'));
         self::assertSame('7*1', (string) ZipCodePattern::fromString('7***1'), 'One star per gap.');
     }
+
+    public function testACodeThatIsNotValidUtf8HasNoNormalForm(): void
+    {
+        self::assertNull(ZipCodePattern::normalize("20\xC3\x28"));
+        self::assertSame('', ZipCodePattern::normalize(' - '), 'A blank code is unknown, not unreadable.');
+    }
 }

@@ -69,7 +69,10 @@ country and belongs to the customer of the cart (a guest's own customer row incl
 country given alone, or an address of someone else, takes the postal code of the cart's
 delivery address when that address is in the country, as the postage estimate does.
 
-A postal code that is not valid UTF-8 normalises to nothing, and counts as unknown.
+A postal code that is not valid UTF-8 has no normal form (`ZipCodePattern::normalize()`
+returns null). It is not unknown but uncertain, as a code PCRE gives up on: an exclusion
+refuses it and an inclusion does not take it; a zone without a rule still takes it. The
+database refuses such a code in an address, so only a caller passing one itself meets it.
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not
