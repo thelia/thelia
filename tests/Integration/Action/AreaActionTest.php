@@ -18,6 +18,8 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\AbstractTlogDestination;
+use Thelia\Log\Tlog;
 use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\AreaZipCodeRule;
@@ -97,6 +99,24 @@ final class AreaActionTest extends ActionIntegrationTestCase
         self::assertNotNull(AreaZipCodeRuleQuery::create()->findPk($ruleOfEveryCountry));
     }
 
+    public function testTheRulesDeletedWithACountryAreLogged(): void
+    {
+        $lines = $this->captureTheLog();
+        $area = $this->persistArea('Postal codes, traced');
+        $country = $this->factory->country(['isoalpha2' => 'XE', 'isoalpha3' => 'XEX', 'isocode' => '986']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern('20*')->setExcluded(true)->save();
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern('75001...75020')->setExcluded(false)->save();
+
+        $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+
+        $traces = array_values(array_filter($lines->lines, static fn (string $line): bool => str_contains($line, 'left shipping zone')));
+        self::assertCount(1, $traces);
+        self::assertStringContainsString('Country '.$country->getId().' left shipping zone '.$area->getId().': 2 postal code rule(s) deleted with it', $traces[0]);
+        self::assertStringContainsString('excluded 20*', $traces[0]);
+        self::assertStringContainsString('included 75001...75020', $traces[0]);
+    }
+
     public function testACountryStillInTheZoneThroughAnotherStateKeepsItsRules(): void
     {
         $area = $this->persistArea('Postal codes by state');
@@ -155,6 +175,53 @@ final class AreaActionTest extends ActionIntegrationTestCase
         $rule->save();
 
         return (int) $rule->getId();
+    }
+
+    protected function tearDown(): void
+    {
+        // The next Tlog::getInstance() reads its configuration again.
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+
+        parent::tearDown();
+    }
+
+    /**
+     * Tlog keeps its lines for the end of the request: a destination of the test reads them
+     * as they come.
+     */
+    private function captureTheLog(): AbstractTlogDestination
+    {
+        $destination = new class extends AbstractTlogDestination {
+            /**
+             * @var list<string>
+             */
+            public array $lines = [];
+
+            public function add($string): void
+            {
+                $this->lines[] = (string) $string;
+            }
+
+            public function write(&$res): void
+            {
+            }
+
+            public function getTitle(): string
+            {
+                return 'Test';
+            }
+
+            public function getDescription(): string
+            {
+                return 'Keeps the lines for the test.';
+            }
+        };
+
+        $log = Tlog::getInstance();
+        $log->setLevel(Tlog::NOTICE);
+        (new \ReflectionProperty(Tlog::class, 'destinations'))->setValue($log, [$destination]);
+
+        return $destination;
     }
 
     private function persistArea(string $name): Area
