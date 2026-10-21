@@ -31,6 +31,7 @@ use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\Service\DeliverySessionStorage;
 use Thelia\Domain\Shipping\Service\DeliverySetupService;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
+use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
@@ -286,7 +287,8 @@ final readonly class ShippingFacade
         [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
         $country = $this->handleCountry($cart, $country);
 
-        if (null === $zipCode || '' === trim($zipCode)) {
+        // Nothing to name: no code, or one its normal form cannot read or empties.
+        if (null === $zipCode || \in_array(ZipCodePattern::normalize($zipCode), [null, ''], true)) {
             return null;
         }
 

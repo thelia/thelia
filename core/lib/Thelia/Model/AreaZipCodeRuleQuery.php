@@ -55,9 +55,10 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
      * from the whole country because of one unreadable row. As an inclusion it takes
      * nothing, and the zone keeps its other inclusions only: an unreadable inclusion must
      * not open the zone to every code. With no other inclusion, the zone then takes no known
-     * postal code of the country (an unknown one is still accepted, as always). A pattern that can be read but that PCRE gives up on
-     * for one code is another case (ZipCodePattern::matches()): its intent is known, only
-     * that code is uncertain, and an exclusion refuses it.
+     * postal code of the country (an unknown one is still accepted, as always). A pattern
+     * that can be read but that PCRE gives up on for one code is another case
+     * (ZipCodePattern::matches()): its intent is known, only that code is uncertain, and an
+     * exclusion refuses it.
      */
     public static function ruleSetFor(int $areaId, int $countryId): ZipCodeRuleSet
     {

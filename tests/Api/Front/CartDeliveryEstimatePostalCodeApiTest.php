@@ -24,6 +24,7 @@ use Thelia\Model\CountryArea;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
 
@@ -80,7 +81,7 @@ final class CartDeliveryEstimatePostalCodeApiTest extends ApiTestCase
     private function zoneExcludingFromTheCarrier(Country $country, string $excluded): Module
     {
         $connection = $this->getPropelConnection();
-        $carrier = ModuleQuery::create()->filterByType(2)->filterByActivate(1)->orderByPosition()->findOne($connection);
+        $carrier = ModuleQuery::create()->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->filterByActivate(1)->orderByPosition()->findOne($connection);
         self::assertNotNull($carrier, 'An active carrier is installed.');
 
         $area = (new Area())->setName('Cart estimate zone');
