@@ -452,6 +452,27 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * The address the guest's cart was copied from is the guest's own: named with a country,
+     * it gives its postal code, here edited since the copy was taken.
+     */
+    public function testAGuestReadsThePostalCodeOfTheAddressItsCartWasCopiedFrom(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $source = $this->factory->address($guest, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($source);
+        $source->setZipcode('20090')->save($this->getPropelConnection());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $source->getId())),
+            'The address the guest\'s cart was copied from is the guest\'s own.',
+        );
+    }
+
     public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
     {
         $area = $this->zoneServedByTheModule();
