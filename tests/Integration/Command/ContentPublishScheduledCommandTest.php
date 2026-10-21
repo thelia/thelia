@@ -204,8 +204,8 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
         $content
             ->setLocale('en_US')
             ->setDescription($body)
-            ->setPublishAt(new \DateTimeImmutable($publishAt))
-            ->setUnpublishAt(null === $unpublishAt ? null : new \DateTimeImmutable($unpublishAt))
+            ->setPublishAt(self::atARoundSecond($publishAt))
+            ->setUnpublishAt(null === $unpublishAt ? null : self::atARoundSecond($unpublishAt))
             ->save();
 
         return $content;
@@ -214,7 +214,7 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
     private function publishedContent(string $unpublishAt): Content
     {
         $content = $this->factory->content($this->factory->folder(), ['visible' => 1]);
-        $content->setPublishAt(new \DateTimeImmutable('-1 week'))->setUnpublishAt(new \DateTimeImmutable($unpublishAt))->save();
+        $content->setPublishAt(self::atARoundSecond('-1 week'))->setUnpublishAt(self::atARoundSecond($unpublishAt))->save();
 
         return $content;
     }
@@ -222,7 +222,7 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
     private function scheduledFolder(string $publishAt): Folder
     {
         $folder = $this->factory->folder(0, ['visible' => 0]);
-        $folder->setPublishAt(new \DateTimeImmutable($publishAt))->save();
+        $folder->setPublishAt(self::atARoundSecond($publishAt))->save();
 
         return $folder;
     }
@@ -230,9 +230,18 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
     private function publishedFolder(string $unpublishAt): Folder
     {
         $folder = $this->factory->folder(0, ['visible' => 1]);
-        $folder->setPublishAt(new \DateTimeImmutable('-1 week'))->setUnpublishAt(new \DateTimeImmutable($unpublishAt))->save();
+        $folder->setPublishAt(self::atARoundSecond('-1 week'))->setUnpublishAt(self::atARoundSecond($unpublishAt))->save();
 
         return $folder;
+    }
+
+    /**
+     * A date with a fraction of a second is rounded by MySQL and truncated by MariaDB:
+     * the fixtures carry none, so what is read back is what was written.
+     */
+    private static function atARoundSecond(string $modifier): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable((new \DateTimeImmutable($modifier))->format('Y-m-d H:i:s'));
     }
 
     private function stateOf(Content|Folder $row): PublicationState

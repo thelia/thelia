@@ -106,7 +106,7 @@ final readonly class PublicationRequest
 
     private static function immutable(?\DateTimeInterface $date): ?\DateTimeImmutable
     {
-        return null === $date ? null : \DateTimeImmutable::createFromInterface($date);
+        return PublicationMoment::atTheSecondOrNull($date);
     }
 
     private static function parse(?string $date): ?\DateTimeImmutable
