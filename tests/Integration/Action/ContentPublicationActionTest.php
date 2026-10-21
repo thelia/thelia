@@ -47,7 +47,8 @@ final class ContentPublicationActionTest extends ActionIntegrationTestCase
     public function testTheFolderEventSchedulesAndLeavesTheStateOnTheEvent(): void
     {
         $folder = $this->factory->folder(0, ['visible' => 0]);
-        $tomorrow = new \DateTimeImmutable('+1 day');
+        // At a round second: a date with a fraction is rounded by MySQL and truncated by MariaDB.
+        $tomorrow = new \DateTimeImmutable((new \DateTimeImmutable('+1 day'))->format('Y-m-d H:i:00'));
 
         $event = $this->dispatch(new FolderUpdatePublicationEvent($folder, PublicationRequest::schedule($tomorrow)), TheliaEvents::FOLDER_UPDATE_PUBLICATION);
 

@@ -28,9 +28,9 @@ final readonly class VisibilityDatesAligner
 {
     public static function alignOn(PublishableInterface $row, \DateTimeInterface $now): void
     {
-        $now = \DateTimeImmutable::createFromInterface($now);
-        $publishAt = self::dateOf($row->getPublishAt());
-        $unpublishAt = self::dateOf($row->getUnpublishAt());
+        $now = PublicationMoment::atTheSecond($now);
+        $publishAt = PublicationMoment::atTheSecondOrNull($row->getPublishAt());
+        $unpublishAt = PublicationMoment::atTheSecondOrNull($row->getUnpublishAt());
 
         if (1 === (int) $row->getVisible()) {
             if (null === $publishAt) {
@@ -52,14 +52,5 @@ final readonly class VisibilityDatesAligner
         if (null === $unpublishAt || $unpublishAt > $now) {
             $row->setUnpublishAt($now);
         }
-    }
-
-    private static function dateOf(string|\DateTimeInterface|null $date): ?\DateTimeImmutable
-    {
-        if (null === $date) {
-            return null;
-        }
-
-        return \is_string($date) ? new \DateTimeImmutable($date) : \DateTimeImmutable::createFromInterface($date);
     }
 }

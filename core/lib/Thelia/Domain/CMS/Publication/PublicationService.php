@@ -36,7 +36,7 @@ final readonly class PublicationService
 
     public function statusOf(PublishableInterface $publishable): PublicationStatus
     {
-        return PublicationStatus::ofPublishable($publishable, $this->clock->now());
+        return PublicationStatus::ofPublishable($publishable, $this->now());
     }
 
     /**
@@ -46,7 +46,7 @@ final readonly class PublicationService
      */
     public function apply(PublishableInterface $publishable, PublicationRequest $request): PublicationStatus
     {
-        $now = $this->clock->now();
+        $now = $this->now();
         $status = PublicationStatus::ofPublishable($publishable, $now);
 
         match ($request->action) {
@@ -143,12 +143,16 @@ final readonly class PublicationService
         }
     }
 
+    /**
+     * Written as it is compared: at the second (see {@see PublicationMoment}).
+     */
+    private function now(): \DateTimeImmutable
+    {
+        return PublicationMoment::atTheSecond($this->clock->now());
+    }
+
     private static function dateOf(string|\DateTimeInterface|null $date): ?\DateTimeImmutable
     {
-        if (null === $date) {
-            return null;
-        }
-
-        return \is_string($date) ? new \DateTimeImmutable($date) : \DateTimeImmutable::createFromInterface($date);
+        return PublicationMoment::atTheSecondOrNull($date);
     }
 }
