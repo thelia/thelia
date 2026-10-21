@@ -64,12 +64,15 @@ The postal code is passed by:
 - the `delivery` loop, when the address it reads is in the country of the loop.
 
 The postal code goes with the address it belongs to: the cart's copy for the cart's own
-address (a guest's cart address points to no customer address), whose country and state
-are read too, as `CartGuard` reads them; the customer address for an `addressId`, also
-when a country is given next to it as the API does, provided the address is in that
-country and belongs to the customer of the cart (a guest's own customer row included). A
-country given alone, or an address of someone else, takes the postal code of the cart's
-delivery address when that address is in the country, as the postage estimate does.
+address, whose country and state are read too, as `CartGuard` reads them; the customer
+address for an `addressId`, also when a country is given next to it as the API does,
+provided the address is in that country and belongs to the customer of the cart. A guest
+row is reused by whoever types the same e-mail address, so for a guest only the address
+the cart's copy was taken from counts as theirs. A country given alone, or any other
+address, takes the postal code of the cart's delivery address when that address is in the
+country, as the postage estimate does. The front API (`GET /api/front/delivery_modules`)
+judges the cart's copy unless the request names, as a strictly positive integer, another
+existing address than the one the copy was taken from.
 
 A postal code that is not valid UTF-8 has no normal form (`ZipCodePattern::normalize()`
 returns null). It is not unknown but uncertain, as a code PCRE gives up on: an exclusion
@@ -81,10 +84,11 @@ limit), the failure is logged and an exclusion refuses the code, an inclusion do
 take it.
 
 `ShippingFacade::postalCodeWithoutCarrier()` names the postal code of the cart's
-address when it is the reason no carrier is offered: some active carrier would be offered
-without it (its zones serve the country and it quotes the cart), and the rules of its
-zones refuse that code. Flexy shows it on the delivery step instead of the general
-message.
+address when it is the reason no carrier is offered: no carrier is offered, and one the
+code is excluded from would quote the cart. To know it, it asks the price
+(`TheliaEvents::MODULE_DELIVERY_GET_POSTAGE`) of the carriers the postal code turned away
+as well as of those it lets through. Flexy shows it on the delivery step instead of the
+general message.
 
 ## Limits
 
