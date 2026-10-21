@@ -583,6 +583,7 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@customer_group_resource_id, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (@customer_group_resource_id, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
 -- Payment journal of an order
 --
 -- One line per money movement (authorization, capture, refund, void) a payment
