@@ -175,6 +175,17 @@ final readonly class ShippingFacade
     }
 
     /**
+     * Gives a guest's virtual cart, settled before it had a billing address, a copy of the
+     * billing address it has since (DeliverySetupService::completeAGuestVirtualDelivery()).
+     *
+     * @return bool whether the cart got a delivery address
+     */
+    public function completeAGuestVirtualDelivery(Cart $cart): bool
+    {
+        return $this->deliverySetupService->completeAGuestVirtualDelivery($cart);
+    }
+
+    /**
      * Find the deliveryMode for a module in the given collection.
      */
     public function findDeliveryModeByModuleId(int $moduleId, DeliveryModuleCollection $collection): ?string

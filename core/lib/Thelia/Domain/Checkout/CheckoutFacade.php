@@ -95,13 +95,26 @@ final readonly class CheckoutFacade
      * and a command line meet the same refusal at placement.
      *
      * A cart already naming a carrier is settled and left untouched, so calling this on
-     * every page of the tunnel writes nothing after the first time.
+     * every page of the tunnel writes nothing after the first time. One exception: a guest's
+     * cart settled before it had a billing address, which gets a copy of it as its delivery
+     * address once it has one (ShippingFacade::completeAGuestVirtualDelivery()).
      *
      * @throws PropelException
      */
     public function settleVirtualDeliveryIfNeeded(Cart $cart): void
     {
-        if (null !== $cart->getDeliveryModuleId() || !$cart->isVirtual()) {
+        if (null !== $cart->getDeliveryModuleId()) {
+            // A guest's cart settled before it had a billing address got the carrier and no
+            // address: the address alone is given once the billing address is there. Any
+            // other settled cart is left as it is.
+            if ($cart->isVirtual() && $this->shippingFacade->completeAGuestVirtualDelivery($cart)) {
+                $this->progressionService->forget();
+            }
+
+            return;
+        }
+
+        if (!$cart->isVirtual()) {
             return;
         }
 

@@ -19,6 +19,7 @@ use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -64,13 +65,38 @@ final readonly class DeliverySetupService
         return $placeBefore !== self::placeOf($defaultCartAddress);
     }
 
+    /**
+     * A guest's virtual cart settled before it had a billing address keeps the virtual carrier
+     * and no delivery address, and the order is refused for the address: once the cart has a
+     * billing address, it gets a copy of it, as setupVirtualDelivery() would have given it,
+     * and is priced again. Nothing for another cart.
+     *
+     * @return bool whether the cart got a delivery address
+     */
+    public function completeAGuestVirtualDelivery(Cart $cart): bool
+    {
+        if (true !== $cart->getCustomer()?->isGuest() || null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+            return false;
+        }
+
+        $virtualDeliveryModule = $this->virtualDeliveryModule();
+
+        if (null === $virtualDeliveryModule || $cart->getDeliveryModuleId() !== $virtualDeliveryModule->getId()) {
+            return false;
+        }
+
+        if (!$this->giveTheGuestTheBillingAddressOfTheCart($cart)) {
+            return false;
+        }
+
+        $this->priceOnTheDeliveryAddress($cart);
+
+        return true;
+    }
+
     public function setupVirtualDelivery(Cart $cart): void
     {
-        $virtualDeliveryModule = ModuleQuery::create()
-            ->filterByActivate(1)
-            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
-            ->filterByCode('VirtualProductDelivery')
-            ->findOne();
+        $virtualDeliveryModule = $this->virtualDeliveryModule();
 
         if (null === $virtualDeliveryModule) {
             throw new \RuntimeException(Translator::getInstance()->trans('Virtual delivery module not found'));
@@ -108,6 +134,20 @@ final readonly class DeliverySetupService
 
         $cart->setDeliveryModuleId($virtualDeliveryModule->getId())->save();
 
+        $this->priceOnTheDeliveryAddress($cart);
+    }
+
+    private function virtualDeliveryModule(): ?Module
+    {
+        return ModuleQuery::create()
+            ->filterByActivate(1)
+            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->filterByCode('VirtualProductDelivery')
+            ->findOne();
+    }
+
+    private function priceOnTheDeliveryAddress(Cart $cart): void
+    {
         $deliveryAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
         $country = $deliveryAddress?->getCountry();
 
@@ -125,23 +165,27 @@ final readonly class DeliverySetupService
      * The billing address on a guest's cart was given for this cart, by this buyer: a cart
      * with nothing to ship and no delivery address takes a copy of it, its own row, so that
      * a later change of one leaves the other as it is.
+     *
+     * @return bool whether the cart got one
      */
-    private function giveTheGuestTheBillingAddressOfTheCart(Cart $cart): void
+    private function giveTheGuestTheBillingAddressOfTheCart(Cart $cart): bool
     {
         if (null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
-            return;
+            return false;
         }
 
         $billingAddress = $cart->getCartAddressRelatedByAddressInvoiceId();
 
         if (null === $billingAddress) {
-            return;
+            return false;
         }
 
         $deliveryAddress = $billingAddress->copy();
         $deliveryAddress->save();
 
         $cart->setAddressDeliveryId($deliveryAddress->getId())->save();
+
+        return true;
     }
 
     /**

@@ -191,6 +191,36 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
     }
 
     /**
+     * Settled before the guest gave a billing address (a front API caller places in that
+     * order): the carrier is there, the address is not. Once the billing address is on the
+     * cart, settling again gives it a copy of it, and the order goes through.
+     */
+    public function testAGuestCartSettledBeforeItsBillingAddressGetsItOnceThere(): void
+    {
+        $this->turnMandatoryConsentsOff();
+        $this->answerPaymentValidityWith(valid: true);
+        $this->answerDeliveryQuoteWith(valid: true);
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $paymentModule = ModuleQuery::create()->findOneByCode('Cheque') ?? self::fail('No payment module installed.');
+        $cart->setPaymentModuleId($paymentModule->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNull($cart->getAddressDeliveryId(), 'No address of the guest yet.');
+
+        $billing = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '3 Later Street']);
+        $cart->setAddressInvoiceId($billing->getId())->save($this->getPropelConnection());
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
+        self::assertSame('3 Later Street', $delivery?->getAddress1(), 'The billing address given since is the delivery address.');
+        self::assertNotSame($billing->getId(), $delivery?->getId());
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+
+        $this->validation()->validateForOrder($cart);
+    }
+
+    /**
      * @return array{0: Cart, 1: Customer}
      */
     private function virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers(): array
