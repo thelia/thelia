@@ -30,8 +30,13 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
      * checkout page builds that list several times over: the rules of a zone are read once
      * per request. Written rules drop them (AreaZipCodeRule::postSave() and postDelete()),
      * and so do a new request, a console command and a reset of the services between two
-     * messages of a worker (ZipCodeRuleCacheListener). A write that skips the model hooks, a
-     * bulk update or delete of this query, is only seen from the next request on.
+     * messages of a worker (ZipCodeRuleCacheListener).
+     *
+     * What the model hooks do not see is only read again from the next request, command or
+     * message on: a bulk update or delete of this query; the rows the database deletes in
+     * cascade with their zone or their country; SQL written straight to the table, by this
+     * process or another one; a rule saved, read, then rolled back with its transaction, which
+     * stays read as saved; and, during a long console command, any rule another process writes.
      *
      * @var array<string, ZipCodeRuleSet>
      */
