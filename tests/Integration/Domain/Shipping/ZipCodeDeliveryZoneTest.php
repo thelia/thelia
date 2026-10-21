@@ -383,20 +383,22 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
     {
         yield 'another address of the customer' => ['own', true];
         yield 'an address of another customer' => ['someone else', false];
-        yield 'an id that reads as none' => ['abc', true];
+        yield 'an id that reads as none' => ['abc', false];
     }
 
     /**
      * A cart without a delivery address yet. The zone serves the country of the customer's
-     * addresses, the shop's default country is served by none: another address of the
-     * customer is listed for; an address of someone else gives the default country of the
+     * addresses but excludes the postal code of their default address, and the shop's
+     * default country is served by none: only the address named, another address of the
+     * customer, is listed for. An address of someone else gives the default country of the
      * shop, never its own; an id that reads as none falls back on the address of the session,
-     * here the default address of the customer.
+     * here the default address of the customer, which the zone excludes.
      */
     #[DataProvider('addressesNamedForACartWithoutACopy')]
     public function testTheFrontApiListsForACartWithoutACopy(string $named, bool $listed): void
     {
-        $this->zoneServedByTheModule();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '69001', excluded: true);
         CountryQuery::create()->update(['ByDefault' => 0], $this->getPropelConnection());
         $this->newCountry('XR', 'XRX', '986')->setByDefault(1)->save($this->getPropelConnection());
         $title = $this->factory->customerTitle();
