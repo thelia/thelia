@@ -403,6 +403,27 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
     }
 
+    public function testTheBulkCancellationSaysWhichOrdersWaitForTheirSingleCapture(): void
+    {
+        DeferredCapturePaymentModule::$capturesOnce = true;
+        $order = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::pending('CAP-ONCE');
+        $this->getService(PaymentCaptureService::class)->capture($order, 40.0);
+        $this->loginAs($this->factory->admin());
+
+        $crawler = $this->client->request('GET', '/admin/orders');
+        $token = $crawler->filter('[data-testid="order-bulk-status-submit"]')->form()->get('_token')->getValue();
+        $this->client->request('POST', '/admin/order/update/status', [
+            '_token' => $token,
+            'status_id' => (int) OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId(),
+            'order_ids' => [$order->getId()],
+        ]);
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString((string) $order->getRef(), $crawler->filter('[data-testid="bo-flash-warning"]')->text());
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
+    }
+
     public function testOnceASingleCaptureIsTakenCancellingNeedsNoCaptureRight(): void
     {
         // The provider let the rest go with the capture: nothing is left to release.
