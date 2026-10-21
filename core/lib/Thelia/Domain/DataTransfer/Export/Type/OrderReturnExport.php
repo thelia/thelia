@@ -55,7 +55,7 @@ class OrderReturnExport extends JsonFileAbstractExport
         // formula is not run by a spreadsheet.
         return SpreadsheetFormulaGuard::neutralizeColumns(
             parent::beforeSerialize($data),
-            ['product_title', 'combination', 'reason', 'expected_exchange', 'comment'],
+            ['product_title', 'combination', 'combination_ref', 'reason', 'expected_exchange', 'comment'],
         );
     }
 
