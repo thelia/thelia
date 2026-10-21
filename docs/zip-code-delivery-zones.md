@@ -25,7 +25,9 @@ match nothing (empty, only `*`, a range with letters or upside down) is refused 
 is written. One that reaches the table by another way matches no postal code and is logged
 with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
-unreadable inclusion never opens the zone to every code).
+unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
+other inclusion therefore closes the zone to every known postal code of the country; an
+unknown postal code is still accepted.
 
 `ZipCodeRuleSet` applies the rules of a zone for one country:
 

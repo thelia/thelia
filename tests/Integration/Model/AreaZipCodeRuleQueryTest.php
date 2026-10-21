@@ -86,16 +86,28 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
      */
     public function testAnUnreadableInclusionKeepsTheZoneToItsOtherInclusions(): void
     {
-        $this->captureTheLog();
-        $this->insertStraightIntoTheTable('75020...75001', excluded: false);
+        $lines = $this->captureTheLog();
+        $ruleId = $this->insertStraightIntoTheTable('75020...75001', excluded: false);
 
         self::assertFalse($this->ruleSet()->accepts('69001'), 'The zone was limited by an inclusion: it does not take every code.');
+        self::assertTrue($this->ruleSet()->accepts(null), 'An unknown postal code is still accepted.');
+        self::assertStringContainsString('with no other inclusion the zone takes no known postal code of the country.', $this->warningAbout($lines, $ruleId));
 
         $this->insertStraightIntoTheTable('75*', excluded: false);
         AreaZipCodeRuleQuery::forgetRuleSets();
+        $lines->lines = [];
 
         self::assertTrue($this->ruleSet()->accepts('75001'));
         self::assertFalse($this->ruleSet()->accepts('69001'));
+        self::assertStringContainsString('the zone keeps its other inclusions only.', $this->warningAbout($lines, $ruleId));
+    }
+
+    private function warningAbout(AbstractTlogDestination $lines, int $ruleId): string
+    {
+        $warnings = array_values(array_filter($lines->lines, static fn (string $line): bool => str_contains($line, 'Postal code rule '.$ruleId.' of zone ')));
+        self::assertCount(1, $warnings);
+
+        return $warnings[0];
     }
 
     /**
