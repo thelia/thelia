@@ -36,8 +36,8 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * Each row goes through its publication event, so the caches are purged and a module
  * listening to the events sees the change. A content the body guard refuses stays
- * scheduled and is reported; the pass goes on with the others. A second pass right after
- * finds nothing left to do.
+ * scheduled and is reported, by a dry run as well; the pass goes on with the others. A
+ * second pass right after finds nothing left to do.
  */
 final readonly class ScheduledPublicationRunner
 {
@@ -47,6 +47,7 @@ final readonly class ScheduledPublicationRunner
     public function __construct(
         private ClockInterface $clock,
         private EventDispatcherInterface $dispatcher,
+        private PublicationGuard $guard = new PublicationGuard(),
     ) {
     }
 
@@ -79,7 +80,17 @@ final readonly class ScheduledPublicationRunner
         $state = PublicationAction::Unpublish === $request->action ? PublicationState::Unpublished : PublicationState::Published;
 
         if ($dryRun) {
-            $report->changed($type, (int) $row->getId(), $state);
+            // The guard runs on the save a real pass would make: a dry run asks it
+            // itself, so it announces the refusal the pass would meet, without writing.
+            try {
+                if ($row instanceof Content && PublicationState::Published === $state) {
+                    $this->guard->assertHasBody($row, null, PublicationGuard::defaultLocale());
+                }
+
+                $report->changed($type, (int) $row->getId(), $state);
+            } catch (PublicationException $exception) {
+                $report->refused($type, (int) $row->getId(), $exception->getMessage());
+            }
 
             return;
         }
@@ -94,7 +105,9 @@ final readonly class ScheduledPublicationRunner
             $report->changed($type, (int) $row->getId(), $state);
         } catch (PublicationException $exception) {
             $report->refused($type, (int) $row->getId(), $exception->getMessage());
-            Tlog::getInstance()->warning(\sprintf('Scheduled publication of %s #%d refused: %s', $type, $row->getId(), $exception->getMessage()));
+            // An error, not a warning: a publication that was promised did not happen, and
+            // the default level of the log only keeps errors.
+            Tlog::getInstance()->error(\sprintf('Scheduled publication of %s #%d refused: %s', $type, $row->getId(), $exception->getMessage()));
         }
     }
 

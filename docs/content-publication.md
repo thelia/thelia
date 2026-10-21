@@ -129,8 +129,8 @@ php bin/console content:publish-scheduled --batch-size=500
 It puts online the rows scheduled for a moment now past (the date waited for is the publication date) and takes
 offline the published rows whose withdrawal date is past, contents and folders alike. A window that closed while
 nothing ran is over, not opened. Each row goes through its publication event, so the caches are purged and a module
-listening sees the change. A content the body guard refuses stays scheduled, is reported, logged, and makes the
-command exit with 1 so the scheduler can alert; the pass goes on with the others. A second pass finds nothing left to
+listening sees the change. A content the body guard refuses stays scheduled, is reported (by a dry run as well, which asks the guard itself),
+logged as an error, and makes the command exit with 1 so the scheduler can alert; the pass goes on with the others. A second pass finds nothing left to
 do. Two runs at once are kept apart by a lock (`framework.lock`, `LOCK_DSN`).
 
 Nothing runs it automatically: schedule it every few minutes alongside `sale:check-activation`. A shop that does not
