@@ -15,20 +15,26 @@ declare(strict_types=1);
 namespace Thelia\Domain\QuickOrder;
 
 use Propel\Runtime\Propel;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
+use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
 use Thelia\Domain\QuickOrder\Enum\LineStatus;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\Service\QuickOrderLimiter;
 use Thelia\Domain\QuickOrder\Service\ReferenceResolver;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
+use Thelia\Domain\Shipping\DestinationRestriction\RestrictedLine;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\CartTableMap;
 
 /**
@@ -38,7 +44,8 @@ use Thelia\Model\Map\CartTableMap;
  * before the cart changes. addToCart() resolves the lines again rather than trust
  * the table the browser holds, then adds the resolved ones through CartFacade, the
  * way a product page does, in one transaction: either every resolved line is in
- * the cart, or none is. A line is only reported added once the cart holds it: the
+ * the cart, or none is. A line a destination restriction keeps from the address
+ * known for the cart is told before anything is written, and then no line is added. A line is only reported added once the cart holds it: the
  * resolver checks a line against the stock alone, and the cart keeps its quantity
  * without a word when what it already holds leaves too little stock for the rest.
  *
@@ -57,6 +64,7 @@ final readonly class QuickOrderFacade
         private CartFacade $cartFacade,
         private PurchaseListFacade $purchaseListFacade,
         private QuickOrderLimiter $limiter,
+        private ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
 
@@ -100,6 +108,20 @@ final readonly class QuickOrderFacade
         }
 
         $table = $this->resolver->resolve($customer, $lines, $cart->getCurrency() ?? Currency::getDefaultCurrency());
+
+        // Every resolved line is judged before the first one is written: a line the
+        // destination refuses leaves the cart as it was, the others included.
+        $refusals = $this->destinationRefusalsOf($cart, $table);
+
+        if ([] !== $refusals) {
+            return new QuickOrderTable(array_map(
+                static fn (QuickOrderLine $line): QuickOrderLine => LineStatus::Resolved === $line->status && isset($refusals[(int) $line->productId])
+                    ? $line->refusedByTheDestination($refusals[(int) $line->productId]->reason)
+                    : $line,
+                $table->lines,
+            ));
+        }
+
         $connection = Propel::getWriteConnection(CartTableMap::DATABASE_NAME);
         $connection->beginTransaction();
 
@@ -136,6 +158,42 @@ final readonly class QuickOrderFacade
         }
 
         return new QuickOrderTable($tableLines);
+    }
+
+    /**
+     * The resolved lines the destination restrictions keep from the cart, judged the way
+     * the addition of one product is (CartAdditionDestinationGuard): on the addresses of
+     * the cart, or the default address of the customer while the cart has none. One
+     * check for the whole table, and none in a shop without active group.
+     *
+     * @return array<int, RestrictedLine> product id => refusal
+     */
+    private function destinationRefusalsOf(Cart $cart, QuickOrderTable $table): array
+    {
+        if (null === $this->destinationRestrictionChecker || !$this->destinationRestrictionChecker->hasActiveGroup()) {
+            return [];
+        }
+
+        $productIds = [];
+
+        foreach ($table->lines as $line) {
+            if (LineStatus::Resolved === $line->status && null !== $line->productId) {
+                $productIds[] = $line->productId;
+            }
+        }
+
+        $refusals = [];
+
+        foreach ($this->destinationRestrictionChecker->violationsForProducts(
+            $productIds,
+            CartDestinations::delivery($cart, true),
+            CartDestinations::billing($cart, true),
+            Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
+        ) as $refusal) {
+            $refusals[$refusal->productId] = $refusal;
+        }
+
+        return $refusals;
     }
 
     /**
