@@ -85,6 +85,7 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertTrue($rules->accepts('2001090'), 'The code does not match the exclusion.');
 
         ini_set('pcre.backtrack_limit', '1');
+        self::assertNotNull(ZipCodePattern::normalize('2001090'), 'The code itself still reads: the pattern is what PCRE gives up on.');
 
         self::assertFalse($rules->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
     }
@@ -98,6 +99,7 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertTrue($rules->accepts('2001091'), 'The code matches the inclusion.');
 
         ini_set('pcre.backtrack_limit', '1');
+        self::assertNotNull(ZipCodePattern::normalize('2001091'), 'The code itself still reads: the pattern is what PCRE gives up on.');
 
         self::assertFalse($rules->accepts('2001091'), 'An inclusion that cannot be checked does not take the code.');
     }
