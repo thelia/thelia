@@ -14,10 +14,25 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\CMS\Publication\Exception;
 
+use Thelia\Core\Translation\Translator;
+
 /**
  * A publication gesture the row cannot take. The message is meant for the person who
- * made the gesture: a back office shows it as it is.
+ * made the gesture and is translated by the Thelia translator (domain `core`), so a
+ * back office, the API and the command show it as it is.
  */
 class PublicationException extends \DomainException
 {
+    /**
+     * @param array<string, string> $parameters
+     */
+    protected static function translated(string $message, array $parameters = []): string
+    {
+        try {
+            return Translator::getInstance()->trans($message, $parameters);
+        } catch (\RuntimeException) {
+            // No translator yet: a bare test, or a command run before the kernel wired it.
+            return strtr($message, $parameters);
+        }
+    }
 }

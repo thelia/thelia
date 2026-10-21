@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Domain\CMS\Publication\Exception;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use Thelia\Core\Translation\Translator;
 
 /**
  * A content cannot go online with nothing to show in the default language of the shop.
@@ -25,7 +24,7 @@ use Thelia\Core\Translation\Translator;
 #[Exclude]
 final class EmptyContentPublicationException extends PublicationException
 {
-    public const MESSAGE = 'This content has no body in the default language (%locale%) and cannot be published.';
+    public const MESSAGE = 'This content has no body in the default language (%locale) and cannot be published.';
 
     private function __construct(
         string $message,
@@ -37,13 +36,6 @@ final class EmptyContentPublicationException extends PublicationException
 
     public static function forContent(int $contentId, string $locale): self
     {
-        try {
-            $message = Translator::getInstance()->trans(self::MESSAGE, ['%locale%' => $locale]);
-        } catch (\RuntimeException) {
-            // No translator yet: a command run before the kernel wired it, or a bare test.
-            $message = strtr(self::MESSAGE, ['%locale%' => $locale]);
-        }
-
-        return new self($message, $contentId, $locale);
+        return new self(self::translated(self::MESSAGE, ['%locale' => $locale]), $contentId, $locale);
     }
 }
