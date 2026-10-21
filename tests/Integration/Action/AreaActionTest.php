@@ -118,6 +118,22 @@ final class AreaActionTest extends ActionIntegrationTestCase
         self::assertStringContainsString('included 75001...75020', $traces[0]);
     }
 
+    public function testAPatternDeletedWithACountryCannotForgeALineOfTheLog(): void
+    {
+        $lines = $this->captureTheLog();
+        $area = $this->persistArea('Postal codes, escaped');
+        $country = $this->factory->country(['isoalpha2' => 'XF', 'isoalpha3' => 'XFX', 'isocode' => '987']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern("20*\r\n[ERROR] forged")->setExcluded(true)->save();
+
+        $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+
+        $traces = array_values(array_filter($lines->lines, static fn (string $line): bool => str_contains($line, 'left shipping zone')));
+        self::assertCount(1, $traces);
+        self::assertStringNotContainsString("\n", $traces[0], 'A line break of the pattern reached the log.');
+        self::assertStringContainsString('excluded 20*\\r\\n[ERROR] forged', $traces[0]);
+    }
+
     public function testACountryStillInTheZoneThroughAnotherStateKeepsItsRules(): void
     {
         $area = $this->persistArea('Postal codes by state');

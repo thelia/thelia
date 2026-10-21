@@ -112,8 +112,8 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
                 [
                     'rule_id' => $rule->getId(),
                     'area_id' => $areaId,
-                    'pattern' => $rule->getPattern(),
-                    'reason' => $reason,
+                    'pattern' => ZipCodePattern::forLog((string) $rule->getPattern()),
+                    'reason' => ZipCodePattern::forLog($reason),
                     'consequence' => match (true) {
                         (bool) $rule->getExcluded() => 'it excludes no postal code.',
                         0 === $readableInclusions => 'it takes no postal code, and with no other inclusion the zone takes no known postal code of the country.',

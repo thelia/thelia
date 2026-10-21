@@ -97,4 +97,10 @@ final class ZipCodePatternTest extends TestCase
         self::assertFalse($nothing->matches('75001', whenUnsure: true));
         self::assertFalse($nothing->matches("20\xC3\x28", whenUnsure: true), 'An unreadable exclusion excludes nothing, not even a code that cannot be read.');
     }
+
+    public function testTheTextOfARuleIsLoggedWithItsControlCharactersEscaped(): void
+    {
+        self::assertSame('20*\\r\\n[ERROR] forged\\000\\177', ZipCodePattern::forLog("20*\r\n[ERROR] forged\0\x7F"));
+        self::assertSame('SW1A1AA', ZipCodePattern::forLog('SW1A1AA'));
+    }
 }

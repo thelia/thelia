@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Log\Tlog;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryArea;
@@ -89,9 +90,10 @@ class Area extends BaseAction implements EventSubscriberInterface
 
         // Written once this transaction is committed: within a transaction of the caller, the
         // deletion is final only when the caller commits, and a rollback there leaves the
-        // line behind. A trace for the shop's developers: the
-        // NOTICE is written only when `tlog_level` lets it through (the default level is
-        // ERROR); the merchant's trace is the administration log of the back office.
+        // line behind. A trace for the shop's developers: the NOTICE is written only when
+        // `tlog_level` lets it through (the default level is ERROR); the merchant's trace is
+        // the administration log of the back office. The patterns, written by hand for all
+        // the core knows, come with their control characters escaped.
         foreach ($deletedPatterns as $countryId => $patterns) {
             Tlog::getInstance()->notice(
                 'Country {country_id} left shipping zone {area_id}: {count} postal code rule(s) deleted with it ({patterns}).',
@@ -126,7 +128,7 @@ class Area extends BaseAction implements EventSubscriberInterface
                 ->find($connection);
 
             foreach ($rules as $rule) {
-                $deletedPatterns[$countryId][] = ($rule->getExcluded() ? 'excluded ' : 'included ').$rule->getPattern();
+                $deletedPatterns[$countryId][] = ($rule->getExcluded() ? 'excluded ' : 'included ').ZipCodePattern::forLog((string) $rule->getPattern());
             }
 
             // One by one, so that the model hooks of each deleted rule run.
