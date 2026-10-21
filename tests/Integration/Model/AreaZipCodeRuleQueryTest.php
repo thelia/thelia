@@ -114,8 +114,9 @@ final class AreaZipCodeRuleQueryTest extends IntegrationTestCase
         $ruleId = $this->insertStraightIntoTheTable('75020...75001', excluded: false);
 
         self::assertFalse($this->ruleSet()->accepts('69001'), 'The zone was limited by an inclusion: it does not take every code.');
-        self::assertTrue($this->ruleSet()->accepts(null), 'An unknown postal code is still accepted.');
-        self::assertStringContainsString('with no other inclusion the zone takes no known postal code of the country.', $this->warningAbout($lines, $ruleId));
+        self::assertTrue($this->ruleSet()->accepts(null), 'No postal code at all is still accepted.');
+        self::assertFalse($this->ruleSet()->accepts('-'), 'A placeholder is a typed code: not taken.');
+        self::assertStringContainsString('with no other inclusion the zone takes no typed postal code of the country, a placeholder included.', $this->warningAbout($lines, $ruleId));
 
         $this->insertStraightIntoTheTable('75*', excluded: false);
         AreaZipCodeRuleQuery::forgetRuleSets();
