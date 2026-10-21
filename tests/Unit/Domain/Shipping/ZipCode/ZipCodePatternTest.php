@@ -169,6 +169,16 @@ final class ZipCodePatternTest extends TestCase
         self::assertNull(ZipCodePattern::nameable("2\u{FE0F}0000"));
     }
 
+    /**
+     * A right-to-left override in the code would turn the message that names it around: the
+     * code is named without its invisible format characters.
+     */
+    public function testACodeIsNamedWithoutItsFormatCharacters(): void
+    {
+        self::assertSame('75001', ZipCodePattern::nameable("75\u{202E}001"));
+        self::assertSame('SW1A 1AA', ZipCodePattern::nameable("SW1A\u{200B} 1AA\u{200F}"));
+    }
+
     public function testThePatternOfAnUnreadableRuleMatchesNothingEvenAnUncertainCode(): void
     {
         $nothing = ZipCodePattern::matchingNothing();

@@ -56,6 +56,9 @@ final readonly class ZipCodePattern
      */
     private const PLACEHOLDER = '/^[\s\p{Pd}\x{2212}]*$/u';
 
+    /** The invisible format characters nameable() takes out of the code it names. */
+    private const FORMAT_CHARACTERS = '/\p{Cf}+/u';
+
     /**
      * The characters forLog() writes as \u{...}: the C1 controls, line and paragraph
      * separators, and the controls that change the direction of the text around them.
@@ -149,8 +152,10 @@ final readonly class ZipCodePattern
 
     /**
      * The postal code as a buyer can be told it is why no carrier is offered: a code that has
-     * a normal form. Null for an unknown code, a placeholder and an uncertain code, which give
-     * the buyer nothing to read.
+     * a normal form, as it was typed, its spaces and dashes kept, without the invisible format
+     * characters (direction marks and overrides, zero-width spaces) that would turn the text
+     * of the message around. Null for an unknown code, a placeholder and an uncertain code,
+     * which give the buyer nothing to read.
      */
     public static function nameable(?string $zipCode): ?string
     {
@@ -158,7 +163,7 @@ final readonly class ZipCodePattern
             return null;
         }
 
-        return $zipCode;
+        return preg_replace(self::FORMAT_CHARACTERS, '', $zipCode);
     }
 
     /**

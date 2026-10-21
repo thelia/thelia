@@ -97,7 +97,9 @@ uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
 does not take it; a zone without a rule still takes it. The database refuses a code that
 is not valid UTF-8 in an address, so only a caller passing one itself meets that case.
 `ShippingFacade::postalCodeWithoutCarrier()` names neither an unknown code, a placeholder
-nor an uncertain code (`ZipCodePattern::nameable()`).
+nor an uncertain code (`ZipCodePattern::nameable()`), and names a code without its
+invisible format characters (direction marks and overrides, zero-width spaces), its spaces
+and dashes kept.
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not
