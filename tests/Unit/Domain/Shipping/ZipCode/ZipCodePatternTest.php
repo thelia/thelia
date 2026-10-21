@@ -40,7 +40,6 @@ final class ZipCodePatternTest extends TestCase
         yield 'hyphen' => ['1000-001', '1000 001', true];
         yield 'prefix with letters' => ['sw1*', 'SW1A 1AA', true];
         yield 'empty code' => ['75*', '  ', false];
-        yield 'a dot is not a wildcard' => ['7.001', '75001', false];
         yield 'range with a leading zero' => ['01000...01999', '01500', true];
         yield 'range against a shorter code' => ['01000...01999', '1500', false];
         yield 'range against a longer code' => ['01000...01999', '001500', false];
@@ -79,6 +78,9 @@ final class ZipCodePatternTest extends TestCase
         yield 'range with a star' => ['75*...76000'];
         yield 'range with bounds of two lengths' => ['1000...20000'];
         yield 'longer than the column' => [str_repeat('7', 51)];
+        yield 'a dot, which is no wildcard' => ['7.001'];
+        yield 'a letter outside A to Z' => ["\u{00C9}1*"];
+        yield 'a variation selector' => ["20\u{FE0F}*"];
     }
 
     #[DataProvider('patternsThatMatchNothing')]
@@ -97,10 +99,61 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame('20*', (string) ZipCodePattern::fromString("\u{FF12}\u{FF10}\u{FF0A}"), 'Written in full-width characters, kept in its normal form.');
     }
 
-    public function testACodeThatIsNotValidUtf8HasNoNormalForm(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function codesWithoutANormalForm(): iterable
     {
-        self::assertNull(ZipCodePattern::normalize("20\xC3\x28"));
-        self::assertSame('', ZipCodePattern::normalize(' - '), 'A blank code is unknown, not unreadable.');
+        yield 'not valid UTF-8' => ["20\xC3\x28"];
+        yield 'a variation selector alone' => ["\u{FE0F}"];
+        yield 'a variation selector inside' => ["2\u{FE0F}0000"];
+        yield 'a zero-width space alone' => ["\u{200B}"];
+        yield 'a C1 control' => ["20\u{0090}000"];
+        yield 'a combining grapheme joiner' => ["20\u{034F}000"];
+        yield 'a Mongolian variation selector' => ["20\u{180B}000"];
+        yield 'a Hangul filler' => ["20\u{3164}000"];
+        yield 'a braille blank' => ["20\u{2800}000"];
+        yield 'a letter outside A to Z' => ["\u{00E9}1"];
+        yield 'a combining accent' => ["E\u{0301}1"];
+    }
+
+    /**
+     * Fail closed: a code that keeps a character outside A to Z and 0 to 9 is uncertain.
+     */
+    #[DataProvider('codesWithoutANormalForm')]
+    public function testACodeThatKeepsAnotherCharacterHasNoNormalForm(string $zipCode): void
+    {
+        self::assertNull(ZipCodePattern::normalize($zipCode));
+        self::assertFalse(ZipCodePattern::isUnknown($zipCode), 'It is not unknown either.');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function unknownCodes(): iterable
+    {
+        yield 'a hyphen' => ['-'];
+        yield 'an en dash' => ["\u{2013}"];
+        yield 'a hyphen between spaces' => [' - '];
+        yield 'a minus sign' => ["\u{2212}"];
+        yield 'spaces' => [" \t\u{00A0}"];
+    }
+
+    /**
+     * A buyer who types "-" means "no code": the code is unknown, as an empty one.
+     */
+    #[DataProvider('unknownCodes')]
+    public function testADashOrSpacesAloneIsAnUnknownCode(string $zipCode): void
+    {
+        self::assertTrue(ZipCodePattern::isUnknown($zipCode));
+        self::assertNull(ZipCodePattern::nameable($zipCode), 'An unknown code is not named.');
+    }
+
+    public function testOnlyAKnownCodeWithANormalFormIsNamed(): void
+    {
+        self::assertSame('20 090', ZipCodePattern::nameable('20 090'));
+        self::assertNull(ZipCodePattern::nameable("\u{200B}"));
+        self::assertNull(ZipCodePattern::nameable("2\u{FE0F}0000"));
     }
 
     public function testThePatternOfAnUnreadableRuleMatchesNothingEvenAnUncertainCode(): void
@@ -125,9 +178,11 @@ final class ZipCodePatternTest extends TestCase
      */
     public static function codesToNormalizeTwice(): iterable
     {
-        yield 'a soft hyphen before a combining accent' => ["A\u{00AD}\u{0301}", "\u{00C1}"];
-        yield 'a zero-width space before a combining accent' => ["E\u{200B}\u{0301}1", "\u{00C9}1"];
+        yield 'a soft hyphen' => ["20\u{00AD}090", '20090'];
+        yield 'a zero-width space between letters' => ["sw1a\u{200B}1aa", 'SW1A1AA'];
         yield 'full-width digits' => ["\u{FF12}\u{FF10} 090", '20090'];
+        yield 'a two-em dash' => ["20\u{2E3A}000", '20000'];
+        yield 'a wave dash' => ["20\u{301C}000", '20000'];
     }
 
     #[DataProvider('codesToNormalizeTwice')]
@@ -137,12 +192,12 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame($normalForm, ZipCodePattern::normalize($normalForm));
     }
 
-    public function testThePatternLengthIsCountedInCharacters(): void
+    public function testAPatternIsRefusedPastTheLengthOfItsColumn(): void
     {
-        self::assertSame(str_repeat("\u{00C9}", 26), (string) ZipCodePattern::fromString(str_repeat("\u{00C9}", 26)), '26 accented letters are 52 bytes and 26 characters.');
+        self::assertSame(str_repeat('7', ZipCodePattern::MAX_LENGTH), (string) ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH)));
 
         $this->expectException(InvalidZipCodeRuleException::class);
-        ZipCodePattern::fromString(str_repeat("\u{00C9}", 51));
+        ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH + 1));
     }
 
     /**

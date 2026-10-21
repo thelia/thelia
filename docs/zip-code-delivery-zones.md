@@ -19,15 +19,19 @@ optionally one country of the zone (no country: every country of the zone).
 - a pattern where `*` stands for any characters, `20*` or `75*1`;
 - a range of numeric codes, `75001...75020`, bounds included.
 
-Codes and patterns are compared in their normal form: compatibility characters folded
-(Unicode NFKC, through `ext-intl`, which the core requires: `２０000` is `20000`), upper
-case, without spaces, hyphens and dashes (a non-breaking hyphen, an en dash, a minus sign)
-or invisible format characters (a soft hyphen, a zero-width space), and with the digits of
-every script written in ASCII (Arabic-Indic or Devanagari digits included). `SW1A 1AA`
-matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern is 50 characters long at
-most. A pattern that can match nothing (empty, only `*`, a range with letters or upside
-down) is refused when it is written. One that reaches the table by another way matches no postal code and is logged
-with its reason, once per zone and country a request reads: as an exclusion it excludes
+Codes and patterns are compared in their normal form (`ZipCodePattern::normalize()`):
+compatibility characters folded (Unicode NFKC, through `ext-intl`, which the core
+requires: `２０000` is `20000`), without spaces, dashes (every `\p{Pd}`, and the minus
+sign) or invisible format characters (`\p{Cf}`: a soft hyphen, a zero-width space), with
+the digits of every script written in ASCII (Arabic-Indic or Devanagari digits included)
+and the ASCII letters in upper case. What is left must be `A` to `Z` and `0` to `9` only;
+a code that keeps anything else (a letter outside `A` to `Z` such as `é`, a variation
+selector, a control character, a combining mark) has no normal form. `SW1A 1AA` matches
+`sw1a1aa`, `1000-001` matches `1000 001`. A pattern holds the same characters, with `*`
+and `...`, and is 50 characters long at most. A pattern that can match nothing (empty,
+only `*`, a range with letters or upside down) or that holds another character is refused
+when it is written. One that reaches the table by another way matches no postal code and is
+logged with its reason, once per zone and country a request reads: as an exclusion it excludes
 nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
 unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
 other inclusion therefore closes the zone to every known postal code of the country; an
@@ -38,8 +42,9 @@ unknown postal code is still accepted.
 - a zone without a rule takes every postal code, as zones always did;
 - a code matching an exclusion is refused, whatever the inclusions say;
 - when the zone has inclusions, a code must match one of them;
-- an unknown postal code (none, or only spaces) is accepted; a code its normal form
-  empties (a zero-width space alone) is not unknown but uncertain, as below.
+- an unknown postal code (none, or only spaces and dashes, as a buyer types `-` for no
+  code) is accepted; a code without a normal form (a zero-width space alone, `é1`, a
+  variation selector) is not unknown but uncertain, as below.
 
 ## Where it applies
 
@@ -82,10 +87,12 @@ country, as the postage estimate does. The front API (`GET /api/front/delivery_m
 judges the cart's copy unless the request names, as a strictly positive integer, another
 existing address than the one the copy was taken from.
 
-A postal code that is not valid UTF-8 has no normal form (`ZipCodePattern::normalize()`
-returns null). It is not unknown but uncertain, as a code PCRE gives up on: an exclusion
-refuses it and an inclusion does not take it; a zone without a rule still takes it. The
-database refuses such a code in an address, so only a caller passing one itself meets it.
+A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is not
+unknown but uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
+does not take it; a zone without a rule still takes it. The database refuses a code that
+is not valid UTF-8 in an address, so only a caller passing one itself meets that case.
+`ShippingFacade::postalCodeWithoutCarrier()` names neither an unknown nor an uncertain
+code (`ZipCodePattern::nameable()`).
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not

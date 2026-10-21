@@ -20,11 +20,11 @@ namespace Thelia\Domain\Shipping\ZipCode;
  * - no rule: every postal code is accepted, as a zone always did;
  * - a code matching an exclusion is refused, whatever the inclusions say;
  * - when the zone has inclusions, a code must match one of them;
- * - an unknown postal code (none, or only spaces) is accepted: the address decides later,
- *   and a missing code never hides every carrier;
- * - a code that cannot be checked (not valid UTF-8, emptied by its normal form as a
- *   zero-width space alone is, or a pattern PCRE gives up on) is uncertain: an exclusion
- *   refuses it, an inclusion does not take it.
+ * - an unknown postal code (none, or only spaces and dashes) is accepted: the address
+ *   decides later, and a missing code never hides every carrier;
+ * - a code that cannot be checked (without a normal form, see ZipCodePattern::normalize(),
+ *   or a pattern PCRE gives up on) is uncertain: an exclusion refuses it, an inclusion does
+ *   not take it.
  */
 final readonly class ZipCodeRuleSet
 {
@@ -40,7 +40,12 @@ final readonly class ZipCodeRuleSet
 
     public function accepts(?string $zipCode): bool
     {
-        // Unknown: no code, or only spaces. A code its normal form cannot read or empties is
+        // A zone without a rule takes every code: nothing to normalise.
+        if ([] === $this->inclusions && [] === $this->exclusions) {
+            return true;
+        }
+
+        // Unknown: no code, or only spaces and dashes. A code without a normal form is
         // uncertain, and goes on to the rules.
         if (ZipCodePattern::isUnknown($zipCode)) {
             return true;

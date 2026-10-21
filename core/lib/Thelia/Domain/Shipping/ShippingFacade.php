@@ -287,8 +287,8 @@ final readonly class ShippingFacade
         [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
         $country = $this->handleCountry($cart, $country);
 
-        // Nothing to name: no code, or one its normal form cannot read or empties.
-        if (null === $zipCode || \in_array(ZipCodePattern::normalize($zipCode), [null, ''], true)) {
+        // Nothing to name: an unknown code, or an uncertain one the buyer could not read.
+        if (null === ZipCodePattern::nameable($zipCode)) {
             return null;
         }
 
