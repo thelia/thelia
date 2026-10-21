@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Front;
 
+use Thelia\Domain\CMS\Publication\ScheduledPublicationRunner;
 use Thelia\Model\ContentQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
@@ -124,6 +125,33 @@ final class ContentPublicationApiTest extends ApiTestCase
         self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
         self::assertStringContainsString('no body in the default language', (string) $response->getContent());
         self::assertSame(0, (int) ContentQuery::create()->findPk($draft->getId())->getVisible());
+    }
+
+    public function testAContentHiddenThroughTheAdminApiIsNotPutBackOnlineByTheScheduledCommand(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $published = $this->factory->content($this->factory->folder(), ['visible' => 1]);
+        $published->setLocale('en_US')->setDescription('<p>A body</p>')->setPublishAt(new \DateTimeImmutable('-1 week'))->save();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/contents/'.$published->getId(), ['visible' => false], $token, 'merge-patch+json');
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('unpublished', json_decode((string) $response->getContent(), true)['publicationState']);
+
+        $this->getService(ScheduledPublicationRunner::class)->run();
+
+        $row = ContentQuery::create()->findPk($published->getId());
+        self::assertSame(0, (int) $row->getVisible());
+        self::assertNotNull($row->getUnpublishAt());
+    }
+
+    public function testTheLinkOfADraftContentToItsFolderIsNotOnTheFrontApi(): void
+    {
+        $folder = $this->factory->folder(0, ['visible' => 1]);
+        $draft = $this->factory->content($folder, ['visible' => 0]);
+        $published = $this->factory->content($folder, ['visible' => 1]);
+
+        self::assertSame(404, $this->jsonRequest('GET', \sprintf('/api/front/content_folders/%d/folders/%d', $draft->getId(), $folder->getId()))->getStatusCode());
+        self::assertSame(200, $this->jsonRequest('GET', \sprintf('/api/front/content_folders/%d/folders/%d', $published->getId(), $folder->getId()))->getStatusCode());
     }
 
     /**
