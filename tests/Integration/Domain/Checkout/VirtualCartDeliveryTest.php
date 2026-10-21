@@ -134,6 +134,92 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
     }
 
     /**
+     * A guest's cart keeps the delivery address it has, an address of the buyer's own, and
+     * gets its carrier: the default address of the guest row, another buyer's, is not read.
+     */
+    public function testAGuestCartKeepsItsDeliveryAddressAndGetsItsCarrier(): void
+    {
+        [$cart, $guest] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $ownAddress = $this->factory->address($guest, $this->factory->country(), null, ['address1' => '1 Own Street']);
+        $copy = $this->factory->cartAddress($ownAddress, $this->factory->country());
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertSame($copy->getId(), $cart->getAddressDeliveryId());
+        self::assertSame('1 Own Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+    }
+
+    /**
+     * A guest's cart with no delivery address takes a copy of its own billing address, in a
+     * row of its own, never the default address of the guest row.
+     */
+    public function testAGuestCartWithoutADeliveryAddressTakesACopyOfItsBillingAddress(): void
+    {
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $billing = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '2 Billing Street']);
+        $cart->setAddressInvoiceId($billing->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNotNull($delivery);
+        self::assertNotSame($billing->getId(), $delivery->getId(), 'A row of its own: a later change of the billing address leaves it as it is.');
+        self::assertSame('2 Billing Street', $delivery->getAddress1());
+        self::assertSame($billing->getId(), $cart->getAddressInvoiceId());
+    }
+
+    /**
+     * Without any address of this cart, a guest's cart gets its carrier and no address: the
+     * order is refused for the address, never placed with another buyer's.
+     */
+    public function testAGuestCartWithNoAddressOfItsOwnGetsNoneAndIsRefused(): void
+    {
+        $this->turnMandatoryConsentsOff();
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNull($cart->getAddressDeliveryId());
+
+        $this->expectException(MissingAddressException::class);
+        $this->expectExceptionMessage('Delivery address is required');
+        $this->validation()->validateForOrder($cart);
+    }
+
+    /**
+     * @return array{0: Cart, 1: Customer}
+     */
+    private function virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers(): array
+    {
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $this->factory->address($guest, $this->factory->country(), null, ['address1' => '9 Another Buyer Street'])
+            ->setIsDefault(1)
+            ->save($this->getPropelConnection());
+
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['baseQuantity' => 100],
+        );
+        $product->setVirtual(1)->save($this->getPropelConnection());
+
+        $cart = $this->factory->cart($guest);
+        $this->factory->cartItem($cart, $product);
+
+        return [$cart, $guest];
+    }
+
+    private function virtualDeliveryModuleId(): ?int
+    {
+        return ModuleQuery::create()->findOneByCode('VirtualProductDelivery')?->getId();
+    }
+
+    /**
      * A virtual cart with an invoice address and a payment module on it: the delivery is
      * the one thing left, and it is the one thing the buyer is never asked about.
      */

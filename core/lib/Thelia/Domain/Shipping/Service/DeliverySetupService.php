@@ -70,10 +70,13 @@ final readonly class DeliverySetupService
 
         $customer = $cart->getCustomer();
 
-        // Never the default address of a guest row: the row is reused by whoever types the
-        // same e-mail address, and each identification makes its own address the default
-        // one, so it may be another buyer's. A guest keeps the address the cart has, if any.
-        if (null !== $customer && !$customer->isGuest()) {
+        // Never an address of a guest row: the row is reused by whoever types the same e-mail
+        // address, and each identification makes its own address the default one, so its
+        // default address, and its first one, may be another buyer's. A guest keeps the
+        // delivery address the cart has, else takes the billing address of this cart.
+        if (true === $customer?->isGuest()) {
+            $this->giveTheGuestTheBillingAddressOfTheCart($cart);
+        } elseif (null !== $customer) {
             $defaultAddress = AddressQuery::create()
                 ->filterByCustomerId($customer->getId())
                 ->filterByIsDefault(1)
@@ -108,5 +111,28 @@ final readonly class DeliverySetupService
                 ->setPostageTax((string) ($estimate->getBestPostageTax() ?? 0))
                 ->save();
         }
+    }
+
+    /**
+     * The billing address on a guest's cart was given for this cart, by this buyer: a cart
+     * with nothing to ship and no delivery address takes a copy of it, its own row, so that
+     * a later change of one leaves the other as it is.
+     */
+    private function giveTheGuestTheBillingAddressOfTheCart(Cart $cart): void
+    {
+        if (null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+            return;
+        }
+
+        $billingAddress = $cart->getCartAddressRelatedByAddressInvoiceId();
+
+        if (null === $billingAddress) {
+            return;
+        }
+
+        $deliveryAddress = $billingAddress->copy();
+        $deliveryAddress->save();
+
+        $cart->setAddressDeliveryId($deliveryAddress->getId())->save();
     }
 }

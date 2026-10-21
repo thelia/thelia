@@ -151,7 +151,10 @@ final readonly class ShippingFacade
     }
 
     /**
-     * Setup virtual delivery (module + optional customer default address + shipping recalculation).
+     * Puts the virtual carrier on a cart with nothing to ship, and prices it. A customer with
+     * an account gets their default address copied onto the cart, else their first one; a
+     * guest keeps the delivery address the cart has, else gets a copy of its billing address,
+     * else none (see DeliverySetupService::setupVirtualDelivery()).
      */
     public function setupVirtualDelivery(Cart $cart): void
     {
