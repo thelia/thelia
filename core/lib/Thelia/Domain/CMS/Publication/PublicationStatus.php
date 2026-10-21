@@ -37,9 +37,9 @@ final readonly class PublicationStatus
 
     public static function of(bool $visible, ?\DateTimeInterface $publishAt, ?\DateTimeInterface $unpublishAt, \DateTimeInterface $now): self
     {
-        $publishAt = null === $publishAt ? null : \DateTimeImmutable::createFromInterface($publishAt);
-        $unpublishAt = null === $unpublishAt ? null : \DateTimeImmutable::createFromInterface($unpublishAt);
-        $now = \DateTimeImmutable::createFromInterface($now);
+        $publishAt = PublicationMoment::atTheSecondOrNull($publishAt);
+        $unpublishAt = PublicationMoment::atTheSecondOrNull($unpublishAt);
+        $now = PublicationMoment::atTheSecond($now);
 
         if ($visible) {
             return new self(PublicationState::Published, $publishAt, $unpublishAt, null !== $unpublishAt && $unpublishAt <= $now);
@@ -111,10 +111,6 @@ final readonly class PublicationStatus
 
     private static function dateOf(string|\DateTimeInterface|null $date): ?\DateTimeInterface
     {
-        if (\is_string($date)) {
-            return new \DateTimeImmutable($date);
-        }
-
-        return $date;
+        return PublicationMoment::atTheSecondOrNull($date);
     }
 }

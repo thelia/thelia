@@ -54,7 +54,7 @@ final readonly class ScheduledPublicationRunner
     public function run(bool $dryRun = false, int $batchSize = 100): ScheduledPublicationReport
     {
         $report = new ScheduledPublicationReport();
-        $now = $this->clock->now();
+        $now = PublicationMoment::atTheSecond($this->clock->now());
 
         foreach ($this->inBatches(fn (int $afterId) => $this->contentsToPublish($now, $afterId, $batchSize)) as $content) {
             $this->release(self::CONTENT, $content, $this->publicationOf($content, $now), $dryRun, $report);
@@ -199,10 +199,6 @@ final readonly class ScheduledPublicationRunner
 
     private static function dateOf(string|\DateTimeInterface|null $date): ?\DateTimeImmutable
     {
-        if (null === $date) {
-            return null;
-        }
-
-        return \is_string($date) ? new \DateTimeImmutable($date) : \DateTimeImmutable::createFromInterface($date);
+        return PublicationMoment::atTheSecondOrNull($date);
     }
 }
