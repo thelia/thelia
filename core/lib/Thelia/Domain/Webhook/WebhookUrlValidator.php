@@ -20,7 +20,7 @@ use Thelia\Domain\Webhook\Exception\InvalidWebhookUrlException;
 
 final readonly class WebhookUrlValidator
 {
-    private const array NON_ROUTABLE_IPV4 = ['192.0.0.0/24', '192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24', '224.0.0.0/4'];
+    public const array NON_ROUTABLE = ['192.0.0.0/24', '192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24', '224.0.0.0/4', 'fec0::/10', '100::/64', '::ffff:0:0:0/96'];
     private const array INTERNAL_SUFFIXES = ['.localhost', '.local', '.internal', '.lan', '.home', '.corp', '.intranet'];
 
     public function __construct(
@@ -34,8 +34,12 @@ final readonly class WebhookUrlValidator
      */
     public function validate(string $url): void
     {
-        if ('' === $url || 1 === preg_match('/[\x00-\x20\x7f]/', $url)) {
-            throw new InvalidWebhookUrlException('The address is empty or contains a control character.');
+        if ('' === $url) {
+            throw new InvalidWebhookUrlException('The address is empty.');
+        }
+
+        if (1 === preg_match('/[\x00-\x20\x7f]/', $url)) {
+            throw new InvalidWebhookUrlException('The address contains a space or a control character.');
         }
 
         $parts = parse_url($url);
@@ -107,7 +111,7 @@ final readonly class WebhookUrlValidator
             throw new InvalidWebhookUrlException('The host embeds an IPv4 address.');
         }
 
-        if (false === filter_var($ip, \FILTER_VALIDATE_IP, $flag | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE) || IpUtils::isPrivateIp($ip) || (!$expectIpv6 && IpUtils::checkIp($ip, self::NON_ROUTABLE_IPV4))) {
+        if (false === filter_var($ip, \FILTER_VALIDATE_IP, $flag | \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE) || IpUtils::isPrivateIp($ip) || IpUtils::checkIp($ip, self::NON_ROUTABLE)) {
             throw new InvalidWebhookUrlException('The host is not a public address.');
         }
     }

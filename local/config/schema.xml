@@ -3344,7 +3344,7 @@
     <column name="subscription_id" required="true" type="INTEGER" />
     <column description="the published event name" name="event" required="true" size="64" type="VARCHAR" />
     <column description="the unique identifier sent in the headers, so a receiver can drop a duplicate" name="delivery_uuid" required="true" size="36" type="VARCHAR" />
-    <column defaultValue="pending" description="pending, succeeded or failed" name="status" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="pending" description="pending, succeeded, failed, or cancelled when the subscription stopped receiving before the request was sent" name="status" required="true" size="16" type="VARCHAR" />
     <column defaultValue="0" name="attempts" required="true" type="INTEGER" />
     <column description="the HTTP code the receiver answered, empty when it never answered" name="response_code" type="INTEGER" />
     <column description="how long the last attempt took, in milliseconds" name="duration_ms" type="INTEGER" />
@@ -3369,6 +3369,11 @@
     <index name="idx_webhook_delivery_status_created">
       <index-column name="status" />
       <index-column name="created_at" />
+    </index>
+    <index name="idx_webhook_delivery_subscription_status_delivered">
+      <index-column name="subscription_id" />
+      <index-column name="status" />
+      <index-column name="delivered_at" />
     </index>
     <unique name="webhook_delivery_uuid_UNIQUE">
       <unique-column name="delivery_uuid" />

@@ -66,6 +66,7 @@ use Thelia\Model\Map\WebhookSubscriptionTableMap;
             uriTemplate: '/admin/webhook-subscriptions/{id}/secret',
             status: 200,
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_SECRET]],
+            input: false,
             read: false,
             deserialize: false,
             processor: WebhookSubscriptionSecretProcessor::class,

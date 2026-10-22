@@ -110,6 +110,21 @@ final class WebhookDeliveryApiTest extends ApiTestCase
         self::assertCount(25, $default['hydra:member']);
     }
 
+    public function testAskingForNoPaginationDoesNotLiftTheCap(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $subscription = $this->subscription();
+
+        for ($i = 0; $i < 55; ++$i) {
+            $this->delivery($subscription, WebhookStatus::DELIVERY_SUCCEEDED);
+        }
+
+        $all = json_decode((string) $this->jsonRequest('GET', self::URI.'?itemsPerPage=0', token: $token)->getContent(), true);
+
+        self::assertCount(50, $all['hydra:member']);
+        self::assertSame(55, $all['hydra:totalItems']);
+    }
+
     public function testTheLogFollowsTheWebhookPermission(): void
     {
         $subscription = $this->subscription();

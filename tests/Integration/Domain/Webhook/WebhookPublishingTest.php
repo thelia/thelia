@@ -335,6 +335,33 @@ final class WebhookPublishingTest extends IntegrationTestCase
         self::assertSame([], $this->requests);
     }
 
+    public function testAProductUpdateSkipsTheComparisonWhenNobodyListensToIt(): void
+    {
+        $product = $this->product();
+        $this->subscribe(['order.created']);
+
+        $withoutListener = $this->queriesOfTheSnapshot($product);
+        $this->subscribe(['product.updated']);
+        $withListener = $this->queriesOfTheSnapshot($product);
+
+        self::assertGreaterThanOrEqual(3, $withListener - $withoutListener, 'The four reads of the fingerprint must not run for nothing.');
+    }
+
+    public function testAClonedProductPublishesNothing(): void
+    {
+        $product = $this->product();
+        $this->dispatcher()->dispatch($this->updateEvent($product, 'Original'), TheliaEvents::PRODUCT_UPDATE);
+        $this->subscribe(['product.updated']);
+
+        $event = new \Thelia\Core\Event\Product\ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatcher()->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $cloned = $event->getClonedProduct();
+        self::assertNotNull($cloned);
+        $announced = array_map(static fn (array $request): int => json_decode($request['body'], true)['data']['id'], $this->requests);
+        self::assertSame([], $announced, 'cloned id '.$cloned->getId());
+    }
+
     public function testAProductUpdateThatChangesATitleOrTheVisibilityIsPublished(): void
     {
         $product = $this->product();
@@ -402,6 +429,18 @@ final class WebhookPublishingTest extends IntegrationTestCase
     private function order(): Order
     {
         return $this->factory->order($this->factory->customer($this->factory->customerTitle()));
+    }
+
+    private function queriesOfTheSnapshot(\Thelia\Model\Product $product): int
+    {
+        $connection = $this->getPropelConnection();
+        $connection->useDebug(true);
+        $before = $connection->getQueryCount();
+        $this->listener()->rememberProductBeforeUpdate($this->updateEvent($product, 'Anything'));
+        $queries = $connection->getQueryCount() - $before;
+        $connection->useDebug(false);
+
+        return $queries;
     }
 
     private function listener(): PublishWebhookEventsListener

@@ -1537,7 +1537,7 @@ CREATE TABLE `webhook_delivery`
     `subscription_id` INTEGER NOT NULL,
     `event` VARCHAR(64) NOT NULL COMMENT 'the published event name',
     `delivery_uuid` VARCHAR(36) NOT NULL COMMENT 'the unique identifier sent in the headers, so a receiver can drop a duplicate',
-    `status` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'pending, succeeded or failed',
+    `status` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'pending, succeeded, failed, or cancelled when the subscription stopped receiving before the request was sent',
     `attempts` INTEGER DEFAULT 0 NOT NULL,
     `response_code` INTEGER COMMENT 'the HTTP code the receiver answered, empty when it never answered',
     `duration_ms` INTEGER COMMENT 'how long the last attempt took, in milliseconds',
@@ -1553,6 +1553,7 @@ CREATE TABLE `webhook_delivery`
     INDEX `idx_webhook_delivery_created_at` (`created_at`),
     INDEX `idx_webhook_delivery_event_created` (`event`, `created_at`),
     INDEX `idx_webhook_delivery_status_created` (`status`, `created_at`),
+    INDEX `idx_webhook_delivery_subscription_status_delivered` (`subscription_id`, `status`, `delivered_at`),
     CONSTRAINT `fk_webhook_delivery_subscription_id`
         FOREIGN KEY (`subscription_id`)
         REFERENCES `webhook_subscription` (`id`)

@@ -193,7 +193,38 @@ final class DeliverWebhookHandlerTest extends IntegrationTestCase
         $this->handler(inline: false)(new DeliverWebhook($delivery->getId()));
 
         self::assertSame(0, $this->requests);
-        self::assertSame(WebhookStatus::DELIVERY_FAILED, $this->reread($delivery)->getStatus());
+        $reread = $this->reread($delivery);
+        self::assertSame(WebhookStatus::DELIVERY_CANCELLED, $reread->getStatus());
+        self::assertSame('Not sent: the subscription is not active.', $reread->getResponseBody());
+    }
+
+    public function testAMessageQueuedBeforeTheSubscriptionWentInErrorIsCancelledWithoutAFifthAttempt(): void
+    {
+        [$subscription, $delivery] = $this->delivery(attempts: 4);
+        $subscription->setStatus(WebhookStatus::SUBSCRIPTION_ERROR)->save($this->getPropelConnection());
+        $this->answerCode = 200;
+
+        $this->handler(inline: false)(new DeliverWebhook($delivery->getId()));
+
+        self::assertSame(0, $this->requests);
+        $reread = $this->reread($delivery);
+        self::assertSame(WebhookStatus::DELIVERY_CANCELLED, $reread->getStatus());
+        self::assertSame(4, $reread->getAttempts());
+        self::assertSame('Not sent: the subscription is in error.', $reread->getResponseBody());
+    }
+
+    public function testAReplayThatFailsIsNotRetriedAndKeepsTheCountOfEveryAttempt(): void
+    {
+        [, $delivery] = $this->delivery(attempts: 1);
+        $delivery->setReplayedAt(new \DateTimeImmutable())->save($this->getPropelConnection());
+        $this->answerCode = 500;
+
+        $this->handler(inline: false)(new DeliverWebhook($delivery->getId()));
+
+        $reread = $this->reread($delivery);
+        self::assertSame(WebhookStatus::DELIVERY_FAILED, $reread->getStatus());
+        self::assertSame(2, $reread->getAttempts());
+        self::assertSame([], $this->dispatched);
     }
 
     public function testADeliveryNotYetVisibleOnAQueueIsLookedForAgainLater(): void

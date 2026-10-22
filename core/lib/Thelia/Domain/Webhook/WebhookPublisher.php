@@ -45,16 +45,35 @@ final readonly class WebhookPublisher
         }
     }
 
+    public function hasSubscriber(string $eventName): bool
+    {
+        try {
+            return $this->catalog->has($eventName) && [] !== $this->subscribersOf($eventName);
+        } catch (\Throwable $exception) {
+            Tlog::getInstance()->error(\sprintf('Webhook "%s" subscribers could not be read: %s', $eventName, $exception::class));
+
+            return false;
+        }
+    }
+
+    /**
+     * @return list<WebhookSubscription>
+     */
+    private function subscribersOf(string $eventName): array
+    {
+        return array_values(array_filter(
+            iterator_to_array(WebhookSubscriptionQuery::create()->filterByStatus(WebhookStatus::SUBSCRIPTION_ACTIVE)->find()),
+            fn (WebhookSubscription $subscription): bool => $this->listensTo($subscription, $eventName),
+        ));
+    }
+
     private function doPublish(string $eventName, ActiveRecordInterface $subject): void
     {
         if (!$this->catalog->has($eventName)) {
             return;
         }
 
-        $subscriptions = array_filter(
-            iterator_to_array(WebhookSubscriptionQuery::create()->filterByStatus(WebhookStatus::SUBSCRIPTION_ACTIVE)->find()),
-            fn (WebhookSubscription $subscription): bool => $this->listensTo($subscription, $eventName),
-        );
+        $subscriptions = $this->subscribersOf($eventName);
 
         if ([] === $subscriptions) {
             return;

@@ -19,6 +19,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Service\CustomerRegistrationService;
 use Thelia\Domain\Webhook\WebhookStatus;
+use Thelia\Model\OrderProductTax;
 use Thelia\Model\WebhookSubscription;
 use Thelia\Model\WebhookSubscriptionQuery;
 use Thelia\Test\ApiTestCase;
@@ -47,7 +48,7 @@ final class WebhookEventsThroughRealPathsTest extends ApiTestCase
             ->setTitle('Real paths')
             ->setUrl('https://hooks.example.com/in')
             ->setSecret(bin2hex(random_bytes(32)))
-            ->setEvents('["customer.created","product.updated"]')
+            ->setEvents('["customer.created","order.created","product.updated"]')
             ->setPayloadMode(WebhookStatus::PAYLOAD_FULL)
             ->setStatus(WebhookStatus::SUBSCRIPTION_ACTIVE)
             ->save();
@@ -95,6 +96,39 @@ final class WebhookEventsThroughRealPathsTest extends ApiTestCase
 
         self::assertSame(['customer.created'], array_column(array_column($this->requests, 'body'), 'type'));
         self::assertSame($customer->getId(), $this->requests[0]['body']['data']['id']);
+    }
+
+    public function testAnOrderCreatedThroughTheAdminApiIsPublishedOnce(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $template = $factory->order($customer);
+        $line = $factory->orderProduct($template);
+        $tax = (new OrderProductTax())
+            ->setOrderProductId($line->getId())
+            ->setTitle('VAT')
+            ->setAmount('2.000000')
+            ->setPromoAmount('2.000000');
+        $tax->save();
+
+        $response = $this->jsonRequest('POST', '/api/admin/orders', [
+            'currencyRate' => 1.0,
+            'postage' => 0.0,
+            'postageTax' => 0.0,
+            'orderProducts' => ['/api/admin/order_products/'.$line->getId()],
+            'cartId' => $template->getCartId(),
+            'customer' => '/api/admin/customers/'.$customer->getId(),
+            'currency' => '/api/admin/currencies/'.$template->getCurrencyId(),
+            'lang' => '/api/admin/languages/'.$template->getLangId(),
+            'orderStatus' => '/api/admin/order_statutes/'.$template->getStatusId(),
+            'paymentModule' => '/api/admin/modules/'.$template->getPaymentModuleId(),
+            'deliveryModule' => '/api/admin/modules/'.$template->getDeliveryModuleId(),
+            'invoiceOrderAddress' => '/api/admin/order_addresses/'.$template->getInvoiceOrderAddressId(),
+            'deliveryOrderAddress' => '/api/admin/order_addresses/'.$template->getDeliveryOrderAddressId(),
+        ], $this->authenticateAsAdmin());
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(['order.created'], array_column(array_column($this->requests, 'body'), 'type'));
     }
 
     public function testAProductWrittenThroughTheAdminApiIsPublished(): void

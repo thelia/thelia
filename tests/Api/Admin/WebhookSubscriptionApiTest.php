@@ -396,4 +396,15 @@ final class WebhookSubscriptionApiTest extends ApiTestCase
     {
         return WebhookSubscriptionQuery::create()->findPk($subscription->getId()) ?? throw new \LogicException('The subscription is gone.');
     }
+
+    public function testTheSecretOperationAnnouncesNoRequestBody(): void
+    {
+        $this->client->request('GET', '/api/docs.jsonopenapi', server: ['HTTP_ACCEPT' => 'application/vnd.openapi+json']);
+        $document = json_decode((string) $this->client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+        $operation = $document['paths']['/api/admin/webhook-subscriptions/{id}/secret']['post'] ?? null;
+
+        self::assertIsArray($operation);
+        self::assertArrayNotHasKey('requestBody', $operation);
+    }
 }

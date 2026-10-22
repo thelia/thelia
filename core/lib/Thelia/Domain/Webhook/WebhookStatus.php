@@ -23,6 +23,7 @@ final class WebhookStatus
     public const string DELIVERY_PENDING = 'pending';
     public const string DELIVERY_SUCCEEDED = 'succeeded';
     public const string DELIVERY_FAILED = 'failed';
+    public const string DELIVERY_CANCELLED = 'cancelled';
 
     public const string PAYLOAD_FULL = 'full';
     public const string PAYLOAD_IDENTIFIERS = 'identifiers';
