@@ -27,7 +27,8 @@ class ContentPublishScheduledCommand extends ContainerAwareCommand
     /**
      * Two runs at once would act on the same rows: the second one waits for nothing and
      * says so. The lock dies with its process, and with a store that honours it, after
-     * this many seconds should the process hang.
+     * this many seconds should the process hang; a pass longer than that keeps it alive
+     * by refreshing it after each batch.
      */
     private const float LOCK_TTL_SECONDS = 600.0;
 
@@ -44,7 +45,8 @@ class ContentPublishScheduledCommand extends ContainerAwareCommand
             ->setHelp(
                 'Run it every few minutes from the scheduler of the server. Each row goes through its publication event, '
                 .'so the caches are purged like after a back-office change. A content with no body in the default language '
-                .'of the shop stays scheduled, is reported, and makes the command exit with 1 so the scheduler can alert.',
+                .'of the shop stays scheduled, is reported, and makes the command exit with 1 so the scheduler can alert; so does '
+                .'a row whose publication event fails, which the next run tries again.',
             )
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what would change, without writing anything')
             ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'How many rows are read at a time', '100');
@@ -64,7 +66,7 @@ class ContentPublishScheduledCommand extends ContainerAwareCommand
         }
 
         try {
-            $report = $this->runner->run($dryRun, $batchSize);
+            $report = $this->runner->run($dryRun, $batchSize, static fn () => $lock->refresh());
         } finally {
             $lock->release();
         }
