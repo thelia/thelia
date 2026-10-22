@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Core\Content\Slot;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,6 +23,7 @@ use Thelia\Core\Content\Slot\ContentSlotLink;
 use Thelia\Core\Content\Slot\ContentSlotResolverInterface;
 use Thelia\Core\Content\Slot\ContentSlotService;
 use Thelia\Core\Content\Slot\NativeContentSlotResolver;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Tools\URL;
 
 /**
@@ -101,6 +103,7 @@ final class ContentSlotServiceTest extends TestCase
         // What the kernel does for every interface it finds under core/lib.
         (new RegisterAutoconfigureAttributesPass())->processClass($container, new \ReflectionClass(ContentSlotResolverInterface::class));
         $container->register(URL::class)->setSynthetic(true);
+        $container->register(ContentFolderPublicationRule::class)->setSynthetic(true);
         $container->register(NativeContentSlotResolver::class)->setAutowired(true)->setAutoconfigured(true);
         $container->register(DefaultPriorityResolver::class)->setAutoconfigured(true);
         $container->register(HighPriorityResolver::class)->setAutoconfigured(true);
@@ -108,6 +111,7 @@ final class ContentSlotServiceTest extends TestCase
         $container->compile();
 
         $container->set(URL::class, $this->createStub(URL::class));
+        $container->set(ContentFolderPublicationRule::class, new ContentFolderPublicationRule(new MockClock()));
 
         /** @var ContentSlotService $service */
         $service = $container->get(ContentSlotService::class);
