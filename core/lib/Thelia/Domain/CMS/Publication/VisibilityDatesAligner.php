@@ -23,6 +23,11 @@ namespace Thelia\Domain\CMS\Publication;
  * Asked from `preSave()` of the content and the folder, on a change of the flag of an
  * existing row, it writes what the service would have written. A row the service
  * schedules (hidden, with a future publication date) is left alone.
+ *
+ * A row turned on ahead of its schedule went online now, not at the date it was
+ * waiting for: the date is brought back to now. Kept as it was, the row hidden again an
+ * hour later would have read as "scheduled" and the command would have put it back
+ * online on the day the schedule named, against the person who hid it.
  */
 final readonly class VisibilityDatesAligner
 {
@@ -33,7 +38,7 @@ final readonly class VisibilityDatesAligner
         $unpublishAt = PublicationMoment::atTheSecondOrNull($row->getUnpublishAt());
 
         if (1 === (int) $row->getVisible()) {
-            if (null === $publishAt) {
+            if (null === $publishAt || $publishAt > $now) {
                 $row->setPublishAt($now);
             }
 
