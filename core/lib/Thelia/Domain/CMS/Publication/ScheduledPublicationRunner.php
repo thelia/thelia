@@ -36,8 +36,10 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * Each row goes through its publication event, so the caches are purged and a module
  * listening to the events sees the change. A content the body guard refuses stays
- * scheduled and is reported, by a dry run as well; the pass goes on with the others. A
- * second pass right after finds nothing left to do.
+ * scheduled and is reported, by a dry run as well; a row whose event fails for any
+ * other reason (a listener of a module, the database) is reported as failed and logged,
+ * and the pass goes on with the others: one bad row must not stop every other row every
+ * time the command runs. A second pass right after finds nothing left to do.
  */
 final readonly class ScheduledPublicationRunner
 {
@@ -51,33 +53,37 @@ final readonly class ScheduledPublicationRunner
     ) {
     }
 
-    public function run(bool $dryRun = false, int $batchSize = 100): ScheduledPublicationReport
+    /**
+     * @param \Closure(): void|null $afterEachBatch called once a batch of rows is done,
+     *                                              for the caller to keep its lock alive
+     */
+    public function run(bool $dryRun = false, int $batchSize = 100, ?\Closure $afterEachBatch = null): ScheduledPublicationReport
     {
         $report = new ScheduledPublicationReport();
         $now = PublicationMoment::atTheSecond($this->clock->now());
 
-        foreach ($this->inBatches(fn (int $afterId) => $this->contentsToPublish($now, $afterId, $batchSize)) as $content) {
-            $this->release(self::CONTENT, $content, $this->publicationOf($content, $now), $dryRun, $report);
+        foreach ($this->inBatches(fn (int $afterId) => $this->contentsToPublish($now, $afterId, $batchSize), $afterEachBatch) as $content) {
+            $this->release(self::CONTENT, $content, PublicationAction::Publish, $now, $dryRun, $report);
         }
 
-        foreach ($this->inBatches(fn (int $afterId) => $this->contentsToUnpublish($now, $afterId, $batchSize)) as $content) {
-            $this->release(self::CONTENT, $content, PublicationRequest::unpublish(self::dateOf($content->getUnpublishAt())), $dryRun, $report);
+        foreach ($this->inBatches(fn (int $afterId) => $this->contentsToUnpublish($now, $afterId, $batchSize), $afterEachBatch) as $content) {
+            $this->release(self::CONTENT, $content, PublicationAction::Unpublish, $now, $dryRun, $report);
         }
 
-        foreach ($this->inBatches(fn (int $afterId) => $this->foldersToPublish($now, $afterId, $batchSize)) as $folder) {
-            $this->release(self::FOLDER, $folder, $this->publicationOf($folder, $now), $dryRun, $report);
+        foreach ($this->inBatches(fn (int $afterId) => $this->foldersToPublish($now, $afterId, $batchSize), $afterEachBatch) as $folder) {
+            $this->release(self::FOLDER, $folder, PublicationAction::Publish, $now, $dryRun, $report);
         }
 
-        foreach ($this->inBatches(fn (int $afterId) => $this->foldersToUnpublish($now, $afterId, $batchSize)) as $folder) {
-            $this->release(self::FOLDER, $folder, PublicationRequest::unpublish(self::dateOf($folder->getUnpublishAt())), $dryRun, $report);
+        foreach ($this->inBatches(fn (int $afterId) => $this->foldersToUnpublish($now, $afterId, $batchSize), $afterEachBatch) as $folder) {
+            $this->release(self::FOLDER, $folder, PublicationAction::Unpublish, $now, $dryRun, $report);
         }
 
         return $report;
     }
 
-    private function release(string $type, Content|Folder $row, PublicationRequest $request, bool $dryRun, ScheduledPublicationReport $report): void
+    private function release(string $type, Content|Folder $row, PublicationAction $action, \DateTimeImmutable $now, bool $dryRun, ScheduledPublicationReport $report): void
     {
-        $state = PublicationAction::Unpublish === $request->action ? PublicationState::Unpublished : PublicationState::Published;
+        $state = PublicationAction::Unpublish === $action ? PublicationState::Unpublished : PublicationState::Published;
 
         if ($dryRun) {
             // The guard runs on the save a real pass would make: a dry run asks it
@@ -96,6 +102,18 @@ final readonly class ScheduledPublicationRunner
         }
 
         try {
+            // The batch was read a moment ago: a schedule cancelled or moved since, by a
+            // back-office user or a module, is not to be acted on from a stale copy.
+            $row->reload();
+
+            if (!$this->isStillDue($row, $action, $now)) {
+                return;
+            }
+
+            $request = PublicationAction::Unpublish === $action
+                ? PublicationRequest::unpublish(self::dateOf($row->getUnpublishAt()))
+                : $this->publicationOf($row, $now);
+
             if ($row instanceof Content) {
                 $this->dispatcher->dispatch(new ContentUpdatePublicationEvent($row, $request), TheliaEvents::CONTENT_UPDATE_PUBLICATION);
             } else {
@@ -108,7 +126,27 @@ final readonly class ScheduledPublicationRunner
             // An error, not a warning: a publication that was promised did not happen, and
             // the default level of the log only keeps errors.
             Tlog::getInstance()->error(\sprintf('Scheduled publication of %s #%d refused: %s', $type, $row->getId(), $exception->getMessage()));
+        } catch (\Throwable $throwable) {
+            $report->failed($type, (int) $row->getId(), $throwable->getMessage());
+            Tlog::getInstance()->error(\sprintf('Scheduled publication of %s #%d failed: %s', $type, $row->getId(), $throwable->getMessage()));
         }
+    }
+
+    /**
+     * Whether the row, read again, still asks for the gesture the batch selected it for.
+     */
+    private function isStillDue(Content|Folder $row, PublicationAction $action, \DateTimeImmutable $now): bool
+    {
+        $publishAt = self::dateOf($row->getPublishAt());
+        $unpublishAt = self::dateOf($row->getUnpublishAt());
+
+        if (PublicationAction::Unpublish === $action) {
+            return 1 === (int) $row->getVisible() && null !== $unpublishAt && $unpublishAt <= $now;
+        }
+
+        return 1 !== (int) $row->getVisible()
+            && null !== $publishAt && $publishAt <= $now
+            && (null === $unpublishAt || $unpublishAt > $now);
     }
 
     /**
@@ -127,10 +165,11 @@ final readonly class ScheduledPublicationRunner
      * @template T of Content|Folder
      *
      * @param \Closure(int): iterable<T> $batch
+     * @param \Closure(): void|null      $afterEachBatch
      *
      * @return iterable<T>
      */
-    private function inBatches(\Closure $batch): iterable
+    private function inBatches(\Closure $batch, ?\Closure $afterEachBatch): iterable
     {
         $afterId = 0;
 
@@ -142,6 +181,10 @@ final readonly class ScheduledPublicationRunner
                 $afterId = (int) $row->getId();
 
                 yield $row;
+            }
+
+            if ($count > 0 && null !== $afterEachBatch) {
+                $afterEachBatch();
             }
         } while ($count > 0);
     }
