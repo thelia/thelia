@@ -70,9 +70,16 @@ content created visible is not checked, nor are the other languages; a back offi
 
 Whichever path writes `visible` on an existing row, the dates are kept in step with it (`VisibilityDatesAligner`,
 also asked from `preSave()`): a row taken offline by the old toggle or update events, the admin API or a module gets
-`unpublish_at = now` unless a schedule carries it, a row turned on gets its `publish_at` and forgets a past withdrawal.
-The state read from the row is therefore always the one the flag says, and the scheduled command never puts back
-online a row somebody hid.
+`unpublish_at = now` unless a schedule carries it, a row turned on gets `publish_at = now` when it had none or was
+still waiting for a later date, and forgets a past withdrawal. The state read from the row is therefore always the
+one the flag says, and the scheduled command never puts back online a row somebody hid, nor a row turned on ahead
+of its schedule and hidden again.
+
+Every date a content or a folder stores goes through `PublicationMoment` in the setters of the models
+(`setPublishAt()`, `setUnpublishAt()`), whoever calls them: it is brought to the timezone of PHP, the one every
+"now" of the publication is read in, and cut at the second, since a `DATETIME` column keeps neither a zone nor a
+fraction and MySQL rounds a fraction up where MariaDB truncates it. A date sent to the admin API as
+`2026-12-01T09:00:00.700+02:00` is stored as `2026-12-01 08:00:00` on a shop whose PHP runs on Paris time in winter.
 
 `EmptyBodyDetector` decides: tags, `<style>` and `<script>` blocks, entities, non-breaking and zero-width spaces are
 nothing to show; an image, a video, an embedded frame on its own is a body. The exception is translated for the
@@ -85,15 +92,29 @@ save of the same instance does not put it online after all.
   a content whose default folder is a draft or is still scheduled is not on the shop. A folder taken offline keeps
   the behaviour an invisible folder always had, its contents stay reachable by their own url.
   `ContentFolderPublicationRule::outsideAnUnreleasedFolderClause()` is the SQL clause both readers share.
+- The `content` and `associated_content` loops apply the same rule when they list the visible rows (`visible`
+  left to its default, or set to `1`): a visible content held by a default folder not online yet is not listed, since
+  its page answers 404. Asked for the hidden rows or for every row (`visible="*"`), they read every row as before.
+- The core content slots (`NativeContentSlotResolver`) link a content only when the shop shows it, and the footer
+  is empty while the information folder is not visible.
 - `/api/front/contents` and `/api/front/folders` serve published rows only, under the same folder rule, whatever
-  `visible` filter the caller passes; `/api/front/content_folders` serves the links of those contents only. The admin endpoints read every state: `publicationState` (read only) and
-  `publishAt`, `unpublishAt` (writable) are on both resources; a withdrawal before the publication, or an empty
+  `visible` filter the caller passes. What hangs from a content follows it (`ContentPublicationExtension`):
+  `/api/front/content_folders`, `/api/front/content_images` and `/api/front/content_documents` with their `/file`
+  routes, `/api/front/product_associated_contents` answer 404 or leave out what belongs to a content the shop does
+  not show. The relations a front read serializes are pruned the same way (`ContentPublicationLinksListener`, one
+  query per resource that carries links): `contentFolders` of a folder names the contents the shop shows, `contentFolders`
+  of a content names the folders online, `productAssociatedContents` of a product names the contents the shop shows.
+  A front read carries `publicationState`, which is always `published` there, and not the dates: when a row went
+  online or goes offline is the back office's. The admin endpoints read every state: `publicationState` (read only)
+  and `publishAt`, `unpublishAt` (writable) are on both resources; a withdrawal before the publication, or an empty
   content put online, answers 422.
 
 ## Preview
 
 `GET /preview/{type}/{id}` (`content` or `folder`, route `publication_preview`) renders the page whatever the state.
-A signed-in administrator reaches it as it is. Anyone else needs the signed link the back office hands out:
+A signed-in administrator reaches it as it is when the back office would show the row: the `VIEW` access on
+`AdminResources::CONTENT` for a content, on `AdminResources::FOLDER` for a folder. An administrator without that
+access is a visitor here, and so is anyone else: they need the signed link the back office hands out:
 
 ```php
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
@@ -109,8 +130,9 @@ with the rest of the link, and the kernel applies it to the session as it does f
 (`LangService::handleLang()`); a link naming a language the shop does not have answers 404. Without it the page renders in the language of the session, as the public page does.
 
 A link with no signature answers 404, so the route gives nothing away; an altered or expired link answers the same
-403; signatures are tried under the `publication_preview_per_client` limit (60 an hour per address), which an
-administrator does not spend. A row that does not exist answers 404 once the caller is allowed to ask.
+403, a link whose language was changed or added too, since the language is signed with the rest; signatures are
+tried under the `publication_preview_per_client` limit (60 an hour per address), which an allowed administrator
+does not spend. A row that does not exist answers 404 once the caller is allowed to ask.
 
 The request carries the attribute `_publication_preview` (`['type' => 'content', 'id' => 12, 'locale' => 'fr_FR']`,
 `locale` null when the link named none), which a theme reads
@@ -128,10 +150,15 @@ php bin/console content:publish-scheduled --batch-size=500
 
 It puts online the rows scheduled for a moment now past (the date waited for is the publication date) and takes
 offline the published rows whose withdrawal date is past, contents and folders alike. A window that closed while
-nothing ran is over, not opened. Each row goes through its publication event, so the caches are purged and a module
-listening sees the change. A content the body guard refuses stays scheduled, is reported (by a dry run as well, which asks the guard itself),
-logged as an error, and makes the command exit with 1 so the scheduler can alert; the pass goes on with the others. A second pass finds nothing left to
-do. Two runs at once are kept apart by a lock (`framework.lock`, `LOCK_DSN`).
+nothing ran is over, not opened. Each row is read again right before it is written, so a schedule cancelled or moved
+since the batch was read is left alone, then goes through its publication event, so the caches are purged and a
+module listening sees the change. A content the body guard refuses stays scheduled, is reported (by a dry run as
+well, which asks the guard itself) as `content #12 left as it is: …`, logged as an error, and makes the command exit
+with 1 so the scheduler can alert; a row whose event breaks for any other reason (a listener of a module, the
+database) keeps its state, is reported as `content #12 failed: …`, logged as an error, makes the command exit with 1
+too, and is tried again by the next run. In both cases the pass goes on with the others. A second pass finds nothing
+left to do. Two runs at once are kept apart by a lock (`framework.lock`, `LOCK_DSN`), refreshed after each batch so
+a long pass keeps it.
 
 Nothing runs it automatically: schedule it every few minutes alongside `sale:check-activation`. A shop that does not
 run it sees its overdue rows (`PublicationStatus::isOverdue()`), which the back office reports on its dashboard;
