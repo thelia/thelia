@@ -21,6 +21,7 @@ use Thelia\Core\Event\Content\ContentUpdatePublicationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\CMS\Publication\PublicationService;
 use Thelia\Domain\CMS\Publication\PublicationState;
+use Thelia\Domain\CMS\Publication\ScheduledPublicationRunner;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
@@ -173,6 +174,87 @@ final class ContentPublishScheduledCommandTest extends IntegrationTestCase
         }
 
         self::assertContains((int) $due->getId(), $seen);
+    }
+
+    public function testARowWhoseEventFailsIsReportedAndThePassGoesOnWithTheOthers(): void
+    {
+        $first = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        $broken = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        $last = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        $dueFolder = $this->scheduledFolder('-1 hour');
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        // A listener of a module, run before the core (at 128) writes anything, breaks on one row.
+        $listener = static function (ContentUpdatePublicationEvent $event) use ($broken): void {
+            if ((int) $event->getContent()?->getId() === (int) $broken->getId()) {
+                throw new \RuntimeException('A module broke on this content');
+            }
+        };
+        $dispatcher->addListener(TheliaEvents::CONTENT_UPDATE_PUBLICATION, $listener, 200);
+
+        ConfigQuery::initCache([Tlog::VAR_DESTINATIONS => CollectingTlogDestination::class, Tlog::VAR_LEVEL => (string) Tlog::DEFAULT_LEVEL]);
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+        CollectingTlogDestination::$lines = [];
+
+        try {
+            $tester = $this->runTheCommand();
+            $lines = CollectingTlogDestination::$lines;
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::CONTENT_UPDATE_PUBLICATION, $listener);
+            ConfigQuery::resetCache();
+            (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+            CollectingTlogDestination::$lines = [];
+        }
+
+        self::assertSame(1, $tester->getStatusCode(), 'the scheduler is told something was left behind');
+        self::assertSame(PublicationState::Published, $this->stateOf($first));
+        self::assertSame(PublicationState::Scheduled, $this->stateOf($broken), 'the broken row keeps its state for the next pass');
+        self::assertSame(PublicationState::Published, $this->stateOf($last), 'the rows after the broken one are still processed');
+        self::assertSame(PublicationState::Published, $this->stateOf($dueFolder), 'and so are the folders');
+        self::assertStringContainsString(\sprintf('content #%d failed: A module broke on this content', $broken->getId()), $tester->getDisplay());
+
+        $failures = array_values(array_filter($lines, static fn (string $line): bool => str_contains($line, \sprintf('Scheduled publication of content #%d failed', $broken->getId()))));
+        self::assertCount(1, $failures, implode("\n", $lines));
+        self::assertStringContainsString('ERROR', $failures[0]);
+    }
+
+    public function testAScheduleCancelledSinceTheBatchWasReadIsNotActedOn(): void
+    {
+        $first = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        $cancelledMeanwhile = $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        // While the first row of the batch is being published, somebody cancels the
+        // schedule of the second one: the batch in memory still says it is due.
+        $listener = static function (ContentUpdatePublicationEvent $event) use ($first, $cancelledMeanwhile): void {
+            if ((int) $event->getContent()?->getId() === (int) $first->getId()) {
+                ContentQuery::create()->findPk($cancelledMeanwhile->getId())->setPublishAt(null)->save();
+            }
+        };
+        $dispatcher->addListener(TheliaEvents::CONTENT_UPDATE_PUBLICATION, $listener, 200);
+
+        try {
+            $tester = $this->runTheCommand();
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::CONTENT_UPDATE_PUBLICATION, $listener);
+        }
+
+        self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertSame(PublicationState::Published, $this->stateOf($first));
+        self::assertSame(PublicationState::Draft, $this->stateOf($cancelledMeanwhile), 'the row is read again before it is written');
+        self::assertStringNotContainsString(\sprintf('content #%d', $cancelledMeanwhile->getId()), $tester->getDisplay());
+    }
+
+    public function testTheCallerIsToldAfterEachBatchSoItCanKeepItsLockAlive(): void
+    {
+        for ($index = 0; $index < 5; ++$index) {
+            $this->scheduledContent('-1 hour', '<p>Ready</p>');
+        }
+        $batchesDone = 0;
+
+        $this->getService(ScheduledPublicationRunner::class)->run(batchSize: 2, afterEachBatch: static function () use (&$batchesDone): void {
+            ++$batchesDone;
+        });
+
+        self::assertSame(3, $batchesDone, 'five rows in batches of two: three batches, the empty read after the last one not counted');
     }
 
     public function testTheRowsAreReadInBatchesWithoutSkippingAny(): void
