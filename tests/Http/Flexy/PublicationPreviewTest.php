@@ -18,6 +18,8 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreviewLinkGenerator;
 use Thelia\Model\Content;
@@ -28,8 +30,9 @@ use Thelia\Tests\Support\BackOffice\AdminSessionInjector;
 
 /**
  * A draft is not on the shop, and is shown by its signed preview link, to an
- * administrator without one, and to nobody else. The preview answer is kept out of the
- * caches and the indexes; the public page of a published content is served as before.
+ * administrator allowed to view the contents without one, and to nobody else. The
+ * preview answer is kept out of the caches and the indexes; the public page of a
+ * published content is served as before.
  */
 final class PublicationPreviewTest extends WebIntegrationTestCase
 {
@@ -98,6 +101,21 @@ final class PublicationPreviewTest extends WebIntegrationTestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('noindex, nofollow', $response->headers->get('X-Robots-Tag'));
+        self::assertTrue($response->headers->hasCacheControlDirective('no-store'));
+    }
+
+    public function testALinkWhoseLanguageIsAlteredOrAddedAnswersForbidden(): void
+    {
+        $draft = $this->draftContent('flexy-preview-language-altered.html');
+
+        $this->client->request('GET', str_replace('locale=en_US', 'locale=fr_FR', $this->signedUrl('content', (int) $draft->getId(), 'en_US')));
+        $altered = $this->client->getResponse();
+
+        $this->client->request('GET', $this->signedUrl('content', (int) $draft->getId()).'&locale=fr_FR');
+        $added = $this->client->getResponse();
+
+        self::assertSame(403, $altered->getStatusCode(), 'the language is signed with the rest of the link');
+        self::assertSame(403, $added->getStatusCode());
     }
 
     public function testTheLinkNamesTheLanguageThePageIsPreviewedIn(): void
@@ -184,6 +202,39 @@ final class PublicationPreviewTest extends WebIntegrationTestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($response->headers->hasCacheControlDirective('no-store'));
+    }
+
+    public function testAnAdministratorAllowedToViewTheContentsNeedsNoSignatureForAContent(): void
+    {
+        $draft = $this->draftContent('flexy-preview-content-right.html');
+        $folder = $this->fixtures()->folder(0, ['visible' => 0]);
+        $this->adminInjector?->setAdmin($this->fixtures()->restrictedAdmin([AdminResources::CONTENT => [AccessManager::VIEW]]));
+
+        $this->client->request('GET', '/preview/content/'.$draft->getId());
+        $content = $this->client->getResponse();
+
+        $this->client->request('GET', '/preview/folder/'.$folder->getId());
+        $folderPreview = $this->client->getResponse();
+
+        self::assertSame(200, $content->getStatusCode());
+        self::assertSame(404, $folderPreview->getStatusCode(), 'a folder asks for the right on the folders');
+    }
+
+    public function testAnAdministratorWithoutTheRightToViewTheContentsIsTreatedAsAVisitor(): void
+    {
+        $draft = $this->draftContent('flexy-preview-no-right.html');
+        $this->adminInjector?->setAdmin($this->fixtures()->restrictedAdmin([AdminResources::FOLDER => [AccessManager::VIEW]]));
+
+        $this->client->request('GET', '/preview/content/'.$draft->getId());
+        $withoutSignature = $this->client->getResponse();
+
+        $this->client->request('GET', $this->signedUrl('content', (int) $draft->getId()));
+        $signed = $this->client->getResponse();
+
+        self::assertSame(404, $withoutSignature->getStatusCode(), 'the session opens nothing the right does not');
+        self::assertSame(200, $signed->getStatusCode(), 'the signed link is served as to anyone');
+        self::assertTrue($signed->headers->hasCacheControlDirective('no-store'));
+        self::assertSame('noindex, nofollow', $signed->headers->get('X-Robots-Tag'));
     }
 
     public function testARowThatDoesNotExistAnswersNotFoundEvenWithAValidSignature(): void
