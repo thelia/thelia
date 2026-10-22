@@ -39,11 +39,13 @@ final readonly class PublicationMoment
 
     /**
      * @param string|int|\DateTimeInterface|null $moment an integer is a Unix timestamp, as
-     *                                                   the Propel setters accept one
+     *                                                   the Propel setters accept one; an
+     *                                                   empty string is no date, as for them,
+     *                                                   not the "now" PHP would read it as
      */
     public static function atTheSecondOrNull(string|int|\DateTimeInterface|null $moment): ?\DateTimeImmutable
     {
-        if (null === $moment) {
+        if (null === $moment || '' === $moment) {
             return null;
         }
 
