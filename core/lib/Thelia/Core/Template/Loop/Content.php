@@ -16,6 +16,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\Clock\Clock;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -24,6 +25,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Model\Content as ContentModel;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
@@ -59,6 +61,17 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     protected $timestampable = true;
     protected $versionable = true;
+
+    protected readonly ContentFolderPublicationRule $folderPublicationRule;
+
+    /**
+     * Optional so that a loop of a module extending this one, declared in its
+     * `config.xml` and built with `new` rather than by the container, keeps working.
+     */
+    public function __construct(?ContentFolderPublicationRule $folderPublicationRule = null)
+    {
+        $this->folderPublicationRule = $folderPublicationRule ?? new ContentFolderPublicationRule(Clock::get());
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -186,6 +199,14 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if (BooleanOrBothType::ANY !== $visible) {
             $search->filterByVisible($visible ? 1 : 0);
+
+            // The visible contents are the ones the shop shows, and a content whose default
+            // folder is not online yet is not shown, whatever its own flag: listing it would
+            // hand out a title and a link that answers 404. The hidden ones and "any", asked
+            // by a back office or a module to see every row, are left as they are.
+            if ($visible) {
+                $search->where($this->folderPublicationRule->outsideAnUnreleasedFolderClause(ContentTableMap::COL_ID));
+            }
         }
 
         $title = $this->getTitle();

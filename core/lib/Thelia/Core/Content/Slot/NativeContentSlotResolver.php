@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Core\Content\Slot;
 
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Map\ContentTableMap;
 use Thelia\Tools\I18n;
 use Thelia\Tools\URL;
 
@@ -32,8 +34,11 @@ use Thelia\Tools\URL;
  *   hidden is skipped, and so is anything that is not a reference. A folder comes without
  *   children: a theme builds its menu from the folder id.
  * - footer_links: the visible contents of the folder named by `information_folder_id`, in
- *   their position in that folder.
+ *   their position in that folder, when that folder is online.
  * - consent.<code>: the content the consent links to, when it exists and is visible.
+ *
+ * A content is linked only when the shop shows it: visible, and not held by a default
+ * folder that is a draft or still waiting for its date, since its page would answer 404.
  *
  * Every other code is left to the other resolvers.
  */
@@ -47,6 +52,7 @@ final readonly class NativeContentSlotResolver implements ContentSlotResolverInt
 
     public function __construct(
         private URL $url,
+        private ContentFolderPublicationRule $folderPublicationRule,
     ) {
     }
 
@@ -102,8 +108,13 @@ final readonly class NativeContentSlotResolver implements ContentSlotResolverInt
             return [];
         }
 
-        $contents = ContentQuery::create()
-            ->filterByVisible(1)
+        // The folder is the one the shop reads the footer from: a draft, or a folder
+        // taken offline, has no footer to give yet.
+        if (!FolderQuery::create()->filterById((int) $folderId)->filterByVisible(1)->exists()) {
+            return [];
+        }
+
+        $contents = $this->shownContents()
             ->useContentFolderQuery()
                 ->filterByFolderId((int) $folderId)
                 ->orderByPosition()
@@ -146,9 +157,19 @@ final readonly class NativeContentSlotResolver implements ContentSlotResolverInt
 
     private function contentLink(int $contentId, string $locale): ?ContentSlotLink
     {
-        $visible = ContentQuery::create()->filterById($contentId)->filterByVisible(1)->exists();
+        $shown = $this->shownContents()->filterById($contentId)->exists();
 
-        return $visible ? $this->linkTo('content', $contentId, $locale) : null;
+        return $shown ? $this->linkTo('content', $contentId, $locale) : null;
+    }
+
+    /**
+     * The contents the shop shows: visible, and outside a default folder not online yet.
+     */
+    private function shownContents(): ContentQuery
+    {
+        return ContentQuery::create()
+            ->filterByVisible(1)
+            ->where($this->folderPublicationRule->outsideAnUnreleasedFolderClause(ContentTableMap::COL_ID));
     }
 
     /**
