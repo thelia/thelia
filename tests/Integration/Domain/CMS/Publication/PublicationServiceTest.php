@@ -46,7 +46,8 @@ final class PublicationServiceTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $this->clock = new MockClock(self::NOW);
+        // In the timezone of PHP, as the clock of the shop is; a mock clock would otherwise tick in UTC.
+        $this->clock = new MockClock(self::NOW, date_default_timezone_get());
         $this->service = new PublicationService($this->clock);
         $this->factory = $this->createFixtureFactory();
     }
