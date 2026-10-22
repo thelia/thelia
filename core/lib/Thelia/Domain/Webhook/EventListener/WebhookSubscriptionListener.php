@@ -147,7 +147,7 @@ final readonly class WebhookSubscriptionListener
         $claimed = WebhookDeliveryQuery::create()
             ->filterById($delivery->getId())
             ->filterByStatus(WebhookStatus::DELIVERY_FAILED)
-            ->update(['Status' => WebhookStatus::DELIVERY_PENDING, 'Attempts' => 0, 'ReplayedAt' => date('Y-m-d H:i:s')]);
+            ->update(['Status' => WebhookStatus::DELIVERY_PENDING, 'ReplayedAt' => date('Y-m-d H:i:s')]);
 
         if (0 === $claimed) {
             throw new \LogicException($this->translate('This delivery is already being replayed.'));

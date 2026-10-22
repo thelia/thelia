@@ -17,6 +17,7 @@ namespace Thelia\Domain\Webhook\EventListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Resource\Customer as CustomerResource;
+use Thelia\Api\Resource\Order as OrderResource;
 use Thelia\Api\Resource\Product as ProductResource;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
@@ -103,8 +104,8 @@ readonly class PublishWebhookEventsListener
     }
 
     /**
-     * The API saves the model without going through the actions: a customer it creates
-     * and a product it writes are published from here. It has no state from before the
+     * The API saves the model without going through the actions: a customer or an order it
+     * creates and a product it writes are published from here. It has no state from before the
      * write to compare with, so a product written through the API is published even
      * when the write changed nothing.
      */
@@ -120,6 +121,10 @@ readonly class PublishWebhookEventsListener
                 $this->publisher->publish('customer.created', $event->getModel());
             }
 
+            if (OrderResource::class === $event->getResourceClass() && $event->isCreate()) {
+                $this->publisher->publish('order.created', $event->getModel());
+            }
+
             if (ProductResource::class === $event->getResourceClass() && !$event->isCreate()) {
                 $this->publisher->publish('product.updated', $event->getModel());
             }
@@ -130,6 +135,10 @@ readonly class PublishWebhookEventsListener
     public function rememberProductBeforeUpdate(ProductUpdateEvent $event): void
     {
         $this->safely(function () use ($event): void {
+            if (!$this->publisher->hasSubscriber('product.updated')) {
+                return;
+            }
+
             $this->productBeforeUpdate[$event] = $this->productFingerprint->of((int) $event->getProductId(), $event->getLocale());
         });
     }

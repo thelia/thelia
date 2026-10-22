@@ -48,6 +48,9 @@ final class WebhookUrlValidatorTest extends TestCase
         yield 'ipv4 mapped private' => ['https://[::ffff:10.0.0.1]/hook'];
         yield 'nat64 loopback' => ['https://[64:ff9b::7f00:1]/hook'];
         yield '6to4 loopback' => ['https://[2002:7f00:1::1]/hook'];
+        yield 'ipv6 site local' => ['https://[fec0::1]/hook'];
+        yield 'ipv6 discard only' => ['https://[100::1]/hook'];
+        yield 'ipv4 translated private' => ['https://[::ffff:0:a00:1]/hook'];
         yield 'internal suffix' => ['https://db.internal/hook'];
         yield 'local suffix' => ['https://printer.local/hook'];
         yield 'credentials in the url' => ['https://user:pass@example.com/hook'];
@@ -58,6 +61,22 @@ final class WebhookUrlValidatorTest extends TestCase
         yield 'empty' => [''];
         yield 'port zero' => ['https://example.com:0/hook'];
         yield 'control character' => ["https://example.com/ho\nok"];
+        yield 'a sentence' => ['not a url'];
+        yield 'a space in the path' => ['https://example.com/ho ok'];
+    }
+
+    public function testTheMessageNamesWhatIsWrongWithTheAddress(): void
+    {
+        $validator = new WebhookUrlValidator();
+
+        foreach (['' => 'The address is empty.', 'not a url' => 'The address contains a space or a control character.', 'example.com/hook' => 'The address must be an absolute URL.'] as $url => $message) {
+            try {
+                $validator->validate((string) $url);
+                self::fail('"'.$url.'" was accepted.');
+            } catch (InvalidWebhookUrlException $exception) {
+                self::assertSame($message, $exception->getMessage(), '"'.$url.'"');
+            }
+        }
     }
 
     #[DataProvider('refusedUrls')]

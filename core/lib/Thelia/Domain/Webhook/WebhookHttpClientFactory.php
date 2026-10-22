@@ -16,6 +16,7 @@ namespace Thelia\Domain\Webhook;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class WebhookHttpClientFactory
@@ -26,8 +27,8 @@ final class WebhookHttpClientFactory
         'max_duration' => 10,
     ];
 
-    public static function create(): HttpClientInterface
+    public static function create(?array $privateSubnets = null): HttpClientInterface
     {
-        return new NoPrivateNetworkHttpClient(HttpClient::create(self::OPTIONS));
+        return (new NoPrivateNetworkHttpClient(HttpClient::create(), $privateSubnets ?? [...IpUtils::PRIVATE_SUBNETS, ...WebhookUrlValidator::NON_ROUTABLE]))->withOptions(self::OPTIONS);
     }
 }

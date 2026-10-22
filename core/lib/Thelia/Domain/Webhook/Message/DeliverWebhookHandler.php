@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Thelia\Domain\Webhook\WebhookDeliverer;
+use Thelia\Domain\Webhook\WebhookDeliveryTransport;
 use Thelia\Domain\Webhook\WebhookRetryPolicy;
 use Thelia\Domain\Webhook\WebhookStatus;
 use Thelia\Model\WebhookDeliveryQuery;
@@ -39,7 +40,7 @@ final readonly class DeliverWebhookHandler
         #[\SensitiveParameter]
         string $jobDsn,
     ) {
-        $this->runsInline = str_starts_with($jobDsn, 'sync://');
+        $this->runsInline = WebhookDeliveryTransport::isInline($jobDsn);
     }
 
     public function __invoke(DeliverWebhook $message): void
@@ -59,7 +60,10 @@ final readonly class DeliverWebhookHandler
         $subscription = $delivery->getWebhookSubscription();
 
         if (null === $subscription || WebhookStatus::SUBSCRIPTION_ACTIVE !== $subscription->getStatus()) {
-            $delivery->setStatus(WebhookStatus::DELIVERY_FAILED)->setResponseBody('The subscription is not active.')->save();
+            $delivery
+                ->setStatus(WebhookStatus::DELIVERY_CANCELLED)
+                ->setResponseBody(WebhookStatus::SUBSCRIPTION_ERROR === $subscription?->getStatus() ? 'Not sent: the subscription is in error.' : 'Not sent: the subscription is not active.')
+                ->save();
 
             return;
         }
@@ -70,7 +74,7 @@ final readonly class DeliverWebhookHandler
 
         $attempt = $delivery->getAttempts();
 
-        if (!$this->runsInline && $this->retryPolicy->shouldRetry($attempt)) {
+        if (!$this->runsInline && null === $delivery->getReplayedAt() && $this->retryPolicy->shouldRetry($attempt)) {
             $this->bus->dispatch(new DeliverWebhook($message->deliveryId), [new DelayStamp(($this->retryPolicy->delayAfter($attempt) ?? 0) * 1000)]);
 
             return;

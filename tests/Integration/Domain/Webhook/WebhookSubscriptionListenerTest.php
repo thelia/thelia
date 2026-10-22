@@ -229,7 +229,7 @@ final class WebhookSubscriptionListenerTest extends IntegrationTestCase
 
         $stored = $this->rereadDelivery($delivery);
         self::assertSame(WebhookStatus::DELIVERY_PENDING, $stored->getStatus());
-        self::assertSame(0, $stored->getAttempts());
+        self::assertSame(5, $stored->getAttempts(), 'The attempts already made stay counted.');
         self::assertNotNull($stored->getReplayedAt());
         self::assertCount(1, $this->dispatched);
         self::assertEquals(new DeliverWebhook($delivery->getId()), $this->dispatched[0]->getMessage());

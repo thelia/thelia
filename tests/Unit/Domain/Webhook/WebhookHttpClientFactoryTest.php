@@ -16,7 +16,6 @@ namespace Thelia\Tests\Unit\Domain\Webhook;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Thelia\Domain\Webhook\WebhookHttpClientFactory;
 
@@ -27,6 +26,9 @@ final class WebhookHttpClientFactoryTest extends TestCase
     {
         yield 'loopback address' => ['http://127.0.0.1:9/hook'];
         yield 'name that resolves to loopback' => ['http://localhost:9/hook'];
+        yield 'site local ipv6' => ['http://[fec0::1]:9/hook'];
+        yield 'ipv4 translated private' => ['http://[::ffff:0:a00:1]:9/hook'];
+        yield 'benchmarking range' => ['http://198.18.0.1:9/hook'];
     }
 
     #[DataProvider('privateTargets')]
@@ -42,33 +44,74 @@ final class WebhookHttpClientFactoryTest extends TestCase
 
     public function testARedirectIsNotFollowed(): void
     {
-        $directory = sys_get_temp_dir().'/webhook-redirect-'.bin2hex(random_bytes(4));
-        mkdir($directory);
-        $marker = $directory.'/second-was-called';
-        file_put_contents($directory.'/router.php', '<?php
-            if ("/first" === parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)) { header("Location: /second", true, 302); return; }
+        $marker = $this->directory().'/second-was-called';
+        $port = $this->serve('
+            if ("/first" === parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)) { header("Location: /second", true, 307); return; }
             file_put_contents('.var_export($marker, true).', "yes");
         ');
+
+        $status = WebhookHttpClientFactory::create(self::PUBLIC_ONLY)->request('POST', 'http://127.0.0.1:'.$port.'/first', ['body' => '{}'])->getStatusCode();
+
+        self::assertSame(307, $status);
+        self::assertFileDoesNotExist($marker, 'The redirect was followed.');
+    }
+
+    public function testAReceiverThatStaysSilentIsGivenUpOn(): void
+    {
+        $port = $this->serve('sleep(8);');
+
+        $started = microtime(true);
+
+        try {
+            WebhookHttpClientFactory::create(self::PUBLIC_ONLY)->request('POST', 'http://127.0.0.1:'.$port.'/slow', ['body' => '{}'])->getStatusCode();
+            self::fail('The client waited for a receiver that never answered.');
+        } catch (TransportExceptionInterface) {
+            self::assertLessThan(7, microtime(true) - $started);
+        }
+    }
+
+    private const array PUBLIC_ONLY = ['10.0.0.0/8'];
+
+    /** @var list<resource> */
+    private array $servers = [];
+
+    private ?string $directory = null;
+
+    protected function tearDown(): void
+    {
+        foreach ($this->servers as $server) {
+            proc_terminate($server);
+            proc_close($server);
+        }
+
+        if (null !== $this->directory) {
+            array_map('unlink', glob($this->directory.'/*') ?: []);
+            @rmdir($this->directory);
+        }
+    }
+
+    private function directory(): string
+    {
+        if (null === $this->directory) {
+            $this->directory = sys_get_temp_dir().'/webhook-client-'.bin2hex(random_bytes(4));
+            mkdir($this->directory);
+        }
+
+        return $this->directory;
+    }
+
+    private function serve(string $routerBody): int
+    {
+        file_put_contents($this->directory().'/router.php', '<?php '.$routerBody);
         $socket = stream_socket_server('tcp://127.0.0.1:0', $errorCode, $errorMessage);
         $port = (int) substr(strrchr((string) stream_socket_get_name($socket, false), ':'), 1);
         fclose($socket);
-        $server = proc_open([\PHP_BINARY, '-S', '127.0.0.1:'.$port, $directory.'/router.php'], [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $pipes);
+        $this->servers[] = proc_open([\PHP_BINARY, '-S', '127.0.0.1:'.$port, $this->directory().'/router.php'], [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $pipes);
 
-        try {
-            for ($try = 0; $try < 50 && !@fsockopen('127.0.0.1', $port); ++$try) {
-                usleep(100_000);
-            }
-
-            $status = HttpClient::create(WebhookHttpClientFactory::OPTIONS)->request('POST', 'http://127.0.0.1:'.$port.'/first', ['body' => '{}'])->getStatusCode();
-
-            self::assertSame(302, $status);
-            self::assertFileDoesNotExist($marker, 'The redirect was followed.');
-        } finally {
-            proc_terminate($server);
-            proc_close($server);
-            @unlink($marker);
-            @unlink($directory.'/router.php');
-            @rmdir($directory);
+        for ($try = 0; $try < 50 && !@fsockopen('127.0.0.1', $port); ++$try) {
+            usleep(100_000);
         }
+
+        return $port;
     }
 }

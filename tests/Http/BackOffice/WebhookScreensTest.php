@@ -137,6 +137,15 @@ final class WebhookScreensTest extends WebIntegrationTestCase
         self::assertStringContainsString('ERP', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testTheListWarnsWhenNoMessageQueueIsConfigured(): void
+    {
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders(self::LIST_URL);
+
+        self::assertCount(1, $this->client->getCrawler()->filter('[data-testid="webhook-inline-banner"]'));
+    }
+
     public function testAnAddressOnAPrivateNetworkIsRefusedByTheServer(): void
     {
         $this->loginAs($this->factory()->admin());
@@ -341,6 +350,56 @@ final class WebhookScreensTest extends WebIntegrationTestCase
         $this->client->submit($this->client->getCrawler()->filter('form[action$="/webhooks/save"]')->form());
 
         self::assertSame(WebhookStatus::SUBSCRIPTION_ERROR, WebhookSubscriptionQuery::create()->findPk($subscription->getId())?->getStatus());
+    }
+
+    public function testAFormThatNamesAnotherSubscriptionThanThePageChangesNeither(): void
+    {
+        $page = $this->subscription('Page one');
+        $other = $this->subscription('Other one');
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders(self::LIST_URL.'/update/'.$page->getId());
+        $form = $this->client->getCrawler()->filter('form[action$="/webhooks/save"]')->form();
+        $values = $form->getPhpValues();
+        $values['thelia_webhook_update']['title'] = 'Renamed';
+        $values['thelia_webhook_update']['id'] = (string) $other->getId();
+        $this->client->request('POST', $form->getUri(), $values);
+        $this->client->followRedirect();
+
+        self::assertSame('Page one', WebhookSubscriptionQuery::create()->findPk($page->getId())?->getTitle());
+        self::assertSame('Other one', WebhookSubscriptionQuery::create()->findPk($other->getId())?->getTitle());
+        self::assertStringContainsString('is not the one of the page', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testAStateThatOnlyTheCoreMayWriteIsRefusedWithAVisibleMessage(): void
+    {
+        $subscription = $this->subscription('Healthy');
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders(self::LIST_URL.'/update/'.$subscription->getId());
+        $form = $this->client->getCrawler()->filter('form[action$="/webhooks/save"]')->form();
+        $values = $form->getPhpValues();
+        $values['thelia_webhook_update']['status'] = WebhookStatus::SUBSCRIPTION_ERROR;
+        $this->client->request('POST', $form->getUri(), $values);
+        $this->client->followRedirect();
+
+        self::assertSame(WebhookStatus::SUBSCRIPTION_ACTIVE, WebhookSubscriptionQuery::create()->findPk($subscription->getId())?->getStatus());
+        self::assertStringContainsString('only an exhausted delivery puts a subscription in error', $this->client->getCrawler()->filter('.alert-danger')->text(''));
+    }
+
+    public function testTheFailureReasonAndTheEventsOfTheListAreEscapedAndWrapped(): void
+    {
+        $subscription = $this->subscription('Broken one', WebhookStatus::SUBSCRIPTION_ERROR);
+        $subscription->setFailureReason('<script>alert(1)</script> failed')->save($this->getPropelConnection());
+        $this->loginAs($this->factory()->admin());
+
+        $this->assertPageRenders(self::LIST_URL);
+
+        $html = (string) $this->client->getResponse()->getContent();
+        self::assertStringNotContainsString('<script>alert(1)</script>', $html);
+        self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt; failed', $html);
+        self::assertGreaterThanOrEqual(1, $this->client->getCrawler()->filter('[data-testid="datatable-webhooks-cell-failure"] .text-wrap.text-break')->count());
+        self::assertGreaterThanOrEqual(1, $this->client->getCrawler()->filter('[data-testid="datatable-webhooks-cell-events"] .text-wrap.text-break')->count());
     }
 
     public function testTheListShowsTheLastSuccessfulDeliveryOrNever(): void

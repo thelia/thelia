@@ -56,6 +56,10 @@ class PaginationExtension implements QueryResultCollectionExtensionInterface
 
         [$page, , $limit] = $pagination;
 
+        if (0 === $limit && null !== $ceiling = $operation?->getPaginationMaximumItemsPerPage()) {
+            $limit = $ceiling;
+        }
+
         return $query->paginate($page, $limit);
     }
 }

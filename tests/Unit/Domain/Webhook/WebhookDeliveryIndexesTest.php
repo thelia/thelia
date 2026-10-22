@@ -28,6 +28,7 @@ final class WebhookDeliveryIndexesTest extends TestCase
         'idx_webhook_delivery_event_created',
         'idx_webhook_delivery_status_created',
         'idx_webhook_delivery_subscription_created',
+        'idx_webhook_delivery_subscription_status_delivered',
         'webhook_delivery_uuid_UNIQUE',
     ];
 
