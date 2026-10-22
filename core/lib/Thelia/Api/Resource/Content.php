@@ -137,10 +137,14 @@ class Content extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public array $contentFolders = [];
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    /**
+     * The dates are the back office's: a front reads published rows only, and when a row
+     * goes offline, or went online, is nothing the shop tells its visitors.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?\DateTimeInterface $publishAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     #[Assert\GreaterThan(propertyPath: 'publishAt', message: 'The withdrawal date must come after the publication date.')]
     public ?\DateTimeInterface $unpublishAt = null;
 
