@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\View\ViewRenderer;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
@@ -33,12 +35,14 @@ use Thelia\Model\LangQuery;
 /**
  * `GET /preview/{type}/{id}`: the page of a content or a folder whatever its state.
  *
- * A signed-in administrator reaches it as it is. Anyone else needs the signed link the
- * back office hands out: a link with no signature answers 404, so the route gives
- * nothing away, and a link altered or past its expiry answers the same 403, so a caller
- * cannot tell one from the other. The signatures are tried under a per-client limit,
- * which an administrator does not spend. A row that does not exist answers 404 in every
- * case, once the caller is allowed to ask.
+ * A signed-in administrator allowed to view the contents (or the folders, for a folder)
+ * in the back office reaches it as it is. Anyone else, an administrator without that
+ * right included, needs the signed link the back office hands out: a link with no
+ * signature answers 404, so the route gives nothing away, and a link altered or past
+ * its expiry answers the same 403, so a caller cannot tell one from the other. The
+ * signatures are tried under a per-client limit, which an allowed administrator does
+ * not spend. A row that does not exist answers 404 in every case, once the caller is
+ * allowed to ask.
  *
  * The page is then rendered through the view renderer like the public one, with the
  * request marked as a preview: the visibility check lets the row through, the answer is
@@ -65,7 +69,7 @@ final readonly class PublicationPreviewController
             throw new NotFoundHttpException();
         }
 
-        if (!$this->securityContext->hasAdminUser()) {
+        if (!$this->isAllowedToViewInTheBackOffice($type)) {
             if (!$request->query->has('_hash')) {
                 throw new NotFoundHttpException();
             }
@@ -94,6 +98,17 @@ final readonly class PublicationPreviewController
         $request->attributes->set($preview->type.'_id', $preview->id);
 
         return $this->viewRenderer->render($request);
+    }
+
+    /**
+     * The same right as the back-office list of the type: the preview is a sheet of the
+     * back office seen from the shop, not a right of its own.
+     */
+    private function isAllowedToViewInTheBackOffice(string $type): bool
+    {
+        $resource = PublicationPreview::CONTENT === $type ? AdminResources::CONTENT : AdminResources::FOLDER;
+
+        return $this->securityContext->isGranted(['ADMIN'], [$resource], [], [AccessManager::VIEW]);
     }
 
     private function exists(PublicationPreview $preview): bool
