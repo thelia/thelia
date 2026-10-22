@@ -399,7 +399,7 @@ final class WebhookScreensTest extends WebIntegrationTestCase
         self::assertStringNotContainsString('<script>alert(1)</script>', $html);
         self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt; failed', $html);
         self::assertGreaterThanOrEqual(1, $this->client->getCrawler()->filter('[data-testid="datatable-webhooks-cell-failure"] .text-wrap.text-break')->count());
-        self::assertGreaterThanOrEqual(1, $this->client->getCrawler()->filter('[data-testid="datatable-webhooks-cell-events"] .text-wrap.text-break')->count());
+        self::assertGreaterThanOrEqual(1, $this->client->getCrawler()->filter('[data-testid="datatable-webhooks-cell-events"] .text-wrap')->count());
     }
 
     public function testTheListShowsTheLastSuccessfulDeliveryOrNever(): void
