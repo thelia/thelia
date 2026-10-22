@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Model;
 
+use Symfony\Component\Clock\MockClock;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
@@ -107,6 +108,27 @@ final class VisibilityDatesAlignmentTest extends IntegrationTestCase
         self::assertSame(PublicationState::Published, $this->stateOf($content));
         self::assertNotNull($row->getPublishAt());
         self::assertNull($row->getUnpublishAt());
+    }
+
+    public function testAScheduledContentToggledOnThenOffIsUnpublishedAndNotPutBackOnlineOnItsDate(): void
+    {
+        $content = $this->factory->content($this->factory->folder(), ['visible' => 0]);
+        $content->setLocale('en_US')->setDescription('<p>A body</p>')->setPublishAt(new \DateTimeImmutable('+1 day'))->save();
+        self::assertSame(PublicationState::Scheduled, $this->stateOf($content));
+
+        $this->dispatcher()->dispatch(new ContentToggleVisibilityEvent($this->reloaded($content)), TheliaEvents::CONTENT_TOGGLE_VISIBILITY);
+
+        self::assertSame(PublicationState::Published, $this->stateOf($content));
+        self::assertLessThanOrEqual(new \DateTimeImmutable(), new \DateTimeImmutable($this->reloaded($content)->getPublishAt('Y-m-d H:i:s')), 'turned on ahead of its schedule, it went online now');
+
+        $this->dispatcher()->dispatch(new ContentToggleVisibilityEvent($this->reloaded($content)), TheliaEvents::CONTENT_TOGGLE_VISIBILITY);
+
+        self::assertSame(PublicationState::Unpublished, $this->stateOf($content), 'hidden again, it is not "scheduled" for the date it once waited for');
+
+        // The day the schedule named comes: nothing puts the row back online.
+        (new ScheduledPublicationRunner(new MockClock('+2 days'), $this->dispatcher()))->run();
+
+        self::assertSame(0, (int) $this->reloaded($content)->getVisible());
     }
 
     public function testAScheduleMadeByTheServiceFromAPublishedRowIsLeftAlone(): void
