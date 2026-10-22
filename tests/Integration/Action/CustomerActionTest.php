@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
@@ -164,6 +167,94 @@ final class CustomerActionTest extends IntegrationTestCase
         self::assertSame('1 rue des Lilas', $address->getAddress1());
         self::assertSame('Vallereuil', $address->getCity());
         self::assertSame($country->getId(), $address->getCountryId());
+    }
+
+    public function testTheAccountCreatedMailDoesNotCarryThePassword(): void
+    {
+        $title = $this->factory->customerTitle();
+        $country = $this->factory->country();
+        $plainPassword = 'Cleartext-Secret-4207';
+
+        $this->withAShopSenderAddress(function () use ($title, $country, $plainPassword): void {
+            $event = new CustomerCreateOrUpdateEvent(
+                title: $title->getId(),
+                firstname: 'Ada',
+                lastname: 'Created',
+                address1: '1 rue des Lilas',
+                zipcode: '75001',
+                city: 'Paris',
+                country: (string) $country->getId(),
+                email: 'created.by.admin@test.com',
+                password: $plainPassword,
+                reseller: false,
+            );
+            $event->setNotifyCustomerOfAccountCreation(true);
+
+            $this->dispatcher->dispatch($event, TheliaEvents::CUSTOMER_CREATEACCOUNT);
+
+            $email = $this->theOnlyMailSentTo('created.by.admin@test.com');
+            self::assertStringNotContainsString($plainPassword, (string) $email->getTextBody());
+            self::assertStringNotContainsString($plainPassword, (string) $email->getHtmlBody());
+        });
+    }
+
+    public function testTheAccountChangedMailDoesNotCarryTheNewPassword(): void
+    {
+        $title = $this->factory->customerTitle();
+        $country = $this->factory->country();
+        $customer = $this->factory->customer($title);
+        $plainPassword = 'Cleartext-Secret-4208';
+
+        $this->withAShopSenderAddress(function () use ($title, $country, $customer, $plainPassword): void {
+            $event = new CustomerCreateOrUpdateEvent(
+                title: $title->getId(),
+                firstname: 'Ada',
+                lastname: 'Changed',
+                address1: '1 rue des Lilas',
+                zipcode: '75001',
+                city: 'Paris',
+                country: (string) $country->getId(),
+                email: $customer->getEmail(),
+                password: $plainPassword,
+                reseller: false,
+            );
+            $event->setCustomer($customer);
+
+            $this->dispatcher->dispatch($event, TheliaEvents::CUSTOMER_UPDATEACCOUNT);
+
+            $email = $this->theOnlyMailSentTo($customer->getEmail());
+            self::assertStringNotContainsString($plainPassword, (string) $email->getTextBody());
+            self::assertStringNotContainsString($plainPassword, (string) $email->getHtmlBody());
+        });
+
+        self::assertTrue(password_verify($plainPassword, CustomerQuery::create()->findPk($customer->getId())->getPassword()));
+    }
+
+    private function withAShopSenderAddress(callable $test): void
+    {
+        // A shop without a sender address sends nothing at all, and the test
+        // database is seeded without one.
+        $storeEmail = ConfigQuery::getStoreEmail();
+        ConfigQuery::write('store_email', 'shop@test.com');
+
+        try {
+            $test();
+        } finally {
+            ConfigQuery::write('store_email', (string) $storeEmail);
+        }
+    }
+
+    private function theOnlyMailSentTo(string $address): Email
+    {
+        $sentEmails = array_values(array_filter(
+            self::getMailerMessages(),
+            static fn (RawMessage $message): bool => $message instanceof Email
+                && \in_array($address, array_map(static fn (Address $to): string => $to->getAddress(), $message->getTo()), true),
+        ));
+
+        self::assertCount(1, $sentEmails, 'The account mail is sent');
+
+        return $sentEmails[0];
     }
 
     public function testTransactionRollbackIsolatesTests(): void

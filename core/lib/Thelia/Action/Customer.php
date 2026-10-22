@@ -75,16 +75,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function create(CustomerCreateOrUpdateEvent $event): void
     {
         $customer = new CustomerModel();
-        $plainPassword = $event->getPassword();
 
         $this->createOrUpdateCustomer($customer, $event);
 
+        // The password stays out of the mail: a mailbox is no place to keep it, and
+        // the customer chooses a new one through the lost password link if needed.
         if ($event->getNotifyCustomerOfAccountCreation()) {
-            $this->mailer->sendEmailToCustomer(
-                'customer_account_created',
-                $customer,
-                ['password' => $plainPassword],
-            );
+            $this->mailer->sendEmailToCustomer('customer_account_created', $customer);
         }
 
         $this->dispatcher->dispatch(
@@ -270,7 +267,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         if ($event->getNotifyCustomerOfAccountModification()
             && ((null !== $plainPassword && '' !== $plainPassword && '0' !== $plainPassword) || $emailChanged)) {
-            $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
+            $this->mailer->sendEmailToCustomer('customer_account_changed', $customer);
         }
     }
 
