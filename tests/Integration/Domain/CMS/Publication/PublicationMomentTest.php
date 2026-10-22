@@ -91,6 +91,21 @@ final class PublicationMomentTest extends IntegrationTestCase
         self::assertNull((new Content())->setPublishAt(null)->getPublishAt());
     }
 
+    /** An empty field, as a form posts it, clears the date like the generated setter does, rather than reading as now. */
+    public function testAnEmptyStringClearsTheDate(): void
+    {
+        $content = (new Content())->setPublishAt('2026-12-01 09:00:00')->setUnpublishAt('2026-12-01 10:00:00');
+        $folder = (new Folder())->setPublishAt('2026-12-01 09:00:00')->setUnpublishAt('2026-12-01 10:00:00');
+
+        $content->setPublishAt('')->setUnpublishAt('');
+        $folder->setPublishAt('')->setUnpublishAt('');
+
+        self::assertNull($content->getPublishAt());
+        self::assertNull($content->getUnpublishAt());
+        self::assertNull($folder->getPublishAt());
+        self::assertNull($folder->getUnpublishAt());
+    }
+
     public function testTheAlignerWritesTheWithdrawalAtTheSecond(): void
     {
         $content = $this->publishedContent();
