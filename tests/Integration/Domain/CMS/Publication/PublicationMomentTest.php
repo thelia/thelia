@@ -22,6 +22,7 @@ use Thelia\Domain\CMS\Publication\PublicationStatus;
 use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Folder;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -31,11 +32,12 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class PublicationMomentTest extends IntegrationTestCase
 {
+    /** Read in the timezone of PHP, as the clock of the shop is; a mock clock would otherwise tick in UTC. */
     private const string NOW_WITH_A_FRACTION = '2026-10-21 12:00:00.700000';
 
     public function testAWithdrawalIsWrittenAtTheSecondAndReadsAsUnpublishedAtOnce(): void
     {
-        $clock = new MockClock(self::NOW_WITH_A_FRACTION);
+        $clock = new MockClock(self::NOW_WITH_A_FRACTION, date_default_timezone_get());
         $service = new PublicationService($clock);
         $content = $this->publishedContent();
 
@@ -49,7 +51,7 @@ final class PublicationMomentTest extends IntegrationTestCase
 
     public function testAPublicationIsWrittenAtTheSecond(): void
     {
-        $service = new PublicationService(new MockClock(self::NOW_WITH_A_FRACTION));
+        $service = new PublicationService(new MockClock(self::NOW_WITH_A_FRACTION, date_default_timezone_get()));
         $content = $this->publishedContent();
         $service->apply($content, PublicationRequest::unpublish());
 
@@ -60,12 +62,33 @@ final class PublicationMomentTest extends IntegrationTestCase
 
     public function testADateGivenWithAFractionIsScheduledAtTheSecond(): void
     {
-        $service = new PublicationService(new MockClock(self::NOW_WITH_A_FRACTION));
+        $service = new PublicationService(new MockClock(self::NOW_WITH_A_FRACTION, date_default_timezone_get()));
         $content = $this->publishedContent();
 
         $service->apply($content, PublicationRequest::schedule(new \DateTimeImmutable('2026-10-22 09:30:15.900000')));
 
         self::assertSame('2026-10-22 09:30:15.000000', ContentQuery::create()->findPk($content->getId())->getPublishAt('Y-m-d H:i:s.u'));
+    }
+
+    /**
+     * The column keeps no timezone either: a date given in another zone is brought to the
+     * zone of PHP, which every "now" of the publication is read in, by the setters of the
+     * models, so every path that writes a date is covered.
+     */
+    public function testTheModelsWriteADateInTheTimezoneOfPhpAtTheSecondWhateverTheZoneGiven(): void
+    {
+        $given = new \DateTimeImmutable('2026-12-01T09:00:00.700+02:00');
+        $expected = $given->setTimezone(new \DateTimeZone(date_default_timezone_get()))->format('Y-m-d H:i:s').'.000000';
+
+        $content = (new Content())->setPublishAt($given)->setUnpublishAt('2026-12-01T10:00:00.700+02:00');
+        $folder = (new Folder())->setPublishAt($given)->setUnpublishAt($given->getTimestamp());
+
+        self::assertSame($expected, $content->getPublishAt('Y-m-d H:i:s.u'));
+        self::assertSame(date_default_timezone_get(), $content->getPublishAt()?->getTimezone()->getName());
+        self::assertSame($given->setTimezone(new \DateTimeZone(date_default_timezone_get()))->modify('+1 hour')->format('Y-m-d H:i:s').'.000000', $content->getUnpublishAt('Y-m-d H:i:s.u'), 'a string is read the same way');
+        self::assertSame($expected, $folder->getPublishAt('Y-m-d H:i:s.u'));
+        self::assertSame($expected, $folder->getUnpublishAt('Y-m-d H:i:s.u'), 'a timestamp too');
+        self::assertNull((new Content())->setPublishAt(null)->getPublishAt());
     }
 
     public function testTheAlignerWritesTheWithdrawalAtTheSecond(): void
