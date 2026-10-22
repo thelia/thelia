@@ -20,6 +20,7 @@ use Propel\Runtime\Propel;
 use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Domain\CMS\Publication\PublicationGuard;
+use Thelia\Domain\CMS\Publication\PublicationMoment;
 use Thelia\Domain\CMS\Publication\PublishableInterface;
 use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Base\Content as BaseContent;
@@ -210,6 +211,21 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
         }
 
         return parent::preSave($con);
+    }
+
+    /**
+     * Written as it is compared: in the timezone of PHP, at the second (see
+     * {@see PublicationMoment}), whichever path writes it: the service, the admin API,
+     * a module.
+     */
+    public function setPublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setPublishAt(PublicationMoment::atTheSecondOrNull($v));
+    }
+
+    public function setUnpublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setUnpublishAt(PublicationMoment::atTheSecondOrNull($v));
     }
 
     public function postSave(?ConnectionInterface $con = null): void
