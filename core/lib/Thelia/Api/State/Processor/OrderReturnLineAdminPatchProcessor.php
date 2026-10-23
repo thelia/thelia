@@ -16,13 +16,14 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\Propel;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Resource\OrderReturnLine as OrderReturnLineResource;
-use Thelia\Config\DatabaseConfiguration;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Customer;
 use Thelia\Model\Order;
@@ -39,7 +40,7 @@ use Thelia\Model\OrderReturnLineQuery;
  *
  * `quantity` is the size of the return itself. Raising it is opening a bigger
  * return, and it goes through the same gate the creation does - under the same
- * row lock, in the same transaction - with the line being edited left out of
+ * row locks, in the same transaction - with the line being edited left out of
  * the cumulative count.
  */
 final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInterface
@@ -47,6 +48,7 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
     public function __construct(
         private PropelPersistProcessor $persistProcessor,
         private ReturnEligibilityChecker $eligibility,
+        private OrderReturnWriteTransactionInterface $transaction,
     ) {
     }
 
@@ -88,31 +90,22 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
             throw new UnprocessableEntityHttpException('The return line is not attached to an order of a customer.');
         }
 
-        $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
-        $connection->beginTransaction();
-
         try {
-            $this->eligibility->lockLine($orderProduct);
-            $this->eligibility->assertReturnable(
-                $order,
-                $customer,
-                $orderProduct,
-                $quantity,
-                excludeReturnId: (int) $stored->getOrderReturnId(),
-            );
+            return $this->transaction->run((int) $order->getId(), [(int) $orderProduct->getId()], function () use ($data, $operation, $uriVariables, $context, $order, $customer, $orderProduct, $quantity, $stored): mixed {
+                $this->eligibility->assertReturnable(
+                    $order,
+                    $customer,
+                    $orderProduct,
+                    $quantity,
+                    excludeReturnId: (int) $stored->getOrderReturnId(),
+                );
 
-            $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-            $connection->commit();
+                return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+            });
+        } catch (ReturnRequestConflictException $exception) {
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         } catch (ReturnNotAllowedException $exception) {
-            $connection->rollBack();
-
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        } catch (\Throwable $exception) {
-            $connection->rollBack();
-
-            throw $exception;
         }
-
-        return $result;
     }
 }
