@@ -114,8 +114,8 @@ readonly class RecordOrderReturnHistoryListener
 
         // A transition onto the status the return already has is not a change. The
         // recorder drops a repeated identical entry on its own, but only when it is
-        // the latest of its kind: a return that went back and forth would otherwise
-        // get a line saying it moved from a status to itself.
+        // the last line of the order: a return that went back and forth would
+        // otherwise get a line saying it moved from a status to itself.
         if ($fromStatusCode === $toStatusCode) {
             return;
         }
