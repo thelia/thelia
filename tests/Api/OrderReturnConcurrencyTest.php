@@ -28,17 +28,21 @@ use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Admin;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\OrderReturnLineTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnLine;
+use Thelia\Model\OrderReturnLineQuery;
+use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
+use Thelia\Test\Trait\ForgetsPooledModels;
 use Thelia\Test\Trait\RecordsSqlQueries;
 use Thelia\Tests\Integration\Domain\OrderReturn\CompetingRequestTrait;
 use Thelia\Tests\Integration\Domain\OrderReturn\SecondConnectionTrait;
@@ -60,6 +64,7 @@ use Thelia\Tests\Integration\Domain\OrderReturn\SecondConnectionTrait;
 final class OrderReturnConcurrencyTest extends ApiTestCase
 {
     use CompetingRequestTrait;
+    use ForgetsPooledModels;
     use RecordsSqlQueries;
     use SecondConnectionTrait;
 
@@ -326,6 +331,428 @@ final class OrderReturnConcurrencyTest extends ApiTestCase
             $locked,
             'The order first, then its two lines, each once: '.implode(' | ', $statements),
         );
+    }
+
+    /**
+     * One admin lowers the quantity of a return line from 2 to 1 while the
+     * request of another one, which the server read at 2, records 2 units
+     * received. That second patch waits on the first one's locks, then finds
+     * the line no longer as the server read it: it is refused as a conflict,
+     * to be sent again on the line as it now is, and writes nothing. Checked
+     * against the committed quantity instead, it would still decide on the 2
+     * read before the locks. This is the window between that read and the
+     * locks; two admins who read the line at different times are not covered.
+     */
+    public function testAPatchOnALineAnotherPatchChangedSinceItWasReadIsAConflict(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity' => 1.0]],
+        ]);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/order_return_lines/'.$lineId, ['quantityReceived' => 2.0], $token, 'merge-patch+json');
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(['quantity' => 1.0, 'received' => 0.0], $this->committedLineQuantities($lineId), 'The patch wrote over a line another one changed while it waited: '.$response->getContent().' / competing request: '.$competing);
+        self::assertSame(409, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('changed since it was read', (string) $response->getContent());
+    }
+
+    /**
+     * The competing patch changes a field the second one does not send. The
+     * second one is refused all the same: kept, the fields it sends would be
+     * written next to a state of the line the server did not read.
+     */
+    public function testAPatchIsAConflictEvenWhenTheLineChangedOnAFieldItDoesNotSend(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['received_condition' => 'damaged']],
+        ]);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/order_return_lines/'.$lineId, ['quantityReceived' => 1.0], $token, 'merge-patch+json');
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(409, $response->getStatusCode(), $response->getContent().' / competing request: '.$competing);
+        self::assertSame(['quantity' => 2.0, 'received' => 0.0], $this->committedLineQuantities($lineId));
+        self::assertSame('damaged', $this->committedLineCondition($lineId));
+    }
+
+    /**
+     * The race above with Propel's instance pool on, as in production: API
+     * Platform read the line before the locks and left it in the pool, and a
+     * pooled line comes back from a later query as it was, whatever the
+     * database now holds.
+     */
+    public function testAPatchSeesTheLineAnotherPatchCommittedThroughTheInstancePool(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity' => 1.0]],
+        ]);
+
+        $response = $this->withInstancePooling(fn (): Response => $this->jsonRequest('PATCH', '/api/admin/order_return_lines/'.$lineId, ['quantityReceived' => 2.0], $token, 'merge-patch+json'));
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(['quantity' => 1.0, 'received' => 0.0], $this->committedLineQuantities($lineId), 'The patch decided on the line the pool kept from before the locks: '.$response->getContent().' / competing request: '.$competing);
+        self::assertSame(409, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * The same race through the reception: the quantities it is handed are
+     * checked against the line as the competing patch left it.
+     */
+    public function testTheReceptionChecksItsQuantitiesAgainstTheLineACompetingPatchCommitted(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity' => 1.0]],
+        ]);
+
+        $refusal = null;
+
+        try {
+            $this->receive($lineId, 2.0);
+        } catch (ReturnNotAllowedException $exception) {
+            $refusal = $exception->getMessage();
+        }
+
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(['quantity' => 1.0, 'received' => 0.0], $this->committedLineQuantities($lineId), 'The reception recorded more units received than the line asks for. Competing request: '.$competing);
+        self::assertNotNull($refusal);
+        self::assertStringContainsString('cannot exceed the returned quantity', $refusal);
+    }
+
+    /**
+     * The reception race with the instance pool on, the lines of the return
+     * loaded by its caller before the locks: the reception reads them again.
+     */
+    public function testTheReceptionSeesTheLineACompetingPatchCommittedThroughTheInstancePool(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity' => 1.0]],
+        ]);
+
+        $refusal = null;
+
+        try {
+            $this->withInstancePooling(function () use ($lineId): void {
+                $this->receive($lineId, 2.0, loadTheLinesFirst: true);
+            });
+        } catch (ReturnNotAllowedException $exception) {
+            $refusal = $exception->getMessage();
+        }
+
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(['quantity' => 1.0, 'received' => 0.0], $this->committedLineQuantities($lineId), 'The reception decided on the lines the pool kept from before the locks. Competing request: '.$competing);
+        self::assertNotNull($refusal);
+        self::assertStringContainsString('cannot exceed the returned quantity', $refusal);
+    }
+
+    /**
+     * A module may receive a return inside a transaction of its own, after
+     * having read in it: the picture of that transaction predates the patch a
+     * competing request committed while the reception waited on its locks. The
+     * return and its lines are read again with locking reads, which see the
+     * last commit, and the quantities are checked against the line as it now is.
+     */
+    public function testAReceptionInACallerTransactionThatAlreadyReadSeesTheLineACompetingPatchCommitted(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity' => 1.0]],
+        ]);
+
+        $refusal = null;
+        $this->mainConnection()->beginTransaction();
+
+        try {
+            $this->readTheLineInTheCallerTransaction($lineId, 2.0);
+            $this->receive($lineId, 2.0);
+        } catch (ReturnNotAllowedException $exception) {
+            $refusal = $exception->getMessage();
+        } finally {
+            $this->mainConnection()->rollBack();
+        }
+
+        $competing = $this->finishCompetingRequest();
+
+        self::assertNotNull($refusal, 'The reception recorded two units received on a line the competing patch lowered to one: it decided on the picture its caller transaction took before. Competing request: '.$competing);
+        self::assertStringContainsString('cannot exceed the returned quantity', $refusal);
+    }
+
+    /**
+     * The same for the status change: moving the return to received in a
+     * caller transaction that already read refunds the quantity received as
+     * the competing patch committed it, not as the caller transaction saw it.
+     */
+    public function testAMoveToReceivedInACallerTransactionThatAlreadyReadRefundsWhatACompetingPatchCommitted(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $returnId = $this->returnIdOf($lineId);
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity_received' => 2.0]],
+        ]);
+
+        $refundInTheTransaction = null;
+        $this->mainConnection()->beginTransaction();
+
+        try {
+            $this->readTheLineInTheCallerTransaction($lineId, 2.0);
+
+            $return = OrderReturnQuery::create()->findPk($returnId);
+            self::assertNotNull($return);
+            $this->getService(EventDispatcherInterface::class)->dispatch(
+                (new OrderReturnEvent($return))->setTargetStatusId(OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_RECEIVED)),
+                TheliaEvents::ORDER_RETURN_UPDATE_STATUS,
+            );
+
+            $statement = $this->mainConnection()->prepare('SELECT refund_amount FROM order_return WHERE id = :id');
+            $statement->execute([':id' => $returnId]);
+            $refundInTheTransaction = (float) $statement->fetchColumn();
+        } finally {
+            $this->mainConnection()->rollBack();
+        }
+
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(20.0, $refundInTheTransaction, 'Two units of 10.00 received while the move waited: the refund was computed on the quantity the caller transaction saw before. Competing request: '.$competing);
+    }
+
+    /**
+     * Moving a return to received restocks and refunds the received
+     * quantities: those of the line as a patch committed while the move
+     * waited on its locks, not as they were before.
+     */
+    public function testAMoveToReceivedRefundsTheQuantityACompetingPatchCommitted(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $returnId = $this->returnIdOf($lineId);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return_line', $lineId, ['quantity_received' => 2.0]],
+        ]);
+
+        $response = $this->jsonRequest('POST', '/api/admin/order_returns/'.$returnId.'/transition', ['statusCode' => OrderReturnStatus::CODE_RECEIVED], token: $token);
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(200, $response->getStatusCode(), $response->getContent().' / competing request: '.$competing);
+        self::assertSame(20.0, $this->committedReturnRefund($returnId), 'Two units of 10.00 received while the move waited: the refund was computed on the quantity read before the locks.');
+    }
+
+    /**
+     * A deadlock the database breaks on a status change is answered as one on
+     * a return opening is: 409, nothing written.
+     */
+    public function testADeadlockOnAStatusChangeIsAConflictToRetry(): void
+    {
+        [$order, $customer, [$first, $second]] = $this->paidOrderWithLines(1.0, 1.0);
+        $lineId = $this->committedReturnLine($order, $customer, $second, 1.0, $first);
+        $returnId = $this->returnIdOf($lineId);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest(
+            $this->mainThreadId(),
+            [['ballast', self::BALLAST_ROWS], ['lock', 'order_product', (int) $second->getId()]],
+            [['lock', 'order_product', (int) $first->getId()]],
+            commit: false,
+        );
+
+        $response = $this->jsonRequest('POST', '/api/admin/order_returns/'.$returnId.'/transition', ['statusCode' => OrderReturnStatus::CODE_RECEIVED], token: $token);
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(409, $response->getStatusCode(), 'A deadlock on a status change must come back as a conflict: '.$response->getContent().' / competing request: '.$competing);
+        self::assertSame(OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_ACCEPTED), $this->committedReturnStatusId($returnId), 'The status change the database gave up on wrote nothing.');
+    }
+
+    /**
+     * The reception locks what a return is opened and patched under, in the
+     * same order - the order, then its lines - before the return itself. The
+     * order of the lines between them is proven by
+     * testTwoRequestsNamingTheSameLinesInOppositeOrdersDoNotDeadlock().
+     */
+    public function testTheReceptionLocksTheOrderThenItsLinesThenTheReturn(): void
+    {
+        [$order, $customer, [$first, $second]] = $this->paidOrderWithLines(1.0, 1.0);
+        $lineId = $this->committedReturnLine($order, $customer, $second, 1.0, $first);
+
+        $statements = $this->recordSqlQueries(function () use ($lineId): void {
+            $this->receive($lineId, 1.0);
+        });
+
+        $locked = [];
+        foreach ($statements as $statement) {
+            if (preg_match('/FROM `(order|order_product|order_return)` WHERE `id` = \S+ FOR UPDATE/', $statement, $match)) {
+                $locked[] = $match[1];
+            }
+        }
+
+        self::assertSame(
+            ['order', 'order_product', 'order_product', 'order_return'],
+            $locked,
+            'The order first, then its two lines, then the return, each once: '.implode(' | ', $statements),
+        );
+    }
+
+    /**
+     * An accepted return committed for real, with one line on $orderProduct and,
+     * when given, a second one on $otherOrderProduct.
+     *
+     * @return int the id of the line on $orderProduct
+     */
+    private function committedReturnLine(Order $order, Customer $customer, OrderProduct $orderProduct, float $quantity, ?OrderProduct $otherOrderProduct = null): int
+    {
+        $acceptedStatusId = OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_ACCEPTED);
+        self::assertNotNull($acceptedStatusId);
+
+        $connection = $this->secondConnection();
+        $connection->prepare('INSERT INTO order_return (order_id, customer_id, status_id, include_postage, created_at, updated_at) VALUES (:order, :customer, :status, 0, NOW(), NOW())')
+            ->execute([':order' => $order->getId(), ':customer' => $customer->getId(), ':status' => $acceptedStatusId]);
+        $returnId = (int) $connection->lastInsertId();
+
+        $insertLine = $connection->prepare('INSERT INTO order_return_line (order_return_id, order_product_id, quantity, quantity_received, created_at, updated_at) VALUES (:return, :line, :quantity, 0, NOW(), NOW())');
+
+        if (null !== $otherOrderProduct) {
+            $insertLine->execute([':return' => $returnId, ':line' => $otherOrderProduct->getId(), ':quantity' => $quantity]);
+        }
+
+        $insertLine->execute([':return' => $returnId, ':line' => $orderProduct->getId(), ':quantity' => $quantity]);
+
+        return (int) $connection->lastInsertId();
+    }
+
+    private function receive(int $lineId, float $quantity, bool $loadTheLinesFirst = false): void
+    {
+        $return = OrderReturnQuery::create()->findPk($this->returnIdOf($lineId));
+        self::assertNotNull($return);
+
+        if ($loadTheLinesFirst) {
+            self::assertCount(1, $return->getOrderReturnLines());
+        }
+
+        $this->getService(EventDispatcherInterface::class)->dispatch(
+            (new OrderReturnEvent($return))->setReceivedLines([$lineId => ['quantity' => $quantity]]),
+            TheliaEvents::ORDER_RETURN_RECEIVE,
+        );
+    }
+
+    /**
+     * The first plain read of a caller transaction, which takes its picture.
+     */
+    private function readTheLineInTheCallerTransaction(int $lineId, float $expectedQuantity): void
+    {
+        OrderReturnLineTableMap::clearInstancePool();
+        $line = OrderReturnLineQuery::create()->findPk($lineId, $this->mainConnection());
+        self::assertNotNull($line);
+        self::assertSame($expectedQuantity, (float) $line->getQuantity());
+        OrderReturnLineTableMap::clearInstancePool();
+    }
+
+    private function returnIdOf(int $lineId): int
+    {
+        $statement = $this->secondConnection()->prepare('SELECT order_return_id FROM order_return_line WHERE id = :id');
+        $statement->execute([':id' => $lineId]);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    private function committedLineCondition(int $lineId): ?string
+    {
+        $statement = $this->secondConnection()->prepare('SELECT received_condition FROM order_return_line WHERE id = :id');
+        $statement->execute([':id' => $lineId]);
+        $condition = $statement->fetchColumn();
+
+        return false === $condition || null === $condition ? null : (string) $condition;
+    }
+
+    private function committedReturnRefund(int $returnId): float
+    {
+        $statement = $this->secondConnection()->prepare('SELECT refund_amount FROM order_return WHERE id = :id');
+        $statement->execute([':id' => $returnId]);
+
+        return (float) $statement->fetchColumn();
+    }
+
+    private function committedReturnStatusId(int $returnId): int
+    {
+        $statement = $this->secondConnection()->prepare('SELECT status_id FROM order_return WHERE id = :id');
+        $statement->execute([':id' => $returnId]);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
+     * Runs $work with Propel's instance pool on, as in production, from an
+     * empty pool; IntegrationTestCase turns it off for every other test.
+     *
+     * @template T
+     *
+     * @param callable(): T $work
+     *
+     * @return T
+     */
+    private function withInstancePooling(callable $work): mixed
+    {
+        Propel::enableInstancePooling();
+        self::forgetPooledModels();
+
+        try {
+            return $work();
+        } finally {
+            self::forgetPooledModels();
+            Propel::disableInstancePooling();
+        }
+    }
+
+    /**
+     * @return array{quantity: float, received: float}
+     */
+    private function committedLineQuantities(int $lineId): array
+    {
+        $statement = $this->secondConnection()->prepare('SELECT quantity, quantity_received FROM order_return_line WHERE id = :id');
+        $statement->execute([':id' => $lineId]);
+        $row = $statement->fetch(\PDO::FETCH_NUM);
+        self::assertIsArray($row);
+
+        return ['quantity' => (float) $row[0], 'received' => (float) $row[1]];
     }
 
     /**

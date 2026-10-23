@@ -22,12 +22,14 @@ namespace Thelia\Tests\Integration\Domain\OrderReturn;
  * Nothing is left to timing. The process runs its first steps and says
  * "ready"; it then watches the database session of the request under test and
  * runs its last steps only once it has seen that session stuck for a while on
- * one statement that takes a lock - a `FOR UPDATE`, or an insert checking its
- * foreign keys - which only a lock wait does. Having never seen it,
+ * one statement that takes a lock - a `FOR UPDATE`, an update, or an insert
+ * checking its foreign keys - which only a lock wait does. Having never seen it,
  * it rolls back and says so, and the test fails as having proved nothing.
  *
  * A step is one of:
  *  - ['lock', 'order'|'order_product', id]: `SELECT ... FOR UPDATE` on the row;
+ *  - ['update', 'order_return_line', id, [column => value, ...]]: updates the
+ *    row, which holds its lock until the end of the transaction;
  *  - ['return', order id, customer id, status id, include postage, [[order product id, quantity], ...]]:
  *    writes a return the way a request that passed the checks does;
  *  - ['ballast', rows]: writes that many throwaway rows, which makes this
@@ -67,6 +69,11 @@ trait CompetingRequestTrait
                             $statement->execute([$step[2]]);
                             $statement->closeCursor();
                             break;
+                        case 'update':
+                            $columns = array_keys($step[3]);
+                            $pdo->prepare(sprintf('UPDATE `%s` SET %s WHERE `id` = ?', $step[1], implode(', ', array_map(static fn (string $column): string => '`'.$column.'` = ?', $columns))))
+                                ->execute([...array_values($step[3]), $step[2]]);
+                            break;
                         case 'return':
                             [, $orderId, $customerId, $statusId, $includePostage, $lines] = $step;
                             $pdo->prepare('INSERT INTO `order_return` (`order_id`, `customer_id`, `status_id`, `include_postage`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, NOW(), NOW())')
@@ -99,7 +106,7 @@ trait CompetingRequestTrait
                 // privilege. One statement seen running over several polls is a
                 // statement waiting on a lock: nothing else the request under
                 // test sends takes that long.
-                $running = $pdo->prepare("SELECT INFO FROM information_schema.PROCESSLIST WHERE ID = ? AND COMMAND IN ('Query', 'Execute') AND (INFO LIKE '%FOR UPDATE%' OR INFO LIKE 'INSERT INTO%')");
+                $running = $pdo->prepare("SELECT INFO FROM information_schema.PROCESSLIST WHERE ID = ? AND COMMAND IN ('Query', 'Execute') AND (INFO LIKE '%FOR UPDATE%' OR INFO LIKE 'INSERT INTO%' OR INFO LIKE 'UPDATE %')");
                 $deadline = microtime(true) + $c['patience'];
                 $seenFor = 0;
                 $seen = null;

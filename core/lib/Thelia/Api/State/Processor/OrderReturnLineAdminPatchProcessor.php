@@ -16,6 +16,7 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -26,7 +27,12 @@ use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\OrderReturnLineTableMap;
 use Thelia\Model\Order;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturnLine;
 use Thelia\Model\OrderReturnLineQuery;
 
 /**
@@ -43,9 +49,19 @@ use Thelia\Model\OrderReturnLineQuery;
  * row locks, in the same transaction - with the line being edited left out of
  * the cumulative count. Only that line: the other lines of its return may
  * hold units of the same order product, and still do.
+ *
+ * Every patch is decided on the line as it is once locked, never on the line
+ * API Platform read before: the order and the order product are locked first,
+ * as every return write does, then the line itself. A line found
+ * otherwise than the request read it - another patch, a reception committed
+ * in between - answers 409: the request carries what its author saw next to
+ * what they changed, and it is sent again on the line as it now is, never
+ * written next to values nobody saw.
  */
 final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInterface
 {
+    private const string CHANGED_SINCE_READ = 'The return line changed since it was read: read it again before changing it.';
+
     public function __construct(
         private PropelPersistProcessor $persistProcessor,
         private ReturnEligibilityChecker $eligibility,
@@ -59,47 +75,51 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
 
-        $stored = OrderReturnLineQuery::create()->findPk((int) ($uriVariables['id'] ?? 0));
+        $lineId = (int) ($uriVariables['id'] ?? 0);
 
-        if (null === $stored) {
+        // Read before any lock, for the ids of the rows to lock only, as
+        // selected columns, so that nothing enters the instance pool.
+        $orderProductId = OrderReturnLineQuery::create()
+            ->filterById($lineId)
+            ->select(['OrderProductId'])
+            ->findOne();
+
+        if (null === $orderProductId) {
             throw new NotFoundHttpException('Return line not found.');
         }
 
-        // A merge patch carries only the fields it changes; the others come
-        // back from the stored line, and an uninitialized typed property means
-        // the read did not fill it.
-        $quantity = isset($data->quantity) ? $data->getQuantity() : (float) $stored->getQuantity();
-        $received = $data->getQuantityReceived() ?? 0.0;
+        $orderProductId = (int) $orderProductId;
+        $orderId = OrderProductQuery::create()->filterById($orderProductId)->select(['OrderId'])->findOne();
 
-        if ($received < 0) {
-            throw new UnprocessableEntityHttpException('The received quantity cannot be negative.');
-        }
-
-        if ($received > $quantity + ReturnEligibilityChecker::QUANTITY_TOLERANCE) {
-            throw new UnprocessableEntityHttpException(\sprintf('The received quantity (%s) cannot exceed the returned quantity (%s) of this line.', $received, $quantity));
-        }
-
-        if (abs($quantity - (float) $stored->getQuantity()) <= ReturnEligibilityChecker::QUANTITY_TOLERANCE) {
-            return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-        }
-
-        $orderProduct = $stored->getOrderProduct();
-        $order = $orderProduct?->getOrder();
-        $customer = $order?->getCustomer();
-
-        if (!$order instanceof Order || !$customer instanceof Customer) {
+        if (null === $orderId) {
             throw new UnprocessableEntityHttpException('The return line is not attached to an order of a customer.');
         }
 
+        $orderId = (int) $orderId;
+        $previous = $context['previous_data'] ?? null;
+        $previous = $previous instanceof OrderReturnLineResource ? $previous : null;
+
         try {
-            return $this->transaction->run((int) $order->getId(), [(int) $orderProduct->getId()], function () use ($data, $operation, $uriVariables, $context, $order, $customer, $orderProduct, $quantity, $stored): mixed {
-                $this->eligibility->assertReturnable(
-                    $order,
-                    $customer,
-                    $orderProduct,
-                    $quantity,
-                    excludeLineId: (int) $stored->getId(),
-                );
+            return $this->transaction->run($orderId, [$orderProductId], function (ConnectionInterface $connection) use ($data, $previous, $operation, $uriVariables, $context, $lineId, $orderId): mixed {
+                $locked = $this->lockedLine($lineId, $connection);
+
+                $this->assertTheLineIsAsItWasRead($locked, $data, $previous);
+                $this->takeWhatNoClientWritesFrom($locked, $data);
+
+                $quantity = $data->getQuantity();
+                $received = $data->getQuantityReceived() ?? 0.0;
+
+                if ($received < 0) {
+                    throw new UnprocessableEntityHttpException('The received quantity cannot be negative.');
+                }
+
+                if ($received > $quantity + ReturnEligibilityChecker::QUANTITY_TOLERANCE) {
+                    throw new UnprocessableEntityHttpException(\sprintf('The received quantity (%s) cannot exceed the returned quantity (%s) of this line.', $received, $quantity));
+                }
+
+                if (!self::sameQuantity($quantity, (float) $locked->getQuantity())) {
+                    $this->assertTheNewQuantityIsReturnable($orderId, $locked, $quantity, $connection);
+                }
 
                 return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
             });
@@ -108,5 +128,91 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
         } catch (ReturnNotAllowedException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
+    }
+
+    /**
+     * The line as it is now, its parent rows locked: out of the instance pool
+     * first, which would hand back the line as loaded before the lock, and
+     * read with a lock of its own, which sees the last commit even in a
+     * transaction a caller opened and already read in.
+     */
+    private function lockedLine(int $lineId, ConnectionInterface $connection): OrderReturnLine
+    {
+        OrderReturnLineTableMap::removeInstanceFromPool((string) $lineId);
+
+        return OrderReturnLineQuery::create()
+            ->filterById($lineId)
+            ->lockForUpdate()
+            ->findOne($connection)
+            ?? throw new NotFoundHttpException('Return line not found.');
+    }
+
+    /**
+     * A merge patch carries only the fields it changes, and the resource holds
+     * the others as API Platform read them, before any lock: written back, they
+     * would undo what was committed since. The line must therefore be, on
+     * every field a patch writes, what that read found.
+     *
+     * Without that read to compare to - the processor called outside of an
+     * HTTP request - only an uninitialized quantity is taken from the line.
+     */
+    private function assertTheLineIsAsItWasRead(OrderReturnLine $locked, OrderReturnLineResource $data, ?OrderReturnLineResource $previous): void
+    {
+        if (null === $previous) {
+            if (!isset($data->quantity)) {
+                $data->setQuantity((float) $locked->getQuantity());
+            }
+
+            return;
+        }
+
+        if ((isset($previous->quantity) && !self::sameQuantity($previous->getQuantity(), (float) $locked->getQuantity()))
+            || !self::sameQuantity($previous->getQuantityReceived() ?? 0.0, (float) $locked->getQuantityReceived())
+            || $previous->getReceivedCondition() !== $locked->getReceivedCondition()
+            || (bool) $previous->getResellable() !== (bool) $locked->getResellable()) {
+            throw new ConflictHttpException(self::CHANGED_SINCE_READ);
+        }
+
+        if (!isset($data->quantity)) {
+            $data->setQuantity((float) $locked->getQuantity());
+        }
+    }
+
+    /**
+     * The fields no client may write come from the locked line: the persist
+     * processor writes every field of the resource back.
+     */
+    private function takeWhatNoClientWritesFrom(OrderReturnLine $locked, OrderReturnLineResource $data): void
+    {
+        $data->setRefundAmount(null === $locked->getRefundAmount() ? null : (float) $locked->getRefundAmount());
+        $data->setProductSaleElementsId($locked->getProductSaleElementsId());
+    }
+
+    private static function sameQuantity(float $one, float $other): bool
+    {
+        return abs($one - $other) <= ReturnEligibilityChecker::QUANTITY_TOLERANCE;
+    }
+
+    /**
+     * Raising or lowering a line goes through the gate a creation goes
+     * through, on the order and the order product read under their locks.
+     */
+    private function assertTheNewQuantityIsReturnable(int $orderId, OrderReturnLine $locked, float $quantity, ConnectionInterface $connection): void
+    {
+        $order = OrderQuery::create()->findPk($orderId, $connection);
+        $orderProduct = OrderProductQuery::create()->findPk((int) $locked->getOrderProductId(), $connection);
+        $customer = $order?->getCustomer($connection);
+
+        if (!$order instanceof Order || !$orderProduct instanceof OrderProduct || !$customer instanceof Customer) {
+            throw new UnprocessableEntityHttpException('The return line is not attached to an order of a customer.');
+        }
+
+        $this->eligibility->assertReturnable(
+            $order,
+            $customer,
+            $orderProduct,
+            $quantity,
+            excludeLineId: (int) $locked->getId(),
+        );
     }
 }
