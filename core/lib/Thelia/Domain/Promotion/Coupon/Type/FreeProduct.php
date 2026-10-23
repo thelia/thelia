@@ -14,13 +14,19 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
+use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\DestinationRestriction\ProductRefusedByDestinationException;
+use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 
@@ -44,6 +50,39 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     public const ADD_TO_CART_IN_PROCESS = -1;
 
+    private const SESSION_VAR_PREFIX = 'coupon.free_product.cart_items.';
+
+    public function __construct(
+        FacadeInterface $facade,
+        protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+    ) {
+        parent::__construct($facade);
+    }
+
+    /**
+     * The cart lines the free product promotions of this session hold as their gift.
+     *
+     * @return list<int>
+     */
+    public static function giftCartItemIds(SessionInterface $session): array
+    {
+        $cartItemIds = [];
+
+        foreach ($session->all() as $name => $cartItemIdOfProduct) {
+            if (!str_starts_with((string) $name, self::SESSION_VAR_PREFIX) || !\is_array($cartItemIdOfProduct)) {
+                continue;
+            }
+
+            foreach ($cartItemIdOfProduct as $cartItemId) {
+                if (\is_int($cartItemId) && $cartItemId > 0) {
+                    $cartItemIds[] = $cartItemId;
+                }
+            }
+        }
+
+        return array_values(array_unique($cartItemIds));
+    }
+
     public function setFieldsValue(array $effects): void
     {
         $this->offeredProductId = empty($effects[self::OFFERED_PRODUCT_ID])
@@ -65,7 +104,7 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     protected function getSessionVarName(): string
     {
-        return 'coupon.free_product.cart_items.'.$this->getCode();
+        return self::SESSION_VAR_PREFIX.$this->getCode();
     }
 
     /**
@@ -225,6 +264,16 @@ class FreeProduct extends AbstractRemoveOnProducts
                 $freeProductCartItem = $cartEvent->getCartItem();
             }
 
+            if ($freeProductCartItem instanceof CartItem && $this->theDestinationRefuses($freeProductCartItem)) {
+                // The cart now goes where the gift cannot travel (the buyer chose another
+                // delivery address): the gift is withdrawn rather than blocking the order.
+                $freeProductCartItem->delete();
+                $this->clearFreeProductsCartItemIds();
+                $this->facade->getCart()?->clearCartItems();
+
+                return 0.0;
+            }
+
             if ($freeProductCartItem instanceof CartItem) {
                 // The discount is the product price.
                 $discount = $freeProductCartItem->getRealTaxedPrice($this->facade->getDeliveryCountry());
@@ -237,6 +286,32 @@ class FreeProduct extends AbstractRemoveOnProducts
         }
 
         return (float) $discount;
+    }
+
+    /**
+     * Judged the way the addition to the cart judges a product: on the addresses of the
+     * cart, or the default address of the customer before one is chosen.
+     */
+    private function theDestinationRefuses(CartItem $giftCartItem): bool
+    {
+        $productId = (int) $giftCartItem->getProductId();
+
+        if (null === $this->destinationRestrictionChecker || !$this->destinationRestrictionChecker->isRestricted($productId)) {
+            return false;
+        }
+
+        $cart = $giftCartItem->getCart();
+
+        if (!$cart instanceof Cart) {
+            return false;
+        }
+
+        return [] !== $this->destinationRestrictionChecker->violationsForProducts(
+            [$productId],
+            CartDestinations::delivery($cart, true),
+            CartDestinations::billing($cart, true),
+            Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale(),
+        );
     }
 
     protected function getFieldList(): array
