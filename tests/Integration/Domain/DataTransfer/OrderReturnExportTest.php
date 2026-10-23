@@ -140,6 +140,19 @@ final class OrderReturnExportTest extends IntegrationTestCase
         self::assertSame("'=1+1", $row['Expected exchange']);
     }
 
+    public function testAWishLeftOnAReturnNoLongerAnExchangeIsNotExported(): void
+    {
+        // An administrator can move a return opened as an exchange to a refund: the wish
+        // stays stored, but the shop no longer sends anything in exchange.
+        $order = $this->orderWithALine(['Helmet size' => 'L']);
+        $this->returnOf($order, OrderReturnStatus::CODE_ACCEPTED, OrderReturn::RESOLUTION_REFUND, 'Too small', null, 'The same one in XL');
+
+        $row = $this->rowsOf($order, $this->locale('en_US'))[0];
+
+        self::assertSame(OrderReturn::RESOLUTION_REFUND, $row['Type']);
+        self::assertNull($row['Expected exchange'], 'Only an exchange row carries the wished exchange.');
+    }
+
     public function testAProductOrACombinationThatStartsLikeAFormulaIsExportedAsText(): void
     {
         $order = $this->orderWithALine(['Helmet size' => '=2+2']);
