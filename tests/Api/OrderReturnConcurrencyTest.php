@@ -414,6 +414,32 @@ final class OrderReturnConcurrencyTest extends ApiTestCase
     }
 
     /**
+     * The return is received while a patch of one of its lines waits on its
+     * locks, the instance pool on: the patch must find the return received,
+     * not as API Platform left it in the pool, and change nothing the
+     * reception already restocked and refunded.
+     */
+    public function testAPatchFindsTheReturnAReceptionCommittedThroughTheInstancePool(): void
+    {
+        [$order, $customer, [$orderProduct]] = $this->paidOrderWithLines(2.0);
+        $lineId = $this->committedReturnLine($order, $customer, $orderProduct, 2.0);
+        $token = $this->authenticateAsAdmin($this->committedAdmin());
+
+        $this->startCompetingRequest($this->mainThreadId(), [
+            ['lock', 'order', (int) $order->getId()],
+            ['lock', 'order_product', (int) $orderProduct->getId()],
+            ['update', 'order_return', $this->returnIdOf($lineId), ['status_id' => OrderReturnStatusQuery::create()->findIdByCode(OrderReturnStatus::CODE_RECEIVED)]],
+        ]);
+
+        $response = $this->withInstancePooling(fn (): Response => $this->jsonRequest('PATCH', '/api/admin/order_return_lines/'.$lineId, ['quantityReceived' => 1.0], $token, 'merge-patch+json'));
+        $competing = $this->finishCompetingRequest();
+
+        self::assertSame(['quantity' => 2.0, 'received' => 0.0], $this->committedLineQuantities($lineId), 'The patch changed a line of a return received while it waited: '.$response->getContent().' / competing request: '.$competing);
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('can no longer be changed', (string) $response->getContent());
+    }
+
+    /**
      * The same race through the reception: the quantities it is handed are
      * checked against the line as the competing patch left it.
      */

@@ -83,6 +83,27 @@ final class OrderReturnStateMachineTest extends TestCase
         self::assertFalse($this->stateMachine->isTerminal(OrderReturnStatus::CODE_INFO_AWAITED));
     }
 
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function receptionStillAhead(): iterable
+    {
+        yield 'requested, through accepted' => [OrderReturnStatus::CODE_REQUESTED, true];
+        yield 'info awaited, through requested and accepted' => [OrderReturnStatus::CODE_INFO_AWAITED, true];
+        yield 'accepted' => [OrderReturnStatus::CODE_ACCEPTED, true];
+        yield 'received already' => [OrderReturnStatus::CODE_RECEIVED, false];
+        yield 'settled' => [OrderReturnStatus::CODE_SETTLED, false];
+        yield 'refused' => [OrderReturnStatus::CODE_REFUSED, false];
+        yield 'expired' => [OrderReturnStatus::CODE_EXPIRED, false];
+        yield 'unknown' => ['no_such_code', false];
+    }
+
+    #[DataProvider('receptionStillAhead')]
+    public function testWhetherAReturnMayStillBeReceived(string $from, bool $reachable): void
+    {
+        self::assertSame($reachable, $this->stateMachine->canStillReach($from, OrderReturnStatus::CODE_RECEIVED));
+    }
+
     public function testAnUnknownStatusHasNoTargetAndIsTerminal(): void
     {
         self::assertSame([], $this->stateMachine->allowedTargets('no_such_code'));
