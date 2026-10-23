@@ -20,6 +20,7 @@ use Propel\Runtime\Propel;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\OrderHistoryTableMap;
+use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderHistoryQuery;
 
 /**
@@ -296,7 +297,7 @@ final readonly class OrderHistoryRecorder
 
     /**
      * Inserts the line with a prepared statement of its own, never through
-     * {@see \Thelia\Model\OrderHistory::save()}.
+     * {@see OrderHistory::save()}.
      *
      * save() opens a transaction level and rolls it back on any refusal (a foreign key
      * on an order that is gone, a lock wait that ran out, a payload too big for the
@@ -306,8 +307,12 @@ final readonly class OrderHistoryRecorder
      * fails on its own undoes the statement only, so the caller's transaction is left as
      * it was and the refusal is logged by {@see self::record()}.
      *
-     * The columns and the values are the ones save() writes, the two timestamps of the
-     * timestampable behavior included.
+     * Everything else save() does is kept. The line is still an OrderHistory model: the
+     * Propel model events of the table (pre.save, pre.insert, post.insert, post.save) are
+     * dispatched around the insert, a listener that stops the propagation of a pre event
+     * keeps the line from being written, and the values written are the ones the model
+     * holds once its listeners have run. The two timestamps of the timestampable behavior
+     * are set the way save() sets them.
      *
      * One refusal cannot be absorbed this way: a deadlock (error 1213) makes InnoDB roll
      * back the whole transaction on the server, whatever the client does next, and the
@@ -323,25 +328,63 @@ final readonly class OrderHistoryRecorder
         ConnectionInterface $connection,
     ): void {
         $actor = $this->actorResolver->resolve($moduleCode);
-        $actorLabel = null === $actor->label ? null : mb_substr($actor->label, 0, self::ACTOR_LABEL_MAX_LENGTH);
-        $now = (new \DateTimeImmutable())->format('Y-m-d H:i:s.u');
+
+        $entry = new OrderHistory();
+        $entry
+            ->setOrderId($orderId)
+            ->setEventType($eventType)
+            ->setActorType($actor->actorType->value)
+            ->setActorLabel(null === $actor->label ? null : mb_substr($actor->label, 0, self::ACTOR_LABEL_MAX_LENGTH))
+            ->setAdminId($actor->adminId)
+            ->setPayload($encodedPayload)
+            ->setComment($comment)
+            ->setVisibleToCustomer($visibleToCustomer ? 1 : 0);
+
+        if (!$entry->preSave($connection) || !$entry->preInsert($connection)) {
+            return;
+        }
+
+        $now = new \DateTimeImmutable();
+
+        if (!$entry->isColumnModified(OrderHistoryTableMap::COL_CREATED_AT)) {
+            $entry->setCreatedAt($now);
+        }
+
+        if (!$entry->isColumnModified(OrderHistoryTableMap::COL_UPDATED_AT)) {
+            $entry->setUpdatedAt($now);
+        }
+
+        $actorLabel = $entry->getActorLabel();
+        $adminId = $entry->getAdminId();
+        $payload = $entry->getPayload();
+        $entryComment = $entry->getComment();
+        $createdAt = $entry->getCreatedAt('Y-m-d H:i:s.u');
+        $updatedAt = $entry->getUpdatedAt('Y-m-d H:i:s.u');
 
         $statement = $connection->prepare(
             'INSERT INTO `order_history` '
             .'(`order_id`, `event_type`, `actor_type`, `actor_label`, `admin_id`, `payload`, `comment`, `visible_to_customer`, `created_at`, `updated_at`) '
             .'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         );
-        $statement->bindValue(1, $orderId, \PDO::PARAM_INT);
-        $statement->bindValue(2, $eventType, \PDO::PARAM_STR);
-        $statement->bindValue(3, $actor->actorType->value, \PDO::PARAM_STR);
+        $statement->bindValue(1, $entry->getOrderId(), \PDO::PARAM_INT);
+        $statement->bindValue(2, $entry->getEventType(), \PDO::PARAM_STR);
+        $statement->bindValue(3, $entry->getActorType(), \PDO::PARAM_STR);
         $statement->bindValue(4, $actorLabel, null === $actorLabel ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
-        $statement->bindValue(5, $actor->adminId, null === $actor->adminId ? \PDO::PARAM_NULL : \PDO::PARAM_INT);
-        $statement->bindValue(6, $encodedPayload, null === $encodedPayload ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
-        $statement->bindValue(7, $comment, null === $comment ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
-        $statement->bindValue(8, $visibleToCustomer ? 1 : 0, \PDO::PARAM_INT);
-        $statement->bindValue(9, $now, \PDO::PARAM_STR);
-        $statement->bindValue(10, $now, \PDO::PARAM_STR);
+        $statement->bindValue(5, $adminId, null === $adminId ? \PDO::PARAM_NULL : \PDO::PARAM_INT);
+        $statement->bindValue(6, $payload, null === $payload ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(7, $entryComment, null === $entryComment ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(8, $entry->getVisibleToCustomer(), \PDO::PARAM_INT);
+        $statement->bindValue(9, $createdAt, null === $createdAt ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(10, $updatedAt, null === $updatedAt ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
         $statement->execute();
+
+        $entry->setId((int) $connection->lastInsertId());
+        $entry->setNew(false);
+        $entry->resetModified();
+
+        $entry->postInsert($connection);
+        $entry->postSave($connection);
+        OrderHistoryTableMap::addInstanceToPool($entry);
     }
 
     /**
