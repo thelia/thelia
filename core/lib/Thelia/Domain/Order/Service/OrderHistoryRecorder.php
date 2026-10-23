@@ -33,13 +33,42 @@ use Thelia\Model\OrderHistoryQuery;
  *
  * An automatic entry is written once. Payment providers notify twice, a browser reloads
  * a confirmation page, a cron retries: the same event with the same payload arriving
- * again adds nothing and is dropped, whether the two arrivals follow each other or land
- * on two workers at the same instant. A note is the exception — a human writing the same
- * sentence twice meant to write it twice.
+ * again right behind itself adds nothing and is dropped, whether the two arrivals follow
+ * each other or land on two workers at the same instant. A note is the exception — a
+ * human writing the same sentence twice meant to write it twice.
+ *
+ * That second rule holds in autocommit only. A caller that wraps its gesture in a
+ * transaction of its own (the API order processor, a payment module) releases nothing
+ * to the other workers before it commits: the lock below is released when the entry is
+ * written, which is before that commit, so a worker that takes it next cannot see the
+ * row the first one has not committed yet; and under REPEATABLE READ the view of the
+ * worker is frozen at its first read, which the caller made before the lock was asked
+ * for. Two workers in two such transactions can both write the same entry. A duplicated
+ * line is accepted there, as it is when the lock cannot be had at all: the mechanism is
+ * what it is, and the first rule, a journal that never breaks its gesture, comes first.
  */
 final readonly class OrderHistoryRecorder
 {
     private const LOCK_NAME_PREFIX = 'thelia_order_history:';
+
+    /**
+     * The kinds whose payload is the new value of something the order holds: a status, a
+     * reference, the fact of being placed. A repeat of the same value is a replay even
+     * with other lines written since, because the value itself would have moved on in
+     * between — a status changes from the one it has — and the lines a gesture writes
+     * after the one that announces it (the invoice number allocated when an order turns
+     * paid, the e-mail it sends) are not a reason to take the replay of that
+     * announcement for a new occurrence. Those kinds are compared with the last entry of
+     * their own kind; every other kind, an e-mail for one, is compared with the last
+     * entry of the order.
+     */
+    private const VALUE_EVENT_TYPES = [
+        OrderHistoryEventType::ORDER_CREATED,
+        OrderHistoryEventType::STATUS_CHANGED,
+        OrderHistoryEventType::DELIVERY_REF_UPDATED,
+        OrderHistoryEventType::TRANSACTION_REF_UPDATED,
+        OrderHistoryEventType::INVOICE_REF_ALLOCATED,
+    ];
 
     /**
      * MySQL refuses a user lock name longer than 64 bytes; MariaDB accepts 192. The
@@ -318,18 +347,38 @@ final readonly class OrderHistoryRecorder
         return json_encode($payload, \JSON_THROW_ON_ERROR);
     }
 
+    private function isValueEvent(string $eventType): bool
+    {
+        $known = OrderHistoryEventType::tryFrom($eventType);
+
+        return null !== $known && \in_array($known, self::VALUE_EVENT_TYPES, true);
+    }
+
     /**
-     * Whether the same automatic event, with the same payload, is already the last one
-     * of its kind on this order.
+     * Whether the same automatic event, with the same payload, is already the last entry
+     * it repeats.
      *
-     * Only the latest entry is compared: an event that happened, then something else,
-     * then happened again is a real second occurrence and belongs in the timeline.
+     * For an occurrence (an e-mail, a module's own step) that is the latest entry of the
+     * order, whatever its kind: an event that happened, then something else, then
+     * happened again is a real second occurrence and belongs in the timeline. Comparing
+     * with the latest entry of the same kind would drop it, and the same e-mail sent on
+     * each step of a return would leave one line. A replay — a notification delivered
+     * twice, a cron that retries — arrives right behind the entry it repeats and is
+     * still dropped. For the kinds listed in {@see self::VALUE_EVENT_TYPES} it is the
+     * latest entry of the same kind, for the reason given there.
      *
      * The answer is only worth what the moment it was read is worth, so the caller runs
      * this check and the write that follows inside a named database lock held on the
      * connection that writes — one lock per couple (order, event type), so two workers
      * handling the same notification at the same instant take their turn instead of both
      * reading an empty journal. That is why this method is never called on its own.
+     *
+     * The lock stays per kind although the comparison of an e-mail now reads the whole
+     * order. It serializes two identical e-mails, which is the race that writes a line
+     * twice. It does not serialize an e-mail against another kind of entry written at the
+     * same instant: whichever lands first decides whether the e-mail looks like a replay,
+     * and a line more or less in that window is accepted, where a lock per order would
+     * make every writer of an order queue behind the others.
      *
      * The lock is asked for, never insisted on: a worker waits a second at most, and an
      * entry whose turn never came is written without being checked. A duplicated line is
@@ -338,8 +387,12 @@ final readonly class OrderHistoryRecorder
      */
     private function isDuplicate(int $orderId, string $eventType, ?string $encodedPayload, ConnectionInterface $connection): bool
     {
-        $latestEntry = OrderHistoryQuery::create()->findLatestOfType($orderId, $eventType, $connection);
+        $latestEntry = $this->isValueEvent($eventType)
+            ? OrderHistoryQuery::create()->findLatestOfType($orderId, $eventType, $connection)
+            : OrderHistoryQuery::create()->findLatest($orderId, $connection);
 
-        return null !== $latestEntry && $latestEntry->getPayload() === $encodedPayload;
+        return null !== $latestEntry
+            && $latestEntry->getEventType() === $eventType
+            && $latestEntry->getPayload() === $encodedPayload;
     }
 }
