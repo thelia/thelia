@@ -26,16 +26,27 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Turns the order events the core already dispatches into history entries.
  *
- * Every recording listener runs at priority 64, after Thelia\Action\Order (128) has
+ * Most recording listeners run at priority 64, after Thelia\Action\Order (128) has
  * persisted the change and committed its own transaction. Recording before that would
  * write a line for a gesture that may still fail, and the status change in particular
  * is wrapped in a transaction of its own: a history row inserted inside it would be
  * rolled back with the stock update it guards.
  *
- * The status change needs what the order looked like before, which at priority 64 is
+ * The status change is the exception and runs at 127. A timeline reads in the order the
+ * lines were written, and the e-mails a status change triggers are sent by listeners
+ * that run after the core one: the Cheque module at 100, the shipping e-mail of the
+ * core at 32. Written at 64, the status line landed behind all of them and the
+ * confirmation showed up before the change that caused it. 127 is the first priority
+ * below the core listener, so the status is persisted and nothing that sends an e-mail
+ * has run yet. The limit is a module that sends its e-mail at 128, the core's own
+ * priority: it runs before 127 and its line still comes first. The fix belongs to that
+ * module, which has to run below 127; the order of other modules' listeners is not
+ * something to change from here.
+ *
+ * The status change needs what the order looked like before, which at priority 127 is
  * already gone — the order in the event carries the new status. A second listener on
  * the same event runs at 192, ahead of the core, and keeps the previous status code
- * for the one at 64 to read back. The two are keyed by the event object itself, so
+ * for the one at 127 to read back. The two are keyed by the event object itself, so
  * concurrent dispatches in the same process never read each other's value.
  */
 readonly class RecordOrderHistoryListener
@@ -46,7 +57,7 @@ readonly class RecordOrderHistoryListener
     /**
      * The status each in-flight event started from.
      *
-     * A WeakMap rather than an SplObjectStorage: nothing guarantees the listener at 64
+     * A WeakMap rather than an SplObjectStorage: nothing guarantees the listener at 127
      * ever runs — a listener in between may stop propagation — and a weak key lets the
      * abandoned entry go with the event instead of holding it for the whole process.
      *
@@ -70,7 +81,7 @@ readonly class RecordOrderHistoryListener
         $this->statusCodeBeforeChange[$event] = $this->statusCodeOf($event->getOrder()->getStatusId());
     }
 
-    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 64)]
+    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 127)]
     public function onStatusUpdated(OrderEvent $event): void
     {
         $order = $event->getOrder();
