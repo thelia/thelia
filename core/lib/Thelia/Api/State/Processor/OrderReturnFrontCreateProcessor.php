@@ -16,8 +16,8 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\Propel;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,18 +25,23 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Resource\OrderReturn as OrderReturnResource;
 use Thelia\Api\Service\OrderReturnHydrator;
-use Thelia\Config\DatabaseConfiguration;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnRequestLimiter;
 use Thelia\Model\Customer;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturn as OrderReturnModel;
 
 /**
  * A return opened under /front/account belongs to the customer holding the
  * token. The owner and the initial status never come from the body, and every
  * line is checked against the order before anything is written.
+ *
+ * A request the database gave up on to break a lock conflict with another one
+ * is answered 409: nothing was written, and it may be sent again.
  */
 final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterface
 {
@@ -46,6 +51,7 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
         private OrderReturnHydrator $hydrator,
         private EventDispatcherInterface $eventDispatcher,
         private ReturnRequestLimiter $limiter,
+        private OrderReturnWriteTransactionInterface $transaction,
     ) {
     }
 
@@ -63,38 +69,57 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
             throw new AccessDeniedHttpException('A customer must be authenticated to open a return.');
         }
 
-        // Checking how much of a line is still returnable and writing the
-        // return that consumes it belong to the same transaction, or two
-        // requests arriving together are both allowed the same last unit. The
-        // persist processor opens a transaction of its own, which Propel nests
-        // inside this one.
-        $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
-        $connection->beginTransaction();
-
         try {
-            $this->hydrator->hydrate($data, $customer, false);
+            [$orderId, $orderProductIds] = OrderReturnHydrator::rowsToLock($data);
 
-            // The quota counts the returns a customer opens, not the mistakes
-            // they make filling the form in: consumed before the eligibility
-            // gate, twenty refusals closed the hour for the one valid request
-            // that followed them.
-            if (!$this->limiter->allows($customer)) {
-                throw new TooManyRequestsHttpException(message: 'Too many return requests, please try again later.');
-            }
+            // Before any lock: naming somebody else's order in the body must not
+            // let a caller hold it, even for the length of a refusal.
+            $this->assertOrderOfTheCustomer($orderId, $customer);
 
-            $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-            $connection->commit();
+            // Checking how much of a line is still returnable and writing the
+            // return that consumes it belong to the same transaction, the rows
+            // locked before anything is read, or two requests arriving together
+            // are both allowed the same last unit. The persist processor opens a
+            // transaction of its own, which Propel nests inside this one.
+            $result = $this->transaction->run($orderId, $orderProductIds, function () use ($data, $customer, $operation, $uriVariables, $context): mixed {
+                $this->hydrator->hydrate($data, $customer, false);
+
+                // The quota counts the returns a customer opens, not the mistakes
+                // they make filling the form in: consumed before the eligibility
+                // gate, twenty refusals closed the hour for the one valid request
+                // that followed them.
+                if (!$this->limiter->allows($customer)) {
+                    throw new TooManyRequestsHttpException(message: 'Too many return requests, please try again later.');
+                }
+
+                return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+            });
+        } catch (ReturnRequestConflictException $exception) {
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         } catch (ReturnNotAllowedException $exception) {
-            $connection->rollBack();
-
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        } catch (\Throwable $exception) {
-            $connection->rollBack();
-
-            throw $exception;
         }
 
         return $this->dispatchStatusEmail($result);
+    }
+
+    /**
+     * A plain read, outside any transaction, so it takes no lock and fixes no
+     * picture.
+     *
+     * @throws ReturnNotAllowedException
+     */
+    private function assertOrderOfTheCustomer(int $orderId, Customer $customer): void
+    {
+        $ownerId = OrderQuery::create()->filterById($orderId)->select(['CustomerId'])->findOne();
+
+        if (null === $ownerId) {
+            throw new ReturnNotAllowedException('The order does not exist.');
+        }
+
+        if ((int) $ownerId !== (int) $customer->getId()) {
+            throw new ReturnNotAllowedException('This order cannot be used for a return.');
+        }
     }
 
     /**

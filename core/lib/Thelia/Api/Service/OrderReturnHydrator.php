@@ -45,9 +45,40 @@ final readonly class OrderReturnHydrator
     }
 
     /**
-     * Meant to be called inside the transaction that writes the return: it
-     * locks every order product line it checks, and a lock outside a
-     * transaction is released as soon as it is taken.
+     * The order and the order product lines a return resource is about, read
+     * from the request alone: OrderReturnWriteTransaction locks them before the
+     * transaction reads anything, so they cannot come from the database.
+     *
+     * @return array{int, list<int>}
+     *
+     * @throws ReturnNotAllowedException
+     */
+    public static function rowsToLock(OrderReturnResource $data): array
+    {
+        // The validation of the write groups already refuses a body missing
+        // either field; an uninitialized typed property read here would still
+        // be an Error, a 500, rather than a refusal.
+        if (!isset($data->order)) {
+            throw new ReturnNotAllowedException('A return must name the order it is about.');
+        }
+
+        $orderProductIds = [];
+
+        foreach ($data->getOrderReturnLines() as $line) {
+            if (!isset($line->orderProduct)) {
+                throw new ReturnNotAllowedException('A return line must name the order product it is about.');
+            }
+
+            $orderProductIds[] = (int) $line->getOrderProduct()->getId();
+        }
+
+        return [(int) $data->getOrder()->getId(), $orderProductIds];
+    }
+
+    /**
+     * Meant to be called inside the transaction that writes the return, opened
+     * by OrderReturnWriteTransaction::run() on the rows rowsToLock() names: the
+     * order and its lines are then locked before anything here reads them.
      *
      * @throws ReturnNotAllowedException
      */

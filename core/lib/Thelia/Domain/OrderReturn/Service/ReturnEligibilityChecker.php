@@ -16,10 +16,10 @@ namespace Thelia\Domain\OrderReturn\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
+use Thelia\Config\DatabaseConfiguration;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
-use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
@@ -77,6 +77,11 @@ final class ReturnEligibilityChecker
      */
     public const QUANTITY_PRECISION = 6;
     public const QUANTITY_TOLERANCE = 1e-6;
+
+    public function __construct(
+        private readonly OrderReturnWriteTransaction $transaction,
+    ) {
+    }
 
     /**
      * Whether the returns feature is enabled on the shop.
@@ -259,21 +264,33 @@ final class ReturnEligibilityChecker
      *
      * The lock is only worth taking inside the transaction that writes the
      * return: a `FOR UPDATE` outside one is released as soon as it is taken.
-     * The caller opens it - OrderReturnFrontCreateProcessor and
-     * OrderReturnAdminCreateProcessor both do - which is also what makes the
-     * read and the insert one atomic step.
+     * The caller opens it through OrderReturnWriteTransaction, which also
+     * takes the locks before anything is read, and makes the read and the
+     * insert one atomic step.
+     *
+     * The order row is locked with the line, before it: every path takes the
+     * order, then its lines by increasing id, see OrderReturnWriteTransaction.
      */
     public function lockLine(OrderProduct $orderProduct): void
     {
-        $connection = Propel::getWriteConnection(OrderProductTableMap::DATABASE_NAME);
+        $this->transaction->lock((int) $orderProduct->getOrderId(), [(int) $orderProduct->getId()]);
+    }
 
-        $statement = $connection->prepare(
-            'SELECT '.OrderProductTableMap::COL_ID
-            .' FROM '.OrderProductTableMap::TABLE_NAME
-            .' WHERE '.OrderProductTableMap::COL_ID.' = :id FOR UPDATE'
-        );
-        $statement->execute([':id' => (int) $orderProduct->getId()]);
-        $statement->closeCursor();
+    /**
+     * lockLine() for several lines of an order at once, in the one order every
+     * path takes them in: two requests asking for [A, B] and [B, A] would
+     * otherwise each hold their first line and wait for the other's.
+     *
+     * @param iterable<OrderProduct> $orderProducts
+     */
+    public function lockLines(Order $order, iterable $orderProducts): void
+    {
+        $orderProductIds = [];
+        foreach ($orderProducts as $orderProduct) {
+            $orderProductIds[] = (int) $orderProduct->getId();
+        }
+
+        $this->transaction->lock((int) $order->getId(), $orderProductIds);
     }
 
     /**
@@ -281,10 +298,31 @@ final class ReturnEligibilityChecker
      * minus the quantities already requested by open returns, or the ordered
      * quantity itself when the shop does not count the returns cumulatively.
      *
+     * This is the figure shown to the customer and the merchant: a plain read,
+     * which never waits on a return being written.
+     *
      * @param int|null $excludeReturnId a return to leave out of the cumulative count,
      *                                  typically the one being edited
      */
     public function remainingReturnableQuantity(OrderProduct $orderProduct, ?int $excludeReturnId = null): float
+    {
+        return $this->computeRemainingQuantity($orderProduct, $excludeReturnId, lockingRead: false);
+    }
+
+    /**
+     * The quantities are read as plain values, never as models: the instance
+     * pool hands back a line already loaded in the process as it was then, so
+     * a quantity changed since would be counted at its old value. They are
+     * summed here rather than by SUM(): the column is a FLOAT, which SQL adds
+     * in single precision (1000.3 is 1000.2999877929688 there), while PDO hands
+     * out the rounded figure the shop displays.
+     *
+     * $lockingRead is for a write transaction that may have read before it
+     * locked its rows, see OrderReturnWriteTransaction: there only a locking
+     * read sees the returns committed since. It goes to the write connection,
+     * where the lock and the transaction are.
+     */
+    private function computeRemainingQuantity(OrderProduct $orderProduct, ?int $excludeReturnId, bool $lockingRead): float
     {
         if (!$this->isQuantityCumulative()) {
             $ordered = round((float) $orderProduct->getQuantity(), self::QUANTITY_PRECISION);
@@ -304,9 +342,15 @@ final class ReturnEligibilityChecker
             $query->filterByOrderReturnId($excludeReturnId, Criteria::NOT_EQUAL);
         }
 
+        $connection = null;
+        if ($lockingRead) {
+            $query->lockForShare();
+            $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
+        }
+
         $alreadyRequested = 0.0;
-        foreach ($query->find() as $line) {
-            $alreadyRequested += (float) $line->getQuantity();
+        foreach ($query->select(['Quantity'])->find($connection) as $quantity) {
+            $alreadyRequested += (float) $quantity;
         }
 
         $remaining = round((float) $orderProduct->getQuantity() - $alreadyRequested, self::QUANTITY_PRECISION);
@@ -316,6 +360,8 @@ final class ReturnEligibilityChecker
 
     /**
      * Assert that the given quantity of a product line may be returned by the customer.
+     *
+     * @param int|null $excludeReturnId a return to leave out of the cumulative count
      *
      * @throws ReturnNotAllowedException
      */
@@ -342,7 +388,9 @@ final class ReturnEligibilityChecker
             throw new ReturnNotAllowedException('The returned quantity must be positive.');
         }
 
-        if ($quantity > $this->remainingReturnableQuantity($orderProduct, $excludeReturnId) + self::QUANTITY_TOLERANCE) {
+        $remaining = $this->computeRemainingQuantity($orderProduct, $excludeReturnId, lockingRead: $this->needsLockingReads());
+
+        if ($quantity > $remaining + self::QUANTITY_TOLERANCE) {
             throw new ReturnNotAllowedException('The returned quantity exceeds the returnable quantity of this line.');
         }
     }
@@ -350,10 +398,19 @@ final class ReturnEligibilityChecker
     /**
      * Assert the postage of the order is not already carried by another still-open return.
      *
+     * The postage belongs to the order, not to a line: two returns on two
+     * different lines share no line lock, and both would count no return
+     * carrying the postage and both carry it back. The order row is held
+     * instead, until the end of the transaction that writes the return. The
+     * count is a locking read only in a transaction that may have read before
+     * it locked, for the same reason as in computeRemainingQuantity().
+     *
      * @throws ReturnNotAllowedException
      */
     public function assertPostageNotAlreadyReturned(Order $order, ?int $excludeReturnId = null): void
     {
+        $this->transaction->lock((int) $order->getId(), []);
+
         $query = OrderReturnQuery::create()
             ->filterByOrderId((int) $order->getId())
             ->filterByIncludePostage(true)
@@ -363,9 +420,24 @@ final class ReturnEligibilityChecker
             $query->filterById($excludeReturnId, Criteria::NOT_EQUAL);
         }
 
-        if ($query->count() > 0) {
+        if ($this->needsLockingReads()) {
+            $query->lockForShare();
+        }
+
+        if ($query->count(Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME)) > 0) {
             throw new ReturnNotAllowedException('The postage of this order is already included in another return.');
         }
+    }
+
+    /**
+     * Whether the reads that grant units have to lock to see the last committed
+     * rows: outside the transaction of an outermost OrderReturnWriteTransaction,
+     * the first plain read may have come before the locks. Such a read may
+     * deadlock; it never grants a unit twice.
+     */
+    private function needsLockingReads(): bool
+    {
+        return !$this->transaction->readsSeeCommits();
     }
 
     /**
