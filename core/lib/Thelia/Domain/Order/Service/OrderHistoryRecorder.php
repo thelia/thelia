@@ -34,8 +34,8 @@ use Thelia\Model\OrderHistoryQuery;
  * An automatic entry is written once. Payment providers notify twice, a browser reloads
  * a confirmation page, a cron retries: the same event with the same payload arriving
  * again right behind itself adds nothing and is dropped, whether the two arrivals follow
- * each other or land on two workers at the same instant. A note is the exception — a
- * human writing the same sentence twice meant to write it twice.
+ * each other or land on two workers at the same instant. A note and an address
+ * correction are the exceptions: each is a gesture of a person, never a replay.
  *
  * That second rule holds in autocommit only. A caller that wraps its gesture in a
  * transaction of its own (the API order processor, a payment module) releases nothing
@@ -281,12 +281,19 @@ final readonly class OrderHistoryRecorder
     /**
      * Whether entries of this kind are checked against the journal before being written.
      *
-     * A note is the only kind that is not: a human writing the same sentence twice meant
-     * to write it twice, so a note is never compared and never waits on the lock.
+     * A note and an address correction are not. A human writing the same sentence twice
+     * meant to write it twice. An administrator correcting an address is a gesture, not
+     * a notification that can be delivered twice, and its payload (the address and its
+     * type, never what was typed) is the same from one correction to the next, so a
+     * comparison would take the second correction, and its author, for a replay.
+     * Neither waits on the lock.
      */
     private function isDeduplicated(string $eventType): bool
     {
-        return OrderHistoryEventType::NOTE->value !== $eventType;
+        return !\in_array($eventType, [
+            OrderHistoryEventType::NOTE->value,
+            OrderHistoryEventType::ADDRESS_UPDATED->value,
+        ], true);
     }
 
     /**
