@@ -161,8 +161,6 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setOrderReturn($return);
-
-        $dispatcher->dispatch($event, TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
     }
 
     /**
@@ -247,8 +245,6 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setOrderReturn($return);
-
-        $dispatcher->dispatch($event, TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
     }
 
     /**
@@ -303,7 +299,23 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         }
 
         $event->setOrderReturn($return);
+    }
 
+    /**
+     * Announces the gesture to the customer, once everything that records it has run.
+     *
+     * The mail used to be sent from the end of the three actions above, at priority 128,
+     * which is before the listener that writes the line of the gesture in the history of
+     * the order (64): the timeline showed the mail before what it announces. It is now
+     * sent by its own listener, below that one, on the same event. It is still sent once
+     * the action has committed, and not at all when the action throws.
+     *
+     * Two things follow from it. A direct call to create(), receive() or updateStatus()
+     * no longer sends the mail: only the dispatch of the event does. And a listener
+     * between 32 and 128 that throws or stops the propagation keeps the mail from going.
+     */
+    public function dispatchStatusEmail(OrderReturnEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
+    {
         $dispatcher->dispatch($event, TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
     }
 
@@ -381,9 +393,9 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::ORDER_RETURN_CREATE => ['create', 128],
-            TheliaEvents::ORDER_RETURN_RECEIVE => ['receive', 128],
-            TheliaEvents::ORDER_RETURN_UPDATE_STATUS => ['updateStatus', 128],
+            TheliaEvents::ORDER_RETURN_CREATE => [['create', 128], ['dispatchStatusEmail', 32]],
+            TheliaEvents::ORDER_RETURN_RECEIVE => [['receive', 128], ['dispatchStatusEmail', 32]],
+            TheliaEvents::ORDER_RETURN_UPDATE_STATUS => [['updateStatus', 128], ['dispatchStatusEmail', 32]],
             TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL => ['sendStatusEmail', 128],
         ];
     }
