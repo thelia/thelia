@@ -20,6 +20,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Thelia\Api\Resource\CustomerPaymentMethod;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\Map\CustomerPaymentMethodTableMap;
@@ -34,6 +35,14 @@ use Thelia\Model\Map\CustomerPaymentMethodTableMap;
  * rather than "forbidden" — the same answer a missing id gives, so probing
  * sequential ids learns nothing about which ones exist.
  *
+ * Who the caller is comes from the firewall token when there is one. A front page
+ * has no token, because its customer lives in the Thelia session, so an in-process
+ * read (`resources()`, `DataAccessService`) falls back to the session customer, read
+ * through SecurityContext, which only looks at a session that already exists and
+ * never opens one. A token that names someone else than a customer, an administrator
+ * on a front route for instance, is never replaced by the session: it keeps reading
+ * nothing, and a guest in the session owns no stored method either.
+ *
  * The admin endpoints are left alone: they sit behind ROLE_ADMIN and a
  * back-office user legitimately reads every customer's stored methods.
  */
@@ -41,6 +50,7 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,
+        private SecurityContext $securityContext,
     ) {
     }
 
@@ -64,7 +74,7 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
             return;
         }
 
-        $customer = $this->tokenStorage->getToken()?->getUser();
+        $customer = $this->caller();
 
         if (!$customer instanceof Customer) {
             // Nobody authenticated as a customer here, so nothing is in scope.
@@ -75,5 +85,18 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
         }
 
         $query->filterByCustomerId($customer->getId());
+    }
+
+    private function caller(): mixed
+    {
+        $token = $this->tokenStorage->getToken();
+
+        if (null !== $token) {
+            return $token->getUser();
+        }
+
+        $sessionCustomer = $this->securityContext->getCustomerUser();
+
+        return $sessionCustomer instanceof Customer && !$sessionCustomer->isGuest() ? $sessionCustomer : null;
     }
 }
