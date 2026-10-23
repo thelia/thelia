@@ -70,6 +70,10 @@ final class DestinationRestrictionChecker implements ResetInterface
     }
 
     /**
+     * The lines the buyer put in the cart. A gift offered by a promotion is not judged:
+     * the buyer cannot remove it, and the promotion withdraws on its own a gift the
+     * destination refuses (OfferedCartLineService).
+     *
      * @return list<RestrictedLine>
      */
     public function violationsFor(Cart $cart, ?Destination $delivery, ?Destination $billing, string $locale): array
@@ -81,7 +85,9 @@ final class DestinationRestrictionChecker implements ResetInterface
         $productIds = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
-            $productIds[] = (int) $cartItem->getProductId();
+            if (1 !== (int) $cartItem->getIsOffered()) {
+                $productIds[] = (int) $cartItem->getProductId();
+            }
         }
 
         return $this->violationsForProducts($productIds, $delivery, $billing, $locale);
