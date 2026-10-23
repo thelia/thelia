@@ -17,6 +17,7 @@ namespace Thelia\Api\State\Processor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
@@ -25,6 +26,7 @@ use Thelia\Api\Resource\OrderReturnTransitionInput;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
+use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
 use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnStatusQuery;
@@ -69,6 +71,8 @@ final readonly class OrderReturnTransitionProcessor implements ProcessorInterfac
 
         try {
             $this->dispatcher->dispatch($event, TheliaEvents::ORDER_RETURN_UPDATE_STATUS);
+        } catch (ReturnRequestConflictException $exception) {
+            throw new ConflictHttpException($exception->getMessage(), $exception);
         } catch (ReturnNotAllowedException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }

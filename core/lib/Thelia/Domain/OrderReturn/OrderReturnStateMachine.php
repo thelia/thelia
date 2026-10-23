@@ -74,6 +74,33 @@ final class OrderReturnStateMachine
     }
 
     /**
+     * Whether a return in the given status may still reach the target one,
+     * through one transition or several.
+     */
+    public function canStillReach(string $fromCode, string $toCode): bool
+    {
+        $seen = [];
+        $pending = $this->allowedTargets($fromCode);
+
+        while ([] !== $pending) {
+            $code = array_shift($pending);
+
+            if ($code === $toCode) {
+                return true;
+            }
+
+            if (isset($seen[$code])) {
+                continue;
+            }
+
+            $seen[$code] = true;
+            array_push($pending, ...$this->allowedTargets($code));
+        }
+
+        return false;
+    }
+
+    /**
      * Whether the given code is terminal (no transition leaves it).
      */
     public function isTerminal(string $code): bool

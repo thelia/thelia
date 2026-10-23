@@ -14,12 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\ConfigTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
@@ -57,7 +59,15 @@ final class OrderReturnApiTest extends ApiTestCase
         ConfigQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
 
-        parent::tearDown();
+        try {
+            parent::tearDown();
+        } finally {
+            // Read again once the rollback is done: a setting a case wrote must
+            // not outlive it in the process, the next test class would read it,
+            // from the cache and from the Propel pool the rollback leaves as it was.
+            ConfigTableMap::clearInstancePool();
+            ConfigQuery::resetCache();
+        }
     }
 
     public function testACustomerOnlySeesTheirOwnReturns(): void
@@ -704,6 +714,195 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * A return may carry two lines on the same order product. Raising one of
+     * them is checked against what the other still holds: leaving the whole
+     * return out of the count handed the second line's units out again.
+     */
+    public function testAnAdminCannotRaiseALineAboveWhatTheOtherLinesOfItsReturnLeave(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantity(1.0)->save($this->getPropelConnection());
+
+        (new OrderReturnLine())
+            ->setOrderReturnId((int) $return->getId())
+            ->setOrderProductId((int) $line->getOrderProductId())
+            ->setProductSaleElementsId($line->getProductSaleElementsId())
+            ->setQuantity(1.0)
+            ->setQuantityReceived(0.0)
+            ->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantity' => 2.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode(), 'Two units ordered, one held by the other line: the patched line cannot take two.');
+        self::assertStringContainsString('exceeds the returnable quantity', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(1.0, (float) $line->getQuantity());
+    }
+
+    /**
+     * The order product and the return of a line are what the patch locks and
+     * what the reception restocks from. A patch naming another one would move
+     * the line onto an order line it never locked, or into another return, and
+     * the reception would restock the wrong sale element: the request is
+     * refused whole, the field it may change included.
+     */
+    #[DataProvider('anotherParent')]
+    public function testAPatchCannotMoveALineToAnotherOrderLineOrReturn(string $field, string $iriPattern): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $orderProductId = (int) $line->getOrderProductId();
+        $other = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $otherLine = $other->getOrderReturnLines()->getFirst();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            [
+                $field => \sprintf($iriPattern, 'orderProduct' === $field ? $otherLine->getOrderProductId() : $other->getId()),
+                'quantityReceived' => 1.0,
+            ],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(400, $response->getStatusCode(), (string) $response->getContent());
+        $refusal = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertIsArray($refusal);
+        self::assertStringContainsString('"'.$field.'"', (string) ($refusal['detail'] ?? ''));
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame($orderProductId, (int) $line->getOrderProductId());
+        self::assertSame((int) $return->getId(), (int) $line->getOrderReturnId());
+        self::assertSame(0.0, (float) $line->getQuantityReceived());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function anotherParent(): iterable
+    {
+        yield 'admin order product' => ['orderProduct', '/api/admin/order_products/%d'];
+        yield 'front order product' => ['orderProduct', '/api/front/account/order_products/%d'];
+        yield 'admin return' => ['orderReturn', '/api/admin/order_returns/%d'];
+        yield 'front return' => ['orderReturn', '/api/front/account/order_returns/%d'];
+    }
+
+    /**
+     * Only the two relations of a line are refused. A client that sends back
+     * what a GET gave it - its own `@id`, the read-only `refundAmount` - is
+     * answered as before: those keys are ignored, and the writable field of the
+     * body is the only thing that changes.
+     */
+    public function testAPatchStillIgnoresTheReadOnlyAttributesOfALine(): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setRefundAmount('7.500000')->save($this->getPropelConnection());
+        $orderProductId = (int) $line->getOrderProductId();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            [
+                '@id' => '/api/admin/order_return_lines/'.$line->getId(),
+                'id' => (int) $line->getId(),
+                'refundAmount' => 12345.0,
+                'productSaleElementsId' => 99999,
+                'quantityReceived' => 1.0,
+            ],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(1.0, (float) $line->getQuantityReceived());
+        self::assertSame($orderProductId, (int) $line->getOrderProductId());
+        self::assertSame((int) $return->getId(), (int) $line->getOrderReturnId());
+        self::assertSame(7.5, (float) $line->getRefundAmount(), 'The refund amount of a line is read only: the PATCH must leave the stored one as it is.');
+        self::assertNotSame(99999, (int) $line->getProductSaleElementsId());
+    }
+
+    /**
+     * Once a return can no longer be received - received, settled, refused,
+     * expired - its stock and its refund are settled on its lines as they
+     * are: a patch changing a quantity, the condition or the resellable flag
+     * would leave them behind.
+     *
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('aChangeToALineOfAReturnPastReception')]
+    public function testALineOfAReturnPastReceptionCannotBeChanged(string $statusCode, array $body): void
+    {
+        $return = $this->returnWithLine($this->customer(), $statusCode, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantityReceived(2.0)->setResellable(false)->setReceivedCondition('new')->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            $body,
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('can no longer be changed', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(2.0, (float) $line->getQuantity());
+        self::assertSame(2.0, (float) $line->getQuantityReceived());
+        self::assertFalse((bool) $line->getResellable());
+        self::assertSame('new', $line->getReceivedCondition());
+    }
+
+    /**
+     * @return iterable<string, array{string, array<string, mixed>}>
+     */
+    public static function aChangeToALineOfAReturnPastReception(): iterable
+    {
+        yield 'received, quantity' => [OrderReturnStatus::CODE_RECEIVED, ['quantity' => 1.0]];
+        yield 'received, received quantity' => [OrderReturnStatus::CODE_RECEIVED, ['quantityReceived' => 1.0]];
+        yield 'received, resellable' => [OrderReturnStatus::CODE_RECEIVED, ['resellable' => true]];
+        yield 'received, condition' => [OrderReturnStatus::CODE_RECEIVED, ['receivedCondition' => 'damaged']];
+        yield 'settled, received quantity' => [OrderReturnStatus::CODE_SETTLED, ['quantityReceived' => 1.0]];
+        yield 'refused, quantity' => [OrderReturnStatus::CODE_REFUSED, ['quantity' => 1.0]];
+        yield 'expired, resellable' => [OrderReturnStatus::CODE_EXPIRED, ['resellable' => true]];
+    }
+
+    /**
+     * Refusing a change is not refusing the request: one that leaves the line
+     * of a received return as it is goes through.
+     */
+    public function testAPatchLeavingALineOfAReceivedReturnAsItIsGoesThrough(): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_RECEIVED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantityReceived(2.0)->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantity' => 2.0, 'quantityReceived' => 2.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertJsonResponseSuccessful($response);
+    }
+
+    /**
      * The rate limiter is the shop's protection against a flood of requests,
      * not a punishment for getting a form wrong: consuming a token before the
      * eligibility check let twenty refused attempts close the hour for the
@@ -873,6 +1072,363 @@ final class OrderReturnApiTest extends ApiTestCase
         self::assertJsonResponseSuccessful(
             $this->jsonRequest('GET', '/api/admin/order_return_statutes/code/'.OrderReturnStatus::CODE_REQUESTED, token: $token),
         );
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function orderForms(): iterable
+    {
+        yield 'IRI' => [true];
+        yield 'bare identifier' => [false];
+    }
+
+    /**
+     * Naming somebody else's order and naming an id that exists nowhere answer
+     * the same status and the same body on this request, whether the order is
+     * given as an IRI or as a bare identifier.
+     */
+    #[DataProvider('orderForms')]
+    public function testAForeignOrderAndAMissingOrderGetTheSameAnswer(bool $asIri): void
+    {
+        $customer = $this->customer();
+        $foreign = $this->factory->order($this->customer(), ['statusCode' => OrderStatus::CODE_PAID]);
+        $foreignProduct = $this->orderProductFor($foreign);
+        $missingOrderId = (int) $foreign->getId() + 1_000_000;
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $answers = [];
+        foreach ([(int) $foreign->getId(), $missingOrderId] as $orderId) {
+            $response = $this->jsonRequest(
+                'POST',
+                '/api/front/account/order_returns',
+                [
+                    'order' => $asIri ? '/api/front/account/orders/'.$orderId : $orderId,
+                    'orderReturnLines' => [
+                        ['orderProduct' => '/api/front/account/order_products/'.$foreignProduct->getId(), 'quantity' => 1.0],
+                    ],
+                ],
+                token: $token,
+            );
+            $answers[] = [$response->getStatusCode(), (string) $response->getContent()];
+        }
+
+        self::assertSame($answers[0], $answers[1], 'A foreign order and a missing order must not be told apart.');
+        self::assertSame(422, $answers[0][0]);
+        self::assertStringContainsString('This order cannot be used for a return.', $answers[0][1]);
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * Same for the lines: an order product of somebody else's order and an id
+     * that exists nowhere are not told apart either.
+     */
+    public function testAForeignOrderProductAndAMissingOrderProductGetTheSameAnswer(): void
+    {
+        $customer = $this->customer();
+        [$order] = $this->paidOrderWithProduct($customer);
+        $foreign = $this->factory->order($this->customer(), ['statusCode' => OrderStatus::CODE_PAID]);
+        $foreignProduct = $this->orderProductFor($foreign);
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $answers = [];
+        foreach ([(int) $foreignProduct->getId(), (int) $foreignProduct->getId() + 1_000_000] as $orderProductId) {
+            $response = $this->jsonRequest(
+                'POST',
+                '/api/front/account/order_returns',
+                [
+                    'order' => '/api/front/account/orders/'.$order->getId(),
+                    'orderReturnLines' => [
+                        ['orderProduct' => '/api/front/account/order_products/'.$orderProductId, 'quantity' => 1.0],
+                    ],
+                ],
+                token: $token,
+            );
+            $answers[] = [$response->getStatusCode(), (string) $response->getContent()];
+        }
+
+        self::assertSame($answers[0], $answers[1], 'A foreign order product and a missing one must not be told apart.');
+        self::assertSame(422, $answers[0][0]);
+    }
+
+    /**
+     * Only the order and the order products are told like a foreign row: a
+     * reason that does not exist is not something a caller can learn anything
+     * from, and keeps its own answer.
+     */
+    public function testAMissingReasonKeepsItsOwnAnswer(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnReason' => '/api/front/account/order_return_reasons/'.(1_000_000 + (int) $order->getId()),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(400, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('Item not found', (string) $response->getContent());
+        self::assertStringNotContainsString(ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE, (string) $response->getContent());
+    }
+
+    /**
+     * Bodies with `{order}` and `{product}` standing for the IRI of the order
+     * and of the order product the case opens a return on.
+     *
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function incompleteBodies(): iterable
+    {
+        yield 'no order' => [['orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 1.0]]]];
+        yield 'no lines' => [['order' => '{order}']];
+        yield 'empty lines' => [['order' => '{order}', 'orderReturnLines' => []]];
+        yield 'neither order nor lines' => [['customerComment' => 'Too small']];
+        yield 'line without product' => [['order' => '{order}', 'orderReturnLines' => [['quantity' => 1.0]]]];
+        yield 'line without quantity' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}']]]];
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function malformedBodies(): iterable
+    {
+        yield 'null order' => [['order' => null, 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 1.0]]]];
+        yield 'null lines' => [['order' => '{order}', 'orderReturnLines' => null]];
+        yield 'lines that are not a list' => [['order' => '{order}', 'orderReturnLines' => 'one']];
+        yield 'null order product' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => null, 'quantity' => 1.0]]]];
+        yield 'null quantity' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => null]]]];
+        yield 'quantity that is not a number' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 'many']]]];
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('malformedBodies')]
+    public function testAMalformedRequestIsRefusedWithA4xxOnTheFront(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            $this->withIris($body, '/api/front/account/orders/'.$order->getId(), '/api/front/account/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertContains($response->getStatusCode(), [400, 422], (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from a malformed request.',
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('incompleteBodies')]
+    public function testAnIncompleteRequestIsRefusedWith422OnTheFront(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            $this->withIris($body, '/api/front/account/orders/'.$order->getId(), '/api/front/account/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from an incomplete request.',
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('incompleteBodies')]
+    public function testAnIncompleteRequestIsRefusedWith422OnTheAdmin(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/order_returns',
+            $this->withIris($body, '/api/admin/orders/'.$order->getId(), '/api/admin/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsAdmin(),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from an incomplete request.',
+        );
+    }
+
+    /**
+     * @return iterable<string, array{float}>
+     */
+    public static function invalidQuantities(): iterable
+    {
+        yield 'zero' => [0.0];
+        yield 'negative' => [-1.0];
+    }
+
+    #[DataProvider('invalidQuantities')]
+    public function testALineWithAQuantityThatIsNotPositiveIsRefusedWith422(float $quantity): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => $quantity],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written with a quantity that is not positive.',
+        );
+    }
+
+    public function testALineOfAnotherOrderOfTheSameCustomerIsRefusedWith422(): void
+    {
+        $customer = $this->customer();
+        [$order] = $this->paidOrderWithProduct($customer);
+        [, $otherProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$otherProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function refusedOrderStatuses(): iterable
+    {
+        yield 'cancelled' => [OrderStatus::CODE_CANCELED, 'This order has been cancelled and can no longer be returned.'];
+        yield 'refunded' => [OrderStatus::CODE_REFUNDED, 'This order has already been refunded and can no longer be returned.'];
+        yield 'unpaid' => [OrderStatus::CODE_NOT_PAID, 'This order has not been paid yet and cannot be returned.'];
+    }
+
+    /**
+     * A cancelled, refunded or unpaid order gets a refusal that names the
+     * reason, not the "window has closed" message a customer would misread as
+     * "you were too slow".
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAnOrderThatCannotBeReturnedIsRefusedWithItsOwnMessage(string $statusCode, string $message): void
+    {
+        $customer = $this->customer();
+        $order = $this->factory->order($customer, ['statusCode' => $statusCode]);
+        $orderProduct = $this->orderProductFor($order);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString($message, (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * The explicit refusals only apply when the status is not one the shop
+     * opens returns on: a status the merchant lists keeps being accepted.
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAStatusTheShopOpensReturnsOnIsStillAccepted(string $statusCode): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, $statusCode);
+
+        $customer = $this->customer();
+        $order = $this->factory->order($customer, ['statusCode' => $statusCode]);
+        $orderProduct = $this->orderProductFor($order);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     *
+     * @return array<string, mixed>
+     */
+    private function withIris(array $body, string $orderIri, string $orderProductIri): array
+    {
+        $encoded = str_replace(
+            ['{order}', '{product}'],
+            [$orderIri, $orderProductIri],
+            (string) json_encode($body, \JSON_THROW_ON_ERROR),
+        );
+
+        return json_decode($encoded, true, flags: \JSON_THROW_ON_ERROR);
     }
 
     private function customer(): Customer

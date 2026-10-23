@@ -38,6 +38,13 @@ use Thelia\Model\OrderReturnReasonQuery;
  */
 final readonly class OrderReturnHydrator
 {
+    /**
+     * Not the words of the denormalizer's refusal: this one is only reached by
+     * a line that got past it (or never went through it, on the administration),
+     * so no request that works as intended can tell the two apart.
+     */
+    public const EXISTING_LINE_MESSAGE = 'A return line must be a new line: this one already exists.';
+
     public function __construct(
         private ReturnEligibilityChecker $eligibility,
         private OrderReturnComposer $composer,
@@ -45,9 +52,64 @@ final readonly class OrderReturnHydrator
     }
 
     /**
-     * Meant to be called inside the transaction that writes the return: it
-     * locks every order product line it checks, and a lock outside a
-     * transaction is released as soon as it is taken.
+     * A return is opened with new lines only. FrontOrderReturnRelationDenormalizer
+     * refuses a line that names an existing one before reading it on the front;
+     * a line that reaches a processor loaded all the same would be moved into
+     * the return being opened when it is saved. Nothing is written.
+     *
+     * @throws ReturnNotAllowedException
+     */
+    public static function assertNewLines(OrderReturnResource $data): void
+    {
+        foreach ($data->getOrderReturnLines() as $line) {
+            if (null !== $line->getId() || null !== $line->getPropelModel()) {
+                throw new ReturnNotAllowedException(self::EXISTING_LINE_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * The order and the order product lines a return resource is about, read
+     * from the request alone: OrderReturnWriteTransaction locks them before the
+     * transaction reads anything, so they cannot come from the database.
+     *
+     * @return array{int, list<int>}
+     *
+     * @throws ReturnNotAllowedException
+     */
+    public static function rowsToLock(OrderReturnResource $data): array
+    {
+        // The NotBlank constraints of the write groups do not see a missing
+        // field: the operations carry no validationContext, so the validation
+        // runs in the Default group while the constraints are declared in the
+        // serialization groups, and orderReturnLines has no #[Valid] either.
+        // A missing field is refused here, where reading the uninitialized typed
+        // property would be an Error, a 500.
+        if (!isset($data->order)) {
+            throw new ReturnNotAllowedException('A return must name the order it is about.');
+        }
+
+        $orderProductIds = [];
+
+        foreach ($data->getOrderReturnLines() as $line) {
+            if (!isset($line->orderProduct)) {
+                throw new ReturnNotAllowedException('A return line must name the order product it is about.');
+            }
+
+            if (!isset($line->quantity)) {
+                throw new ReturnNotAllowedException('A return line must name the quantity to return.');
+            }
+
+            $orderProductIds[] = (int) $line->getOrderProduct()->getId();
+        }
+
+        return [(int) $data->getOrder()->getId(), $orderProductIds];
+    }
+
+    /**
+     * Meant to be called inside the transaction that writes the return, opened
+     * by OrderReturnWriteTransaction::run() on the rows rowsToLock() names: the
+     * order and its lines are then locked before anything here reads them.
      *
      * @throws ReturnNotAllowedException
      */
@@ -65,7 +127,10 @@ final readonly class OrderReturnHydrator
         $order = OrderQuery::create()->findPk($data->getOrder()->getId());
 
         if (null === $order) {
-            throw new ReturnNotAllowedException('The order does not exist.');
+            // The front answers a missing order as a foreign one, see
+            // OrderReturnFrontCreateProcessor; the admin path names a real
+            // order, so a missing one stays a precise data error.
+            throw new ReturnNotAllowedException($byAdmin ? 'The order does not exist.' : ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE);
         }
 
         // A customer-opened return goes through the full opening gate (feature
@@ -81,7 +146,7 @@ final readonly class OrderReturnHydrator
             $orderProduct = OrderProductQuery::create()->findPk($line->getOrderProduct()->getId());
 
             if (null === $orderProduct) {
-                throw new ReturnNotAllowedException('Unknown order product in a return line.');
+                throw new ReturnNotAllowedException($byAdmin ? 'Unknown order product in a return line.' : ReturnEligibilityChecker::ORDER_PRODUCT_NOT_USABLE_MESSAGE);
             }
 
             $resourceLines[] = [$line, $orderProduct];
