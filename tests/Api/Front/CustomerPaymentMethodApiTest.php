@@ -331,6 +331,29 @@ final class CustomerPaymentMethodApiTest extends ApiTestCase
         self::assertStringNotContainsString('pm_secret', (string) $response->getContent());
     }
 
+    /**
+     * A provider SDK fails on its own terms, and its message quotes the token: the answer
+     * is the 409 of a refusal, with the core's wording, and the method stays.
+     */
+    public function testAProviderFailureQuotingTheTokenAnswers409WithoutIt(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $module = $this->paymentModuleRow();
+        $service = $this->getService(CustomerPaymentMethodService::class);
+
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $method = $service->register($customer, $module, 'pm_secret', 'Visa ending 2222', null);
+        $token = $this->authenticateAsCustomer($customer);
+
+        StoredMethodsPaymentModule::$failureMessage = 'pm_secret';
+
+        $response = $this->jsonRequest('DELETE', '/api/front/account/payment_methods/'.$method->getId(), token: $token);
+
+        self::assertSame(409, $response->getStatusCode());
+        self::assertStringNotContainsString('pm_secret', (string) $response->getContent());
+        self::assertNotNull(CustomerPaymentMethodQuery::create()->findPk($method->getId()));
+    }
+
     private function paymentModuleRow(): Module
     {
         $code = StoredMethodsPaymentModule::getModuleCode();
