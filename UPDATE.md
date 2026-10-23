@@ -66,6 +66,31 @@ php Thelia cache:warmup --env=prod
 If the script ran in another environment than the one you serve, remove that one first:
 `rm -rf var/cache/prod var/propel/prod`.
 
+## 4. Rebuild the theme assets
+
+In production the themes serve compiled assets. Once the cache is warm, compile them again:
+
+```bash
+php Thelia importmap:install --env=prod
+php Thelia asset-map:compile --env=prod
+```
+
+`asset-map:compile` builds the Flexy stylesheet minified and the back-office stylesheet
+compressed, then writes a `.gz` copy of each text asset next to it, plus `.br` and `.zst`
+copies when the `brotli` and `zstd` commands (or the PHP extensions of the same names) are
+installed on the machine that runs it. Apache sends these copies through `public/.htaccess`;
+nginx sends them once configured as the nginx page of the documentation shows.
+
+The compile builds the Flexy stylesheet with the Tailwind binary, which it downloads into
+`var/tailwind/` when it is missing: the machine that compiles needs to reach GitHub once, or
+to have the binary already there.
+
+An update does not replace the `public/.htaccess` of a shop. To serve the compressed copies
+with Apache, copy into yours the rules of the `public/.htaccess` of this release (the block
+about precompressed assets, and the `<IfModule mod_headers.c>` block after it). Remove the
+`BrotliCompressionQuality` line if your file has one: Apache refuses it in a `.htaccess` and
+answers 500 to every request when `mod_brotli` is loaded.
+
 ## Converting a database migrated from Thelia 2 to utf8mb4
 
 Thelia 2 created its tables in `utf8` (`utf8mb3`) and the migration keeps them in it. Thelia 3

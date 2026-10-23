@@ -31,11 +31,43 @@ AddDefaultCharset UTF-8
     # define the RewriteBase below to get a proper URL rewriting
     # RewriteBase /thelia2
 
+    # Theme assets compiled in production come with a precompressed copy (.br, .gz) next to
+    # them: send it when the browser accepts it and the original file exists. Without
+    # mod_headers the copy could not be labelled, so the original is sent.
+    <IfModule mod_headers.c>
+        RewriteCond %{HTTP:Accept-Encoding} br
+        RewriteCond %{REQUEST_FILENAME} -f
+        RewriteCond %{REQUEST_FILENAME}.br -s
+        RewriteRule ^(assets/.*)\.(css|js|json|svg)$ $1.$2.br [QSA]
+
+        RewriteCond %{HTTP:Accept-Encoding} gzip
+        RewriteCond %{REQUEST_FILENAME} -f
+        RewriteCond %{REQUEST_FILENAME}.gz -s
+        RewriteRule ^(assets/.*)\.(css|js|json|svg)$ $1.$2.gz [QSA]
+
+        # Right content type, and no second compression by mod_brotli or mod_deflate
+        RewriteRule \.css\.(br|gz)$ - [T=text/css,E=no-brotli:1,E=no-gzip:1]
+        RewriteRule \.js\.(br|gz)$ - [T=text/javascript,E=no-brotli:1,E=no-gzip:1]
+        RewriteRule \.json\.(br|gz)$ - [T=application/json,E=no-brotli:1,E=no-gzip:1]
+        RewriteRule \.svg\.(br|gz)$ - [T=image/svg+xml,E=no-brotli:1,E=no-gzip:1]
+    </IfModule>
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
     RewriteRule ^(.*)$ index.php [QSA,L]
     RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization},last]
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|json|svg)\.br$">
+        Header append Content-Encoding br
+        Header append Vary Accept-Encoding
+    </FilesMatch>
+    <FilesMatch "\.(css|js|json|svg)\.gz$">
+        Header append Content-Encoding gzip
+        Header append Vary Accept-Encoding
+    </FilesMatch>
 </IfModule>
 
 <IfModule mod_expires.c>
