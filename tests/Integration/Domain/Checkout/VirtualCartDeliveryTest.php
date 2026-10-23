@@ -24,6 +24,7 @@ use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Model\Cart;
+use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
@@ -134,6 +135,129 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
     }
 
     /**
+     * A guest's cart keeps the delivery address it has, an address of the buyer's own, and
+     * gets its carrier: the default address of the guest row, another buyer's, is not read.
+     */
+    public function testAGuestCartKeepsItsDeliveryAddressAndGetsItsCarrier(): void
+    {
+        [$cart, $guest] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $ownAddress = $this->factory->address($guest, $this->factory->country(), null, ['address1' => '1 Own Street']);
+        $copy = $this->factory->cartAddress($ownAddress, $this->factory->country());
+        $cart->setAddressDeliveryId($copy->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertSame($copy->getId(), $cart->getAddressDeliveryId());
+        self::assertSame('1 Own Street', $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+    }
+
+    /**
+     * A guest's cart with no delivery address takes a copy of its own billing address, in a
+     * row of its own, never the default address of the guest row.
+     */
+    public function testAGuestCartWithoutADeliveryAddressTakesACopyOfItsBillingAddress(): void
+    {
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $billing = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '2 Billing Street']);
+        $cart->setAddressInvoiceId($billing->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNotNull($delivery);
+        self::assertNotSame($billing->getId(), $delivery->getId(), 'A row of its own: a later change of the billing address leaves it as it is.');
+        self::assertSame('2 Billing Street', $delivery->getAddress1());
+        self::assertSame($billing->getId(), $cart->getAddressInvoiceId());
+    }
+
+    /**
+     * Without any address of this cart, a guest's cart gets its carrier and no address: the
+     * order is refused for the address, never placed with another buyer's.
+     */
+    public function testAGuestCartWithNoAddressOfItsOwnGetsNoneAndIsRefused(): void
+    {
+        $this->turnMandatoryConsentsOff();
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNull($cart->getAddressDeliveryId());
+
+        $this->expectException(MissingAddressException::class);
+        $this->expectExceptionMessage('Delivery address is required');
+        $this->validation()->validateForOrder($cart);
+    }
+
+    /**
+     * Settled before the guest gave a billing address (a front API caller places in that
+     * order): the carrier is there, the address is not. Once the billing address is on the
+     * cart, settling again gives it a copy of it, and the order goes through.
+     */
+    public function testAGuestCartSettledBeforeItsBillingAddressGetsItOnceThere(): void
+    {
+        $this->turnMandatoryConsentsOff();
+        $this->answerPaymentValidityWith(valid: true);
+        // A virtual carrier that charges, so that the catch-up is seen to price the cart.
+        $this->answerDeliveryQuoteWith(valid: true, amount: 2.5);
+        [$cart] = $this->virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers();
+        $paymentModule = ModuleQuery::create()->findOneByCode('Cheque') ?? self::fail('No payment module installed.');
+        $cart->setPaymentModuleId($paymentModule->getId())->save($this->getPropelConnection());
+
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertNull($cart->getAddressDeliveryId(), 'No address of the guest yet.');
+
+        $billing = $this->factory->cartAddress(null, $this->factory->country(), null, ['address1' => '3 Later Street']);
+        $cart->setAddressInvoiceId($billing->getId())->save($this->getPropelConnection());
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+
+        $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
+        self::assertSame('3 Later Street', $delivery?->getAddress1(), 'The billing address given since is the delivery address.');
+        self::assertNotSame($billing->getId(), $delivery?->getId());
+        self::assertSame($this->virtualDeliveryModuleId(), $cart->getDeliveryModuleId());
+        self::assertEqualsWithDelta(2.5, (float) $cart->getPostage(), 0.001, 'The cart is priced on the address it got.');
+
+        $copies = CartAddressQuery::create()->count($this->getPropelConnection());
+        $this->facade()->settleVirtualDeliveryIfNeeded($cart);
+        self::assertSame($delivery?->getId(), $cart->getAddressDeliveryId(), 'Settled again, the cart keeps its copy.');
+        self::assertSame($copies, CartAddressQuery::create()->count($this->getPropelConnection()), 'No second copy.');
+
+        $this->validation()->validateForOrder($cart);
+    }
+
+    /**
+     * @return array{0: Cart, 1: Customer}
+     */
+    private function virtualCartOfAGuestWhoseRowDefaultIsAnotherBuyers(): array
+    {
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $this->factory->address($guest, $this->factory->country(), null, ['address1' => '9 Another Buyer Street'])
+            ->setIsDefault(1)
+            ->save($this->getPropelConnection());
+
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['baseQuantity' => 100],
+        );
+        $product->setVirtual(1)->save($this->getPropelConnection());
+
+        $cart = $this->factory->cart($guest);
+        $this->factory->cartItem($cart, $product);
+
+        return [$cart, $guest];
+    }
+
+    private function virtualDeliveryModuleId(): ?int
+    {
+        return ModuleQuery::create()->findOneByCode('VirtualProductDelivery')?->getId();
+    }
+
+    /**
      * A virtual cart with an invoice address and a payment module on it: the delivery is
      * the one thing left, and it is the one thing the buyer is never asked about.
      */
@@ -204,12 +328,12 @@ final class VirtualCartDeliveryTest extends IntegrationTestCase
         });
     }
 
-    private function answerDeliveryQuoteWith(bool $valid): void
+    private function answerDeliveryQuoteWith(bool $valid, float $amount = 0.0): void
     {
-        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($valid): void {
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use ($valid, $amount): void {
             $event->setValidModule($valid);
             if ($valid) {
-                $event->setPostage(new OrderPostage(0.0, 0.0, 'VAT'));
+                $event->setPostage(new OrderPostage($amount, 0.0, 'VAT'));
             }
             $event->stopPropagation();
         });

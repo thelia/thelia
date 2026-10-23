@@ -151,7 +151,10 @@ final readonly class ShippingFacade
     }
 
     /**
-     * Setup virtual delivery (module + optional customer default address + shipping recalculation).
+     * Puts the virtual carrier on a cart with nothing to ship, and prices it. A customer with
+     * an account gets their default address copied onto the cart, else their first one; a
+     * guest keeps the delivery address the cart has, else gets a copy of its billing address,
+     * else none (see DeliverySetupService::setupVirtualDelivery()).
      */
     public function setupVirtualDelivery(Cart $cart): void
     {
@@ -159,11 +162,27 @@ final readonly class ShippingFacade
     }
 
     /**
-     * Set cart delivery address to the customer's default address.
+     * Copies the default address of the cart's customer onto the cart, into the copy it
+     * already has when it has one. Nothing for a guest, whose row's default address may be
+     * another buyer's.
+     *
+     * @return bool whether the cart is delivered to another place (another country, state,
+     *              postal code or city, or no copy before): its carrier has to be priced again
      */
-    public function setCustomerDefaultDeliveryAddress(Cart $cart): void
+    public function setCustomerDefaultDeliveryAddress(Cart $cart): bool
     {
-        $this->deliverySetupService->setCustomerDefaultDeliveryAddress($cart);
+        return $this->deliverySetupService->setCustomerDefaultDeliveryAddress($cart);
+    }
+
+    /**
+     * Gives a guest's virtual cart, settled before it had a billing address, a copy of the
+     * billing address it has since (DeliverySetupService::completeAGuestVirtualDelivery()).
+     *
+     * @return bool whether the cart got a delivery address
+     */
+    public function completeAGuestVirtualDelivery(Cart $cart): bool
+    {
+        return $this->deliverySetupService->completeAGuestVirtualDelivery($cart);
     }
 
     /**
