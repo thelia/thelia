@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
@@ -31,12 +31,15 @@ use Thelia\Domain\OrderReturn\Service\StockIncrementer;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\OrderReturnLineTableMap;
 use Thelia\Model\Map\OrderReturnTableMap;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturn as OrderReturnModel;
+use Thelia\Model\OrderReturnLineQuery;
+use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnReason;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
@@ -207,12 +210,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             throw new ReturnNotAllowedException('The received return status does not exist.');
         }
 
-        $connection = Propel::getConnection(OrderReturnTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
-
-        try {
-            $this->lockReturn($return, $connection);
-
+        $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $declaredLines, $receivedStatus): void {
             $fromCode = $return->getStatusCode();
 
             if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, OrderReturnStatus::CODE_RECEIVED)) {
@@ -255,12 +253,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
                 ->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''))
                 ->setStatusId((int) $receivedStatus->getId())
                 ->save($connection);
-
-            $connection->commit();
-        } catch (\Throwable $exception) {
-            $connection->rollBack();
-            throw $exception;
-        }
+        });
 
         $event->setOrderReturn($return);
     }
@@ -287,12 +280,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
 
         $toCode = $targetStatus->getEffectiveCode();
 
-        $connection = Propel::getConnection(OrderReturnTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
-
-        try {
-            $this->lockReturn($return, $connection);
-
+        $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $event, $targetStatusId, $toCode): void {
             $fromCode = $return->getStatusCode();
 
             if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, $toCode)) {
@@ -309,12 +297,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             }
 
             $return->setStatusId($targetStatusId)->save($connection);
-
-            $connection->commit();
-        } catch (\Throwable $exception) {
-            $connection->rollBack();
-            throw $exception;
-        }
+        });
 
         $event->setOrderReturn($return);
     }
@@ -369,17 +352,108 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Runs $work in the transaction a return is written in, with the locks
+     * every return write takes in the same order - the order, then the order
+     * product lines of the return by increasing id - and then the return row:
+     * a reception and a patch of one of its lines wait on each other, so the
+     * reception never restocks a quantity a patch is changing, nor checks its
+     * own against a quantity a patch is changing.
+     *
+     * The order product lines are read before the transaction, for the ids of
+     * the rows to lock only.
+     *
+     * @param callable(ConnectionInterface): void $work
+     */
+    private function inReturnTransaction(OrderReturnModel $return, callable $work): void
+    {
+        /** @var list<int> $orderProductIds */
+        $orderProductIds = array_map('intval', OrderReturnLineQuery::create()
+            ->filterByOrderReturnId((int) $return->getId())
+            ->select([OrderReturnLineTableMap::COL_ORDER_PRODUCT_ID])
+            ->find()
+            ->getData());
+
+        $this->transaction->run((int) $return->getOrderId(), $orderProductIds, function (ConnectionInterface $connection) use ($return, $work): void {
+            $this->lockReturn($return, $connection);
+            $work($connection);
+        });
+    }
+
+    /**
      * Holds the return row until the end of the transaction in progress and
-     * rereads it, so two callers cannot decide on the same stale status.
+     * rereads it with its lines, so two callers cannot decide on the same
+     * stale status or quantities. The lines leave the instance pool first: a
+     * deep reload reads them again, but a pooled line would come back as it
+     * was loaded before the lock.
+     *
+     * In a transaction this reception opened, its plain reads see every commit
+     * up to the locks, and a deep reload is enough. Nested in a transaction the
+     * caller opened, a plain read returns the picture the caller took at its
+     * first read, whatever was committed since: the return and its lines are
+     * then read with locking reads, which see the last commit.
      */
     private function lockReturn(OrderReturnModel $return, ConnectionInterface $connection): void
     {
+        OrderReturnLineTableMap::clearInstancePool();
+
+        if (!$this->transaction->readsSeeCommits()) {
+            $this->rereadLocked($return, $connection);
+
+            return;
+        }
+
         $lock = $connection->prepare('SELECT `id` FROM `order_return` WHERE `id` = :id FOR UPDATE');
         $lock->bindValue(':id', $return->getId(), \PDO::PARAM_INT);
         $lock->execute();
         $lock->closeCursor();
 
         $return->reload(true, $connection);
+    }
+
+    /**
+     * Loads the return and its lines as they are now, each held by a locking
+     * read on its primary key: the return first, then its lines by increasing
+     * id, as a patch of a line takes them. The ids of the lines come from a
+     * plain read, which is enough: a return never gains nor loses a line once
+     * written, and a line that is gone is left out.
+     */
+    private function rereadLocked(OrderReturnModel $return, ConnectionInterface $connection): void
+    {
+        OrderReturnTableMap::removeInstanceFromPool((string) $return->getId());
+
+        $dataFetcher = OrderReturnQuery::create()
+            ->filterById($return->getId())
+            ->lockForUpdate()
+            ->setFormatter(ModelCriteria::FORMAT_STATEMENT)
+            ->find($connection);
+        $row = $dataFetcher->fetch();
+        $dataFetcher->close();
+
+        if (!$row) {
+            throw new ReturnNotAllowedException('The return does not exist.');
+        }
+
+        $return->hydrate($row, 0, true, $dataFetcher->getIndexType());
+
+        /** @var list<int> $lineIds */
+        $lineIds = array_map('intval', OrderReturnLineQuery::create()
+            ->filterByOrderReturnId((int) $return->getId())
+            ->orderById()
+            ->select([OrderReturnLineTableMap::COL_ID])
+            ->find($connection)
+            ->getData());
+
+        $return->clearOrderReturnLines();
+
+        foreach ($lineIds as $lineId) {
+            $line = OrderReturnLineQuery::create()->filterById($lineId)->lockForUpdate()->findOne($connection);
+
+            if (null !== $line) {
+                $return->addOrderReturnLine($line);
+            }
+        }
+
+        $return->resetPartialOrderReturnLines(false);
     }
 
     private function restockReceivedLines(OrderReturnModel $return, ConnectionInterface $connection): void

@@ -39,4 +39,12 @@ interface OrderReturnWriteTransactionInterface
      * @throws ReturnRequestConflictException when the database gave up on the transaction to break a lock conflict
      */
     public function run(int $orderId, array $orderProductIds, callable $work): mixed;
+
+    /**
+     * Whether the transaction in progress is one run() opened, the rows locked
+     * before its first plain read: a plain read then sees every commit up to
+     * the locks. Nested in a transaction its caller opened, it does not: only a
+     * locking read sees what was committed after the caller's first read.
+     */
+    public function readsSeeCommits(): bool;
 }

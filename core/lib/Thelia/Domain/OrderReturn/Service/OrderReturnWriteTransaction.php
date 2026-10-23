@@ -159,6 +159,7 @@ final class OrderReturnWriteTransaction implements OrderReturnWriteTransactionIn
      * before its first plain read: a plain read then sees every return
      * committed on them.
      */
+    #[\Override]
     public function readsSeeCommits(): bool
     {
         return $this->readsSeeCommits;
