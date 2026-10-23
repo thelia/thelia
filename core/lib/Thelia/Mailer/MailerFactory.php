@@ -73,10 +73,13 @@ class MailerFactory
     /**
      * Hands the message to the mailer: to the queue when the shop has one. The mail
      * gets an identifier that travels with it, so a worker sends it once even when the
-     * queue hands it out twice ({@see SentMailGuardListener}).
+     * queue hands it out twice ({@see SentMailGuardListener}). The identifier goes on a
+     * copy: a caller that sends the same message again, to someone else, sends a new mail.
      */
     public function send(Email $message): void
     {
+        $message = clone $message;
+
         if (!$message->getHeaders()->has(SentMailGuardListener::MAIL_ID_HEADER)) {
             $message->getHeaders()->addTextHeader(SentMailGuardListener::MAIL_ID_HEADER, SentMailGuardListener::newMailId());
         }
