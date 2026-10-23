@@ -21,6 +21,7 @@ use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Model\Order;
+use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatusQuery;
 
 /**
@@ -47,7 +48,8 @@ use Thelia\Model\OrderStatusQuery;
  * already gone — the order in the event carries the new status. A second listener on
  * the same event runs at 192, ahead of the core, and keeps the previous status code
  * for the one at 127 to read back. The two are keyed by the event object itself, so
- * concurrent dispatches in the same process never read each other's value.
+ * concurrent dispatches in the same process never read each other's value. The
+ * correction of an address works the same way, with the columns of the address.
  */
 readonly class RecordOrderHistoryListener
 {
@@ -65,10 +67,18 @@ readonly class RecordOrderHistoryListener
      */
     private \WeakMap $statusCodeBeforeChange;
 
+    /**
+     * The columns each in-flight address correction started from.
+     *
+     * @var \WeakMap<OrderAddressEvent, array<string, mixed>>
+     */
+    private \WeakMap $addressBeforeCorrection;
+
     public function __construct(
         private OrderHistoryRecorder $orderHistoryRecorder,
     ) {
         $this->statusCodeBeforeChange = new \WeakMap();
+        $this->addressBeforeCorrection = new \WeakMap();
     }
 
     /**
@@ -177,9 +187,37 @@ readonly class RecordOrderHistoryListener
         );
     }
 
+    /**
+     * Runs at 192, ahead of Thelia\Action\Order::updateAddress (128), purely to read the
+     * columns the address still has. Writes nothing.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_ADDRESS, priority: 192)]
+    public function rememberAddressBeforeCorrection(OrderAddressEvent $event): void
+    {
+        $this->addressBeforeCorrection[$event] = $this->comparableColumnsOf($event->getOrderAddress());
+    }
+
+    /**
+     * A correction is recorded when it changed a column of the address, and every such
+     * correction is a line of its own, with its author: the recorder does not compare
+     * address entries, whose payload (the address and its type, never what was typed)
+     * would make a second correction look like a replay of the first.
+     *
+     * A form submitted again with the same values changes nothing and writes nothing. The
+     * comparison ignores the two dates the model stamps itself, and reads an empty string
+     * and a NULL as the same value: the back-office form sends an empty phone number for a
+     * column that holds NULL, and that is not a correction.
+     * The comparison reads the address as it was when this event started, so two
+     * submissions that run at the very same instant, both starting from the old
+     * columns, both write a line: a doubled line in that window is accepted, a
+     * correction lost is not.
+     */
     #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_ADDRESS, priority: 64)]
     public function onAddressUpdated(OrderAddressEvent $event): void
     {
+        $columnsBefore = $this->addressBeforeCorrection[$event] ?? null;
+        unset($this->addressBeforeCorrection[$event]);
+
         // Callers are not required to name the order on this event, and the core
         // listener does not set it either: without it there is nothing to attach the
         // entry to.
@@ -187,13 +225,36 @@ readonly class RecordOrderHistoryListener
             return;
         }
 
+        $orderAddress = $event->getOrderAddress();
+
+        if (null !== $columnsBefore && $columnsBefore === $this->comparableColumnsOf($orderAddress)) {
+            return;
+        }
+
         $order = $event->getOrder();
-        $orderAddressId = $event->getOrderAddress()->getId();
+        $orderAddressId = $orderAddress->getId();
 
         $this->orderHistoryRecorder->recordAddressUpdated(
             $order->getId(),
             $orderAddressId,
             $this->addressTypeOf($order, $orderAddressId),
+        );
+    }
+
+    /**
+     * The columns of the address a person can correct, in a form that compares equal when
+     * nothing was corrected.
+     *
+     * @return array<string, string|null>
+     */
+    private function comparableColumnsOf(OrderAddress $orderAddress): array
+    {
+        $columns = $orderAddress->toArray();
+        unset($columns['CreatedAt'], $columns['UpdatedAt']);
+
+        return array_map(
+            static fn (mixed $value): ?string => null === $value || '' === $value ? null : (string) $value,
+            $columns,
         );
     }
 
