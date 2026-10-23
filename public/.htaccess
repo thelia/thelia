@@ -93,7 +93,8 @@ AddOutputFilterByType DEFLATE text/xml
 </IfModule>
 
 <IfModule mod_brotli.c>
-    BrotliCompressionQuality 5
+    # BrotliCompressionQuality is only allowed in the server or virtual host configuration:
+    # here it would answer 500 to every request. Its default is 5.
 
     # Compress HTML
     AddOutputFilterByType BROTLI_COMPRESS text/html
