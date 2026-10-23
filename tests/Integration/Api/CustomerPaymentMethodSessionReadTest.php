@@ -16,12 +16,17 @@ namespace Thelia\Tests\Integration\Api;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Thelia\Api\Bridge\Propel\Extension\CustomerPaymentMethodOwnershipExtension;
 use Thelia\Api\Resource\CustomerPaymentMethod;
+use Thelia\Api\Service\API\ResourceMemoizer;
 use Thelia\Api\Service\DataAccess\DataAccessService;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\CustomerPaymentMethodQuery;
@@ -203,6 +208,84 @@ final class CustomerPaymentMethodSessionReadTest extends IntegrationTestCase
     }
 
     /**
+     * A read that looks for a customer must not be what opens the session: a request
+     * whose session is still behind its lazy factory keeps it there.
+     */
+    public function testTheFallbackLeavesASessionBehindItsLazyFactoryAlone(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $other = $factory->customer($factory->customerTitle());
+        $this->service->register($other, $this->module, 'pm_other', 'Visa ending 1111', null);
+
+        $created = false;
+        $request = Request::create('http://localhost');
+        $request->setSessionFactory(static function () use (&$created): Session {
+            $created = true;
+
+            return new Session(new MockArraySessionStorage());
+        });
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $query = CustomerPaymentMethodQuery::create();
+        (new CustomerPaymentMethodOwnershipExtension(new TokenStorage(), new SecurityContext($requestStack), $requestStack))
+            ->applyToCollection($query, CustomerPaymentMethod::class, new GetCollection(uriTemplate: '/front/account/payment_methods'));
+
+        self::assertSame([], $this->idsOfQuery($query));
+        self::assertFalse($created, 'Reading for a customer must not create the session.');
+    }
+
+    /**
+     * The answer of an account path depends on the customer of the session, which the
+     * memoization of a request does not know: the customer changes, so does the answer.
+     */
+    public function testAnAccountReadIsNotServedFromAnotherCustomersMemoizedAnswer(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $first = $factory->customer($factory->customerTitle());
+        $firstMethod = $this->service->register($first, $this->module, 'pm_first', 'Visa ending 1111', null);
+        $second = $factory->customer($factory->customerTitle());
+        $secondMethod = $this->service->register($second, $this->module, 'pm_second', 'Visa ending 2222', null);
+
+        $this->loginAsCustomerInSession($first);
+        self::assertSame([$firstMethod->getId()], $this->idsOf($this->dataAccess->resources(self::COLLECTION)));
+
+        $this->logoutCustomer();
+        $this->loginAsCustomerInSession($second);
+
+        self::assertSame([$secondMethod->getId()], $this->idsOf($this->dataAccess->resources(self::COLLECTION)));
+
+        $this->logoutCustomer();
+
+        self::assertSame([], $this->idsOf($this->dataAccess->resources(self::COLLECTION)));
+    }
+
+    /**
+     * Control of the exclusion above: it covers the stored payment methods alone, the other
+     * account reads of a page (the order is read three times by the checkout page) stay
+     * memoized in the request.
+     */
+    public function testAnotherAccountReadIsStillMemoized(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $this->loginAsCustomerInSession($customer);
+        $memoizer = $this->getService(ResourceMemoizer::class);
+        $memoizer->clear();
+
+        $this->dataAccess->resources('/api/front/account/addresses');
+        self::assertSame(1, $this->memoizedAnswers($memoizer), 'An account read other than the payment methods is memoized.');
+
+        $this->dataAccess->resources(self::COLLECTION);
+        self::assertSame(1, $this->memoizedAnswers($memoizer), 'The stored payment methods are never memoized.');
+    }
+
+    private function memoizedAnswers(ResourceMemoizer $memoizer): int
+    {
+        return \count((new \ReflectionProperty($memoizer, 'store'))->getValue($memoizer));
+    }
+
+    /**
      * Control: the rows of the other customers are really in the table, so the empty
      * answers above do not come from an empty table.
      */
@@ -218,7 +301,7 @@ final class CustomerPaymentMethodSessionReadTest extends IntegrationTestCase
     private function scopedQuery(TokenStorageInterface $tokenStorage, GetCollection|Get $operation): CustomerPaymentMethodQuery
     {
         $query = CustomerPaymentMethodQuery::create();
-        $extension = new CustomerPaymentMethodOwnershipExtension($tokenStorage, $this->getService(SecurityContext::class));
+        $extension = new CustomerPaymentMethodOwnershipExtension($tokenStorage, $this->getService(SecurityContext::class), $this->getService('request_stack'));
 
         $operation instanceof GetCollection
             ? $extension->applyToCollection($query, CustomerPaymentMethod::class, $operation)
