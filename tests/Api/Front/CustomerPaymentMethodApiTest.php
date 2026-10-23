@@ -20,6 +20,7 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
+use Thelia\Test\Trait\LogsInAsAdmin;
 use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 /**
@@ -33,6 +34,8 @@ use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
  */
 final class CustomerPaymentMethodApiTest extends ApiTestCase
 {
+    use LogsInAsAdmin;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -226,6 +229,34 @@ final class CustomerPaymentMethodApiTest extends ApiTestCase
         // way the resource's own logic, and the token it would have exposed, is
         // never reached.
         self::assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    public function testAnonymousCallerCannotReadAnItemEither(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $module = $this->paymentModuleRow();
+        $victim = $this->getService(CustomerPaymentMethodService::class)
+            ->register($factory->customer($factory->customerTitle()), $module, 'pm_victim', 'Visa ending 1111', null);
+
+        $response = $this->jsonRequest('GET', '/api/front/account/payment_methods/'.$victim->getId());
+
+        self::assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    public function testAnAdministratorTokenOnTheFrontRouteReadsNothing(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $module = $this->paymentModuleRow();
+        $victim = $this->getService(CustomerPaymentMethodService::class)
+            ->register($factory->customer($factory->customerTitle()), $module, 'pm_victim', 'Visa ending 1111', null);
+        $token = $this->authenticateAsAdmin();
+
+        foreach (['/api/front/account/payment_methods', '/api/front/account/payment_methods/'.$victim->getId()] as $url) {
+            $response = $this->jsonRequest('GET', $url, token: $token);
+
+            self::assertContains($response->getStatusCode(), [401, 403, 404], $url);
+            self::assertStringNotContainsString('Visa ending 1111', (string) $response->getContent(), $url);
+        }
     }
 
     /**
