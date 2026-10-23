@@ -57,6 +57,10 @@ use Thelia\Model\OrderReturnLineQuery;
  * in between - answers 409: the request carries what its author saw next to
  * what they changed, and it is sent again on the line as it now is, never
  * written next to values nobody saw.
+ *
+ * The patch changes what was received of a line, never what the line is
+ * about: its order product and its return are not writable, and are checked
+ * under the locks to be those the locks were taken on.
  */
 final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInterface
 {
@@ -77,18 +81,21 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
 
         $lineId = (int) ($uriVariables['id'] ?? 0);
 
-        // Read before any lock, for the ids of the rows to lock only, as
-        // selected columns, so that nothing enters the instance pool.
-        $orderProductId = OrderReturnLineQuery::create()
+        // Read before any lock, for the ids of the rows to lock only, and read
+        // again under the locks: a line moved in between is refused there.
+        // Selected columns, so that nothing enters the instance pool.
+        /** @var array{OrderProductId: int|string|null, OrderReturnId: int|string|null}|null $parents */
+        $parents = OrderReturnLineQuery::create()
             ->filterById($lineId)
-            ->select(['OrderProductId'])
+            ->select(['OrderProductId', 'OrderReturnId'])
             ->findOne();
 
-        if (null === $orderProductId) {
+        if (null === $parents) {
             throw new NotFoundHttpException('Return line not found.');
         }
 
-        $orderProductId = (int) $orderProductId;
+        $orderProductId = (int) $parents['OrderProductId'];
+        $returnId = (int) $parents['OrderReturnId'];
         $orderId = OrderProductQuery::create()->filterById($orderProductId)->select(['OrderId'])->findOne();
 
         if (null === $orderId) {
@@ -100,10 +107,10 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
         $previous = $previous instanceof OrderReturnLineResource ? $previous : null;
 
         try {
-            return $this->transaction->run($orderId, [$orderProductId], function (ConnectionInterface $connection) use ($data, $previous, $operation, $uriVariables, $context, $lineId, $orderId): mixed {
+            return $this->transaction->run($orderId, [$orderProductId], function (ConnectionInterface $connection) use ($data, $previous, $operation, $uriVariables, $context, $lineId, $orderId, $orderProductId, $returnId): mixed {
                 $locked = $this->lockedLine($lineId, $connection);
 
-                $this->assertTheLineIsAsItWasRead($locked, $data, $previous);
+                $this->assertTheLineIsAsItWasRead($locked, $data, $previous, $orderProductId, $returnId);
                 $this->takeWhatNoClientWritesFrom($locked, $data);
 
                 $quantity = $data->getQuantity();
@@ -151,13 +158,21 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
      * A merge patch carries only the fields it changes, and the resource holds
      * the others as API Platform read them, before any lock: written back, they
      * would undo what was committed since. The line must therefore be, on
-     * every field a patch writes, what that read found.
+     * every field a patch writes, what that read found, and on its order
+     * product and its return, what the locks were taken on.
      *
      * Without that read to compare to - the processor called outside of an
      * HTTP request - only an uninitialized quantity is taken from the line.
      */
-    private function assertTheLineIsAsItWasRead(OrderReturnLine $locked, OrderReturnLineResource $data, ?OrderReturnLineResource $previous): void
+    private function assertTheLineIsAsItWasRead(OrderReturnLine $locked, OrderReturnLineResource $data, ?OrderReturnLineResource $previous, int $orderProductId, int $returnId): void
     {
+        if ((int) $locked->getOrderProductId() !== $orderProductId
+            || (int) $locked->getOrderReturnId() !== $returnId
+            || (isset($data->orderProduct) && $data->getOrderProduct()->getId() !== $orderProductId)
+            || (null !== $data->getOrderReturn() && $data->getOrderReturn()->getId() !== $returnId)) {
+            throw new ConflictHttpException(self::CHANGED_SINCE_READ);
+        }
+
         if (null === $previous) {
             if (!isset($data->quantity)) {
                 $data->setQuantity((float) $locked->getQuantity());

@@ -749,6 +749,92 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * The order product and the return of a line are what the patch locks and
+     * what the reception restocks from. A patch naming another one would move
+     * the line onto an order line it never locked, or into another return, and
+     * the reception would restock the wrong sale element: the request is
+     * refused whole, the field it may change included.
+     */
+    #[DataProvider('anotherParent')]
+    public function testAPatchCannotMoveALineToAnotherOrderLineOrReturn(string $field, string $iriPattern): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $orderProductId = (int) $line->getOrderProductId();
+        $other = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $otherLine = $other->getOrderReturnLines()->getFirst();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            [
+                $field => \sprintf($iriPattern, 'orderProduct' === $field ? $otherLine->getOrderProductId() : $other->getId()),
+                'quantityReceived' => 1.0,
+            ],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(400, $response->getStatusCode(), (string) $response->getContent());
+        $refusal = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertIsArray($refusal);
+        self::assertStringContainsString('"'.$field.'"', (string) ($refusal['detail'] ?? ''));
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame($orderProductId, (int) $line->getOrderProductId());
+        self::assertSame((int) $return->getId(), (int) $line->getOrderReturnId());
+        self::assertSame(0.0, (float) $line->getQuantityReceived());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function anotherParent(): iterable
+    {
+        yield 'admin order product' => ['orderProduct', '/api/admin/order_products/%d'];
+        yield 'front order product' => ['orderProduct', '/api/front/account/order_products/%d'];
+        yield 'admin return' => ['orderReturn', '/api/admin/order_returns/%d'];
+        yield 'front return' => ['orderReturn', '/api/front/account/order_returns/%d'];
+    }
+
+    /**
+     * Only the two relations of a line are refused. A client that sends back
+     * what a GET gave it - its own `@id`, the read-only `refundAmount` - is
+     * answered as before: those keys are ignored, and the writable field of the
+     * body is the only thing that changes.
+     */
+    public function testAPatchStillIgnoresTheReadOnlyAttributesOfALine(): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_ACCEPTED, quantity: 1.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setRefundAmount('7.500000')->save($this->getPropelConnection());
+        $orderProductId = (int) $line->getOrderProductId();
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            [
+                '@id' => '/api/admin/order_return_lines/'.$line->getId(),
+                'id' => (int) $line->getId(),
+                'refundAmount' => 12345.0,
+                'productSaleElementsId' => 99999,
+                'quantityReceived' => 1.0,
+            ],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(1.0, (float) $line->getQuantityReceived());
+        self::assertSame($orderProductId, (int) $line->getOrderProductId());
+        self::assertSame((int) $return->getId(), (int) $line->getOrderReturnId());
+        self::assertSame(7.5, (float) $line->getRefundAmount(), 'The refund amount of a line is read only: the PATCH must leave the stored one as it is.');
+        self::assertNotSame(99999, (int) $line->getProductSaleElementsId());
+    }
+
+    /**
      * The rate limiter is the shop's protection against a flood of requests,
      * not a punishment for getting a form wrong: consuming a token before the
      * eligibility check let twenty refused attempts close the hour for the
