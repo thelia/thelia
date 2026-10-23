@@ -38,10 +38,34 @@ use Thelia\Model\OrderReturnReasonQuery;
  */
 final readonly class OrderReturnHydrator
 {
+    /**
+     * Not the words of the denormalizer's refusal: this one is only reached by
+     * a line that got past it (or never went through it, on the administration),
+     * so no request that works as intended can tell the two apart.
+     */
+    public const EXISTING_LINE_MESSAGE = 'A return line must be a new line: this one already exists.';
+
     public function __construct(
         private ReturnEligibilityChecker $eligibility,
         private OrderReturnComposer $composer,
     ) {
+    }
+
+    /**
+     * A return is opened with new lines only. FrontOrderReturnRelationDenormalizer
+     * refuses a line that names an existing one before reading it on the front;
+     * a line that reaches a processor loaded all the same would be moved into
+     * the return being opened when it is saved. Nothing is written.
+     *
+     * @throws ReturnNotAllowedException
+     */
+    public static function assertNewLines(OrderReturnResource $data): void
+    {
+        foreach ($data->getOrderReturnLines() as $line) {
+            if (null !== $line->getId() || null !== $line->getPropelModel()) {
+                throw new ReturnNotAllowedException(self::EXISTING_LINE_MESSAGE);
+            }
+        }
     }
 
     /**

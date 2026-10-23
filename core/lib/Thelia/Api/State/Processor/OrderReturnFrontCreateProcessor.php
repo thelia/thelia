@@ -71,6 +71,8 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
         }
 
         try {
+            OrderReturnHydrator::assertNewLines($data);
+
             [$orderId, $orderProductIds] = OrderReturnHydrator::rowsToLock($data);
 
             // Before any lock: naming somebody else's order in the body must not
