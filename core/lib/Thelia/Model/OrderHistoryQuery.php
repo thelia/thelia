@@ -22,6 +22,19 @@ use Thelia\Model\Base\OrderHistoryQuery as BaseOrderHistoryQuery;
 class OrderHistoryQuery extends BaseOrderHistoryQuery
 {
     /**
+     * The most recent entry of an order, whatever its kind.
+     *
+     * Ordered on the primary key for the same reason as {@see self::findLatestOfType()}.
+     */
+    public function findLatest(int $orderId, ?ConnectionInterface $con = null): ?OrderHistory
+    {
+        return self::create()
+            ->filterByOrderId($orderId)
+            ->orderById(Criteria::DESC)
+            ->findOne($con);
+    }
+
+    /**
      * The most recent entry of one kind on one order.
      *
      * Ordered on the primary key rather than on created_at: two entries written in the
