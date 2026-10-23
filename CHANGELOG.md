@@ -1,5 +1,9 @@
 # 3.2.5 (unreleased)
 
+## Security
+
+- Opening a return, on the front API or from the administration, can no longer take over a return line that already exists, including one of another customer: such a request is refused with 422 and the line stays where it was.
+
 ## Fixed
 
 - The history of an order reads in the order things happened. The line of a status change was written after the e-mails the change sends, so the confirmation of a cheque payment came before the status that caused it; it is now written right after the core listener persists the status, at priority 127 of `ORDER_UPDATE_STATUS`. The listener moves from priority 64 to 127, so a module listening between the two that stops the propagation of `ORDER_UPDATE_STATUS` no longer keeps the line from being written. A module that sends its e-mail at priority 128, `VirtualProductDelivery` for one, still comes first, and has to run below 127.
