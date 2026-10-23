@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\OrderReturn\EventListener\SendOrderReturnStatusEmailListener;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
 use Thelia\Domain\OrderReturn\Service\OrderReturnComposer;
@@ -46,8 +47,10 @@ use Thelia\Model\OrderReturnStatusQuery;
 
 /**
  * Drives a return through its state machine: it validates each transition,
- * restocks the received goods according to the shop setting, recomputes the
- * refundable amount, and lets the status change notify the customer.
+ * restocks the received goods according to the shop setting and recomputes the
+ * refundable amount. The customer is told of the change by
+ * {@see SendOrderReturnStatusEmailListener}, once the line recording it has been
+ * written, which is why none of the three gestures dispatches the mail itself.
  */
 class OrderReturn extends BaseAction implements EventSubscriberInterface
 {
@@ -303,25 +306,9 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Announces the gesture to the customer, once everything that records it has run.
-     *
-     * The mail used to be sent from the end of the three actions above, at priority 128,
-     * which is before the listener that writes the line of the gesture in the history of
-     * the order (64): the timeline showed the mail before what it announces. It is now
-     * sent by its own listener, below that one, on the same event. It is still sent once
-     * the action has committed, and not at all when the action throws.
-     *
-     * Two things follow from it. A direct call to create(), receive() or updateStatus()
-     * no longer sends the mail: only the dispatch of the event does. And a listener
-     * between 32 and 128 that throws or stops the propagation keeps the mail from going.
-     */
-    public function dispatchStatusEmail(OrderReturnEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
-    {
-        $dispatcher->dispatch($event, TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
-    }
-
-    /**
      * Notify the customer of a return status change, when a message is configured for it.
+     * Reached through ORDER_RETURN_SEND_STATUS_EMAIL, dispatched by
+     * {@see \Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher}.
      */
     public function sendStatusEmail(OrderReturnEvent $event): void
     {
@@ -485,9 +472,9 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::ORDER_RETURN_CREATE => [['create', 128], ['dispatchStatusEmail', 32]],
-            TheliaEvents::ORDER_RETURN_RECEIVE => [['receive', 128], ['dispatchStatusEmail', 32]],
-            TheliaEvents::ORDER_RETURN_UPDATE_STATUS => [['updateStatus', 128], ['dispatchStatusEmail', 32]],
+            TheliaEvents::ORDER_RETURN_CREATE => ['create', 128],
+            TheliaEvents::ORDER_RETURN_RECEIVE => ['receive', 128],
+            TheliaEvents::ORDER_RETURN_UPDATE_STATUS => ['updateStatus', 128],
             TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL => ['sendStatusEmail', 128],
         ];
     }

@@ -22,9 +22,11 @@ use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\OrderReturn\EventListener\SendOrderReturnStatusEmailListener;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
 use Thelia\Domain\OrderReturn\Service\OrderReturnComposer;
+use Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher;
 use Thelia\Domain\OrderReturn\Service\RefundAmountCalculator;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Domain\OrderReturn\Service\StockIncrementer;
@@ -300,6 +302,10 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
             $this->getService(ReturnEligibilityChecker::class),
             $this->getService(OrderReturnComposer::class),
         ));
+        $statusEmailListener = new SendOrderReturnStatusEmailListener(new OrderReturnStatusEmailDispatcher($dispatcher));
+        foreach ([TheliaEvents::ORDER_RETURN_CREATE, TheliaEvents::ORDER_RETURN_RECEIVE, TheliaEvents::ORDER_RETURN_UPDATE_STATUS] as $eventName) {
+            $dispatcher->addListener($eventName, $statusEmailListener, 32);
+        }
 
         return $dispatcher;
     }
