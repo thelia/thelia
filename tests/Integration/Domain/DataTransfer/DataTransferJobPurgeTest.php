@@ -16,7 +16,7 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
-use Thelia\Domain\DataTransfer\EventListener\PurgeExportCacheListener;
+use Thelia\Domain\DataTransfer\EventListener\DataTransferJobsPurgeListener;
 use Thelia\Domain\DataTransfer\Job\ImportStorage;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Domain\DataTransfer\Service\DataTransferJobPurger;
@@ -59,7 +59,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $oldExport = $this->exportJob('-8 days');
         $recentExport = $this->exportJob('-1 day');
 
-        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+        $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
 
         self::assertNull(ImportJobQuery::create()->findPk($oldImport));
         self::assertNotNull(ImportJobQuery::create()->findPk($recentImport));
@@ -79,7 +79,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $failedExport = $this->exportJob('-8 days', JobStatus::FAILED);
         $expiredExport = $this->exportJob('-40 days', JobStatus::FAILED);
 
-        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+        $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
 
         self::assertNotNull(ImportJobQuery::create()->findPk($failedImport));
         self::assertNull(ImportJobQuery::create()->findPk($expiredImport));
@@ -96,7 +96,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $setAsideLate = $this->importJob('-30 days -12 hours', '/nowhere.csv', JobStatus::FAILED);
         $expired = $this->exportJob('-32 days', JobStatus::FAILED);
 
-        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+        $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
 
         self::assertNotNull(ImportJobQuery::create()->findPk($setAsideLate));
         self::assertNull(ExportJobQuery::create()->findPk($expired));
@@ -112,7 +112,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $waiting = $this->importJob('-8 days', '/nowhere.csv', JobStatus::QUEUED);
         $expired = $this->exportJob('-40 days', JobStatus::RUNNING);
 
-        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+        $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
 
         self::assertNotNull(ExportJobQuery::create()->findPk($stuck));
         self::assertNotNull(ImportJobQuery::create()->findPk($waiting));
@@ -126,7 +126,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         $oldExport = $this->exportJob('-8 days');
 
         $event = new MaintenancePurgeEvent(true);
-        $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge($event);
+        $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge($event);
 
         self::assertNotNull(ImportJobQuery::create()->findPk($oldImport));
         self::assertNotNull(ExportJobQuery::create()->findPk($oldExport));
@@ -206,7 +206,7 @@ final class DataTransferJobPurgeTest extends IntegrationTestCase
         chmod(\dirname($locked), 0o555);
 
         try {
-            $this->getService(PurgeExportCacheListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
+            $this->getService(DataTransferJobsPurgeListener::class)->onMaintenancePurge(new MaintenancePurgeEvent(false));
         } finally {
             chmod(\dirname($locked), 0o755);
         }
