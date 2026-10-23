@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\DestinationRestriction;
 
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Model\Cart;
 use Thelia\Model\DestinationRestriction;
 use Thelia\Model\DestinationRestrictionCountryQuery;
@@ -24,10 +25,8 @@ use Thelia\Model\Map\DestinationRestrictionCountryTableMap;
 use Thelia\Model\Map\DestinationRestrictionI18nTableMap;
 use Thelia\Model\Map\DestinationRestrictionTableMap;
 use Thelia\Model\Map\ProductDestinationRestrictionTableMap;
-use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDestinationRestrictionQuery;
-use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 
 /**
@@ -43,6 +42,10 @@ use Thelia\Model\ProductQuery;
 final class DestinationRestrictionChecker implements ResetInterface
 {
     private ?bool $anyActiveGroup = null;
+
+    public function __construct(private readonly CartShippingRules $cartShippingRules)
+    {
+    }
 
     public function hasActiveGroup(): bool
     {
@@ -169,7 +172,7 @@ final class DestinationRestrictionChecker implements ResetInterface
             return [];
         }
 
-        $titles = $this->titlesOf(array_keys($refusingGroup), $locale);
+        $titles = $this->cartShippingRules->titlesOf(array_keys($refusingGroup), $locale);
         $reasons = $this->reasonsOf(array_values(array_unique($refusingGroup)), $locale);
         $lines = [];
 
@@ -202,28 +205,6 @@ final class DestinationRestrictionChecker implements ResetInterface
         }
 
         return DestinationRestriction::MODE_ALLOW === $mode ? !$listed : $listed;
-    }
-
-    /**
-     * Titles of the products a refusal names, in the buyer's language or the default one
-     * of the shop (FallbackTranslation). A product with no title there is named by its
-     * reference.
-     *
-     * @param list<int> $productIds
-     *
-     * @return array<int, string> product id => title
-     */
-    private function titlesOf(array $productIds, string $locale): array
-    {
-        $titles = FallbackTranslation::valuesOf(ProductI18nQuery::create(), ProductI18nTableMap::COL_ID, ProductI18nTableMap::COL_LOCALE, ProductI18nTableMap::COL_TITLE, $productIds, $locale);
-        $named = [];
-
-        foreach (ProductQuery::create()->filterById($productIds)->select([ProductTableMap::COL_ID, ProductTableMap::COL_REF])->find() as $row) {
-            $productId = (int) $row[ProductTableMap::COL_ID];
-            $named[$productId] = $titles[$productId] ?? (string) $row[ProductTableMap::COL_REF];
-        }
-
-        return $named;
     }
 
     /**
