@@ -71,6 +71,8 @@ ddev exec php bin/console tailwind:build      # front-office stylesheet (Flexy)
 ddev exec php bin/console sass:build          # back-office stylesheet (default-twig)
 ```
 
+In production, compile the assets once per deployment with `php bin/console asset-map:compile --env=prod`: it writes them to `public/assets/` with the stylesheets minified and a compressed copy of each text file for the web server to send (see [UPDATE.md](UPDATE.md), section 4).
+
 The storefront is then at `https://<project>.ddev.site` and the admin at `https://<project>.ddev.site/admin`.
 
 ## Back-office templates
