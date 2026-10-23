@@ -25,6 +25,8 @@ use Thelia\Model\Lang;
 
 readonly class ResourceService
 {
+    private const SESSION_CUSTOMER_PATH_PREFIX = '/api/front/account/payment_methods';
+
     public function __construct(
         private RequestBuilderService $requestBuilder,
         private RouteMatcherService $routeMatcher,
@@ -49,6 +51,14 @@ readonly class ResourceService
         $this->sharedCacheKeys->record($path);
 
         $currentLocale = $this->localeService->getLocale();
+
+        // The answer for the stored payment methods depends on the customer of the session,
+        // which neither this key nor the memoizer's holds, and they are written to while
+        // a request runs: it is computed at each call. The other account reads stay memoized.
+        if (str_starts_with($path, self::SESSION_CUSTOMER_PATH_PREFIX)) {
+            return $this->doResources($path, $parameters, $format, $currentLocale);
+        }
+
         $cacheKey = $this->buildCacheKey($path, $parameters, $format, $currentLocale);
 
         return $this->memoizer->remember(

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Thelia\Api\Resource\CustomerPaymentMethod;
 use Thelia\Core\Security\SecurityContext;
@@ -31,17 +32,21 @@ use Thelia\Model\Map\CustomerPaymentMethodTableMap;
  * A stored payment method is reached by a sequential numeric id, and the
  * `security:` expression of its front operations only asks for a customer, not
  * for the owner: filtering in the query means the collection, the item read, the
- * PATCH read step and the DELETE read step are all bounded by the same rule, and another customer's id reads as "not found"
- * rather than "forbidden" — the same answer a missing id gives, so probing
- * sequential ids learns nothing about which ones exist.
+ * PATCH read step and the DELETE read step are all bounded by the same rule, and
+ * another customer's id reads as "not found" rather than "forbidden", the same
+ * answer a missing id gives, so probing sequential ids learns nothing about which
+ * ones exist.
  *
  * Who the caller is comes from the firewall token when there is one. A front page
  * has no token, because its customer lives in the Thelia session, so an in-process
- * read (`resources()`, `DataAccessService`) falls back to the session customer, read
- * through SecurityContext, which only looks at a session that already exists and
- * never opens one. A token that names someone else than a customer, an administrator
- * on a front route for instance, is never replaced by the session: it keeps reading
- * nothing, and a guest in the session owns no stored method either.
+ * read (`resources()`, `DataAccessService`) falls back to the session customer. That
+ * fallback applies only when the main request already holds its session object
+ * (`hasSession(true)`, the rule of CartOwnership): a session still behind the lazy
+ * factory of the request is not created here, and in CLI there is none. The customer
+ * is then read through SecurityContext. A token that names someone
+ * other than a customer, an administrator on a front route for instance, is never
+ * replaced by the session: it keeps reading nothing. A guest in the session owns no
+ * stored method either.
  *
  * The admin endpoints are left alone: they sit behind ROLE_ADMIN and a
  * back-office user legitimately reads every customer's stored methods.
@@ -51,6 +56,7 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
     public function __construct(
         private TokenStorageInterface $tokenStorage,
         private SecurityContext $securityContext,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -93,6 +99,13 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
 
         if (null !== $token) {
             return $token->getUser();
+        }
+
+        // Only a session the request already holds is read, the rule of CartOwnership:
+        // SecurityContext would create it from the request's lazy factory, and a read
+        // that looks for a customer must not be what opens a session.
+        if (!$this->requestStack->getMainRequest()?->hasSession(true)) {
+            return null;
         }
 
         $sessionCustomer = $this->securityContext->getCustomerUser();
