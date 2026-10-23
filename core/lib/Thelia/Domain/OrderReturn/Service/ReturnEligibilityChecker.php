@@ -246,6 +246,26 @@ final class ReturnEligibilityChecker
             throw new ReturnNotAllowedException(self::ORDER_NOT_USABLE_MESSAGE);
         }
 
+        // After the ownership check, which answers first: the status of an order
+        // that is not the caller's is not theirs to learn. Before the window, so
+        // that a cancelled order is not told it came too late. A status the shop
+        // opens returns on is never refused here, whatever it is called.
+        $status = $order->getOrderStatus();
+
+        if (null !== $status && !$this->isOpeningStatus($status)) {
+            if ($status->isCancelled()) {
+                throw new ReturnNotAllowedException('This order has been cancelled and can no longer be returned.');
+            }
+
+            if ($status->isRefunded()) {
+                throw new ReturnNotAllowedException('This order has already been refunded and can no longer be returned.');
+            }
+
+            if ($status->isNotPaid()) {
+                throw new ReturnNotAllowedException('This order has not been paid yet and cannot be returned.');
+            }
+        }
+
         if (!$this->isWithinReturnWindow($order)) {
             throw new ReturnNotAllowedException('The return window for this order has closed.');
         }

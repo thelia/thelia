@@ -21,6 +21,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\ConfigTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
@@ -58,7 +59,15 @@ final class OrderReturnApiTest extends ApiTestCase
         ConfigQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
 
-        parent::tearDown();
+        try {
+            parent::tearDown();
+        } finally {
+            // Read again once the rollback is done: a setting a case wrote must
+            // not outlive it in the process, the next test class would read it,
+            // from the cache and from the Propel pool the rollback leaves as it was.
+            ConfigTableMap::clearInstancePool();
+            ConfigQuery::resetCache();
+        }
     }
 
     public function testACustomerOnlySeesTheirOwnReturns(): void
@@ -1022,15 +1031,6 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
-     * The body of a refusal with the identifier the caller sent taken out: the
-     * identifier is the caller's own input, it may be echoed back.
-     */
-    private function withoutTheIdentifier(string $content, int $identifier): string
-    {
-        return str_replace((string) $identifier, '<id>', $content);
-    }
-
-    /**
      * Bodies with `{order}` and `{product}` standing for the IRI of the order
      * and of the order product the case opens a return on.
      *
@@ -1189,6 +1189,76 @@ final class OrderReturnApiTest extends ApiTestCase
             0,
             OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
         );
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function refusedOrderStatuses(): iterable
+    {
+        yield 'cancelled' => [OrderStatus::CODE_CANCELED, 'This order has been cancelled and can no longer be returned.'];
+        yield 'refunded' => [OrderStatus::CODE_REFUNDED, 'This order has already been refunded and can no longer be returned.'];
+        yield 'unpaid' => [OrderStatus::CODE_NOT_PAID, 'This order has not been paid yet and cannot be returned.'];
+    }
+
+    /**
+     * A cancelled, refunded or unpaid order gets a refusal that names the
+     * reason, not the "window has closed" message a customer would misread as
+     * "you were too slow".
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAnOrderThatCannotBeReturnedIsRefusedWithItsOwnMessage(string $statusCode, string $message): void
+    {
+        $customer = $this->customer();
+        $order = $this->factory->order($customer, ['statusCode' => $statusCode]);
+        $orderProduct = $this->orderProductFor($order);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringContainsString($message, (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * The explicit refusals only apply when the status is not one the shop
+     * opens returns on: a status the merchant lists keeps being accepted.
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAStatusTheShopOpensReturnsOnIsStillAccepted(string $statusCode): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, $statusCode);
+
+        $customer = $this->customer();
+        $order = $this->factory->order($customer, ['statusCode' => $statusCode]);
+        $orderProduct = $this->orderProductFor($order);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
     }
 
     /**
