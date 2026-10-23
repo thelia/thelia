@@ -35,6 +35,9 @@ use Thelia\Model\Map\OrderReturnLineTableMap;
             uriTemplate: '/admin/order_return_lines/{id}',
             normalizationContext: ['groups' => [self::GROUP_ADMIN_READ, self::GROUP_ADMIN_READ_SINGLE]],
         ),
+        // A patch changes what was received of the line, never what the line is
+        // about: AdminOrderReturnLinePatchDenormalizer refuses a body that names
+        // its orderProduct or its orderReturn.
         new Patch(
             uriTemplate: '/admin/order_return_lines/{id}',
             processor: OrderReturnLineAdminPatchProcessor::class,
@@ -61,11 +64,14 @@ class OrderReturnLine implements PropelResourceInterface
     ])]
     public ?int $id = null;
 
+    /**
+     * Written on creation only, nested in its return: the admin patch of a
+     * line cannot move it onto another order line.
+     */
     #[Relation(targetResource: OrderProduct::class)]
-    #[NotBlank(groups: [self::GROUP_FRONT_WRITE, self::GROUP_ADMIN_WRITE])]
+    #[NotBlank(groups: [self::GROUP_FRONT_WRITE])]
     #[Groups([
         self::GROUP_ADMIN_READ,
-        self::GROUP_ADMIN_WRITE,
         self::GROUP_FRONT_READ,
         self::GROUP_FRONT_WRITE,
         OrderReturn::GROUP_ADMIN_READ,
@@ -126,9 +132,12 @@ class OrderReturnLine implements PropelResourceInterface
     ])]
     public ?float $refundAmount = null;
 
+    /**
+     * Read only: the admin patch of a line cannot move it into another return.
+     */
     #[Relation(targetResource: OrderReturn::class)]
     #[Column(propelSetter: 'setOrderReturnId')]
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public ?OrderReturn $orderReturn = null;
 
     public function getId(): ?int
