@@ -28,6 +28,7 @@ use Thelia\Model\Map\OrderShipmentTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderShipment;
 use Thelia\Model\OrderShipmentItem;
 use Thelia\Model\OrderShipmentQuery;
@@ -355,13 +356,7 @@ final readonly class OrderShipmentManager
      */
     private function lockOrder(Order $order, ConnectionInterface $connection): ?int
     {
-        $statement = $connection->prepare('SELECT `status_id` FROM `order` WHERE `id` = :id FOR UPDATE');
-        $statement->bindValue(':id', (int) $order->getId(), \PDO::PARAM_INT);
-        $statement->execute();
-
-        $statusId = $statement->fetchColumn();
-
-        return false === $statusId || null === $statusId ? null : (int) $statusId;
+        return OrderQuery::create()->lockStatusIdForUpdate((int) $order->getId(), $connection);
     }
 
     /**
