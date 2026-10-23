@@ -16,6 +16,8 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Thelia\Controller\Api\RefreshTokenController;
 use Thelia\Controller\Front\ContactController;
 use Thelia\Controller\Front\DefaultController;
+use Thelia\Controller\Front\PublicationPreviewController;
+use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
 
 return static function (RoutingConfigurator $routes): void {
     $routes->add('api_front_login_check', '/api/front/login');
@@ -40,6 +42,13 @@ return static function (RoutingConfigurator $routes): void {
     $routes->add('contact_submit', '/contact')
         ->controller([ContactController::class, 'send'])
         ->methods(['POST']);
+
+    // The preview of a content or a folder whatever its publication state, for an
+    // administrator or whoever holds the signed link the back office hands out.
+    $routes->add(PublicationPreview::ROUTE, '/preview/{type}/{id}')
+        ->controller(PublicationPreviewController::class)
+        ->requirements(['type' => 'content|folder', 'id' => '\d+'])
+        ->methods(['GET']);
 
     $routes->import('.', 'module_attribute');
     $routes->import('.', 'template_attribute');

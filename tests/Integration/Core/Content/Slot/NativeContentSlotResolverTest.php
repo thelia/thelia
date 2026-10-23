@@ -147,6 +147,46 @@ final class NativeContentSlotResolverTest extends IntegrationTestCase
         self::assertNotContains($elsewhere->getId(), array_column($this->sources($this->service()->links(ContentSlots::FOOTER, 'en_US')), 1));
     }
 
+    public function testTheFooterIsEmptyWhileTheInformationFolderIsNotOnline(): void
+    {
+        $information = $this->fixtures->folder(0, ['visible' => 0]);
+        $this->fixtures->content($information, ['title' => 'Terms']);
+        // A content shown elsewhere, filed in the draft folder as well: the folder, not
+        // the content, is what keeps the footer empty.
+        $shownElsewhere = $this->fixtures->content($this->fixtures->folder(), ['title' => 'Delivery']);
+        (new ContentFolder())->setContentId($shownElsewhere->getId())->setFolderId($information->getId())->setDefaultFolder(false)->setPosition(2)->save();
+
+        ConfigQuery::write(NativeContentSlotResolver::INFORMATION_FOLDER_CONFIG, (string) $information->getId());
+
+        self::assertSame([], $this->service()->links(ContentSlots::FOOTER, 'en_US'), 'a draft folder has no footer to give yet');
+    }
+
+    public function testTheFooterLeavesOutAContentHeldByAFolderNotOnlineYet(): void
+    {
+        $information = $this->fixtures->folder();
+        $terms = $this->fixtures->content($information, ['title' => 'Terms']);
+        $heldByADraftFolder = $this->fixtures->content($this->fixtures->folder(0, ['visible' => 0]), ['title' => 'Not yet']);
+        (new ContentFolder())->setContentId($heldByADraftFolder->getId())->setFolderId($information->getId())->setDefaultFolder(false)->setPosition(1)->save();
+
+        ConfigQuery::write(NativeContentSlotResolver::INFORMATION_FOLDER_CONFIG, (string) $information->getId());
+
+        self::assertSame(
+            [['content', $terms->getId()]],
+            $this->sources($this->service()->links(ContentSlots::FOOTER, 'en_US')),
+            'its page would answer 404: the link is not drawn',
+        );
+    }
+
+    public function testTheHeaderAndAConsentSkipAContentHeldByAFolderNotOnlineYet(): void
+    {
+        $content = $this->fixtures->content($this->fixtures->folder(0, ['visible' => 0]), ['title' => 'Not yet']);
+        ConfigQuery::write(NativeContentSlotResolver::HEADER_MENU_ITEMS_CONFIG, \sprintf('content:%d', $content->getId()));
+        $this->termsConsent()->setContentId($content->getId())->save();
+
+        self::assertSame([], $this->service()->links(ContentSlots::HEADER, 'en_US'));
+        self::assertSame([], $this->service()->links('consent.terms_and_conditions', 'en_US'));
+    }
+
     public function testAnEmptyInformationFolderSettingGivesAnEmptySlot(): void
     {
         ConfigQuery::write(NativeContentSlotResolver::INFORMATION_FOLDER_CONFIG, '');

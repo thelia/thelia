@@ -18,12 +18,17 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
+use Thelia\Domain\CMS\Publication\PublicationGuard;
+use Thelia\Domain\CMS\Publication\PublicationMoment;
+use Thelia\Domain\CMS\Publication\PublishableInterface;
+use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Base\Content as BaseContent;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Content extends BaseContent implements FileModelParentInterface
+class Content extends BaseContent implements FileModelParentInterface, PublishableInterface
 {
     use PositionManagementTrait;
     use UrlRewritingTrait;
@@ -167,6 +172,60 @@ class Content extends BaseContent implements FileModelParentInterface
     public function getPosition(): ?int
     {
         return parent::getPosition();
+    }
+
+    /**
+     * An existing content going from hidden to visible needs a body in the default
+     * language, whichever path writes the flag (publication event, update or toggle
+     * event, facade, admin API, scheduled command). A new content is not checked. The
+     * dates are then kept in step with the flag, so the state read from the row is
+     * always the one the flag says.
+     *
+     * @throws EmptyContentPublicationException
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        $visibilityChanged = !$this->isNew() && $this->isColumnModified(ContentTableMap::COL_VISIBLE);
+
+        if ($visibilityChanged && 1 === (int) $this->getVisible()) {
+            $locale = PublicationGuard::defaultLocale();
+            // The translation held in memory carries the body being saved along with the
+            // flag; it is not in the database yet. Reading it through getTranslation() would
+            // switch the locale of the row, so the array is read directly.
+            $bodyInMemory = isset($this->currentTranslations[$locale]) ? $this->currentTranslations[$locale]->getDescription() : null;
+
+            try {
+                (new PublicationGuard())->assertHasBody($this, $bodyInMemory, $locale);
+            } catch (EmptyContentPublicationException $exception) {
+                // With the instance pool on, the row in memory is the one every later read of
+                // this content gets: left as it is, it says visible, and the next save of the
+                // same content would put it online after all.
+                $this->reload(false, $con);
+
+                throw $exception;
+            }
+        }
+
+        if ($visibilityChanged) {
+            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
+        }
+
+        return parent::preSave($con);
+    }
+
+    /**
+     * Written as it is compared: in the timezone of PHP, at the second (see
+     * {@see PublicationMoment}), whichever path writes it: the service, the admin API,
+     * a module.
+     */
+    public function setPublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setPublishAt(PublicationMoment::atTheSecondOrNull($v));
+    }
+
+    public function setUnpublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setUnpublishAt(PublicationMoment::atTheSecondOrNull($v));
     }
 
     public function postSave(?ConnectionInterface $con = null): void

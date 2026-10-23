@@ -21,6 +21,7 @@ use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Core\Event\Content\ContentUpdatePublicationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
@@ -28,6 +29,8 @@ use Thelia\Domain\CMS\Content\DTO\ContentCreateDTO;
 use Thelia\Domain\CMS\Content\DTO\ContentSeoDTO;
 use Thelia\Domain\CMS\Content\DTO\ContentUpdateDTO;
 use Thelia\Domain\CMS\Content\Exception\ContentNotFoundException;
+use Thelia\Domain\CMS\Publication\PublicationRequest;
+use Thelia\Domain\CMS\Publication\PublicationStatus;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 
@@ -89,6 +92,27 @@ final readonly class ContentFacade
         $this->dispatcher->dispatch($event, TheliaEvents::CONTENT_TOGGLE_VISIBILITY);
 
         return $event->getContent();
+    }
+
+    /**
+     * Publish, schedule, cancel or take offline.
+     *
+     * @throws ContentNotFoundException
+     * @throws \Thelia\Domain\CMS\Publication\Exception\PublicationException the gesture is refused, nothing is written
+     */
+    public function updatePublication(int $contentId, PublicationRequest $request): PublicationStatus
+    {
+        $content = $this->getById($contentId);
+
+        if (null === $content) {
+            throw ContentNotFoundException::withId($contentId);
+        }
+
+        $event = new ContentUpdatePublicationEvent($content, $request);
+
+        $this->dispatcher->dispatch($event, TheliaEvents::CONTENT_UPDATE_PUBLICATION);
+
+        return $event->getStatus() ?? throw new \LogicException('No listener handled the publication of the content.');
     }
 
     public function updatePosition(int $contentId, int $position, int $mode = UpdatePositionEvent::POSITION_ABSOLUTE): void

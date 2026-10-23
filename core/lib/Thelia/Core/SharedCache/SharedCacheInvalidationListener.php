@@ -108,6 +108,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::CONTENT_UPDATE_SEO => self::CONTENT,
         TheliaEvents::CONTENT_ADD_FOLDER => self::CONTENT,
         TheliaEvents::CONTENT_REMOVE_FOLDER => self::CONTENT,
+        TheliaEvents::CONTENT_UPDATE_PUBLICATION => self::CONTENT,
 
         TheliaEvents::FOLDER_CREATE => self::FOLDER,
         TheliaEvents::FOLDER_UPDATE => self::FOLDER,
@@ -115,6 +116,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         TheliaEvents::FOLDER_TOGGLE_VISIBILITY => self::FOLDER,
         TheliaEvents::FOLDER_UPDATE_POSITION => self::FOLDER,
         TheliaEvents::FOLDER_UPDATE_SEO => self::FOLDER,
+        TheliaEvents::FOLDER_UPDATE_PUBLICATION => self::FOLDER,
 
         TheliaEvents::BRAND_CREATE => self::BRAND,
         TheliaEvents::BRAND_UPDATE => self::BRAND,

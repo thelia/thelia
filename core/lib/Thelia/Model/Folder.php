@@ -18,11 +18,15 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\CMS\Publication\PublicationMoment;
+use Thelia\Domain\CMS\Publication\PublishableInterface;
+use Thelia\Domain\CMS\Publication\VisibilityDatesAligner;
 use Thelia\Model\Base\Folder as BaseFolder;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Folder extends BaseFolder implements FileModelParentInterface
+class Folder extends BaseFolder implements FileModelParentInterface, PublishableInterface
 {
     use PositionManagementTrait;
     use UrlRewritingTrait;
@@ -81,6 +85,34 @@ class Folder extends BaseFolder implements FileModelParentInterface
     protected function addCriteriaToPositionQuery(FolderQuery $query): void
     {
         $query->filterByParent($this->getParent());
+    }
+
+    /**
+     * The dates are kept in step with `visible` whichever path writes the flag, so the
+     * state read from the row is always the one the flag says.
+     */
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        if (!$this->isNew() && $this->isColumnModified(FolderTableMap::COL_VISIBLE)) {
+            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
+        }
+
+        return parent::preSave($con);
+    }
+
+    /**
+     * Written as it is compared: in the timezone of PHP, at the second (see
+     * {@see PublicationMoment}), whichever path writes it: the service, the admin API,
+     * a module.
+     */
+    public function setPublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setPublishAt(PublicationMoment::atTheSecondOrNull($v));
+    }
+
+    public function setUnpublishAt(string|int|\DateTimeInterface|null $v = null): static
+    {
+        return parent::setUnpublishAt(PublicationMoment::atTheSecondOrNull($v));
     }
 
     public function preInsert(?ConnectionInterface $con = null): bool
