@@ -24,16 +24,21 @@ use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Resource\OrderReturnLine as OrderReturnLineResource;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\OrderReturnLineTableMap;
+use Thelia\Model\Map\OrderReturnTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnLine;
 use Thelia\Model\OrderReturnLineQuery;
+use Thelia\Model\OrderReturnQuery;
+use Thelia\Model\OrderReturnStatus;
 
 /**
  * The two quantities of a return line are what the rest of the feature counts
@@ -52,15 +57,21 @@ use Thelia\Model\OrderReturnLineQuery;
  *
  * Every patch is decided on the line as it is once locked, never on the line
  * API Platform read before: the order and the order product are locked first,
- * as every return write does, then the line itself. A line found
- * otherwise than the request read it - another patch, a reception committed
- * in between - answers 409: the request carries what its author saw next to
- * what they changed, and it is sent again on the line as it now is, never
- * written next to values nobody saw.
+ * as every return write does, then the return and the line. A line found
+ * otherwise than API Platform read it for this request - another patch, a
+ * reception committed between that read and the locks - answers 409: the
+ * request is sent again on the line as it now is, and the fields it does not
+ * send are never written back from a read the locks outdated. The 409 covers
+ * that window only. It is not a check between two administrators who read the
+ * line at different times: that would take an optimistic lock (an ETag the
+ * client sends back in `If-Match`), and a PATCH applies to the line as the
+ * server reads it, on the fields it sends.
  *
  * The patch changes what was received of a line, never what the line is
  * about: its order product and its return are not writable, and are checked
- * under the locks to be those the locks were taken on.
+ * under the locks to be those the locks were taken on. Once the return can no
+ * longer be received - received, settled, refused, expired - the stock and
+ * the refund are settled on its lines, and they no longer change.
  */
 final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInterface
 {
@@ -70,6 +81,7 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
         private PropelPersistProcessor $persistProcessor,
         private ReturnEligibilityChecker $eligibility,
         private OrderReturnWriteTransactionInterface $transaction,
+        private OrderReturnStateMachine $stateMachine,
     ) {
     }
 
@@ -108,10 +120,12 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
 
         try {
             return $this->transaction->run($orderId, [$orderProductId], function (ConnectionInterface $connection) use ($data, $previous, $operation, $uriVariables, $context, $lineId, $orderId, $orderProductId, $returnId): mixed {
+                $return = $this->lockedReturn($returnId, $connection);
                 $locked = $this->lockedLine($lineId, $connection);
 
                 $this->assertTheLineIsAsItWasRead($locked, $data, $previous, $orderProductId, $returnId);
                 $this->takeWhatNoClientWritesFrom($locked, $data);
+                $this->assertTheLineMayStillChange($return, $locked, $data);
 
                 $quantity = $data->getQuantity();
                 $received = $data->getQuantityReceived() ?? 0.0;
@@ -135,6 +149,23 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
         } catch (ReturnNotAllowedException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
+    }
+
+    /**
+     * The return of the line, held until the end of the transaction - after
+     * the order and its lines, as a reception takes it - and read as it is
+     * now: out of the instance pool first, which would hand it back as loaded
+     * before the lock.
+     */
+    private function lockedReturn(int $returnId, ConnectionInterface $connection): OrderReturn
+    {
+        OrderReturnTableMap::removeInstanceFromPool((string) $returnId);
+
+        return OrderReturnQuery::create()
+            ->filterById($returnId)
+            ->lockForUpdate()
+            ->findOne($connection)
+            ?? throw new ConflictHttpException(self::CHANGED_SINCE_READ);
     }
 
     /**
@@ -201,6 +232,30 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
     {
         $data->setRefundAmount(null === $locked->getRefundAmount() ? null : (float) $locked->getRefundAmount());
         $data->setProductSaleElementsId($locked->getProductSaleElementsId());
+    }
+
+    /**
+     * What was received of a return is restocked and refunded when it moves
+     * to received. Past that point - or once it can no longer get there -
+     * changing a quantity, the condition or the resellable flag of a line
+     * would leave the stock and the refund behind.
+     */
+    private function assertTheLineMayStillChange(OrderReturn $return, OrderReturnLine $locked, OrderReturnLineResource $data): void
+    {
+        $statusCode = $return->getStatusCode();
+
+        if (null !== $statusCode && $this->stateMachine->canStillReach($statusCode, OrderReturnStatus::CODE_RECEIVED)) {
+            return;
+        }
+
+        if (self::sameQuantity($data->getQuantity(), (float) $locked->getQuantity())
+            && self::sameQuantity($data->getQuantityReceived() ?? 0.0, (float) $locked->getQuantityReceived())
+            && $data->getReceivedCondition() === $locked->getReceivedCondition()
+            && (bool) $data->getResellable() === (bool) $locked->getResellable()) {
+            return;
+        }
+
+        throw new UnprocessableEntityHttpException(\sprintf('The lines of a return in status "%s" can no longer be changed.', $statusCode ?? 'none'));
     }
 
     private static function sameQuantity(float $one, float $other): bool

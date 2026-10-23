@@ -835,6 +835,74 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * Once a return can no longer be received - received, settled, refused,
+     * expired - its stock and its refund are settled on its lines as they
+     * are: a patch changing a quantity, the condition or the resellable flag
+     * would leave them behind.
+     *
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('aChangeToALineOfAReturnPastReception')]
+    public function testALineOfAReturnPastReceptionCannotBeChanged(string $statusCode, array $body): void
+    {
+        $return = $this->returnWithLine($this->customer(), $statusCode, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantityReceived(2.0)->setResellable(false)->setReceivedCondition('new')->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            $body,
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('can no longer be changed', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(2.0, (float) $line->getQuantity());
+        self::assertSame(2.0, (float) $line->getQuantityReceived());
+        self::assertFalse((bool) $line->getResellable());
+        self::assertSame('new', $line->getReceivedCondition());
+    }
+
+    /**
+     * @return iterable<string, array{string, array<string, mixed>}>
+     */
+    public static function aChangeToALineOfAReturnPastReception(): iterable
+    {
+        yield 'received, quantity' => [OrderReturnStatus::CODE_RECEIVED, ['quantity' => 1.0]];
+        yield 'received, received quantity' => [OrderReturnStatus::CODE_RECEIVED, ['quantityReceived' => 1.0]];
+        yield 'received, resellable' => [OrderReturnStatus::CODE_RECEIVED, ['resellable' => true]];
+        yield 'received, condition' => [OrderReturnStatus::CODE_RECEIVED, ['receivedCondition' => 'damaged']];
+        yield 'settled, received quantity' => [OrderReturnStatus::CODE_SETTLED, ['quantityReceived' => 1.0]];
+        yield 'refused, quantity' => [OrderReturnStatus::CODE_REFUSED, ['quantity' => 1.0]];
+        yield 'expired, resellable' => [OrderReturnStatus::CODE_EXPIRED, ['resellable' => true]];
+    }
+
+    /**
+     * Refusing a change is not refusing the request: one that leaves the line
+     * of a received return as it is goes through.
+     */
+    public function testAPatchLeavingALineOfAReceivedReturnAsItIsGoesThrough(): void
+    {
+        $return = $this->returnWithLine($this->customer(), OrderReturnStatus::CODE_RECEIVED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantityReceived(2.0)->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantity' => 2.0, 'quantityReceived' => 2.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertJsonResponseSuccessful($response);
+    }
+
+    /**
      * The rate limiter is the shop's protection against a flood of requests,
      * not a punishment for getting a form wrong: consuming a token before the
      * eligibility check let twenty refused attempts close the hour for the
