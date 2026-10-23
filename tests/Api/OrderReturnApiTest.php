@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -1027,6 +1028,183 @@ final class OrderReturnApiTest extends ApiTestCase
     private function withoutTheIdentifier(string $content, int $identifier): string
     {
         return str_replace((string) $identifier, '<id>', $content);
+    }
+
+    /**
+     * Bodies with `{order}` and `{product}` standing for the IRI of the order
+     * and of the order product the case opens a return on.
+     *
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function incompleteBodies(): iterable
+    {
+        yield 'no order' => [['orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 1.0]]]];
+        yield 'no lines' => [['order' => '{order}']];
+        yield 'empty lines' => [['order' => '{order}', 'orderReturnLines' => []]];
+        yield 'neither order nor lines' => [['customerComment' => 'Too small']];
+        yield 'line without product' => [['order' => '{order}', 'orderReturnLines' => [['quantity' => 1.0]]]];
+        yield 'line without quantity' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}']]]];
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function malformedBodies(): iterable
+    {
+        yield 'null order' => [['order' => null, 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 1.0]]]];
+        yield 'null lines' => [['order' => '{order}', 'orderReturnLines' => null]];
+        yield 'lines that are not a list' => [['order' => '{order}', 'orderReturnLines' => 'one']];
+        yield 'null order product' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => null, 'quantity' => 1.0]]]];
+        yield 'null quantity' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => null]]]];
+        yield 'quantity that is not a number' => [['order' => '{order}', 'orderReturnLines' => [['orderProduct' => '{product}', 'quantity' => 'many']]]];
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('malformedBodies')]
+    public function testAMalformedRequestIsRefusedWithA4xxOnTheFront(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            $this->withIris($body, '/api/front/account/orders/'.$order->getId(), '/api/front/account/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertContains($response->getStatusCode(), [400, 422], (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from a malformed request.',
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('incompleteBodies')]
+    public function testAnIncompleteRequestIsRefusedWith422OnTheFront(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            $this->withIris($body, '/api/front/account/orders/'.$order->getId(), '/api/front/account/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from an incomplete request.',
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    #[DataProvider('incompleteBodies')]
+    public function testAnIncompleteRequestIsRefusedWith422OnTheAdmin(array $body): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/order_returns',
+            $this->withIris($body, '/api/admin/orders/'.$order->getId(), '/api/admin/order_products/'.$orderProduct->getId()),
+            token: $this->authenticateAsAdmin(),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written from an incomplete request.',
+        );
+    }
+
+    /**
+     * @return iterable<string, array{float}>
+     */
+    public static function invalidQuantities(): iterable
+    {
+        yield 'zero' => [0.0];
+        yield 'negative' => [-1.0];
+    }
+
+    #[DataProvider('invalidQuantities')]
+    public function testALineWithAQuantityThatIsNotPositiveIsRefusedWith422(float $quantity): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => $quantity],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+            'A return was written with a quantity that is not positive.',
+        );
+    }
+
+    public function testALineOfAnotherOrderOfTheSameCustomerIsRefusedWith422(): void
+    {
+        $customer = $this->customer();
+        [$order] = $this->paidOrderWithProduct($customer);
+        [, $otherProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$otherProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     *
+     * @return array<string, mixed>
+     */
+    private function withIris(array $body, string $orderIri, string $orderProductIri): array
+    {
+        $encoded = str_replace(
+            ['{order}', '{product}'],
+            [$orderIri, $orderProductIri],
+            (string) json_encode($body, \JSON_THROW_ON_ERROR),
+        );
+
+        return json_decode($encoded, true, flags: \JSON_THROW_ON_ERROR);
     }
 
     private function customer(): Customer

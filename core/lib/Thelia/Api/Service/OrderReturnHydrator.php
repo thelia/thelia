@@ -55,9 +55,12 @@ final readonly class OrderReturnHydrator
      */
     public static function rowsToLock(OrderReturnResource $data): array
     {
-        // The validation of the write groups already refuses a body missing
-        // either field; an uninitialized typed property read here would still
-        // be an Error, a 500, rather than a refusal.
+        // The NotBlank constraints of the write groups do not see a missing
+        // field: the operations carry no validationContext, so the validation
+        // runs in the Default group while the constraints are declared in the
+        // serialization groups, and orderReturnLines has no #[Valid] either.
+        // A missing field is refused here, where reading the uninitialized typed
+        // property would be an Error, a 500.
         if (!isset($data->order)) {
             throw new ReturnNotAllowedException('A return must name the order it is about.');
         }
@@ -67,6 +70,10 @@ final readonly class OrderReturnHydrator
         foreach ($data->getOrderReturnLines() as $line) {
             if (!isset($line->orderProduct)) {
                 throw new ReturnNotAllowedException('A return line must name the order product it is about.');
+            }
+
+            if (!isset($line->quantity)) {
+                throw new ReturnNotAllowedException('A return line must name the quantity to return.');
             }
 
             $orderProductIds[] = (int) $line->getOrderProduct()->getId();
