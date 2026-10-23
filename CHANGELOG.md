@@ -1,3 +1,9 @@
+# 3.1.6 (unreleased)
+
+## Security
+
+- Opening a return, on the front API or from the administration, can no longer take over a return line that already exists, including one of another customer: such a request is refused with 422 and the line stays where it was.
+
 # 3.1.5
 
 Security release of the 3.1 line. It ships `setup/update/sql/3.1.5.sql`, which adds a configuration variable and records the new version, without any schema change. `thelia/setup` ships as 3.1.6 with this core, its 3.1.5 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
