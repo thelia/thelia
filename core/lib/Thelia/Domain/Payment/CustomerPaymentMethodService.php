@@ -33,6 +33,7 @@ use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\Map\CustomerPaymentMethodTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\DeferredStoredMethodForgettingPaymentModuleInterface;
 use Thelia\Module\ModuleTransactionGuard;
 use Thelia\Module\PaymentModuleWithStoredMethodsInterface;
 
@@ -339,11 +340,13 @@ final readonly class CustomerPaymentMethodService
      * erasure of personal data does not wait on a third party. The providers are told
      * afterwards, through the returned callbacks, which the caller runs once its
      * transaction is committed. Each one asks the provider in best effort, logs a
-     * failure without the token, and announces the deletion.
+     * failure without the token, and announces the deletion. A module that needs data
+     * going with the row reads it before the drop
+     * (DeferredStoredMethodForgettingPaymentModuleInterface).
      *
      * @return list<\Closure(): void>
      *
-     * @throws \LogicException when the caller holds no transaction
+     * @throws \LogicException when the caller holds no transaction, or a module ended it
      */
     public function forgetAllOf(Customer $customer, ConnectionInterface $connection): array
     {
@@ -375,15 +378,23 @@ final readonly class CustomerPaymentMethodService
             return [];
         }
 
+        // Before the drop: what a provider needs to forget a method may go with its row,
+        // through a foreign key on delete cascade, and be gone once the caller commits.
+        $preparedCalls = array_map(
+            fn (CustomerPaymentMethod $method): ?\Closure => $this->prepareTheProviderToForget($method, $connection),
+            $methods,
+        );
+
         $this->dropByPrimaryKey($methods, $connection);
 
-        return array_values(array_map(
-            fn (CustomerPaymentMethod $method): \Closure => function () use ($method): void {
-                $this->tellTheProviderToForget($method);
+        return array_map(
+            fn (CustomerPaymentMethod $method, ?\Closure $preparedCall): \Closure => function () use ($method, $preparedCall): void {
+                $this->tellTheProviderToForget($method, preparedCall: $preparedCall);
                 $this->dispatcher->dispatch(new CustomerPaymentMethodEvent($method), TheliaEvents::CUSTOMER_PAYMENT_METHOD_DELETE);
             },
             $methods,
-        ));
+            $preparedCalls,
+        );
     }
 
     /**
@@ -502,20 +513,87 @@ final readonly class CustomerPaymentMethodService
     }
 
     /**
+     * Lets a module that needs data going with the row of a method read it before the
+     * drop (DeferredStoredMethodForgettingPaymentModuleInterface), in the caller's
+     * transaction and under the transaction guard. Best effort: a failure is logged by
+     * its class only, and the provider is then told the plain way.
+     *
+     * @return (\Closure(): void)|null the call to make once the drop is committed, null
+     *                                 for the plain forgetStoredMethod()
+     *
+     * @throws \LogicException when the module ended the caller's transaction
+     */
+    private function prepareTheProviderToForget(CustomerPaymentMethod $method, ConnectionInterface $connection): ?\Closure
+    {
+        $transactionLost = false;
+        $module = null;
+
+        try {
+            $module = ModuleQuery::create()->findPk($method->getPaymentModuleId(), $connection);
+            $moduleInstance = null === $module ? null : $this->storedMethodsModule($module);
+
+            if (!$moduleInstance instanceof DeferredStoredMethodForgettingPaymentModuleInterface) {
+                return null;
+            }
+
+            $levelOnEntry = $connection instanceof ConnectionWrapper ? $connection->getNestedTransactionCount() : null;
+
+            return ModuleTransactionGuard::run(
+                $connection,
+                (string) $module->getCode(),
+                'prepareToForgetStoredMethod',
+                static function () use ($moduleInstance, $method, $connection, $levelOnEntry, &$transactionLost): \Closure {
+                    try {
+                        return $moduleInstance->prepareToForgetStoredMethod($method);
+                    } finally {
+                        $transactionLost = !$connection->inTransaction()
+                            || (null !== $levelOnEntry && $connection->getNestedTransactionCount() < $levelOnEntry);
+                    }
+                },
+            );
+        } catch (\Throwable $throwable) {
+            $this->logger->warning(\sprintf(
+                'The provider of stored payment method #%d could not read what it needs to forget it before its drop (module #%d, %s).',
+                (int) $method->getId(),
+                (int) $method->getPaymentModuleId(),
+                $throwable::class,
+            ));
+
+            return null;
+        } finally {
+            // A transaction the module ended cannot be given back with what it held: the
+            // erasure must fail and its caller roll back.
+            if ($transactionLost) {
+                throw new \LogicException(\sprintf('The provider of stored payment method #%d (module %s) ended the transaction that drops it: it is aborted.', (int) $method->getId(), (string) $module?->getCode()));
+            }
+        }
+    }
+
+    /**
      * Best effort, for a method whose row is gone or about to go. Any failure is logged
      * by its class only: a provider message, and the trace arguments, may carry the
      * token.
      *
      * With a connection, the call is made inside the caller's transaction and runs under
      * the transaction guard; without one, nothing is open and the module is called as is.
+     * A prepared call, made by the module before the drop, is run in place of
+     * forgetStoredMethod().
+     *
+     * @param (\Closure(): void)|null $preparedCall
      *
      * @throws \LogicException when the provider ended the caller's transaction
      */
-    private function tellTheProviderToForget(CustomerPaymentMethod $method, ?Module $module = null, ?ConnectionInterface $connection = null): void
+    private function tellTheProviderToForget(CustomerPaymentMethod $method, ?Module $module = null, ?ConnectionInterface $connection = null, ?\Closure $preparedCall = null): void
     {
         $transactionLost = false;
 
         try {
+            if (null !== $preparedCall) {
+                $preparedCall();
+
+                return;
+            }
+
             $module ??= ModuleQuery::create()->findPk($method->getPaymentModuleId());
             $moduleInstance = null === $module ? null : $this->storedMethodsModule($module);
 
