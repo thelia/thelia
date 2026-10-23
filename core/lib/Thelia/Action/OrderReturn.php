@@ -108,7 +108,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         // Before any lock: a return naming the order of another customer is
         // refused without holding that order, even for the length of a refusal.
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order cannot be used for a return.');
+            throw new ReturnNotAllowedException(ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE);
         }
 
         $orderProductIds = [];
