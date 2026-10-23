@@ -56,6 +56,10 @@
 - An integration test fails, with a message that says why, when the code under test commits or rolls back a transaction it did not open, and the rows of that test no longer stay in the test database for the tests that follow. `IntegrationTestCase` opens the transaction of each test under nested levels, which such a commit only counts down.
 - `composer test:prepare` warms the container the suites run with, the one without debug, as the CI does. The first test process used to compile it, and under mutation testing that process could be running a mutant.
 
+## Security
+
+- Opening a return, on the front API or from the administration, can no longer take over a return line that already exists, including one of another customer: such a request is refused with 422 and the line stays where it was. On the front it is refused before the line is read.
+
 ## Fixed
 
 - `opcache.preload` pointed at `config/preload.php` no longer kills PHP-FPM at startup with `Class "Thelia\Model\Base\…Query" not found`. The preload file Symfony writes next to the container now registers the directory of the generated Propel models (`var/propel/<env>/model`) before it loads the loops that extend them. `docs/opcache-preload.md` describes how to enable preloading.

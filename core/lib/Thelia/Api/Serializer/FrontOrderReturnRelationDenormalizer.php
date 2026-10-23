@@ -52,11 +52,20 @@ use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
  *
  * It runs after PlainIdentifierDenormalizer (priority 0), which turns a bare
  * identifier into an IRI: this one then only sees IRIs.
+ *
+ * It also keeps the lines of the return new. API Platform reads a line given
+ * as an IRI, as an object carrying an `@id` (JSON-LD) or an `id` (JSON), from
+ * the database and writes the body onto it: the return being opened would take
+ * over that line, whichever return and customer it belonged to. Such a line is
+ * refused here, before anything is read, with the same answer whether the line
+ * exists or not.
  */
 #[AutoconfigureTag('serializer.normalizer', ['priority' => -10])]
 final class FrontOrderReturnRelationDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
+
+    public const EXISTING_LINE_MESSAGE = 'A return line must be a new line, not an existing one.';
 
     public function __construct(
         private readonly IriConverterInterface $iriConverter,
@@ -65,10 +74,15 @@ final class FrontOrderReturnRelationDenormalizer implements DenormalizerInterfac
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return \is_array($data)
-            && null !== self::relationOf($type)
-            && \in_array(OrderReturn::GROUP_FRONT_WRITE, (array) ($context['groups'] ?? []), true)
-            && !isset($context[self::guardOf($type)]);
+        if (null === self::relationOf($type)
+            || !\in_array(OrderReturn::GROUP_FRONT_WRITE, (array) ($context['groups'] ?? []), true)
+            || isset($context[self::guardOf($type)])) {
+            return false;
+        }
+
+        // A line that is not an object (an IRI, a bare identifier) is taken in
+        // too, to be refused: it can only name an existing line.
+        return \is_array($data) || OrderReturnLine::class === $type;
     }
 
     public function getSupportedTypes(?string $format): array
@@ -81,6 +95,10 @@ final class FrontOrderReturnRelationDenormalizer implements DenormalizerInterfac
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
+        if (OrderReturnLine::class === $type && self::namesAnExistingLine($data)) {
+            throw new UnprocessableEntityHttpException(self::EXISTING_LINE_MESSAGE);
+        }
+
         try {
             // One guard per type: the line is denormalized from inside the
             // return, with the context of the return.
@@ -94,6 +112,16 @@ final class FrontOrderReturnRelationDenormalizer implements DenormalizerInterfac
 
             throw new UnprocessableEntityHttpException($message, $exception);
         }
+    }
+
+    /**
+     * Whether a line of the body points at a line already written rather than
+     * describing a new one. The value is never looked up; a key set to null
+     * names nothing, for API Platform as here.
+     */
+    private static function namesAnExistingLine(mixed $data): bool
+    {
+        return !\is_array($data) || isset($data['@id']) || isset($data['id']);
     }
 
     /**

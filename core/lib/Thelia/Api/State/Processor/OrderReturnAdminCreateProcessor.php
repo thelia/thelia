@@ -60,6 +60,8 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
         }
 
         try {
+            OrderReturnHydrator::assertNewLines($data);
+
             [$orderId, $orderProductIds] = OrderReturnHydrator::rowsToLock($data);
         } catch (ReturnNotAllowedException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
