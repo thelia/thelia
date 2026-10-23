@@ -105,6 +105,19 @@ final class SaleUnitAdminRestrictionApiTest extends ApiTestCase
         self::assertSame(404, $this->jsonRequest('GET', '/api/admin/orders/'.$theirs->getOrderId().'/history', token: $token)->getStatusCode());
     }
 
+    public function testThePaymentOfAnOrderOfAnotherUnitIsOutOfReach(): void
+    {
+        $mine = $this->orderOn($this->mine);
+        $theirs = $this->orderOn($this->theirs);
+        $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
+
+        self::assertJsonResponseSuccessful($this->jsonRequest('GET', '/api/admin/orders/'.$mine->getId().'/payment_transactions', token: $token));
+        self::assertJsonResponseSuccessful($this->jsonRequest('GET', '/api/admin/orders/'.$mine->getId().'/payment', token: $token));
+        self::assertSame(404, $this->jsonRequest('GET', '/api/admin/orders/'.$theirs->getId().'/payment_transactions', token: $token)->getStatusCode());
+        self::assertSame(404, $this->jsonRequest('GET', '/api/admin/orders/'.$theirs->getId().'/payment', token: $token)->getStatusCode());
+        self::assertSame(404, $this->jsonRequest('POST', '/api/admin/orders/'.$theirs->getId().'/capture', ['amount' => null], $token)->getStatusCode());
+    }
+
     public function testARestrictedAdministratorReachesThePricesAndStocksOfItsUnitsOnly(): void
     {
         $productSaleElements = $this->productSaleElements();
@@ -340,6 +353,7 @@ final class SaleUnitAdminRestrictionApiTest extends ApiTestCase
     {
         return $this->factory->restrictedAdmin([
             AdminResources::ORDER => self::ALL,
+            AdminResources::ORDER_PAYMENT_CAPTURE => self::ALL,
             AdminResources::ORDER_RETURN => self::ALL,
             AdminResources::SALE_UNIT => self::ALL,
         ]);

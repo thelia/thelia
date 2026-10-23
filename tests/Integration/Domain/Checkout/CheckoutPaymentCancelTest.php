@@ -121,9 +121,11 @@ final class CheckoutPaymentCancelTest extends IntegrationTestCase
      * "Cancel" here means "the payment did not go through". An order that was paid is
      * past that, and taking it back is a back-office decision with money behind it —
      * not something a tracking link may do, and a tracking link stays valid for a month
-     * after the order was paid.
+     * after the order was paid. An order on hold for capture is not paid yet, but its
+     * amount is reserved on the buyer's card: the payment did go through.
      *
      * @testWith ["paid"]
+     *           ["awaiting_capture"]
      *           ["processing"]
      *           ["sent"]
      *           ["canceled"]

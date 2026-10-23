@@ -36,6 +36,8 @@ class OrderEvent extends ActionEvent
     protected ?int $status = null;
     protected ?int $previousStatusId = null;
     protected bool $statusTransitionForced = false;
+
+    protected ?int $expectedStatusId = null;
     protected ?string $deliveryRef = null;
     protected ?int $cartItemId = null;
     protected ?string $transactionRef = null;
@@ -303,6 +305,23 @@ class OrderEvent extends ActionEvent
     public function isStatusTransitionForced(): bool
     {
         return $this->statusTransitionForced;
+    }
+
+    /**
+     * Applies the status only if the order still has $statusId when the core writes it:
+     * a change decided on a status another worker has changed since is dropped, and the
+     * event stops there.
+     */
+    public function expectStatus(int $statusId): self
+    {
+        $this->expectedStatusId = $statusId;
+
+        return $this;
+    }
+
+    public function getExpectedStatusId(): ?int
+    {
+        return $this->expectedStatusId;
     }
 
     /**
