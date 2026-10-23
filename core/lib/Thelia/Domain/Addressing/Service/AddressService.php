@@ -16,6 +16,7 @@ namespace Thelia\Domain\Addressing\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -157,16 +158,41 @@ readonly class AddressService
         );
     }
 
+    /**
+     * The id of the address a request names, read from the first of its route, its body and
+     * its query string that holds a value (a blank string is no value). Strictly a positive
+     * decimal integer: an int above zero, or digits only, without a sign, a space or a
+     * leading zero. Anything else names none: zero, a negative or signed number, "007",
+     * " 7", a boolean or a float of a JSON body, text.
+     */
+    public function requestedAddressId(HttpRequest $request): ?int
+    {
+        foreach ([$request->attributes, $request->request, $request->query] as $parameters) {
+            $addressId = $parameters->get('addressId');
+
+            if (null === $addressId || (\is_string($addressId) && '' === trim($addressId))) {
+                continue;
+            }
+
+            if (\is_int($addressId)) {
+                return $addressId > 0 ? $addressId : null;
+            }
+
+            if (!\is_string($addressId) || !ctype_digit($addressId) || '0' === $addressId[0] || \strlen($addressId) > 18) {
+                return null;
+            }
+
+            return (int) $addressId;
+        }
+
+        return null;
+    }
+
     public function getDeliveryAddress(
         Request $request,
         SecurityContext $securityContext,
     ): ?Address {
-        if (null === $request) {
-            return null;
-        }
-        $addressId = $request->attributes->get('addressId')
-            ?? $request->request->get('addressId')
-            ?? $request->query->get('addressId');
+        $addressId = $this->requestedAddressId($request);
 
         if (null === $addressId) {
             // The cart holds a `cart_address` id, which is its own frozen copy

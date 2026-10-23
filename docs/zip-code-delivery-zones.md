@@ -19,17 +19,39 @@ optionally one country of the zone (no country: every country of the zone).
 - a pattern where `*` stands for any characters, `20*` or `75*1`;
 - a range of numeric codes, `75001...75020`, bounds included.
 
-Codes and patterns are compared in their normal form: upper case, without spaces or
-hyphens. `SW1A 1AA` matches `sw1a1aa`, `1000-001` matches `1000 001`. A pattern that can
-match nothing (empty, only `*`, a range with letters or upside down) is refused when it
-is written, and ignored with a log line if one reaches the table by another way.
+Codes and patterns are compared in their normal form (`ZipCodePattern::normalize()`):
+compatibility characters folded (Unicode NFKC, through `ext-intl`, which the core
+requires: `２０000` is `20000`), without spaces, dashes (every `\p{Pd}`, and the minus
+sign) or invisible format characters (`\p{Cf}`: a soft hyphen, a zero-width space), with
+the digits of every script written in ASCII (Arabic-Indic or Devanagari digits included)
+and the ASCII letters in upper case. What is left must be `A` to `Z` and `0` to `9` only;
+a code that keeps anything else (a letter outside `A` to `Z` such as `é`, a variation
+selector, a control character, a combining mark) has no normal form. `SW1A 1AA` matches
+`sw1a1aa`, `1000-001` matches `1000 001`. A pattern holds the same characters, with `*`
+and `...`, and is 50 characters long at most. A pattern that can match nothing (empty,
+only `*`, a range with letters or upside down) or that holds another character is refused
+when it is written. One that reaches the table by another way matches no postal code and is
+logged with its reason, once per zone and country a request reads: as an exclusion it excludes
+nothing, as an inclusion it takes nothing and the zone keeps its other inclusions (an
+unreadable inclusion never opens the zone to every code). An unreadable inclusion with no
+other inclusion therefore closes the zone to every typed postal code of the country, a
+placeholder included; no postal code at all is still accepted.
 
 `ZipCodeRuleSet` applies the rules of a zone for one country:
 
 - a zone without a rule takes every postal code, as zones always did;
 - a code matching an exclusion is refused, whatever the inclusions say;
 - when the zone has inclusions, a code must match one of them;
-- an unknown postal code is accepted.
+- no postal code at all (`null`: no address yet, a cart estimated without one) is unknown:
+  every zone takes it, and `AreaDeliveryModuleQuery::findByCountryAndModule()` reads no
+  rule for it;
+- a typed code made only of spaces and dashes (a buyer typing `-` for no code, a code of
+  spaces through the API) or empty (which only an address written outside the forms and
+  the API can hold: both refuse a blank code) is a placeholder
+  (`ZipCodePattern::isPlaceholder()`): a zone with an inclusion does not take it, a zone
+  with exclusions only or without a rule does;
+- a code without a normal form (a zero-width space alone, `é1`, a variation selector) is
+  uncertain, as below.
 
 ## Where it applies
 
@@ -45,7 +67,9 @@ page that lists, estimates and checks the carriers reads the rules of a zone onc
 saved or deleted through the model drops them, and so do a new request, a console
 command and the reset of the services between two messages of a worker
 (`ZipCodeRuleCacheListener`). A bulk write on `AreaZipCodeRuleQuery`, which skips the
-model hooks, is seen from the next request on.
+model hooks, is seen from the next request on, and so are the rows deleted in cascade with
+their zone or their country, SQL written straight to the table, a rule read then rolled back
+with its transaction, and what another process writes during a long console command.
 
 The postal code is passed by:
 
@@ -59,24 +83,47 @@ The postal code is passed by:
 - the `delivery` loop, when the address it reads is in the country of the loop.
 
 The postal code goes with the address it belongs to: the cart's copy for the cart's own
-address (a guest's cart address points to no customer address), whose country and state
-are read too, as `CartGuard` reads them; the customer address for an `addressId`, also
-when a country is given next to it as the API does, provided the address is in that
-country and belongs to the customer of the cart (a guest's own customer row included). A
-country given alone, or an address of someone else, takes the postal code of the cart's
-delivery address when that address is in the country, as the postage estimate does.
+address, whose country and state are read too, as `CartGuard` reads them; the customer
+address for an `addressId`, also when a country is given next to it as the API does,
+provided the address is in that country, belongs to the customer of the cart and is not
+the one the copy was taken from (the copy judges its own source, which may have been
+edited since). A guest names no address this way: a guest row is reused by whoever types
+the same e-mail address. A country given alone, or any other
+address, takes the postal code of the cart's delivery address when that address is in the
+country, as the postage estimate does. The front API (`GET /api/front/delivery_modules`)
+judges the cart's copy unless the request names another address of the cart's customer
+(never for a guest) than the one the copy was taken from.
 
-A postal code that is not valid UTF-8 normalises to nothing, and counts as unknown.
+A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is
+uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
+does not take it; a zone without a rule still takes it. The database refuses a code that
+is not valid UTF-8 in an address, so only a caller passing one itself meets that case.
+`ShippingFacade::postalCodeWithoutCarrier()` names neither an unknown code, a placeholder
+nor an uncertain code (`ZipCodePattern::nameable()`), and names a code without what would
+break or turn its message around: invisible format characters (direction marks and
+overrides, zero-width spaces), controls (line feeds, tabs, NEL) and line and paragraph
+separators; its visible spaces and dashes are kept.
 
 A rule with `*` runs as a regular expression. Should PCRE give up on it (its backtrack
 limit), the failure is logged and an exclusion refuses the code, an inclusion does not
 take it.
 
 `ShippingFacade::postalCodeWithoutCarrier()` names the postal code of the cart's
-address when it is the reason no carrier is offered: some active carrier would be offered
-without it (its zones serve the country and it quotes the cart), and the rules of its
-zones refuse that code. Flexy shows it on the delivery step instead of the general
-message.
+address when it is the reason no carrier is offered: no carrier is offered, and one the
+code is excluded from would quote the cart. To know it, it asks the price
+(`TheliaEvents::MODULE_DELIVERY_GET_POSTAGE`) of the carriers the postal code turned away
+as well as of those it lets through. Flexy shows it on the delivery step instead of the
+general message.
+
+A pattern written into a log line has its control characters, its backslashes, its line
+and paragraph separators and its direction controls escaped (`ZipCodePattern::forLog()`),
+so that a rule written by hand cannot forge or turn around a line of the log.
+
+The log lines of the feature are for the shop's developers and go through `Tlog`, whose
+default level is ERROR (`tlog_level`, seeded by no install): the unreadable rules and the
+patterns PCRE gives up on are WARNING, the rules deleted with a country NOTICE. They are
+written only once `tlog_level` is set that low. The merchant's trace of the rules added,
+deleted, or deleted with a country is the administration log of the back office.
 
 ## Limits
 
@@ -90,13 +137,24 @@ message.
   carrier module.
 - On a country without a postal code format (`country.zip_code_format` empty, or
   `need_zip_code` off, in which case the format is not checked), the customer can type any
-  code, or none. An empty code is unknown and accepted by every zone, a mistyped one
-  matches no exclusion: both pass the exclusions, and only inclusions hold. The back
+  code, or none. A format that leaves free text is not much better: `Country::getZipCodeRE()`
+  reads `C` as `.+`, any characters, and copies every other character unescaped into the
+  regular expression, so a `.`, `*`, `?`, `+`, `|`, brackets, braces or a backslash act as
+  regular expression characters. The part they cover is free; the rest of the code is
+  checked. An empty code is a placeholder, a mistyped one matches no exclusion: both pass
+  the exclusions, and only inclusions hold. The back
   office warns on the card of a zone whose rules apply to such a country.
 - A rule written for a country goes with the country when it leaves the zone
   (`TheliaEvents::AREA_REMOVE_COUNTRY`).
 - A module that decides eligibility on its own (`isValidDelivery()`, the postage event)
   is not affected by the rules of the zones it is not linked to.
+- The carriers are judged on the cart's copy of its address (its country, state and postal
+  code), and so is the order by `CartGuard`; the modules, however, still receive the
+  customer address behind the copy in `DeliveryPostageEvent::getAddress()`, which may have
+  been edited since it was chosen (and is null for a guest whose copy points to no customer
+  address). A module that prices on the address (postal code, city, coordinates) reads the
+  cart's copy, `$cart->getCartAddressRelatedByAddressDeliveryId()`, as GeolocatedDelivery
+  does: the event carries the cart.
 - The carriers follow the cart's copy of its delivery address, which only choosing the
   address again refreshes: an address edited elsewhere (another checkout step, the
   customer account, the API) keeps its old postal code in the cart until it is chosen

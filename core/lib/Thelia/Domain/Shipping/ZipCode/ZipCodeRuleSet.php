@@ -20,8 +20,13 @@ namespace Thelia\Domain\Shipping\ZipCode;
  * - no rule: every postal code is accepted, as a zone always did;
  * - a code matching an exclusion is refused, whatever the inclusions say;
  * - when the zone has inclusions, a code must match one of them;
- * - an unknown postal code is accepted: the address decides later, and a missing code
- *   never hides every carrier.
+ * - no postal code at all (null: no address yet) is accepted: the address decides later,
+ *   and a missing code never hides every carrier;
+ * - a placeholder (a typed code of only spaces and dashes, as "-") is not taken by a zone
+ *   with an inclusion, and is taken by a zone with exclusions only;
+ * - a code that cannot be checked (without a normal form, see ZipCodePattern::normalize(),
+ *   or a pattern PCRE gives up on) is uncertain: an exclusion refuses it, an inclusion does
+ *   not take it.
  */
 final readonly class ZipCodeRuleSet
 {
@@ -37,13 +42,27 @@ final readonly class ZipCodeRuleSet
 
     public function accepts(?string $zipCode): bool
     {
-        if (null === $zipCode || '' === ZipCodePattern::normalize($zipCode)) {
+        // A zone without a rule takes every code: nothing to normalise.
+        if ([] === $this->inclusions && [] === $this->exclusions) {
             return true;
         }
 
+        // No code at all: the address decides later.
+        if (ZipCodePattern::isUnknown($zipCode)) {
+            return true;
+        }
+
+        // Typed, but no code: no inclusion takes it, and no exclusion names it.
+        if (ZipCodePattern::isPlaceholder($zipCode)) {
+            return [] === $this->inclusions;
+        }
+
+        // Normalised once for every rule. A code without a normal form is uncertain.
+        $normalized = ZipCodePattern::normalize($zipCode);
+
         // An exclusion that cannot be checked refuses the code: it fails closed.
         foreach ($this->exclusions as $exclusion) {
-            if ($exclusion->matches($zipCode, whenUnsure: true)) {
+            if ($exclusion->matchesNormalized($normalized, whenUnsure: true)) {
                 return false;
             }
         }
@@ -53,7 +72,7 @@ final readonly class ZipCodeRuleSet
         }
 
         foreach ($this->inclusions as $inclusion) {
-            if ($inclusion->matches($zipCode)) {
+            if ($inclusion->matchesNormalized($normalized)) {
                 return true;
             }
         }

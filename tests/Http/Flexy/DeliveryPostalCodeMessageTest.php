@@ -34,6 +34,7 @@ use Thelia\Model\CartAddress;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\CountryArea;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\CartTableMap;
@@ -99,16 +100,20 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         self::assertStringContainsString('No delivery method is available for this order.', $crawler->text());
     }
 
-    public function testThePostalCodeIsPrintedAsTextNotAsMarkup(): void
+    /**
+     * The snack bar prints its text raw. A code holding markup keeps a character outside A
+     * to Z and 0 to 9: it is uncertain, the step never names it, and it never becomes an
+     * element of the page.
+     */
+    public function testAPostalCodeHoldingMarkupIsNeverNamed(): void
     {
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
 
-        // The snack bar prints its text raw; the code typed by the buyer must not be markup.
-        $crawler = $this->deliveryStepOfAGuest(excluding: '<*', zipCode: '<b>20</b>');
+        $crawler = $this->deliveryStepOfAGuest(excluding: '20*', zipCode: '<b>20</b>');
 
-        self::assertStringContainsString('No carrier delivers to the postal code <b>20</b>.', $crawler->text());
-        self::assertSame(0, $crawler->filter('.SnackBar-message b')->count(), 'The postal code became an element of the page.');
+        self::assertStringNotContainsString('No carrier delivers to the postal code', $crawler->text());
+        self::assertSame(0, $crawler->filter('b')->reduce(static fn (Crawler $node): bool => '20' === $node->text())->count(), 'The postal code became an element of the page.');
     }
 
     /**
@@ -155,6 +160,32 @@ final class DeliveryPostalCodeMessageTest extends GuestCheckoutTestCase
         $this->editOnTheStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
 
         self::assertSame('Paris 2e', $this->deliveryCopyOf($guest)?->getCity());
+        CartTableMap::clearInstancePool();
+        self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
+    }
+
+    /**
+     * The same for a signed-in customer, whose address book is the account's own.
+     */
+    public function testASignedInCustomerEditingTheCityOnTheStepIsAskedForACarrierAgain(): void
+    {
+        $this->skipUnlessTheStepChoosesAnEditedAddressAgain();
+        $this->openASessionWithACart();
+        $account = $this->signInAsARealAccount();
+        $country = CountryQuery::create()->filterByHasStates(0)->filterByNeedZipCode(0)->orderById()->findOne();
+        self::assertNotNull($country);
+        $address = $this->fixtures()->address($account, $country, null, ['zipcode' => self::GUEST_ZIP_CODE, 'city' => 'Paris']);
+        $address->setIsDefault(1)->save($this->getPropelConnection());
+        $this->zoneServingTheCountryExcept((int) $country->getId(), '20*', true);
+
+        $this->client->request('GET', '/checkout/delivery');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $cart = $this->guestWithACarrier($account);
+        self::assertSame(self::GUEST_ZIP_CODE, $this->deliveryCopyOf($account)?->getZipcode(), 'The step chose the address of the account.');
+
+        $this->editOnTheStep($address, static fn (Address $edited) => $edited->setCity('Paris 2e'));
+
+        self::assertSame('Paris 2e', $this->deliveryCopyOf($account)?->getCity());
         CartTableMap::clearInstancePool();
         self::assertNull(CartQuery::create()->findPk($cart->getId())?->getDeliveryModuleId(), 'The carrier chosen for the former city stayed.');
     }

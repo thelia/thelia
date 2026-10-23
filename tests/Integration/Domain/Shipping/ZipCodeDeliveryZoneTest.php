@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
 use ApiPlatform\Metadata\GetCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Api\Bridge\Propel\Serializer\CartNormalizer;
 use Thelia\Api\State\Provider\DeliveryModuleProvider;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -41,6 +41,7 @@ use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\CountryArea;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
@@ -148,6 +149,71 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertTrue($this->isEligible(null));
     }
 
+    /**
+     * "-" typed for no code: a zone with an inclusion does not take it, a zone with
+     * exclusions only or without a rule does. No code at all (null) is still taken.
+     */
+    public function testAPlaceholderIsTakenOnlyByAZoneWithoutAnInclusion(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        self::assertTrue($this->isEligible('-'), 'A zone without a rule takes it.');
+
+        $exclusion = $this->rule($area, '75*', excluded: true);
+        self::assertTrue($this->isEligible('-'), 'A zone with exclusions only takes it.');
+
+        $exclusion->delete($this->getPropelConnection());
+        $this->rule($area, '75*');
+        self::assertFalse($this->isEligible('-'), 'A zone with an inclusion does not take it.');
+        self::assertFalse($this->isEligible(''), 'Nor an empty code.');
+        self::assertTrue($this->isEligible(null), 'No code at all is still taken.');
+    }
+
+    public function testTheGuardRefusesACartWhosePostalCodeIsAPlaceholderInAZoneWithAnInclusion(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*');
+        $cart = $this->guestCartShippedTo('-');
+        $cart->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+
+        $this->expectException(InvalidDeliveryException::class);
+        $this->getService(CartGuard::class)->checkValidDelivery($cart);
+    }
+
+    public function testAPlaceholderIsNotNamed(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*');
+        $cart = $this->guestCartShippedTo('-');
+
+        self::assertNotContains($this->module->getId(), $this->offeredModuleIds($cart));
+        self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($cart), 'A placeholder gives the buyer nothing to read.');
+    }
+
+    public function testAPostalCodeThatCannotBeReadIsNotTakenForAnUnknownOne(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        // The database refuses such a code: it can only come from the caller.
+        self::assertFalse(
+            $this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($this->module, $this->guestCartShippedTo('69001'), $this->country, null, "20\xC3\x28"),
+            'An exclusion refuses a code it cannot check.',
+        );
+    }
+
+    public function testAPostalCodeOfInvisibleCharactersIsNotTakenForAnUnknownOne(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        self::assertFalse(
+            $this->getService(DeliveryModuleEligibilityChecker::class)->isEligible($this->module, $this->guestCartShippedTo('69001'), $this->country, null, "\u{200B}"),
+            'An exclusion refuses a code its normal form empties.',
+        );
+        self::assertTrue($this->isEligible(' '), 'A blank code is a placeholder, which exclusions do not refuse.');
+    }
+
     public function testTheGuardRefusesACartWhosePostalCodeTheZoneExcludes(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -194,6 +260,19 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNull($facade->postalCodeWithoutCarrier($this->guestCartShippedTo('69001')), 'A carrier is offered.');
     }
 
+    /**
+     * The code the tunnel prints is the one nameable() gives: a right-to-left override typed
+     * in it would otherwise turn the message around.
+     */
+    public function testThePostalCodeIsNamedWithoutWhatWouldTurnTheMessageAround(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+
+        self::assertSame('20090', $this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo("20\u{202E}090")));
+    }
+
     public function testThePostalCodeIsNotBlamedForACarrierThatWouldNotQuoteTheCartAnyway(): void
     {
         $this->onlyTheModuleOfTheTestIsActive();
@@ -205,6 +284,18 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         }, 2048);
 
         self::assertNull($this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo('20090')));
+    }
+
+    public function testAPostalCodeOfInvisibleCharactersIsNotNamed(): void
+    {
+        $this->onlyTheModuleOfTheTestIsActive();
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '75*', excluded: true);
+
+        self::assertNull(
+            $this->getService(ShippingFacade::class)->postalCodeWithoutCarrier($this->guestCartShippedTo("\u{200B}")),
+            'A code its normal form empties gives the buyer nothing to read.',
+        );
     }
 
     public function testThePostalCodeIsNotBlamedWhenNoCarrierServesTheCountry(): void
@@ -222,6 +313,166 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
         self::assertNotContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('20090'))));
         self::assertContains($this->module->getId(), $ids($this->frontApiListFor($this->guestCartShippedTo('69001'))));
+    }
+
+    /**
+     * A signed-in customer chose an address, then edited it from the account: the front API,
+     * asked for the carriers of the cart, judges the cart's copy, as the guard will.
+     */
+    public function testTheFrontApiJudgesTheCartCopyOfACustomerAddressEditedSince(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $excludedSince = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($excludedSince);
+        $excludedSince->setZipcode('20090')->save($this->getPropelConnection());
+        self::assertContains($this->module->getId(), $ids($this->frontApiListFor($cart)), 'The copy is in Lyon.');
+
+        $movedAbroad = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $abroadCart = $this->customerCartShippedTo($movedAbroad);
+        $movedAbroad->setCountryId($this->newCountry('XZ', 'XZX', '989')->getId())->save($this->getPropelConnection());
+        self::assertContains($this->module->getId(), $ids($this->frontApiListFor($abroadCart)), 'The copy is in the country of the zone.');
+
+        $another = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => (string) $another->getId()])),
+            'Another address the request names decides.',
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function addressesNamedToTheFrontApi(): iterable
+    {
+        yield 'an address of another customer' => ['someone else', true];
+        yield 'another address of the guest row' => ['guest row', true];
+        yield 'another address of the customer' => ['own', false];
+    }
+
+    /**
+     * The address a request names, in a country no zone of the carrier serves: only another
+     * address of the cart's customer is listed for; anything else lists the carriers of the
+     * cart's copy, so the country and the state of an address of someone else are never read
+     * out through the list.
+     */
+    #[DataProvider('addressesNamedToTheFrontApi')]
+    public function testTheFrontApiListsForANamedAddressOnlyWhenItIsTheCustomers(string $whose, bool $listedForTheCopy): void
+    {
+        $this->zoneServedByTheModule();
+        $title = $this->factory->customerTitle();
+        $customer = 'guest row' === $whose ? $this->factory->guestCustomer($title) : $this->factory->customer($title);
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '69001']));
+        $owner = 'someone else' === $whose ? $this->factory->customer($title) : $customer;
+        $abroad = $this->factory->address($owner, $this->newCountry('XY', 'XYX', '987'), null, ['zipcode' => '69001']);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $listed = \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => (string) $abroad->getId()])), true);
+
+        self::assertSame($listedForTheCopy, $listed, $listedForTheCopy ? 'The list read an address that is not the customer\'s.' : 'An address of the customer decides.');
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function addressesNamedForACartWithoutACopy(): iterable
+    {
+        yield 'another address of the customer' => ['own', true];
+        yield 'an address of another customer' => ['someone else', false];
+        yield 'an id that reads as none' => ['abc', false];
+    }
+
+    /**
+     * A cart without a delivery address yet. The zone serves the country of the customer's
+     * addresses but excludes the postal code of their default address, and the shop's
+     * default country is served by none: only the address named, another address of the
+     * customer, is listed for. An address of someone else gives the default country of the
+     * shop, never its own; an id that reads as none falls back on the address of the session,
+     * here the default address of the customer, which the zone excludes.
+     */
+    #[DataProvider('addressesNamedForACartWithoutACopy')]
+    public function testTheFrontApiListsForACartWithoutACopy(string $named, bool $listed): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '69001', excluded: true);
+        CountryQuery::create()->update(['ByDefault' => 0], $this->getPropelConnection());
+        $this->newCountry('XR', 'XRX', '986')->setByDefault(1)->save($this->getPropelConnection());
+        $title = $this->factory->customerTitle();
+        $customer = $this->factory->customer($title);
+        $this->factory->address($customer, $this->country, null, ['zipcode' => '69001'])->setIsDefault(1)->save($this->getPropelConnection());
+        $cart = $this->factory->cart($customer);
+        $this->factory->cartItem($cart, $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency()));
+        $addressId = match ($named) {
+            'own' => (string) $this->factory->address($customer, $this->country, null, ['zipcode' => '69002'])->getId(),
+            'someone else' => (string) $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '69003'])->getId(),
+            default => $named,
+        };
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertSame($listed, \in_array((int) $this->module->getId(), $ids($this->frontApiListFor($cart, ['addressId' => $addressId])), true));
+    }
+
+    public function testAnEmptyRouteAttributeDoesNotHideTheAddressTheQueryNames(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '69001']));
+        $another = $this->factory->address($customer, $this->country, null, ['zipcode' => '20090']);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => (string) $another->getId()], ['addressId' => ''])),
+            'The address the query names decides.',
+        );
+    }
+
+    /**
+     * An `addressId` names an address only when it is a strictly positive integer that
+     * resolves to one other than the source of the cart's copy: otherwise the copy judges, as
+     * CartGuard will.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function idsThatNameNoOtherAddress(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'zero' => ['0'];
+        yield 'not a number' => ['abc'];
+        yield 'an unknown id' => ['999999999'];
+        yield 'a negative id' => ['-5'];
+        yield 'an id with leading zeros' => ['007'];
+        yield 'the id of another address with leading zeros' => ['zeros'];
+        yield 'the source of the copy' => ['source'];
+    }
+
+    #[DataProvider('idsThatNameNoOtherAddress')]
+    public function testTheFrontApiJudgesTheCartCopyWhenTheRequestNamesNoOtherAddress(string $addressId): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $source = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($source);
+        // Edited since it was chosen: read, the source would exclude the carrier.
+        $source->setZipcode('20090')->save($this->getPropelConnection());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->frontApiListFor($cart, ['addressId' => match ($addressId) {
+                'source' => (string) $source->getId(),
+                // Read as an id, it would name an address the zone excludes.
+                'zeros' => '00'.$this->factory->address($customer, $this->country, null, ['zipcode' => '20090'])->getId(),
+                default => $addressId,
+            }])),
+            'The copy, in Lyon, judges.',
+        );
     }
 
     public function testAGuestIsListedTheCarriersOfTheZoneOfItsState(): void
@@ -286,6 +537,101 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
             'The postal code of the cart decides, not the one of an address of someone else.',
         );
         self::assertContains($this->module->getId(), $ids($facade->listValidMethodsAsResourceApi($cart, null, null, $someoneElses->getId())));
+    }
+
+    /**
+     * A guest row is reused by whoever types the same e-mail address: an earlier buyer's
+     * address hangs off the row, and only the one the cart was copied from is this buyer's.
+     */
+    public function testAGuestReadsNoPostalCodeOfAnEarlierBuyerOfTheSameRow(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $guest = $this->factory->guestCustomer($this->factory->customerTitle());
+        $earlierBuyers = $this->factory->address($guest, $this->country, null, ['zipcode' => '20090']);
+        $cart = $this->customerCartShippedTo($this->factory->address($guest, $this->country, null, ['zipcode' => '69001']));
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $earlierBuyers->getId())),
+            'The postal code of an earlier buyer of the guest row decides nothing.',
+        );
+    }
+
+    /**
+     * The carriers are asked for a price with the address the request names only when it is
+     * an address of the cart's customer: anyone else's never reaches a module.
+     */
+    public function testNoModuleIsHandedTheAddressOfAnotherCustomer(): void
+    {
+        $this->zoneServedByTheModule();
+        $title = $this->factory->customerTitle();
+        $mine = $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '69001']);
+        $someoneElses = $this->factory->address($this->factory->customer($title), $this->country, null, ['zipcode' => '20090']);
+        $cart = $this->customerCartShippedTo($mine);
+        $addressesHandedOver = [];
+        $this->listen(TheliaEvents::MODULE_DELIVERY_GET_POSTAGE, static function (DeliveryPostageEvent $event) use (&$addressesHandedOver): void {
+            $addressesHandedOver[] = $event->getAddress()?->getId();
+        }, 4096);
+        $facade = $this->getService(ShippingFacade::class);
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        $named = $ids($facade->listValidMethodsAsResourceApi($cart, null, null, $someoneElses->getId()));
+
+        self::assertNotContains($someoneElses->getId(), $addressesHandedOver, 'A module was handed the address of another customer.');
+        self::assertContains($mine->getId(), $addressesHandedOver);
+        self::assertSame($ids($facade->listValidMethodsAsResourceApi($cart)), $named, 'The list is the one of the cart.');
+    }
+
+    public function testAnAddressInAnotherCountryLeavesThePostalCodeOfTheCartToSpeak(): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $abroad = $this->factory->address($customer, $this->newCountry('XN', 'XNX', '988'), null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($this->factory->address($customer, $this->country, null, ['zipcode' => '20090']));
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertNotContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $this->country, null, $abroad->getId())),
+            'The cart is in Corsica: an address abroad does not make the code unknown.',
+        );
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function sourcesOfTheCopy(): iterable
+    {
+        yield 'a guest, with a country' => [true, true];
+        yield 'a guest, without a country' => [true, false];
+        yield 'a customer, with a country' => [false, true];
+        yield 'a customer, without a country' => [false, false];
+    }
+
+    /**
+     * The address the cart's copy was taken from, edited since, named by the request: the
+     * copy judges, as CartGuard does, whoever calls the facade.
+     */
+    #[DataProvider('sourcesOfTheCopy')]
+    public function testTheSourceOfTheCopyIsJudgedOnTheCopy(bool $guest, bool $withACountry): void
+    {
+        $area = $this->zoneServedByTheModule();
+        $this->rule($area, '20*', excluded: true);
+        $title = $this->factory->customerTitle();
+        $customer = $guest ? $this->factory->guestCustomer($title) : $this->factory->customer($title);
+        $source = $this->factory->address($customer, $this->country, null, ['zipcode' => '69001']);
+        $cart = $this->customerCartShippedTo($source);
+        $source->setZipcode('20090')->save($this->getPropelConnection());
+        $ids = static fn (array $resources): array => array_map(static fn ($resource): int => (int) $resource->getId(), $resources);
+
+        self::assertContains(
+            $this->module->getId(),
+            $ids($this->getService(ShippingFacade::class)->listValidMethodsAsResourceApi($cart, $withACountry ? $this->country : null, null, $source->getId())),
+            'The copy, in Lyon, judges its own source.',
+        );
     }
 
     public function testAGuestCartReadsNoPostalCodeOfACustomerAddress(): void
@@ -403,24 +749,6 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         );
     }
 
-    /**
-     * The API cart payload of a cart that has not chosen its carrier yet carries an estimate:
-     * read with the postal code of the cart's address, as the checkout will judge it.
-     */
-    public function testTheCartPayloadEstimatesWithThePostalCodeOfTheCartAddress(): void
-    {
-        $area = $this->zoneServedByTheModule();
-        $this->rule($area, '20*', excluded: true);
-        $normalizer = $this->getService(CartNormalizer::class);
-        $deliveryCostOf = new \ReflectionMethod(CartNormalizer::class, 'deliveryCostOf');
-
-        [$corsica] = $deliveryCostOf->invoke($normalizer, $this->guestCartShippedTo('20090'), $this->country, null, false);
-        [$lyon] = $deliveryCostOf->invoke($normalizer, $this->guestCartShippedTo('69001'), $this->country, null, false);
-
-        self::assertNull($corsica, 'No carrier serves the address: no delivery cost to show.');
-        self::assertNotNull($lyon);
-    }
-
     public function testTheEstimateForAnotherCountryReadsNoPostalCodeOfTheCartAddress(): void
     {
         $area = $this->zoneServedByTheModule();
@@ -433,6 +761,23 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertNotNull(
             $this->getService(PostageEstimator::class)->estimatePostageForCountry($cart, $this->country)->getBestPostageAmount(),
             'The postal code of an address abroad says nothing of the country estimated for.',
+        );
+    }
+
+    public function testTheEstimateOfACartReadsTheStateOfItsCopy(): void
+    {
+        $state = (new State())->setCountryId($this->country->getId())->setIsocode('XQ2')->setVisible(1);
+        $state->save($this->getPropelConnection());
+        $area = (new Area())->setName('State zone');
+        $area->save($this->getPropelConnection());
+        (new CountryArea())->setAreaId($area->getId())->setCountryId($this->country->getId())->setStateId($state->getId())->save($this->getPropelConnection());
+        (new AreaDeliveryModule())->setAreaId($area->getId())->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+        $cart = $this->guestCartShippedTo('69001');
+        $cart->getCartAddressRelatedByAddressDeliveryId()->setStateId($state->getId())->save($this->getPropelConnection());
+
+        self::assertNotNull(
+            $this->getService(ShippingFacade::class)->estimateCartPostage($cart)->totalTtc,
+            'The carrier of the zone of the state of the copy is estimated.',
         );
     }
 
@@ -518,13 +863,20 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
     /**
      * What GET /api/front/delivery_modules answers for a session holding the cart.
      *
+     * @param array<string, string> $query
+     * @param array<string, string> $attributes
+     *
      * @return list<mixed>
      */
-    private function frontApiListFor(Cart $cart): array
+    private function frontApiListFor(Cart $cart, array $query = [], array $attributes = []): array
     {
         $session = new Session(new MockArraySessionStorage());
+        // The cart of a customer is the session's only once the customer is signed in.
+        if (null !== $cart->getCustomer()) {
+            $session->setCustomerUser($cart->getCustomer());
+        }
         $session->setSessionCart($cart);
-        $request = new Request();
+        $request = new Request($query, [], $attributes);
         $request->setSession($session);
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -532,7 +884,8 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         $provider = new DeliveryModuleProvider(
             $requestStack,
             $session,
-            $this->getService(SecurityContext::class),
+            // The security context of this request, which holds the signed-in customer.
+            new SecurityContext($requestStack),
             $this->getService(AddressService::class),
             $this->dispatcher(),
             $this->getService(ShippingFacade::class),

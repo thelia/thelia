@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Shipping\ZipCode\Exception\InvalidZipCodeRuleException;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
 use Thelia\Log\Tlog;
@@ -30,8 +31,13 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
      * checkout page builds that list several times over: the rules of a zone are read once
      * per request. Written rules drop them (AreaZipCodeRule::postSave() and postDelete()),
      * and so do a new request, a console command and a reset of the services between two
-     * messages of a worker (ZipCodeRuleCacheListener). A write that skips the model hooks, a
-     * bulk update or delete of this query, is only seen from the next request on.
+     * messages of a worker (ZipCodeRuleCacheListener).
+     *
+     * What the model hooks do not see is only read again from the next request, command or
+     * message on: a bulk update or delete of this query; the rows the database deletes in
+     * cascade with their zone or their country; SQL written straight to the table, by this
+     * process or another one; a rule saved, read, then rolled back with its transaction, which
+     * stays read as saved; and, during a long console command, any rule another process writes.
      *
      * @var array<string, ZipCodeRuleSet>
      */
@@ -40,6 +46,23 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
     /**
      * The rules of a zone that apply to the addresses of one country: the rules written for
      * that country and the rules written for every country of the zone.
+     *
+     * A row whose pattern cannot be read (empty, only *, holding a character other than A
+     * to Z, 0 to 9 and *, a range upside down or of two lengths, too long: the back office
+     * refuses all of them, so it was written by another way) matches no postal code, and is
+     * logged once per zone and country a request reads.
+     *
+     * As an exclusion it then excludes nothing: it says nothing the shop could honour, and
+     * refusing every code of the country for it would take the carriers of the zone away
+     * from the whole country because of one unreadable row. As an inclusion it takes
+     * nothing, and the zone keeps its other inclusions only: an unreadable inclusion must
+     * not open the zone to every code. With no other inclusion, the zone then takes no typed
+     * postal code of the country, a placeholder ("-") included; no postal code at all is
+     * still accepted, as always.
+     *
+     * A pattern that can be read but that PCRE gives up on for one code is another case
+     * (ZipCodePattern::matches()): its intent is known, only that code is uncertain, and an
+     * exclusion refuses it.
      */
     public static function ruleSetFor(int $areaId, int $countryId): ZipCodeRuleSet
     {
@@ -67,19 +90,17 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
 
         $inclusions = [];
         $exclusions = [];
+        $readableInclusions = 0;
+        /** @var list<array{rule: AreaZipCodeRule, reason: string}> $unreadable */
+        $unreadable = [];
 
         foreach ($rules as $rule) {
             try {
                 $pattern = ZipCodePattern::fromString((string) $rule->getPattern());
-            } catch (\InvalidArgumentException) {
-                // Written by hand in the database: the back office never saves one. Logged
-                // once per request, the rule sets being kept for it.
-                Tlog::getInstance()->warning(
-                    'Postal code rule {rule_id} of zone {area_id} is ignored: "{pattern}" matches nothing.',
-                    ['rule_id' => $rule->getId(), 'area_id' => $areaId, 'pattern' => $rule->getPattern()],
-                );
-
-                continue;
+                $readableInclusions += $rule->getExcluded() ? 0 : 1;
+            } catch (InvalidZipCodeRuleException $exception) {
+                $pattern = ZipCodePattern::matchingNothing();
+                $unreadable[] = ['rule' => $rule, 'reason' => $exception->getMessage()];
             }
 
             if ($rule->getExcluded()) {
@@ -87,6 +108,25 @@ class AreaZipCodeRuleQuery extends BaseAreaZipCodeRuleQuery
             } else {
                 $inclusions[] = $pattern;
             }
+        }
+
+        // Written by hand in the database: the back office never saves one. Logged once per
+        // zone and country a request reads, the rule sets being kept for it.
+        foreach ($unreadable as ['rule' => $rule, 'reason' => $reason]) {
+            Tlog::getInstance()->warning(
+                'Postal code rule {rule_id} of zone {area_id} cannot be read ("{pattern}": {reason}): {consequence}',
+                [
+                    'rule_id' => $rule->getId(),
+                    'area_id' => $areaId,
+                    'pattern' => ZipCodePattern::forLog((string) $rule->getPattern()),
+                    'reason' => ZipCodePattern::forLog($reason),
+                    'consequence' => match (true) {
+                        (bool) $rule->getExcluded() => 'it excludes no postal code.',
+                        0 === $readableInclusions => 'it takes no postal code, and with no other inclusion the zone takes no typed postal code of the country, a placeholder included.',
+                        default => 'it takes no postal code, and the zone keeps its other inclusions only.',
+                    },
+                ],
+            );
         }
 
         return new ZipCodeRuleSet($inclusions, $exclusions);

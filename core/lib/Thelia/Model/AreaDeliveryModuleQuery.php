@@ -30,20 +30,15 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     /**
      * Check if a delivery module is suitable for the given country.
      *
-     * With a postal code, a zone whose postal code rules refuse it is skipped: the module
-     * is suitable when another of its zones covering the country accepts the code. Without
-     * one, the rules are not read, as before they existed.
+     * With a postal code, a placeholder ("-") included, a zone whose postal code rules refuse
+     * it is skipped: the module is suitable when another of its zones covering the country
+     * accepts the code. Without one (null), the rules are not read, as before they existed.
      *
      * @throws PropelException
      */
     public function findByCountryAndModule(Country $country, Module $module, ?State $state = null, ?string $zipCode = null): ?AreaDeliveryModule
     {
         $response = null;
-
-        // A blank code is an unknown one: every zone takes it, no rule is read.
-        if (null !== $zipCode && '' === ZipCodePattern::normalize($zipCode)) {
-            $zipCode = null;
-        }
 
         $countryInAreaList = CountryAreaQuery::findByCountryAndState($country, $state);
 
@@ -53,7 +48,8 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
                 ->filterByModule($module)
                 ->findOne();
 
-            if (null !== $response && null !== $zipCode
+            // No code at all: no rule is read. A placeholder and an uncertain code go to them.
+            if (null !== $response && !ZipCodePattern::isUnknown($zipCode)
                 && !AreaZipCodeRuleQuery::ruleSetFor((int) $countryInArea->getAreaId(), (int) $country->getId())->accepts($zipCode)
             ) {
                 $response = null;

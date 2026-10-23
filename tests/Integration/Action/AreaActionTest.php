@@ -14,15 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use Propel\Runtime\Exception\ExceptionInterface as PropelError;
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\AbstractTlogDestination;
+use Thelia\Log\Tlog;
 use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\AreaZipCodeRule;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Event\AreaEvent;
+use Thelia\Model\Map\CountryAreaTableMap;
 use Thelia\Model\State;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -95,6 +100,40 @@ final class AreaActionTest extends ActionIntegrationTestCase
         self::assertNotNull(AreaZipCodeRuleQuery::create()->findPk($ruleOfEveryCountry));
     }
 
+    public function testTheRulesDeletedWithACountryAreLogged(): void
+    {
+        $lines = $this->captureTheLog();
+        $area = $this->persistArea('Postal codes, traced');
+        $country = $this->factory->country(['isoalpha2' => 'XE', 'isoalpha3' => 'XEX', 'isocode' => '986']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern('20*')->setExcluded(true)->save();
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern('75001...75020')->setExcluded(false)->save();
+
+        $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+
+        $traces = array_values(array_filter($lines->lines, static fn (string $line): bool => str_contains($line, 'left shipping zone')));
+        self::assertCount(1, $traces);
+        self::assertStringContainsString('Country '.$country->getId().' left shipping zone '.$area->getId().': 2 postal code rule(s) deleted with it', $traces[0]);
+        self::assertStringContainsString('excluded 20*', $traces[0]);
+        self::assertStringContainsString('included 75001...75020', $traces[0]);
+    }
+
+    public function testAPatternDeletedWithACountryCannotForgeALineOfTheLog(): void
+    {
+        $lines = $this->captureTheLog();
+        $area = $this->persistArea('Postal codes, escaped');
+        $country = $this->factory->country(['isoalpha2' => 'XF', 'isoalpha3' => 'XFX', 'isocode' => '987']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        (new AreaZipCodeRule())->setAreaId($area->getId())->setCountryId($country->getId())->setPattern("20*\r\n[ERROR] forged")->setExcluded(true)->save();
+
+        $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+
+        $traces = array_values(array_filter($lines->lines, static fn (string $line): bool => str_contains($line, 'left shipping zone')));
+        self::assertCount(1, $traces);
+        self::assertStringNotContainsString("\n", $traces[0], 'A line break of the pattern reached the log.');
+        self::assertStringContainsString('excluded 20*\\r\\n[ERROR] forged', $traces[0]);
+    }
+
     public function testACountryStillInTheZoneThroughAnotherStateKeepsItsRules(): void
     {
         $area = $this->persistArea('Postal codes by state');
@@ -108,6 +147,33 @@ final class AreaActionTest extends ActionIntegrationTestCase
 
         self::assertSame(1, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count());
         self::assertNotNull(AreaZipCodeRuleQuery::create()->findPk($rule));
+    }
+
+    /**
+     * The rules cannot be read (their table is masked for the connection, with no implicit
+     * commit): the removal of the country is rolled back with them. The test runs inside a
+     * transaction of its own, so Propel only marks it as not committable instead of rolling
+     * the rows back at once: that mark is what proves the action rolled back its work.
+     */
+    public function testACountryDoesNotLeaveTheZoneWithoutItsRules(): void
+    {
+        $area = $this->persistArea('Postal codes, all or nothing');
+        $country = $this->factory->country(['isoalpha2' => 'XD', 'isoalpha3' => 'XDX', 'isocode' => '985']);
+        $this->dispatch(new AreaAddCountryEvent($area, [(string) $country->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+        $connection = Propel::getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
+        self::assertTrue($connection->isCommitable());
+
+        $connection->exec('CREATE TEMPORARY TABLE `area_zip_code_rule` (id INT)');
+
+        try {
+            $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+            self::fail('The rules could not be read: the removal must fail.');
+        } catch (PropelError) {
+        } finally {
+            $connection->exec('DROP TEMPORARY TABLE `area_zip_code_rule`');
+        }
+
+        self::assertFalse($connection->isCommitable(), 'The removal of the country was not rolled back.');
     }
 
     public function testDeleteRemovesArea(): void
@@ -126,6 +192,53 @@ final class AreaActionTest extends ActionIntegrationTestCase
         $rule->save();
 
         return (int) $rule->getId();
+    }
+
+    protected function tearDown(): void
+    {
+        // The next Tlog::getInstance() reads its configuration again.
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, null);
+
+        parent::tearDown();
+    }
+
+    /**
+     * Tlog keeps its lines for the end of the request: a destination of the test reads them
+     * as they come.
+     */
+    private function captureTheLog(): AbstractTlogDestination
+    {
+        $destination = new class extends AbstractTlogDestination {
+            /**
+             * @var list<string>
+             */
+            public array $lines = [];
+
+            public function add($string): void
+            {
+                $this->lines[] = (string) $string;
+            }
+
+            public function write(&$res): void
+            {
+            }
+
+            public function getTitle(): string
+            {
+                return 'Test';
+            }
+
+            public function getDescription(): string
+            {
+                return 'Keeps the lines for the test.';
+            }
+        };
+
+        $log = Tlog::getInstance();
+        $log->setLevel(Tlog::NOTICE);
+        (new \ReflectionProperty(Tlog::class, 'destinations'))->setValue($log, [$destination]);
+
+        return $destination;
     }
 
     private function persistArea(string $name): Area

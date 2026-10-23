@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Unit\Domain\Shipping\ZipCode;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Domain\Shipping\ZipCode\ZipCodeRuleSet;
@@ -67,26 +68,96 @@ final class ZipCodeRuleSetTest extends TestCase
         self::assertTrue($rules->accepts('75015'));
     }
 
-    public function testAnUnknownCodeIsAccepted(): void
+    public function testNoCodeAtAllIsAccepted(): void
     {
         $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('75*')]);
 
         self::assertTrue($rules->accepts(null));
-        self::assertTrue($rules->accepts(' '));
     }
 
     /**
      * A pattern with * runs as a regular expression, which PCRE may give up on: an exclusion
-     * then refuses the code instead of letting it through, and an inclusion does not take it.
+     * then refuses the code instead of letting it through.
      */
-    public function testAPatternThatCannotBeCheckedFailsClosed(): void
+    public function testAnExclusionThatCannotBeCheckedRefusesTheCode(): void
     {
-        $pattern = ZipCodePattern::fromString('2*0*1');
-        self::assertTrue((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'The code does not match the pattern.');
+        $rules = new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('2*0*1')]);
+        self::assertTrue($rules->accepts('2001090'), 'The code does not match the exclusion.');
 
         ini_set('pcre.backtrack_limit', '1');
+        self::assertNotNull(ZipCodePattern::normalize('2001090'), 'The code itself still reads: the pattern is what PCRE gives up on.');
 
-        self::assertFalse((new ZipCodeRuleSet(exclusions: [$pattern]))->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
-        self::assertFalse((new ZipCodeRuleSet(inclusions: [$pattern]))->accepts('2001090'), 'An inclusion that cannot be checked does not take the code.');
+        self::assertFalse($rules->accepts('2001090'), 'An exclusion that cannot be checked refuses.');
+    }
+
+    /**
+     * An inclusion PCRE gives up on does not take the code, even one it would match.
+     */
+    public function testAnInclusionThatCannotBeCheckedDoesNotTakeTheCode(): void
+    {
+        $rules = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('2*0*1')]);
+        self::assertTrue($rules->accepts('2001091'), 'The code matches the inclusion.');
+
+        ini_set('pcre.backtrack_limit', '1');
+        self::assertNotNull(ZipCodePattern::normalize('2001091'), 'The code itself still reads: the pattern is what PCRE gives up on.');
+
+        self::assertFalse($rules->accepts('2001091'), 'An inclusion that cannot be checked does not take the code.');
+    }
+
+    /**
+     * A postal code that is not valid UTF-8 cannot be normalised: it is not unknown, it is
+     * uncertain, and the rules fail closed on it.
+     */
+    public function testAPostalCodeThatCannotBeReadIsUncertain(): void
+    {
+        $unreadable = "20\xC3\x28";
+
+        self::assertTrue((new ZipCodeRuleSet())->accepts($unreadable), 'A zone without a rule takes every code.');
+        self::assertFalse((new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('75*')]))->accepts($unreadable), 'An exclusion refuses it.');
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($unreadable), 'An inclusion does not take it.');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invisibleCodes(): iterable
+    {
+        yield 'a zero-width space' => ["\u{200B}"];
+        yield 'a soft hyphen' => ["\u{00AD}"];
+        yield 'a word joiner' => ["\u{2060}"];
+        yield 'a variation selector' => ["\u{FE0F}"];
+        yield 'a variation selector inside a code' => ["2\u{FE0F}0000"];
+        yield 'a C1 control' => ["\u{0090}"];
+        yield 'a letter outside A to Z' => ["\u{00E9}1"];
+    }
+
+    /**
+     * A code that is not blank but that its normal form empties is not unknown: the rules
+     * cannot tell where it is, so they fail closed on it.
+     */
+    #[DataProvider('invisibleCodes')]
+    public function testACodeOfInvisibleCharactersIsUncertainNotUnknown(string $zipCode): void
+    {
+        self::assertTrue((new ZipCodeRuleSet())->accepts($zipCode), 'A zone without a rule takes every code.');
+        self::assertFalse((new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('75*')]))->accepts($zipCode), 'An exclusion refuses it.');
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]))->accepts($zipCode), 'An inclusion does not take it.');
+    }
+
+    /**
+     * A typed code of only spaces and dashes says where nothing is: a zone that names the
+     * codes it takes does not take it, a zone that only names codes it refuses does.
+     */
+    public function testAPlaceholderIsTakenOnlyByAZoneWithoutAnInclusion(): void
+    {
+        $inclusions = new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')]);
+        $exclusions = new ZipCodeRuleSet(exclusions: [ZipCodePattern::fromString('20*')]);
+
+        foreach (['-', '', " \t\u{00A0}", " \u{2013} "] as $placeholder) {
+            self::assertFalse($inclusions->accepts($placeholder), 'A zone with an inclusion does not take a placeholder.');
+            self::assertTrue($exclusions->accepts($placeholder), 'A zone with exclusions only takes it.');
+            self::assertTrue((new ZipCodeRuleSet())->accepts($placeholder), 'A zone without a rule takes it.');
+        }
+
+        self::assertFalse((new ZipCodeRuleSet(inclusions: [ZipCodePattern::fromString('20*')], exclusions: [ZipCodePattern::fromString('75*')]))->accepts('-'));
     }
 }

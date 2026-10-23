@@ -31,6 +31,7 @@ use Thelia\Domain\Shipping\Service\DeliveryOptionsProvider;
 use Thelia\Domain\Shipping\Service\DeliverySessionStorage;
 use Thelia\Domain\Shipping\Service\DeliverySetupService;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
+use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
@@ -87,13 +88,10 @@ final readonly class ShippingFacade
         ?State $state = null,
         ?int $addressId = null,
     ): PostageEstimateView {
-        $country = $this->handleCountry($cart, $country);
-
+        // The cart's copy first, with its state, and the default country only then, as the
+        // lists of carriers do.
         [, $country, $state, $zipCode] = $this->resolveAddressContext($cart, $country, $state, $addressId);
-
-        if (null === $country) {
-            return new PostageEstimateView(null, null, null);
-        }
+        $country = $this->handleCountry($cart, $country);
 
         $estimate = $this->postageEstimator->estimatePostageForCountry($cart, $country, $state, $zipCode);
 
@@ -274,9 +272,12 @@ final readonly class ShippingFacade
 
     /**
      * The postal code of the cart's delivery address when it is the reason no carrier is
-     * offered: some active carrier would be offered without it (its zones serve the country
-     * and it quotes the cart), and the postal code rules of its zones refuse that code. Null
-     * otherwise, including when carriers are offered.
+     * offered: no carrier is offered, and some active carrier would be without it (its zones
+     * serve the country and it quotes the cart) but the postal code rules of its zones refuse
+     * that code. Null otherwise, including when carriers are offered.
+     *
+     * Each carrier is asked its price for the cart (TheliaEvents::MODULE_DELIVERY_GET_POSTAGE),
+     * those the postal code turned away included.
      *
      * A front office reads it to explain an empty list of carriers instead of only
      * showing one.
@@ -286,7 +287,10 @@ final readonly class ShippingFacade
         [$address, $country, $state, $zipCode] = $this->resolveAddressContext($cart, null, null, null);
         $country = $this->handleCountry($cart, $country);
 
-        if (null === $zipCode || '' === trim($zipCode)) {
+        // Nothing to name: an unknown code, a placeholder or an uncertain one.
+        $nameable = ZipCodePattern::nameable($zipCode);
+
+        if (null === $nameable) {
             return null;
         }
 
@@ -310,7 +314,7 @@ final readonly class ShippingFacade
         // quote this cart anyway is not one the postal code took away.
         foreach ($refusedByThePostalCode as $module) {
             if (null !== $this->resourceBuilder->build($module, $cart, $address, $country, $state, true)) {
-                return $zipCode;
+                return $nameable;
             }
         }
 
@@ -322,16 +326,18 @@ final readonly class ShippingFacade
      *
      * Rules:
      * - If country is provided, use the provided (country, state) over address.
-     * - Else, if addressId is provided, resolve through that customer address.
+     * - Else, if addressId names an address of the cart's customer, resolve through it.
      * - Else, resolve through the cart's own copy of its delivery address: its country,
      *   state and postal code, with the customer address behind it.
      * - Else, return (null, null, null, null).
      *
      * The postal code comes with the address it belongs to: the cart's own copy for the
-     * cart's address, so that a guest, whose cart address points to no customer address, is
-     * judged on the code typed. An `addressId` gives its postal code only when it is an
-     * address of the cart's customer; otherwise, as for a country given alone, the postal
-     * code of the cart's address is read when that address is in the country.
+     * cart's address, the place the order leaves for, also when no customer address stands
+     * behind the copy (its customer was anonymized, or a module wrote the copy itself). An
+     * `addressId` gives its postal code only when it is an
+     * address of the cart's customer in the country asked for; otherwise, as for a country
+     * given alone, the postal code of the cart's address is read when that address is in
+     * the country.
      *
      * @param int|null $addressId id of a customer `address`
      *
@@ -347,38 +353,32 @@ final readonly class ShippingFacade
             // Explicit (country/state) context over address; an address of the cart's
             // customer still gives its postal code when it is in that country, as the API
             // passes both.
+            // An address in another country says nothing of this one: as for an address of
+            // someone else, the cart's address speaks when it is in the country.
             $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
-            if (null === $address) {
+            if (null === $address || $address->getCountryId() !== $country->getId()) {
                 return [null, $country, $state, $this->postageEstimator->cartZipCodeIn($cart, $country)];
             }
 
-            $zipCode = $address->getCountryId() === $country->getId() ? $address->getZipcode() : null;
-
-            return [null, $country, $state, $zipCode];
+            return [null, $country, $state, $address->getZipcode()];
         }
 
-        if (null !== $addressId) {
-            $address = AddressQuery::create()->findPk($addressId);
+        // An address of someone else, or none at all, is not handed to the modules: the list
+        // is then the one of the cart, as without an address.
+        $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
-            if (null === $address) {
-                return [null, null, null, null];
-            }
-
-            $addressCountry = $address->getCountry();
-            $zipCode = null !== $this->addressOfTheCartCustomer($cart, $addressId)
-                ? $address->getZipcode()
-                : (null === $addressCountry ? null : $this->postageEstimator->cartZipCodeIn($cart, $addressCountry));
-
-            return [$address, $addressCountry, $address->getState(), $zipCode];
+        if (null !== $address) {
+            return [$address, $address->getCountry(), $address->getState(), $address->getZipcode()];
         }
 
         $cartAddress = $cart->getCartAddressRelatedByAddressDeliveryId();
         $address = $cartAddress?->getAddress();
 
         if (null === $address) {
-            // A guest: no customer address behind the cart's copy, whose country
-            // handleCountry() reads, and whose postal code goes with it.
+            // No customer address behind the copy (its customer was anonymized, or a module
+            // wrote the copy itself): the copy's country, which handleCountry() reads, its
+            // state and its postal code.
             return [null, null, $cartAddress?->getState(), $cartAddress?->getZipcode()];
         }
 
@@ -389,23 +389,31 @@ final readonly class ShippingFacade
     }
 
     /**
-     * The address, when it belongs to the customer of the cart, a guest included: the
-     * checkout gives a guest a customer row of its own and binds the cart to it.
+     * The address an `addressId` names for the carriers, when it is another address of the
+     * customer of the cart than the one the cart's copy was taken from.
      *
      * An id comes with a request: the postal code of an address of someone else would
-     * otherwise be read out through the carriers offered for it.
+     * otherwise be read out through the carriers offered for it. The source of the copy is
+     * the copy's to judge, as CartGuard judges the order: the address may have been edited
+     * since it was chosen. A guest row is reused by whoever types the same e-mail address
+     * (CustomerGuestRegistrationService), so it carries the addresses of earlier buyers: the
+     * only address a guest owns for sure is the source of the copy, so a guest names none.
      */
     private function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
     {
-        $customerId = $cart->getCustomerId();
+        $customer = $cart->getCustomer();
 
-        if (null === $customerId) {
+        if (null === $customer || $customer->isGuest()) {
+            return null;
+        }
+
+        if ($addressId === $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId()) {
             return null;
         }
 
         return AddressQuery::create()
             ->filterById($addressId)
-            ->filterByCustomerId($customerId)
+            ->filterByCustomerId($customer->getId())
             ->findOne();
     }
 

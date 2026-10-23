@@ -17,6 +17,7 @@ namespace Thelia\Api\State\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
@@ -25,6 +26,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Address;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
@@ -58,14 +60,27 @@ readonly class DeliveryModuleProvider implements ProviderInterface
         }
 
         $request = $this->requestStack->getCurrentRequest() ?? $this->requestStack->getMainRequest();
-        $deliveryAddress = $request instanceof Request
-            ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
-            : null;
-        // A guest's cart address points to no customer address: its own copy carries the
-        // country and the postal code the carriers are judged on.
-        if (!$deliveryAddress instanceof Address && null !== $cart->getCartAddressRelatedByAddressDeliveryId()) {
+
+        // A request that names no other address of the cart's customer asks for the carriers of
+        // the cart: its own copy of the delivery address decides, as CartGuard judges it when
+        // the order is placed, and not the customer address behind it, which may have been
+        // edited since. The country and the state of an address of someone else would otherwise
+        // be read out through the carriers listed for it.
+        $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
+        $requestedId = $request instanceof HttpRequest ? $this->addressService->requestedAddressId($request) : null;
+        $namedAddress = $this->anotherAddressOfTheCustomer($cart, $requestedId, $copy?->getAddressId());
+
+        if (null !== $copy && null === $namedAddress) {
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
         }
+
+        // Another address of the customer named: that address. Otherwise, without a copy: the
+        // address of the session when the request names none (an id that does not read as
+        // one names none), the default country of the shop when it names an address that is
+        // not the customer's.
+        $deliveryAddress = $namedAddress ?? (null === $requestedId && $request instanceof Request
+            ? $this->addressService->getDeliveryAddress($request, $this->securityContext)
+            : null);
 
         $country = $deliveryAddress instanceof Address
             ? $deliveryAddress->getCountry()
@@ -80,5 +95,24 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             : StateQuery::create()->filterByCountryId($country->getId())->findOne();
 
         return $this->shippingFacade->listValidMethodsAsResourceApi($cart, $country, $state, $deliveryAddress?->getId());
+    }
+
+    /**
+     * The address the request names when it is another address of the cart's customer than
+     * the one the cart's copy was taken from. Never for a guest: a guest row is reused by
+     * whoever types the same e-mail address, so its other addresses may be other buyers'.
+     */
+    private function anotherAddressOfTheCustomer(Cart $cart, ?int $addressId, ?int $copySourceId): ?Address
+    {
+        $customer = $cart->getCustomer();
+
+        if (null === $addressId || $addressId === $copySourceId || null === $customer || $customer->isGuest()) {
+            return null;
+        }
+
+        return AddressQuery::create()
+            ->filterById($addressId)
+            ->filterByCustomerId($customer->getId())
+            ->findOne();
     }
 }
