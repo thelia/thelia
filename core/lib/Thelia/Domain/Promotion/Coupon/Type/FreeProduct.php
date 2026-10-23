@@ -18,6 +18,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Shipping\DestinationRestriction\ProductRefusedByDestinationException;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Product;
@@ -209,10 +210,11 @@ class FreeProduct extends AbstractRemoveOnProducts
 
                 try {
                     $this->facade->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
-                } catch (NotEnoughStockException) {
-                    // A gift the shop cannot ship is not offered, and the customer's own
+                } catch (NotEnoughStockException|ProductRefusedByDestinationException) {
+                    // A gift the shop cannot ship (out of stock, or refused by the
+                    // destination of the cart) is not offered, and the customer's own
                     // addition goes through. The marker is dropped so the gift is tried
-                    // again once it is back in stock.
+                    // again once it is back in stock or the destination changes.
                     $this->clearFreeProductsCartItemIds();
 
                     return 0.0;

@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Model\Lang;
 
 /**
@@ -59,7 +58,7 @@ final readonly class CartAdditionDestinationGuard implements EventSubscriberInte
         );
 
         if ([] !== $lines) {
-            throw new InvalidCartException(Translator::getInstance()->trans('%product cannot be shipped to your address.', ['%product' => $lines[0]->label()]));
+            throw new ProductRefusedByDestinationException(Translator::getInstance()->trans('%product cannot be shipped to your address.', ['%product' => $lines[0]->label()]));
         }
     }
 }
