@@ -99,7 +99,15 @@ class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, P
 
     public function getSerial(): string
     {
-        return $this->getRememberMeSerial();
+        $serial = $this->getRememberMeSerial();
+
+        if (null === $serial || '' === $serial) {
+            // Created outside the application, so preInsert() never ran: give it the serial it lacks.
+            $serial = uniqid('', true);
+            $this->setRememberMeSerial($serial)->save();
+        }
+
+        return $serial;
     }
 
     public function setSerial($serial): void
