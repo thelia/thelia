@@ -200,6 +200,75 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
     }
 
     /**
+     * Opening and receiving go through their own events, and each owes the customer one
+     * mail, no more: the mail is sent by a listener of its own, behind the one that does
+     * the work, on the same event.
+     */
+    public function testOpeningAReturnMailsTheCustomerOnce(): void
+    {
+        ConfigQuery::write('order_return_enabled', '1');
+        ConfigQuery::write('order_return_window_days', '14');
+
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+        );
+        $pse = $this->factory->productSaleElement($product, ['quantity' => 10]);
+        $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, $pse, quantity: 3.0);
+
+        $opened = (new OrderReturn())
+            ->setOrder($order)
+            ->setCustomer($customer)
+            ->setCreatedByAdmin(true);
+        $opened->addOrderReturnLine(
+            (new OrderReturnLine())
+                ->setOrderProduct($orderProduct)
+                ->setQuantity(1.0),
+        );
+
+        $this->recordingDispatcher()->dispatch(new OrderReturnEvent($opened), TheliaEvents::ORDER_RETURN_CREATE);
+
+        $sent = $this->mailer->parametersOfMessagesSent('order_return_status_changed');
+        self::assertCount(1, $sent, 'Opening a return sends exactly one mail.');
+        self::assertSame($opened->getRef(), $sent[0]['return_ref']);
+    }
+
+    public function testReceivingAReturnMailsTheCustomerOnce(): void
+    {
+        [$return] = $this->acceptedReturn(receivedQuantity: 0.0, resellable: true);
+        $line = $return->getOrderReturnLines()->getFirst();
+
+        $event = (new OrderReturnEvent($return))->setReceivedLines([
+            (int) $line->getId() => ['quantity' => 2.0, 'condition' => 'as new', 'resellable' => true],
+        ]);
+        $this->recordingDispatcher()->dispatch($event, TheliaEvents::ORDER_RETURN_RECEIVE);
+
+        $sent = $this->mailer->parametersOfMessagesSent('order_return_status_changed');
+        self::assertCount(1, $sent, 'Pointing a reception sends exactly one mail.');
+        self::assertSame($return->getRef(), $sent[0]['return_ref']);
+    }
+
+    /**
+     * The mail leaves after the action has committed: a transition the state machine
+     * refuses throws before any mail is owed.
+     */
+    public function testARefusedTransitionMailsNoOne(): void
+    {
+        [$return] = $this->returnInStatus(OrderReturnStatus::CODE_REQUESTED);
+
+        try {
+            $this->recordedTransition($return, OrderReturnStatus::CODE_SETTLED);
+            self::fail('The transition requested -> settled must be refused.');
+        } catch (ReturnNotAllowedException) {
+        }
+
+        self::assertCount(0, $this->mailer->parametersOfMessagesSent('order_return_status_changed'));
+    }
+
+    /**
      * Drives the transition through an action wired to a recording mailer, on a
      * dispatcher of its own so the mail the transition sends comes back here
      * rather than going out through the shop's.
