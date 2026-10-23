@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
+use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnStatus;
 
 /**
@@ -28,8 +29,9 @@ use Thelia\Model\OrderReturnStatus;
  * (the snapshot kept on the return, never a title renamed since), or their own words
  * when they picked none; the comment column holds their words only when a title took
  * the reason column. The combination is the attribute values of the
- * order line as they were sold. The type is the code of the expected resolution, and
- * "settled" is 1 once the effective status of the return is settled.
+ * order line as they were sold. The type is the code of the expected resolution, the
+ * wished exchange is only given under an exchange, and "settled" is 1 once the
+ * effective status of the return is settled.
  */
 class OrderReturnExport extends JsonFileAbstractExport
 {
@@ -74,7 +76,7 @@ class OrderReturnExport extends JsonFileAbstractExport
                 order_product.product_sale_elements_ref AS "combination_ref",
                 COALESCE(NULLIF(order_return.reason_title, \'\'), order_return.customer_comment) AS "reason",
                 order_return.expected_resolution AS "expected_resolution",
-                order_return.expected_exchange AS "expected_exchange",
+                IF(order_return.expected_resolution = :exchange, order_return.expected_exchange, NULL) AS "expected_exchange",
                 IF(
                     IF(order_return_status.protected_status = 1, order_return_status.code, COALESCE(NULLIF(order_return_status.equivalent_code, \'\'), order_return_status.code)) = :settled,
                     1,
@@ -90,6 +92,7 @@ class OrderReturnExport extends JsonFileAbstractExport
             ORDER BY order_return.created_at DESC, order_return.id DESC, order_return_line.id ASC
         ');
         $statement->bindValue('settled', OrderReturnStatus::CODE_SETTLED);
+        $statement->bindValue('exchange', OrderReturn::RESOLUTION_EXCHANGE);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $statement->bindValue($bound, $date->format('Y-m-d H:i:s'));
