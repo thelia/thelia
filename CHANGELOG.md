@@ -244,6 +244,7 @@ Two limits are accepted for this version.
 
 - A failed job replayed from the back office and with `messenger:failed:retry` at the same moment may be sent twice: the command reads the job without holding it while it asks what to do. Replay a job from one place at a time.
 - A mail is guarded against a second delivery only when it goes through `MailerFactory`, which gives it its identifier. A mail sent with the Symfony mailer directly carries none: if the queue hands its job out again, after a worker stopped between the mail server accepting it and the job being acknowledged, it is sent again. Send the mails of a module through `MailerFactory`.
+- Signing in with "Remember me" ticked no longer ends in a 500 for a customer or an administrator created outside the application, an import or a migration, whose account has no remember-me serial: `Customer::getSerial()` and `Admin::getSerial()` generate and store one when it is missing.
 
 ### Queues outside the shop database
 
