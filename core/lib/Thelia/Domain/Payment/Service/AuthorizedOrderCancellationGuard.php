@@ -1,0 +1,79 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Thelia\Domain\Payment\Service;
+
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Order\Service\OrderHistoryActorResolver;
+use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
+use Thelia\Domain\Payment\Exception\CancellationWaitsForCaptureException;
+use Thelia\Model\Order;
+use Thelia\Model\OrderStatusQuery;
+
+/**
+ * Cancelling an order whose authorization still holds an amount releases that amount at
+ * the provider. An administrator does it only with the right to capture payments, the
+ * same right the capture asks for; a module, a customer or the shop itself is not asked.
+ * While a single capture waits for its answer at a provider that takes one, no administrator
+ * cancels the order: the capture would go through on a cancelled order.
+ */
+final readonly class AuthorizedOrderCancellationGuard
+{
+    public function __construct(
+        private OrderHistoryActorResolver $actorResolver,
+        private SecurityContext $securityContext,
+        private PaymentCaptureService $captureService,
+        private PaymentTransactionTotalsReader $totalsReader,
+    ) {
+    }
+
+    /**
+     * @throws CancellationNeedsCaptureRightException
+     * @throws CancellationWaitsForCaptureException
+     */
+    public function assertMayMoveTo(Order $order, int $toStatusId, ?string $moduleCode = null): void
+    {
+        if ($order->getOrderStatus()->isCancelled(false)) {
+            return;
+        }
+
+        $toStatus = OrderStatusQuery::create()->findPk($toStatusId);
+
+        if (null === $toStatus || !$toStatus->isCancelled(false)) {
+            return;
+        }
+
+        $administrator = $this->actorResolver->actingAdministrator($moduleCode);
+
+        if (null === $administrator) {
+            return;
+        }
+
+        // A single capture waiting for its answer goes through whatever the order becomes.
+        if ($this->captureService->capturesOnce($order) && $this->totalsReader->forOrder((int) $order->getId())->hasPendingCapture()) {
+            throw new CancellationWaitsForCaptureException((string) $order->getRef());
+        }
+
+        // What is left as the module takes it: nothing more once a single capture was asked.
+        if (!PaymentAmount::isPositive($this->captureService->leftToCapture($order))) {
+            return;
+        }
+
+        if (!$this->securityContext->isUserGranted(['ADMIN'], [AdminResources::ORDER_PAYMENT_CAPTURE], [], [AccessManager::CREATE], $administrator)) {
+            throw new CancellationNeedsCaptureRightException((string) $order->getRef());
+        }
+    }
+}

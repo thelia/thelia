@@ -16,8 +16,8 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
@@ -26,7 +26,12 @@ use Thelia\Api\Resource\OrderStatus as OrderStatusResource;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
-use Thelia\Model\Map\OrderTableMap;
+use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
+use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
+use Thelia\Domain\Payment\Exception\CancellationWaitsForCaptureException;
+use Thelia\Domain\Payment\Service\AuthorizedOrderCancellationGuard;
+use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -41,6 +46,8 @@ final readonly class OrderProcessor implements ProcessorInterface
         private PropelPersistProcessor $persistProcessor,
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
+        private OrderStatusTransitionGuard $transitionGuard,
+        private AuthorizedOrderCancellationGuard $cancellationGuard,
     ) {
     }
 
@@ -51,36 +58,47 @@ final readonly class OrderProcessor implements ProcessorInterface
         }
 
         $order = OrderQuery::create()->findPk((int) $uriVariables['id']);
+
+        if (null !== $order) {
+            $this->assertPaymentNamesUntouched($order, $data);
+        }
+
         $requestedStatusId = $this->requestedStatusId($data);
 
         if (null === $order || null === $requestedStatusId || $requestedStatusId === $order->getStatusId()) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
 
-        // Persist everything but the status, then move the status through the event.
-        // One transaction around both: a refused transition must not leave the other
-        // fields of the request written while the client is told the write failed.
-        $data->setOrderStatus((new OrderStatusResource())->setId($order->getStatusId()));
+        // A transition the graph refuses is refused before anything of the request is
+        // written. The other fields are then persisted, and the status moved through the
+        // event once they are committed, as the back office does: its listeners call
+        // payment modules and write the payment journal under its own lock, which a
+        // transaction held open around them would outlive.
+        try {
+            $this->transitionGuard->assertAllowed($order, $requestedStatusId);
+            $this->cancellationGuard->assertMayMoveTo($order, $requestedStatusId);
+        } catch (OrderStatusTransitionRefusedException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (CancellationNeedsCaptureRightException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+        } catch (CancellationWaitsForCaptureException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        }
 
-        $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
+        $data->setOrderStatus((new OrderStatusResource())->setId($order->getStatusId()));
+        $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+
+        $order->reload();
+        $event = (new OrderEvent($order))->setStatus($requestedStatusId);
 
         try {
-            $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-
-            $order->reload();
-            $event = (new OrderEvent($order))->setStatus($requestedStatusId);
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-
-            $connection->commit();
         } catch (OrderStatusTransitionRefusedException $exception) {
-            $connection->rollBack();
-
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        } catch (\Throwable $throwable) {
-            $connection->rollBack();
-
-            throw $throwable;
+        } catch (CancellationNeedsCaptureRightException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+        } catch (CancellationWaitsForCaptureException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 
         return $this->transformer->modelToResource(
@@ -88,6 +106,36 @@ final readonly class OrderProcessor implements ProcessorInterface
             propelModel: $event->getOrder(),
             context: $operation->getNormalizationContext() ?? [],
         );
+    }
+
+    /**
+     * Once money moved on the order, its payment journal names the provider reference and
+     * the module of each movement: a refund or a release goes to the reference of the order,
+     * through its module. Changing either by hand would send them to another order's
+     * transaction, so they are refused; an order with no journal line takes them as before.
+     */
+    private function assertPaymentNamesUntouched(Order $order, OrderResource $data): void
+    {
+        $referenceChanged = self::referenceOf($data->getTransactionRef()) !== self::referenceOf($order->getTransactionRef());
+        $moduleChanged = $data->getPaymentModule()?->getId() !== $order->getPaymentModuleId();
+
+        if (!$referenceChanged && !$moduleChanged) {
+            return;
+        }
+
+        if (!OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->exists()) {
+            return;
+        }
+
+        throw new UnprocessableEntityHttpException(\sprintf('Order %s has a payment journal: its transaction reference and payment module are no longer changed by hand.', (string) $order->getRef()));
+    }
+
+    /**
+     * No reference and an empty one are the same: neither names a transaction.
+     */
+    private static function referenceOf(?string $transactionRef): ?string
+    {
+        return null === $transactionRef || '' === trim($transactionRef) ? null : $transactionRef;
     }
 
     private function requestedStatusId(OrderResource $data): ?int

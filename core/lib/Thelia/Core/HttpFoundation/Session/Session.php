@@ -430,7 +430,7 @@ class Session extends BaseSession
             ->find();
 
         foreach ($orders as $order) {
-            if ($order->isPaid(false) || $order->isRefunded(false)) {
+            if ($order->isPaymentSecured()) {
                 return true;
             }
         }

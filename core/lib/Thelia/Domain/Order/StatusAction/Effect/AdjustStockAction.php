@@ -80,8 +80,8 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         // The order is adjusted as a whole or not at all, WHATEVER the surrounding transaction.
-        // The status change itself is dispatched inside one (the back office as well as the admin
-        // API), so this action rarely owns it; a nested rollBack would poison the caller's commit,
+        // A caller may dispatch the status change inside one (the core no longer does, a module
+        // still can), so this action does not always own it; a nested rollBack would poison the caller's commit,
         // and doing nothing left the products adjusted before the failing one decremented for good.
         // A savepoint undoes exactly what this action wrote, and nothing of what the caller wrote.
         $ownTransaction = !$connection->inTransaction();

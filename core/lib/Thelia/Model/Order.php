@@ -23,6 +23,11 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
+use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Service\PaymentAmount;
+use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
@@ -507,6 +512,48 @@ class Order extends BaseOrder
     }
 
     /**
+     * Whether the buyer has done what paying asks of them: the order is paid or refunded,
+     * or its payment is authorized and only waits for the merchant's capture.
+     *
+     * An order on hold for capture answers false to isPaid() — its status stands for
+     * "not paid" so that nothing ships and nothing is invoiced — yet the amount is
+     * reserved on the buyer's card. The checkout reads this, not isPaid(): an authorized
+     * order presented again to its module, or cancelled to place a new one, would reserve
+     * the amount a second time. An authorization still waiting for the provider's answer
+     * counts: the amount may be reserved already.
+     *
+     * A cancelled order is never secured: whatever its journal still holds is released
+     * on the cancellation, and its cart is free to be ordered again.
+     */
+    public function isPaymentSecured(): bool
+    {
+        if ($this->isCancelled(false)) {
+            return false;
+        }
+
+        if ($this->isPaid(false) || $this->isRefunded(false)) {
+            return true;
+        }
+
+        if (OrderStatus::CODE_AWAITING_CAPTURE === $this->getOrderStatus()->getCode()) {
+            return true;
+        }
+
+        $totals = (new PaymentTransactionTotalsReader())->forOrder((int) $this->getId());
+
+        return $totals->hasSomethingLeftToCapture()
+            || $totals->hasPendingCapture()
+            // Money taken, whatever the status says: the move to paid may have been refused
+            // by the transition graph.
+            || PaymentAmount::isPositive($totals->netCaptured())
+            || OrderPaymentTransactionQuery::create()
+                ->filterByOrderId((int) $this->getId())
+                ->filterByTypeEnum(PaymentTransactionType::AUTHORIZATION)
+                ->filterByState(PaymentTransactionState::PENDING->value)
+                ->exists();
+    }
+
+    /**
      * Set the status of the current order to PROCESSING.
      *
      * @throws PropelException
@@ -696,19 +743,23 @@ class Order extends BaseOrder
      */
     public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher): bool
     {
-        $paymentModule = $this->getPaymentModuleInstance();
+        // Asked from a status change of the back office or the admin API too: the module and
+        // its listeners read the configuration of the sale unit the order was placed on.
+        return SaleUnitConfigScope::runFor($this->getSaleUnitId(), function () use ($dispatcher): bool {
+            $paymentModule = $this->getPaymentModuleInstance();
 
-        $event = new ManageStockOnCreationEvent($paymentModule);
+            $event = new ManageStockOnCreationEvent($paymentModule);
 
-        $dispatcher->dispatch(
-            $event,
-            TheliaEvents::getModuleEvent(
-                TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
-                $paymentModule->getCode(),
-            ),
-        );
+            $dispatcher->dispatch(
+                $event,
+                TheliaEvents::getModuleEvent(
+                    TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
+                    $paymentModule->getCode(),
+                ),
+            );
 
-        return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+            return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+        });
     }
 
     protected function getCart(): ?Cart
