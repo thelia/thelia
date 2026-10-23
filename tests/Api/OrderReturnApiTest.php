@@ -704,6 +704,41 @@ final class OrderReturnApiTest extends ApiTestCase
     }
 
     /**
+     * A return may carry two lines on the same order product. Raising one of
+     * them is checked against what the other still holds: leaving the whole
+     * return out of the count handed the second line's units out again.
+     */
+    public function testAnAdminCannotRaiseALineAboveWhatTheOtherLinesOfItsReturnLeave(): void
+    {
+        $customer = $this->customer();
+        $return = $this->returnWithLine($customer, OrderReturnStatus::CODE_ACCEPTED, quantity: 2.0);
+        $line = $return->getOrderReturnLines()->getFirst();
+        $line->setQuantity(1.0)->save($this->getPropelConnection());
+
+        (new OrderReturnLine())
+            ->setOrderReturnId((int) $return->getId())
+            ->setOrderProductId((int) $line->getOrderProductId())
+            ->setProductSaleElementsId($line->getProductSaleElementsId())
+            ->setQuantity(1.0)
+            ->setQuantityReceived(0.0)
+            ->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest(
+            'PATCH',
+            '/api/admin/order_return_lines/'.$line->getId(),
+            ['quantity' => 2.0],
+            $this->authenticateAsAdmin(),
+            'merge-patch+json',
+        );
+
+        self::assertSame(422, $response->getStatusCode(), 'Two units ordered, one held by the other line: the patched line cannot take two.');
+        self::assertStringContainsString('exceeds the returnable quantity', (string) $response->getContent());
+
+        $line->reload(false, $this->getPropelConnection());
+        self::assertSame(1.0, (float) $line->getQuantity());
+    }
+
+    /**
      * The rate limiter is the shop's protection against a flood of requests,
      * not a punishment for getting a form wrong: consuming a token before the
      * eligibility check let twenty refused attempts close the hour for the
