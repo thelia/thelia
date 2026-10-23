@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\OrderReturn;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
@@ -186,6 +187,59 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
         [$order] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_NOT_PAID);
 
         self::assertFalse($this->checker->isWithinReturnWindow($order));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function refusedOrderStatuses(): iterable
+    {
+        yield 'cancelled' => [OrderStatus::CODE_CANCELED, 'This order has been cancelled and can no longer be returned.'];
+        yield 'refunded' => [OrderStatus::CODE_REFUNDED, 'This order has already been refunded and can no longer be returned.'];
+        yield 'unpaid' => [OrderStatus::CODE_NOT_PAID, 'This order has not been paid yet and cannot be returned.'];
+    }
+
+    /**
+     * A cancelled, refunded or unpaid order gets its own refusal, distinct from
+     * "the window has closed": the customer did not miss a deadline.
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAnOrderThatCannotBeReturnedIsRefusedWithAnExplicitMessage(string $statusCode, string $message): void
+    {
+        [$order, $customer] = $this->paidOrderWithProduct(statusCode: $statusCode);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->expectExceptionMessage($message);
+        $this->checker->assertOrderReturnable($order, $customer);
+    }
+
+    /**
+     * The explicit refusals do not override the shop: a status it lists as one
+     * returns open on is accepted, whatever the status is called.
+     */
+    #[DataProvider('refusedOrderStatuses')]
+    public function testAStatusTheShopOpensReturnsOnIsNotRefusedWithAnExplicitMessage(string $statusCode): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ORDER_STATUSES_CONFIG_KEY, $statusCode);
+        [$order, $customer] = $this->paidOrderWithProduct(statusCode: $statusCode);
+
+        $this->checker->assertOrderReturnable($order, $customer);
+
+        self::assertTrue($this->checker->isReturnable($order));
+    }
+
+    /**
+     * The ownership answer comes first: an order that is not the caller's says
+     * nothing of its status.
+     */
+    public function testAForeignCancelledOrderIsRefusedAsAForeignOrder(): void
+    {
+        [$order] = $this->paidOrderWithProduct(statusCode: OrderStatus::CODE_CANCELED);
+        $other = $this->factory->customer($this->factory->customerTitle());
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->expectExceptionMessage('This order cannot be used for a return.');
+        $this->checker->assertOrderReturnable($order, $other);
     }
 
     public function testAForeignOrderCannotBeOpenedByAnotherCustomer(): void

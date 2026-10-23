@@ -140,7 +140,9 @@ class OrderReturn implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?string $orderRef = null;
 
-    #[Relation(targetResource: Order::class)]
+    // preload: every member of a list reads its order (the reference is shown
+    // next to each return), one query per return unless read for the page.
+    #[Relation(targetResource: Order::class, preload: true)]
     #[NotBlank(groups: [self::GROUP_FRONT_WRITE, self::GROUP_ADMIN_WRITE])]
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -156,12 +158,18 @@ class OrderReturn implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ_SINGLE])]
     public Customer $customer;
 
-    #[Relation(targetResource: OrderReturnStatus::class)]
+    // preload: every member of a list reads its status and the status'
+    // translated label (order_return_status_i18n), one query each per return
+    // unless read for the page.
+    #[Relation(targetResource: OrderReturnStatus::class, preload: true)]
     #[Column(propelSetter: 'setStatusId')]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?OrderReturnStatus $orderReturnStatus = null;
 
-    #[Relation(targetResource: OrderReturnReason::class)]
+    // preload: every member of a list reads its reason and the reason's
+    // translated label (order_return_reason_i18n), one query each per return
+    // unless read for the page.
+    #[Relation(targetResource: OrderReturnReason::class, preload: true)]
     #[Column(propelSetter: 'setReasonId')]
     #[Groups([
         self::GROUP_ADMIN_READ,

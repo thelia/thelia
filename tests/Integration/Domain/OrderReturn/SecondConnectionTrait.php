@@ -32,6 +32,10 @@ use Thelia\Model\OrderProductQuery;
  * deleteTheCommittedLines() whatever its teardown does, and
  * deleteTheLinesAKilledTestLeft() before it starts, for a process killed in the
  * middle of one (an Infection timeout).
+ *
+ * A test that runs outside the test transaction altogether, to have its own
+ * requests wait on other sessions, commits whole orders: it hands their ids to
+ * deleteTheCommittedOrders() in its teardown.
  */
 trait SecondConnectionTrait
 {
@@ -110,6 +114,60 @@ trait SecondConnectionTrait
     }
 
     /**
+     * Deletes, in foreign key order, orders a test committed for real together
+     * with everything hanging from them: their returns, their lines, their cart,
+     * their addresses and their customer. Nothing rolls them back on their own.
+     *
+     * @param list<int> $orderIds
+     */
+    private function deleteTheCommittedOrders(array $orderIds): void
+    {
+        $connection = $this->secondConnection();
+
+        foreach ($orderIds as $orderId) {
+            $read = $connection->prepare('SELECT customer_id, cart_id, invoice_order_address_id, delivery_order_address_id FROM `order` WHERE id = :id');
+            $read->execute([':id' => $orderId]);
+            $order = $read->fetch(\PDO::FETCH_ASSOC);
+            $read->closeCursor();
+
+            // The lines of a return go with it, the lines and the history of an
+            // order with it.
+            $connection->prepare('DELETE FROM order_return WHERE order_id = :id')->execute([':id' => $orderId]);
+            $connection->prepare('DELETE FROM `order` WHERE id = :id')->execute([':id' => $orderId]);
+
+            if (!\is_array($order)) {
+                continue;
+            }
+
+            $connection->prepare('DELETE FROM cart WHERE id = :id')->execute([':id' => $order['cart_id']]);
+            $connection->prepare('DELETE FROM order_address WHERE id IN (:invoice, :delivery)')
+                ->execute([':invoice' => $order['invoice_order_address_id'], ':delivery' => $order['delivery_order_address_id']]);
+            $connection->prepare('DELETE FROM customer WHERE id = :id')->execute([':id' => $order['customer_id']]);
+        }
+    }
+
+    /**
+     * What a connection of its own is opened from: the configuration Propel
+     * already holds, with the DSN, the user and the password of the test
+     * database.
+     *
+     * @return array{dsn: string, user?: string, password?: string}
+     */
+    private function secondConnectionConfiguration(): array
+    {
+        $connectionManager = Propel::getServiceContainer()->getConnectionManager(OrderProductTableMap::DATABASE_NAME);
+
+        if (!$connectionManager instanceof ConnectionManagerSingle) {
+            self::fail(\sprintf(
+                'A second connection is opened from a single-connection manager, the test database is served by %s.',
+                get_debug_type($connectionManager),
+            ));
+        }
+
+        return $connectionManager->getConfiguration();
+    }
+
+    /**
      * A connection of its own, opened from the configuration Propel already holds:
      * Propel hands out one connection per datasource, and the test transaction is
      * on it.
@@ -120,19 +178,9 @@ trait SecondConnectionTrait
             return $this->secondConnection;
         }
 
-        $serviceContainer = Propel::getServiceContainer();
-        $connectionManager = $serviceContainer->getConnectionManager(OrderProductTableMap::DATABASE_NAME);
-
-        if (!$connectionManager instanceof ConnectionManagerSingle) {
-            self::fail(\sprintf(
-                'A second connection is opened from a single-connection manager, the test database is served by %s.',
-                get_debug_type($connectionManager),
-            ));
-        }
-
         return $this->secondConnection = ConnectionFactory::create(
-            $connectionManager->getConfiguration(),
-            $serviceContainer->getAdapter(OrderProductTableMap::DATABASE_NAME),
+            $this->secondConnectionConfiguration(),
+            Propel::getServiceContainer()->getAdapter(OrderProductTableMap::DATABASE_NAME),
         );
     }
 }

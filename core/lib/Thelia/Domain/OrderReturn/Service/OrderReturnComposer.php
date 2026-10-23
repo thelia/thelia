@@ -33,9 +33,10 @@ use Thelia\Model\OrderReturnStatusQuery;
  * Propel model - and they must not each hold their own copy of the rules. What
  * they share is here; what differs is only where the computed values are set.
  *
- * Meant to be called inside the transaction that writes the return: it locks
- * every order product line it checks, and a lock outside a transaction is
- * released as soon as it is taken.
+ * Meant to be called inside the transaction that writes the return, opened by
+ * OrderReturnWriteTransaction::run(): it locks the order and every order
+ * product line it checks, and a lock outside a transaction is released as soon
+ * as it is taken.
  */
 final readonly class OrderReturnComposer
 {
@@ -70,6 +71,11 @@ final readonly class OrderReturnComposer
      */
     public function priceRequestedLines(Order $order, Customer $customer, array $lines): array
     {
+        // Every line is locked before any is checked, in the one order every
+        // path takes them in. Inside OrderReturnWriteTransaction::run(), which
+        // locked them already, this costs nothing.
+        $this->eligibility->lockLines($order, array_column($lines, 'order_product'));
+
         $claimedByOrderProduct = [];
         $refunds = [];
 
@@ -78,7 +84,6 @@ final readonly class OrderReturnComposer
             $orderProductId = (int) $orderProduct->getId();
             $claimed = ($claimedByOrderProduct[$orderProductId] ?? 0.0) + $line['quantity'];
 
-            $this->eligibility->lockLine($orderProduct);
             $this->eligibility->assertReturnable($order, $customer, $orderProduct, $claimed);
 
             $claimedByOrderProduct[$orderProductId] = $claimed;

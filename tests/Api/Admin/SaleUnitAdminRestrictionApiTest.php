@@ -23,12 +23,14 @@ use Thelia\Domain\Shipping\Service\OrderShipmentManager;
 use Thelia\Model\Admin;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\Map\OrderReturnLineTableMap;
 use Thelia\Model\Map\SaleUnitTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnLine;
+use Thelia\Model\OrderReturnLineQuery;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\OrderShipment;
@@ -251,6 +253,35 @@ final class SaleUnitAdminRestrictionApiTest extends ApiTestCase
 
         self::assertSame(0, $order->countOrderShipments(null, false, $this->getPropelConnection()));
         self::assertSame(0, $order->countOrderReturns(null, false, $this->getPropelConnection()));
+        ConfigQuery::resetCache();
+    }
+
+    public function testAReturnCannotTakeOverTheLineOfAnotherUnit(): void
+    {
+        ConfigQuery::write(ReturnEligibilityChecker::ENABLED_CONFIG_KEY, '1');
+        $mine = $this->paidOrderOn($this->mine);
+        $myLine = $this->factory->orderProduct($mine, ['quantity' => 2.0]);
+        $theirs = $this->paidOrderOn($this->theirs);
+        $theirReturn = $this->returnOf($theirs, $this->factory->orderProduct($theirs, ['quantity' => 2.0]));
+        $theirReturnLine = $theirReturn->getOrderReturnLines()->getFirst();
+        self::assertNotNull($theirReturnLine);
+        OrderReturnLineTableMap::clearInstancePool();
+        $before = OrderReturnLineQuery::create()->findPk($theirReturnLine->getId(), $this->getPropelConnection())?->toArray();
+        $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
+
+        $response = $this->jsonRequest('POST', '/api/admin/order_returns', [
+            'order' => '/api/admin/orders/'.$mine->getId(),
+            'orderReturnLines' => [[
+                '@id' => '/api/admin/order_return_lines/'.$theirReturnLine->getId(),
+                'orderProduct' => '/api/admin/order_products/'.$myLine->getId(),
+                'quantity' => 1.0,
+            ]],
+        ], token: $token);
+
+        self::assertContains($response->getStatusCode(), [400, 404, 422], (string) $response->getContent());
+        OrderReturnLineTableMap::clearInstancePool();
+        self::assertSame($before, OrderReturnLineQuery::create()->findPk($theirReturnLine->getId(), $this->getPropelConnection())?->toArray());
+        self::assertSame(0, $mine->countOrderReturns(null, false, $this->getPropelConnection()));
         ConfigQuery::resetCache();
     }
 
