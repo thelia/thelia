@@ -16,7 +16,6 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Domain\DataTransfer\EventListener\PurgeExportCacheListener;
-use Thelia\Domain\DataTransfer\Service\DataTransferJobPurger;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Test\IntegrationTestCase;
 
@@ -33,7 +32,7 @@ final class PurgeExportCacheListenerTest extends IntegrationTestCase
         $purger->expects(self::once())->method('countOldExportFiles')->willReturn(4);
         $event = new MaintenancePurgeEvent(true);
 
-        (new PurgeExportCacheListener($purger, $this->getService(DataTransferJobPurger::class)))->onMaintenancePurge($event);
+        (new PurgeExportCacheListener($purger))->onMaintenancePurge($event);
 
         self::assertStringContainsString('4 to delete', implode("\n", $event->getResults()));
     }
@@ -45,7 +44,7 @@ final class PurgeExportCacheListenerTest extends IntegrationTestCase
         $purger->expects(self::once())->method('purgeOldExportFiles')->willReturn(4);
         $event = new MaintenancePurgeEvent();
 
-        (new PurgeExportCacheListener($purger, $this->getService(DataTransferJobPurger::class)))->onMaintenancePurge($event);
+        (new PurgeExportCacheListener($purger))->onMaintenancePurge($event);
 
         self::assertStringContainsString('4 deleted', implode("\n", $event->getResults()));
     }
