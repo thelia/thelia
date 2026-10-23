@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
+use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Domain\OrderReturn\Service\ReturnRequestLimiter;
 use Thelia\Model\Customer;
 use Thelia\Model\OrderQuery;
@@ -113,12 +114,10 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
     {
         $ownerId = OrderQuery::create()->filterById($orderId)->select(['CustomerId'])->findOne();
 
-        if (null === $ownerId) {
-            throw new ReturnNotAllowedException('The order does not exist.');
-        }
-
-        if ((int) $ownerId !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order cannot be used for a return.');
+        // A missing order is refused like a foreign one, with the same status and
+        // message, as FrontOrderReturnRelationDenormalizer does for a missing IRI.
+        if (null === $ownerId || (int) $ownerId !== (int) $customer->getId()) {
+            throw new ReturnNotAllowedException(ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE);
         }
     }
 

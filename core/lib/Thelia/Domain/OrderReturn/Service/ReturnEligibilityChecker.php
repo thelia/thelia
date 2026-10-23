@@ -51,6 +51,18 @@ final class ReturnEligibilityChecker
     public const DEFAULT_WINDOW_DAYS = 14;
 
     /**
+     * What a customer is told of an order that is not theirs and of one that does
+     * not exist: the same words, so that the two get the same refusal.
+     */
+    public const ORDER_NOT_USABLE_MESSAGE = 'This order cannot be used for a return.';
+
+    /**
+     * The same for an order product that is on another order and one that does
+     * not exist.
+     */
+    public const ORDER_PRODUCT_NOT_USABLE_MESSAGE = 'This product line does not belong to the order.';
+
+    /**
      * The order statuses a return may be opened on, as a comma separated list of
      * status codes, compared on their effective code. Empty by default: any paid
      * status, the rule until now. A shop that takes back what it has shipped only
@@ -231,7 +243,7 @@ final class ReturnEligibilityChecker
         }
 
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order cannot be used for a return.');
+            throw new ReturnNotAllowedException(self::ORDER_NOT_USABLE_MESSAGE);
         }
 
         if (!$this->isWithinReturnWindow($order)) {
@@ -381,11 +393,11 @@ final class ReturnEligibilityChecker
         ?int $excludeLineId = null,
     ): void {
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
-            throw new ReturnNotAllowedException('This order cannot be used for a return.');
+            throw new ReturnNotAllowedException(self::ORDER_NOT_USABLE_MESSAGE);
         }
 
         if ((int) $orderProduct->getOrderId() !== (int) $order->getId()) {
-            throw new ReturnNotAllowedException('This product line does not belong to the order.');
+            throw new ReturnNotAllowedException(self::ORDER_PRODUCT_NOT_USABLE_MESSAGE);
         }
 
         if (!$this->isProductReturnable($orderProduct)) {

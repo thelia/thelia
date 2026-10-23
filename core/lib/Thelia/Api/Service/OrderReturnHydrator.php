@@ -96,7 +96,10 @@ final readonly class OrderReturnHydrator
         $order = OrderQuery::create()->findPk($data->getOrder()->getId());
 
         if (null === $order) {
-            throw new ReturnNotAllowedException('The order does not exist.');
+            // The front answers a missing order as a foreign one, see
+            // OrderReturnFrontCreateProcessor; the admin path names a real
+            // order, so a missing one stays a precise data error.
+            throw new ReturnNotAllowedException($byAdmin ? 'The order does not exist.' : ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE);
         }
 
         // A customer-opened return goes through the full opening gate (feature
@@ -112,7 +115,7 @@ final readonly class OrderReturnHydrator
             $orderProduct = OrderProductQuery::create()->findPk($line->getOrderProduct()->getId());
 
             if (null === $orderProduct) {
-                throw new ReturnNotAllowedException('Unknown order product in a return line.');
+                throw new ReturnNotAllowedException($byAdmin ? 'Unknown order product in a return line.' : ReturnEligibilityChecker::ORDER_PRODUCT_NOT_USABLE_MESSAGE);
             }
 
             $resourceLines[] = [$line, $orderProduct];

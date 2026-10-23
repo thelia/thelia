@@ -910,6 +910,125 @@ final class OrderReturnApiTest extends ApiTestCase
         );
     }
 
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function orderForms(): iterable
+    {
+        yield 'IRI' => [true];
+        yield 'bare identifier' => [false];
+    }
+
+    /**
+     * Naming somebody else's order and naming an id that exists nowhere answer
+     * the same status and the same body on this request, whether the order is
+     * given as an IRI or as a bare identifier.
+     */
+    #[DataProvider('orderForms')]
+    public function testAForeignOrderAndAMissingOrderGetTheSameAnswer(bool $asIri): void
+    {
+        $customer = $this->customer();
+        $foreign = $this->factory->order($this->customer(), ['statusCode' => OrderStatus::CODE_PAID]);
+        $foreignProduct = $this->orderProductFor($foreign);
+        $missingOrderId = (int) $foreign->getId() + 1_000_000;
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $answers = [];
+        foreach ([(int) $foreign->getId(), $missingOrderId] as $orderId) {
+            $response = $this->jsonRequest(
+                'POST',
+                '/api/front/account/order_returns',
+                [
+                    'order' => $asIri ? '/api/front/account/orders/'.$orderId : $orderId,
+                    'orderReturnLines' => [
+                        ['orderProduct' => '/api/front/account/order_products/'.$foreignProduct->getId(), 'quantity' => 1.0],
+                    ],
+                ],
+                token: $token,
+            );
+            $answers[] = [$response->getStatusCode(), (string) $response->getContent()];
+        }
+
+        self::assertSame($answers[0], $answers[1], 'A foreign order and a missing order must not be told apart.');
+        self::assertSame(422, $answers[0][0]);
+        self::assertStringContainsString('This order cannot be used for a return.', $answers[0][1]);
+        self::assertSame(
+            0,
+            OrderReturnQuery::create()->filterByCustomerId((int) $customer->getId())->count($this->getPropelConnection()),
+        );
+    }
+
+    /**
+     * Same for the lines: an order product of somebody else's order and an id
+     * that exists nowhere are not told apart either.
+     */
+    public function testAForeignOrderProductAndAMissingOrderProductGetTheSameAnswer(): void
+    {
+        $customer = $this->customer();
+        [$order] = $this->paidOrderWithProduct($customer);
+        $foreign = $this->factory->order($this->customer(), ['statusCode' => OrderStatus::CODE_PAID]);
+        $foreignProduct = $this->orderProductFor($foreign);
+
+        $token = $this->authenticateAsCustomer($customer);
+
+        $answers = [];
+        foreach ([(int) $foreignProduct->getId(), (int) $foreignProduct->getId() + 1_000_000] as $orderProductId) {
+            $response = $this->jsonRequest(
+                'POST',
+                '/api/front/account/order_returns',
+                [
+                    'order' => '/api/front/account/orders/'.$order->getId(),
+                    'orderReturnLines' => [
+                        ['orderProduct' => '/api/front/account/order_products/'.$orderProductId, 'quantity' => 1.0],
+                    ],
+                ],
+                token: $token,
+            );
+            $answers[] = [$response->getStatusCode(), (string) $response->getContent()];
+        }
+
+        self::assertSame($answers[0], $answers[1], 'A foreign order product and a missing one must not be told apart.');
+        self::assertSame(422, $answers[0][0]);
+    }
+
+    /**
+     * Only the order and the order products are told like a foreign row: a
+     * reason that does not exist is not something a caller can learn anything
+     * from, and keeps its own answer.
+     */
+    public function testAMissingReasonKeepsItsOwnAnswer(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnReason' => '/api/front/account/order_return_reasons/'.(1_000_000 + (int) $order->getId()),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(400, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('Item not found', (string) $response->getContent());
+        self::assertStringNotContainsString(ReturnEligibilityChecker::ORDER_NOT_USABLE_MESSAGE, (string) $response->getContent());
+    }
+
+    /**
+     * The body of a refusal with the identifier the caller sent taken out: the
+     * identifier is the caller's own input, it may be echoed back.
+     */
+    private function withoutTheIdentifier(string $content, int $identifier): string
+    {
+        return str_replace((string) $identifier, '<id>', $content);
+    }
+
     private function customer(): Customer
     {
         return $this->factory->customer($this->factory->customerTitle());
