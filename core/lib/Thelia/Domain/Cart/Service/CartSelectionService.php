@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Domain\Cart\Service;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
+use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\Service\PostageHandler;
@@ -33,6 +35,7 @@ class CartSelectionService
         protected CartCheckoutEventBuilder $cartCheckoutEventBuilder,
         protected PostageHandler $postageHandler,
         protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+        protected ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -65,8 +68,9 @@ class CartSelectionService
      * the buyer may not have chosen yet, and is judged at the placement of the order.
      * An address of another customer is not looked at, as the action that writes the
      * address ignores it too. A gift offered by a promotion is not judged either: the
-     * buyer cannot remove it, and writing the address reconciles the offered lines,
-     * which withdraws the gift this destination refuses.
+     * buyer cannot remove it, and writing the address applies the promotions again,
+     * which withdraws the gift this destination refuses (the offered lines, and the
+     * line a free product promotion holds as its gift).
      */
     private function refuseARestrictedDestination(CheckoutDTO $checkoutDTO): void
     {
@@ -86,10 +90,11 @@ class CartSelectionService
             return;
         }
 
+        $giftCartItemIds = $this->freeProductGiftCartItemIds();
         $boughtProductIds = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
-            if (1 !== (int) $cartItem->getIsOffered()) {
+            if (1 !== (int) $cartItem->getIsOffered() && !\in_array((int) $cartItem->getId(), $giftCartItemIds, true)) {
                 $boughtProductIds[] = (int) $cartItem->getProductId();
             }
         }
@@ -104,6 +109,20 @@ class CartSelectionService
         if ([] !== $lines) {
             throw new DestinationRestrictedException($lines);
         }
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function freeProductGiftCartItemIds(): array
+    {
+        $request = $this->requestStack?->getMainRequest();
+
+        if (null === $request || !$request->hasSession()) {
+            return [];
+        }
+
+        return FreeProduct::giftCartItemIds($request->getSession());
     }
 
     public function setInvoiceAddress(CheckoutDTO $checkoutDTO): void
