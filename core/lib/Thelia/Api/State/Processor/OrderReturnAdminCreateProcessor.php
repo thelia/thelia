@@ -67,6 +67,8 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
         $connection->beginTransaction();
 
         try {
+            OrderReturnHydrator::assertNewLines($data);
+
             $this->hydrator->hydrate($data, $customer, true);
             $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
             $connection->commit();
