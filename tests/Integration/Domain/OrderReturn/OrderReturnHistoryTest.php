@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\OrderReturn;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Order\Service\OrderHistoryRecorder;
 use Thelia\Domain\OrderReturn\EventListener\RecordOrderReturnHistoryListener;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -133,6 +134,71 @@ final class OrderReturnHistoryTest extends ActionIntegrationTestCase
             $this->entriesOfType($order, OrderHistoryEventType::RETURN_STATUS_CHANGED),
             'Only the acceptance is a status change here.',
         );
+    }
+
+    /**
+     * The mail a return gesture sends comes after the line that records the gesture. The
+     * mail is stood for by a listener that writes its own line, ahead of the one that
+     * sends it, so the order of the two lines is the order of the two events.
+     */
+    public function testTheLineOfOpeningAReturnPrecedesItsEmail(): void
+    {
+        [$customer, $order, $orderProduct] = $this->paidOrder(quantity: 3.0);
+        $this->standForTheEmail($order);
+
+        $this->openReturn($customer, $order, $orderProduct, quantity: 2.0);
+
+        $this->assertTheLinePrecedesTheEmail($order, OrderHistoryEventType::RETURN_OPENED);
+    }
+
+    public function testTheLineOfAReturnStatusChangePrecedesItsEmail(): void
+    {
+        [$customer, $order, $orderProduct] = $this->paidOrder(quantity: 3.0);
+        $return = $this->openReturn($customer, $order, $orderProduct, quantity: 2.0);
+        $this->standForTheEmail($order);
+
+        $this->transition($return, OrderReturnStatus::CODE_ACCEPTED);
+
+        $this->assertTheLinePrecedesTheEmail($order, OrderHistoryEventType::RETURN_STATUS_CHANGED);
+    }
+
+    public function testTheLineOfAReturnReceptionPrecedesItsEmail(): void
+    {
+        [$customer, $order, $orderProduct] = $this->paidOrder(quantity: 3.0);
+        $return = $this->openReturn($customer, $order, $orderProduct, quantity: 2.0);
+        $this->transition($return, OrderReturnStatus::CODE_ACCEPTED);
+        $this->standForTheEmail($order);
+
+        $line = $return->getOrderReturnLines()->getFirst();
+        $event = (new OrderReturnEvent($return))->setReceivedLines([
+            (int) $line->getId() => ['quantity' => 2.0, 'condition' => 'as new', 'resellable' => true],
+        ]);
+        $this->dispatch($event, TheliaEvents::ORDER_RETURN_RECEIVE);
+
+        $this->assertTheLinePrecedesTheEmail($order, OrderHistoryEventType::RETURN_RECEIVED);
+    }
+
+    private function standForTheEmail(Order $order): void
+    {
+        $recorder = $this->getService(OrderHistoryRecorder::class);
+
+        $this->dispatcher->addListener(
+            TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL,
+            static function () use ($recorder, $order): void {
+                $recorder->recordEmailSent($order->getId(), 'order_return_status_changed');
+            },
+            200,
+        );
+    }
+
+    private function assertTheLinePrecedesTheEmail(Order $order, OrderHistoryEventType $gesture): void
+    {
+        $gestureLine = $this->entriesOfType($order, $gesture)[0] ?? null;
+        $emailLine = $this->entriesOfType($order, OrderHistoryEventType::EMAIL_SENT)[0] ?? null;
+
+        self::assertNotNull($gestureLine);
+        self::assertNotNull($emailLine);
+        self::assertLessThan($emailLine->getId(), $gestureLine->getId(), 'The line of the gesture must precede the e-mail line.');
     }
 
     public function testTheWholeCycleReadsAsOneTimelineOnTheOrder(): void
