@@ -45,7 +45,10 @@ interface PaymentModuleWithStoredMethodsInterface extends PaymentModuleInterface
     public function payWithStoredMethod(Order $order, CustomerPaymentMethod $method): ?Response;
 
     /**
-     * Asks the provider to forget the method. Called before the shop drops the row.
+     * Asks the provider to forget the method. Called before the shop drops the row,
+     * except by the anonymization and the deletion of the customer, which call it once
+     * the drop is committed: a module that then needs data going with the row implements
+     * DeferredStoredMethodForgettingPaymentModuleInterface.
      *
      * A refusal passes what the provider said as the providerReason of the exception,
      * never as its message nor as a previous exception: the message is answered to the
