@@ -18,6 +18,7 @@ use Thelia\Domain\DataTransfer\Import\AbstractImport;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionException;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
+use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 
 /**
  * Puts products into destination restriction groups: one row per product and group,
@@ -36,7 +37,7 @@ class ProductDestinationRestrictionImport extends AbstractImport
     public function importData(array $data): ?string
     {
         // The import handler builds its handlers with new: the facade is built here.
-        $this->facade ??= new DestinationRestrictionFacade(new DestinationRestrictionChecker());
+        $this->facade ??= new DestinationRestrictionFacade(new DestinationRestrictionChecker(new CartShippingRules()));
 
         try {
             $this->facade->attachProductByReference(trim((string) $data['ref']), trim((string) $data['restriction_code']));
