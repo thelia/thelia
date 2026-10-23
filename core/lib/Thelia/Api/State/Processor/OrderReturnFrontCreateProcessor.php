@@ -21,14 +21,12 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Resource\OrderReturn as OrderReturnResource;
 use Thelia\Api\Service\OrderReturnHydrator;
-use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Domain\OrderReturn\Service\ReturnRequestLimiter;
@@ -50,7 +48,7 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
         private PropelPersistProcessor $persistProcessor,
         private TokenStorageInterface $tokenStorage,
         private OrderReturnHydrator $hydrator,
-        private EventDispatcherInterface $eventDispatcher,
+        private OrderReturnStatusEmailDispatcher $statusEmailDispatcher,
         private ReturnRequestLimiter $limiter,
         private OrderReturnWriteTransactionInterface $transaction,
     ) {
@@ -131,7 +129,7 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
     {
         $model = $result instanceof OrderReturnResource ? $result->getPropelModel() : null;
         if ($model instanceof OrderReturnModel) {
-            $this->eventDispatcher->dispatch(new OrderReturnEvent($model), TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
+            $this->statusEmailDispatcher->dispatchFor($model);
         }
 
         return $result;

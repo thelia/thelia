@@ -18,14 +18,12 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
 use Thelia\Api\Resource\OrderReturn as OrderReturnResource;
 use Thelia\Api\Service\OrderReturnHydrator;
-use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Model\Customer;
@@ -45,7 +43,7 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
     public function __construct(
         private PropelPersistProcessor $persistProcessor,
         private OrderReturnHydrator $hydrator,
-        private EventDispatcherInterface $eventDispatcher,
+        private OrderReturnStatusEmailDispatcher $statusEmailDispatcher,
         private AdminSaleUnitScope $adminSaleUnitScope,
         private OrderReturnWriteTransactionInterface $transaction,
     ) {
@@ -101,7 +99,7 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
     {
         $model = $result instanceof OrderReturnResource ? $result->getPropelModel() : null;
         if ($model instanceof OrderReturnModel) {
-            $this->eventDispatcher->dispatch(new OrderReturnEvent($model), TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL);
+            $this->statusEmailDispatcher->dispatchFor($model);
         }
 
         return $result;
