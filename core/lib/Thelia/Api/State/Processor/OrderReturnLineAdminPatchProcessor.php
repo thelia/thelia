@@ -41,7 +41,8 @@ use Thelia\Model\OrderReturnLineQuery;
  * `quantity` is the size of the return itself. Raising it is opening a bigger
  * return, and it goes through the same gate the creation does - under the same
  * row locks, in the same transaction - with the line being edited left out of
- * the cumulative count.
+ * the cumulative count. Only that line: the other lines of its return may
+ * hold units of the same order product, and still do.
  */
 final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInterface
 {
@@ -97,7 +98,7 @@ final readonly class OrderReturnLineAdminPatchProcessor implements ProcessorInte
                     $customer,
                     $orderProduct,
                     $quantity,
-                    excludeReturnId: (int) $stored->getOrderReturnId(),
+                    excludeLineId: (int) $stored->getId(),
                 );
 
                 return $this->persistProcessor->process($data, $operation, $uriVariables, $context);

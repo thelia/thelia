@@ -306,7 +306,7 @@ final class ReturnEligibilityChecker
      */
     public function remainingReturnableQuantity(OrderProduct $orderProduct, ?int $excludeReturnId = null): float
     {
-        return $this->computeRemainingQuantity($orderProduct, $excludeReturnId, lockingRead: false);
+        return $this->computeRemainingQuantity($orderProduct, $excludeReturnId, null, lockingRead: false);
     }
 
     /**
@@ -322,7 +322,7 @@ final class ReturnEligibilityChecker
      * read sees the returns committed since. It goes to the write connection,
      * where the lock and the transaction are.
      */
-    private function computeRemainingQuantity(OrderProduct $orderProduct, ?int $excludeReturnId, bool $lockingRead): float
+    private function computeRemainingQuantity(OrderProduct $orderProduct, ?int $excludeReturnId, ?int $excludeLineId, bool $lockingRead): float
     {
         if (!$this->isQuantityCumulative()) {
             $ordered = round((float) $orderProduct->getQuantity(), self::QUANTITY_PRECISION);
@@ -340,6 +340,10 @@ final class ReturnEligibilityChecker
 
         if (null !== $excludeReturnId) {
             $query->filterByOrderReturnId($excludeReturnId, Criteria::NOT_EQUAL);
+        }
+
+        if (null !== $excludeLineId) {
+            $query->filterById($excludeLineId, Criteria::NOT_EQUAL);
         }
 
         $connection = null;
@@ -362,6 +366,9 @@ final class ReturnEligibilityChecker
      * Assert that the given quantity of a product line may be returned by the customer.
      *
      * @param int|null $excludeReturnId a return to leave out of the cumulative count
+     * @param int|null $excludeLineId   a single return line to leave out of it, the
+     *                                  one being edited: the other lines of its return
+     *                                  still hold their units
      *
      * @throws ReturnNotAllowedException
      */
@@ -371,6 +378,7 @@ final class ReturnEligibilityChecker
         OrderProduct $orderProduct,
         float $quantity,
         ?int $excludeReturnId = null,
+        ?int $excludeLineId = null,
     ): void {
         if ((int) $order->getCustomerId() !== (int) $customer->getId()) {
             throw new ReturnNotAllowedException('This order cannot be used for a return.');
@@ -388,7 +396,7 @@ final class ReturnEligibilityChecker
             throw new ReturnNotAllowedException('The returned quantity must be positive.');
         }
 
-        $remaining = $this->computeRemainingQuantity($orderProduct, $excludeReturnId, lockingRead: $this->needsLockingReads());
+        $remaining = $this->computeRemainingQuantity($orderProduct, $excludeReturnId, $excludeLineId, lockingRead: $this->needsLockingReads());
 
         if ($quantity > $remaining + self::QUANTITY_TOLERANCE) {
             throw new ReturnNotAllowedException('The returned quantity exceeds the returnable quantity of this line.');
