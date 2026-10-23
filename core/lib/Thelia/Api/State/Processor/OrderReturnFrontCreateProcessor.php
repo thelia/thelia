@@ -72,6 +72,8 @@ final readonly class OrderReturnFrontCreateProcessor implements ProcessorInterfa
         $connection->beginTransaction();
 
         try {
+            OrderReturnHydrator::assertNewLines($data);
+
             $this->hydrator->hydrate($data, $customer, false);
 
             // The quota counts the returns a customer opens, not the mistakes
