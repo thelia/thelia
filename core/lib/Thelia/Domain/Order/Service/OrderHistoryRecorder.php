@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\OrderHistoryTableMap;
-use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderHistoryQuery;
 
 /**
@@ -83,6 +83,16 @@ final readonly class OrderHistoryRecorder
      */
     private const LOCK_TIMEOUT = 1;
 
+    /**
+     * The width of the columns an entry fills from outside: the type is a VARCHAR(50)
+     * that a module chooses, the label a VARCHAR(255) that receives a login, a customer
+     * reference or a module code. A longer value is refused by the database in strict
+     * mode and cut by it otherwise; bounded here, the line is the same on both.
+     */
+    private const EVENT_TYPE_MAX_LENGTH = 50;
+
+    private const ACTOR_LABEL_MAX_LENGTH = 255;
+
     public function __construct(
         private OrderHistoryActorResolver $actorResolver,
     ) {
@@ -119,9 +129,17 @@ final readonly class OrderHistoryRecorder
         bool $visibleToCustomer = false,
         ?string $moduleCode = null,
     ): void {
+        $connection = null;
+        $callerCanCommit = false;
+
         try {
+            if (mb_strlen($eventType) > self::EVENT_TYPE_MAX_LENGTH) {
+                throw new \InvalidArgumentException(\sprintf('An order history event type holds %d characters at most.', self::EVENT_TYPE_MAX_LENGTH));
+            }
+
             $encodedPayload = $this->encodePayload($payload);
             $connection = Propel::getConnection(OrderHistoryTableMap::DATABASE_NAME);
+            $callerCanCommit = $this->canCommit($connection);
 
             if (!$this->isDeduplicated($eventType)) {
                 $this->write($orderId, $eventType, $encodedPayload, $comment, $visibleToCustomer, $moduleCode, $connection);
@@ -151,7 +169,29 @@ final readonly class OrderHistoryRecorder
                 'Failed to record order history entry {type} on order {order}: {ex}',
                 ['type' => $eventType, 'order' => $orderId, 'ex' => $throwable],
             );
+
+            // The line is written by a statement of its own, which leaves the transaction
+            // of the caller alone. The check stays for what a refusal can still do: a
+            // module that rolls back the connection from a listener it was called from,
+            // or a server that aborted the transaction (a deadlock). The caller's commit
+            // then throws and the gesture is lost with its audit trail; it cannot be
+            // undone from here, so it is at least said.
+            if ($callerCanCommit && null !== $connection && !$this->canCommit($connection)) {
+                Tlog::getInstance()->err(
+                    'The failed order history entry {type} on order {order} left the transaction of the caller not committable.',
+                    ['type' => $eventType, 'order' => $orderId],
+                );
+            }
         }
+    }
+
+    /**
+     * Whether a transaction is open and still able to commit; false in autocommit, where
+     * there is nothing for a failed write to take away.
+     */
+    private function canCommit(ConnectionInterface $connection): bool
+    {
+        return $connection instanceof ConnectionWrapper && $connection->isCommitable();
     }
 
     public function recordOrderCreated(int $orderId, ?string $orderRef, ?string $moduleCode = null): void
@@ -254,6 +294,25 @@ final readonly class OrderHistoryRecorder
         );
     }
 
+    /**
+     * Inserts the line with a prepared statement of its own, never through
+     * {@see \Thelia\Model\OrderHistory::save()}.
+     *
+     * save() opens a transaction level and rolls it back on any refusal (a foreign key
+     * on an order that is gone, a lock wait that ran out, a payload too big for the
+     * server). Propel then marks the transaction of the caller as not committable, and
+     * the caller's commit throws: the status change the line was recording is lost with
+     * it (the API order processor wraps the change in a transaction). A statement that
+     * fails on its own undoes the statement only, so the caller's transaction is left as
+     * it was and the refusal is logged by {@see self::record()}.
+     *
+     * The columns and the values are the ones save() writes, the two timestamps of the
+     * timestampable behavior included.
+     *
+     * One refusal cannot be absorbed this way: a deadlock (error 1213) makes InnoDB roll
+     * back the whole transaction on the server, whatever the client does next, and the
+     * caller's gesture goes with it. Nothing written here can prevent that.
+     */
     private function write(
         int $orderId,
         string $eventType,
@@ -264,18 +323,25 @@ final readonly class OrderHistoryRecorder
         ConnectionInterface $connection,
     ): void {
         $actor = $this->actorResolver->resolve($moduleCode);
+        $actorLabel = null === $actor->label ? null : mb_substr($actor->label, 0, self::ACTOR_LABEL_MAX_LENGTH);
+        $now = (new \DateTimeImmutable())->format('Y-m-d H:i:s.u');
 
-        $entry = new OrderHistory();
-        $entry
-            ->setOrderId($orderId)
-            ->setEventType($eventType)
-            ->setActorType($actor->actorType->value)
-            ->setActorLabel($actor->label)
-            ->setAdminId($actor->adminId)
-            ->setPayload($encodedPayload)
-            ->setComment($comment)
-            ->setVisibleToCustomer($visibleToCustomer ? 1 : 0)
-            ->save($connection);
+        $statement = $connection->prepare(
+            'INSERT INTO `order_history` '
+            .'(`order_id`, `event_type`, `actor_type`, `actor_label`, `admin_id`, `payload`, `comment`, `visible_to_customer`, `created_at`, `updated_at`) '
+            .'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        );
+        $statement->bindValue(1, $orderId, \PDO::PARAM_INT);
+        $statement->bindValue(2, $eventType, \PDO::PARAM_STR);
+        $statement->bindValue(3, $actor->actorType->value, \PDO::PARAM_STR);
+        $statement->bindValue(4, $actorLabel, null === $actorLabel ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(5, $actor->adminId, null === $actor->adminId ? \PDO::PARAM_NULL : \PDO::PARAM_INT);
+        $statement->bindValue(6, $encodedPayload, null === $encodedPayload ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(7, $comment, null === $comment ? \PDO::PARAM_NULL : \PDO::PARAM_STR);
+        $statement->bindValue(8, $visibleToCustomer ? 1 : 0, \PDO::PARAM_INT);
+        $statement->bindValue(9, $now, \PDO::PARAM_STR);
+        $statement->bindValue(10, $now, \PDO::PARAM_STR);
+        $statement->execute();
     }
 
     /**
