@@ -43,6 +43,17 @@ final class StoredMethodsPaymentModule extends AbstractPaymentModule implements 
     public static ?string $refusalReason = null;
 
     /**
+     * When set, the provider fails with a \RuntimeException of this message, the way an
+     * SDK does on a transport error, instead of answering.
+     */
+    public static ?string $failureMessage = null;
+
+    /**
+     * With a failure message set, the provider throws an \Error (a bug of the module) instead.
+     */
+    public static bool $failureIsAnError = false;
+
+    /**
      * @var list<int>
      */
     public static array $forgottenMethodIds = [];
@@ -67,6 +78,8 @@ final class StoredMethodsPaymentModule extends AbstractPaymentModule implements 
         self::$offersStoredMethods = true;
         self::$providerRefusesToForget = false;
         self::$refusalReason = null;
+        self::$failureMessage = null;
+        self::$failureIsAnError = false;
         self::$forgottenMethodIds = [];
         self::$calls = [];
         self::$paidWithMethodIds = [];
@@ -114,6 +127,14 @@ final class StoredMethodsPaymentModule extends AbstractPaymentModule implements 
     public function forgetStoredMethod(CustomerPaymentMethod $method): void
     {
         self::$calls[] = 'forget';
+
+        if (null !== self::$failureMessage) {
+            if (self::$failureIsAnError) {
+                throw new \TypeError(self::$failureMessage);
+            }
+
+            throw new \RuntimeException(self::$failureMessage);
+        }
 
         if (self::$providerRefusesToForget) {
             throw new StoredMethodRefusedException(self::$refusalReason);

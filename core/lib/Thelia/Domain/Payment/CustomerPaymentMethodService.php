@@ -204,7 +204,8 @@ final readonly class CustomerPaymentMethodService
      * such a setDefault() or register() may also run out of lock wait time (1205).
      *
      * @throws PaymentMethodNotOwnedException
-     * @throws StoredMethodRefusedException   when the provider refuses
+     * @throws StoredMethodRefusedException   when the provider refuses, or fails in any way: what it
+     *                                        threw is never passed on, its message may quote the token
      */
     public function forget(Customer $customer, CustomerPaymentMethod $method): void
     {
@@ -235,6 +236,32 @@ final readonly class CustomerPaymentMethodService
             ));
 
             throw $refusal;
+        } catch (\Throwable $failure) {
+            // A provider SDK fails with its own exceptions (transport, decoding), whose
+            // message quotes what it was handed, the token included. Left to go up, it
+            // would end as a 500 whose message the error listener logs. It is a refusal
+            // all the same: the provider did not forget the method, so the shop keeps it,
+            // and the class alone is written down. An \Error is a bug of the module, not a
+            // provider answer: it is logged as an error, with where it was thrown.
+            if ($failure instanceof \Error) {
+                $this->logger->error(\sprintf(
+                    'Stored payment method #%d kept: the module failed with a bug while forgetting it (module #%d, %s at %s:%d, message withheld).',
+                    (int) $owned->getId(),
+                    (int) $owned->getPaymentModuleId(),
+                    $failure::class,
+                    $failure->getFile(),
+                    $failure->getLine(),
+                ));
+            } else {
+                $this->logger->warning(\sprintf(
+                    'Stored payment method #%d kept: its provider failed while forgetting it (module #%d, %s, message withheld).',
+                    (int) $owned->getId(),
+                    (int) $owned->getPaymentModuleId(),
+                    $failure::class,
+                ));
+            }
+
+            throw new StoredMethodRefusedException();
         }
 
         $connection->beginTransaction();

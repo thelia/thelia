@@ -195,6 +195,37 @@ final class CustomerPaymentMethodServiceTest extends IntegrationTestCase
         }
     }
 
+    /**
+     * A provider SDK fails with its own exceptions, which quote what they were handed:
+     * the caller gets a refusal with the core's wording, the method stays, and only the
+     * class of the failure is written down.
+     */
+    public function testAProviderFailureIsARefusalThatCarriesItsMessageNeitherInTheResultNorInTheLog(): void
+    {
+        $logger = $this->collectingLogger();
+        $service = $this->serviceLoggingTo($logger);
+        $customer = $this->customer();
+        $method = $service->register($customer, $this->module, 'pm_secret', 'Visa ending 1111', null);
+        StoredMethodsPaymentModule::$failureMessage = 'pm_secret';
+
+        try {
+            $service->forget($customer, $method);
+            self::fail('A failure of the provider has to reach the caller as a refusal.');
+        } catch (StoredMethodRefusedException $refusal) {
+            self::assertSame(StoredMethodRefusedException::MESSAGE, $refusal->getMessage());
+            self::assertNull($refusal->getPrevious(), 'A previous exception would be logged with the whole chain.');
+        }
+
+        self::assertNotNull(CustomerPaymentMethodQuery::create()->findPk($method->getId()), 'The provider did not forget it, the shop keeps it.');
+        self::assertNotEmpty($logger->messages);
+
+        foreach ($logger->messages as $message) {
+            self::assertStringNotContainsString('pm_secret', $message);
+        }
+
+        self::assertStringContainsString(\RuntimeException::class, implode("\n", $logger->messages));
+    }
+
     public function testForgettingAMethodThatIsNotTheDefaultLeavesTheDefaultWhereItIs(): void
     {
         $customer = $this->customer();
@@ -435,6 +466,36 @@ final class CustomerPaymentMethodServiceTest extends IntegrationTestCase
         self::assertFalse($restored->isModified(), 'Saving the copy writes nothing, least of all an empty token.');
     }
 
+    /**
+     * An \Error is a bug of the module, not an answer of the provider: it is an error in
+     * the log, with where it was thrown and without its message; an \Exception stays a warning.
+     */
+    public function testAnErrorOfTheModuleIsLoggedAsAnErrorWhereAnExceptionIsAWarning(): void
+    {
+        $customer = $this->customer();
+
+        foreach ([[false, 'warning'], [true, 'error']] as [$isAnError, $level]) {
+            $logger = $this->collectingLogger();
+            $service = $this->serviceLoggingTo($logger);
+            $method = $service->register($customer, $this->module, 'pm_secret', 'Visa ending 1111', null);
+            StoredMethodsPaymentModule::$failureMessage = 'pm_secret';
+            StoredMethodsPaymentModule::$failureIsAnError = $isAnError;
+
+            try {
+                $service->forget($customer, $method);
+                self::fail('A failure of the module has to reach the caller as a refusal.');
+            } catch (StoredMethodRefusedException) {
+            }
+
+            self::assertSame([$level], $logger->levels);
+            self::assertStringNotContainsString('pm_secret', $logger->messages[0]);
+
+            if ($isAnError) {
+                self::assertStringContainsString('StoredMethodsPaymentModule.php:', $logger->messages[0]);
+            }
+        }
+    }
+
     private function serviceLoggingTo(AbstractLogger $logger): CustomerPaymentMethodService
     {
         return new CustomerPaymentMethodService(static::getContainer(), $this->dispatcher(), $logger);
@@ -448,8 +509,14 @@ final class CustomerPaymentMethodServiceTest extends IntegrationTestCase
              */
             public array $messages = [];
 
+            /**
+             * @var list<string>
+             */
+            public array $levels = [];
+
             public function log($level, string|\Stringable $message, array $context = []): void
             {
+                $this->levels[] = (string) $level;
                 $this->messages[] = (string) $message;
             }
         };
