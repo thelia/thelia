@@ -103,6 +103,18 @@ final class OrderReturnMissingRowRefusalTest extends IntegrationTestCase
         );
     }
 
+    public function testALineWithoutQuantityIsRefusedBeforeAnythingIsLocked(): void
+    {
+        $request = (new OrderReturnResource())
+            ->setOrder((new OrderResource())->setId(1))
+            ->setOrderReturnLines([(new OrderReturnLineResource())->setOrderProduct((new OrderProductResource())->setId(1))]);
+
+        $this->expectException(ReturnNotAllowedException::class);
+        $this->expectExceptionMessage('A return line must name the quantity to return.');
+
+        OrderReturnHydrator::rowsToLock($request);
+    }
+
     private function frontProcessor(Customer $customer): OrderReturnFrontCreateProcessor
     {
         $this->getService(TokenStorageInterface::class)->setToken(new UsernamePasswordToken($customer, 'api', []));
