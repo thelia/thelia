@@ -29,6 +29,8 @@ local/media/documents/*
 local/media/images/*
 local/media/videos/*
 local/library/*
+# The IP database a shop downloads for the visitor country detection, under its own licence
+local/geoip/*
 local/backup/*
 !local/backup/.gitkeep
 !local/media/images/store/favicon.png
