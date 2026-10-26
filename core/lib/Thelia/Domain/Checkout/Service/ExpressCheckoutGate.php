@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
