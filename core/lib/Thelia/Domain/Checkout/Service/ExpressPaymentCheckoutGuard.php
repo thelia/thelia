@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Checkout\Service;
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Model\Cart;
 use Thelia\Model\ModuleQuery;

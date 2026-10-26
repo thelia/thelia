@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
