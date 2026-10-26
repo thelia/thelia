@@ -40,4 +40,17 @@ class CartAddress extends BaseCartAddress
             ->setCountryId($address->getCountryId())
             ->setStateId($address->getStateId());
     }
+
+    /**
+     * Whether the address still lies where this copy says: the same country, state, postal
+     * code and city. Carriers and postage are quoted for that place, and a carrier may price
+     * by city as well as by postal code.
+     */
+    public function isAtThePlaceOf(Address $address): bool
+    {
+        return $this->getCountryId() === $address->getCountryId()
+            && $this->getStateId() === $address->getStateId()
+            && (string) $this->getZipcode() === (string) $address->getZipcode()
+            && (string) $this->getCity() === (string) $address->getCity();
+    }
 }

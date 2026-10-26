@@ -991,6 +991,7 @@ return [
     'Please choose a delivery slot.' => 'Veuillez choisir un créneau de livraison.',
     'This delivery date is not available. Please choose another one.' => 'Cette date de livraison n\'est pas disponible. Veuillez en choisir une autre.',
     'This delivery slot is full. Please choose another one.' => 'Ce créneau de livraison est complet. Veuillez en choisir un autre.',
+    'Your delivery address has changed. Please choose your delivery method again.' => 'Votre adresse de livraison a changé. Veuillez choisir à nouveau votre mode de livraison.',
     'Please choose a carrier before a delivery date.' => 'Veuillez choisir un transporteur avant la date de livraison.',
     'This carrier does not offer delivery dates.' => 'Ce transporteur ne propose pas de date de livraison.',
     'This carrier does not offer this kind of delivery date.' => 'Ce transporteur ne propose pas ce type de date de livraison.',

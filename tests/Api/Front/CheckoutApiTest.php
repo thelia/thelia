@@ -583,6 +583,80 @@ final class CheckoutApiTest extends ApiTestCase
     }
 
     /**
+     * The address moved through the API once the carrier was chosen: the order is refused,
+     * sending the buyer back to the delivery step, until the address is chosen again and
+     * its carrier and postage are asked for the new place.
+     */
+    public function testAnAddressMovedThroughTheApiIsRefusedUntilItIsChosenAgain(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+        self::assertTrue($this->decode($this->jsonRequest('GET', $this->url($cartId, 'validation'), token: $token))['ready'], 'Control: the cart starts ready.');
+
+        $this->putAddress($checkout, $token, address1: '1 Main Street', zipcode: '20000', city: 'Ajaccio');
+
+        $verdict = $this->decode($this->jsonRequest('GET', $this->url($cartId, 'validation'), token: $token));
+        self::assertFalse($verdict['ready']);
+        self::assertSame('delivery', $this->theViolation($verdict['violations'], CheckoutViolationCode::DeliveryAddressMoved->value)['stepCode']);
+
+        $placement = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+        self::assertSame(422, $placement->getStatusCode());
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+
+        $chosenAgain = $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+        self::assertJsonResponseSuccessful($chosenAgain);
+
+        $checkout['cart']->reload(true);
+        self::assertSame('20000', $checkout['cart']->getCartAddressRelatedByAddressDeliveryId()?->getZipcode());
+        self::assertSame(['ready' => true, 'violations' => []], $this->decode($this->jsonRequest('GET', $this->url($cartId, 'validation'), token: $token)));
+    }
+
+    /**
+     * Another street, name or phone written through the API reaches the cart at once and
+     * keeps it ready: the carrier and its postage were quoted for the same place.
+     */
+    public function testAStreetEditedThroughTheApiReachesTheCartAndKeepsItReady(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $this->putAddress(
+            $checkout,
+            $token,
+            address1: '2 avenue des Tests',
+            zipcode: (string) $checkout['address']->getZipcode(),
+            city: (string) $checkout['address']->getCity(),
+        );
+
+        $checkout['cart']->reload(true);
+        self::assertSame('2 avenue des Tests', $checkout['cart']->getCartAddressRelatedByAddressDeliveryId()?->getAddress1());
+        self::assertSame($checkout['deliveryModule']->getId(), $checkout['cart']->getDeliveryModuleId());
+        self::assertSame(['ready' => true, 'violations' => []], $this->decode($this->jsonRequest('GET', $this->url($cartId, 'validation'), token: $token)));
+    }
+
+    /**
+     * A cart with nothing to ship has no delivery step to choose the address again on: its
+     * default address moved from the account does not hold the order back.
+     */
+    public function testACartWithNothingToShipIsPlacedAfterItsAddressMoved(): void
+    {
+        $checkout = $this->readyCheckout(virtual: true);
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->jsonRequest('POST', $this->url($cartId, 'invoice_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+        $this->jsonRequest('POST', $this->url($cartId, 'payment_module'), ['paymentModuleId' => $checkout['paymentModule']->getId()], token: $token);
+        $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+
+        $this->putAddress($checkout, $token, address1: '1 Main Street', zipcode: '20000', city: 'Ajaccio');
+
+        self::assertJsonResponseSuccessful($this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token));
+    }
+
+    /**
      * What a buyer agrees to travels in the body of the placement, and ends up on the
      * order exactly as it does when a theme collects it.
      *
@@ -815,6 +889,30 @@ final class CheckoutApiTest extends ApiTestCase
         $this->jsonRequest('POST', $this->url($cartId, 'invoice_address'), ['addressId' => $checkout['address']->getId()], token: $token);
         $this->jsonRequest('POST', $this->url($cartId, 'delivery_module'), ['deliveryModuleId' => $checkout['deliveryModule']->getId()], token: $token);
         $this->jsonRequest('POST', $this->url($cartId, 'payment_module'), ['paymentModuleId' => $checkout['paymentModule']->getId()], token: $token);
+    }
+
+    /**
+     * @param array{customer: Customer, address: Address, country: Country} $checkout
+     */
+    private function putAddress(array $checkout, string $token, string $address1, string $zipcode, string $city): void
+    {
+        $response = $this->jsonRequest(
+            'PUT',
+            '/api/front/account/addresses/'.$checkout['address']->getId(),
+            [
+                'label' => 'Home',
+                'firstname' => (string) $checkout['address']->getFirstname(),
+                'lastname' => (string) $checkout['address']->getLastname(),
+                'address1' => $address1,
+                'city' => $city,
+                'zipcode' => $zipcode,
+                'country' => '/api/front/countries/'.$checkout['country']->getId(),
+                'customerTitle' => '/api/admin/customer_titles/'.$checkout['customer']->getCustomerTitle()->getId(),
+            ],
+            $token,
+        );
+
+        self::assertJsonResponseSuccessful($response);
     }
 
     private function url(int $cartId, string $step): string

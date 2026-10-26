@@ -89,9 +89,36 @@ class Address extends BaseAddress
             foreach (CartAddressQuery::create()->filterById($invoiceCopyIds)->find($con) as $cartAddress) {
                 $cartAddress->copyFrom($this)->save($con);
             }
+
+            $this->refreshTheDeliveryCopiesStillAtItsPlace($con);
         }
 
         parent::postUpdate($con);
+    }
+
+    /**
+     * The delivery copy of an open cart follows another street, name or phone at once: the
+     * carrier and its postage were quoted for the same place and still hold. A copy whose
+     * country, state, postal code or city the edit moved is left as it was quoted, and the
+     * order is refused until the address is chosen again (CartGuard::checkValidDelivery()),
+     * which asks the carriers and their postage for the new place.
+     */
+    private function refreshTheDeliveryCopiesStillAtItsPlace(?ConnectionInterface $con): void
+    {
+        $deliveryCopyIds = CartQuery::create()
+            ->useCartAddressRelatedByAddressDeliveryIdQuery()
+                ->filterByAddressId($this->getId())
+            ->endUse()
+            ->where('NOT EXISTS (SELECT 1 FROM `order` WHERE `order`.`cart_id` = `cart`.`id`)')
+            ->select('AddressDeliveryId')
+            ->find($con)
+            ->getData();
+
+        foreach (CartAddressQuery::create()->filterById($deliveryCopyIds)->find($con) as $cartAddress) {
+            if ($cartAddress->isAtThePlaceOf($this)) {
+                $cartAddress->copyFrom($this)->save($con);
+            }
+        }
     }
 
     public function getVatVerificationValid(): bool
