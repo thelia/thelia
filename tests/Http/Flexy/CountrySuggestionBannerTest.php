@@ -120,6 +120,15 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
         self::assertCount(1, $crawler->filter(self::BANNER.' form[action="'.$this->url(self::DECLINE_ROUTE).'"]'));
     }
 
+    public function testTheBannerIsALandmarkNamedByItsMessage(): void
+    {
+        $crawler = $this->visitorFrom('suggest');
+
+        $banner = $crawler->filter('section'.self::BANNER);
+        self::assertCount(1, $banner);
+        self::assertStringContainsString($this->belgiumName(), $crawler->filter('#'.$banner->attr('aria-labelledby'))->text(), 'A screen reader names the region after the message, which says the country.');
+    }
+
     public function testInApplyModeThereIsNothingToOffer(): void
     {
         self::assertCount(0, $this->visitorFrom('apply')->filter(self::BANNER));
