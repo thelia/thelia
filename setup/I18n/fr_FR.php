@@ -1564,4 +1564,8 @@ return [
     'Price' => 'Prix',
     'Configuration destination restrictions' => 'Configuration des restrictions de destination',
     'Configuration background jobs' => 'Configuration des tâches en arrière-plan',
+    'Country detection of the visitor: off, suggest (offer the detected country to the visitor) or apply (use the detected country for taxes and address forms)' => 'Détection du pays du visiteur : off (désactivée), suggest (proposer le pays détecté au visiteur) ou apply (utiliser le pays détecté pour les taxes et les formulaires d\'adresse)',
+    'Where the country of the visitor is read: header (a header set by the CDN or the proxy) or ip_database (a MaxMind database that the shop installs in local/geoip)' => 'Origine du pays du visiteur : header (un en-tête posé par le CDN ou le proxy) ou ip_database (une base MaxMind que la boutique installe dans local/geoip)',
+    'Name of the HTTP header that carries the country code of the visitor when the source is header (e.g. CF-IPCountry)' => 'Nom de l\'en-tête HTTP qui porte le code pays du visiteur quand la source est header (ex. CF-IPCountry)',
+    'File name of the MaxMind country database (.mmdb) inside local/geoip, when the source is ip_database' => 'Nom du fichier de la base pays MaxMind (.mmdb) dans local/geoip, quand la source est ip_database',
 ];

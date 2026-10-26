@@ -1127,4 +1127,8 @@ return [
     'Configuration destination restrictions' => 'Konfiguration der Lieferbeschränkungen',
     'Configuration background jobs' => 'Konfiguration der Hintergrundaufgaben',
     'Saved payment methods' => 'Gespeicherte Zahlungsmethoden',
+    'Country detection of the visitor: off, suggest (offer the detected country to the visitor) or apply (use the detected country for taxes and address forms)' => 'Länderermittlung des Besuchers: off (aus), suggest (dem Besucher das erkannte Land vorschlagen) oder apply (das erkannte Land für Steuern und Adressformulare verwenden)',
+    'Where the country of the visitor is read: header (a header set by the CDN or the proxy) or ip_database (a MaxMind database that the shop installs in local/geoip)' => 'Quelle des Besucherlands: header (ein vom CDN oder Proxy gesetzter Header) oder ip_database (eine MaxMind-Datenbank, die der Shop in local/geoip ablegt)',
+    'Name of the HTTP header that carries the country code of the visitor when the source is header (e.g. CF-IPCountry)' => 'Name des HTTP-Headers mit dem Ländercode des Besuchers, wenn die Quelle header ist (z. B. CF-IPCountry)',
+    'File name of the MaxMind country database (.mmdb) inside local/geoip, when the source is ip_database' => 'Dateiname der MaxMind-Länderdatenbank (.mmdb) in local/geoip, wenn die Quelle ip_database ist',
 ];

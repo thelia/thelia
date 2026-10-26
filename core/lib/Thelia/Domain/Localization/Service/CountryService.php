@@ -15,14 +15,18 @@ declare(strict_types=1);
 namespace Thelia\Domain\Localization\Service;
 
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
+use Thelia\Domain\Localization\VisitorCountryFacade;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Lang;
 
 readonly class CountryService
 {
-    public function __construct(protected Session $session)
-    {
+    public function __construct(
+        protected Session $session,
+        protected ?VisitorCountryFacade $visitorCountry = null,
+    ) {
     }
 
     public function getAllCountriesChoiceType(): array
@@ -71,6 +75,28 @@ readonly class CountryService
 
         $locale = $this->session->getLang()->getLocale();
         $country->setLocale($locale);
+
+        return $country;
+    }
+
+    /**
+     * The country a form opens on: the one the visitor shops in when the shop detects it,
+     * else the default country. getDefaultCountry() stays the shop's own default, which
+     * other readers rely on.
+     */
+    public function getPreselectedCountry(): Country
+    {
+        if (null === $this->visitorCountry || VisitorCountryMode::Off === $this->visitorCountry->mode()) {
+            return $this->getDefaultCountry();
+        }
+
+        $country = $this->visitorCountry->currentCountry();
+
+        if ($country->getByDefault()) {
+            return $this->getDefaultCountry();
+        }
+
+        $country->setLocale($this->session->getLang()->getLocale());
 
         return $country;
     }
