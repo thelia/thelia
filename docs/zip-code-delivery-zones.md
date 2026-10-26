@@ -97,13 +97,16 @@ message.
   (`TheliaEvents::AREA_REMOVE_COUNTRY`).
 - A module that decides eligibility on its own (`isValidDelivery()`, the postage event)
   is not affected by the rules of the zones it is not linked to.
-- The carriers follow the cart's copy of its delivery address, which only choosing the
-  address again refreshes: an address edited elsewhere (another checkout step, the
-  customer account, the API) keeps its old postal code in the cart until it is chosen
-  again. Flexy's delivery step refreshes the copy of an address edited on it, and chooses
-  the address again, asking the carriers and their postage again, when its country, state,
-  postal code or city changed (a carrier may price by city, as GeolocatedDelivery does);
-  another edit keeps the carrier and its postage as they were.
+- The carriers follow the cart's copy of its delivery address. An address edited outside
+  the checkout (the customer account, the API, the back office) updates the copy of every
+  cart not yet ordered that ships to it when the edit keeps its country, state, postal
+  code and city, and the carrier stays. An edit that moves it leaves the copy as the
+  carrier and its postage were quoted for, and `CartGuard::checkValidDelivery()` refuses
+  the order with `delivery-address-moved` until the address is chosen again (a carrier may
+  price by city, as GeolocatedDelivery does). Flexy's payment step then sends the buyer
+  back to the delivery step, which chooses the address again and asks the carriers and
+  their postage; an API client posts the delivery address again. A cart with nothing to
+  ship is not held back.
 - A radius around a shop is the job of the GeolocatedDelivery module (2.0.0 for Thelia 3),
   a carrier of its own that zones and their postal code rules filter like any other.
 
