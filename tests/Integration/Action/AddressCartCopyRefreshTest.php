@@ -94,6 +94,20 @@ final class AddressCartCopyRefreshTest extends ActionIntegrationTestCase
         self::assertSame($this->country('BE')->getId(), CartAddressQuery::create()->findPk($deliveryCopy->getId())?->getCountryId());
     }
 
+    public function testTheDeliveryCopyFollowsAnEditThatKeepsItsPlace(): void
+    {
+        [$title, $address, $cart] = $this->cartBilledToAVerifiedBelgianAddress();
+        $deliveryCopy = (new CartAddressService())->getOrCreateCartAddressFromAddress($address);
+        $cart->setAddressDeliveryId($deliveryCopy->getId())->save($this->getPropelConnection());
+
+        $address->setAddress1('2 avenue des Tests')->setLastname('Martin')->save($this->getPropelConnection());
+
+        CartAddressTableMap::clearInstancePool();
+        $copy = CartAddressQuery::create()->findPk($deliveryCopy->getId());
+        self::assertSame('2 avenue des Tests', $copy?->getAddress1());
+        self::assertSame('Martin', $copy?->getLastname());
+    }
+
     public function testTheCopyOfACartAlreadyOrderedIsLeftAsOrdered(): void
     {
         [$title, $address, $cart] = $this->cartBilledToAVerifiedBelgianAddress();

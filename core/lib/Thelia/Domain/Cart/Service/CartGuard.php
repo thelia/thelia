@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Checkout\Exception\DeliveryAddressMovedException;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\EmptyCartException;
@@ -35,6 +36,7 @@ use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\Lang;
@@ -129,6 +131,7 @@ class CartGuard
     public function checkValidDelivery(?Cart $cart): void
     {
         $this->checkDeliveryAddress($cart);
+        $this->refuseADeliveryAddressMovedSinceItWasChosen($cart);
 
         // Before anything about the carrier: no carrier may take a product its destination
         // refuses, and the buyer has to be told which product is in the way.
@@ -175,6 +178,32 @@ class CartGuard
         // Last, once the carrier itself is settled: the day only means something for a
         // carrier that will ship this cart to this address.
         $this->deliveryDateGuard->check($cart, $module);
+    }
+
+    /**
+     * The cart ships to its own copy of the delivery address, and its carrier and postage
+     * were quoted for the place the copy names. An address moved since, from the customer
+     * account or through the API, has to be chosen again so that they are asked again: left
+     * there, the order would leave with a carrier chosen for the former postal code.
+     *
+     * A cart with nothing to ship is not held back: the buyer is never shown a delivery step
+     * to choose the address again on. A copy of no customer address (a guest's, an address
+     * typed at checkout) or of an address since deleted has nothing to be compared with.
+     *
+     * @throws DeliveryAddressMovedException
+     */
+    private function refuseADeliveryAddressMovedSinceItWasChosen(Cart $cart): void
+    {
+        if ($cart->isVirtual()) {
+            return;
+        }
+
+        $copy = CartAddressQuery::create()->findPk($cart->getAddressDeliveryId());
+        $address = null !== $copy?->getAddressId() ? AddressQuery::create()->findPk($copy->getAddressId()) : null;
+
+        if (null !== $address && !$copy->isAtThePlaceOf($address)) {
+            throw new DeliveryAddressMovedException();
+        }
     }
 
     /**

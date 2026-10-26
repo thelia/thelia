@@ -47,6 +47,12 @@ enum CheckoutViolationCode: string
     case DeliveryDestinationRestricted = 'delivery-destination-restricted';
 
     /**
+     * The delivery address was moved to another country, state, postal code or city after
+     * the carrier was chosen: the address has to be chosen again on the delivery step.
+     */
+    case DeliveryAddressMoved = 'delivery-address-moved';
+
+    /**
      * The carrier offers delivery dates and none, or no slot, was picked.
      */
     case DeliveryDateMissing = 'delivery-date-missing';

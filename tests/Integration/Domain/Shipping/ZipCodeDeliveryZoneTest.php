@@ -29,6 +29,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Checkout\Exception\DeliveryAddressMovedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Shipping\Service\DeliveryModuleEligibilityChecker;
 use Thelia\Domain\Shipping\Service\PostageEstimator;
@@ -303,7 +304,9 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
 
     /**
      * The customer address moved abroad after it was chosen: the cart's copy, which the order
-     * leaves for and the guard judges, still decides the country, the state and the postal code.
+     * leaves for, still decides the country, the state and the postal code of the list. The
+     * guard refuses the order until the address is chosen again, which asks the carriers of
+     * the new place.
      */
     public function testTheListJudgesTheCartCopyOfACustomerAddressThatMovedSince(): void
     {
@@ -318,6 +321,7 @@ final class ZipCodeDeliveryZoneTest extends IntegrationTestCase
         self::assertContains($this->module->getId(), $this->offeredModuleIds($cart), 'The list reads the copy, as the guard does.');
 
         $cart->setDeliveryModuleId($this->module->getId())->save($this->getPropelConnection());
+        $this->expectException(DeliveryAddressMovedException::class);
         $this->getService(CartGuard::class)->checkValidDelivery($cart);
     }
 
