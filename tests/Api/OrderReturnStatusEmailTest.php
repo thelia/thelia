@@ -21,14 +21,17 @@ use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Event\OrderHistoryEvent;
 use Thelia\Model\Map\ConfigTableMap;
 use Thelia\Model\Order;
+use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\OrderReturn;
@@ -66,12 +69,24 @@ final class OrderReturnStatusEmailTest extends ApiTestCase
      */
     private array $announced = [];
 
+    /**
+     * The nested transaction count each RETURN_OPENED line was inserted at.
+     *
+     * @var list<int>
+     */
+    private array $openingInsertions = [];
+
     private int $baselineNestedTransactions;
 
     /**
      * @var callable(OrderReturnEvent): void
      */
     private $observer;
+
+    /**
+     * @var callable(OrderHistoryEvent): void
+     */
+    private $insertionObserver;
 
     protected function setUp(): void
     {
@@ -104,11 +119,19 @@ final class OrderReturnStatusEmailTest extends ApiTestCase
             ];
         };
         $this->eventDispatcher->addListener(TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL, $this->observer, 256);
+
+        $this->insertionObserver = function (OrderHistoryEvent $event): void {
+            if (OrderHistoryEventType::RETURN_OPENED->value === $event->getModel()->getEventType()) {
+                $this->openingInsertions[] = $this->getPropelConnection()->getNestedTransactionCount();
+            }
+        };
+        $this->eventDispatcher->addListener(OrderHistoryEvent::POST_INSERT, $this->insertionObserver);
     }
 
     protected function tearDown(): void
     {
         $this->eventDispatcher->removeListener(TheliaEvents::ORDER_RETURN_SEND_STATUS_EMAIL, $this->observer);
+        $this->eventDispatcher->removeListener(OrderHistoryEvent::POST_INSERT, $this->insertionObserver);
         OrderReturnStatusQuery::resetCache();
 
         try {
@@ -214,6 +237,113 @@ final class OrderReturnStatusEmailTest extends ApiTestCase
         self::assertCount(3, $this->mailsTo($customer), 'ORDER_RETURN_RECEIVE');
         self::assertSame(OrderHistoryEventType::RETURN_RECEIVED->value, $this->lastHistoryLine(2));
         self::assertCount(3, $this->announced);
+    }
+
+    /**
+     * The API processors do not dispatch ORDER_RETURN_CREATE, so the line that
+     * opens a return on the order is theirs to write: once, after the commit,
+     * before the mail that announces it, under the name of whoever opened it.
+     */
+    public function testAFrontCreationWritesTheOpeningLineBeforeTheMailUnderTheCustomer(): void
+    {
+        $customer = $this->customer();
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()->filterByOrderId((int) $order->getId())->findOne($this->getPropelConnection());
+        self::assertNotNull($created);
+
+        $lines = $this->openingLinesOf($order);
+        self::assertCount(1, $lines, 'One line is owed for the opening of the return.');
+        self::assertSame(OrderHistoryActorType::CUSTOMER->value, $lines[0]->getActorType());
+        self::assertSame($customer->getRef(), $lines[0]->getActorLabel());
+        self::assertSame(['return_ref' => $created->getRef()], json_decode((string) $lines[0]->getPayload(), true, flags: \JSON_THROW_ON_ERROR));
+        self::assertSame(OrderHistoryEventType::RETURN_OPENED->value, $this->lastHistoryLine(0), 'The mail went out before the line that records the opening.');
+        self::assertSame([$this->baselineNestedTransactions], $this->openingInsertions, 'The line was written while the transaction of the write was still open.');
+        self::assertCount(1, $this->announced);
+    }
+
+    public function testAnAdminCreationWritesTheOpeningLineBeforeTheMailUnderTheAdministrator(): void
+    {
+        $customer = $this->customer();
+        $admin = $this->createFixtureFactory()->admin(['password' => 'password']);
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $response = $this->jsonRequest(
+            'POST',
+            '/api/admin/order_returns',
+            [
+                'order' => '/api/admin/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/admin/order_products/'.$orderProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsAdmin($admin),
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+
+        $created = OrderReturnQuery::create()->filterByOrderId((int) $order->getId())->findOne($this->getPropelConnection());
+        self::assertNotNull($created);
+
+        $lines = $this->openingLinesOf($order);
+        self::assertCount(1, $lines, 'One line is owed for the opening of the return.');
+        self::assertSame(OrderHistoryActorType::ADMIN->value, $lines[0]->getActorType());
+        self::assertSame($admin->getLogin(), $lines[0]->getActorLabel());
+        self::assertSame((int) $admin->getId(), $lines[0]->getAdminId());
+        self::assertSame(['return_ref' => $created->getRef()], json_decode((string) $lines[0]->getPayload(), true, flags: \JSON_THROW_ON_ERROR));
+        self::assertSame(OrderHistoryEventType::RETURN_OPENED->value, $this->lastHistoryLine(0), 'The mail went out before the line that records the opening.');
+        self::assertSame([$this->baselineNestedTransactions], $this->openingInsertions, 'The line was written while the transaction of the write was still open.');
+        self::assertCount(1, $this->announced);
+    }
+
+    public function testARefusedCreationWritesNoOpeningLine(): void
+    {
+        $customer = $this->customer();
+        $stranger = $this->customer();
+        [$strangerOrder, $strangerProduct] = $this->paidOrderWithProduct($stranger);
+        [$order, $orderProduct] = $this->paidOrderWithProduct($customer);
+
+        $front = $this->jsonRequest(
+            'POST',
+            '/api/front/account/order_returns',
+            [
+                'order' => '/api/front/account/orders/'.$strangerOrder->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/front/account/order_products/'.$strangerProduct->getId(), 'quantity' => 1.0],
+                ],
+            ],
+            token: $this->authenticateAsCustomer($customer),
+        );
+        $admin = $this->jsonRequest(
+            'POST',
+            '/api/admin/order_returns',
+            [
+                'order' => '/api/admin/orders/'.$order->getId(),
+                'orderReturnLines' => [
+                    ['orderProduct' => '/api/admin/order_products/'.$orderProduct->getId(), 'quantity' => 99.0],
+                ],
+            ],
+            token: $this->authenticateAsAdmin(),
+        );
+
+        self::assertGreaterThanOrEqual(400, $front->getStatusCode());
+        self::assertSame(422, $admin->getStatusCode());
+        self::assertSame([], $this->openingLinesOf($strangerOrder));
+        self::assertSame([], $this->openingLinesOf($order));
     }
 
     public function testAMailIsOnlySentOnceTheWriteIsCommitted(): void
@@ -385,6 +515,19 @@ final class OrderReturnStatusEmailTest extends ApiTestCase
         $history = $this->announced[$announcement]['history'] ?? [];
 
         return [] === $history ? null : $history[array_key_last($history)];
+    }
+
+    /**
+     * @return list<OrderHistory>
+     */
+    private function openingLinesOf(Order $order): array
+    {
+        return array_values(OrderHistoryQuery::create()
+            ->filterByOrderId((int) $order->getId())
+            ->filterByEventType(OrderHistoryEventType::RETURN_OPENED->value)
+            ->orderById()
+            ->find($this->getPropelConnection())
+            ->getData());
     }
 
     /**

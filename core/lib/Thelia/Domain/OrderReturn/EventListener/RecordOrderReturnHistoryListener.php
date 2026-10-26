@@ -19,7 +19,7 @@ use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
-use Thelia\Model\OrderReturn;
+use Thelia\Domain\OrderReturn\Service\OrderReturnHistoryRecorder;
 
 /**
  * Writes what happens to a return in the history of the order it came from.
@@ -59,6 +59,7 @@ readonly class RecordOrderReturnHistoryListener
 
     public function __construct(
         private OrderHistoryRecorder $orderHistoryRecorder,
+        private OrderReturnHistoryRecorder $returnHistoryRecorder,
     ) {
         $this->statusCodeBeforeChange = new \WeakMap();
     }
@@ -66,18 +67,7 @@ readonly class RecordOrderReturnHistoryListener
     #[AsEventListener(event: TheliaEvents::ORDER_RETURN_CREATE, priority: 64)]
     public function onReturnOpened(OrderReturnEvent $event): void
     {
-        $return = $event->getOrderReturn();
-        $orderId = $return->getOrderId();
-
-        if (null === $orderId) {
-            return;
-        }
-
-        $this->orderHistoryRecorder->record(
-            $orderId,
-            OrderHistoryEventType::RETURN_OPENED->value,
-            $this->referencePayload($return),
-        );
+        $this->returnHistoryRecorder->recordOpened($event->getOrderReturn());
     }
 
     /**
@@ -123,7 +113,7 @@ readonly class RecordOrderReturnHistoryListener
         $this->orderHistoryRecorder->record(
             $orderId,
             OrderHistoryEventType::RETURN_STATUS_CHANGED->value,
-            $this->referencePayload($return) + ['from' => $fromStatusCode, 'to' => $toStatusCode],
+            $this->returnHistoryRecorder->referencePayload($return) + ['from' => $fromStatusCode, 'to' => $toStatusCode],
         );
     }
 
@@ -146,21 +136,7 @@ readonly class RecordOrderReturnHistoryListener
         $this->orderHistoryRecorder->record(
             $orderId,
             OrderHistoryEventType::RETURN_RECEIVED->value,
-            $this->referencePayload($return),
+            $this->returnHistoryRecorder->referencePayload($return),
         );
-    }
-
-    /**
-     * The reference of the return, which is what tells two returns of the same order
-     * apart — both for the merchant reading the line and for the deduplication the
-     * recorder applies on an identical payload.
-     *
-     * @return array<string, string>
-     */
-    private function referencePayload(OrderReturn $return): array
-    {
-        $reference = $return->getRef();
-
-        return null === $reference || '' === $reference ? [] : ['return_ref' => $reference];
     }
 }

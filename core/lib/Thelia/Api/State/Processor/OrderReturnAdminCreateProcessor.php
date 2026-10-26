@@ -23,6 +23,7 @@ use Thelia\Api\Resource\OrderReturn as OrderReturnResource;
 use Thelia\Api\Service\OrderReturnHydrator;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\OrderReturn\Service\OrderReturnHistoryRecorder;
 use Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher;
 use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
@@ -46,13 +47,14 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
         private OrderReturnStatusEmailDispatcher $statusEmailDispatcher,
         private AdminSaleUnitScope $adminSaleUnitScope,
         private OrderReturnWriteTransactionInterface $transaction,
+        private OrderReturnHistoryRecorder $historyRecorder,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof OrderReturnResource) {
-            return $this->dispatchStatusEmail(
+            return $this->announceCreation(
                 $this->persistProcessor->process($data, $operation, $uriVariables, $context),
             );
         }
@@ -88,17 +90,24 @@ final readonly class OrderReturnAdminCreateProcessor implements ProcessorInterfa
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         }
 
-        return $this->dispatchStatusEmail($result);
+        return $this->announceCreation($result);
     }
 
     /**
-     * Announces the return to the customer once it is committed, never from
-     * inside the transaction: a mail is not something a rollback takes back.
+     * Announces the creation of the return, once it is committed and never from
+     * inside the transaction: first the line that opens the return on the
+     * history of its order, then the mail to the customer, so the timeline
+     * shows the gesture before the mail that follows it. A mail is not
+     * something a rollback takes back, and a line written inside the
+     * transaction would go with a rollback.
+     * ORDER_RETURN_CREATE is not dispatched here, which is what would have
+     * written the line and sent the mail.
      */
-    private function dispatchStatusEmail(mixed $result): mixed
+    private function announceCreation(mixed $result): mixed
     {
         $model = $result instanceof OrderReturnResource ? $result->getPropelModel() : null;
         if ($model instanceof OrderReturnModel) {
+            $this->historyRecorder->recordOpened($model);
             $this->statusEmailDispatcher->dispatchFor($model);
         }
 
