@@ -1595,4 +1595,67 @@ CREATE TABLE IF NOT EXISTS `order_payment_part`
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- Visitor country
+--
+-- The shop can detect the country of an anonymous visitor, from a header set by
+-- the CDN or from an IP database, and offer it or apply it. Off by default, so
+-- a shop that upgrades changes nothing; INSERT IGNORE leaves alone a shop that
+-- already chose a value.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('visitor_country_mode', 'off', 0, 0, NOW(), NOW()),
+    ('visitor_country_source', 'header', 0, 0, NOW(), NOW()),
+    ('visitor_country_header', 'CF-IPCountry', 0, 0, NOW(), NOW()),
+    ('visitor_country_database', '', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'visitor_country_mode' AS `name`, 'en_US' AS `locale`, 'Country detection of the visitor: off, suggest (offer the detected country to the visitor) or apply (use the detected country for taxes and address forms)' AS `title`
+    UNION ALL SELECT 'visitor_country_mode', 'fr_FR', 'Détection du pays du visiteur : off (désactivée), suggest (proposer le pays détecté au visiteur) ou apply (utiliser le pays détecté pour les taxes et les formulaires d''adresse)'
+    UNION ALL SELECT 'visitor_country_mode', 'de_DE', 'Länderermittlung des Besuchers: off (aus), suggest (dem Besucher das erkannte Land vorschlagen) oder apply (das erkannte Land für Steuern und Adressformulare verwenden)'
+    UNION ALL SELECT 'visitor_country_mode', 'es_ES', 'Detección del país del visitante: off (desactivada), suggest (proponer al visitante el país detectado) o apply (usar el país detectado para los impuestos y los formularios de dirección)'
+    UNION ALL SELECT 'visitor_country_mode', 'nl_NL', 'Landdetectie van de bezoeker: off (uit), suggest (het gedetecteerde land aan de bezoeker voorstellen) of apply (het gedetecteerde land gebruiken voor belastingen en adresformulieren)'
+    UNION ALL SELECT 'visitor_country_mode', 'ru_RU', 'Определение страны посетителя: off (выключено), suggest (предложить посетителю найденную страну) или apply (использовать найденную страну для налогов и форм адреса)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'visitor_country_source' AS `name`, 'en_US' AS `locale`, 'Where the country of the visitor is read: header (a header set by the CDN or the proxy) or ip_database (a MaxMind database that the shop installs in local/geoip)' AS `title`
+    UNION ALL SELECT 'visitor_country_source', 'fr_FR', 'Origine du pays du visiteur : header (un en-tête posé par le CDN ou le proxy) ou ip_database (une base MaxMind que la boutique installe dans local/geoip)'
+    UNION ALL SELECT 'visitor_country_source', 'de_DE', 'Quelle des Besucherlands: header (ein vom CDN oder Proxy gesetzter Header) oder ip_database (eine MaxMind-Datenbank, die der Shop in local/geoip ablegt)'
+    UNION ALL SELECT 'visitor_country_source', 'es_ES', 'Origen del país del visitante: header (una cabecera añadida por el CDN o el proxy) o ip_database (una base MaxMind que la tienda instala en local/geoip)'
+    UNION ALL SELECT 'visitor_country_source', 'nl_NL', 'Bron van het land van de bezoeker: header (een header van de CDN of de proxy) of ip_database (een MaxMind-database die de winkel in local/geoip plaatst)'
+    UNION ALL SELECT 'visitor_country_source', 'ru_RU', 'Источник страны посетителя: header (заголовок, добавленный CDN или прокси) или ip_database (база MaxMind, которую магазин размещает в local/geoip)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'visitor_country_header' AS `name`, 'en_US' AS `locale`, 'Name of the HTTP header that carries the country code of the visitor when the source is header (e.g. CF-IPCountry)' AS `title`
+    UNION ALL SELECT 'visitor_country_header', 'fr_FR', 'Nom de l''en-tête HTTP qui porte le code pays du visiteur quand la source est header (ex. CF-IPCountry)'
+    UNION ALL SELECT 'visitor_country_header', 'de_DE', 'Name des HTTP-Headers mit dem Ländercode des Besuchers, wenn die Quelle header ist (z. B. CF-IPCountry)'
+    UNION ALL SELECT 'visitor_country_header', 'es_ES', 'Nombre de la cabecera HTTP que lleva el código de país del visitante cuando el origen es header (p. ej. CF-IPCountry)'
+    UNION ALL SELECT 'visitor_country_header', 'nl_NL', 'Naam van de HTTP-header met de landcode van de bezoeker wanneer de bron header is (bijv. CF-IPCountry)'
+    UNION ALL SELECT 'visitor_country_header', 'ru_RU', 'Имя HTTP-заголовка с кодом страны посетителя, если источник header (например, CF-IPCountry)'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `labels`.`locale`, `labels`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN (
+    SELECT 'visitor_country_database' AS `name`, 'en_US' AS `locale`, 'File name of the MaxMind country database (.mmdb) inside local/geoip, when the source is ip_database' AS `title`
+    UNION ALL SELECT 'visitor_country_database', 'fr_FR', 'Nom du fichier de la base pays MaxMind (.mmdb) dans local/geoip, quand la source est ip_database'
+    UNION ALL SELECT 'visitor_country_database', 'de_DE', 'Dateiname der MaxMind-Länderdatenbank (.mmdb) in local/geoip, wenn die Quelle ip_database ist'
+    UNION ALL SELECT 'visitor_country_database', 'es_ES', 'Nombre del archivo de la base de países MaxMind (.mmdb) dentro de local/geoip, cuando el origen es ip_database'
+    UNION ALL SELECT 'visitor_country_database', 'nl_NL', 'Bestandsnaam van de MaxMind-landendatabase (.mmdb) in local/geoip, wanneer de bron ip_database is'
+    UNION ALL SELECT 'visitor_country_database', 'ru_RU', 'Имя файла базы стран MaxMind (.mmdb) в local/geoip, если источник ip_database'
+) AS `labels` ON `labels`.`name` = `config`.`name`;
+
 SET FOREIGN_KEY_CHECKS = 1;

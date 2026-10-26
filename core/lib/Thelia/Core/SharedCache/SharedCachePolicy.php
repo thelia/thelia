@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
+use Thelia\Domain\Localization\VisitorCountry\VisitorCountrySource;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Model\ConfigQuery;
 
@@ -127,6 +129,13 @@ final readonly class SharedCachePolicy
         }
 
         if ($response->headers->hasCacheControlDirective('no-store') || !$this->keyCollector->isComplete()) {
+            return false;
+        }
+
+        // A page priced or offered in the country of the visitor cannot be told apart by an
+        // address: only a header can be a cache key, so a country read from the IP is personal.
+        if (VisitorCountryMode::Off !== VisitorCountryMode::fromShopConfiguration()
+            && VisitorCountrySource::IpDatabase === VisitorCountrySource::fromShopConfiguration()) {
             return false;
         }
 

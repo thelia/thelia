@@ -110,7 +110,11 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (99, 'order_return_order_statuses', '', 0, 0, NOW(), NOW()),
 (100, 'shared_cache_mode', 'disabled', 0, 0, NOW(), NOW()),
 (101, 'shared_cache_ttl', '300', 0, 0, NOW(), NOW()),
-(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW())
+(102, 'coupon_unpaid_order_hold_days', '7', 0, 0, NOW(), NOW()),
+(103, 'visitor_country_mode', 'off', 0, 0, NOW(), NOW()),
+(104, 'visitor_country_source', 'header', 0, 0, NOW(), NOW()),
+(105, 'visitor_country_header', 'CF-IPCountry', 0, 0, NOW(), NOW()),
+(106, 'visitor_country_database', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2327,7 +2331,11 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (99, '{{ locale }}', {{ intl('Order statuses a customer may open a return on, comma separated status codes (empty: any paid status)', locale) }}, NULL, NULL, NULL),
     (100, '{{ locale }}', {{ intl('Shared cache for anonymous public pages: disabled, announce (the page states how long a shared cache may keep it, cookies untouched) or enabled (also removes the cookies of an anonymous page so that a proxy can keep it)', locale) }}, NULL, NULL, NULL),
     (101, '{{ locale }}', {{ intl('Seconds a shared cache may keep a public page (between 1 and 86400, 300 when invalid)', locale) }}, NULL, NULL, NULL),
-    (102, '{{ locale }}', {{ intl('Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (102, '{{ locale }}', {{ intl('Days an unpaid order holds the coupon usages it was placed with (0: an unpaid order holds none)', locale) }}, NULL, NULL, NULL),
+    (103, '{{ locale }}', {{ intl('Country detection of the visitor: off, suggest (offer the detected country to the visitor) or apply (use the detected country for taxes and address forms)', locale) }}, NULL, NULL, NULL),
+    (104, '{{ locale }}', {{ intl('Where the country of the visitor is read: header (a header set by the CDN or the proxy) or ip_database (a MaxMind database that the shop installs in local/geoip)', locale) }}, NULL, NULL, NULL),
+    (105, '{{ locale }}', {{ intl('Name of the HTTP header that carries the country code of the visitor when the source is header (e.g. CF-IPCountry)', locale) }}, NULL, NULL, NULL),
+    (106, '{{ locale }}', {{ intl('File name of the MaxMind country database (.mmdb) inside local/geoip, when the source is ip_database', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Localization\VisitorCountryFacade;
 use Thelia\Model\Country;
 use Thelia\Model\Customer;
 use Thelia\Model\State;
@@ -35,6 +36,8 @@ class TaxEngine
     public function __construct(
         protected RequestStack $requestStack,
         protected EventDispatcherInterface $dispatcher,
+        // Optional: a test or a theme may build the engine by hand with the two arguments it had.
+        protected ?VisitorCountryFacade $visitorCountry = null,
     ) {
     }
 
@@ -42,7 +45,8 @@ class TaxEngine
      * Find Tax Country ID
      * First look for a picked delivery address country
      * Then look at the current customer default address country
-     * Else look at the default website country.
+     * Else, for a visitor with no account, the country the visitor shops in
+     * (the detected one when the shop applies it), else the default website country.
      */
     public function getDeliveryCountry(): Country
     {
@@ -65,7 +69,7 @@ class TaxEngine
         $customer = $this->getSession()?->getCustomerUser();
 
         if (!$customer) {
-            $this->taxCountry = Country::getDefaultCountry();
+            $this->taxCountry = $this->visitorCountry?->currentCountry() ?? Country::getDefaultCountry();
             $this->taxState = null;
 
             return $this->taxCountry;
