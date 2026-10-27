@@ -369,6 +369,7 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
     public function testOnTheDomainOfTheLanguageOfTheCountryThereIsNoBannerAndTheCountryIsRetained(): void
     {
         $this->languageOfBelgium('https://be.example.test');
+        $this->settings['one_domain_foreach_lang'] ??= (string) ConfigQuery::read('one_domain_foreach_lang', '0');
 
         $crawler = $this->visitorFrom('suggest', ['one_domain_foreach_lang' => '1'], 'https://be.example.test/?lang=nl_BE');
 
