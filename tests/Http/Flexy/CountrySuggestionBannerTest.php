@@ -181,6 +181,28 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
         self::assertCount(0, $next->filter(self::BANNER));
     }
 
+    /**
+     * The token is the stateless one: it is the same for every visitor, so a banner kept
+     * by a cache or a Turbo snapshot still answers to the session of whoever reads it.
+     */
+    public function testTheTokenOfAnotherVisitorIsAcceptedBecauseItIsStateless(): void
+    {
+        $tokenOfTheOtherVisitor = $this->tokenOf($this->visitorFrom('suggest'));
+
+        $this->client->getCookieJar()->clear();
+        $this->client->request('GET', '/', server: ['HTTP_CF_IPCOUNTRY' => 'BE']);
+        self::assertResponseIsSuccessful();
+
+        $this->client->request('POST', $this->url(self::ACCEPT_ROUTE), [
+            'country_id' => (string) $this->belgium?->getId(),
+            '_token' => $tokenOfTheOtherVisitor,
+            'redirect' => '/contact',
+        ]);
+
+        self::assertResponseRedirects('/contact', 303);
+        self::assertSame($this->belgium?->getId(), $this->sessionValue(VisitorCountrySession::ID_KEY));
+    }
+
     public function testAForgedTokenIsRefusedAndNothingIsRemembered(): void
     {
         $this->visitorFrom('suggest');
@@ -242,6 +264,40 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
         self::assertCount(1, $crawler->filter(self::BANNER.' form[action="'.$this->url(self::DECLINE_ROUTE).'"]'), 'Closing stays a POST.');
     }
 
+    /**
+     * With two languages of the country the offer is the same one on every page: the first
+     * by position, not by whatever order the database answers in.
+     */
+    public function testWithTwoLanguagesOfTheCountryTheFirstByPositionIsOffered(): void
+    {
+        $this->languageOfBelgium('https://be.example.test');
+        $this->languageOfBelgium('https://fr-be.example.test', 'fr_BE', 'bf', 98);
+        $this->settings['one_domain_foreach_lang'] ??= (string) ConfigQuery::read('one_domain_foreach_lang', '0');
+
+        $crawler = $this->visitorFrom('suggest', ['one_domain_foreach_lang' => '1']);
+
+        self::assertCount(1, $crawler->filter(self::BANNER.' a[href="/?lang=fr_BE"]'));
+        self::assertCount(0, $crawler->filter(self::BANNER.' a[href="/?lang=nl_BE"]'));
+    }
+
+    /**
+     * A path that starts with two slashes must not give a link that the browser reads as
+     * the address of another host.
+     */
+    public function testAPathWithTwoLeadingSlashesGivesALinkOnTheSameSite(): void
+    {
+        $this->languageOfBelgium('https://be.example.test');
+        $this->settings['one_domain_foreach_lang'] ??= (string) ConfigQuery::read('one_domain_foreach_lang', '0');
+
+        $this->visitorFrom('suggest', ['one_domain_foreach_lang' => '1']);
+        // The router answers a double slash with the page of a missing address, which wears the theme and its banner.
+        $crawler = $this->client->request('GET', 'https://localhost//contact', server: ['HTTP_CF_IPCOUNTRY' => 'BE']);
+
+        $link = $crawler->filter(self::BANNER.' a[href*="lang=nl_BE"]');
+        self::assertCount(1, $link);
+        self::assertSame('/contact?lang=nl_BE', $link->attr('href'));
+    }
+
     public function testALanguageWithoutADomainDoesNotTurnAcceptingIntoALink(): void
     {
         $this->languageOfBelgium('');
@@ -277,22 +333,32 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
     }
 
     /**
-     * Two pages for one URL are only safe in a shared cache if the response says it varies
-     * on the header.
+     * Two pages for one URL are only safe in a shared cache if the shop never shares them:
+     * while the detection is active the page of a visitor is personal.
      */
-    public function testTheSharedCacheVariesOnTheHeaderOfTheCountry(): void
+    public function testWhileTheDetectionIsActiveThePageIsNotPublic(): void
     {
-        [$belgian, $french] = $this->twoVisitorsOfTheSameUrl();
+        $this->client->request('GET', '/');
+        self::assertResponseIsSuccessful();
+
+        ConfigQuery::write(SharedCacheMode::CONFIG_KEY, SharedCacheMode::ENABLED->value);
+        ConfigQuery::resetCache();
+        $this->client->getCookieJar()->clear();
+        $this->client->request('GET', '/', server: ['HTTP_CF_IPCOUNTRY' => 'BE']);
+        $before = $this->client->getResponse();
 
         // The same reservation as SharedCachePublicPagesTest: a theme or a module that reads a
-        // resource the shared cache list does not name keeps its pages personal, and a personal
-        // page has no Vary to read. The header is pinned on its own by VisitorCountrySharedCacheTest.
-        if (!$belgian['response']->headers->hasCacheControlDirective('public')) {
-            self::markTestSkipped('The home page of the installed theme is not shareable in the test shop: '.$belgian['response']->headers->get('Cache-Control'));
+        // resource the shared cache list does not name keeps its pages personal, and the page
+        // could not be told from one the detection made personal.
+        if (!$before->headers->hasCacheControlDirective('public')) {
+            self::markTestSkipped('The home page of the installed theme is not shareable in the test shop: '.$before->headers->get('Cache-Control'));
         }
 
+        [$belgian, $french] = $this->twoVisitorsOfTheSameUrl();
+
         foreach ([$belgian, $french] as $visitor) {
-            self::assertContains('CF-IPCountry', $visitor['response']->getVary());
+            self::assertFalse($visitor['response']->headers->hasCacheControlDirective('public'));
+            self::assertNotContains('CF-IPCountry', $visitor['response']->getVary());
         }
     }
 
@@ -335,12 +401,12 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
         return $visitors;
     }
 
-    private function languageOfBelgium(string $url): void
+    private function languageOfBelgium(string $url, string $locale = 'nl_BE', string $code = 'be', int $position = 99): void
     {
         (new Lang())
-            ->setTitle('Nederlands (Belgie)')
-            ->setCode('be')
-            ->setLocale('nl_BE')
+            ->setTitle($locale)
+            ->setCode($code)
+            ->setLocale($locale)
             ->setUrl($url)
             ->setActive(1)
             ->setVisible(1)
@@ -350,14 +416,13 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
             ->setDecimalSeparator(',')
             ->setThousandsSeparator('.')
             ->setDecimals('2')
-            ->setPosition(99)
+            ->setPosition($position)
             ->save($this->getPropelConnection());
     }
 
     /**
      * The first request opens the session: a config written before it loses it.
-     */
-    /**
+     *
      * @param array<string, string> $more other shop settings, written with the mode
      */
     private function visitorFrom(string $mode, array $more = [], string $url = '/'): Crawler

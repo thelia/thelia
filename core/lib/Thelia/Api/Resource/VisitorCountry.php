@@ -40,6 +40,8 @@ use Thelia\Api\Controller\Front\VisitorCountryController;
                     ),
                 ],
             ),
+            // Public on purpose: the answer is the detection of the request, nothing of the visitor.
+            security: 'true',
             read: false,
             write: false,
         ),

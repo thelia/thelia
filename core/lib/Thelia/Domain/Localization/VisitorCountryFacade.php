@@ -98,11 +98,17 @@ final readonly class VisitorCountryFacade
     }
 
     /**
-     * @return bool false when the country is not one the shop shows, or there is no session to remember it
+     * Only the country the shop detected for this visitor can be accepted: the posted
+     * identifier is the visitor's to forge.
+     *
+     * @return bool false when the detection is off, the country is not the detected one or not one the shop shows, or there is no session to remember it
      */
     public function accept(int $countryId): bool
     {
-        if (null === $this->visibleCountry($countryId) || !$this->session->isAvailable()) {
+        if (VisitorCountryMode::Off === $this->mode()
+            || $countryId !== $this->session->detectedCountryId()
+            || null === $this->visibleCountry($countryId)
+            || !$this->session->isAvailable()) {
             return false;
         }
 
@@ -114,6 +120,8 @@ final readonly class VisitorCountryFacade
 
     public function decline(): void
     {
+        // A country kept from a time the shop applied it is not the visitor's answer.
+        $this->session->forget();
         $this->session->markAnswered();
     }
 
