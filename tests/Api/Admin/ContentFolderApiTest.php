@@ -69,7 +69,7 @@ final class ContentFolderApiTest extends ApiTestCase
             'position' => 1,
             'defaultFolder' => '/api/admin/folders/'.$folder->getId(),
             'i18ns' => [
-                'en_US' => ['title' => 'About Us', 'locale' => 'en_US'],
+                'en_US' => ['title' => 'About Us', 'locale' => 'en_US', 'description' => '<p>Who we are</p>'],
             ],
         ], $token);
 

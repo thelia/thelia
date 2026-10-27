@@ -135,7 +135,7 @@ final class LinkPositionReadTest extends IntegrationTestCase
         $folder = $this->folderWithNumberedContents(returnModel: true);
 
         $content = new Content();
-        $content->setVisible(1)->setLocale('en_US')->setTitle('Extra content')->save($connection);
+        $content->setVisible(1)->setLocale('en_US')->setTitle('Extra content')->setDescription('<p>A body</p>')->save($connection);
 
         $link = new ContentFolder();
         $link->setContent($content);
@@ -181,7 +181,7 @@ final class LinkPositionReadTest extends IntegrationTestCase
 
         foreach (self::POSITIONS as $position) {
             $content = new Content();
-            $content->setVisible(1)->setLocale('en_US')->setTitle('Content '.$position)->save($connection);
+            $content->setVisible(1)->setLocale('en_US')->setTitle('Content '.$position)->setDescription('<p>A body</p>')->save($connection);
 
             $link = new ContentFolder();
             $link->setContent($content);

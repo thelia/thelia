@@ -175,6 +175,22 @@ final class ContentPublicationApiTest extends ApiTestCase
         self::assertSame(0, (int) ContentQuery::create()->findPk($draft->getId())->getVisible());
     }
 
+    public function testTheAdminApiCannotCreateAnEmptyContentOnline(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $folder = $this->factory->folder();
+
+        $response = $this->jsonRequest('POST', '/api/admin/contents', [
+            'visible' => true,
+            'defaultFolder' => '/api/admin/folders/'.$folder->getId(),
+            'i18ns' => ['en_US' => ['title' => 'Created online, empty', 'locale' => 'en_US']],
+        ], $token);
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertStringContainsString('no body in the default language', (string) $response->getContent());
+        self::assertSame(0, ContentQuery::create()->useContentI18nQuery()->filterByTitle('Created online, empty')->endUse()->count());
+    }
+
     public function testAContentHiddenThroughTheAdminApiIsNotPutBackOnlineByTheScheduledCommand(): void
     {
         $token = $this->authenticateAsAdmin();
