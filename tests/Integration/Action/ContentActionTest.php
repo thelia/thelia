@@ -19,6 +19,7 @@ use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -34,7 +35,7 @@ final class ContentActionTest extends ActionIntegrationTestCase
             ->setTitle('Article One')
             ->setLocale('en_US')
             ->setDefaultFolder($folder->getId())
-            ->setVisible(1);
+            ->setVisible(0);
 
         $this->dispatch($event, TheliaEvents::CONTENT_CREATE);
 
@@ -48,6 +49,31 @@ final class ContentActionTest extends ActionIntegrationTestCase
             ->findOne();
         self::assertNotNull($link);
         self::assertSame($folder->getId(), $link->getFolderId());
+    }
+
+    /**
+     * The creation event carries no body: a content created online through it would be
+     * online and empty, so it is refused and nothing is written. A caller creates a
+     * draft, writes the body, then publishes.
+     */
+    public function testCreatingAContentOnlineThroughTheEventIsRefused(): void
+    {
+        $folder = $this->factory->folder(0, ['title' => 'Docs']);
+
+        $event = new ContentCreateEvent();
+        $event
+            ->setTitle('Created online, empty')
+            ->setLocale('en_US')
+            ->setDefaultFolder($folder->getId())
+            ->setVisible(1);
+
+        try {
+            $this->dispatch($event, TheliaEvents::CONTENT_CREATE);
+            self::fail('A content was created online with no body.');
+        } catch (EmptyContentPublicationException) {
+        }
+
+        self::assertSame(0, ContentQuery::create()->useContentI18nQuery()->filterByTitle('Created online, empty')->endUse()->count());
     }
 
     public function testUpdateChangesI18nFields(): void
