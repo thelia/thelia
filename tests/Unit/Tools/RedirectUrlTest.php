@@ -44,6 +44,7 @@ final class RedirectUrlTest extends TestCase
         yield 'same host, scheme in capitals' => ['HTTPS://shop.example.com/cart'];
         yield 'relative path carrying an absolute url in its query' => ['/customer/login?next=https://shop.example.com/cart'];
         yield 'relative path with a colon in its query' => ['/agenda?from=10:30'];
+        yield 'space inside a path' => ['/my cart'];
     }
 
     public static function unsafeUrls(): iterable
@@ -59,5 +60,11 @@ final class RedirectUrlTest extends TestCase
         yield 'host lookalike' => ['https://shop.example.com.evil.net/cart'];
         yield 'javascript scheme in capitals' => ['JAVASCRIPT:alert(1)'];
         yield 'absolute url without a host' => ['https:///cart'];
+        yield 'tab that a browser drops to make a protocol relative url' => ["/\t/evil.example.net"];
+        yield 'carriage return inside' => ["/\r/evil.example.net"];
+        yield 'line feed inside' => ["/\n/evil.example.net"];
+        yield 'line feed in the query' => ["/cart?a=1\nb=2"];
+        yield 'null byte' => ["/cart\0.php"];
+        yield 'delete character' => ["/cart\x7F"];
     }
 }

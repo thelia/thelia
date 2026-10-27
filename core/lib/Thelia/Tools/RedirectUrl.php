@@ -26,13 +26,14 @@ final class RedirectUrl
     /**
      * A redirection URL is safe when it is a relative path, or an absolute http(s)
      * URL whose host is the one being browsed. Protocol-relative URLs, backslash
-     * tricks and non-http schemes (javascript:, data:, file:, ...) are rejected.
+     * tricks, control characters (a browser drops a tab or a line break inside a URL, which
+     * turns "/\t/evil.com" into "//evil.com") and non-http schemes (javascript:, data:, file:, ...) are rejected.
      */
     public static function isSafe(string $url, string $currentHost): bool
     {
         $url = trim($url);
 
-        if ('' === $url || str_starts_with($url, '//') || str_contains($url, '\\')) {
+        if ('' === $url || str_starts_with($url, '//') || str_contains($url, '\\') || 1 === preg_match('/[\x00-\x1F\x7F]/', $url)) {
             return false;
         }
 
