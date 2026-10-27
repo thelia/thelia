@@ -64,6 +64,16 @@ final readonly class VisitorCountrySession
         $this->session()?->set(self::ID_KEY, $countryId);
     }
 
+    /**
+     * What the shop applies is not an answer of the visitor: an earlier refusal is lifted,
+     * or the country applied would count as accepted once the shop offers it again.
+     */
+    public function retainApplied(int $countryId): void
+    {
+        $this->session()?->set(self::ID_KEY, $countryId);
+        $this->session()?->remove(self::ANSWERED_KEY);
+    }
+
     public function forget(): void
     {
         $this->session()?->remove(self::ID_KEY);

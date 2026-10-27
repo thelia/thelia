@@ -79,7 +79,7 @@ final readonly class VisitorCountryListener
         // shop may change while the visitor browses.
         if (VisitorCountryMode::Apply === $mode) {
             if (null === $this->session->retainedCountryId()) {
-                $this->session->retain($detectedId);
+                $this->session->retainApplied($detectedId);
             }
 
             return;

@@ -452,6 +452,22 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
         self::assertSame(Country::getDefaultCountry()->getId(), $this->facade()->currentCountry()->getId());
     }
 
+    public function testACountryTheVisitorDeclinedIsNotAppliedWhenTheShopGoesBackToSuggestMode(): void
+    {
+        $this->mode('suggest');
+        $this->belgium();
+        $this->visit('BE');
+        $this->facade()->decline();
+
+        $this->mode('apply');
+        $this->visit('BE');
+
+        $this->mode('suggest');
+        $this->visit('BE');
+
+        self::assertSame(Country::getDefaultCountry()->getId(), $this->facade()->currentCountry()->getId());
+    }
+
     public function testDecliningEndsTheSuggestionAndKeepsTheDefaultCountry(): void
     {
         $this->mode('suggest');
