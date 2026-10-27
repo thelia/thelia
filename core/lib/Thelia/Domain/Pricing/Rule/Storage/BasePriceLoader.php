@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Pricing\Rule\Storage;
 
 use Propel\Runtime\Propel;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
@@ -27,9 +28,16 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * converted from the default currency at the rates. A sale element with no price in
  * the default currency has no price at all in the currencies it lacks, and is simply
  * absent there - it never stops the batch.
+ *
+ * The promo price and the promo flag come along in the same statement and follow the
+ * same currency rule, for the readers that start from the whole catalog price.
  */
 class BasePriceLoader
 {
+    public function __construct(private readonly CurrencyConverter $currencyConverter)
+    {
+    }
+
     /**
      * @param list<int> $productSaleElementsIds
      *
@@ -43,61 +51,69 @@ class BasePriceLoader
             return [];
         }
 
-        $defaultCurrency = Currency::getDefaultCurrency();
-        $defaultCurrencyId = (int) $defaultCurrency->getId();
-        $defaultRate = (float) $defaultCurrency->getRate();
-
-        /** @var array<int, float> $ratesByCurrencyId */
-        $ratesByCurrencyId = [];
-
-        foreach (CurrencyQuery::create()->find() as $currency) {
-            $ratesByCurrencyId[(int) $currency->getId()] = (float) $currency->getRate();
-        }
+        $defaultCurrencyId = (int) Currency::getDefaultCurrency()->getId();
+        $currencies = CurrencyQuery::create()->find();
 
         $statement = Propel::getConnection(ProductPriceTableMap::DATABASE_NAME)->query(\sprintf(
-            'SELECT pse.id AS pse_id, pse.product_id AS product_id, pp.currency_id AS currency_id, pp.price AS price, pp.from_default_currency AS from_default_currency
+            'SELECT pse.id AS pse_id, pse.product_id AS product_id, pse.promo AS promo, pp.currency_id AS currency_id, pp.price AS price, pp.promo_price AS promo_price, pp.from_default_currency AS from_default_currency
              FROM `product_sale_elements` pse
              LEFT JOIN `product_price` pp ON pp.product_sale_elements_id = pse.id
              WHERE pse.id IN (%s)',
             implode(', ', $productSaleElementsIds),
         ));
 
-        /** @var array<int, array{product_id: int, explicit: array<int, float>, default: float|null}> $rows */
+        /** @var array<int, array{product_id: int, promo: bool, explicit: array<int, array{float, float}>, default: array{float, float}|null}> $rows */
         $rows = [];
 
         foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) ?: [] as $row) {
             $pseId = (int) $row['pse_id'];
-            $rows[$pseId] ??= ['product_id' => (int) $row['product_id'], 'explicit' => [], 'default' => null];
+            $rows[$pseId] ??= ['product_id' => (int) $row['product_id'], 'promo' => (bool) $row['promo'], 'explicit' => [], 'default' => null];
 
             if (null === $row['currency_id']) {
                 continue;
             }
 
             $currencyId = (int) $row['currency_id'];
+            $pair = [(float) $row['price'], (float) $row['promo_price']];
 
             if ($currencyId === $defaultCurrencyId) {
-                $rows[$pseId]['default'] = (float) $row['price'];
+                $rows[$pseId]['default'] = $pair;
             }
 
             if (!$row['from_default_currency']) {
-                $rows[$pseId]['explicit'][$currencyId] = (float) $row['price'];
+                $rows[$pseId]['explicit'][$currencyId] = $pair;
             }
         }
 
         $prices = [];
 
         foreach ($rows as $pseId => $row) {
-            $byCurrency = [];
+            $priceByCurrency = [];
+            $promoPriceByCurrency = [];
 
-            foreach ($ratesByCurrencyId as $currencyId => $rate) {
+            foreach ($currencies as $currency) {
+                $currencyId = (int) $currency->getId();
+
                 if (isset($row['explicit'][$currencyId])) {
-                    $byCurrency[$currencyId] = $row['explicit'][$currencyId];
-                } elseif (null !== $row['default'] && $defaultRate > 0.0) {
-                    $byCurrency[$currencyId] = $row['default'] * $rate / $defaultRate;
+                    [$priceByCurrency[$currencyId], $promoPriceByCurrency[$currencyId]] = $row['explicit'][$currencyId];
+
+                    continue;
+                }
+
+                if (null === $row['default']) {
+                    continue;
+                }
+
+                $price = $this->currencyConverter->fromDefaultCurrency($row['default'][0], $currency);
+                $promoPrice = $this->currencyConverter->fromDefaultCurrency($row['default'][1], $currency);
+
+                if (null !== $price && null !== $promoPrice) {
+                    $priceByCurrency[$currencyId] = $price;
+                    $promoPriceByCurrency[$currencyId] = $promoPrice;
                 }
             }
 
-            $prices[$pseId] = new BasePrices($pseId, $row['product_id'], $byCurrency);
+            $prices[$pseId] = new BasePrices($pseId, $row['product_id'], $priceByCurrency, $promoPriceByCurrency, $row['promo']);
         }
 
         return $prices;

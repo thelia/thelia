@@ -18,7 +18,6 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\CatalogPriceRule\CatalogPriceRuleToggleActivityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
-use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CatalogPriceRule;
@@ -78,7 +77,7 @@ final class CatalogPriceRuleCartSettlementTest extends ActionIntegrationTestCase
      */
     private function newRequest(): void
     {
-        $this->getService(PricingActivityChecker::class)->reset();
+        $this->getService('services_resetter')->reset();
         $this->getService(EffectivePriceCatalog::class)->reset();
     }
 

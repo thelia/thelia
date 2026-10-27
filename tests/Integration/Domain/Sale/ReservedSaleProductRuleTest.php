@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Sale;
 
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\Sale\SaleAudienceChecker;
@@ -149,6 +151,8 @@ final class ReservedSaleProductRuleTest extends IntegrationTestCase
         $checker = new class((int) $sale->getId()) extends SaleAudienceChecker {
             public function __construct(private readonly int $saleTheFirstCustomerIsNamedOn)
             {
+                $probe = new CatalogActivityProbe();
+                parent::__construct($probe, new CustomerGroupResolver($probe));
             }
 
             public function getEntitledReservedSaleIds(?Customer $customer): array
@@ -181,7 +185,9 @@ final class ReservedSaleProductRuleTest extends IntegrationTestCase
 
     private function rule(): ReservedSaleProductRule
     {
-        return new ReservedSaleProductRule(new SaleAudienceChecker(), $this->customerProvider());
+        $probe = new CatalogActivityProbe();
+
+        return new ReservedSaleProductRule(new SaleAudienceChecker($probe, new CustomerGroupResolver($probe)), $this->customerProvider());
     }
 
     private function customerProvider(): CurrentCustomerProvider

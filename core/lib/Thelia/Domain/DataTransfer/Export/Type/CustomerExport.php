@@ -36,6 +36,8 @@ class CustomerExport extends JsonFileAbstractExport
         'customer_lastname' => 'last_name',
         'customer_email' => 'email',
         'customer_discount' => 'discount',
+        'customer_group_code' => 'customer_group',
+        'customer_group_i18n_title' => 'customer_group_title',
         'newsletter_id' => 'is_registered_to_newsletter',
         'customer_created_at' => 'sign_up_date',
         'address_company' => 'company',
@@ -61,6 +63,8 @@ class CustomerExport extends JsonFileAbstractExport
                         customer.lastname as "customer_lastname",
                         customer.email as "customer_email",
                         customer.discount as "customer_discount",
+                        customer_group.code as "customer_group_code",
+                        customer_group_i18n.title as "customer_group_i18n_title",
                         address.company as "address_company",
                         address.address1 as "address_address1",
                         address.address2 as "address_address2",
@@ -74,6 +78,8 @@ class CustomerExport extends JsonFileAbstractExport
                         customer.created_at as "customer_created_at"
                     FROM customer
                     LEFT JOIN customer_title_i18n ON customer.title_id = customer_title_i18n.id AND customer_title_i18n.locale = :locale
+                    LEFT JOIN customer_group ON customer.customer_group_id = customer_group.id
+                    LEFT JOIN customer_group_i18n ON customer_group.id = customer_group_i18n.id AND customer_group_i18n.locale = :locale
                     LEFT JOIN address ON address.customer_id = customer.id AND address.is_default = 1
                     LEFT JOIN country_i18n ON address.country_id = country_i18n.id AND country_i18n.locale = :locale
                     LEFT JOIN newsletter ON newsletter.email = customer.email

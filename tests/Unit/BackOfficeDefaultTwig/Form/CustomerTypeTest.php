@@ -86,6 +86,7 @@ final class CustomerTypeTest extends TestCase
             'title_choices' => ['Mr' => 1],
             'country_choices' => ['France' => 64],
             'lang_choices' => ['Français' => 1],
+            'group_choices' => ['Default' => 1],
             'include_address' => false,
         ]);
         $builder->add('cellphone', TextType::class, ['constraints' => [new NotBlank()], 'required' => true]);
@@ -108,6 +109,29 @@ final class CustomerTypeTest extends TestCase
         $this->assertFalse($form->isValid(), 'the default form must keep its address constraints');
     }
 
+    public function testGroupFieldIsPresentAndRequiredOnEdit(): void
+    {
+        $form = $this->createForm(['include_id' => true, 'include_address' => false]);
+
+        $this->assertTrue($form->has('customer_group_id'));
+        $this->assertTrue($form->get('customer_group_id')->getConfig()->getRequired());
+        $this->assertNull($form->get('customer_group_id')->getConfig()->getOption('placeholder'), 'an existing account always holds a group: no empty choice');
+
+        $form->submit([
+            'title' => '1', 'firstname' => 'Ada', 'lastname' => 'Lovelace', 'email' => 'ada@example.com',
+            'id' => '5', 'customer_group_id' => '',
+        ]);
+        $this->assertFalse($form->get('customer_group_id')->isValid(), 'an edit without a group must be refused');
+    }
+
+    public function testGroupFieldIsOptionalOnCreation(): void
+    {
+        $form = $this->createForm([]);
+
+        $this->assertFalse($form->get('customer_group_id')->getConfig()->getRequired());
+        $this->assertNotNull($form->get('customer_group_id')->getConfig()->getOption('placeholder'), 'left empty, the core files the account under the default group');
+    }
+
     private function formFactory(): FormFactoryInterface
     {
         return Forms::createFormFactoryBuilder()
@@ -125,6 +149,7 @@ final class CustomerTypeTest extends TestCase
             'title_choices' => ['Mr' => 1],
             'country_choices' => ['France' => 64],
             'lang_choices' => ['Français' => 1],
+            'group_choices' => ['Default' => 1, 'Wholesale' => 2],
         ], $options));
     }
 }

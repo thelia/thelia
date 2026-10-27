@@ -55,6 +55,9 @@ class CatalogPriceRuleCreateEvent extends CatalogPriceRuleEvent
     /** @var list<int> the customers a reserved rule prices for */
     protected array $customerIds = [];
 
+    /** @var list<int> the customer groups a rule reserved for groups prices for */
+    protected array $customerGroupIds = [];
+
     protected bool $displayInitialPrice = true;
 
     protected bool $includeSubcategories = true;
@@ -232,6 +235,24 @@ class CatalogPriceRuleCreateEvent extends CatalogPriceRuleEvent
     public function getCustomerIds(): array
     {
         return $this->customerIds;
+    }
+
+    /**
+     * @param array<int|string, int|string> $customerGroupIds
+     */
+    public function setCustomerGroupIds(array $customerGroupIds): static
+    {
+        $this->customerGroupIds = array_values(array_unique(array_map('intval', $customerGroupIds)));
+
+        return $this;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function getCustomerGroupIds(): array
+    {
+        return $this->customerGroupIds;
     }
 
     public function setDisplayInitialPrice(bool $displayInitialPrice): static

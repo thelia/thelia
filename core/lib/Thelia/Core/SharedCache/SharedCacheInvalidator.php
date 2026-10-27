@@ -14,18 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Core\SharedCache;
 
-use Thelia\Api\Service\API\ResourceCache;
+use Thelia\Api\Service\API\ResourceCacheInvalidationListener;
 
 /**
  * Purges the pages tagged with some keys. The keys are sent to the proxy when the request
- * ends, and the data access cache pool is flushed now, so a page rebuilt after the purge
- * cannot read a stale answer.
+ * ends, and the data access cache pool is flushed then too, through the same marking as
+ * every other write: the write that asks for the purge is still in its transaction, and a
+ * pool flushed before the commit is refilled by a concurrent reader with the rows as they
+ * were. A page rebuilt after the purge cannot read a stale answer.
  */
 final readonly class SharedCacheInvalidator
 {
     public function __construct(
         private SharedCachePurgeQueue $queue,
-        private ResourceCache $resourceCache,
+        private ResourceCacheInvalidationListener $resourceCacheInvalidation,
     ) {
     }
 
@@ -39,7 +41,7 @@ final readonly class SharedCacheInvalidator
         }
 
         if (SharedCacheMode::DISABLED !== SharedCacheMode::fromShopConfiguration()) {
-            $this->resourceCache->clear();
+            $this->resourceCacheInvalidation->clear();
         }
 
         $this->queue->add($keys);

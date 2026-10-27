@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Pricing\Rule;
 use Thelia\Domain\Pricing\CatalogPriceResolverInterface;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Model\CatalogPriceRule;
+use Thelia\Model\CatalogPriceRuleCustomerGroup;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Product;
@@ -83,6 +84,29 @@ final class CatalogPriceRuleResolverTest extends ActionIntegrationTestCase
         self::assertEqualsWithDelta(50.0, $this->resolver->resolve([$pse->getId()], $this->currency, $named)[$pse->getId()]->untaxedPrice, 0.000001);
         self::assertEqualsWithDelta(80.0, $this->resolver->resolve([$pse->getId()], $this->currency, $other)[$pse->getId()]->untaxedPrice, 0.000001);
         self::assertEqualsWithDelta(80.0, $this->resolver->resolve([$pse->getId()], $this->currency, $guest)[$pse->getId()]->untaxedPrice, 0.000001);
+    }
+
+    /**
+     * A rule reserved for a customer group prices for its members, not for another
+     * customer, nor for a guest account of the group.
+     */
+    public function testARuleReservedForACustomerGroupPricesForItsMembersOnly(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember->setIsGuest(1)->save();
+
+        $reserved = $this->rule($product, ['percentageValue' => 30.0, 'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+        (new CatalogPriceRuleCustomerGroup())->setCatalogPriceRuleId($reserved->getId())->setCustomerGroupId($group->getId())->save();
+
+        $price = $this->resolver->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()];
+        self::assertEqualsWithDelta(70.0, $price->untaxedPrice, 0.000001);
+        self::assertSame($reserved->getId(), $price->ruleId);
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $this->currency, $this->customer()));
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $this->currency, $guestMember));
     }
 
     public function testANamedCustomerGetsThePublicRulesAndTheirOwnChainedByPriority(): void

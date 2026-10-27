@@ -25,7 +25,8 @@ use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheListener;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePolicy;
-use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\Pricing\CatalogActivity;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -83,9 +84,8 @@ final class VisitorCountrySharedCacheTest extends IntegrationTestCase
     public function testThePolicyAnswersTheSameWayOnItsOwn(): void
     {
         $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
-        $checker = $this->createStub(PricingActivityChecker::class);
-        $checker->method('hasVisitorDependentPricing')->willReturn(false);
-        $policy = new SharedCachePolicy($checker, $collector);
+        $probe = $this->quietProbe();
+        $policy = new SharedCachePolicy($probe, $collector);
         $request = TheliaRequest::create('/horatio.html');
         $request->attributes->set('_view', 'product');
 
@@ -96,6 +96,22 @@ final class VisitorCountrySharedCacheTest extends IntegrationTestCase
 
         $this->configure('off', 'header');
         self::assertTrue($policy->isShareable($request, new Response('x')));
+    }
+
+    private function quietProbe(): CatalogActivityProbe
+    {
+        $probe = $this->createStub(CatalogActivityProbe::class);
+        $probe->method('read')->willReturn(new CatalogActivity(
+            hasActivePublicRule: false,
+            hasActiveNamedRule: false,
+            hasActiveReservedSale: false,
+            hasCustomerGroupPrices: false,
+            hasDiscountedCustomerGroup: false,
+            hasCategoryRestrictions: false,
+            defaultCustomerGroupId: null,
+        ));
+
+        return $probe;
     }
 
     private function configure(string $mode, string $source): void
@@ -118,10 +134,9 @@ final class VisitorCountrySharedCacheTest extends IntegrationTestCase
         $response->headers->setCookie(Cookie::create('PHPSESSID', 'abc', 0, '/', null, false, true, false, 'lax'));
 
         $collector = new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
-        $checker = $this->createStub(PricingActivityChecker::class);
-        $checker->method('hasVisitorDependentPricing')->willReturn(false);
+        $probe = $this->quietProbe();
 
-        (new SharedCacheListener(new SharedCachePolicy($checker, $collector), $collector))
+        (new SharedCacheListener(new SharedCachePolicy($probe, $collector), $collector))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         return $response;

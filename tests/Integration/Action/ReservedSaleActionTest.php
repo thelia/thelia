@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -21,12 +22,14 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Sale\Exception\InvalidSaleException;
 use Thelia\Model\Currency;
 use Thelia\Model\Product;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleCustomerGroupQuery;
 use Thelia\Model\SaleCustomerQuery;
 use Thelia\Model\SaleQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -242,6 +245,126 @@ final class ReservedSaleActionTest extends ActionIntegrationTestCase
         self::assertSame([], $this->targetedCustomerIds($sale));
     }
 
+    public function testUpdateResynchronisesTheTargetedCustomerGroups(): void
+    {
+        $first = $this->factory->customerGroup();
+        $second = $this->factory->customerGroup();
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $sale = $this->createSale();
+
+        $this->updateSale($sale, [
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$first->getId(), $second->getId(), $first->getId()],
+            'customerIds' => [$customer->getId()],
+        ]);
+
+        self::assertSame([$first->getId(), $second->getId()], $this->targetedGroupIds($sale));
+        self::assertSame([], $this->targetedCustomerIds($sale), 'named customers are only kept in their own mode');
+
+        $this->updateSale($sale, [
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$second->getId()],
+        ]);
+
+        self::assertSame([$second->getId()], $this->targetedGroupIds($sale), 'a group taken out loses its row');
+    }
+
+    public function testCreatingAReservedOperationForGroupsStoresItsGroups(): void
+    {
+        $group = $this->factory->customerGroup();
+
+        $sale = $this->dispatch(
+            (new SaleCreateEvent())
+                ->setLocale('en_US')
+                ->setTitle('Operation')
+                ->setSaleLabel('OP')
+                ->setAudienceMode(Sale::AUDIENCE_MODE_CUSTOMER_GROUPS)
+                ->setCustomerGroupIds([$group->getId()]),
+            TheliaEvents::SALE_CREATE,
+        )->getSale();
+
+        self::assertSame([$group->getId()], $this->targetedGroupIds($sale));
+    }
+
+    public function testAnOperationReservedForGroupsWithoutAGroupIsRefused(): void
+    {
+        $sale = $this->createSale();
+
+        try {
+            $this->updateSale($sale, ['audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+            self::fail('The update was accepted.');
+        } catch (InvalidSaleException $exception) {
+            self::assertStringContainsString('at least one customer group', $exception->getMessage());
+        }
+
+        self::assertSame(Sale::AUDIENCE_MODE_PUBLIC, (int) SaleQuery::create()->findPk($sale->getId())->getAudienceMode(), 'nothing was written');
+
+        $this->expectException(InvalidSaleException::class);
+        $this->dispatch(
+            (new SaleCreateEvent())->setLocale('en_US')->setTitle('Operation')->setSaleLabel('OP')->setAudienceMode(Sale::AUDIENCE_MODE_CUSTOMER_GROUPS),
+            TheliaEvents::SALE_CREATE,
+        );
+    }
+
+    public function testAnOperationNamingAGroupThatDoesNotExistIsRefusedBeforeAnythingIsWritten(): void
+    {
+        $known = $this->factory->customerGroup();
+        $unknownId = (int) $known->getId() + 9999;
+        $sale = $this->createSale();
+        $salesBefore = SaleQuery::create()->count();
+
+        try {
+            $this->updateSale($sale, ['audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS, 'customerGroupIds' => [$known->getId(), $unknownId]]);
+            self::fail('The update was accepted.');
+        } catch (InvalidSaleException $exception) {
+            self::assertStringContainsString((string) $unknownId, $exception->getMessage());
+        }
+
+        self::assertSame(Sale::AUDIENCE_MODE_PUBLIC, (int) SaleQuery::create()->findPk($sale->getId())->getAudienceMode(), 'nothing was written');
+
+        try {
+            $this->dispatch(
+                (new SaleCreateEvent())->setLocale('en_US')->setTitle('Operation')->setSaleLabel('OP')
+                    ->setAudienceMode(Sale::AUDIENCE_MODE_CUSTOMER_GROUPS)->setCustomerGroupIds([$unknownId]),
+                TheliaEvents::SALE_CREATE,
+            );
+            self::fail('The creation was accepted.');
+        } catch (InvalidSaleException) {
+            self::assertSame($salesBefore, SaleQuery::create()->count(), 'no sale was created');
+        }
+    }
+
+    /**
+     * @return iterable<string, array{int}>
+     */
+    public static function audiencesThatKeepNoGroup(): iterable
+    {
+        yield 'everyone' => [Sale::AUDIENCE_MODE_PUBLIC];
+        yield 'named customers' => [Sale::AUDIENCE_MODE_CUSTOMERS];
+    }
+
+    #[DataProvider('audiencesThatKeepNoGroup')]
+    public function testLeavingTheGroupAudienceEmptiesTheGroupsEvenWhenTheEventStillCarriesThem(int $audienceMode): void
+    {
+        $group = $this->factory->customerGroup();
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $sale = $this->createSale();
+
+        $this->updateSale($sale, [
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$group->getId()],
+        ]);
+        self::assertSame([$group->getId()], $this->targetedGroupIds($sale));
+
+        $this->updateSale($sale, [
+            'audienceMode' => $audienceMode,
+            'customerGroupIds' => [$group->getId()],
+            'customerIds' => [$customer->getId()],
+        ]);
+
+        self::assertSame([], $this->targetedGroupIds($sale));
+    }
+
     /**
      * The mirror of the switch above: an operation that opens up to everyone starts
      * writing the public flags it never wrote while it was reserved.
@@ -393,7 +516,8 @@ final class ReservedSaleActionTest extends ActionIntegrationTestCase
             ->setHideProducts($overrides['hideProducts'] ?? false)
             ->setCountdownMode($overrides['countdownMode'] ?? Sale::COUNTDOWN_MODE_NONE)
             ->setCountdownLeadHours($overrides['countdownLeadHours'] ?? null)
-            ->setCustomerIds($overrides['customerIds'] ?? []);
+            ->setCustomerIds($overrides['customerIds'] ?? [])
+            ->setCustomerGroupIds($overrides['customerGroupIds'] ?? []);
 
         return $this->dispatch($event, TheliaEvents::SALE_UPDATE);
     }
@@ -423,6 +547,19 @@ final class ReservedSaleActionTest extends ActionIntegrationTestCase
             ->filterByCurrencyId($currency->getId())
             ->findOne()
             ->getPromoPrice();
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function targetedGroupIds(Sale $sale): array
+    {
+        return array_map('intval', SaleCustomerGroupQuery::create()
+            ->filterBySaleId($sale->getId())
+            ->orderByCustomerGroupId()
+            ->select('CustomerGroupId')
+            ->find()
+            ->getData());
     }
 
     /**
