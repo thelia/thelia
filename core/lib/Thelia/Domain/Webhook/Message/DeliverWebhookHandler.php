@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Webhook\Message;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -36,11 +35,9 @@ final readonly class DeliverWebhookHandler
         private WebhookDeliverer $deliverer,
         private WebhookRetryPolicy $retryPolicy,
         private MessageBusInterface $bus,
-        #[Autowire('%env(default:thelia.messenger.inline_transport_dsn:MESSENGER_TRANSPORT_DSN)%')]
-        #[\SensitiveParameter]
-        string $jobDsn,
+        WebhookDeliveryTransport $transport,
     ) {
-        $this->runsInline = WebhookDeliveryTransport::isInline($jobDsn);
+        $this->runsInline = $transport->runsInline();
     }
 
     public function __invoke(DeliverWebhook $message): void
