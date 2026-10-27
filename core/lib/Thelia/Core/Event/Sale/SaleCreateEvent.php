@@ -43,6 +43,9 @@ class SaleCreateEvent extends SaleEvent
     /** @var array<int|string, int|string> the IDs of the customers the operation is reserved for */
     protected array $customerIds = [];
 
+    /** @var list<int> the IDs of the customer groups the operation is reserved for */
+    protected array $customerGroupIds = [];
+
     /**
      * @return SaleCreateEvent $this
      */
@@ -170,5 +173,25 @@ class SaleCreateEvent extends SaleEvent
     public function getCustomerIds(): array
     {
         return $this->customerIds;
+    }
+
+    /**
+     * @param array<int|string, int|string> $customerGroupIds the IDs of the customer groups the operation is reserved for
+     *
+     * @return $this
+     */
+    public function setCustomerGroupIds(array $customerGroupIds): static
+    {
+        $this->customerGroupIds = array_values(array_unique(array_map('intval', $customerGroupIds)));
+
+        return $this;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function getCustomerGroupIds(): array
+    {
+        return $this->customerGroupIds;
     }
 }

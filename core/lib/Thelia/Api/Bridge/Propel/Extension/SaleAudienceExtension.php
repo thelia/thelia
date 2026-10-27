@@ -16,6 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\Sale;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\SaleQuery;
@@ -58,7 +59,7 @@ final readonly class SaleAudienceExtension implements QueryCollectionExtensionIn
             return;
         }
 
-        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+        if (!FrontOperation::isFront($operation)) {
             return;
         }
 

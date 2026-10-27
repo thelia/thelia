@@ -100,9 +100,13 @@ class CatalogPriceRuleDefinitionValidator
 
                 return;
             case CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS:
-                throw new InvalidCatalogPriceRuleException('Customer groups are not available yet: reserve the rule for named customers or open it to everyone.');
+                if ([] === $definition->getCustomerGroupIds()) {
+                    throw new InvalidCatalogPriceRuleException('A rule reserved for customer groups needs at least one customer group.');
+                }
+
+                return;
             default:
-                throw new InvalidCatalogPriceRuleException('The audience of a catalog price rule must be everyone or named customers.');
+                throw new InvalidCatalogPriceRuleException('The audience of a catalog price rule must be everyone, named customers or customer groups.');
         }
     }
 

@@ -21,11 +21,15 @@ use Thelia\Core\Event\CatalogPriceRule\CatalogPriceRuleRecomputeEvent;
 use Thelia\Core\Event\CatalogPriceRule\CatalogPriceRuleToggleActivityEvent;
 use Thelia\Core\Event\CatalogPriceRule\CatalogPriceRuleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\Rule\Exception\InvalidCatalogPriceRuleException;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Domain\Pricing\Rule\Storage\PublicPriceReader;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleCriterionQuery;
+use Thelia\Model\CatalogPriceRuleCustomerGroupQuery;
 use Thelia\Model\CatalogPriceRuleCustomerQuery;
 use Thelia\Model\CatalogPriceRuleEffectCurrencyQuery;
 use Thelia\Model\CatalogPriceRulePriceQuery;
@@ -111,6 +115,115 @@ final class CatalogPriceRuleActionTest extends ActionIntegrationTestCase
         self::assertSame([$customer->getId()], array_map('intval', CatalogPriceRuleCustomerQuery::create()->filterByCatalogPriceRuleId($rule->getId())->select('CustomerId')->find()->getData()));
         self::assertSame([$this->defaultPseFor($product)->getId()], $this->scopeOf($rule));
         self::assertSame(0, CatalogPriceRulePriceQuery::create()->filterByCatalogPriceRuleId($rule->getId())->count());
+    }
+
+    /**
+     * A rule reserved for customer groups is stored like a rule reserved for named
+     * customers: no public price, the members of its groups get it at read time.
+     */
+    public function testARuleReservedForCustomerGroupsIsStoredWithoutAPublicPrice(): void
+    {
+        $product = $this->catalogProduct();
+        $group = $this->factory->customerGroup();
+
+        $rule = $this->dispatch($this->definition([
+            'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$group->getId()],
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), TheliaEvents::CATALOG_PRICE_RULE_CREATE)->getCatalogPriceRule();
+
+        self::assertSame(CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS, (int) $rule->getAudienceMode());
+        self::assertSame([$this->defaultPseFor($product)->getId()], $this->scopeOf($rule));
+        self::assertSame(0, CatalogPriceRulePriceQuery::create()->filterByCatalogPriceRuleId($rule->getId())->count());
+    }
+
+    public function testARuleReservedForCustomerGroupsStoresItsGroupsAndSyncsThemOnUpdate(): void
+    {
+        $product = $this->catalogProduct();
+        $first = $this->factory->customerGroup();
+        $second = $this->factory->customerGroup();
+        $customer = $this->factory->customer($this->factory->customerTitle());
+
+        $rule = $this->dispatch($this->definition([
+            'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$first->getId(), $second->getId(), $first->getId()],
+            'customerIds' => [$customer->getId()],
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), TheliaEvents::CATALOG_PRICE_RULE_CREATE)->getCatalogPriceRule();
+
+        self::assertSame([$first->getId(), $second->getId()], $this->groupsOf($rule), 'the list is deduplicated');
+        self::assertSame(0, CatalogPriceRuleCustomerQuery::create()->filterByCatalogPriceRuleId($rule->getId())->count(), 'named customers are only kept in their own mode');
+
+        $this->dispatch($this->fill(new CatalogPriceRuleUpdateEvent($rule->getId()), [
+            'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$second->getId()],
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), TheliaEvents::CATALOG_PRICE_RULE_UPDATE);
+
+        self::assertSame([$second->getId()], $this->groupsOf($rule), 'a group taken out loses its row');
+    }
+
+    #[DataProvider('audiencesThatKeepNoGroup')]
+    public function testLeavingTheGroupAudienceEmptiesTheGroupsEvenWhenTheEventStillCarriesThem(int $audienceMode): void
+    {
+        $product = $this->catalogProduct();
+        $group = $this->factory->customerGroup();
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $criteria = [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]];
+
+        $rule = $this->dispatch($this->definition([
+            'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$group->getId()],
+            'criteria' => $criteria,
+        ]), TheliaEvents::CATALOG_PRICE_RULE_CREATE)->getCatalogPriceRule();
+        self::assertSame([$group->getId()], $this->groupsOf($rule));
+
+        $this->dispatch($this->fill(new CatalogPriceRuleUpdateEvent($rule->getId()), [
+            'audienceMode' => $audienceMode,
+            'customerGroupIds' => [$group->getId()],
+            'customerIds' => [$customer->getId()],
+            'criteria' => $criteria,
+        ]), TheliaEvents::CATALOG_PRICE_RULE_UPDATE);
+
+        self::assertSame([], $this->groupsOf($rule));
+    }
+
+    /**
+     * @return iterable<string, array{int}>
+     */
+    public static function audiencesThatKeepNoGroup(): iterable
+    {
+        yield 'everyone' => [CatalogPriceRule::AUDIENCE_MODE_PUBLIC];
+        yield 'named customers' => [CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS];
+    }
+
+    /**
+     * The whole way: a rule reserved for a group, written through its event, prices the
+     * members of the group and nobody else.
+     */
+    public function testARuleWrittenForAGroupPricesTheCustomerOfTheGroupOnly(): void
+    {
+        $product = $this->catalogProduct();
+        $pse = $this->defaultPseFor($product);
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $outsider = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $this->factory->customerGroup()]);
+
+        $this->dispatch($this->definition([
+            'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'customerGroupIds' => [$group->getId()],
+            'criteria' => [CatalogPriceRule::CRITERION_PRODUCT => [$product->getId()]],
+        ]), TheliaEvents::CATALOG_PRICE_RULE_CREATE);
+
+        $context = $this->getService(CustomerPriceContextInterface::class);
+
+        $memberPrice = $context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()];
+        $outsiderPrice = $context->resolve([$pse->getId()], $this->currency, $outsider)[$pse->getId()];
+
+        self::assertEqualsWithDelta(80.0, $memberPrice->untaxedPromoPrice, 0.000001);
+        self::assertSame(EffectivePrice::SOURCE_RULE, $memberPrice->source);
+        self::assertSame(ResolvedPrice::SOURCE_BASE, $outsiderPrice->source);
+        self::assertFalse($outsiderPrice->isPromo);
     }
 
     public function testUpdatingARuleReplacesItsListsAndRepricesWhatLeftAndWhatCame(): void
@@ -210,6 +323,25 @@ final class CatalogPriceRuleActionTest extends ActionIntegrationTestCase
         self::assertArrayHasKey($pse->getId(), $this->reader->currentPrices([$pse->getId()], $this->currency));
     }
 
+    public function testARuleNamingAGroupThatDoesNotExistIsRefusedBeforeAnythingIsWritten(): void
+    {
+        $known = $this->factory->customerGroup();
+        $unknownId = (int) $known->getId() + 9999;
+        $rulesBefore = CatalogPriceRuleQuery::create()->count();
+
+        try {
+            $this->dispatch($this->definition([
+                'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS,
+                'customerGroupIds' => [$known->getId(), $unknownId],
+            ]), TheliaEvents::CATALOG_PRICE_RULE_CREATE);
+            self::fail('The creation was accepted.');
+        } catch (InvalidCatalogPriceRuleException $exception) {
+            self::assertStringContainsString((string) $unknownId, $exception->getMessage());
+        }
+
+        self::assertSame($rulesBefore, CatalogPriceRuleQuery::create()->count(), 'no rule was created');
+    }
+
     #[DataProvider('refusedDefinitions')]
     public function testADefinitionThatSaysNothingIsRefused(array $overrides, string $messagePart): void
     {
@@ -231,7 +363,8 @@ final class CatalogPriceRuleActionTest extends ActionIntegrationTestCase
         yield 'amount without a currency' => [['effectType' => CatalogPriceRule::EFFECT_TYPE_AMOUNT, 'effectValues' => []], 'at least one currency'];
         yield 'negative fixed price' => [['effectType' => CatalogPriceRule::EFFECT_TYPE_FIXED_PRICE, 'effectValues' => [1 => -5.0]], 'cannot be negative'];
         yield 'named customers without a customer' => [['audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS, 'customerIds' => []], 'at least one customer'];
-        yield 'customer groups' => [['audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS], 'not available yet'];
+        yield 'customer groups without a group' => [['audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS, 'customerGroupIds' => []], 'at least one customer group'];
+        yield 'unknown audience' => [['audienceMode' => 9], 'must be everyone, named customers or customer groups'];
         yield 'unknown criterion type' => [['criteria' => ['moon_phase' => [1]]], 'moon_phase'];
     }
 
@@ -262,6 +395,7 @@ final class CatalogPriceRuleActionTest extends ActionIntegrationTestCase
             ->setEffectValuesByCurrency($overrides['effectValues'] ?? [])
             ->setAudienceMode($overrides['audienceMode'] ?? CatalogPriceRule::AUDIENCE_MODE_PUBLIC)
             ->setCustomerIds($overrides['customerIds'] ?? [])
+            ->setCustomerGroupIds($overrides['customerGroupIds'] ?? [])
             ->setCriteria($overrides['criteria'] ?? []);
 
         return $event;
@@ -278,6 +412,19 @@ final class CatalogPriceRuleActionTest extends ActionIntegrationTestCase
         self::assertNotNull($pse);
 
         return $pse;
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function groupsOf(CatalogPriceRule $rule): array
+    {
+        return array_map('intval', CatalogPriceRuleCustomerGroupQuery::create()
+            ->filterByCatalogPriceRuleId($rule->getId())
+            ->orderByCustomerGroupId()
+            ->select('CustomerGroupId')
+            ->find()
+            ->getData());
     }
 
     /**

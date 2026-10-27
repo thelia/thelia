@@ -74,6 +74,8 @@ class SaleToPriceRuleConverter
             ->find()
             ->getData());
 
+        $customerGroupIds = $sale->getCustomerGroupIds();
+
         $rules = [];
         $index = 0;
 
@@ -103,6 +105,7 @@ class SaleToPriceRuleConverter
                 ->setEffectValuesByCurrency($valuesByCurrency)
                 ->setAudienceMode((int) $sale->getAudienceMode())
                 ->setCustomerIds($customerIds)
+                ->setCustomerGroupIds($customerGroupIds)
                 ->setDisplayInitialPrice((bool) $sale->getDisplayInitialPrice())
                 ->setIncludeSubcategories(true)
                 ->setCriteria($criteria);

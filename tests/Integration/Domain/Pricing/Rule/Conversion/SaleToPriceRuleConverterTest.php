@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Pricing\Rule\Conversion;
 use Thelia\Domain\Pricing\Rule\Conversion\SaleToPriceRuleConverter;
 use Thelia\Domain\Pricing\Rule\Exception\InvalidCatalogPriceRuleException;
 use Thelia\Model\CatalogPriceRule;
+use Thelia\Model\CatalogPriceRuleCustomerGroupQuery;
 use Thelia\Model\CatalogPriceRuleCustomerQuery;
 use Thelia\Model\CatalogPriceRuleProductSaleElementsQuery;
 use Thelia\Model\Currency;
@@ -122,6 +123,23 @@ final class SaleToPriceRuleConverterTest extends ActionIntegrationTestCase
         self::assertSame(CatalogPriceRule::AUDIENCE_MODE_CUSTOMERS, (int) $rule->getAudienceMode());
         self::assertSame([$customer->getId()], array_map('intval', CatalogPriceRuleCustomerQuery::create()->filterByCatalogPriceRuleId($rule->getId())->select('CustomerId')->find()->getData()));
         self::assertSame('VIP', $rule->setLocale('en_US')->getTitle());
+    }
+
+    public function testASaleReservedForGroupsBecomesARuleReservedForTheSameGroups(): void
+    {
+        $product = $this->catalogProduct();
+        $group = $this->factory->customerGroup();
+        $other = $this->factory->customerGroup();
+        $sale = $this->sale(['audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomerGroup($sale, $group);
+        $this->factory->saleCustomerGroup($sale, $other);
+        $this->factory->saleOffsetCurrency($sale, $this->currency, 20.0);
+
+        $rule = $this->converter->convert($sale, 'Pros')->rules[0];
+
+        self::assertSame(CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS, (int) $rule->getAudienceMode());
+        self::assertSame([$group->getId(), $other->getId()], array_map('intval', CatalogPriceRuleCustomerGroupQuery::create()->filterByCatalogPriceRuleId($rule->getId())->orderByCustomerGroupId()->select('CustomerGroupId')->find()->getData()));
     }
 
     public function testTheRulesComeOutWithTheSettingsOfANewRule(): void

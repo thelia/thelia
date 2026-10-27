@@ -16,9 +16,12 @@ namespace Thelia\Domain\Sale;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleCustomerGroupQuery;
 use Thelia\Model\SaleCustomerQuery;
 use Thelia\Model\SaleQuery;
 
@@ -37,21 +40,25 @@ use Thelia\Model\SaleQuery;
  */
 class SaleAudienceChecker implements ResetInterface
 {
-    private ?bool $hasActiveReservedSale = null;
-
     /** @var array<int, list<int>> the sale IDs each customer is named on, whatever their state */
     private array $targetedSaleIdsByCustomer = [];
 
     /** @var array<int, list<int>> the running reserved sale IDs each customer is entitled to */
     private array $entitledReservedSaleIdsByCustomer = [];
 
+    public function __construct(
+        private readonly CatalogActivityProbe $catalogActivityProbe,
+        private readonly CustomerGroupResolver $customerGroupResolver,
+    ) {
+    }
+
     /**
      * Whether the customer gets the price of this operation.
      *
      * An operation open to everyone entitles everyone, a visitor with no account
-     * included. A reserved one entitles only the customers it names, so an
-     * operation reserved for customer groups (US #122, whose groups nothing reads
-     * yet) entitles nobody — which is the safe way round.
+     * included. A reserved one entitles only the customers it names, or the members
+     * of the customer groups it is reserved for. A guest account belongs to no
+     * group here: the row is reusable by e-mail, which is no proof of anything.
      */
     public function isCustomerEntitled(Sale $sale, ?Customer $customer): bool
     {
@@ -69,17 +76,16 @@ class SaleAudienceChecker implements ResetInterface
     /**
      * Whether any reserved operation is running in the shop right now.
      *
-     * One indexed query on (`active`, `audience_mode`), once per request: this is
-     * the gate the front-office cache reads to decide whether a page can be
-     * shared between visitors at all, so it has to be cheap on a shop that has no
-     * reserved operation — which is most shops, most of the time.
+     * One indexed existence check on (`active`, `audience_mode`), read with the
+     * other activity checks of the shop in a single statement per request
+     * ({@see CatalogActivityProbe}): this is the gate the front-office cache reads
+     * to decide whether a page can be shared between visitors at all, so it has to
+     * be cheap on a shop that has no reserved operation — which is most shops, most
+     * of the time.
      */
     public function hasActiveReservedSale(): bool
     {
-        return $this->hasActiveReservedSale ??= SaleQuery::create()
-            ->filterByActive(true)
-            ->filterByAudienceMode(Sale::AUDIENCE_MODE_PUBLIC, Criteria::NOT_EQUAL)
-            ->exists();
+        return $this->catalogActivityProbe->read()->hasActiveReservedSale;
     }
 
     /**
@@ -104,12 +110,25 @@ class SaleAudienceChecker implements ResetInterface
             return $this->entitledReservedSaleIdsByCustomer[$customerId];
         }
 
+        // One statement for both audiences: the operations naming the customer, and
+        // the ones reserved for the group the customer belongs to. The ids are
+        // integers cast here, never caller input.
         $query = SaleQuery::create()
             ->filterByActive(true)
             ->filterByAudienceMode(Sale::AUDIENCE_MODE_PUBLIC, Criteria::NOT_EQUAL)
-            ->useSaleCustomerQuery()
-                ->filterByCustomerId($customerId)
-            ->endUse();
+            ->condition('namesTheCustomer', \sprintf(
+                '%s IN (SELECT sale_id FROM sale_customer WHERE customer_id = %d)',
+                SaleTableMap::COL_ID,
+                $customerId,
+            ))
+            ->condition('targetsTheGroup', \sprintf(
+                '%s = %d AND %s IN (SELECT sale_id FROM sale_customer_group WHERE customer_group_id = %d)',
+                SaleTableMap::COL_AUDIENCE_MODE,
+                Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+                SaleTableMap::COL_ID,
+                $this->audienceGroupIdOf($customer),
+            ))
+            ->combine(['namesTheCustomer', 'targetsTheGroup'], Criteria::LOGICAL_OR);
 
         $this->filterByRunningDates($query);
 
@@ -139,14 +158,14 @@ class SaleAudienceChecker implements ResetInterface
 
     public function reset(): void
     {
-        $this->hasActiveReservedSale = null;
         $this->targetedSaleIdsByCustomer = [];
         $this->entitledReservedSaleIdsByCustomer = [];
     }
 
     /**
-     * Every operation the customer is named on, in one query, so that a catalog
-     * page asking about fifty operations does not ask the database fifty times.
+     * Every operation the customer is named on or whose customer group it targets,
+     * in two queries, so that a catalog page asking about fifty operations does not
+     * ask the database fifty times.
      *
      * @return list<int>
      */
@@ -168,6 +187,34 @@ class SaleAudienceChecker implements ResetInterface
                 ->getData(),
         );
 
-        return $this->targetedSaleIdsByCustomer[$customerId] = $saleIds;
+        // A link to a group counts only on an operation reserved for groups: one left
+        // behind by a change of audience must not open a named operation to a group.
+        /** @var list<int> $groupSaleIds */
+        $groupSaleIds = array_map(
+            'intval',
+            SaleCustomerGroupQuery::create()
+                ->filterByCustomerGroupId($this->audienceGroupIdOf($customer))
+                ->useSaleQuery()
+                    ->filterByAudienceMode(Sale::AUDIENCE_MODE_CUSTOMER_GROUPS)
+                ->endUse()
+                ->select('SaleId')
+                ->find()
+                ->getData(),
+        );
+
+        return $this->targetedSaleIdsByCustomer[$customerId] = array_values(array_unique([...$saleIds, ...$groupSaleIds]));
+    }
+
+    /**
+     * The customer group an operation reserved for groups entitles this customer
+     * through, 0 for none. A guest account is no member of any group here, the
+     * default one included: the guest row is reusable by e-mail, which is no proof of
+     * belonging anywhere. Every other account is in the group
+     * {@see CustomerGroupResolver} reads back from the database, so an account moved
+     * to another group is entitled through the new one at once.
+     */
+    public function audienceGroupIdOf(Customer $customer): int
+    {
+        return $customer->isGuest() ? 0 : $this->customerGroupResolver->groupIdOf($customer);
     }
 }

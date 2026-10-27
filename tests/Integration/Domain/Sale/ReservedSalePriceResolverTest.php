@@ -27,6 +27,7 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleCustomerGroup;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
 
@@ -138,6 +139,45 @@ final class ReservedSalePriceResolverTest extends ActionIntegrationTestCase
         [$currency, $pse] = $this->reservedOperationOnOneProduct($this->newCustomer());
 
         self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $this->newCustomer()));
+    }
+
+    /**
+     * An operation reserved for customer groups prices for the members of its
+     * groups, for no one else, and never for a guest account of the group.
+     */
+    public function testAnOperationReservedForAGroupPricesForItsMembersOnly(): void
+    {
+        $currency = $this->factory->currency();
+        $pse = $this->defaultPseFor($this->catalogProduct($currency));
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember->setIsGuest(1)->save();
+        $sale = $this->runningReservedSale($currency, '10', overrides: ['audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+        $this->factory->saleProduct($sale, $pse->getProduct());
+        (new SaleCustomerGroup())->setSaleId($sale->getId())->setCustomerGroupId($group->getId())->save();
+
+        $prices = $this->resolver->resolve([$pse->getId()], $currency, $member);
+
+        self::assertEqualsWithDelta(90.0, $prices[$pse->getId()]->untaxedPromoPrice, 0.000001);
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $this->newCustomer()));
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $guestMember));
+    }
+
+    /**
+     * A group linked to an operation reserved for named customers opens it to no one.
+     */
+    public function testALinkToAGroupLeftOnAnOperationForNamedCustomersOpensNothing(): void
+    {
+        $currency = $this->factory->currency();
+        $pse = $this->defaultPseFor($this->catalogProduct($currency));
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $sale = $this->runningReservedSale($currency, '10');
+        $this->factory->saleProduct($sale, $pse->getProduct());
+        (new SaleCustomerGroup())->setSaleId($sale->getId())->setCustomerGroupId($group->getId())->save();
+
+        self::assertSame([], $this->resolver->resolve([$pse->getId()], $currency, $member));
     }
 
     /**

@@ -19,23 +19,32 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 /**
  * The catalog price of one sale element in every currency of the shop, as
  * `product_price` gives it: the row of the currency when the shopkeeper typed one,
- * the default currency row converted at the rate otherwise.
+ * the default currency row converted at the rate otherwise. The promo price follows
+ * the same rule; whether it applies is the promo flag of the sale element.
  */
 #[Exclude]
 final readonly class BasePrices
 {
     /**
      * @param array<int, float> $untaxedPriceByCurrencyId
+     * @param array<int, float> $untaxedPromoPriceByCurrencyId
      */
     public function __construct(
         public int $productSaleElementsId,
         public int $productId,
         public array $untaxedPriceByCurrencyId,
+        public array $untaxedPromoPriceByCurrencyId = [],
+        public bool $isPromo = false,
     ) {
     }
 
     public function in(int $currencyId): ?float
     {
         return $this->untaxedPriceByCurrencyId[$currencyId] ?? null;
+    }
+
+    public function promoIn(int $currencyId): ?float
+    {
+        return $this->untaxedPromoPriceByCurrencyId[$currencyId] ?? null;
     }
 }
