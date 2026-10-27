@@ -23,6 +23,7 @@ use Thelia\Domain\Checkout\DTO\ExpressCheckoutRequest;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
+use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\Currency;
@@ -45,8 +46,6 @@ use Thelia\Model\Lang;
  */
 final readonly class ExpressCheckoutPlacementService
 {
-    private const TOTAL_TOLERANCE = 0.01;
-
     public function __construct(
         private CheckoutPlacementService $placementService,
         private PostageHandler $postageHandler,
@@ -91,7 +90,7 @@ final readonly class ExpressCheckoutPlacementService
      * Where the parcel goes: the carrier and the addresses the checkout wrote on the cart.
      * All of them have to be there, or the order would leave without a destination the
      * buyer chose. A cart with nothing to ship is never asked for a delivery address: its
-     * carrier and its invoice address are enough.
+     * carrier, its invoice address and the address it is taxed at are enough.
      */
     private function refuseACartWithoutTheDeliveryTheCheckoutChose(Cart $cart): void
     {
@@ -103,9 +102,10 @@ final readonly class ExpressCheckoutPlacementService
     }
 
     /**
-     * An order is written with a delivery address, even when nothing is shipped. The buyer
-     * of a cart with nothing to ship was only asked where they are invoiced, so the order
-     * is delivered there, on a copy of its own the invoice address does not share.
+     * An order is written with a delivery address, even when nothing is shipped, and that
+     * address is where the order is taxed. The one written here is the address the wallet's
+     * total was taxed at, so the order is placed at the amount the buyer agreed to, on a
+     * copy of its own no other address of the cart shares.
      */
     private function writeTheDeliveryAddressOfANothingToShipCart(Cart $cart): ?CartAddress
     {
@@ -113,7 +113,8 @@ final readonly class ExpressCheckoutPlacementService
             return null;
         }
 
-        $copy = $cart->getCartAddressRelatedByAddressInvoiceId()?->copy();
+        $taxedFor = $this->checkoutTotal->addressTheCartIsTaxedFor($cart);
+        $copy = $taxedFor instanceof Address ? (new CartAddress())->copyFrom($taxedFor) : $taxedFor?->copy();
         $event = (new CartCheckoutEvent($cart))->setCartAddress($copy);
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::CART_SET_DELIVERY_ADDRESS_MANUAL);
@@ -122,9 +123,9 @@ final readonly class ExpressCheckoutPlacementService
     }
 
     /**
-     * A refused attempt leaves the cart as it found it. The copy was made from the invoice
-     * address of that attempt: kept on the cart, it would become the delivery address of
-     * the next one, even after the buyer corrected where they are invoiced.
+     * A refused attempt leaves the cart as it found it. The copy was made from an address
+     * as it stood at that attempt: kept on the cart, it would become the delivery address of
+     * the next one, even after the buyer corrected it.
      */
     private function forgetTheDeliveryAddressWrittenForThisAttempt(Cart $cart, ?CartAddress $writtenDeliveryAddress): void
     {
@@ -167,15 +168,23 @@ final readonly class ExpressCheckoutPlacementService
     /**
      * What the shop computes, against what the sheet showed. The shop wins, and a
      * difference means nothing is created at all.
+     *
+     * Both are compared in cents: a float tolerance of one cent lets some one-cent gaps
+     * through, depending on how the two amounts round in binary.
      */
     private function refuseATotalTheBuyerNeverSaw(Cart $cart, ExpressCheckoutRequest $request): void
     {
         $computed = $this->checkoutTotal->of($cart) ?? throw ExpressCheckoutRefusedException::becauseNoDeliveryIsChosenYet();
         $shown = round($request->totalTaxIncludedShownToTheBuyer, 2);
 
-        if (abs($computed - $shown) > self::TOTAL_TOLERANCE) {
+        if ($this->inCents($computed) !== $this->inCents($shown)) {
             throw ExpressCheckoutRefusedException::becauseTheTotalDoesNotMatch($shown, $computed);
         }
+    }
+
+    private function inCents(float $amount): int
+    {
+        return (int) round($amount * 100);
     }
 
     private function currencyOf(Cart $cart): Currency

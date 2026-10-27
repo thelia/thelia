@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Checkout;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,6 +24,8 @@ use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutPlacementService;
+use Thelia\Domain\Checkout\Service\ExpressCheckoutTotal;
+use Thelia\Domain\Checkout\Service\ExpressPaymentButtonCollector;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery;
@@ -30,6 +34,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryAreaQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderAddressQuery;
@@ -51,6 +56,8 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
 {
     private ?string $previousGuestMode = null;
 
+    private ?string $previousZones = null;
+
     private ?\Thelia\Model\Customer $owner = null;
 
     /** @var list<array{string, callable}> */
@@ -62,6 +69,8 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
 
         $this->previousGuestMode = ConfigQuery::read('guest_checkout_mode');
         ConfigQuery::write('guest_checkout_mode', GuestCheckoutMode::Enabled->value);
+        $this->previousZones = ConfigQuery::read(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME);
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, 'checkout');
     }
 
     protected function tearDown(): void
@@ -72,6 +81,7 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
         $this->registeredListeners = [];
 
         ConfigQuery::write('guest_checkout_mode', (string) $this->previousGuestMode);
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, (string) $this->previousZones);
 
         parent::tearDown();
     }
@@ -132,6 +142,39 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
     }
 
     /**
+     * One cent is a total the buyer never saw, whichever way it goes and whatever the
+     * quantity: amounts are compared in cents, never as floats within a tolerance.
+     */
+    #[DataProvider('oneCentOffTotals')]
+    public function testATotalOneCentOffCreatesNothing(int $quantity, int $centsOff): void
+    {
+        [$cart, $country] = $this->aCartReadyForAWallet(quantity: $quantity);
+        $this->chooseTheDeliveryInTheCheckout($cart, $country, 'Lyon');
+        $ordersBefore = OrderQuery::create()->count();
+        $totalShown = round($this->totalTheSheetWouldShow($cart, $country) + $centsOff / 100, 2);
+
+        try {
+            $this->service()->place($this->requestFor($cart, $country, totalShown: $totalShown));
+            self::fail(\sprintf('An order was placed for %.2f, one cent off the total of %d items.', $totalShown, $quantity));
+        } catch (ExpressCheckoutRefusedException $refusal) {
+            self::assertStringContainsString('never saw', $refusal->getMessage());
+        }
+
+        self::assertSame($ordersBefore, OrderQuery::create()->count());
+    }
+
+    /**
+     * @return iterable<string, array{int, int}>
+     */
+    public static function oneCentOffTotals(): iterable
+    {
+        foreach (range(1, 6) as $quantity) {
+            yield $quantity.' items, one cent more' => [$quantity, 1];
+            yield $quantity.' items, one cent less' => [$quantity, -1];
+        }
+    }
+
+    /**
      * A wallet that confirms twice, a retried request or a double tap, buys once. The
      * guarantee is the checkout's own: the same lock, the same cart fingerprint.
      */
@@ -168,7 +211,46 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
      * A cart with nothing to ship is never asked for a delivery address. The wallet pays it
      * with the invoice address alone, and the order is delivered there, on a copy of its own.
      */
-    public function testACartWithNothingToShipIsPaidWithItsInvoiceAddressAlone(): void
+    /**
+     * A cart with nothing to ship is taxed and delivered at the default address of its
+     * buyer, as the checkout does for every payment method: the invoice address, in another
+     * country here, is not where the wallet's total or the order is taxed.
+     */
+    public function testACartWithNothingToShipIsTaxedAtTheDefaultAddressOfItsBuyer(): void
+    {
+        [$cart, $invoiceCountry] = $this->aCartWithNothingToShipReadyForAWallet();
+        $factory = $this->createFixtureFactory();
+        $homeCountry = CountryQuery::create()->filterById($invoiceCountry->getId(), Criteria::NOT_EQUAL)->findOne();
+        self::assertNotNull($homeCountry, 'The seed data holds a single country.');
+
+        self::assertNotNull($this->owner);
+        $factory->address($this->owner, $homeCountry, null, ['city' => 'Bordeaux'])->setIsDefault(1)->save($this->getPropelConnection());
+        $invoice = $factory->cartAddress(null, $invoiceCountry, null, ['city' => 'Lyon']);
+        $cart->setAddressInvoiceId($invoice->getId())->save($this->getPropelConnection());
+
+        $taxedFor = $this->getService(ExpressCheckoutTotal::class)->addressTheCartIsTaxedFor($cart);
+        self::assertSame($homeCountry->getId(), $taxedFor?->getCountryId());
+
+        $wallet = ModuleQuery::create()->findOneByCode(ExpressPaymentTestModule::MODULE_CODE);
+        $result = $this->service()->place(new ExpressCheckoutRequest(
+            $cart,
+            (int) $wallet?->getId(),
+            round($cart->getTaxedAmount($homeCountry), 2),
+            $this->consentsAcceptedInTheSheet(),
+        ));
+
+        $order = OrderQuery::create()->findPk($result->orderId);
+        self::assertNotNull($order);
+        $delivery = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
+        self::assertSame('Bordeaux', $delivery?->getCity());
+        self::assertSame($homeCountry->getId(), $delivery?->getCountryId());
+        self::assertSame('Lyon', OrderAddressQuery::create()->findPk($order->getInvoiceOrderAddressId())?->getCity());
+    }
+
+    /**
+     * A buyer with no address of their own is taxed and delivered where they are invoiced.
+     */
+    public function testACartWithNothingToShipOfABuyerWithNoAddressIsPaidWithItsInvoiceAddressAlone(): void
     {
         [$cart, $country] = $this->aCartWithNothingToShipReadyForAWallet();
 
@@ -324,7 +406,7 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
     /**
      * @return array{0: Cart, 1: Country}
      */
-    private function aCartReadyForAWallet(bool $ownedBySomebody = true): array
+    private function aCartReadyForAWallet(bool $ownedBySomebody = true, int $quantity = 1): array
     {
         $factory = $this->createFixtureFactory();
         $country = $factory->country();
@@ -336,7 +418,7 @@ final class ExpressCheckoutPlacementTest extends IntegrationTestCase
             $factory->currency(),
             ['baseQuantity' => 100],
         );
-        $factory->cartItem($cart, $product);
+        $factory->cartItem($cart, $product, overrides: ['quantity' => (float) $quantity]);
 
         $this->registerCarrier($country);
         $this->registerWallet();

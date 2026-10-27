@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Model\Address;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 
@@ -48,11 +50,14 @@ final readonly class ExpressCheckoutTotal
 
     /**
      * The delivery address the checkout chose. A cart with nothing to ship is never asked
-     * for one, and its buyer is taxed where they are invoiced.
+     * for one: it is taxed at the address the checkout gives it, the default address of its
+     * buyer ({@see \Thelia\Domain\Shipping\Service\DeliverySetupService::setupVirtualDelivery()}),
+     * so a wallet and any other payment method tax the same cart in the same place. A buyer
+     * with no address of their own is taxed where they are invoiced.
      *
      * @throws PropelException
      */
-    public function addressTheCartIsTaxedFor(Cart $cart): ?CartAddress
+    public function addressTheCartIsTaxedFor(Cart $cart): Address|CartAddress|null
     {
         $delivery = $cart->getCartAddressRelatedByAddressDeliveryId();
 
@@ -60,6 +65,20 @@ final readonly class ExpressCheckoutTotal
             return $delivery;
         }
 
-        return $cart->getCartAddressRelatedByAddressInvoiceId();
+        return $this->addressOfTheBuyer($cart) ?? $cart->getCartAddressRelatedByAddressInvoiceId();
+    }
+
+    /**
+     * @throws PropelException
+     */
+    private function addressOfTheBuyer(Cart $cart): ?Address
+    {
+        $customer = $cart->getCustomer();
+
+        if (null === $customer) {
+            return null;
+        }
+
+        return $customer->getDefaultAddress() ?? AddressQuery::create()->filterByCustomer($customer)->findOne();
     }
 }
