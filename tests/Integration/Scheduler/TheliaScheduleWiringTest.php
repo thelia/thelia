@@ -50,6 +50,7 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
                 'sale:check-activation' => '* * * * *',
                 'maintenance:purge' => '30 3 * * *',
                 'thelia:messenger:purge-failed' => '0 4 * * *',
+                'content:publish-scheduled' => '* * * * *',
             ],
             self::commands($schedule->getRecurringMessages()),
             'The currency rates are left out: the update overwrites every rate, those set by hand included.',
@@ -95,7 +96,7 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
         $container->register('messenger.transport_factory')->setSynthetic(true);
         $container->register('messenger.default_serializer')->setSynthetic(true);
         $container->register(TheliaSchedule::class, TheliaSchedule::class)
-            ->setArguments([new Definition(ArrayAdapter::class), new Definition(LockFactory::class, [new Definition(InMemoryStore::class)]), '* * * * *', '30 3 * * *', '0 4 * * *', ''])
+            ->setArguments([new Definition(ArrayAdapter::class), new Definition(LockFactory::class, [new Definition(InMemoryStore::class)]), '* * * * *', '30 3 * * *', '0 4 * * *', '', '* * * * *'])
             ->addTag('scheduler.schedule_provider', ['name' => TheliaSchedule::NAME])
             ->setPublic(true);
         $container->register('stock_sync.nightly_check', \stdClass::class)

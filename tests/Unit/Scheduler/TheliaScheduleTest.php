@@ -26,10 +26,10 @@ final class TheliaScheduleTest extends TestCase
 {
     public function testTheTasksOfTheCoreAreScheduledWithTheirExpression(): void
     {
-        $schedule = $this->schedule(saleCheck: '* * * * *', maintenancePurge: '30 3 * * *', failedJobsPurge: '0 4 * * *', currencyRates: '');
+        $schedule = $this->schedule(saleCheck: '* * * * *', maintenancePurge: '30 3 * * *', failedJobsPurge: '0 4 * * *', currencyRates: '', contentPublication: '*/5 * * * *');
 
         self::assertSame(
-            ['sale:check-activation' => '* * * * *', 'maintenance:purge' => '30 3 * * *', 'thelia:messenger:purge-failed' => '0 4 * * *'],
+            ['sale:check-activation' => '* * * * *', 'maintenance:purge' => '30 3 * * *', 'thelia:messenger:purge-failed' => '0 4 * * *', 'content:publish-scheduled' => '*/5 * * * *'],
             self::commands($schedule->getRecurringMessages()),
         );
     }
@@ -40,14 +40,14 @@ final class TheliaScheduleTest extends TestCase
      */
     public function testTheCurrencyRatesRunOnlyOnceAnExpressionIsGiven(): void
     {
-        $schedule = $this->schedule(saleCheck: '', maintenancePurge: '', failedJobsPurge: '', currencyRates: '0 6 * * *');
+        $schedule = $this->schedule(saleCheck: '', maintenancePurge: '', failedJobsPurge: '', currencyRates: '0 6 * * *', contentPublication: '');
 
         self::assertSame(['currency:update-rates' => '0 6 * * *'], self::commands($schedule->getRecurringMessages()));
     }
 
     public function testAnEmptyExpressionLeavesTheTaskOut(): void
     {
-        $schedule = $this->schedule(saleCheck: '  ', maintenancePurge: '', failedJobsPurge: '', currencyRates: '');
+        $schedule = $this->schedule(saleCheck: '  ', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '');
 
         self::assertSame([], $schedule->getRecurringMessages());
     }
@@ -59,8 +59,8 @@ final class TheliaScheduleTest extends TestCase
     public function testTwoWorkersCannotHoldTheScheduleAtOnce(): void
     {
         $store = new InMemoryStore();
-        $first = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', ''))->getSchedule();
-        $second = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', ''))->getSchedule();
+        $first = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', ''))->getSchedule();
+        $second = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', ''))->getSchedule();
 
         self::assertTrue($first->getLock()?->acquire());
         self::assertFalse($second->getLock()?->acquire(), 'The second worker must wait for the first.');
@@ -75,15 +75,15 @@ final class TheliaScheduleTest extends TestCase
      */
     public function testAWorkerComingBackCatchesUpTheLastMissedRunOnly(): void
     {
-        $schedule = $this->schedule(saleCheck: '* * * * *', maintenancePurge: '', failedJobsPurge: '', currencyRates: '');
+        $schedule = $this->schedule(saleCheck: '* * * * *', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '');
 
         self::assertNotNull($schedule->getState());
         self::assertTrue($schedule->shouldProcessOnlyLastMissedRun());
     }
 
-    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates): \Symfony\Component\Scheduler\Schedule
+    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates, string $contentPublication): \Symfony\Component\Scheduler\Schedule
     {
-        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates))->getSchedule();
+        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates, $contentPublication))->getSchedule();
     }
 
     /**
