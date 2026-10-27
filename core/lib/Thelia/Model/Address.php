@@ -101,21 +101,28 @@ class Address extends BaseAddress
      * carrier and its postage were quoted for the same place and still hold. A copy whose
      * country, state, postal code or city the edit moved is left as it was quoted, and the
      * order is refused until the address is chosen again (CartGuard::checkValidDelivery()),
-     * which asks the carriers and their postage for the new place.
+     * which asks the carriers and their postage for the new place. A cart with nothing to
+     * ship quoted no postage and is never refused for a move: its copy follows any edit,
+     * unless a cart that ships holds the same copy.
      */
     private function refreshTheDeliveryCopiesStillAtItsPlace(?ConnectionInterface $con): void
     {
-        $deliveryCopyIds = CartQuery::create()
+        $openCarts = CartQuery::create()
             ->useCartAddressRelatedByAddressDeliveryIdQuery()
                 ->filterByAddressId($this->getId())
             ->endUse()
             ->where('NOT EXISTS (SELECT 1 FROM `order` WHERE `order`.`cart_id` = `cart`.`id`)')
-            ->select('AddressDeliveryId')
-            ->find($con)
-            ->getData();
+            ->find($con);
 
-        foreach (CartAddressQuery::create()->filterById($deliveryCopyIds)->find($con) as $cartAddress) {
-            if ($cartAddress->isAtThePlaceOf($this)) {
+        $copyFollowsAnyMove = [];
+
+        foreach ($openCarts as $cart) {
+            $copyId = $cart->getAddressDeliveryId();
+            $copyFollowsAnyMove[$copyId] = ($copyFollowsAnyMove[$copyId] ?? true) && $cart->isVirtual();
+        }
+
+        foreach (CartAddressQuery::create()->filterById(array_keys($copyFollowsAnyMove))->find($con) as $cartAddress) {
+            if ($copyFollowsAnyMove[$cartAddress->getId()] || $cartAddress->isAtThePlaceOf($this)) {
                 $cartAddress->copyFrom($this)->save($con);
             }
         }
