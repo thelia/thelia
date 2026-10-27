@@ -27,6 +27,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\CartItemTableMap;
 use Thelia\Model\Product;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Sale;
 use Thelia\Test\ApiTestCase;
@@ -159,6 +160,26 @@ final class CartItemThroughCartApiTest extends ApiTestCase
         $response = $this->jsonRequest('POST', '/api/front/cart_items', $this->addition($cart, $product, 2), $this->authenticateAsCustomer($customer));
 
         self::assertSame(422, $response->getStatusCode());
+        self::assertSame(0, CartItemQuery::create()->filterByCartId($cart->getId())->count($this->getPropelConnection()));
+    }
+
+    /**
+     * Nothing prices a sale element that has no price in the default currency: the cart
+     * writes no line, and that is the caller's refusal (422), not a server error.
+     */
+    public function testAnAdditionOfASaleElementNothingPricesIsRefusedAndAddsNothing(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $cart = $factory->cart($customer);
+        $product = $this->product($factory, stock: 100);
+        ProductPriceQuery::create()
+            ->filterByProductSaleElementsId($product->getProductSaleElementss()->getFirst()->getId())
+            ->delete($this->getPropelConnection());
+
+        $response = $this->jsonRequest('POST', '/api/front/cart_items', $this->addition($cart, $product, 2), $this->authenticateAsCustomer($customer));
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
         self::assertSame(0, CartItemQuery::create()->filterByCartId($cart->getId())->count($this->getPropelConnection()));
     }
 

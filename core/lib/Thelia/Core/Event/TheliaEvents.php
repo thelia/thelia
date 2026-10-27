@@ -127,6 +127,13 @@ final class TheliaEvents
     /** Sent to open the passwordless account that carries an order placed without one. */
     public const CUSTOMER_GUEST_CREATE = 'action.create.customer.guest';
 
+    /**
+     * Sent once a customer is moved to another group and the move is written:
+     * {@see Customer\CustomerGroupChangedEvent}. Never raised for a
+     * customer created in a group, nor for a move to the group the customer is already in.
+     */
+    public const CUSTOMER_GROUP_CHANGED = 'action.customer.groupChanged';
+
     /** sent on customer account update. */
     public const CUSTOMER_UPDATEACCOUNT = 'action.updateCustomer';
 
@@ -268,6 +275,22 @@ final class TheliaEvents
      * the lines removed, the quantities reduced and the prices changed.
      */
     public const CART_SALE_UNIT_SWITCHED = 'cart.saleUnit.switched';
+
+    /**
+     * Sent (CartEvent) once the lines of a cart held by a session were priced again outside of a
+     * cart change (a customer group moved them at the payment): what depends on the total of the
+     * cart, the discount of the coupons, is priced on the new lines.
+     */
+    public const CART_LINES_REPRICED = 'cart.lines.repriced';
+
+    /**
+     * Sent (CartEvent) once lines were taken out of a cart that a session now holds, outside of
+     * any cart event: a cart found again by its cookie that holds products its visitor no longer
+     * sees. What depends on the lines (the discount of the coupons and the lines they offer, the
+     * postage) is priced on what is left. Sent once the cart is the session's, never while it is
+     * being restored: the listeners read the session cart.
+     */
+    public const CART_LINES_REMOVED = 'cart.lines.removed';
 
     /** sent when a new item is added to current cart. */
     public const AFTER_CARTADDITEM = 'cart.after.addItem';

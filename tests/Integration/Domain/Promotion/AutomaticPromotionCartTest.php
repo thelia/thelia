@@ -19,6 +19,7 @@ use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
@@ -391,7 +392,7 @@ final class AutomaticPromotionCartTest extends ActionIntegrationPromotionTestCas
         $customer = $this->factory->customer($this->factory->customerTitle());
         $this->getService(SecurityContext::class)->setCustomerUser($customer);
 
-        $newCart = $cart->duplicate(null, $customer, $cart->getCurrency(), $this->dispatcher);
+        $newCart = $cart->duplicate(null, $customer, $cart->getCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $newCart);
         self::assertCount(

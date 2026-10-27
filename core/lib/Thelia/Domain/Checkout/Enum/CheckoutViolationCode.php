@@ -98,6 +98,21 @@ enum CheckoutViolationCode: string
     case GuestCheckoutNotAllowed = 'guest-checkout-not-allowed';
 
     /**
+     * The price of a line is no longer the one the buyer was shown: a group, a rule or an
+     * operation moved it between the cart and the payment. The lines were priced again and
+     * the placement stopped, so that the coupon, the postage and the total the buyer pays
+     * are all read on the final prices; the same request, posted again, goes through.
+     */
+    case CartPricesChanged = 'cart-prices-changed';
+
+    /**
+     * A line of the cart holds a product the buyer may no longer see (a customer group
+     * restricted to some categories, a rule of a module). The line has to come out of the
+     * cart before the order can be placed.
+     */
+    case CartLineUnavailable = 'cart-line-unavailable';
+
+    /**
      * A refusal of the checkout that names no family of its own — a module's step, or a
      * core exception a later version has not given a code to yet.
      */

@@ -21,6 +21,8 @@ class CartRestoreEvent extends ActionEvent
 {
     protected ?Cart $cart = null;
 
+    protected bool $linesRemoved = false;
+
     public function getCart(): ?Cart
     {
         return $this->cart;
@@ -31,5 +33,21 @@ class CartRestoreEvent extends ActionEvent
         $this->cart = $cart;
 
         return $this;
+    }
+
+    /**
+     * Said by the listener that restored the cart when it took lines out of it: the session
+     * tells what depends on the lines once it holds the cart (TheliaEvents::CART_LINES_REMOVED).
+     */
+    public function markLinesRemoved(): static
+    {
+        $this->linesRemoved = true;
+
+        return $this;
+    }
+
+    public function haveLinesBeenRemoved(): bool
+    {
+        return $this->linesRemoved;
     }
 }

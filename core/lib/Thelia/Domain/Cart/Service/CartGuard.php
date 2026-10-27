@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Exception\CartLineUnavailableException;
 use Thelia\Domain\Checkout\Exception\DeliveryAddressMovedException;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
@@ -28,6 +29,7 @@ use Thelia\Domain\Checkout\Exception\IncompleteInvoiceAddressException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
 use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
@@ -39,6 +41,7 @@ use Thelia\Domain\Shipping\Service\DeliveryPostageQuerier;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
+use Thelia\Model\CartItem;
 use Thelia\Model\Lang;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -52,6 +55,8 @@ class CartGuard
         private readonly ContainerInterface $container,
         private readonly DeliveryDateGuard $deliveryDateGuard,
         private readonly CartShippingRules $cartShippingRules,
+        private readonly CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
+        private readonly CartLineVisibility $cartLineVisibility,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
@@ -65,6 +70,31 @@ class CartGuard
         if (!$cart || $cart->countCartItems() === 0) {
             throw new EmptyCartException('Cart is empty or contains no items');
         }
+    }
+
+    /**
+     * Refuses a cart that holds a product the buyer may not see: a line added before they signed
+     * in as a customer of a group that does not see it, a restriction written since. The theme
+     * and the API answer the catalog the same way, and an order is never placed for a product
+     * the catalog hides from its buyer. The lines a promotion offered are the shop's, not judged.
+     *
+     * @throws CartLineUnavailableException
+     */
+    public function checkLinesAreAvailable(?Cart $cart): void
+    {
+        if (!$cart instanceof Cart) {
+            return;
+        }
+
+        $hiddenLines = $this->cartLineVisibility->hiddenLinesOf($cart);
+
+        if ([] === $hiddenLines) {
+            return;
+        }
+
+        $productIds = array_values(array_unique(array_map(static fn (CartItem $line): int => (int) $line->getProductId(), $hiddenLines)));
+
+        throw new CartLineUnavailableException($this->cartShippingRules->titlesOf($productIds, $this->locale()), array_map(static fn (CartItem $line): int => (int) $line->getId(), $hiddenLines));
     }
 
     /**
@@ -303,6 +333,11 @@ class CartGuard
         if (!$module->isPayementModule() || !$this->isActive($module)) {
             throw new InvalidPaymentException('Payment module is not available');
         }
+
+        // Called here and not left to a listener of the event below: the judge stops as soon
+        // as a module stops the propagation, and a module a customer group is shut out of
+        // must be refused whoever answers.
+        $this->customerGroupPaymentPolicy->refuseUnlessAllowedForCart((int) $module->getId(), $cart);
 
         // Same judge as the payment options offered at checkout.
         $isValidPaymentEvent = new IsValidPaymentEvent($module->getPaymentModuleInstance($this->container), $cart);

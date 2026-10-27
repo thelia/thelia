@@ -359,6 +359,28 @@ class BuyXGetY extends CouponAbstract implements OfferedLineProviderInterface
         return $this->discountCarriedBy($cartItem, $lots);
     }
 
+    /**
+     * The same discount without tax, before any proration: the taxed one brought back to the
+     * price of the line without tax, so that both read the same lots, the same units and the
+     * same discount type. A theme showing untaxed prices strikes this one.
+     */
+    public function untaxedDiscountOnOfferedLine(CartItem $cartItem): float
+    {
+        $taxedDiscount = $this->taxedDiscountOnOfferedLine($cartItem);
+
+        if ($taxedDiscount <= 0.0) {
+            return 0.0;
+        }
+
+        $taxedPrice = $cartItem->getRealTaxedPrice($this->facade->getDeliveryCountry());
+
+        if ($taxedPrice <= 0.0) {
+            return 0.0;
+        }
+
+        return $taxedDiscount * $cartItem->getRealPrice() / $taxedPrice;
+    }
+
     private function ownsOfferedLine(CartItem $cartItem): bool
     {
         return self::TARGET_MODE_PRODUCT === $this->targetMode

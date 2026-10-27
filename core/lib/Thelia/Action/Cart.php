@@ -35,9 +35,11 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Cart\Exception\ProductNotAvailableException;
+use Thelia\Domain\Cart\Exception\ProductWithoutPriceException;
 use Thelia\Domain\Cart\Service\CartAddressService;
-use Thelia\Domain\Pricing\EffectivePrice;
-use Thelia\Domain\Pricing\EffectivePriceResolver;
+use Thelia\Domain\Cart\Service\CartLinePricer;
+use Thelia\Domain\Cart\Service\CartLineVisibility;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\SaleUnit\Cart\CartLineChange;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
@@ -63,7 +65,6 @@ use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\ProductSaleElements;
-use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\TokenProvider;
 
@@ -83,7 +84,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ContainerInterface $container,
         protected CartAddressService $cartAddressService,
         protected PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
-        protected EffectivePriceResolver $effectivePriceResolver,
+        protected CartLinePricer $cartLinePricer,
         protected PricingActivityChecker $pricingActivityChecker,
         protected ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
         protected ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
@@ -91,6 +92,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?SaleUnitStockResolver $saleUnitStockResolver = null,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
         protected ?CartShippingRules $cartShippingRules = null,
+        protected ?CartLineVisibility $cartLineVisibility = null,
     ) {
     }
 
@@ -256,23 +258,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * add an article in the current cart.
      *
      * @throws PropelException
+     * @throws ProductWithoutPriceException when nothing prices the sale element, so no line can be written
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
-        $customer = $cart->getCustomer();
-        $discount = 0.0;
 
         if ($cart->isNew()) {
             $persistEvent = new CartPersistEvent($cart);
             $dispatcher->dispatch($persistEvent, TheliaEvents::CART_PERSIST);
-        }
-
-        if (null !== $customer && $customer->getDiscount() > 0) {
-            // getDiscount() maps a DECIMAL column and returns a string.
-            $discount = (float) $customer->getDiscount();
         }
 
         if (null === $quantity || $quantity <= 0) {
@@ -319,12 +315,15 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if ($appends) {
             $cartItem->addQuantity($quantity, $saleUnitQuantity)->save();
         } else {
-            $productPrices = $productSaleElements->getPricesByCurrency(
-                $this->currencyOf($cart),
-                $discount,
-            );
+            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity);
 
-            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
+            if (null === $cartItem) {
+                // Nothing prices this sale element (no price in the default currency):
+                // there is no price to write on a line, so there is no line. Refused, not
+                // answered with an event that holds no line: a module dispatching
+                // CART_ADDITEM reads the line it asked for on the event.
+                throw new ProductWithoutPriceException();
+            }
         }
 
         $this->settlePrices($cart);
@@ -383,6 +382,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      * @throws NotEnoughStockException
+     * @throws ProductNotAvailableException when the quantity of a line the visitor no longer sees would grow
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -403,6 +403,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
                     );
 
                     return;
+                }
+
+                // A line the visitor no longer sees (a restriction written since, a sign-in
+                // as somebody who sees less) may be reduced or removed, never increased.
+                if ($quantity > (float) $cartItem->getQuantity() && $this->cartLineVisibility?->isLineHidden($cartItem)) {
+                    throw new ProductNotAvailableException();
                 }
 
                 $event->setCartItem(
@@ -448,59 +454,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency): void
     {
-        $customer = $cart->getCustomer();
-        $discount = 0.0;
-
-        if (null !== $customer && $customer->getDiscount() > 0) {
-            // getDiscount() maps a DECIMAL column and returns a string.
-            $discount = (float) $customer->getDiscount();
-        }
-
-        $effectivePrices = $this->effectivePriceResolver->resolve(
-            $this->saleElementIdsOf($cart),
-            $currency,
-            $customer,
-        );
-
-        // cart item
-        foreach ($cart->getCartItems() as $cartItem) {
-            // An offered line belongs to the promotion that placed it, which set its
-            // price: settling it against the catalog would charge the customer for a
-            // gift the shop decided to give.
-            if (1 === (int) $cartItem->getIsOffered()) {
-                continue;
-            }
-
-            $productSaleElements = $cartItem->getProductSaleElements();
-
-            if (null === $productSaleElements) {
-                continue;
-            }
-
-            $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
-
-            [$promo, $promoPrice] = $this->promoOfLine(
-                $productSaleElements,
-                $productPrice,
-                $effectivePrices,
-                $discount,
-            );
-
-            // Nothing changed for this item, leave it alone. The comparison is made on
-            // the settled values, rule and reserved price included: comparing the
-            // catalog ones would keep a line at a price the customer has since lost.
-            if ((float) $cartItem->getPrice() === (float) $productPrice->getPrice()
-                && (float) $cartItem->getPromoPrice() === $promoPrice
-                && (int) $cartItem->getPromo() === $promo) {
-                continue;
-            }
-
-            $cartItem
-                ->setPrice((string) $productPrice->getPrice())
-                ->setPromoPrice((string) $promoPrice)
-                ->setPromo($promo)
-                ->save();
-        }
+        $this->cartLinePricer->reprice($cart, $currency, $cart->getCustomer());
     }
 
     /**
@@ -515,9 +469,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     private function settlePrices(CartModel $cart): void
     {
-        if (!$this->pricingActivityChecker->hasActivePublicRule()
-            && !$this->pricingActivityChecker->hasVisitorDependentPricing()
-            && true !== $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
+        $customer = null === $cart->getCustomerId() ? null : $cart->getCustomer();
+
+        if (!$this->pricingActivityChecker->mayPriceBeyondCatalog($customer)
             && !$this->holdsSpecialOffer($cart)) {
             return;
         }
@@ -557,60 +511,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     private function currencyOf(CartModel $cart): CurrencyModel
     {
         return $cart->getCurrency() ?? CurrencyModel::getDefaultCurrency();
-    }
-
-    /**
-     * @return list<int> the sale elements the cart holds a line for
-     */
-    private function saleElementIdsOf(CartModel $cart): array
-    {
-        $saleElementIds = [];
-
-        foreach ($cart->getCartItems() as $cartItem) {
-            if (null !== $saleElementId = $cartItem->getProductSaleElementsId()) {
-                $saleElementIds[] = (int) $saleElementId;
-            }
-        }
-
-        return $saleElementIds;
-    }
-
-    /**
-     * The special offer a cart line carries: the catalog one, unless a catalog price
-     * rule or a reserved operation resolved a price of its own for this customer.
-     *
-     * A rule replaces the catalog special offer; a reserved operation only comes
-     * through when it beats what the customer would otherwise pay.
-     *
-     * @param array<int, EffectivePrice> $effectivePrices as resolved for the whole batch
-     *
-     * @return array{0: int, 1: float} the promo flag, and the untaxed promo price
-     */
-    private function promoOfLine(
-        ProductSaleElements $productSaleElements,
-        ProductPriceTools $catalogPrices,
-        array $effectivePrices,
-        float $discount,
-    ): array {
-        $effectivePrice = $effectivePrices[(int) $productSaleElements->getId()] ?? null;
-
-        if (null === $effectivePrice) {
-            return [(int) $productSaleElements->getPromo(), round((float) $catalogPrices->getPromoPrice(), 6)];
-        }
-
-        $promoPrice = $effectivePrice->untaxedPromoPrice;
-
-        // A customer discount rate applies on top, the way getPricesByCurrency()
-        // applies it to the catalog prices. It scales both prices by the same
-        // factor, so it never changes which of the two is the lower one.
-        if ($discount > 0) {
-            $promoPrice *= 1 - $discount / 100;
-        }
-
-        // `cart_item.promo_price` is a DECIMAL(16,6): rounding here is what makes
-        // the value written and the value read back compare equal, so a refresh
-        // that changes nothing writes nothing.
-        return [1, round($promoPrice, 6)];
     }
 
     /**
@@ -679,6 +579,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * try to attach a new item to an existing cart.
+     *
+     * @return CartItem|null null when nothing prices the sale element: no line is written
      */
     protected function doAddItem(
         EventDispatcherInterface $dispatcher,
@@ -686,28 +588,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         int $productId,
         ProductSaleElements $productSaleElements,
         float $quantity,
-        ProductPriceTools $productPrices,
-    ): CartItem {
-        // The line is the proof of the price the shop agreed to: an order is built
-        // from it, so a rule or reserved price has to be written down here and not
-        // worked out again later, when the rule or the operation may well be over.
-        $customer = $cart->getCustomer();
-        $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
-
-        [$promo, $promoPrice] = $this->promoOfLine(
-            $productSaleElements,
-            $productPrices,
-            // The same currency the catalog prices of this line were read in: the two
-            // are compared against each other, so resolving them apart would let a
-            // price in one currency undercut a catalog price in another.
-            $this->effectivePriceResolver->resolve(
-                [(int) $productSaleElements->getId()],
-                $this->currencyOf($cart),
-                $customer,
-            ),
-            $discount,
-        );
-
+    ): ?CartItem {
         $cartItem = new CartItem();
         $cartItem->setDispatcher($dispatcher);
         $cartItem
@@ -715,11 +596,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice((string) $productPrices->getPrice())
-            ->setPromoPrice((string) $promoPrice)
-            ->setPromo($promo)
-            ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30))
-            ->save();
+            ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30));
+
+        // The line is the proof of the price the shop agreed to: an order is built
+        // from it, so the price of the group, a rule or a reserved price has to be
+        // written down here and not worked out again later, when it may well be over.
+        if ([] === $this->cartLinePricer->price([$cartItem], $this->currencyOf($cart), $cart->getCustomer())) {
+            return null;
+        }
+
+        $cartItem->save();
 
         return $cartItem;
     }
@@ -965,6 +851,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->getSession()->setCurrency($cart->getCurrency());
         }
 
+        // A cart found again by its cookie may hold lines the visitor who owns it now does not see
+        // (a restriction written since, a customer group signed in through the remember-me).
+        // The discount, the lines a promotion offered and the postage follow them once the
+        // session holds the cart (Session::getSessionCart), not here: the listeners read it.
+        if (!$cart->isNew() && [] !== ($this->cartLineVisibility?->removeHiddenLines($cart) ?? [])) {
+            $cartRestoreEvent->markLinesRemoved();
+        }
+
         // A restored cart may have been created a long time ago: bring the price and the special offer
         // status of its items back in line with the current catalog. A cart of another sale unit is
         // left to followSaleUnit(), which reprices it and tells what changed.
@@ -1046,15 +940,15 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // A customer is logged in.
             // If the customer has a discount, whe have to duplicate the cart,
             // so that the discount will be applied to the products in cart.
-            // getDiscount() maps a DECIMAL column, so it returns a string such as '0.000000'.
             //
             // A shop running a reserved operation or a rule for named customers has
             // to reprice the cart at sign-in for the same reason: what the visitor
             // filled it with is the public price, and the customer they turned out to
-            // be may be entitled to better. The checks are indexed queries, memoised
-            // for the request, so a shop with neither keeps the behaviour it had.
-            $needsRepricing = 0.0 !== (float) $customer->getDiscount()
-                || $this->pricingActivityChecker->hasVisitorDependentPricing();
+            // be may be entitled to better. So does a shop where a customer group has a
+            // discount or prices of its own: the customer signing in may belong to it,
+            // which the visitor's cart does not know. The checks are indexed queries,
+            // memoised for the request, so a shop with none keeps the behaviour it had.
+            $needsRepricing = $this->pricingActivityChecker->pricesDependOnWhoIsAsking($customer);
 
             if (null === $cart->getCustomerId() && (!$needsRepricing || 0 === $cart->countCartItems())) {
                 // Nothing to reprice, or an empty cart: there's no need to duplicate.
@@ -1208,6 +1102,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->getSession()->getCurrency(),
             $dispatcher,
             $this->saleUnitStockResolver,
+            $this->cartLinePricer,
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);

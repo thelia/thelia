@@ -18,6 +18,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\CartContainsCategories;
 use Thelia\Condition\Implementation\CartContainsProducts;
+use Thelia\Condition\Implementation\ForSomeCustomerGroups;
 use Thelia\Condition\Implementation\ForSomeCustomers;
 use Thelia\Condition\Implementation\MatchBillingCountries;
 use Thelia\Condition\Implementation\MatchDeliveryCountries;
@@ -74,4 +75,5 @@ return static function (ContainerConfigurator $configurator): void {
     $services->alias('thelia.condition.cart_contains_categories', CartContainsCategories::class)->public();
     $services->alias('thelia.condition.cart_contains_products', CartContainsProducts::class)->public();
     $services->alias('thelia.condition.for_some_customers', ForSomeCustomers::class)->public();
+    $services->alias('thelia.condition.for_some_customer_groups', ForSomeCustomerGroups::class)->public();
 };

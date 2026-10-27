@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -70,6 +71,7 @@ class OfferedCartLineService implements ResetInterface
     public function __construct(
         private readonly FacadeInterface $facade,
         private readonly RequestStack $requestStack,
+        private readonly CartLinePricer $cartLinePricer,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
     ) {
     }
@@ -258,7 +260,7 @@ class OfferedCartLineService implements ResetInterface
         if ($priceEndOfLife instanceof \DateTimeInterface && $priceEndOfLife < new \DateTime()) {
             // The pinned price expired: pin it again on the current catalog price,
             // the way any cart line is repriced when its price end of life passes.
-            $this->pinPrices($line, $productSaleElements, $cart);
+            $this->pinPrices($line, $cart);
             $modified = true;
         }
 
@@ -308,7 +310,13 @@ class OfferedCartLineService implements ResetInterface
             ->setIsOffered(1)
             ->setOfferedByCouponId($request->couponId);
 
-        $this->pinPrices($line, $productSaleElements, $cart);
+        if (!$this->pinPrices($line, $cart)) {
+            Tlog::getInstance()->warning(
+                \sprintf('Offered product %d has no price, promotion "%s" adds nothing', $request->productId, $label),
+            );
+
+            return false;
+        }
 
         $line->save();
 
@@ -316,34 +324,28 @@ class OfferedCartLineService implements ResetInterface
     }
 
     /**
-     * Pins the line prices the way Action\Cart::doAddItem() does: the catalog
-     * prices for the cart currency, the customer discount applied, and a fresh
-     * price end of life.
+     * Pins the line prices the way Action\Cart::doAddItem() does: what the customer of
+     * the cart is owed for the sale element in the cart currency, and a fresh price end
+     * of life.
+     *
+     * @return bool false for a new line nothing prices; a line already in the cart
+     *              keeps the price it had
      */
-    private function pinPrices(CartItem $line, ProductSaleElements $productSaleElements, Cart $cart): void
+    private function pinPrices(CartItem $line, Cart $cart): bool
     {
-        $prices = $productSaleElements->getPricesByCurrency(
+        $priced = [] !== $this->cartLinePricer->price(
+            [$line],
             $cart->getCurrency() ?? Currency::getDefaultCurrency(),
-            $this->customerDiscountOf($cart),
+            $cart->getCustomer(),
         );
 
-        $line
-            ->setPrice((string) $prices->getPrice())
-            ->setPromoPrice((string) $prices->getPromoPrice())
-            ->setPromo((int) $productSaleElements->getPromo())
-            ->setPriceEndOfLife(time() + (int) ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30));
-    }
-
-    private function customerDiscountOf(Cart $cart): float
-    {
-        $customer = $cart->getCustomer();
-
-        if (null === $customer) {
-            return 0.0;
+        if (!$priced && $line->isNew()) {
+            return false;
         }
 
-        // getDiscount() maps a DECIMAL column and returns a string.
-        return (float) $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
+        $line->setPriceEndOfLife(time() + (int) ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30));
+
+        return true;
     }
 
     /**

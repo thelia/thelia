@@ -40,6 +40,8 @@ use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
+use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
@@ -74,6 +76,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         private ApiResourcePropelTransformerService $transformer,
         private CartFacade $cartFacade,
         private CartGuard $cartGuard,
+        private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
     ) {
     }
 
@@ -110,6 +113,13 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             // placement is, so the client branches on the same codes either way.
             return new JsonResponse(
                 CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        } catch (InvalidPaymentException $refusal) {
+            // A module the group of the buyer is shut out of is refused when it is chosen, in
+            // the shape the placement refuses it, rather than at the validation only.
+            return new JsonResponse(
+                CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_PAYMENT, $refusal)])->toArray(),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
             );
         } catch (CustomerPaymentMethodException $refusal) {
@@ -180,10 +190,14 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     /**
      * @throws PropelException
      * @throws CustomerPaymentMethodException
+     * @throws InvalidPaymentException        when the group of the buyer does not list the module
      */
     private function selectPaymentModule(Cart $cart, CheckoutPaymentModuleInput $input): void
     {
         $module = $this->activatedModule($input->paymentModuleId, BaseModule::PAYMENT_MODULE_TYPE, 'payment');
+
+        // Refused before anything is written, the module already held included.
+        $this->customerGroupPaymentPolicy->refuseUnlessAllowedForCart((int) $module->getId(), $cart);
 
         if (
             $cart->getPaymentModuleId() === $module->getId()

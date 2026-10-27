@@ -20,6 +20,7 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\EventBuilder\CartEventBuilder;
+use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\CartItem;
@@ -33,13 +34,24 @@ readonly class CartItemService
     ) {
     }
 
+    /**
+     * @throws InvalidCartException when the cart wrote no line: nothing prices the sale
+     *                              element, so there is no price to put on a line
+     */
     public function addItem(CartItemAddDTO $cartAddDTO): CartItem
     {
         $cartEvent = $this->cartEventBuilder->buildEvent($cartAddDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
+
+        $cartItem = $cartEvent->getCartItem();
+
+        if (!$cartItem instanceof CartItem) {
+            throw new InvalidCartException('This product has no price: it cannot be added to the cart.');
+        }
+
         $this->postageHandler->handlePostageOnCart($cartAddDTO->getCart());
 
-        return $cartEvent->getCartItem();
+        return $cartItem;
     }
 
     public function deleteItem(CartItemDeleteDTO $cartDeleteItemDTO): void

@@ -302,6 +302,30 @@ final class CheckoutGiftWrappingTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * A theme showing prices without tax reads the untaxed price of the service from the
+     * provider: the figure the cart total is built from, cut to the cent.
+     */
+    public function testTheUntaxedPriceOfAWrappingIsTheOneTheCartIsTotalledWith(): void
+    {
+        $wrapping = $this->createGiftWrapping('gift-box', '4.166667', ['en_US' => 'Gift box']);
+        $free = $this->createGiftWrapping('kraft-paper', '0.000000', ['en_US' => 'Kraft paper']);
+
+        [$cart] = $this->cartReadyToPay();
+        $this->cartFacade()->chooseGiftWrapping($cart, (int) $wrapping->getId());
+
+        $provider = $this->getService(GiftWrappingProvider::class);
+
+        self::assertSame(4.17, $provider->untaxedPrice($wrapping));
+        self::assertSame($cart->getUntaxedGiftWrapping(), $provider->untaxedPrice($wrapping), 'One figure for the cart and for the theme.');
+        self::assertSame(0.0, $provider->untaxedPrice($free));
+        self::assertSame(
+            $provider->untaxedPrice($wrapping),
+            $provider->taxedPrice($wrapping),
+            'A wrapping read without a destination is priced at its bare price: the same figure.',
+        );
+    }
+
     // ------------------------------------------------------------------
     // Harness
     // ------------------------------------------------------------------

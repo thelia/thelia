@@ -29,6 +29,7 @@ use Thelia\Model\Address;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
@@ -314,6 +315,93 @@ final class CheckoutApiTest extends ApiTestCase
         self::assertFalse($refusal['ready']);
         self::assertContains(CheckoutViolationCode::CartEmpty->value, array_column($refusal['violations'], 'code'));
         self::assertCount(0, OrderQuery::create()->filterByCartId($cart->getId())->find($this->getPropelConnection()));
+    }
+
+    /**
+     * The other conflict with the state of the shop: a group moved the price of a line between
+     * the cart and the placement. The lines are priced again, nothing is ordered, and the
+     * same request posted again is placed on the prices the cart now shows.
+     */
+    public function testPlacingACartWhoseGroupChangedItsPricesIsAConflictThenPlacedOnTheNewPrices(): void
+    {
+        $checkout = $this->readyCheckout();
+        $factory = $this->createFixtureFactory();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+        $factory->assignCustomerGroup($checkout['customer'], $factory->customerGroup('checkout-api-pro', 20.0));
+
+        $refused = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(409, $refused->getStatusCode(), (string) $refused->getContent());
+        self::assertStringContainsString('prices of your cart have changed', (string) $refused->getContent());
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+        self::assertSame(
+            8.0,
+            round((float) CartItemQuery::create()->filterByCartId($cartId)->findOne($this->getPropelConnection())?->getPrice(), 6),
+            'the cart now reads the price of the group',
+        );
+
+        $placed = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertJsonResponseSuccessful($placed);
+        self::assertCount(1, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    /**
+     * A group that lists the payment modules it may pay with is refused the others, however
+     * the module is posted; the list of that group closes nothing to the default group.
+     */
+    public function testPlacingWithAPaymentModuleOffTheListOfTheGroupIsRefusedAndWritesNoOrder(): void
+    {
+        $checkout = $this->readyCheckout();
+        $factory = $this->createFixtureFactory();
+        $anotherModule = ModuleQuery::create()
+            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->filterById($checkout['paymentModule']->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
+            ->findOne($this->getPropelConnection())
+            ?? throw new \RuntimeException('A second payment module is needed — run bin/test-prepare.');
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+        // The group lists the other module only once the buyer holds the choice: the guard of
+        // the placement is what refuses here, whatever the selection did.
+        $factory->assignCustomerGroup($checkout['customer'], $factory->customerGroup('checkout-api-pro', paymentModuleIds: [(int) $anotherModule->getId()]));
+
+        $refused = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertGreaterThanOrEqual(400, $refused->getStatusCode(), (string) $refused->getContent());
+        self::assertLessThan(500, $refused->getStatusCode(), (string) $refused->getContent());
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    /**
+     * The module is refused when it is chosen, not only at the validation: 422 in the shape of a
+     * refused placement, nothing written on the cart. A group that lists it, and the default
+     * group, choose it.
+     */
+    public function testChoosingAPaymentModuleOffTheListOfTheGroupIsRefusedAndWritesNothingOnTheCart(): void
+    {
+        $checkout = $this->readyCheckout();
+        $factory = $this->createFixtureFactory();
+        $anotherModule = ModuleQuery::create()
+            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->filterById($checkout['paymentModule']->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
+            ->findOne($this->getPropelConnection())
+            ?? throw new \RuntimeException('A second payment module is needed — run bin/test-prepare.');
+        $group = $factory->customerGroup('checkout-api-select-pro', paymentModuleIds: [(int) $anotherModule->getId()]);
+        $factory->assignCustomerGroup($checkout['customer'], $group);
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+
+        $refused = $this->jsonRequest('POST', $this->url($cartId, 'payment_module'), ['paymentModuleId' => $checkout['paymentModule']->getId()], token: $token);
+
+        self::assertSame(422, $refused->getStatusCode(), (string) $refused->getContent());
+        $this->theViolation($this->decode($refused)['violations'], CheckoutViolationCode::PaymentInvalid->value);
+        self::assertNull(CartQuery::create()->findPk($cartId, $this->getPropelConnection())?->getPaymentModuleId(), 'The refused module is not written on the cart.');
+
+        $listed = $this->jsonRequest('POST', $this->url($cartId, 'payment_module'), ['paymentModuleId' => $anotherModule->getId()], token: $token);
+        self::assertJsonResponseSuccessful($listed);
     }
 
     /**

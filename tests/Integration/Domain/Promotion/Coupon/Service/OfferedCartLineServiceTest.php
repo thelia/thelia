@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -213,6 +214,45 @@ final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCas
         $this->service($this->requestStackWithSession())->reconcile([$this->offer($promotion, $gift, 1)], $cart);
 
         self::assertSame($expectedPrice, (float) $this->offeredLines($cart)[0]->getPrice());
+    }
+
+    public function testTheOfferedLineIsPricedWithTheDiscountOfTheGroupOfTheCustomer(): void
+    {
+        $group = $this->factory->customerGroup('pro', 15.0);
+        $customer = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $customer->setDiscount('10.000000')->save();
+        $gift = $this->product(['basePrice' => 10.0]);
+        $cart = $this->factory->cart($customer);
+
+        $this->service($this->requestStackWithSession())->reconcile([$this->offer($this->factory->coupon(), $gift, 1)], $cart);
+
+        // 10, less 15 % for the group, less 10 % for the customer.
+        self::assertEqualsWithDelta(7.65, (float) $this->offeredLines($cart)[0]->getPrice(), 0.0000001);
+    }
+
+    public function testTheOfferedLineIsPricedAtThePriceTheGroupHasOfItsOwn(): void
+    {
+        $group = $this->factory->customerGroup('pro', 15.0);
+        $customer = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $gift = $this->product(['basePrice' => 10.0]);
+        $this->factory->customerGroupProductPrice($group, $this->defaultPseFor($gift), $this->factory->currency(), 4.0);
+        $cart = $this->factory->cart($customer);
+
+        $this->service($this->requestStackWithSession())->reconcile([$this->offer($this->factory->coupon(), $gift, 1)], $cart);
+
+        self::assertSame(4.0, (float) $this->offeredLines($cart)[0]->getPrice());
+    }
+
+    public function testAGiftNothingPricesIsNotOffered(): void
+    {
+        $gift = $this->product(['basePrice' => 10.0]);
+        ProductPriceQuery::create()->filterByProductSaleElementsId($this->defaultPseFor($gift)->getId())->delete();
+        $cart = $this->factory->cart();
+
+        $changed = $this->service($this->requestStackWithSession())->reconcile([$this->offer($this->factory->coupon(), $gift, 1)], $cart);
+
+        self::assertFalse($changed);
+        self::assertSame([], $this->offeredLines($cart));
     }
 
     public function testTheOfferedLineIsPricedInTheCurrencyOfTheCart(): void
@@ -521,7 +561,7 @@ final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCas
 
     private function service(RequestStack $requestStack): OfferedCartLineService
     {
-        return new OfferedCartLineService($this->createStub(FacadeInterface::class), $requestStack);
+        return new OfferedCartLineService($this->createStub(FacadeInterface::class), $requestStack, $this->getService(CartLinePricer::class));
     }
 
     private function requestStackWithSession(): RequestStack

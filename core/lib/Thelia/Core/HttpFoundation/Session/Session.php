@@ -371,7 +371,15 @@ class Session extends BaseSession
 
         $this->setSessionCart($cart);
 
-        return $this->followSaleUnit($cart, $dispatcher);
+        $cart = $this->followSaleUnit($cart, $dispatcher);
+
+        // Lines taken out while the cart was restored: what depends on them is priced now that
+        // the session holds the cart, the listeners of the discount and of the postage read it.
+        if ($cartEvent->haveLinesBeenRemoved()) {
+            $dispatcher->dispatch(new CartEvent($cart), TheliaEvents::CART_LINES_REMOVED);
+        }
+
+        return $cart;
     }
 
     /**
