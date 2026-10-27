@@ -16,16 +16,24 @@ namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Cart\Exception\CartLineUnavailableException;
+use Thelia\Domain\Cart\Exception\CartPricesChangedException;
+use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Cart\Service\CartPriceGuard;
 use Thelia\Domain\Checkout\DTO\OrderPaymentOutcome;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
+use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\OrderFacade;
@@ -63,6 +71,10 @@ readonly class CheckoutPaymentService
         private OrderPaymentComposer $orderPaymentComposer,
         private OrderPaymentPartSettlement $orderPaymentPartSettlement,
         private ContainerInterface $container,
+        private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
+        private CartPriceGuard $cartPriceGuard,
+        private RequestStack $requestStack,
+        private CartGuard $cartGuard,
     ) {
     }
 
@@ -98,6 +110,9 @@ readonly class CheckoutPaymentService
      * so there is no second way to place an order to keep in step with the first.
      *
      * @throws GuestCheckoutNotAllowedException        when the shop stopped allowing this cart to be ordered without an account
+     * @throws CartLineUnavailableException            when the cart holds a product the buyer no longer sees (a restriction written since, a sign-in as a customer of another group)
+     * @throws CartPricesChangedException              when a line of the cart is no longer at the price its buyer is owed: the lines are priced again, nothing else is written, and the same call goes through next
+     * @throws InvalidPaymentException                 when an unpaid order is presented again to a payment module its customer's group is now shut out of
      * @throws StoredMethodPaymentRateLimitedException when the customer already paid with a stored method too often this hour
      * @throws PaymentCompositionRefusedException      when the instant payment means of the cart and the payment module chosen cannot make up one payment
      * @throws CartAlreadyOrderedException             when this very cart was turned into an order by another request
@@ -109,6 +124,21 @@ readonly class CheckoutPaymentService
         $cart = $request->cart;
 
         $this->refuseAGuestTheShopNoLongerAllows($cart);
+
+        // The tunnel refuses a line the catalog hides from the buyer, but this method is also
+        // called by those who pay without validating first: the order is never written for one.
+        $this->cartGuard->checkLinesAreAvailable($cart);
+
+        // First of everything that reads an amount: the coupon, the postage the cart carries,
+        // the fingerprint, the parts of a split payment and the order itself all start from
+        // the lines. A line a group moved since the buyer filled the cart is priced again and
+        // saved here, and the buyer is told: what they confirm next is calculated on the
+        // final prices, not on a total that was true a moment ago.
+        $this->cartPriceGuard->settleOrRefuse(
+            $cart,
+            $this->currencyOf($request),
+            $this->cartPriceGuard->buyerOf($cart, $this->securityContext->getCustomerUser()),
+        );
 
         // Read once, here, because the fingerprint says what the order is paid with, and
         // refused here, before the unpaid order of the cart is looked at, let alone cancelled:
@@ -178,6 +208,22 @@ readonly class CheckoutPaymentService
     }
 
     /**
+     * The currency the order is written in, which the lines are priced in: the one the request
+     * states, else the session's, else the shop's, as the order creation reads it.
+     */
+    private function currencyOf(OrderPaymentRequest $request): Currency
+    {
+        if ($request->currency instanceof Currency) {
+            return $request->currency;
+        }
+
+        $mainRequest = $this->requestStack->getMainRequest();
+        $session = true === $mainRequest?->hasSession() ? $mainRequest->getSession() : null;
+
+        return $session instanceof Session ? $session->getCurrency() : Currency::getDefaultCurrency();
+    }
+
+    /**
      * Whether the unpaid order of the cart can carry this payment attempt.
      *
      * Two conditions, and both are needed. The order must still describe what the buyer
@@ -221,6 +267,11 @@ readonly class CheckoutPaymentService
      */
     private function payAgain(Order $unpaidOrder, Cart $cart): OrderPaymentOutcome
     {
+        // ORDER_PAY is not raised, so the refusal Action\Order::create makes for a new
+        // placement is not reached: a group shut out of the module since the order was
+        // written is refused here, before the module is asked again.
+        $this->customerGroupPaymentPolicy->refuseUnlessAllowedForCart((int) $unpaidOrder->getPaymentModuleId(), $cart);
+
         $payEvent = new OrderPaymentEvent($unpaidOrder);
 
         $this->paymentCartContext->within(

@@ -140,6 +140,16 @@ final class GiftWrappingProvider implements EventSubscriberInterface
     }
 
     /**
+     * What the buyer is charged for the service without tax: the figure of
+     * {@see Cart::getUntaxedGiftWrapping()}, which the cart total is built from, so that a theme
+     * showing prices without tax needs no model of its own to read it.
+     */
+    public function untaxedPrice(GiftWrapping $giftWrapping): float
+    {
+        return $giftWrapping->getUntaxedPrice();
+    }
+
+    /**
      * What the buyer is charged for the service, tax included, for the country the order
      * is being delivered to.
      *
@@ -157,7 +167,7 @@ final class GiftWrappingProvider implements EventSubscriberInterface
         // No country to tax against yet — a cart with no delivery address — and the service
         // reads at its bare price until there is one.
         if (!$country instanceof Country || !$taxRule instanceof TaxRule) {
-            return round($untaxedPrice, 2);
+            return $this->untaxedPrice($giftWrapping);
         }
 
         return round(

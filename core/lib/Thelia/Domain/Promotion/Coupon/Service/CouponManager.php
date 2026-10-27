@@ -26,6 +26,7 @@ use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
@@ -112,6 +113,29 @@ class CouponManager implements ResetInterface
         );
     }
 
+    /**
+     * The discount the automatic promotions give a cart, priced from the database alone: no
+     * session is read nor started. For a caller that has none (the front API is stateless) and
+     * has to bring the discount of a cart in line with its lines.
+     *
+     * What lives in a session is out of reach: the codes a buyer typed in, and the promotions
+     * that keep their gifts in it (free product). They count for nothing here, so the caller
+     * only uses this for a cart no session stands behind.
+     */
+    public function discountOfCartWithoutSession(Cart $cart, ?Customer $buyer): float
+    {
+        return CartDiscountScope::within($cart, $buyer, function (): float {
+            $this->invalidateCurrentCoupons();
+
+            try {
+                return $this->getDiscount();
+            } finally {
+                // Built for this cart: not for the next one this request asks about.
+                $this->invalidateCurrentCoupons();
+            }
+        });
+    }
+
     public function invalidateCurrentCoupons(): void
     {
         $this->currentCoupons = null;
@@ -129,7 +153,8 @@ class CouponManager implements ResetInterface
      */
     private function getSessionCoupons(): array
     {
-        $session = $this->getSession();
+        // Priced outside of a session: no code was typed in that this request could read.
+        $session = null === CartDiscountScope::cart() ? $this->getSession() : null;
 
         if (!$session instanceof Session) {
             // No session on this request (CLI, cold error page): no code was typed in.
@@ -232,6 +257,11 @@ class CouponManager implements ResetInterface
                     \sprintf('Automatic promotion %d ignored, exception occurred: %s', $model->getId(), $ex->getMessage()),
                 );
 
+                continue;
+            }
+
+            // Keeps its gift in the session: it cannot be priced without one.
+            if ($coupon instanceof FreeProduct && null !== CartDiscountScope::cart()) {
                 continue;
             }
 

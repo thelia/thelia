@@ -22,6 +22,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
@@ -294,6 +295,8 @@ final class CartActionTest extends ActionIntegrationTestCase
             null,
             $this->factory->currency(),
             $this->getService(EventDispatcherInterface::class),
+            null,
+            $this->getService(CartLinePricer::class),
         );
 
         self::assertInstanceOf(Cart::class, $duplicate);
