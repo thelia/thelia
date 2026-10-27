@@ -442,4 +442,6 @@ return [
     'Configuration destination restrictions' => 'Configurazione delle restrizioni di destinazione',
     'Configuration background jobs' => 'Configurazione delle attività in background',
     'Saved payment methods' => 'Metodi di pagamento salvati',
+    'Customer groups' => 'Gruppi di clienti',
+    'Default customer group' => 'Gruppo di clienti predefinito',
 ];

@@ -977,6 +977,9 @@ INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `upda
 (2, 0, 2, NOW(), NOW()),
 (3, 0, 3, NOW(), NOW());
 
+INSERT INTO `customer_group`(`id`, `code`, `position`, `is_default`, `discount`, `display_taxed_price`, `created_at`, `updated_at`) VALUES
+(1, 'default', 1, 1, 0.000000, 1, NOW(), NOW());
+
 INSERT INTO `currency` (`id`, `code`, `isocode_numeric`, `symbol`, `format`, `rate`, `visible`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
 (1, 'EUR', '978', '€', '%n %s','1.00', 1, 1, '1', NOW(), NOW()),
@@ -2243,7 +2246,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (61, 'admin.configuration.destination-restriction', NOW(), NOW()),
 (62, 'admin.configuration.background-jobs', NOW(), NOW()),
 (63, 'admin.customer.payment-method', NOW(), NOW()),
-(64, 'admin.configuration.webhook', NOW(), NOW())
+(64, 'admin.configuration.webhook', NOW(), NOW()),
+(65, 'admin.customer.group', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -9558,6 +9562,17 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
     (3, 'ru_RU', 'Ув.', 'Уважаемая')
 ;
 
+INSERT INTO `customer_group_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (1, 'cs_CZ', NULL, NULL),
+    (1, 'de_DE', 'Standard-Kundengruppe', NULL),
+    (1, 'en_US', 'Default customer group', NULL),
+    (1, 'es_ES', 'Grupo de clientes por defecto', NULL),
+    (1, 'fr_FR', 'Groupe de clients par défaut', NULL),
+    (1, 'it_IT', 'Gruppo di clienti predefinito', NULL),
+    (1, 'nl_NL', 'Standaard klantgroep', NULL),
+    (1, 'ru_RU', 'Группа клиентов по умолчанию', NULL)
+;
+
 INSERT INTO `currency_i18n` (`id`, `locale`, `name`) VALUES
     (1, 'cs_CZ', NULL),
     (2, 'cs_CZ', NULL),
@@ -15535,6 +15550,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'cs_CZ', 'Konfigurace úloh na pozadí', NULL, NULL, NULL),
     (63, 'cs_CZ', NULL, NULL, NULL, NULL),
     (64, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (65, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15598,6 +15614,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'de_DE', 'Konfiguration der Hintergrundaufgaben', NULL, NULL, NULL),
     (63, 'de_DE', 'Gespeicherte Zahlungsmethoden', NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
+    (65, 'de_DE', 'Kundengruppen', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15661,6 +15678,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'en_US', 'Configuration background jobs', NULL, NULL, NULL),
     (63, 'en_US', 'Saved payment methods', NULL, NULL, NULL),
     (64, 'en_US', 'Configuration webhooks', NULL, NULL, NULL),
+    (65, 'en_US', 'Customer groups', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15724,6 +15742,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'es_ES', 'Configuración de tareas en segundo plano', NULL, NULL, NULL),
     (63, 'es_ES', 'Métodos de pago guardados', NULL, NULL, NULL),
     (64, 'es_ES', NULL, NULL, NULL, NULL),
+    (65, 'es_ES', 'Grupos de clientes', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15787,6 +15806,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'fr_FR', 'Configuration des tâches en arrière-plan', NULL, NULL, NULL),
     (63, 'fr_FR', 'Moyens de paiement enregistrés', NULL, NULL, NULL),
     (64, 'fr_FR', 'Configuration des webhooks', NULL, NULL, NULL),
+    (65, 'fr_FR', 'Groupes de clients', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15850,6 +15870,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'it_IT', 'Configurazione delle attività in background', NULL, NULL, NULL),
     (63, 'it_IT', 'Metodi di pagamento salvati', NULL, NULL, NULL),
     (64, 'it_IT', NULL, NULL, NULL, NULL),
+    (65, 'it_IT', 'Gruppi di clienti', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15913,6 +15934,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'nl_NL', 'Configuratie van achtergrondtaken', NULL, NULL, NULL),
     (63, 'nl_NL', 'Opgeslagen betaalmethoden', NULL, NULL, NULL),
     (64, 'nl_NL', NULL, NULL, NULL, NULL),
+    (65, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15975,7 +15997,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (61, 'ru_RU', 'Настройка ограничений по направлениям доставки', NULL, NULL, NULL),
     (62, 'ru_RU', 'Настройка фоновых задач', NULL, NULL, NULL),
     (63, 'ru_RU', 'Сохранённые способы оплаты', NULL, NULL, NULL),
-    (64, 'ru_RU', NULL, NULL, NULL, NULL)
+    (64, 'ru_RU', NULL, NULL, NULL, NULL),
+    (65, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL)
 ;
 
 

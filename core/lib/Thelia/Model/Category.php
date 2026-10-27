@@ -20,7 +20,9 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\Base\Category as BaseCategory;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
@@ -46,11 +48,20 @@ class Category extends BaseCategory implements FileModelParentInterface
      * count all products for current category and sub categories.
      *
      * /!\ the number of queries is exponential, use it with caution
+     *
+     * @param ProductVisibility|null $visibleToVisitor  when given, the products the current visitor may not see
+     *                                                  (reserved operations, restricted categories, module rules) are not counted
+     * @param list<int>              $closedCategoryIds the sub-categories the visitor may not browse: a product they hold
+     *                                                  is not counted for them, even when another category keeps it visible
      */
-    public function countAllProducts($productVisibility = true): int
+    public function countAllProducts($productVisibility = true, ?ProductVisibility $visibleToVisitor = null, array $closedCategoryIds = []): int
     {
         $children = CategoryQuery::findAllChild($this->getId());
         $children[] = $this;
+
+        if ([] !== $closedCategoryIds) {
+            $children = array_values(array_filter($children, static fn (Category $child): bool => !\in_array((int) $child->getId(), $closedCategoryIds, true)));
+        }
 
         $query = ProductQuery::create();
 
@@ -58,10 +69,14 @@ class Category extends BaseCategory implements FileModelParentInterface
             $query->filterByVisible($productVisibility);
         }
 
+        // A product filed in two categories of the sub-tree is one product.
         $query
+            ->distinct()
             ->useProductCategoryQuery()
             ->filterByCategory(new ObjectCollection($children), Criteria::IN)
             ->endUse();
+
+        $visibleToVisitor?->applyTo($query, ProductTableMap::COL_ID);
 
         return $query->count();
     }

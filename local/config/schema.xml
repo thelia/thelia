@@ -438,11 +438,15 @@
     <column name="confirmation_token_expires_at" type="DATE" />
     <column description="when the identifying data of the account was erased, NULL as long as the account carries an identity" name="anonymized_at" type="TIMESTAMP" />
     <column defaultValue="0" description="the customer ordered without creating an account and carries no password, until the account is completed" name="is_guest" required="true" type="TINYINT" />
+    <column description="the customer group the account belongs to, the default group until an administrator moves it" name="customer_group_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
     <foreign-key foreignTable="lang" name="fk_customer_lang_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="LangModel">
       <reference foreign="id" local="lang_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_group" name="fk_customer_customer_group_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />
@@ -458,6 +462,9 @@
     </index>
     <index name="idx_customer_anonymized_at">
       <index-column name="anonymized_at" />
+    </index>
+    <index name="idx_customer_customer_group_id">
+      <index-column name="customer_group_id" />
     </index>
     <behavior name="timestampable" />
     <behavior name="versionable">
@@ -523,6 +530,88 @@
     <behavior name="i18n">
       <parameter name="i18n_columns" value="short, long" />
     </behavior>
+  </table>
+  <table name="customer_group" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="stable machine name a deployment references a customer group by; read by the front through the customer group API, not meant as a label" name="code" required="true" size="64" type="VARCHAR" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column defaultValue="0" description="the group a new account and a visitor belong to; exactly one" name="is_default" required="true" type="TINYINT" />
+    <column defaultValue="0.000000" description="the discount rate of the group, as a percentage, applied before the discount of the customer" name="discount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="1" description="whether the prices are shown with taxes (1) or without taxes (0) to the members of the group" name="display_taxed_price" required="true" type="TINYINT" />
+    <column defaultValue="0" description="1 when the group may browse only the categories it lists (customer_group_category), an empty list included; 0 opens the whole catalog; set by the writer of the list alone, never by the deletion of a listed category" name="restricts_categories" required="true" type="TINYINT" />
+    <column defaultValue="0" description="1 when the group may pay only with the modules it lists (customer_group_payment_module), an empty list included; 0 opens every module; set by the writer of the list alone, never by the deletion of a listed module" name="restricts_payment_modules" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="secret token of the registration link of the group: a visitor who registers through it joins the group; NULL when the link is closed; never read by the front, never written by a client" name="registration_token" size="64" type="VARCHAR" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <unique name="customer_group_code_unique">
+      <unique-column name="code" />
+    </unique>
+    <unique name="customer_group_registration_token_unique">
+      <unique-column name="registration_token" />
+    </unique>
+    <index name="idx_customer_group_is_default">
+      <index-column name="is_default" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
+  <table name="customer_group_product_price" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="customer_group_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the price without taxes the group pays, NULL when the group has no price of its own" name="price" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="NULL" description="the promotional price without taxes the group pays, NULL when the group has no promotional price of its own" name="promo_price" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" name="from_default_currency" required="true" type="TINYINT" />
+    <foreign-key foreignTable="customer_group" name="fk_customer_group_product_price_customer_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_customer_group_product_price_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_customer_group_product_price_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <unique name="customer_group_product_price_unique">
+      <unique-column name="customer_group_id" />
+      <unique-column name="product_sale_elements_id" />
+      <unique-column name="currency_id" />
+    </unique>
+    <index name="idx_customer_group_product_price_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
+    <index name="idx_customer_group_product_price_currency_id">
+      <index-column name="currency_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="customer_group_payment_module" namespace="Thelia\Model">
+    <column description="a payment module the customer group may pay with, read only when customer_group.restricts_payment_modules is 1: then the modules listed are the only ones, and none when the list is empty" name="customer_group_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="customer_group" name="fk_customer_group_payment_module_customer_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_customer_group_payment_module_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <index name="idx_customer_group_payment_module_module_id">
+      <index-column name="module_id" />
+    </index>
+  </table>
+  <table name="customer_group_category" namespace="Thelia\Model">
+    <column description="a category the customer group may browse, read only when customer_group.restricts_categories is 1: then the categories listed are the only ones open, and none when the list is empty" name="customer_group_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="customer_group" name="fk_customer_group_category_customer_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <foreign-key foreignTable="category" name="fk_customer_group_category_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <index name="idx_customer_group_category_category_id">
+      <index-column name="category_id" />
+    </index>
   </table>
   <table name="lang" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -727,11 +816,17 @@
     <column description="the local hour the picked slot started at, copied off the slot" name="delivery_slot_start" type="TIME" />
     <column description="the local hour the picked slot ended at, copied off the slot" name="delivery_slot_end" type="TIME" />
     <column defaultValue="NULL" description="the sale unit this order was placed on, NULL for a national (single-shop) order" name="sale_unit_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted" name="customer_group_id" type="INTEGER" />
+    <column defaultValue="0.000000" description="the customer group discount rate, as a percentage, already included in the order products prices" name="customer_group_discount_rate" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="1" description="the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices" name="customer_group_display_taxed_price" required="true" type="TINYINT" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
     <foreign-key foreignTable="sale_unit" name="fk_order_sale_unit_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="sale_unit_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_group" name="fk_order_customer_group_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
     </foreign-key>
     <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
@@ -2516,6 +2611,24 @@
       <unique-column name="customer_id" />
     </unique>
   </table>
+  <table name="sale_customer_group" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_id" required="true" type="INTEGER" />
+    <column description="a customer group the operation is reserved for, read when audience_mode is 2" name="customer_group_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="sale" name="fk_sale_customer_group_sales_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_group" name="fk_sale_customer_group_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <index name="fk_sale_customer_group_group_idx">
+      <index-column name="customer_group_id" />
+    </index>
+    <unique name="idx_sale_customer_group_sales_id_group_id">
+      <unique-column name="sale_id" />
+      <unique-column name="customer_group_id" />
+    </unique>
+  </table>
   <table name="catalog_price_rule" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
@@ -2597,6 +2710,24 @@
     <unique name="idx_catalog_price_rule_customer_rule_id_customer_id">
       <unique-column name="catalog_price_rule_id" />
       <unique-column name="customer_id" />
+    </unique>
+  </table>
+  <table name="catalog_price_rule_customer_group" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="catalog_price_rule_id" required="true" type="INTEGER" />
+    <column description="a customer group the rule prices for, read when audience_mode is 2" name="customer_group_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="catalog_price_rule" name="fk_catalog_price_rule_customer_group_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="catalog_price_rule_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_group" name="fk_catalog_price_rule_customer_group_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <index name="fk_catalog_price_rule_customer_group_group_idx">
+      <index-column name="customer_group_id" />
+    </index>
+    <unique name="idx_catalog_price_rule_customer_group_rule_id_group_id">
+      <unique-column name="catalog_price_rule_id" />
+      <unique-column name="customer_group_id" />
     </unique>
   </table>
   <table name="catalog_price_rule_product_sale_elements" namespace="Thelia\Model">

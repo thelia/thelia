@@ -56,6 +56,7 @@ final class UpdateScriptTest extends TestCase
         'message_i18n',
         'resource_i18n',
         'choice_filter_other_i18n',
+        'customer_group_i18n',
     ];
 
     public function testNoUpdateScriptUsesConditionalDdlMySqlRefuses(): void
@@ -168,6 +169,7 @@ final class UpdateScriptTest extends TestCase
         yield 'Order status transition override' => ['Order status transition override'];
         yield 'Catalog price rules' => ['Catalog price rules'];
         yield 'Destination restrictions' => ['Configuration destination restrictions'];
+        yield 'Customer groups' => ['Customer groups'];
     }
 
     /**
@@ -230,6 +232,52 @@ final class UpdateScriptTest extends TestCase
         }
 
         self::assertGreaterThan(0, $checked, 'No forced AUTO_INCREMENT left to judge: this test has lost its subject.');
+    }
+
+    /**
+     * `customer.customer_group_id` is NOT NULL and every customer a shop already
+     * has must land in the default group. The column is therefore added nullable,
+     * filled, then made required, in that order: made required first, the update
+     * fails on the first existing customer (or, in a lax SQL mode, silently points
+     * them all at group 0). `customer_version` keeps the history of the customer
+     * and goes through the same three steps.
+     */
+    #[DataProvider('tablesHoldingTheGroupOfACustomer')]
+    public function testTheCustomerGroupColumnIsMadeRequiredOnlyAfterEveryRowHasAGroup(string $table): void
+    {
+        $statements = $this->statementsOf($this->pendingScript());
+
+        $defaultGroup = $this->positionOfTheFirstStatementMatching($statements, '/^INSERT\s+IGNORE\s+INTO\s+`customer_group`\s/i');
+        $addNullable = $this->positionOfTheFirstStatementMatching($statements, \sprintf('/ALTER TABLE `%s` ADD COLUMN `customer_group_id` INTEGER NULL\b/', $table));
+        $fill = $this->positionOfTheFirstStatementMatching($statements, \sprintf('/^UPDATE\s+`%s`\s+SET\s+`customer_group_id`\s*=\s*@default_customer_group_id\b/i', $table));
+        $require = $this->positionOfTheFirstStatementMatching($statements, \sprintf('/ALTER TABLE `%s` MODIFY `customer_group_id` INTEGER NOT NULL\b/', $table));
+
+        self::assertLessThan($addNullable, $defaultGroup, \sprintf('The default group is seeded after `%s.customer_group_id` is added.', $table));
+        self::assertLessThan($fill, $addNullable, \sprintf('`%s.customer_group_id` is filled before it exists.', $table));
+        self::assertLessThan($require, $fill, \sprintf('`%s.customer_group_id` is made required before every row has a group.', $table));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function tablesHoldingTheGroupOfACustomer(): iterable
+    {
+        yield 'customer' => ['customer'];
+        yield 'customer_version' => ['customer_version'];
+    }
+
+    /**
+     * @param list<string> $statements
+     */
+    private function positionOfTheFirstStatementMatching(array $statements, string $pattern): int
+    {
+        foreach ($statements as $position => $statement) {
+            if (1 === preg_match($pattern, $statement)) {
+                return $position;
+            }
+        }
+
+        self::fail(\sprintf('The pending script has no statement matching %s.', $pattern));
     }
 
     /**
