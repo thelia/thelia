@@ -50,6 +50,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         protected ?int $state = null,
         protected ?string $siret = null,
         protected ?string $vatNumber = null,
+        protected ?int $customerGroupId = null,
     ) {
         parent::__construct();
     }
@@ -187,6 +188,13 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this;
     }
 
+    public function setCustomerGroupId(?int $customerGroupId): self
+    {
+        $this->customerGroupId = $customerGroupId;
+
+        return $this;
+    }
+
     public function setRef(?string $ref): self
     {
         $this->ref = $ref;
@@ -199,6 +207,11 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->state = $state;
 
         return $this;
+    }
+
+    public function getCustomerGroupId(): ?int
+    {
+        return $this->customerGroupId;
     }
 
     public function getCompany(): ?string

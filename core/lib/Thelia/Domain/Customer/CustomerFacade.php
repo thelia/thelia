@@ -24,6 +24,7 @@ use Thelia\Domain\Customer\DTO\CustomerRegisterDTO;
 use Thelia\Domain\Customer\Exception\CustomerNotEnabledException;
 use Thelia\Domain\Customer\Exception\GuestCheckoutEmailAlreadyRegisteredException;
 use Thelia\Domain\Customer\Exception\GuestConversionPendingException;
+use Thelia\Domain\Customer\Exception\InvalidRegistrationTokenException;
 use Thelia\Domain\Customer\Exception\NotAGuestCustomerException;
 use Thelia\Domain\Customer\Service\CustomerAuthenticator;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
@@ -102,10 +103,15 @@ readonly class CustomerFacade
     /**
      * Register a new customer account (front registration flow).
      * Returns the created Customer (may be disabled/pending confirmation based on business rules).
+     *
+     * The account joins the default group, or the group the registration token of a registration
+     * link opens: the visitor sends the token, never a group.
+     *
+     * @throws InvalidRegistrationTokenException when a token is given and opens no group
      */
-    public function register(CustomerRegisterDTO $customerRegisterDTO): Customer
+    public function register(CustomerRegisterDTO $customerRegisterDTO, ?string $registrationToken = null): Customer
     {
-        return $this->customerRegistrationService->registerCustomer($customerRegisterDTO);
+        return $this->customerRegistrationService->registerCustomer($customerRegisterDTO, $registrationToken);
     }
 
     /**

@@ -45,11 +45,10 @@ return static function (ContainerConfigurator $container): void {
             '/api/front/taxes',
         ])
         // Of the paths above, the ones a price that depends on the visitor travels
-        // on: a running reserved operation, or a catalog price rule reserved for
-        // named customers, owes two visitors two different prices for the same
-        // product, and the cache key holds no customer. They are bypassed for as
-        // long as such a rule or operation runs, and cached again as soon as none
-        // does. The public rules price everyone the same and stay cacheable.
+        // on: their key holds the customer group of the one asking, and a customer a
+        // rule or an operation reserved for named customers may price, or who has a
+        // discount of their own, is not cached at all. The visitors and the public
+        // rules stay cacheable.
         ->set('thelia.api.data_access.cache.visitor_dependent_price_prefixes', [
             '/api/front/products',
             '/api/front/product_sale_elements',

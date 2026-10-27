@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -39,6 +38,7 @@ use Thelia\Api\Security\SaleUnitScopeVoter;
 use Thelia\Api\State\Processor\OrderProcessor;
 use Thelia\Api\State\Provider\GuestOrderProvider;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderQuery;
 
 #[ApiResource(
@@ -192,6 +192,31 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?float $customerDiscountRate = null;
 
+    /**
+     * The customer group the buyer belonged to when the order was placed, null once that group
+     * is deleted. A snapshot, read only, and deliberately not an IRI: the group of the order is
+     * not necessarily the group of the customer any more.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?int $customerGroupId = null;
+
+    #[Column(propelFieldName: 'customerGroupCode')]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?string $customerGroupCode = null;
+
+    /**
+     * Customer group discount rate, as a percentage, already included in the order products prices.
+     * Read only: it is a snapshot taken when the order was placed.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?float $customerGroupDiscountRate = null;
+
+    /**
+     * Whether the group of the buyer was shown taxed prices when the order was placed. Read only snapshot.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public ?bool $customerGroupDisplayTaxedPrice = null;
+
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     public float $postage;
@@ -226,6 +251,12 @@ class Order implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithoutTaxes = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?float $totalGoodsWithoutTaxes = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public ?float $totalGoodsWithTaxes = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?float $totalAmountWithTaxBeforeDiscount = null;
@@ -364,31 +395,33 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmount(): ?float
     {
-        $propelModel = $this->getPropelModel();
-
-        if (!$propelModel instanceof ActiveRecordInterface) {
-            $propelModel = OrderQuery::create()->findOneById($this->getId());
-            $this->setPropelModel($propelModel);
-        }
-
-        return round($propelModel?->getTotalAmount(), 2);
+        return $this->orderModel()?->getTotalAmountWithTaxesWithShipping() ?? 0.0;
     }
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmountWithoutTaxes(): ?float
     {
-        $itemsTax = 0;
-        /** @var \Thelia\Model\Order $orderPropelModel */
-        $orderPropelModel = $this->getPropelModel();
+        return $this->orderModel()?->getTotalAmountWithoutTaxes() ?? 0.0;
+    }
 
-        if (!$orderPropelModel) {
-            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
-            $this->setPropelModel($orderPropelModel);
-        }
+    /**
+     * The articles of the order without tax, before the discount, the service lines (a gift
+     * wrapping) left out: totalAmountWithoutTaxes less what those lines were charged. The order
+     * loop's TOTAL_GOODS_AMOUNT.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getTotalGoodsWithoutTaxes(): ?float
+    {
+        return $this->orderModel()?->getTotalGoodsWithoutTaxes() ?? 0.0;
+    }
 
-        $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
-
-        return round($itemsAmount - $itemsTax, 2);
+    /**
+     * The same articles with their tax: the order loop's TOTAL_TAXED_GOODS_AMOUNT.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    public function getTotalGoodsWithTaxes(): ?float
+    {
+        return $this->orderModel()?->getTotalGoodsWithTaxes() ?? 0.0;
     }
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
@@ -404,38 +437,86 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getAmountDiscountWithTaxes(): ?float
     {
-        /** @var \Thelia\Model\Order $orderPropelModel */
-        $orderPropelModel = $this->getPropelModel();
-
-        if (!$orderPropelModel) {
-            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
-            $this->setPropelModel($orderPropelModel);
-        }
-
-        return round((float) $orderPropelModel->getDiscount(), 2);
+        return $this->orderModel()?->getAmountDiscountWithTaxes() ?? 0.0;
     }
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalAmountWithTaxesAfterDiscount(): ?float
     {
-        $totalTaxedAmount = $this->getTotalAmount();
-        $postage = $this->getPostage();
+        return $this->orderModel()?->getTotalAmountWithTaxesAfterDiscount() ?? 0.0;
+    }
 
-        return round($totalTaxedAmount - $postage, 2);
+    /**
+     * The discount of the order without its tax: what the order loop calls DISCOUNT_WITHOUT_TAX,
+     * read through the same method of the model. A theme that shows untaxed prices reads it
+     * rather than working the tax out of the taxed discount.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public function getAmountDiscountWithoutTaxes(): ?float
+    {
+        return $this->orderModel()?->getAmountDiscountWithoutTaxes() ?? 0.0;
+    }
+
+    /**
+     * The goods of the order without tax, once the discount is taken off and the postage left
+     * out, as totalAmountWithTaxesAfterDiscount does for the taxed total. The postage is in
+     * totalAmountWithoutTaxesWithShipping.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public function getTotalAmountWithoutTaxesAfterDiscount(): ?float
+    {
+        return $this->orderModel()?->getTotalAmountWithoutTaxesAfterDiscount() ?? 0.0;
+    }
+
+    /**
+     * All the tax of the order, postage included and discount taken off: the one figure that
+     * makes totalAmountWithoutTaxesAfterDiscount + totalShippingWithoutTaxes + totalTaxAmount
+     * equal totalAmount, and totalAmountWithoutTaxesWithShipping + totalTaxAmount with it,
+     * whichever rounding mode the order was invoiced with. It is the order loop's TOTAL_TAX,
+     * read through the same method of the model.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public function getTotalTaxAmount(): ?float
+    {
+        return $this->orderModel()?->getTotalTaxAmount() ?? 0.0;
+    }
+
+    /**
+     * What the order is worth without tax, postage included and discount taken off: the
+     * untaxed counterpart of totalAmount, and the order loop's TOTAL_AMOUNT. A theme that
+     * shows untaxed prices prints it as the total instead of adding the postage to the goods.
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public function getTotalAmountWithoutTaxesWithShipping(): ?float
+    {
+        return $this->orderModel()?->getTotalAmountWithoutTaxesWithShipping() ?? 0.0;
+    }
+
+    /**
+     * The postage without its tax (the order loop's POSTAGE_UNTAXED).
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    public function getTotalShippingWithoutTaxes(): ?float
+    {
+        return $this->orderModel()?->getTotalShippingWithoutTaxes() ?? 0.0;
+    }
+
+    private function orderModel(): ?OrderModel
+    {
+        $propelModel = $this->getPropelModel();
+
+        if (!$propelModel instanceof OrderModel) {
+            $propelModel = OrderQuery::create()->findOneById($this->getId());
+            $this->setPropelModel($propelModel);
+        }
+
+        return $propelModel;
     }
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public function getTotalShippingWithTaxes(): ?float
     {
-        /** @var \Thelia\Model\Order $orderPropelModel */
-        $orderPropelModel = $this->getPropelModel();
-
-        if (!$orderPropelModel) {
-            $orderPropelModel = OrderQuery::create()->findOneById($this->getId());
-            $this->setPropelModel($orderPropelModel);
-        }
-
-        return round((float) $orderPropelModel->getPostage(), 2);
+        return $this->orderModel()?->getTotalShippingWithTaxes() ?? 0.0;
     }
 
     public function getId(): ?int
@@ -546,6 +627,54 @@ class Order implements PropelResourceInterface
         return $this;
     }
 
+    public function getCustomerGroupId(): ?int
+    {
+        return $this->customerGroupId;
+    }
+
+    public function setCustomerGroupId(?int $customerGroupId): self
+    {
+        $this->customerGroupId = $customerGroupId;
+
+        return $this;
+    }
+
+    public function getCustomerGroupCode(): ?string
+    {
+        return $this->customerGroupCode;
+    }
+
+    public function setCustomerGroupCode(?string $customerGroupCode): self
+    {
+        $this->customerGroupCode = $customerGroupCode;
+
+        return $this;
+    }
+
+    public function getCustomerGroupDiscountRate(): ?float
+    {
+        return $this->customerGroupDiscountRate;
+    }
+
+    public function setCustomerGroupDiscountRate(?float $customerGroupDiscountRate): self
+    {
+        $this->customerGroupDiscountRate = $customerGroupDiscountRate;
+
+        return $this;
+    }
+
+    public function getCustomerGroupDisplayTaxedPrice(): ?bool
+    {
+        return $this->customerGroupDisplayTaxedPrice;
+    }
+
+    public function setCustomerGroupDisplayTaxedPrice(?bool $customerGroupDisplayTaxedPrice): self
+    {
+        $this->customerGroupDisplayTaxedPrice = $customerGroupDisplayTaxedPrice;
+
+        return $this;
+    }
+
     public function getPostage(): float
     {
         return round($this->postage, 2);
@@ -560,7 +689,9 @@ class Order implements PropelResourceInterface
 
     public function getPostageTax(): float
     {
-        return round($this->postageTax, 2);
+        $model = $this->getPropelModel();
+
+        return $model instanceof OrderModel ? $model->getTotalShippingTaxAmount() : round($this->postageTax, 2);
     }
 
     public function setPostageTax(float $postageTax): self

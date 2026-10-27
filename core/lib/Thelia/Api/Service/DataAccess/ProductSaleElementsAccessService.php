@@ -21,13 +21,12 @@ use Thelia\Core\Event\Attribute\AttributeAvProductEvent;
 use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
+use Thelia\Domain\Catalog\Product\ProductTaxedPriceResolver;
+use Thelia\Domain\Catalog\Product\VisitorPriceReader;
 use Thelia\Domain\Localization\Service\LangService;
-use Thelia\Domain\Pricing\EffectivePrice;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
-use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\ConfigQuery;
@@ -42,12 +41,11 @@ class ProductSaleElementsAccessService
 
     public function __construct(
         private readonly RequestStack $requestStack,
-        private readonly TaxEngine $taxEngine,
-        private readonly SecurityContext $securityContext,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LangService $langService,
         private readonly ReservedSaleVisibility $reservedSaleVisibility,
-        private readonly EffectivePriceCatalog $effectivePriceCatalog,
+        private readonly VisitorPriceReader $visitorPriceReader,
+        private readonly ProductTaxedPriceResolver $productTaxedPriceResolver,
         private readonly BundleDisplayedStock $bundleDisplayedStock,
     ) {
         $this->request = $requestStack->getMainRequest();
@@ -61,13 +59,7 @@ class ProductSaleElementsAccessService
             return [];
         }
 
-        $discount = 0;
-        $taxCountry = $this->taxEngine->getDeliveryCountry();
         $currency = $this->currentCurrency();
-
-        if ($this->securityContext->hasCustomerUser()) {
-            $discount = $this->securityContext->getCustomerUser()->getDiscount();
-        }
 
         // Reached by a product id, so the private drop rule has to be enforced here
         // too: the page of such a product is out of reach for this visitor, and its
@@ -86,59 +78,31 @@ class ProductSaleElementsAccessService
             $productSaleElementsIds[] = (int) $pse->getId();
         }
 
-        $effectivePrices = $this->effectivePriceCatalog->warm(
-            $productSaleElementsIds,
-            $currency,
-            $this->reservedSaleVisibility->currentCustomer(),
-        );
+        // What the visitor pays, for the whole product at once: the price of their group,
+        // rules and operations, then their discounts - the price their cart will charge.
+        // A sale element the visitor has no price for in this currency is not offered.
+        $resolvedPrices = $this->visitorPriceReader->resolve($productSaleElementsIds, $currency, true);
 
         // A bundle is supplied by its components: the stock of its own sale element, which stays at
         // zero, is never the answer (the default composition is the one a page shows).
         $bundleQuantity = $this->bundleDisplayedStock->forProducts([(int) $productId])[(int) $productId] ?? null;
 
         foreach ($pses as $pse) {
-            $attributes = [];
-            $isPromo = (bool) $pse->getPromo();
+            $resolvedPrice = $resolvedPrices[(int) $pse->getId()] ?? null;
 
-            // Reading the first price row priced the sale element in whichever
-            // currency the database answered first. The model knows the rule:
-            // the row of the currency being browsed, the default currency one
-            // converted at its rate when there is none.
-            $prices = $pse->getPricesByCurrency($currency, (float) $discount);
-
-            $pse->setVirtualColumn('price_PRICE', $prices->getPrice());
-            $pse->setVirtualColumn('price_PROMO_PRICE', $prices->getPromoPrice());
-
-            // A catalog price rule or a reserved operation writes nothing in the
-            // catalog, so its price is substituted in the virtual column the getters
-            // below read: the customer discount and the tax are then applied to it
-            // exactly the way they are applied to a public promo price.
-            $effectivePrice = $effectivePrices[(int) $pse->getId()] ?? null;
-            $displayInitialPrice = null;
-
-            if (null !== $effectivePrice) {
-                if (EffectivePrice::SOURCE_SALE_UNIT === $effectivePrice->source) {
-                    // A sale unit's own price is the price of the sale element there, not a
-                    // promotion of the national one: nothing is struck through.
-                    $chargedPrice = $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100));
-                    $pse->setVirtualColumn('price_PROMO_PRICE', $chargedPrice);
-                    $pse->setVirtualColumn('price_PRICE', $chargedPrice);
-                    $isPromo = false;
-                    $displayInitialPrice = $effectivePrice->displayInitialPrice;
-                } else {
-                    // The customer discount is applied to what the effective price says, as it is
-                    // to the catalog prices read above.
-                    $settled = $effectivePrice->settle((float) $prices->getPrice(), (float) $discount);
-
-                    if ($settled->priceReplaced) {
-                        $pse->setVirtualColumn('price_PRICE', $settled->untaxedPrice);
-                    }
-
-                    $pse->setVirtualColumn('price_PROMO_PRICE', $settled->untaxedPromoPrice);
-                    $isPromo = $settled->isPromo;
-                    $displayInitialPrice = $settled->displayInitialPrice;
-                }
+            if (!$resolvedPrice instanceof ResolvedPrice) {
+                continue;
             }
+
+            $attributes = [];
+
+            // The virtual columns the price getters read, so that the tax rule of the
+            // product is applied to what is charged.
+            $pse->setVirtualColumn('price_PRICE', $resolvedPrice->untaxedPrice);
+            $pse->setVirtualColumn('price_PROMO_PRICE', $resolvedPrice->untaxedPromoPrice);
+
+            // Left null while the catalog prices alone: the theme then reads its default.
+            $displayInitialPrice = ResolvedPrice::SOURCE_BASE === $resolvedPrice->source ? null : $resolvedPrice->displayInitialPrice;
 
             foreach ($pse->getAttributeCombinations() as $attribute) {
                 $attributes[$attribute->getAttributeId()] = $attribute->getAttributeAvId();
@@ -149,7 +113,7 @@ class ProductSaleElementsAccessService
             $result[] = [
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
-                'isPromo' => $isPromo,
+                'isPromo' => $resolvedPrice->isPromo,
                 'displayInitialPrice' => $displayInitialPrice,
                 'isNew' => $pse->getNewness() ? true : false,
                 'ref' => $pse->getRef(),
@@ -157,9 +121,11 @@ class ProductSaleElementsAccessService
                 'mpn' => $pse->getMpn(),
                 'quantity' => $bundleQuantity ?? $pse->getQuantity(),
                 'weight' => $pse->getWeight(),
-                'price' => $pse->getTaxedPrice($taxCountry),
+                // Taxed by the service the product cards of the API are, so that a card and
+                // the page it opens print the same figure.
+                'price' => $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPrice()),
                 'untaxedPrice' => $pse->getPrice(),
-                'promoPrice' => $pse->getTaxedPromoPrice($taxCountry),
+                'promoPrice' => $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPromoPrice()),
                 'promoUntaxedPrice' => $pse->getPromoPrice(),
                 'combination' => $attributes,
             ];

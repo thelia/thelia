@@ -17,6 +17,7 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -24,7 +25,9 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Type\AlphaNumStringListType;
@@ -44,6 +47,7 @@ use Thelia\Type\TypeCollection;
  * @method string      getRef()
  * @method bool        getReseller()
  * @method int         getSponsor()
+ * @method int[]       getCustomerGroup()
  * @method bool|string getNewsletter()
  * @method string[]    getOrder()
  * @method bool        getWithPrevNextInfo()
@@ -66,6 +70,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             ),
             Argument::createBooleanTypeArgument('reseller'),
             Argument::createIntTypeArgument('sponsor'),
+            Argument::createIntListTypeArgument('customer_group'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -192,6 +197,12 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
+        $customerGroupIds = $this->getCustomerGroup();
+
+        if (null !== $customerGroupIds) {
+            $search->filterByCustomerGroupId($customerGroupIds, Criteria::IN);
+        }
+
         $orders = $this->getOrder();
 
         foreach ($orders as $order) {
@@ -234,8 +245,12 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
+        $customerGroups = $this->customerGroupsOf($loopResult);
+
         /** @var \Thelia\Model\Customer $customer */
         foreach ($loopResult->getResultDataCollection() as $customer) {
+            $customerGroup = $customerGroups[$customer->getCustomerGroupId()] ?? null;
+
             $loopResultRow = new LoopResultRow($customer);
 
             $loopResultRow
@@ -248,6 +263,9 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set('RESELLER', $customer->getReseller())
                 ->set('SPONSOR', $customer->getSponsor())
                 ->set('DISCOUNT', $customer->getDiscount())
+                ->set('CUSTOMER_GROUP_ID', $customer->getCustomerGroupId())
+                ->set('CUSTOMER_GROUP_CODE', $customerGroup?->getCode())
+                ->set('CUSTOMER_GROUP_TITLE', $customerGroup?->getTitle())
                 ->set('NEWSLETTER', $customer->getVirtualColumn('is_registered_to_newsletter'))
                 ->set('CONFIRMATION_TOKEN', $customer->getConfirmationToken());
 
@@ -276,5 +294,49 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         }
 
         return $loopResult;
+    }
+
+    /**
+     * The groups of the customers of the page, read in one query and localised in the language of the visit.
+     *
+     * @return array<int, \Thelia\Model\CustomerGroup> indexed by group id
+     */
+    private function customerGroupsOf(LoopResult $loopResult): array
+    {
+        $groupIds = [];
+
+        /** @var \Thelia\Model\Customer $customer */
+        foreach ($loopResult->getResultDataCollection() as $customer) {
+            $groupIds[$customer->getCustomerGroupId()] = $customer->getCustomerGroupId();
+        }
+
+        if ([] === $groupIds) {
+            return [];
+        }
+
+        $locale = $this->localeOfTheVisit();
+
+        $customerGroups = [];
+
+        $customerGroupQuery = CustomerGroupQuery::create()->filterById($groupIds, Criteria::IN)->joinWithI18n($locale);
+
+        foreach ($customerGroupQuery->find() as $customerGroup) {
+            $customerGroup->setLocale($locale);
+            $customerGroups[$customerGroup->getId()] = $customerGroup;
+        }
+
+        return $customerGroups;
+    }
+
+    /**
+     * The language of the visit, the default one when there is none: a console command, a
+     * worker or a request with no session has no language to ask.
+     */
+    private function localeOfTheVisit(): string
+    {
+        $request = $this->requestStack->getMainRequest();
+        $session = null !== $request && $request->hasSession() ? $request->getSession() : null;
+
+        return ($session instanceof Session ? $session->getLang()?->getLocale() : null) ?? Lang::getDefaultLanguage()->getLocale();
     }
 }
