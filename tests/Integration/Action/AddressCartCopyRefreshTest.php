@@ -24,11 +24,13 @@ use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
+use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerTitle;
 use Thelia\Model\Map\CartAddressTableMap;
+use Thelia\Model\Map\CartTableMap;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class AddressCartCopyRefreshTest extends ActionIntegrationTestCase
@@ -106,6 +108,32 @@ final class AddressCartCopyRefreshTest extends ActionIntegrationTestCase
         $copy = CartAddressQuery::create()->findPk($deliveryCopy->getId());
         self::assertSame('2 avenue des Tests', $copy?->getAddress1());
         self::assertSame('Martin', $copy?->getLastname());
+    }
+
+    public function testTheDeliveryCopyOfACartWithNothingToShipFollowsAMove(): void
+    {
+        $connection = $this->getPropelConnection();
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $address = $this->factory->address($customer, null, null, ['zipcode' => '75001', 'city' => 'Paris']);
+
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());
+        $product->setVirtual(1)->save($connection);
+
+        $cart = $this->factory->cart($customer);
+        $this->factory->cartItem($cart, $product);
+        $copy = (new CartAddressService())->getOrCreateCartAddressFromAddress($address);
+        $cart->setAddressDeliveryId($copy->getId())->save($connection);
+
+        CartTableMap::clearInstancePool();
+        self::assertTrue(CartQuery::create()->findPk($cart->getId())?->isVirtual(), 'Control: the cart has nothing to ship.');
+
+        $address->setAddress1('1 Main Street')->setZipcode('20000')->setCity('Ajaccio')->save($connection);
+
+        CartAddressTableMap::clearInstancePool();
+        $followed = CartAddressQuery::create()->findPk($copy->getId());
+        self::assertSame('20000', $followed?->getZipcode(), 'A virtual cart is not held back by the move, so its delivery copy must follow it.');
+        self::assertSame('Ajaccio', $followed?->getCity());
+        self::assertSame('1 Main Street', $followed?->getAddress1());
     }
 
     public function testTheCopyOfACartAlreadyOrderedIsLeftAsOrdered(): void
