@@ -24,8 +24,12 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\CategoryImageTableMap;
+use Thelia\Model\Map\ProductImageTableMap;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Type\BooleanOrBothType;
@@ -70,6 +74,12 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /** @var array Possible standard image sources */
     protected array $possible_sources = ['category', 'product', 'folder', 'content', 'module', 'brand'];
+
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+        private readonly ProductVisibility $productVisibility,
+    ) {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -222,6 +232,18 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
                 }
             }
+        }
+
+        // The images of a category closed to the customer's group are hidden with it on
+        // the front, whichever way the category is named; the back office lists them all.
+        if ('category' === strtolower((string) $objectType) && null !== $search && !$this->getBackendContext()) {
+            $this->categoryVisibility->applyTo($search, CategoryImageTableMap::COL_CATEGORY_ID);
+        }
+
+        // Likewise the images of a product the visitor may not see (a private drop, a category
+        // closed to the group, a rule of a module).
+        if ('product' === strtolower((string) $objectType) && null !== $search && !$this->getBackendContext()) {
+            $this->productVisibility->applyTo($search, ProductImageTableMap::COL_PRODUCT_ID);
         }
 
         return $search;

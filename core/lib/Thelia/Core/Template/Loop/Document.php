@@ -24,8 +24,12 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\CategoryDocumentTableMap;
+use Thelia\Model\Map\ProductDocumentTableMap;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Type\BooleanOrBothType;
@@ -60,6 +64,12 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /** @var array Possible standard document sources */
     protected array $possible_sources = ['category', 'product', 'folder', 'content', 'brand'];
+
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+        private readonly ProductVisibility $productVisibility,
+    ) {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -191,6 +201,18 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
                 }
             }
+        }
+
+        // The documents of a category closed to the customer's group are hidden with it on
+        // the front, whichever way the category is named; the back office lists them all.
+        if ('category' === strtolower((string) $object_type) && null !== $search && !$this->getBackendContext()) {
+            $this->categoryVisibility->applyTo($search, CategoryDocumentTableMap::COL_CATEGORY_ID);
+        }
+
+        // Likewise the documents of a product the visitor may not see (a private drop, a category
+        // closed to the group, a rule of a module).
+        if ('product' === strtolower((string) $object_type) && null !== $search && !$this->getBackendContext()) {
+            $this->productVisibility->applyTo($search, ProductDocumentTableMap::COL_PRODUCT_ID);
         }
 
         return $search;

@@ -20,7 +20,9 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Type\BooleanOrBothType;
 
 /**
@@ -41,6 +43,11 @@ use Thelia\Type\BooleanOrBothType;
  */
 class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
@@ -67,6 +74,11 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
             $this->configureI18nProcessing($search, ['TITLE']);
 
             $search->filterById($currentId);
+
+            // The path of a closed category is empty: it stops where the visitor may not go.
+            if (!$this->getBackendContext()) {
+                $this->categoryVisibility->applyTo($search, CategoryTableMap::COL_ID);
+            }
 
             if (BooleanOrBothType::ANY !== $visible) {
                 $search->filterByVisible($visible);

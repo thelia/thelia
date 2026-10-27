@@ -22,7 +22,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Resource\PaymentModule;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Module\Payment\PaymentModuleService;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Model\Cart;
 use Thelia\Model\Lang;
 use Thelia\Model\Module;
@@ -87,7 +90,7 @@ final class PaymentModuleServiceTest extends TestCase
         $lang = $this->createStub(Lang::class);
         $lang->method('getLocale')->willReturn('en_US');
 
-        $service = new PaymentModuleService(new RequestStack(), $dispatcher, $container);
+        $service = new PaymentModuleService(new RequestStack(), $dispatcher, $container, new CustomerGroupPaymentPolicy(new CustomerGroupResolver(new CatalogActivityProbe())));
 
         $paymentModule = (new \ReflectionMethod(PaymentModuleService::class, 'getPaymentModule'))
             ->invoke($service, $dispatcher, $module, $this->createStub(Cart::class), $lang);
