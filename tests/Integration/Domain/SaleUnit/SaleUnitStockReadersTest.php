@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Loop\LoopExecutor;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
@@ -95,7 +96,10 @@ final class SaleUnitStockReadersTest extends IntegrationTestCase
         $row = $this->saleElementRow();
 
         self::assertSame(4.0, (float) $row['QUANTITY']);
-        self::assertSame(1, (int) $row['IS_PROMO']);
+        // The price of the unit is the price of the sale element there, never a promotion of
+        // the national one: nothing is struck through, as in the data access of the themes.
+        self::assertSame(0, (int) $row['IS_PROMO']);
+        self::assertEqualsWithDelta(7.5, (float) $row['PRICE'], 0.000001);
         self::assertEqualsWithDelta(7.5, (float) $row['PROMO_PRICE'], 0.000001);
     }
 
@@ -244,6 +248,7 @@ final class SaleUnitStockReadersTest extends IntegrationTestCase
             $this->currency,
             $this->getService(EventDispatcherInterface::class),
             $this->getService(SaleUnitStockResolver::class),
+            $this->getService(CartLinePricer::class),
         );
         self::assertInstanceOf(Cart::class, $copy);
 

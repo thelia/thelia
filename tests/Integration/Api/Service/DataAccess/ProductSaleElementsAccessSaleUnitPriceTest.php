@@ -16,7 +16,6 @@ namespace Thelia\Tests\Integration\Api\Service\DataAccess;
 
 use Thelia\Api\Service\DataAccess\ProductSaleElementsAccessService;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
-use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
@@ -51,7 +50,7 @@ final class ProductSaleElementsAccessSaleUnitPriceTest extends IntegrationTestCa
         $this->getService(SaleUnitContext::class)->reset();
         $this->getService(SaleUnitActivityChecker::class)->reset();
         $this->getService(SaleUnitPricingActivityChecker::class)->reset();
-        $this->getService(PricingActivityChecker::class)->reset();
+        $this->getService('services_resetter')->reset();
         $this->getService(EffectivePriceCatalog::class)->reset();
 
         parent::tearDown();

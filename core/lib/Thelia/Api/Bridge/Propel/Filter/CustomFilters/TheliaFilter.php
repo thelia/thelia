@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 
 class TheliaFilter extends AbstractFilter
 {
@@ -55,11 +56,13 @@ class TheliaFilter extends AbstractFilter
         $this->applied[$query] = true;
 
         $isApiRoute = $request->request->get('isApiRoute', false);
+        // Only a front operation is narrowed to what the visitor's group may see.
+        $openToVisitorOnly = FrontOperation::isFront($operation);
 
         if ($isApiRoute) {
-            $this->filterService->filterTFilterWithRequest(request: $request, query: $query);
+            $this->filterService->filterTFilterWithRequest(request: $request, query: $query, openToVisitorOnly: $openToVisitorOnly);
         } else {
-            $this->filterService->filterTFilterWithContext(context: $context, query: $query);
+            $this->filterService->filterTFilterWithContext(context: $context, query: $query, openToVisitorOnly: $openToVisitorOnly);
         }
     }
 
