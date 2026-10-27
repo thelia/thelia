@@ -223,6 +223,19 @@ final class WebhookPublishingTest extends IntegrationTestCase
         self::assertSame('https://ok.example.com/in', $this->requests[0]['url']);
     }
 
+    public function testASubscriptionWhoseEventsAreNotAListDoesNotStopTheOthers(): void
+    {
+        $broken = $this->subscribe(['order.created']);
+        $broken->setEvents('"order.created"')->save($this->getPropelConnection());
+        $healthy = $this->subscribe(['order.created'], url: 'https://ok.example.com/in');
+
+        static::getContainer()->get(WebhookPublisher::class)->publish('order.created', $this->order());
+
+        self::assertSame(1, WebhookDeliveryQuery::create()->filterBySubscriptionId($healthy->getId())->count($this->getPropelConnection()));
+        self::assertCount(1, $this->requests);
+        self::assertSame('https://ok.example.com/in', $this->requests[0]['url']);
+    }
+
     public function testAListenerThatFailsNeverReachesTheCodeThatRaisedTheEvent(): void
     {
         $event = new class($this->order()) extends OrderEvent {
