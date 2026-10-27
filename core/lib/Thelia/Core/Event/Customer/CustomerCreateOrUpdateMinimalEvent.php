@@ -31,6 +31,7 @@ class CustomerCreateOrUpdateMinimalEvent extends ActionEvent
     protected bool $forceEmailUpdate = false;
     protected bool $enabled = false;
     protected bool $reseller = false;
+    protected ?int $customerGroupId = null;
 
     protected ?Customer $customer = null;
 
@@ -197,6 +198,23 @@ class CustomerCreateOrUpdateMinimalEvent extends ActionEvent
         $this->enabled = $enabled;
 
         return $this;
+    }
+
+    /**
+     * The group the new account joins, which the registration resolved from a registration token
+     * on the server. Not a setter on purpose: {@see ActionEvent::bindArray()} calls the setters
+     * of the names it is given, and the data a visitor posts must never reach a group.
+     */
+    public function joinGroup(int $customerGroupId): self
+    {
+        $this->customerGroupId = $customerGroupId;
+
+        return $this;
+    }
+
+    public function getCustomerGroupId(): ?int
+    {
+        return $this->customerGroupId;
     }
 
     public function isReseller(): bool

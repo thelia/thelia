@@ -105,6 +105,33 @@ class ProductPrice implements PropelResourceInterface
     ])]
     public float $promoPrice;
 
+    /**
+     * The price with its taxes, for the country the visitor is delivered to: the figure of the
+     * product loop's TAXED_PRICE and of the product page, so that a card and the page it opens
+     * agree. A theme that shows taxed prices prints it instead of taxing `price` itself. Set on
+     * the front read of a sale element only, and null elsewhere.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    public ?float $taxedPrice = null;
+
+    /**
+     * The promotional price with its taxes, as `taxedPrice` is the price with its taxes.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        ProductSaleElements::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    public ?float $taxedPromoPrice = null;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
@@ -162,6 +189,30 @@ class ProductPrice implements PropelResourceInterface
     public function setPromoPrice(float $promoPrice): self
     {
         $this->promoPrice = $promoPrice;
+
+        return $this;
+    }
+
+    public function getTaxedPrice(): ?float
+    {
+        return $this->taxedPrice;
+    }
+
+    public function setTaxedPrice(?float $taxedPrice): self
+    {
+        $this->taxedPrice = $taxedPrice;
+
+        return $this;
+    }
+
+    public function getTaxedPromoPrice(): ?float
+    {
+        return $this->taxedPromoPrice;
+    }
+
+    public function setTaxedPromoPrice(?float $taxedPromoPrice): self
+    {
+        $this->taxedPromoPrice = $taxedPromoPrice;
 
         return $this;
     }

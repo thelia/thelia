@@ -99,9 +99,27 @@ final readonly class CustomerPersonalDataExporter
             'locale' => $locale,
             'reseller' => (bool) $customer->getReseller(),
             'discount' => $customer->getDiscount(),
+            'customer_group' => $this->exportCustomerGroup($customer),
             'sponsor' => $customer->getSponsor(),
             'created_at' => $this->formatDate($customer->getCreatedAt()),
             'updated_at' => $this->formatDate($customer->getUpdatedAt()),
+        ];
+    }
+
+    /**
+     * The group is shop configuration, not the customer's own data: the export reports which one the account sits in,
+     * titled in the language of the account like the customer title above.
+     *
+     * @return array{code: string, title: string|null}
+     */
+    private function exportCustomerGroup(Customer $customer): array
+    {
+        $customerGroup = $customer->getCustomerGroup();
+        $locale = $customer->getLangModel()?->getLocale();
+
+        return [
+            'code' => $customerGroup->getCode(),
+            'title' => null === $locale ? null : $customerGroup->setLocale($locale)->getTitle(),
         ];
     }
 
@@ -169,6 +187,9 @@ final readonly class CustomerPersonalDataExporter
             'currency' => $order->getCurrency()?->getCode(),
             'currency_rate' => $order->getCurrencyRate(),
             'discount' => $order->getDiscount(),
+            'customer_discount_rate' => $order->getCustomerDiscountRate(),
+            'customer_group' => $order->getCustomerGroup()?->getCode(),
+            'customer_group_discount_rate' => $order->getCustomerGroupDiscountRate(),
             'postage' => $order->getPostage(),
             'postage_tax' => $order->getPostageTax(),
             'transaction_reference' => $order->getTransactionRef(),

@@ -338,6 +338,30 @@ class CatalogPriceRule extends AbstractTranslatableResource implements Collectio
         return $ids;
     }
 
+    /**
+     * The groups a rule reserved for groups prices for. Read only, like the named
+     * customers: a rule is written through its events.
+     *
+     * @return list<int>
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    public function getCustomerGroupIds(): array
+    {
+        $rule = $this->propelRule();
+
+        if (null === $rule) {
+            return [];
+        }
+
+        $ids = [];
+
+        foreach ($rule->getCatalogPriceRuleCustomerGroups() as $ruleCustomerGroup) {
+            $ids[] = (int) $ruleCustomerGroup->getCustomerGroupId();
+        }
+
+        return $ids;
+    }
+
     public static function preloadCollection(array $resources): void
     {
         $ruleIds = [];

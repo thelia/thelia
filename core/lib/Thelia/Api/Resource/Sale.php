@@ -332,6 +332,30 @@ class Sale extends AbstractTranslatableResource implements CollectionPreloadable
     }
 
     /**
+     * The customer groups a reserved operation is open to. Admin only and read only,
+     * like everything about the audience of an operation.
+     *
+     * @return list<int>
+     */
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    public function getCustomerGroupIds(): array
+    {
+        $sale = $this->propelSale();
+
+        if (null === $sale) {
+            return [];
+        }
+
+        $ids = [];
+
+        foreach ($sale->getSaleCustomerGroups() as $saleCustomerGroup) {
+            $ids[] = (int) $saleCustomerGroup->getCustomerGroupId();
+        }
+
+        return $ids;
+    }
+
+    /**
      * Reads the products of every operation of a page in one statement.
      *
      * `productIds` belongs to both read groups, so the serializer asks each member of

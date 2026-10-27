@@ -353,4 +353,8 @@ return [
     '%products cannot be ordered with this invoice address. Remove them from your cart or choose another invoice address.' => '%products non possono essere ordinati con questo indirizzo di fatturazione. Rimuovili dal carrello o scegli un altro indirizzo di fatturazione.',
     '%product cannot be shipped to your address.' => '%product non può essere spedito al tuo indirizzo.',
     'The value "%value" of the column %column is not a number (product sale element id %id)' => 'Il valore "%value" della colonna %column non è un numero (id della variante di prodotto %id)',
+    'This product is not available.' => 'Questo prodotto non è disponibile.',
+    '%products is no longer available to you. Remove it from your cart to complete your order.' => '%products non è più disponibile per lei. Lo rimuova dal carrello per completare l\'ordine.',
+    '%products are no longer available to you. Remove them from your cart to complete your order.' => '%products non sono più disponibili per lei. Li rimuova dal carrello per completare l\'ordine.',
+    'These products are not available to your account and were taken out of your cart: %products.' => 'Questi prodotti non sono disponibili per il suo account e sono stati rimossi dal carrello: %products.',
 ];
