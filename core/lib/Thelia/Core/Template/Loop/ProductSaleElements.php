@@ -16,7 +16,6 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -24,8 +23,9 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Domain\Pricing\EffectivePrice;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\CurrencyConverter;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
@@ -68,7 +68,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function __construct(
         protected readonly TaxEngine $taxEngine,
         protected readonly ReservedSaleVisibility $reservedSaleVisibility,
-        protected readonly EffectivePriceCatalog $effectivePriceCatalog,
+        protected readonly VisitorPriceReader $visitorPriceReader,
+        protected readonly CurrencyConverter $currencyConverter,
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
     ) {
     }
@@ -255,11 +256,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
             ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-        /**
-         * rate value is checked as a float in overloaded getRate method.
-         */
-        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END';
-        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END';
+        // A default currency price is converted at rate / default rate, the way the cart
+        // converts it: the rate alone is only right while the default rate is 1.
+        $factorAsSql = $this->currencyConverter->factorAsSql($currency);
+
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * '.$factorAsSql.' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE * '.$factorAsSql.' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
             ->withColumn('CASE WHEN '.ProductSaleElementsTableMap::COL_PROMO.' = 1 THEN '.$promoPriceSelectorAsSQL.' ELSE '.$priceSelectorAsSQL.' END', 'price_FINAL_PRICE');
@@ -272,16 +274,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function parseResults(LoopResult $loopResult): LoopResult
     {
         $taxCountry = $this->taxEngine->getDeliveryCountry();
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('thelia.securityContext');
-        $discount = 0.0;
-
-        if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
-            // getDiscount() maps a DECIMAL column and returns a string.
-            $discount = (float) $securityContext->getCustomerUser()->getDiscount();
-        }
-
-        $effectivePrices = $this->effectivePricesOf($loopResult);
+        $resolvedPrices = $this->resolvedPricesOf($loopResult);
         $saleUnitQuantities = $this->saleUnitQuantitiesOf($loopResult);
 
         /** @var \Thelia\Model\ProductSaleElements $PSEValue */
@@ -290,38 +283,37 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
             $isPromo = 1 === $PSEValue->getPromo() ? 1 : 0;
 
-            // A catalog price rule or a reserved operation writes nothing in the
-            // catalog, so its price is substituted here — in the virtual column the
-            // price getters read, so that the customer discount and the tax are
-            // applied to it exactly the way they are applied to a public promo price.
-            // The promo flag itself is only raised for the row: the model belongs to
-            // the catalog, and the catalog is where such a price leaves no trace.
-            $effectivePrice = $effectivePrices[(int) $PSEValue->getId()] ?? null;
+            // What the visitor pays - price of the group, rules, operations, then the
+            // discounts of the group and of the customer - writes nothing in the catalog,
+            // so it is substituted here, in the virtual columns the price getters read, so
+            // that the tax is applied to it exactly the way it is applied to a public price.
+            // The promo flag itself is only raised for the row: the model belongs to the
+            // catalog.
+            $resolvedPrice = $resolvedPrices[(int) $PSEValue->getId()] ?? null;
 
-            if (null !== $effectivePrice) {
-                $PSEValue->setVirtualColumn('price_PROMO_PRICE', $effectivePrice->untaxedPromoPrice);
-                $isPromo = 1;
+            if (null !== $resolvedPrice) {
+                $PSEValue->setVirtualColumn('price_PRICE', $resolvedPrice->untaxedPrice);
+                $PSEValue->setVirtualColumn('price_PROMO_PRICE', $resolvedPrice->untaxedPromoPrice);
+                $isPromo = $resolvedPrice->isPromo ? 1 : 0;
             }
 
-            $price = $PSEValue->getPrice('price_PRICE', $discount);
+            $price = $PSEValue->getPrice('price_PRICE');
 
             try {
                 $taxedPrice = $PSEValue->getTaxedPrice(
                     $taxCountry,
                     'price_PRICE',
-                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPrice = null;
             }
 
-            $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE', $discount);
+            $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE');
 
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry,
                     'price_PROMO_PRICE',
-                    $discount,
                 );
             } catch (TaxEngineException) {
                 $taxedPromoPrice = null;
@@ -356,15 +348,15 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     }
 
     /**
-     * The effective prices of the page, resolved once for the whole page rather
-     * than once per row.
+     * What the visitor pays for the sale elements of the page, resolved once for the
+     * whole page rather than once per row.
      *
-     * Empty in the back office: the catalog is what it edits, and a rule price or a
-     * reserved price is deliberately not part of the catalog.
+     * Empty in the back office: the catalog is what it edits, and what a rule, an
+     * operation, a group or a discount gives a customer is deliberately not part of it.
      *
-     * @return array<int, EffectivePrice> keyed by sale element id
+     * @return array<int, ResolvedPrice> keyed by sale element id
      */
-    private function effectivePricesOf(LoopResult $loopResult): array
+    private function resolvedPricesOf(LoopResult $loopResult): array
     {
         if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
             return [];
@@ -377,11 +369,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $productSaleElementsIds[] = (int) $PSEValue->getId();
         }
 
-        return $this->effectivePriceCatalog->warm(
-            $productSaleElementsIds,
-            $this->currency,
-            $this->reservedSaleVisibility->currentCustomer(),
-        );
+        return $this->visitorPriceReader->resolve($productSaleElementsIds, $this->currency);
     }
 
     /**

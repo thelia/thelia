@@ -24,8 +24,11 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
@@ -70,6 +73,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
     protected $timestampable = true;
     protected $versionable = true;
+
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+        private readonly ProductVisibility $productVisibility,
+    ) {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -125,6 +134,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     public function buildModelCriteria(): ModelCriteria
     {
         $search = CategoryQuery::create();
+
+        // A category closed to the customer's group, and its sub-tree, is not listed on the
+        // front; the back office lists them all.
+        if (!$this->getBackendContext()) {
+            $this->categoryVisibility->applyTo($search, CategoryTableMap::COL_ID);
+        }
 
         /* manage translations */
         $this->configureI18nProcessing($search, ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']);
@@ -284,11 +299,16 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->set('TEMPLATE', $category->getDefaultTemplateId());
 
             if ($this->getNeedCountChild()) {
-                $loopResultRow->set('CHILD_COUNT', $category->countChild());
+                $loopResultRow->set('CHILD_COUNT', $this->getBackendContext() ? $category->countChild() : $this->categoryVisibility->countOpenChildren((int) $category->getId()));
             }
 
             if ($this->getNeedProductCount()) {
-                if ($this->getProductCountVisibleOnly()) {
+                if (!$this->getBackendContext()) {
+                    // The figure shown next to a category on the front must not count the products the
+                    // visitor cannot see (reserved operations, restricted categories, module rules), nor the
+                    // ones it would only reach through a sub-category it may not browse.
+                    $loopResultRow->set('PRODUCT_COUNT', $category->countAllProducts(true, $this->productVisibility, $this->categoryVisibility->closedCategoryIds()));
+                } elseif ($this->getProductCountVisibleOnly()) {
                     $loopResultRow->set('PRODUCT_COUNT', $category->countAllProductsVisibleOnly());
                 } else {
                     $loopResultRow->set('PRODUCT_COUNT', $category->countAllProducts());

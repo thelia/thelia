@@ -28,6 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Domain\Media\DeletedItemMedia;
 use Thelia\Domain\Media\PendingMediaDeletions;
 use Thelia\Model\Category as CategoryModel;
@@ -38,6 +39,11 @@ use Thelia\Model\Map\CategoryTableMap;
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+    ) {
+    }
+
     /**
      * Create a new category entry.
      */
@@ -182,12 +188,15 @@ class Category extends BaseAction implements EventSubscriberInterface
         if ('category' !== $event->getView()) {
             return;
         }
-        $category = CategoryQuery::create()
+        $query = CategoryQuery::create()
             ->filterById($event->getViewId())
-            ->filterByVisible(1)
-            ->count();
+            ->filterByVisible(1);
 
-        if (0 === $category) {
+        // A category closed to the visitor's customer group answers the same 404 as one
+        // that is not visible, and so does the page of a category below it.
+        $this->categoryVisibility->applyTo($query, CategoryTableMap::COL_ID);
+
+        if (0 === $query->count()) {
             $dispatcher->dispatch($event, TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE);
         }
     }

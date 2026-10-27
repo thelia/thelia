@@ -19,6 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 
@@ -29,6 +30,11 @@ use Thelia\Module\BaseModule;
  */
 class Payment extends BaseSpecificModule
 {
+    public function __construct(
+        private readonly CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return parent::getArgDefinitions();
@@ -40,6 +46,12 @@ class Payment extends BaseSpecificModule
 
         /** @var Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
+            // Asked here and not left to the listeners of the event below: a module the
+            // customer's group is shut out of is not offered, whoever answers the event.
+            if (!$this->customerGroupPaymentPolicy->isAllowedForCart((int) $paymentModule->getId(), $cart)) {
+                continue;
+            }
+
             $loopResultRow = new LoopResultRow($paymentModule);
 
             $moduleInstance = $paymentModule->getPaymentModuleInstance($this->container);
