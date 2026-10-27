@@ -64,8 +64,9 @@ final readonly class VisitorCountryListener
 
             // Remembered even when nothing was found: the chain, and the log line of a
             // database that cannot be read, run once per session. A header that is absent
-            // costs nothing to read again, and may well come with the next request.
-            if ($detectedId > 0 || VisitorCountrySource::IpDatabase === $this->settings->source()) {
+            // costs nothing to read again, and may well come with the next request; a header
+            // that is present is the answer of the proxy, even for a country the shop hides.
+            if ($detectedId > 0 || $this->isDetectionFinal($request)) {
                 $this->session->rememberDetected($detectedId);
             }
         }
@@ -88,6 +89,14 @@ final readonly class VisitorCountryListener
             $this->session->retain($detectedId);
             $this->session->markAnswered();
         }
+    }
+
+    private function isDetectionFinal(Request $request): bool
+    {
+        return match ($this->settings->source()) {
+            VisitorCountrySource::IpDatabase => true,
+            VisitorCountrySource::Header => '' !== trim((string) $request->headers->get($this->settings->header(), '')),
+        };
     }
 
     /**

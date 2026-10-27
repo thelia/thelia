@@ -108,12 +108,12 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
         self::assertNull($this->facade()->detectedCountry());
     }
 
-    public function testNothingFoundInTheHeaderIsNotRememberedSoTheNextRequestDetectsAgain(): void
+    public function testAnAbsentHeaderIsNotRememberedSoTheNextRequestDetectsAgain(): void
     {
         $this->mode('apply');
         $belgium = $this->belgium();
 
-        $this->visit('XX');
+        $this->visit(null);
 
         self::assertFalse($this->session()->has('thelia.visitor_country.detected'));
         self::assertFalse($this->session()->has('thelia.visitor_country.id'));
@@ -122,6 +122,22 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
 
         self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.detected'));
         self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.id'));
+    }
+
+    public function testTheHeaderOfACountryTheShopHidesIsAnAnswerRememberedAsNothingFound(): void
+    {
+        $this->mode('apply');
+        $this->createFixtureFactory()->country(['isocode' => '905', 'isoalpha2' => 'YD', 'isoalpha3' => 'YDD', 'visible' => 0]);
+
+        $this->visit('YD');
+
+        self::assertSame(0, $this->session()->get('thelia.visitor_country.detected'));
+
+        $statements = $this->recordSqlQueries(function (): void {
+            $this->visit('YD');
+        });
+
+        self::assertSame(0, self::countSqlQueriesSelectingFrom($statements, 'country'), 'The second request does not look the header up again.');
     }
 
     public function testOnTheDomainOfALanguageOfTheDetectedCountryTheSuggestionIsAnsweredAndTheCountryRetained(): void
@@ -397,6 +413,45 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
         self::assertFalse($this->session()->has('thelia.visitor_country.answered'));
     }
 
+    public function testAcceptingACountryOtherThanTheDetectedOneIsRefusedAndWritesNothing(): void
+    {
+        $this->mode('suggest');
+        $this->belgium();
+        $this->visit('BE');
+
+        self::assertSame('FR', CountryQuery::create()->findPk($this->visitedId('FR'))?->getIsoalpha2());
+        self::assertSame(1, CountryQuery::create()->findPk($this->visitedId('FR'))?->getVisible());
+        self::assertFalse($this->facade()->accept($this->visitedId('FR')));
+
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+        self::assertFalse($this->session()->has('thelia.visitor_country.answered'));
+    }
+
+    public function testAcceptingIsRefusedInOffModeWhateverTheSessionHolds(): void
+    {
+        $belgium = $this->belgium();
+        $this->session()->set('thelia.visitor_country.detected', $belgium->getId());
+
+        self::assertFalse($this->facade()->accept($belgium->getId()));
+
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+        self::assertFalse($this->session()->has('thelia.visitor_country.answered'));
+    }
+
+    public function testDecliningForgetsTheCountryKeptFromAnEarlierApplyMode(): void
+    {
+        $this->mode('apply');
+        $belgium = $this->belgium();
+        $this->visit('BE');
+        self::assertSame($belgium->getId(), $this->facade()->currentCountry()->getId());
+
+        $this->mode('suggest');
+        $this->facade()->decline();
+
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+        self::assertSame(Country::getDefaultCountry()->getId(), $this->facade()->currentCountry()->getId());
+    }
+
     public function testDecliningEndsTheSuggestionAndKeepsTheDefaultCountry(): void
     {
         $this->mode('suggest');
@@ -420,6 +475,32 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
 
         self::assertSame($belgium->getId(), $service->getPreselectedCountry()->getId());
         self::assertNotSame($belgium->getId(), $service->getDefaultCountry()->getId(), 'getDefaultCountry() stays the default of the shop');
+    }
+
+    /**
+     * The instance of the country is shared through the pool of Propel: naming it in the
+     * language of the session would leave every other reader of it in that language.
+     */
+    public function testThePreselectedCountryLeavesTheSharedInstanceInItsLocale(): void
+    {
+        $this->mode('apply');
+        $belgium = $this->belgium();
+        $this->visit('BE');
+        $this->session()->setLang((new Lang())->setLocale('en_US'));
+
+        Propel::enableInstancePooling();
+
+        try {
+            $shared = CountryQuery::create()->findPk($belgium->getId());
+            $shared->setLocale('fr_FR');
+
+            $preselected = $this->getService(CountryService::class)->getPreselectedCountry();
+
+            self::assertSame($belgium->getId(), $preselected->getId());
+            self::assertSame('fr_FR', $shared->getLocale());
+        } finally {
+            Propel::disableInstancePooling();
+        }
     }
 
     public function testResolveFromRequestReadsTheRequestAndStoresNothing(): void
@@ -512,16 +593,20 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
         return $this->getService(RequestStack::class)->getMainRequest()->getSession();
     }
 
-    private function requestWithHeader(string $country, string $path = '/'): Request
+    private function requestWithHeader(?string $country, string $path = '/'): Request
     {
         $request = TheliaRequest::create($path);
-        $request->headers->set('CF-IPCountry', $country);
+
+        if (null !== $country) {
+            $request->headers->set('CF-IPCountry', $country);
+        }
+
         $request->setSession($this->session());
 
         return $request;
     }
 
-    private function visit(string $country, string $path = '/'): void
+    private function visit(?string $country, string $path = '/'): void
     {
         $session = $this->session();
         if (!$session->isStarted()) {

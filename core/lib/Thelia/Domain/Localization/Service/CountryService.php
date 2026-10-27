@@ -96,8 +96,8 @@ readonly class CountryService
             return $this->getDefaultCountry();
         }
 
-        $country->setLocale($this->session->getLang()->getLocale());
-
+        // The locale is left alone: the instance is shared with the pool of Propel, and the
+        // callers read the identifier only.
         return $country;
     }
 }

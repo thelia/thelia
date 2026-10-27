@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Thelia\Domain\Localization\VisitorCountry\MaxMindDatabaseLookup;
 
 final class MaxMindDatabaseLookupTest extends TestCase
@@ -29,7 +30,6 @@ final class MaxMindDatabaseLookupTest extends TestCase
     {
         $this->directory = sys_get_temp_dir().'/thelia-geoip-'.bin2hex(random_bytes(4));
         mkdir($this->directory);
-        MaxMindDatabaseLookup::forgetWarnings();
     }
 
     protected function tearDown(): void
@@ -79,26 +79,46 @@ final class MaxMindDatabaseLookupTest extends TestCase
         self::assertStringNotContainsString('203.0.113.7', json_encode($logger->records, \JSON_THROW_ON_ERROR));
     }
 
-    #[RunInSeparateProcess]
-    #[PreserveGlobalState(false)]
-    public function testTheSameWarningIsLoggedOncePerProcessWhateverTheNumberOfSessions(): void
+    public function testTheSameWarningIsLoggedOnceWhateverTheNumberOfSessions(): void
     {
         $logger = $this->logger();
+        $pool = new ArrayAdapter();
 
         foreach (range(1, 3) as $session) {
-            (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.'.$session, 'GeoLite2-Country.mmdb');
+            (new MaxMindDatabaseLookup($logger, $this->directory, $pool))->lookup('203.0.113.'.$session, 'GeoLite2-Country.mmdb');
         }
 
         self::assertCount(1, $logger->warnings);
 
-        (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.9', 'Other.mmdb');
+        (new MaxMindDatabaseLookup($logger, $this->directory, $pool))->lookup('203.0.113.9', 'Other.mmdb');
 
         self::assertCount(2, $logger->warnings, 'Another file is another warning.');
+    }
 
-        MaxMindDatabaseLookup::forgetWarnings();
-        (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.9', 'Other.mmdb');
+    /**
+     * Two requests of a FPM pool are two processes: only a cache they share can tell that
+     * the second warning is the first one again.
+     */
+    public function testTwoInstancesSharingTheCacheLogTheWarningOnce(): void
+    {
+        $logger = $this->logger();
+        $pool = new ArrayAdapter();
 
-        self::assertCount(3, $logger->warnings);
+        (new MaxMindDatabaseLookup($logger, $this->directory, $pool))->lookup('203.0.113.1', 'GeoLite2-Country.mmdb');
+        (new MaxMindDatabaseLookup($logger, $this->directory, $pool))->lookup('203.0.113.2', 'GeoLite2-Country.mmdb');
+
+        self::assertCount(1, $logger->warnings);
+    }
+
+    public function testWithoutACacheEveryFailureIsLogged(): void
+    {
+        $logger = $this->logger();
+        $lookup = new MaxMindDatabaseLookup($logger, $this->directory);
+
+        $lookup->lookup('203.0.113.1', 'GeoLite2-Country.mmdb');
+        $lookup->lookup('203.0.113.2', 'GeoLite2-Country.mmdb');
+
+        self::assertCount(2, $logger->warnings);
     }
 
     #[RunInSeparateProcess]

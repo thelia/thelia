@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Core\SharedCache;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -29,8 +30,8 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * A page that depends on the country of the visitor is only shared when the country
- * comes from a header the cache can vary on.
+ * A page that depends on the country of the visitor is never shared: while the detection
+ * is active, whatever its source, the pages are personal.
  */
 final class VisitorCountrySharedCacheTest extends IntegrationTestCase
 {
@@ -41,34 +42,29 @@ final class VisitorCountrySharedCacheTest extends IntegrationTestCase
         parent::tearDown();
     }
 
-    public function testInHeaderModeTheConfiguredHeaderIsAddedToTheVary(): void
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function activeDetections(): iterable
     {
-        $this->configure('suggest', 'header');
+        yield 'suggest with a header' => ['suggest', 'header'];
+        yield 'apply with a header' => ['apply', 'header'];
+        yield 'suggest with an IP database' => ['suggest', 'ip_database'];
+        yield 'apply with an IP database' => ['apply', 'ip_database'];
+    }
+
+    #[DataProvider('activeDetections')]
+    public function testWhileTheDetectionIsActiveThePageIsNotSharedWhateverTheSource(string $mode, string $source): void
+    {
+        $this->configure($mode, $source);
         ConfigQuery::write('visitor_country_header', 'X-Geo');
         ConfigQuery::resetCache();
 
         $response = $this->handle();
 
-        self::assertTrue($response->headers->hasCacheControlDirective('public'));
-        self::assertContains('X-Geo', $response->getVary());
-        self::assertContains('X-Forwarded-Proto', $response->getVary());
-    }
-
-    public function testTheDefaultHeaderIsAddedToTheVaryInApplyMode(): void
-    {
-        $this->configure('apply', 'header');
-
-        self::assertContains('CF-IPCountry', $this->handle()->getVary());
-    }
-
-    public function testInIpDatabaseModeThePageIsNotShared(): void
-    {
-        $this->configure('apply', 'ip_database');
-
-        $response = $this->handle();
-
         self::assertFalse($response->headers->hasCacheControlDirective('public'));
         self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertNotContains('X-Geo', $response->getVary());
         self::assertNotContains('CF-IPCountry', $response->getVary());
     }
 
@@ -93,10 +89,12 @@ final class VisitorCountrySharedCacheTest extends IntegrationTestCase
         $request = TheliaRequest::create('/horatio.html');
         $request->attributes->set('_view', 'product');
 
-        $this->configure('suggest', 'ip_database');
-        self::assertFalse($policy->isShareable($request, new Response('x')));
+        foreach ([['suggest', 'ip_database'], ['suggest', 'header'], ['apply', 'header']] as [$mode, $source]) {
+            $this->configure($mode, $source);
+            self::assertFalse($policy->isShareable($request, new Response('x')), $mode.' '.$source);
+        }
 
-        $this->configure('suggest', 'header');
+        $this->configure('off', 'header');
         self::assertTrue($policy->isShareable($request, new Response('x')));
     }
 

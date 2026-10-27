@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
-use Thelia\Domain\Localization\VisitorCountry\VisitorCountrySource;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Model\ConfigQuery;
 
@@ -132,10 +131,9 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        // A page priced or offered in the country of the visitor cannot be told apart by an
-        // address: only a header can be a cache key, so a country read from the IP is personal.
-        if (VisitorCountryMode::Off !== VisitorCountryMode::fromShopConfiguration()
-            && VisitorCountrySource::IpDatabase === VisitorCountrySource::fromShopConfiguration()) {
+        // A page priced or offered in the country of the visitor is personal, whatever the
+        // source of the country: the detection is shared with no one while it is active.
+        if (VisitorCountryMode::Off !== VisitorCountryMode::fromShopConfiguration()) {
             return false;
         }
 

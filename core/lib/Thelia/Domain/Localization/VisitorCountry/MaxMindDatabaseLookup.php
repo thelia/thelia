@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Localization\VisitorCountry;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Reads a MaxMind country database (GeoLite2-Country, GeoIP2-Country or any database
@@ -24,26 +26,28 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
  * The database and the `maxmind-db/reader` library are the shop's to provide: neither
  * ships with Thelia, and without them the detection answers nothing. A failure is
  * logged and never thrown, and never with the address: the detection runs once per
- * visitor session, so the log gets one line per session at most.
+ * visitor session, and the log gets a given line once an hour at most.
  */
 #[AsAlias(IpCountryLookupInterface::class)]
-final class MaxMindDatabaseLookup implements IpCountryLookupInterface
+final readonly class MaxMindDatabaseLookup implements IpCountryLookupInterface
 {
     public const READER_CLASS = 'MaxMind\Db\Reader';
 
+    private const WARNING_LIFETIME = 3600;
+
+    private string $directory;
+
     /**
-     * The warnings already logged by this PHP process. A robot without a cookie opens a
-     * session per request: a warning once per session would be a line per request.
-     *
-     * @var array<string, true>
+     * @param CacheItemPoolInterface|null $warnings the application cache, where a warning is remembered for an hour:
+     *                                              a robot without a cookie opens a session per request, and a
+     *                                              warning once per session would be a line per request. Without a
+     *                                              pool every failure is logged
      */
-    private static array $warned = [];
-
-    private readonly string $directory;
-
     public function __construct(
-        private readonly ?LoggerInterface $logger = null,
+        private ?LoggerInterface $logger = null,
         ?string $directory = null,
+        #[Autowire(service: 'cache.app')]
+        private ?CacheItemPoolInterface $warnings = null,
     ) {
         $this->directory = rtrim($directory ?? THELIA_LOCAL_DIR.'geoip', '/\\');
     }
@@ -92,26 +96,29 @@ final class MaxMindDatabaseLookup implements IpCountryLookupInterface
     }
 
     /**
-     * @internal for the tests: a process that serves many requests never forgets
-     */
-    public static function forgetWarnings(): void
-    {
-        self::$warned = [];
-    }
-
-    /**
      * @param array<string, string> $context
      */
     private function warnOnce(string $message, array $context = []): void
     {
-        $key = $message.'|'.json_encode($context, \JSON_THROW_ON_ERROR);
-
-        if (isset(self::$warned[$key])) {
+        if (null === $this->logger) {
             return;
         }
 
-        self::$warned[$key] = true;
-        $this->logger?->warning($message, $context);
+        if (null !== $this->warnings) {
+            try {
+                $item = $this->warnings->getItem('thelia.visitor_country.warning.'.hash('xxh128', $message.'|'.json_encode($context, \JSON_THROW_ON_ERROR)));
+
+                if ($item->isHit()) {
+                    return;
+                }
+
+                $this->warnings->save($item->set(true)->expiresAfter(self::WARNING_LIFETIME));
+            } catch (\Throwable) {
+                // A cache that fails must not hide the warning: it is logged each time.
+            }
+        }
+
+        $this->logger->warning($message, $context);
     }
 
     private static function isPlainFileName(string $name): bool

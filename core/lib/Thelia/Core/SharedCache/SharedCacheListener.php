@@ -21,9 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
-use Thelia\Domain\Localization\VisitorCountry\VisitorCountrySettings;
-use Thelia\Domain\Localization\VisitorCountry\VisitorCountrySource;
 use Thelia\Model\ConfigQuery;
 
 final readonly class SharedCacheListener
@@ -60,7 +57,7 @@ final readonly class SharedCacheListener
             return;
         }
 
-        $response->setVary([...$this->forwardedHeaders(), ...$this->visitorCountryHeaders()], false);
+        $response->setVary($this->forwardedHeaders(), false);
 
         $ttl = SharedCachePolicy::ttl();
 
@@ -119,22 +116,6 @@ final readonly class SharedCacheListener
         }
 
         return $headers;
-    }
-
-    /**
-     * The country of a visitor read from a header changes the page: two visitors are only
-     * served the same copy when they sent the same value.
-     *
-     * @return list<string>
-     */
-    private function visitorCountryHeaders(): array
-    {
-        if (VisitorCountryMode::Off === VisitorCountryMode::fromShopConfiguration()
-            || VisitorCountrySource::Header !== VisitorCountrySource::fromShopConfiguration()) {
-            return [];
-        }
-
-        return [(new VisitorCountrySettings())->header()];
     }
 
     private function carriesOnlyTheCookiesAProxyMayStrip(Request $request, Response $response): bool

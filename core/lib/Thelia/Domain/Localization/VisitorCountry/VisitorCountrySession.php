@@ -64,6 +64,11 @@ final readonly class VisitorCountrySession
         $this->session()?->set(self::ID_KEY, $countryId);
     }
 
+    public function forget(): void
+    {
+        $this->session()?->remove(self::ID_KEY);
+    }
+
     public function isAnswered(): bool
     {
         return true === $this->session()?->get(self::ANSWERED_KEY);
