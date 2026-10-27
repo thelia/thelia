@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -247,7 +248,7 @@ class Content extends AbstractTranslatableResource
             return null;
         }
 
-        return PublicationStatus::ofPublishable($propelModel, new \DateTimeImmutable())->state->value;
+        return PublicationStatus::ofPublishable($propelModel, Clock::get()->now())->state->value;
     }
 
     public function getCreatedAt(): ?\DateTime
