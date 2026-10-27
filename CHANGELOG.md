@@ -1,8 +1,20 @@
-# 3.1.6 (unreleased)
+# 3.1.6
+
+Security release of the 3.1 line. It stops a return request from taking over the return lines of another customer. It ships `setup/update/sql/3.1.6.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.1.7 with this core, its 3.1.6 tag being already taken; `thelia/config` does not change and stays at 3.1.1. The themes do not change.
 
 ## Security
 
 - Opening a return, on the front API or from the administration, can no longer take over a return line that already exists, including one of another customer: such a request is refused with 422 and the line stays where it was.
+
+## Upgrade notes
+
+Update the core and the setup package, then the database, from the root of the project, and warm the cache up. The project keeps the 3.1 line of the skeleton, so Composer keeps the core on 3.1:
+
+```bash
+composer update thelia/core thelia/setup --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
 
 # 3.1.5
 
