@@ -111,15 +111,9 @@ final readonly class VisitorCountryListener
 
         $session = $request->getSession();
         $locale = (string) ($session instanceof Session ? $session->getLang()?->getLocale() : '');
-        $separator = strrpos($locale, '_');
+        $localeCountry = IsoCountryCode::ofLocale($locale);
 
-        if (false === $separator) {
-            return false;
-        }
-
-        $country = CountryQuery::create()->findPk($countryId);
-
-        return null !== $country && strtoupper(substr($locale, $separator + 1)) === strtoupper((string) $country->getIsoalpha2());
+        return null !== $localeCountry && $localeCountry === IsoCountryCode::normalize(CountryQuery::create()->findPk($countryId)?->getIsoalpha2());
     }
 
     private function isBackendPath(string $path): bool

@@ -58,4 +58,23 @@ final class IsoCountryCodeTest extends TestCase
         yield 'a trailing line break and more' => ["BE\nXX"];
         yield 'a null byte' => ["B\0"];
     }
+
+    #[DataProvider('locales')]
+    public function testTheCountryOfALocaleIsItsRegion(?string $locale, ?string $expected): void
+    {
+        self::assertSame($expected, IsoCountryCode::ofLocale($locale));
+    }
+
+    /**
+     * @return iterable<string, array{string|null, string|null}>
+     */
+    public static function locales(): iterable
+    {
+        yield 'language and region' => ['nl_BE', 'BE'];
+        yield 'lower case region' => ['fr_be', 'BE'];
+        yield 'no region' => ['fr', null];
+        yield 'empty' => ['', null];
+        yield 'null' => [null, null];
+        yield 'not a region' => ['sr_Latn', null];
+    }
 }

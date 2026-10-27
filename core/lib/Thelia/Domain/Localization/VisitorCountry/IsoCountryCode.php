@@ -30,4 +30,14 @@ final readonly class IsoCountryCode
 
         return 1 === preg_match('/^[A-Z]{2}$/', $code) ? $code : null;
     }
+
+    /**
+     * The country a locale is written for: `BE` for `nl_BE`, null for a locale with no region.
+     */
+    public static function ofLocale(?string $locale): ?string
+    {
+        $separator = strrpos((string) $locale, '_');
+
+        return false === $separator ? null : self::normalize(substr((string) $locale, $separator + 1));
+    }
 }
