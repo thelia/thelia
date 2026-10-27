@@ -16,6 +16,7 @@ namespace Thelia\Tests\Api\Admin;
 
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
+use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -66,6 +67,20 @@ final class OrderProductUnitTaxedPriceApiTest extends ApiTestCase
 
         self::assertCount(1, $payload['orderProductTaxes'] ?? []);
         self::assertSame(self::UNIT_PRICE + self::UNIT_TAX, $payload['unitTaxedPrice']);
+    }
+
+    public function testALineWithoutTaxRowIsTaxedAtItsPrice(): void
+    {
+        $orderProduct = $this->taxedOrderLine();
+        OrderProductTaxQuery::create()->filterByOrderProductId($orderProduct->getId())->delete($this->getPropelConnection());
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('GET', '/api/admin/order_products/'.$orderProduct->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $payload = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertSame(self::UNIT_PRICE, $payload['unitTaxedPrice'], 'An order without VAT charges the price: not an unknown amount.');
     }
 
     private function taxedOrderLine(): OrderProduct
