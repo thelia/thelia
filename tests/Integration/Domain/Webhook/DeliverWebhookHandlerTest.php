@@ -28,6 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Thelia\Domain\Webhook\Message\DeliverWebhook;
 use Thelia\Domain\Webhook\Message\DeliverWebhookHandler;
 use Thelia\Domain\Webhook\WebhookDeliverer;
+use Thelia\Domain\Webhook\WebhookDeliveryTransport;
 use Thelia\Domain\Webhook\WebhookRetryPolicy;
 use Thelia\Domain\Webhook\WebhookSigner;
 use Thelia\Domain\Webhook\WebhookStatus;
@@ -313,7 +314,7 @@ final class DeliverWebhookHandlerTest extends IntegrationTestCase
             new WebhookDeliverer($client, new WebhookSigner(), new WebhookUrlValidator()),
             new WebhookRetryPolicy(),
             $bus,
-            $inline ? 'sync://' : 'doctrine://default',
+            new WebhookDeliveryTransport($inline ? 'sync://' : 'doctrine://default'),
         );
     }
 

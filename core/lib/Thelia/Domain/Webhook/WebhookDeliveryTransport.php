@@ -25,13 +25,8 @@ final readonly class WebhookDeliveryTransport
     ) {
     }
 
-    public static function isInline(string $jobDsn): bool
-    {
-        return str_starts_with($jobDsn, 'sync://');
-    }
-
     public function runsInline(): bool
     {
-        return self::isInline($this->jobDsn);
+        return str_starts_with($this->jobDsn, 'sync://');
     }
 }
