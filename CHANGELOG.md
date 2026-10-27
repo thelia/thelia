@@ -1,4 +1,6 @@
-# 3.2.5 (unreleased)
+# 3.2.5
+
+Security and maintenance release of the 3.2 line. It stops a return request from taking over the return lines of another customer, and it keeps the history of an order in the order things happened. It ships `setup/update/sql/3.2.5.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.2.5 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
 
 ## Security
 
@@ -14,6 +16,16 @@
 ## Breaking changes
 
 - The history line of opening a return, pointing its reception or moving it to another status precedes the e-mail that gesture sends. `Thelia\Action\OrderReturn` no longer dispatches `ORDER_RETURN_SEND_STATUS_EMAIL` from the end of `create()`, `receive()` and `updateStatus()`: a listener at priority 32 of `ORDER_RETURN_CREATE`, `ORDER_RETURN_RECEIVE` and `ORDER_RETURN_UPDATE_STATUS` does it, so a listener of those events between 32 and 128 now runs before the e-mail, and if it throws or stops the propagation the e-mail is not sent. Calling `create()`, `receive()` or `updateStatus()` directly, without dispatching the event, no longer sends the e-mail either.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
 
 # 3.2.4
 
