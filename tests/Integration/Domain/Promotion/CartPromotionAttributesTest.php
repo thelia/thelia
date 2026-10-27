@@ -19,6 +19,9 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
 use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Product;
 
@@ -282,6 +285,41 @@ final class CartPromotionAttributesTest extends ActionIntegrationPromotionTestCa
         );
     }
 
+    /**
+     * A theme that shows untaxed prices strikes the gift's untaxed price: the same discount,
+     * without its tax, which is the untaxed discount of the cart when the gift is its only
+     * discount.
+     */
+    public function testAnOfferedLineExposesTheUntaxedDiscountItCarries(): void
+    {
+        $trigger = $this->product();
+        $gift = $this->product(['basePrice' => 12.0]);
+        $this->buyXGetYPromotion($trigger, $gift, 'Two bought, one offered');
+
+        $cart = $this->newEmptyCart();
+        $triggerLine = $this->addItem($cart, $trigger, quantity: 2);
+
+        $offeredLine = CartItemQuery::create()
+            ->filterByCartId($cart->getId())
+            ->filterByIsOffered(1)
+            ->findOne();
+        self::assertNotNull($offeredLine);
+
+        $items = array_column($this->attributeAccess->attributeCart('cart_items'), null, 'id');
+        $offered = $items[$offeredLine->getId()];
+
+        self::assertGreaterThan(0.0, $offered['offered_discount']);
+        self::assertLessThan($offered['offered_taxed_discount'], $offered['offered_discount'], 'The taxed gift carries tax: its untaxed discount is smaller.');
+        self::assertEqualsWithDelta(
+            $this->attributeAccess->attributeCart('discount'),
+            $offered['offered_discount'],
+            0.01,
+            'A fully offered gift carries the whole untaxed discount of its promotion.',
+        );
+        self::assertEqualsWithDelta(12.0, $offered['offered_discount'], 0.01, 'The gift costs 12 untaxed.');
+        self::assertSame(0.0, $items[$triggerLine->getId()]['offered_discount'], 'A regular line carries no offered discount.');
+    }
+
     public function testTheOfferedLineDiscountFollowsTheProrationOfTheStoredDiscount(): void
     {
         $trigger = $this->product();
@@ -303,6 +341,97 @@ final class CartPromotionAttributesTest extends ActionIntegrationPromotionTestCa
             array_values(array_column($offeredItems, 'offered_taxed_discount')),
             'The line discount is scaled onto the stored discount, like the list.',
         );
+    }
+
+    /**
+     * A theme prints the line of a gift from the figures the cart publishes, in the display it
+     * is read in: the whole line, the discount it carries and what is left to pay, no sum made
+     * by the theme.
+     */
+    public function testAFullyOfferedLineIsPublishedWithNothingLeftToPay(): void
+    {
+        [$cart, $triggerLine, $offeredLine] = $this->cartWithAnOfferedGift();
+
+        $items = array_column($this->attributeAccess->attributeCart('cart_items'), null, 'id');
+        $offered = $items[$offeredLine->getId()];
+
+        self::assertEqualsWithDelta(12.0, $offered['line_total_untaxed'], 0.0001);
+        self::assertEqualsWithDelta($this->taxedTotalOf($offeredLine), $offered['line_total_taxed'], 0.0001);
+        self::assertEqualsWithDelta($offered['offered_taxed_discount'], $offered['offered_effective_taxed'], 0.0001);
+        self::assertEqualsWithDelta($offered['offered_discount'], $offered['offered_effective_untaxed'], 0.0001);
+        self::assertEqualsWithDelta(0.0, $offered['line_total_after_discount_taxed'], 0.01);
+        self::assertEqualsWithDelta(0.0, $offered['line_total_after_discount_untaxed'], 0.01);
+
+        $regular = $items[$triggerLine->getId()];
+        self::assertSame(0.0, $regular['offered_effective_taxed']);
+        self::assertSame(0.0, $regular['offered_effective_untaxed']);
+        self::assertSame($regular['line_total_taxed'], $regular['line_total_after_discount_taxed'], 'A regular line pays its whole total.');
+        self::assertSame($regular['line_total_untaxed'], $regular['line_total_after_discount_untaxed']);
+    }
+
+    public function testAPartlyOfferedLineLeavesWhatTheDiscountDoesNotTake(): void
+    {
+        [$cart, , $offeredLine] = $this->cartWithAnOfferedGift();
+
+        // The promotion grants the whole gift, the cart stores less: the line carries the share.
+        $cart->setDiscount('3')->save();
+
+        $offered = array_column($this->attributeAccess->attributeCart('cart_items'), null, 'id')[$offeredLine->getId()];
+
+        $taxedTotal = $this->taxedTotalOf($offeredLine);
+        self::assertEqualsWithDelta(3.0, $offered['offered_effective_taxed'], 0.0001);
+        self::assertEqualsWithDelta(round($taxedTotal - 3.0, 2), $offered['line_total_after_discount_taxed'], 0.0001);
+        self::assertGreaterThan(0.0, $offered['line_total_after_discount_taxed']);
+        self::assertGreaterThan(0.0, $offered['offered_effective_untaxed']);
+        self::assertLessThan($offered['offered_effective_taxed'], $offered['offered_effective_untaxed'], 'The untaxed part of the discount is the smaller.');
+        self::assertEqualsWithDelta(
+            round(12.0 - $offered['offered_effective_untaxed'], 2),
+            $offered['line_total_after_discount_untaxed'],
+            0.0001,
+        );
+    }
+
+    public function testADiscountWorthMoreThanTheLineTakesTheLineAndNoMore(): void
+    {
+        [$cart, , $offeredLine] = $this->cartWithAnOfferedGift();
+
+        $cart->setDiscount('100')->save();
+
+        $offered = array_column($this->attributeAccess->attributeCart('cart_items'), null, 'id')[$offeredLine->getId()];
+
+        self::assertGreaterThan($offered['line_total_taxed'], $offered['offered_taxed_discount'], 'The promotion is configured to take off more than the line is worth.');
+        self::assertEqualsWithDelta($offered['line_total_taxed'], $offered['offered_effective_taxed'], 0.0001);
+        self::assertEqualsWithDelta($offered['line_total_untaxed'], $offered['offered_effective_untaxed'], 0.0001);
+        self::assertSame(0.0, $offered['line_total_after_discount_taxed'], 'The buyer is never shown a negative price.');
+        self::assertSame(0.0, $offered['line_total_after_discount_untaxed']);
+    }
+
+    /**
+     * @return array{0: Cart, 1: CartItem, 2: CartItem}
+     */
+    private function cartWithAnOfferedGift(): array
+    {
+        $trigger = $this->product();
+        $gift = $this->product(['basePrice' => 12.0]);
+        $this->buyXGetYPromotion($trigger, $gift, 'Two bought, one offered');
+
+        $cart = $this->newEmptyCart();
+        $triggerLine = $this->addItem($cart, $trigger, quantity: 2);
+
+        $offeredLine = CartItemQuery::create()
+            ->filterByCartId($cart->getId())
+            ->filterByIsOffered(1)
+            ->findOne();
+        self::assertNotNull($offeredLine);
+
+        return [$cart, $triggerLine, $offeredLine];
+    }
+
+    private function taxedTotalOf(CartItem $line): float
+    {
+        $taxEngine = $this->getService(TaxEngine::class);
+
+        return round($line->getTotalRealTaxedPrice($taxEngine->getDeliveryCountry(), $taxEngine->getDeliveryState()), 2);
     }
 
     private function buyXGetYPromotion(Product $trigger, Product $gift, string $title): void

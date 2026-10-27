@@ -16,6 +16,7 @@ namespace Thelia\Domain\Shipping\ProductRule;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Api\Resource\DeliveryModuleOption;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -39,6 +40,7 @@ final readonly class ProductShippingRuleQuoter
     public function __construct(
         private CartShippingRules $cartShippingRules,
         private ContainerInterface $container,
+        private CurrencyConverter $currencyConverter,
     ) {
     }
 
@@ -236,12 +238,12 @@ final readonly class ProductShippingRuleQuoter
     private function toCartCurrency(float $amount, Cart $cart): float
     {
         $currency = $cart->getCurrency();
-        $defaultCurrency = Currency::getDefaultCurrency();
 
-        if (null === $currency || $currency->getId() === $defaultCurrency->getId()) {
+        if (null === $currency || $currency->getId() === Currency::getDefaultCurrency()->getId()) {
             return $amount;
         }
 
-        return $amount * $currency->getRate() / $defaultCurrency->getRate();
+        // Without a usable default rate nothing converts: the amount stays as typed.
+        return $this->currencyConverter->fromDefaultCurrency($amount, $currency) ?? $amount;
     }
 }

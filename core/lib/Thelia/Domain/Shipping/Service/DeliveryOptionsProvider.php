@@ -16,12 +16,14 @@ namespace Thelia\Domain\Shipping\Service;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Event\DeliveryModuleOptionEvent;
+use Thelia\Api\Resource\DeliveryModuleOption;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\Module;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
 
 final readonly class DeliveryOptionsProvider
@@ -44,8 +46,33 @@ final readonly class DeliveryOptionsProvider
 
         // The prices listed to the buyer follow the shipping rules of the products,
         // as the postage charged afterwards does.
-        return null !== $this->productShippingRuleQuoter
+        $options = null !== $this->productShippingRuleQuoter
             ? $this->productShippingRuleQuoter->quoteOptions($module, $cart, $country, $askCarrier)
             : $askCarrier($cart);
+
+        foreach ($options as $option) {
+            if ($option instanceof DeliveryModuleOption) {
+                $this->completeUntaxedPostage($option);
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * A carrier may quote the postage and its tax alone. The untaxed amount is then read the way
+     * the core reads it on its own postage, in {@see OrderPostage::getUntaxedAmount()}, so that
+     * every option is published with all three figures and a theme never subtracts one from
+     * another.
+     */
+    private function completeUntaxedPostage(DeliveryModuleOption $option): void
+    {
+        if (null !== $option->getPostageUntaxed() || null === $option->getPostage()) {
+            return;
+        }
+
+        $option->setPostageUntaxed(
+            (new OrderPostage($option->getPostage(), $option->getPostageTax()))->getUntaxedAmount(),
+        );
     }
 }

@@ -19,10 +19,13 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Cart\Exception\ProductNotAvailableException;
+use Thelia\Domain\Cart\Exception\ProductWithoutPriceException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
 use Thelia\Domain\Shipping\DestinationRestriction\ProductRefusedByDestinationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
@@ -249,19 +252,32 @@ class FreeProduct extends AbstractRemoveOnProducts
 
                 try {
                     $this->facade->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
-                } catch (NotEnoughStockException|ProductRefusedByDestinationException) {
-                    // A gift the shop cannot ship (out of stock, or refused by the
-                    // destination of the cart) is not offered, and the customer's own
-                    // addition goes through. The marker is dropped so the gift is tried
-                    // again once it is back in stock or the destination changes.
+                } catch (NotEnoughStockException|ProductRefusedByDestinationException|ProductNotAvailableException|ProductWithoutPriceException) {
+                    // A gift the shop cannot ship (out of stock, refused by the destination
+                    // of the cart), the catalog hides from this customer or nothing prices (no
+                    // price in the default currency) is not offered, and the customer's own
+                    // addition goes through. The marker is dropped so the gift is tried again
+                    // once it is back in stock, priced, or the destination changes. A module
+                    // that turns the gift away with its own InvalidCartException is not
+                    // swallowed: it is heard.
+                    $this->clearFreeProductsCartItemIds();
+
+                    return 0.0;
+                }
+
+                $freeProductCartItem = $cartEvent->getCartItem();
+
+                if (!$freeProductCartItem instanceof CartItem) {
+                    // The cart wrote no line (the sale element is gone). The gift is not
+                    // offered, and the marker is dropped so that it is tried again.
+                    Tlog::getInstance()->warning(\sprintf('The free product %d of the coupon %s was not added to the cart: it is not offered.', $this->offeredProductId, $this->code));
                     $this->clearFreeProductsCartItemIds();
 
                     return 0.0;
                 }
 
                 // Store the final cart item ID.
-                $this->setRelatedCartItem($eligibleProduct, $cartEvent->getCartItem()->getId());
-                $freeProductCartItem = $cartEvent->getCartItem();
+                $this->setRelatedCartItem($eligibleProduct, $freeProductCartItem->getId());
             }
 
             if ($freeProductCartItem instanceof CartItem && $this->theDestinationRefuses($freeProductCartItem)) {
