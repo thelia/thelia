@@ -17,6 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Symfony\Component\Clock\Clock;
 use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Domain\CMS\Publication\PublicationGuard;
@@ -207,7 +208,7 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
         }
 
         if ($visibilityChanged) {
-            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
+            VisibilityDatesAligner::alignOn($this, Clock::get()->now());
         }
 
         return parent::preSave($con);

@@ -17,6 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\Clock\Clock;
 use Thelia\Core\File\FileModelParentInterface;
 use Thelia\Domain\CMS\Publication\PublicationMoment;
 use Thelia\Domain\CMS\Publication\PublishableInterface;
@@ -94,7 +95,7 @@ class Folder extends BaseFolder implements FileModelParentInterface, Publishable
     public function preSave(?ConnectionInterface $con = null): bool
     {
         if (!$this->isNew() && $this->isColumnModified(FolderTableMap::COL_VISIBLE)) {
-            VisibilityDatesAligner::alignOn($this, new \DateTimeImmutable());
+            VisibilityDatesAligner::alignOn($this, Clock::get()->now());
         }
 
         return parent::preSave($con);

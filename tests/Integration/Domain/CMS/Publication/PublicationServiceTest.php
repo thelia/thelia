@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\CMS\Publication;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\MockClock;
 use Thelia\Domain\CMS\Publication\Exception\EmptyContentPublicationException;
 use Thelia\Domain\CMS\Publication\Exception\InvalidPublicationDatesException;
@@ -42,6 +44,8 @@ final class PublicationServiceTest extends IntegrationTestCase
 
     private FixtureFactory $factory;
 
+    private ?ClockInterface $clockOfTheShop = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,6 +54,20 @@ final class PublicationServiceTest extends IntegrationTestCase
         $this->clock = new MockClock(self::NOW, date_default_timezone_get());
         $this->service = new PublicationService($this->clock);
         $this->factory = $this->createFixtureFactory();
+
+        // The models align their dates on the global clock when `visible` changes: stopped
+        // with the service, so the test reads the same day whatever day it runs.
+        $this->clockOfTheShop = Clock::get();
+        Clock::set($this->clock);
+    }
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->clockOfTheShop) {
+            Clock::set($this->clockOfTheShop);
+        }
+
+        parent::tearDown();
     }
 
     public function testADraftIsPublishedNow(): void
