@@ -116,7 +116,7 @@ final class TFiltersVisibleProductsTest extends IntegrationTestCase
         $factory->saleOffsetCurrency($sale, $currency, 10.0);
 
         // Both services answer from memory for the whole request.
-        $this->getService(SaleAudienceChecker::class)->reset();
+        $this->getService('services_resetter')->reset();
         $this->getService(ReservedSaleVisibility::class)->reset();
 
         self::assertSame(

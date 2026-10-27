@@ -35,6 +35,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\DeltaType;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Brand;
@@ -56,6 +57,7 @@ readonly class FilterService
         private readonly RequestStack $requestStack,
         private readonly Translator $translator,
         private readonly ?ProductVisibility $productVisibility = null,
+        private readonly ?CategoryVisibility $categoryVisibility = null,
     ) {
     }
 
@@ -116,7 +118,7 @@ readonly class FilterService
         return array_values(array_unique($names));
     }
 
-    public function filterTFilterWithRequest($request, ?ModelCriteria $query = null): iterable
+    public function filterTFilterWithRequest($request, ?ModelCriteria $query = null, bool $openToVisitorOnly = false): iterable
     {
         $tfilters = $request->query->all('tfilters');
         $categoryDepth = (int) $request->query->get(CategoryFilter::CATEGORY_DEPTH_NAME);
@@ -124,10 +126,10 @@ readonly class FilterService
         $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
-        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth, openToVisitorOnly: $openToVisitorOnly);
     }
 
-    public function filterTFilterWithContext(?array $context = null, ?ModelCriteria $query = null): iterable
+    public function filterTFilterWithContext(?array $context = null, ?ModelCriteria $query = null, bool $openToVisitorOnly = false): iterable
     {
         $tfilters = $context['filters']['tfilters'] ?? [];
         $categoryDepth = (int) ($context['filters'][CategoryFilter::CATEGORY_DEPTH_NAME] ?? null);
@@ -135,10 +137,14 @@ readonly class FilterService
         $segments = explode('/', (string) $pathInfo);
         $resource = end($segments);
 
-        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth);
+        return $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, query: $query, categoryDepth: $categoryDepth, openToVisitorOnly: $openToVisitorOnly);
     }
 
-    public function filterWithTFilter(array $tfilters, string $resource, ?ModelCriteria $query = null, ?int $categoryDepth = null): iterable
+    /**
+     * @param bool $openToVisitorOnly true for a front reader: the categories closed to the visitor's group are neither
+     *                                filtered on nor walked into (the admin API is never narrowed)
+     */
+    public function filterWithTFilter(array $tfilters, string $resource, ?ModelCriteria $query = null, ?int $categoryDepth = null, bool $openToVisitorOnly = false): iterable
     {
         $filters = $this->getAvailableFiltersWithTFilter($resource, $tfilters);
 
@@ -173,7 +179,7 @@ readonly class FilterService
             $isMinOrMaxFilter = $this->isMinOrMaxFilter($values);
 
             if ($filterClass instanceof CategoryFilter) {
-                $filterClass->filter(query: $query, value: $values, categoryDepth: $categoryDepth);
+                $filterClass->filter(query: $query, value: $values, categoryDepth: $categoryDepth, openToVisitorOnly: $openToVisitorOnly);
             } else {
                 $filterClass->filter(query: $query, value: $values, isMinOrMaxFilter: $isMinOrMaxFilter);
             }
@@ -234,7 +240,7 @@ readonly class FilterService
         $locale ??= $this->langService->getLocale();
 
         $resolveIds = function (array $selection) use ($resource, $visible, $categoryDepth, $scopeIds, $browsedBrandId): array {
-            $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth);
+            $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth, openToVisitorOnly: true);
             $this->restrictToVisibility($query, $visible);
             $this->restrictToVisitorCatalog($query);
             $this->restrictToScope($query, $scopeIds);
@@ -296,7 +302,7 @@ readonly class FilterService
      */
     private function restrictedQuery(array $tfilters, string $resource, mixed $visible, int $categoryDepth, ?array $scopeIds, ?int $browsedBrandId): ModelCriteria
     {
-        $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth);
+        $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth, openToVisitorOnly: true);
         $this->restrictToVisibility($query, $visible);
         $this->restrictToVisitorCatalog($query);
         $this->restrictToScope($query, $scopeIds);
@@ -528,7 +534,8 @@ readonly class FilterService
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
         $category = CategoryQuery::create()->findPk(key: $categoryId);
 
-        if (!$category) {
+        // A category closed to the visitor is as good as absent: its facets are not described either.
+        if (!$category || \in_array((int) $category->getId(), $this->closedCategoryIds(), true)) {
             return null;
         }
 
@@ -789,7 +796,22 @@ readonly class FilterService
             && [] !== $this->retrieveFilterValue($theliaFilterNames, $tfilters);
     }
 
-    public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1): array
+    /**
+     * The categories the visitor's group is shut out of, sub-trees included: none of them
+     * is offered, walked into or filtered on by a front reader.
+     *
+     * @return list<int>
+     */
+    public function closedCategoryIds(): array
+    {
+        return $this->categoryVisibility?->closedCategoryIds() ?? [];
+    }
+
+    /**
+     * @param bool $openToVisitorOnly leaves out the categories closed to the visitor's group; the facets always do, a
+     *                                collection filter does on the front operations only
+     */
+    public function getCategoriesRecursively($categoryId, int $maxDepth, array $categoriesFound = [], int $depth = 1, bool $openToVisitorOnly = false): array
     {
         $categories = CategoryQuery::create()->filterByParent($categoryId)->find();
 
@@ -797,8 +819,10 @@ readonly class FilterService
             return $categoriesFound;
         }
 
+        $closedCategoryIds = $openToVisitorOnly ? $this->closedCategoryIds() : [];
+
         foreach ($categories as $category) {
-            if (!$category->getVisible()) {
+            if (!$category->getVisible() || \in_array((int) $category->getId(), $closedCategoryIds, true)) {
                 continue;
             }
 
@@ -808,6 +832,7 @@ readonly class FilterService
                 maxDepth: $maxDepth,
                 categoriesFound: $categoriesFound,
                 depth: $depth + 1,
+                openToVisitorOnly: $openToVisitorOnly,
             );
         }
 
