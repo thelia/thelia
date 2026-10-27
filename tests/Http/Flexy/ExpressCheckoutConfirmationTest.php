@@ -15,12 +15,14 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\Flexy;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent;
 use Thelia\Domain\Checkout\DTO\ExpressWalletAnswer;
 use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutConfirmationToken;
+use Thelia\Domain\Checkout\Service\ExpressPaymentButtonCollector;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery;
@@ -57,11 +59,15 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
 
     private ?string $previousDisplayMode = null;
 
+    private ?string $previousZones = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->previousDisplayMode = ConfigQuery::read('checkout_display_mode');
+        $this->previousZones = ConfigQuery::read(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME);
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, 'checkout');
 
         $this->skipUnlessTheThemeHasTheIdentificationPage();
         $this->setGuestCheckoutMode(GuestCheckoutMode::Enabled);
@@ -74,6 +80,7 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
     protected function tearDown(): void
     {
         ConfigQuery::write('checkout_display_mode', (string) $this->previousDisplayMode);
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, (string) $this->previousZones);
 
         parent::tearDown();
     }
@@ -216,6 +223,77 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
         $this->openASessionWithACart();
 
         self::assertContains(ExpressPaymentTestModule::MODULE_CODE, $this->paymentMethodCodes());
+    }
+
+    /**
+     * A shop that did not turn the checkout zone on shows the payment step of a shop
+     * without the wallet: no card to choose, so no order button handed to a wallet button
+     * that will never be rendered.
+     */
+    public function testWithTheCheckoutZoneOffThePaymentStepInStepsListsNoWallet(): void
+    {
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::Steps->value);
+        $this->aGuestReadyToPay();
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, '');
+
+        self::assertCount(0, $this->walletCardsOn('/checkout/payment'));
+        self::assertNotContains(ExpressPaymentTestModule::MODULE_CODE, $this->paymentMethodCodes());
+    }
+
+    public function testWithTheCheckoutZoneOffTheOnePageCheckoutListsNoWallet(): void
+    {
+        $this->aGuestReadyToPay();
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::OnePage->value);
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, '');
+
+        self::assertCount(0, $this->walletCardsOn('/checkout/cart'));
+    }
+
+    public function testWithTheCheckoutZoneOnThePaymentStepListsTheWalletInBothModes(): void
+    {
+        $this->aGuestReadyToPay();
+
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::Steps->value);
+        self::assertCount(1, $this->walletCardsOn('/checkout/payment'));
+
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::OnePage->value);
+        self::assertCount(1, $this->walletCardsOn('/checkout/cart'));
+    }
+
+    /**
+     * A cart that carried the wallet when the merchant turned the zone off gets the order
+     * button back, not a slot no wallet button will ever fill: the buyer is told to choose
+     * another payment method.
+     */
+    public function testACartThatChoseTheWalletBeforeTheCheckoutZoneWasTurnedOffGetsTheOrderButtonBack(): void
+    {
+        ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::Steps->value);
+        $cart = $this->aGuestReadyToPay();
+        CartQuery::create()->findPk($cart->getId())?->setPaymentModuleId($this->walletModuleId)->save($this->getPropelConnection());
+
+        self::assertCount(1, $this->expressPaymentSlotsOn('/checkout/payment'), 'With the zone on, the wallet takes the place of the order button.');
+
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, '');
+
+        self::assertCount(0, $this->expressPaymentSlotsOn('/checkout/payment'));
+    }
+
+    /**
+     * Turning the zone off also closes the door to a page opened before: the token it
+     * carries buys nothing.
+     */
+    public function testATokenIssuedBeforeTheCheckoutZoneWasTurnedOffBuysNothing(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+        $token = $this->tokenFor($cart);
+        $ordersBefore = OrderQuery::create()->count();
+
+        ConfigQuery::write(ExpressPaymentButtonCollector::ZONES_CONFIG_NAME, '');
+        $this->confirm($token);
+
+        self::assertGreaterThanOrEqual(400, $this->client->getResponse()->getStatusCode(), (string) $this->client->getResponse()->getContent());
+        self::assertSame($ordersBefore, OrderQuery::create()->count());
     }
 
     /**
@@ -469,6 +547,8 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
     }
 
     /**
+     * The payment methods a buyer can choose: the theme drops those the shop judged invalid.
+     *
      * @return list<string>
      */
     private function paymentMethodCodes(): array
@@ -477,7 +557,33 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
 
         self::assertSame(200, $this->client->getResponse()->getStatusCode(), (string) $this->client->getResponse()->getContent());
 
-        return array_column(json_decode((string) $this->client->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR), 'code');
+        $modules = json_decode((string) $this->client->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        return array_column(array_filter($modules, static fn (array $module): bool => true === ($module['valid'] ?? null)), 'code');
+    }
+
+    private function expressPaymentSlotsOn(string $path): Crawler
+    {
+        $this->forgetHydratedModels();
+        $crawler = $this->client->request('GET', $path);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode(), 'The page must be served with a 200, or looking for the slot proves nothing.');
+
+        return $crawler->filter('[data-express-payment-slot]');
+    }
+
+    /**
+     * The payment cards of the wallet on a page of the checkout.
+     */
+    private function walletCardsOn(string $path): Crawler
+    {
+        $this->forgetHydratedModels();
+        $crawler = $this->client->request('GET', $path);
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode(), 'The page must be served with a 200, or counting its cards proves nothing.');
+        self::assertGreaterThan(0, $crawler->filter('[data-live-module-id-param]')->count(), 'The page shows no payment card at all.');
+
+        return $crawler->filter(\sprintf('[data-live-module-id-param="%d"]', $this->walletModuleId));
     }
 
     private function amount(string $token): void
