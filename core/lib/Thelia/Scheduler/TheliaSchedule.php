@@ -61,6 +61,8 @@ final readonly class TheliaSchedule implements ScheduleProviderInterface
         private string $failedJobsPurge,
         #[Autowire(env: 'THELIA_SCHEDULE_CURRENCY_RATES')]
         private string $currencyRates,
+        #[Autowire(env: 'THELIA_SCHEDULE_CONTENT_PUBLICATION')]
+        private string $contentPublication,
     ) {
     }
 
@@ -90,6 +92,7 @@ final readonly class TheliaSchedule implements ScheduleProviderInterface
             [$this->maintenancePurge, 'maintenance:purge'],
             [$this->failedJobsPurge, 'thelia:messenger:purge-failed'],
             [$this->currencyRates, 'currency:update-rates'],
+            [$this->contentPublication, 'content:publish-scheduled'],
         ];
     }
 }
