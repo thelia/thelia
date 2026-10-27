@@ -16,6 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\ProductSaleElementsProductVideo;
 use Thelia\Api\Resource\ProductVideo;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
@@ -61,7 +62,7 @@ final readonly class ProductVideoVisibilityExtension implements QueryCollectionE
 
     private function scopeToWhatTheShopShows(ModelCriteria $query, string $resourceClass, ?Operation $operation): void
     {
-        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+        if (!FrontOperation::isFront($operation)) {
             return;
         }
 

@@ -16,6 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\OrderReturnReason;
 use Thelia\Model\OrderReturnReasonQuery;
 
@@ -51,7 +52,7 @@ final readonly class OrderReturnReasonVisibilityExtension implements QueryCollec
             return;
         }
 
-        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+        if (!FrontOperation::isFront($operation)) {
             return;
         }
 

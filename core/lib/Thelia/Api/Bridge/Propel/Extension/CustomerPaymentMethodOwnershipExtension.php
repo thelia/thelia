@@ -20,6 +20,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\CustomerPaymentMethod;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer;
@@ -76,7 +77,7 @@ final readonly class CustomerPaymentMethodOwnershipExtension implements QueryCol
             return;
         }
 
-        if (!$operation instanceof HttpOperation || !str_starts_with((string) $operation->getUriTemplate(), '/front/')) {
+        if (!$operation instanceof HttpOperation || !FrontOperation::isFront($operation)) {
             return;
         }
 

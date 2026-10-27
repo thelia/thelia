@@ -16,6 +16,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
@@ -67,7 +68,7 @@ final readonly class ProductAssociationVisibilityExtension implements QueryColle
 
     private function scopeToWhatTheShopOffers(ModelCriteria $query, string $resourceClass, ?Operation $operation): void
     {
-        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+        if (!FrontOperation::isFront($operation)) {
             return;
         }
 

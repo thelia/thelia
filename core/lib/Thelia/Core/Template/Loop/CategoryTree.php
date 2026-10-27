@@ -21,7 +21,9 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
@@ -44,6 +46,11 @@ use Thelia\Type\TypeCollection;
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+    ) {
+    }
+
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
@@ -80,6 +87,12 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        // A category closed to the customer's group is left out with its sub-tree, which
+        // is closed with it; the back office walks them all.
+        if (!$this->getBackendContext()) {
+            $this->categoryVisibility->applyTo($search, CategoryTableMap::COL_ID);
         }
 
         $orders = $this->getOrder();
@@ -123,7 +136,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             ];
 
             if ($needCountChild) {
-                $row['CHILD_COUNT'] = $result->countChild();
+                $row['CHILD_COUNT'] = $this->getBackendContext() ? $result->countChild() : $this->categoryVisibility->countOpenChildren((int) $result->getId());
             }
 
             $resultsList[] = $row;
