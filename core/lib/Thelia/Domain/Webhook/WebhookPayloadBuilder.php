@@ -45,6 +45,18 @@ final readonly class WebhookPayloadBuilder
     }
 
     /**
+     * The identifier of a delivery: a random UUID v4, kept when the delivery is replayed.
+     */
+    public function deliveryUuid(): string
+    {
+        $bytes = random_bytes(16);
+        $bytes[6] = \chr(\ord($bytes[6]) & 0x0F | 0x40);
+        $bytes[8] = \chr(\ord($bytes[8]) & 0x3F | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+
+    /**
      * @param array<string, mixed> $data
      */
     public function envelope(string $eventName, string $deliveryUuid, array $data, \DateTimeImmutable $at): string
